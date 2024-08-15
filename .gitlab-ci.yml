@@ -1,0 +1,25 @@
+test-ulsdk:
+    image: gitlab.y.urbanlogiq.com:4567/urbanlogiq/ul/code-build:latest-bullseye-13
+    rules:
+        - if: $CI_COMMIT_BRANCH != "prod"
+          changes:
+            - "Cargo.lock"
+            - "ulsdk/**/*"
+    stage: test
+    variables:
+        DEBIAN_FRONTEND: "noninteractive"
+    script:
+        - cd ulsdk
+        - apt-get update && apt-get install -y libcurl4-openssl-dev libsodium-dev
+        - apt install -y -V ca-certificates lsb-release wget
+        - wget https://apache.jfrog.io/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
+        - apt install -y -V ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
+        - apt update
+        - apt install -y -V libarrow-dev
+        # build+test Rust SDK
+        - cargo test
+        # build+test C++ sdk
+        - cmake -B target -S .
+        - cmake --build target --parallel
+        - cmake --install target
+        - target/testulsdk

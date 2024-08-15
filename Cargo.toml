@@ -1,0 +1,22 @@
+[workspace]
+resolver = "2"
+members = [
+    "rust/ulsdk",
+]
+
+[workspace.dependencies]
+async-trait = "0.1.42"
+base64 = "0.13"
+bytes = "1.6.1"
+dirs = "3.0"
+ed25519-dalek = { version = "2.1", features = ["zeroize"] }
+hex = "0.4"
+reqwest = { version = "0.12", default-features = false, features = ["gzip", "zstd", "brotli", "rustls-tls", "blocking", "json", "multipart", "hickory-dns", "http2"] }
+serde = { version = "1", features = ["derive"] }
+serde_derive = "1"
+serde_ini = "0.2"
+serde_json = { version = "1.0", features = ["preserve_order"] }
+sha2 = "0.10"
+tokio = { version = "1.32", features = ["full"] }
+url = "2.2"
+uuid = { version = "1", features=["v4", "serde"] }
