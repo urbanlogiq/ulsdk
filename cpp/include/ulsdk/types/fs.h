@@ -71,6 +71,9 @@ struct File {
     File(const std::vector<uint8_t> &bytes);
 };
 
+///
+/// This Directory table holds the entries in the actual directory
+///
 struct Directory {
     std::optional<std::vector<B2cId>> notifications_;
     std::vector<Slot> slots_;
@@ -186,6 +189,9 @@ struct MoveRequest {
     MoveRequest(const std::vector<uint8_t> &bytes);
 };
 
+///
+/// Body parameter for PUT drive/<object>
+///
 struct NewLink {
     std::string name_;
     ObjectId obj_;

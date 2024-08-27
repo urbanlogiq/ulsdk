@@ -25,10 +25,10 @@ class Region(Enum):
 
 
 class Key(NamedTuple):
-    _user_id: UUID
-    _region: Region
-    _access_key: str
-    _secret_key: str
+    user_id: UUID
+    region: Region
+    access_key: str
+    secret_key: str
 
 
 def _load_keys() -> ConfigParser:

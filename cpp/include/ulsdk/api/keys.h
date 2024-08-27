@@ -66,7 +66,7 @@ to_bytes(const UpdateKey &o);
 
 /**
  * Retrieves a listing of the API keys associated with the current user.
- * @return 
+ * @return A list of all the API keys currently associated with the current user
  */
 Result<GetKeys>
 get_keys(
@@ -75,7 +75,7 @@ get_keys(
 
 /**
  * Creates a new API key for the current user.
- * @return 
+ * @return The details of the created key, including the secret key. This secret key cannot be retrieved again, if it is lost a new key must be created.
  */
 Result<CreateKey>
 create_key(
@@ -84,8 +84,8 @@ create_key(
 
 /**
  * Updates an API key by id.
- * @param id 
- * @param update_key 
+ * @param id The ID of the key to update.
+ * @param update_key The details with which to update the key.
  */
 Result<Void>
 update_key(
@@ -96,8 +96,8 @@ update_key(
 
 /**
  * Retrieves an API key by id.
- * @param id 
- * @return 
+ * @param id The ID of the key to retrieve.
+ * @return The key details. Note that the secret key is not stored and cannot be retrieved with this API.
  */
 Result<Key>
 get_key(
@@ -107,7 +107,7 @@ get_key(
 
 /**
  * Deletes an API key by id.
- * @param id 
+ * @param id The ID of the key to delete
  */
 Result<Void>
 delete_key(

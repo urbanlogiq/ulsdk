@@ -8,6 +8,8 @@
 #include <vector>
 #include <memory>
 
+#include <curl/curl.h>
+
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -111,7 +113,6 @@ using Result = std::variant<R, Error>;
 
 struct Void {};
 
-int init();
 std::string hex(size_t len, const uint8_t* bytes);
 std::string to_string(const Region& r);
 
@@ -122,5 +123,10 @@ to_arrow(const std::vector<uint8_t>& input);
 
 std::vector<uint8_t>
 to_bytes(const std::vector<std::shared_ptr<arrow::RecordBatch>>& input);
+
+std::string
+url_encode(const std::string& input);
+
+int init();
 
 }  // namespace ul

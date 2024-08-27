@@ -105,6 +105,8 @@ template<> struct ParameterValueTraits<ValueInstance> {
 bool VerifyParameterValue(::flatbuffers::Verifier &verifier, const void *obj, ParameterValue type);
 bool VerifyParameterValueVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<ParameterValue> *types);
 
+/// In the aggregate data, there are two relevant keys relevant to the user,
+/// sum and average. This stores which to show in the chart
 enum class AggregationTy : uint32_t {
   Invalid = 0,
   Sum = 1,
@@ -138,6 +140,7 @@ inline const char *EnumNameAggregationTy(AggregationTy e) {
   return EnumNamesAggregationTy()[index];
 }
 
+/// The type of chart to use to display the data
 enum class ChartTypeTy : uint32_t {
   Invalid = 0,
   Bar = 1,
@@ -189,6 +192,7 @@ inline const char *EnumNameChartTypeTy(ChartTypeTy e) {
   return EnumNamesChartTypeTy()[index];
 }
 
+/// Whether do display raw numbers or percentages
 enum class ValuesFormatTy : uint32_t {
   Invalid = 0,
   RawNumber = 1,
@@ -451,21 +455,39 @@ struct WorkLog FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_USER_SETTINGS = 18,
     VT_JOB_ID = 20
   };
+  /// A human-readable tag.
   const ::flatbuffers::String *name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_NAME);
   }
+  /// Input streams and/or worklogs. These may be either work logs or streams.
   const ::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>> *input_streams() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>> *>(VT_INPUT_STREAMS);
   }
+  /// The schematic used behind creating the worklog. This may be empty/null
+  /// if we are just layering data, for example.
   const ObjectId *schematic() const {
     return GetPointer<const ObjectId *>(VT_SCHEMATIC);
   }
+  /// The output_streams contain a list of Parquet documents that consist of
+  /// the results. These documents may expire (ie: if this is a temporary
+  /// step) so there should be enough information in the worklog necessary
+  /// to reconstruct these output streams.
   const ::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>> *output_streams() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>> *>(VT_OUTPUT_STREAMS);
   }
+  /// These are the serialized parameters passed into the task which created
+  /// this worklog.
   const ::flatbuffers::Vector<::flatbuffers::Offset<WorklogParameter>> *params() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<WorklogParameter>> *>(VT_PARAMS);
   }
+  /// Worklogs can contain multiple "levels". Consider the case where the user
+  /// submits a request for multiple ADT reports. We will create separate ADT
+  /// reports as required but also one that ties them all together. There are a
+  /// couple reasons for this; the primary is that the output of a schematic
+  /// node is allocated before the job is run and before it knows how many
+  /// worklogs will be generated. Another is that it makes it it easy (or
+  /// easier) to organize because we can sort based on "stuff the user requested",
+  /// instead of just "stuff the system generated".
   const ObjectId *parent() const {
     return GetPointer<const ObjectId *>(VT_PARENT);
   }
@@ -736,15 +758,19 @@ struct Layout FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_X = 8,
     VT_Y = 10
   };
+  /// The height of the chart tile in react-grid-layout grid units
   uint32_t height() const {
     return GetField<uint32_t>(VT_HEIGHT, 0);
   }
+  /// The width in react-grid-layout grid units
   uint32_t width() const {
     return GetField<uint32_t>(VT_WIDTH, 0);
   }
+  /// The x position in react-grid-layout grid units
   uint32_t x() const {
     return GetField<uint32_t>(VT_X, 0);
   }
+  /// The y position in react-grid-layout grid units
   uint32_t y() const {
     return GetField<uint32_t>(VT_Y, 0);
   }
@@ -823,42 +849,60 @@ struct TileSettings FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_TEXT_TILE_FONT_SIZE = 28,
     VT_RECORD_COUNT_STREAM_ID = 30
   };
+  /// The column of tbe aggregation dataset to use
   AggregationTy aggregation() const {
     return static_cast<AggregationTy>(GetField<uint32_t>(VT_AGGREGATION, 0));
   }
+  /// The category
   uint32_t category() const {
     return GetField<uint32_t>(VT_CATEGORY, 0);
   }
+  /// What chart type to display the data as
   ChartTypeTy chart_type() const {
     return static_cast<ChartTypeTy>(GetField<uint32_t>(VT_CHART_TYPE, 0));
   }
+  /// The field name from the metadata and dataset. Note that if it is a
+  /// relationshipField, it will use the displayName instead
   const ::flatbuffers::String *field_name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_FIELD_NAME);
   }
+  /// Whether to group the other fields under "Other" if not showing all columns
   bool group_others() const {
     return GetField<uint8_t>(VT_GROUP_OTHERS, 0) != 0;
   }
+  /// Whether it is a relationship field (or a non-associated field)
   bool is_relationship_field() const {
     return GetField<uint8_t>(VT_IS_RELATIONSHIP_FIELD, 0) != 0;
   }
+  /// The metadata id for the field shown
   const ObjectId *metadata_id() const {
     return GetPointer<const ObjectId *>(VT_METADATA_ID);
   }
+  /// Which output stream the report belongs to
   uint32_t output_stream_index() const {
     return GetField<uint32_t>(VT_OUTPUT_STREAM_INDEX, 0);
   }
+  /// Which columns the user has selected to show. If this is a relationship field, the user
+  /// can select which of the relationship fields to show. If it is nonassociated field, it's
+  /// possible that they only want to show certain ranges, which would be stored here, but
+  /// that isn't currently supported
   const ::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>> *selected_columns() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>> *>(VT_SELECTED_COLUMNS);
   }
+  /// The title of the tile
   const ::flatbuffers::String *title() const {
     return GetPointer<const ::flatbuffers::String *>(VT_TITLE);
   }
+  /// Percentage or RawNumber
   ValuesFormatTy values_format() const {
     return static_cast<ValuesFormatTy>(GetField<uint32_t>(VT_VALUES_FORMAT, 0));
   }
+  /// Record-count tiles report on the total number of graph nodes for the stream in the area, rather than
+  /// on any specific field in that stream.
   bool is_record_count_tile() const {
     return GetField<uint8_t>(VT_IS_RECORD_COUNT_TILE, 0) != 0;
   }
+  /// Font size for text tiles
   uint32_t text_tile_font_size() const {
     return GetField<uint32_t>(VT_TEXT_TILE_FONT_SIZE, 0);
   }

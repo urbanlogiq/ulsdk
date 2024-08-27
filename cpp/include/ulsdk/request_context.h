@@ -48,7 +48,7 @@ struct RequestContext {
     virtual Result<std::vector<uint8_t>>
     upload(const std::string& path, const std::vector<File>& files) const = 0;
 
-    virtual Result<Void>
+    virtual Result<std::vector<uint8_t>>
     del(const std::string& path,
         const std::map<std::string, std::string>& params,
         const std::map<std::string, std::string>& headers) const = 0;

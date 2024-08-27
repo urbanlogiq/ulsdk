@@ -53,7 +53,7 @@ get_acl(
 /**
  * Fetch the head revision of the object with the given ID
  * @param id The ID of the object to fetch the head revision for
- * @return 
+ * @return The summary for the head revision of the object
  */
 Result<::ul::types::ObjectSummary>
 get_head_revision(
@@ -145,7 +145,7 @@ create_object(
  * INTERNAL
  * @param columns Comma separated list of columns to aggregate
  * @param query INTERNAL
- * @return 
+ * @return INTERNAL
  */
 Result<std::vector<std::shared_ptr<::arrow::RecordBatch>>>
 query_aggregate_numeric(
@@ -158,7 +158,7 @@ query_aggregate_numeric(
  * INTERNAL
  * @param columns Comma separated list of columns to aggregate
  * @param query INTERNAL
- * @return 
+ * @return INTERNAL
  */
 Result<std::vector<std::shared_ptr<::arrow::RecordBatch>>>
 query_aggregate_string(
@@ -172,7 +172,7 @@ query_aggregate_string(
  * @param buckets Number of buckets
  * @param columns Comma separated list of columns to aggregate
  * @param query INTERNAL
- * @return 
+ * @return INTERNAL
  */
 Result<std::vector<std::shared_ptr<::arrow::RecordBatch>>>
 query_aggregate_histo(
@@ -188,7 +188,7 @@ query_aggregate_histo(
  * @param numerator_columns Comma separated list of columns to aggregate for the numerator value
  * @param denominator_columns Comma separated list of columns to aggregate for the denominator value
  * @param query INTERNAL
- * @return 
+ * @return INTERNAL
  */
 Result<std::vector<std::shared_ptr<::arrow::RecordBatch>>>
 query_aggregate_relative_histo(

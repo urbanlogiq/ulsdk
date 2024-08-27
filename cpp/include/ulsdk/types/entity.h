@@ -60,6 +60,10 @@ struct MultiLine {
     MultiLine(const std::vector<uint8_t> &bytes);
 };
 
+///
+/// Polygon is an array of arrays of points.
+/// The first array is exterior coords, following are any interior holes
+///
 struct Polygon {
     std::vector<Line> polygon_geo_;
 

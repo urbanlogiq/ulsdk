@@ -34,8 +34,11 @@ struct DirectionAndRoadNameBuilder;
 struct DirectionAndRoadNames;
 struct DirectionAndRoadNamesBuilder;
 
+/// If no flags are set, this indicates the associated NamedParameter is required.
 enum class NamedParameterFlags : uint32_t {
+  /// This variant indicates the parameter is a Value type (see the TaskParameter definition)
   Value = 1,
+  /// This variant indicates the parameter does not need to be specified
   Optional = 2,
   NONE = 0,
   ANY = 3

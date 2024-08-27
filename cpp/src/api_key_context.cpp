@@ -597,7 +597,7 @@ Result<std::vector<uint8_t>> ApiKeyContext::upload(
     return post(path, body, mime_type.str(), {}, {});
 }
 
-Result<Void> ApiKeyContext::del(
+Result<std::vector<uint8_t>> ApiKeyContext::del(
     const std::string& path,
     const std::map<std::string, std::string>& params_map,
     const std::map<std::string, std::string>& headers_map
@@ -605,12 +605,12 @@ Result<Void> ApiKeyContext::del(
     const Result<std::string> endpoint =
         get_endpoint(key_.region_, environment_, path);
     if (std::holds_alternative<Error>(endpoint)) {
-        return Result<Void>(std::get<Error>(endpoint));
+        return Result<std::vector<uint8_t>>(std::get<Error>(endpoint));
     }
 
     CurlHandle curl;
     if (!curl.ok()) {
-        return Result<Void>(Error("Failed to initialize curl"));
+        return Result<std::vector<uint8_t>>(Error("Failed to initialize curl"));
     }
 
     const auto params = std::vector<std::pair<std::string, std::string>>(
@@ -632,7 +632,7 @@ Result<Void> ApiKeyContext::del(
         std::vector<uint8_t>()
     );
     if (std::holds_alternative<Error>(auth_header_res)) {
-        return Result<Void>(std::get<Error>(auth_header_res));
+        return Result<std::vector<uint8_t>>(std::get<Error>(auth_header_res));
     }
 
     const std::string auth_header = std::get<std::string>(auth_header_res);
@@ -662,9 +662,9 @@ Result<Void> ApiKeyContext::del(
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
 
     if (curl_easy_perform(curl) != CURLE_OK) {
-        return Result<Void>(Error(curl.error_buffer()));
+        return Result<std::vector<uint8_t>>(Error(curl.error_buffer()));
     }
 
-    return Result<Void>({});
+    return Result<std::vector<uint8_t>>(response);
 }
 }  // namespace ul

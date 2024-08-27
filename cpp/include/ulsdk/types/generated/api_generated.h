@@ -13,6 +13,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
               FLATBUFFERS_VERSION_REVISION == 26,
              "Non-compatible flatbuffers version included");
 
+/// These constants are used to populate the `OrderByOp` struct's `order` field.
 enum class SortOrder : uint32_t {
   ASC = 0,
   DESC = 1,

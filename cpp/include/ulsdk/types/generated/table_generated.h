@@ -57,6 +57,7 @@ struct ChangeSetBuilder;
 struct History;
 struct HistoryBuilder;
 
+/// Table Ops are used to modify the contents of a table.
 enum class Op : uint8_t {
   NONE = 0,
   Set = 1,
@@ -167,6 +168,7 @@ template<> struct ChangeOpTraits<Restore> {
 bool VerifyChangeOp(::flatbuffers::Verifier &verifier, const void *obj, ChangeOp type);
 bool VerifyChangeOpVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<ChangeOp> *types);
 
+/// The Set operation is used to set the value of a cell in a table.
 struct Set FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SetBuilder Builder;
   struct Traits;
@@ -175,12 +177,15 @@ struct Set FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_COL = 6,
     VT_VALUE = 8
   };
+  /// The value of the ul_node_id column, which uniquely identifies the row.
   const GenericId *row() const {
     return GetPointer<const GenericId *>(VT_ROW);
   }
+  /// Name of the column to set.
   const ::flatbuffers::String *col() const {
     return GetPointer<const ::flatbuffers::String *>(VT_COL);
   }
+  /// The value to set.
   const ValueInstance *value() const {
     return GetPointer<const ValueInstance *>(VT_VALUE);
   }
@@ -253,12 +258,14 @@ inline ::flatbuffers::Offset<Set> CreateSetDirect(
       value);
 }
 
+/// The RmRow operation is used to remove a row from a table.
 struct RmRow FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef RmRowBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ROW = 4
   };
+  /// The value of the ul_node_id column, which uniquely identifies the row.
   const GenericId *row() const {
     return GetPointer<const GenericId *>(VT_ROW);
   }
@@ -302,12 +309,16 @@ struct RmRow::Traits {
   static auto constexpr Create = CreateRmRow;
 };
 
+/// The RestoreRow operation restore a deleted row in the table
+/// "Restore" is implemented by setting the value of the `ul_keep` system column to true.
+/// This means that formerly "removed" rows are no longer treated as "removed" and will then be returned by queries.
 struct RestoreRow FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef RestoreRowBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ROW = 4
   };
+  /// The value of the ul_node_id column, which uniquely identifies the row.
   const GenericId *row() const {
     return GetPointer<const GenericId *>(VT_ROW);
   }
@@ -432,6 +443,8 @@ struct OpEntry::Traits {
   static auto constexpr Create = CreateOpEntry;
 };
 
+/// A DiffStream encodes a sequence of operations that should be performed on a table.
+/// The operations are applied in order to the table, i.e. the ordering of the `seq` field is significant.
 struct DiffStream FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef DiffStreamBuilder Builder;
   struct Traits;
@@ -440,12 +453,16 @@ struct DiffStream FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_SEQ = 6,
     VT_ATTRIBUTES = 8
   };
+  /// This is the head revision of the directory object that contains the table.
   const ContentId *base() const {
     return GetPointer<const ContentId *>(VT_BASE);
   }
   const ::flatbuffers::Vector<::flatbuffers::Offset<OpEntry>> *seq() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<OpEntry>> *>(VT_SEQ);
   }
+  /// We can optionally associate attributes with the diffstream.
+  /// When the change history of the table is retrieved, the attributes from the diffstream
+  /// will be accessible as the `attributes` field on the ChangeSet associated with this diffstream.
   const ::flatbuffers::Vector<::flatbuffers::Offset<Attr>> *attributes() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Attr>> *>(VT_ATTRIBUTES);
   }
@@ -520,6 +537,7 @@ inline ::flatbuffers::Offset<DiffStream> CreateDiffStreamDirect(
       attributes__);
 }
 
+/// Body parameter for POST datacatalog/table/<objectId>
 struct NewTable FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef NewTableBuilder Builder;
   struct Traits;
@@ -534,6 +552,7 @@ struct NewTable FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ObjectId *parent() const {
     return GetPointer<const ObjectId *>(VT_PARENT);
   }
+  /// If specified, creates a new table using this as the object ID.
   const ObjectId *target() const {
     return GetPointer<const ObjectId *>(VT_TARGET);
   }

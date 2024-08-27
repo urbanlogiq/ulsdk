@@ -111,6 +111,13 @@ inline const char *EnumNameAxisType(AxisType e) {
   return EnumNamesAxisType()[index];
 }
 
+/// A Stream is an instance of a source. The main difference is the parameters
+/// field is not a ParameterDesc descriptor object but the actual, serialized
+/// parameter values.
+///
+/// Code performing the operation on the source will be able to construct a
+/// stream object from this description and downstream code will be able to
+/// read from it.
 struct Stream FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef StreamBuilder Builder;
   struct Traits;
@@ -122,8 +129,6 @@ struct Stream FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_METADATA = 12,
     VT_METADATA_REVISION = 14,
     VT_FLAGS = 16,
-    VT_BUCKET_WIDTH = 18,
-    VT_AXES = 20,
     VT_SUBSTREAMS = 22
   };
   const ::flatbuffers::String *url() const {
@@ -157,12 +162,6 @@ struct Stream FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   uint32_t flags() const {
     return GetField<uint32_t>(VT_FLAGS, 0);
   }
-  int64_t bucket_width() const {
-    return GetField<int64_t>(VT_BUCKET_WIDTH, 0);
-  }
-  const ::flatbuffers::Vector<AxisType> *axes() const {
-    return GetPointer<const ::flatbuffers::Vector<AxisType> *>(VT_AXES);
-  }
   const ::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>> *substreams() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>> *>(VT_SUBSTREAMS);
   }
@@ -183,9 +182,6 @@ struct Stream FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_METADATA_REVISION) &&
            verifier.VerifyTable(metadata_revision()) &&
            VerifyField<uint32_t>(verifier, VT_FLAGS, 4) &&
-           VerifyField<int64_t>(verifier, VT_BUCKET_WIDTH, 8) &&
-           VerifyOffset(verifier, VT_AXES) &&
-           verifier.VerifyVector(axes()) &&
            VerifyOffset(verifier, VT_SUBSTREAMS) &&
            verifier.VerifyVector(substreams()) &&
            verifier.VerifyVectorOfTables(substreams()) &&
@@ -218,12 +214,6 @@ struct StreamBuilder {
   void add_flags(uint32_t flags) {
     fbb_.AddElement<uint32_t>(Stream::VT_FLAGS, flags, 0);
   }
-  void add_bucket_width(int64_t bucket_width) {
-    fbb_.AddElement<int64_t>(Stream::VT_BUCKET_WIDTH, bucket_width, 0);
-  }
-  void add_axes(::flatbuffers::Offset<::flatbuffers::Vector<AxisType>> axes) {
-    fbb_.AddOffset(Stream::VT_AXES, axes);
-  }
   void add_substreams(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>>> substreams) {
     fbb_.AddOffset(Stream::VT_SUBSTREAMS, substreams);
   }
@@ -249,13 +239,9 @@ inline ::flatbuffers::Offset<Stream> CreateStream(
     ::flatbuffers::Offset<ObjectId> metadata = 0,
     ::flatbuffers::Offset<ContentId> metadata_revision = 0,
     uint32_t flags = 0,
-    int64_t bucket_width = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<AxisType>> axes = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>>> substreams = 0) {
   StreamBuilder builder_(_fbb);
-  builder_.add_bucket_width(bucket_width);
   builder_.add_substreams(substreams);
-  builder_.add_axes(axes);
   builder_.add_flags(flags);
   builder_.add_metadata_revision(metadata_revision);
   builder_.add_metadata(metadata);
@@ -280,13 +266,10 @@ inline ::flatbuffers::Offset<Stream> CreateStreamDirect(
     ::flatbuffers::Offset<ObjectId> metadata = 0,
     ::flatbuffers::Offset<ContentId> metadata_revision = 0,
     uint32_t flags = 0,
-    int64_t bucket_width = 0,
-    const std::vector<AxisType> *axes = nullptr,
     const std::vector<::flatbuffers::Offset<ObjectId>> *substreams = nullptr) {
   auto url__ = url ? _fbb.CreateString(url) : 0;
   auto options__ = options ? _fbb.CreateVector<uint8_t>(*options) : 0;
   auto parameters__ = parameters ? _fbb.CreateVector<uint8_t>(*parameters) : 0;
-  auto axes__ = axes ? _fbb.CreateVector<AxisType>(*axes) : 0;
   auto substreams__ = substreams ? _fbb.CreateVector<::flatbuffers::Offset<ObjectId>>(*substreams) : 0;
   return CreateStream(
       _fbb,
@@ -297,8 +280,6 @@ inline ::flatbuffers::Offset<Stream> CreateStreamDirect(
       metadata,
       metadata_revision,
       flags,
-      bucket_width,
-      axes__,
       substreams__);
 }
 

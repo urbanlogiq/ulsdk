@@ -23,9 +23,16 @@ struct Stream;
 using ::AxisType;
 using ::FormatFlags;
 using ::StreamFlags;
+///
+/// A Stream is an instance of a source. The main difference is the parameters
+/// field is not a ParameterDesc descriptor object but the actual, serialized
+/// parameter values.
+///
+/// Code performing the operation on the source will be able to construct a
+/// stream object from this description and downstream code will be able to
+/// read from it.
+///
 struct Stream {
-    std::optional<std::vector<AxisType>> axes_;
-    int64_t bucket_width_;
     uint32_t flags_;
     std::optional<ObjectId> metadata_;
     std::optional<ContentId> metadata_revision_;

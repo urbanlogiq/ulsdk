@@ -37,7 +37,7 @@ struct AdUser {
     std::string id_;
     std::string user_principal_name_;
     std::vector<std::string> other_mails_;
-    std::string department_;
+    std::optional<std::string> department_;
     std::string created_date_time_;
 
     AdUser() = default;
@@ -129,7 +129,7 @@ struct AdUserWithAuditLog {
     std::string id_;
     std::string user_principal_name_;
     std::vector<std::string> other_mails_;
-    std::string department_;
+    std::optional<std::string> department_;
     std::string created_date_time_;
     std::optional<AuditLog> audit_log_;
 
@@ -213,8 +213,8 @@ to_bytes(const GroupMembership &o);
 
 /**
  * Retrieves a single principal by id.
- * @param id 
- * @return 
+ * @param id The ID (uuid-style) of the principal to search for
+ * @return Details of the specified principal
  */
 Result<Principal>
 get_principal(
@@ -224,8 +224,8 @@ get_principal(
 
 /**
  * Retrieves a list of principals specified by a comma-separated list of ids.
- * @param ids 
- * @return 
+ * @param ids The comma separated list of IDs (uuid-style) of the principals to search for
+ * @return Details of all the specified principals
  */
 Result<std::vector<Principal>>
 get_principals(
@@ -235,16 +235,16 @@ get_principals(
 
 /**
  * Queries for principals. The query is performed as a substring match against the following fields:
-                For users:
-                - displayName
-                - id
-                - otherMails
-                For groups:
-                - displayName
-                - id
-                - description
- * @param query 
- * @return 
+For users:
+- displayName
+- id
+- otherMails
+For groups:
+- displayName
+- id
+- description
+ * @param query The query string to search for
+ * @return A list of all matching directory principals.
  */
 Result<std::vector<Principal>>
 query_principals(
@@ -254,7 +254,7 @@ query_principals(
 
 /**
  * Retrieves details of all users in the directory that are visible to the current user.
- * @return 
+ * @return Details of all specified users.
  */
 Result<std::vector<AdUser>>
 get_users(
@@ -263,7 +263,7 @@ get_users(
 
 /**
  * Retrieves the id and display name of every user in the directory.
- * @return 
+ * @return The list of users including their IDs and their display names
  */
 Result<std::vector<DisplayNames>>
 get_users_display_names(
@@ -273,7 +273,7 @@ get_users_display_names(
 /**
  * Retrieves details of the current user.
  * @param audit_log Whether to include the user's audit log in the response.
- * @return 
+ * @return The complete details of the specified user, including audit log if specified.
  */
 Result<AdUserWithAuditLog>
 get_current_user(
@@ -283,7 +283,7 @@ get_current_user(
 
 /**
  * Creates a new user in the directory.
- * @return 
+ * @return The details of the user along with their temporary, one-time-use password.
  */
 Result<CreateUser>
 create_user(
@@ -292,7 +292,7 @@ create_user(
 
 /**
  * Updates the current user.
- * @param update_user_request 
+ * @param update_user_request The details which which to update the current user
  */
 Result<Void>
 update_current_user(
@@ -302,9 +302,9 @@ update_current_user(
 
 /**
  * Retrieves details of a user by id.
- * @param id 
+ * @param id The ID of the user to retrieve details for
  * @param audit_log Whether to include the user's audit log in the response.
- * @return 
+ * @return The complete details of the specified user, including audit log if specified.
  */
 Result<AdUserWithAuditLog>
 get_user(
@@ -315,8 +315,8 @@ get_user(
 
 /**
  * Updates a user by id.
- * @param id 
- * @param update_user_request 
+ * @param id The ID of the user to update
+ * @param update_user_request The details which which to update the user
  */
 Result<Void>
 update_user(
@@ -327,7 +327,7 @@ update_user(
 
 /**
  * Deletes a user by id.
- * @param id 
+ * @param id The ID of the user to delete
  */
 Result<Void>
 delete_user(
@@ -337,7 +337,7 @@ delete_user(
 
 /**
  * Retrieves a listing of all groups in the directory.
- * @return 
+ * @return A list of all the groups from the directory for which the current user is allowed to see.
  */
 Result<std::vector<AdGroup>>
 get_groups(
@@ -346,8 +346,8 @@ get_groups(
 
 /**
  * Creates a new group in the directory.
- * @param create_group_request 
- * @return 
+ * @param create_group_request The group creation request details
+ * @return Details of the created group
  */
 Result<AdGroup>
 create_group(
@@ -357,8 +357,8 @@ create_group(
 
 /**
  * Retrieves a listing of all members of a group by group id.
- * @param id 
- * @return 
+ * @param id The ID of the group to retrieve members for
+ * @return The grouyp membership list.
  */
 Result<std::vector<GroupMembership>>
 get_group_members(
@@ -368,7 +368,7 @@ get_group_members(
 
 /**
  * Deletes a group by id.
- * @param id 
+ * @param id The ID of the group to delete
  */
 Result<Void>
 delete_group(
@@ -378,8 +378,8 @@ delete_group(
 
 /**
  * Adds a member to a group.
- * @param group 
- * @param member 
+ * @param group The ID of the group to which to add the member
+ * @param member The ID of the member to add
  */
 Result<Void>
 add_group_member(
@@ -390,8 +390,8 @@ add_group_member(
 
 /**
  * Removes a member from a group.
- * @param group 
- * @param member 
+ * @param group The ID of the group from which to remove the member
+ * @param member The ID of the member to remove
  */
 Result<Void>
 remove_group_member(

@@ -720,45 +720,65 @@ struct Task FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ObjectId *_id() const {
     return GetPointer<const ObjectId *>(VT__ID);
   }
+  /// User who created the job. This is the same as the user_id field in the
+  /// job structure but duplicated for convenience when looking up task related
+  /// information.
   const ObjectId *user_id() const {
     return GetPointer<const ObjectId *>(VT_USER_ID);
   }
+  /// Task object, either a source or a stream
   const ObjectId *task() const {
     return GetPointer<const ObjectId *>(VT_TASK);
   }
   const ::flatbuffers::String *name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_NAME);
   }
+  /// Associated Job ID
   const ObjectId *job_id() const {
     return GetPointer<const ObjectId *>(VT_JOB_ID);
   }
+  /// Task status
   Status status() const {
     return static_cast<Status>(GetField<int8_t>(VT_STATUS, 0));
   }
+  /// For errors, generic information.
   const ::flatbuffers::String *message() const {
     return GetPointer<const ::flatbuffers::String *>(VT_MESSAGE);
   }
+  /// Parameter indices taken from the RunSpec for this particular task step.
   const ParamIndices *params() const {
     return GetPointer<const ParamIndices *>(VT_PARAMS);
   }
+  /// The output of this step. If the task is computational (ie: not just a
+  /// data stream lookup) this is a blank object where the results will be
+  /// written. If it is a lookup of an existing stream, this will be populated
+  /// with the stream ID
   const ObjectId *output() const {
     return GetPointer<const ObjectId *>(VT_OUTPUT);
   }
+  /// If false, keep this object if it's a temporary/intermediate after job
+  /// creation. This must not be set if the output object above is a provided
+  /// stream.
   bool discard() const {
     return GetField<uint8_t>(VT_DISCARD, 0) != 0;
   }
+  /// The upstream nodes that enabled this task
   const ::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>> *upstream() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>> *>(VT_UPSTREAM);
   }
+  /// The downstream nodes to enable once this task is complete
   const ::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>> *downstream() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>> *>(VT_DOWNSTREAM);
   }
+  /// Task creation time, in ms-since-Unix-epoch UTC.
   uint64_t created() const {
     return GetField<uint64_t>(VT_CREATED, 0);
   }
+  /// Task start time, in ms-since-Unix-epoch UTC.
   uint64_t start() const {
     return GetField<uint64_t>(VT_START, 0);
   }
+  /// Task last poll time, in ms-since-Unix-epoch UTC.
   uint64_t last_updated() const {
     return GetField<uint64_t>(VT_LAST_UPDATED, 0);
   }
@@ -1094,15 +1114,19 @@ struct Job FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_PARAMS = 10,
     VT_ERROR_TYS = 12
   };
+  /// Is the job complete?
   Status status() const {
     return static_cast<Status>(GetField<int8_t>(VT_STATUS, 0));
   }
+  /// User ID who created this job.
   const ObjectId *user_id() const {
     return GetPointer<const ObjectId *>(VT_USER_ID);
   }
+  /// A list of all the tasks that constitute this job.
   const ::flatbuffers::Vector<::flatbuffers::Offset<Task>> *tasks() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Task>> *>(VT_TASKS);
   }
+  /// Parameters verbatim from the RunSpec
   const ::flatbuffers::Vector<::flatbuffers::Offset<TaskParameter>> *params() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<TaskParameter>> *>(VT_PARAMS);
   }
@@ -1199,6 +1223,13 @@ inline ::flatbuffers::Offset<Job> CreateJobDirect(
       error_tys__);
 }
 
+/// A RunSpec is the data required in order to kickstart a schematic job.
+/// It includes the ID of the schematic to run along with the parameters.
+/// The param_indices list must be *exactly* as long as the nodes list in
+/// the Schematic. Each entry in the param_indices list is itself a list
+/// that points to all the parameters in the params array. This lets
+/// us reuse the task parameters across nodes (ie: if we want a shared
+/// start_date / end_date to be used in a number of calculations)
 struct RunSpec FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef RunSpecBuilder Builder;
   struct Traits;

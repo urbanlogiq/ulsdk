@@ -96,10 +96,10 @@ def _generate_auth_header(
     request_hash = canonicalize_request(
         method, path, query, headers, signed_headers, body
     )
-    scope = f"{key._user_id}/{ts}/{key._region}/{REQUEST_TYPE}"
+    scope = f"{key.user_id}/{ts}/{key.region.str()}/{REQUEST_TYPE}"
 
     signing_string = SIGNATURE_V1 + "\n" + scope + "\n" + request_hash
-    signing_key = base64.b64decode(key._secret_key + "==")
+    signing_key = base64.b64decode(key.secret_key + "==")
     nacl_key = nacl.signing.SigningKey(
         signing_key[0:32], encoder=nacl.encoding.RawEncoder
     )
@@ -107,7 +107,7 @@ def _generate_auth_header(
 
     auth_header_value = "{} Credential={}/{}, SignedHeaders={}, Signature={}".format(
         SIGNATURE_V1,
-        key._access_key,
+        key.access_key,
         scope,
         ";".join(signed_headers),
         signature,
@@ -130,7 +130,7 @@ class ApiKeyContext(RequestContext):
         return self._environment
 
     def region(self):
-        return self._key._region
+        return self._key.region
 
     def get(
         self,
@@ -139,7 +139,7 @@ class ApiKeyContext(RequestContext):
         headers: Dict[str, str] = dict(),
         **kwargs,
     ) -> bytes:
-        endpoint = _get_endpoint(self._key._region, self._environment, path)
+        endpoint = _get_endpoint(self._key.region, self._environment, path)
         headers = _generate_auth_header(self._key, "GET", path, params, headers, None)
         kwargs["headers"] = headers
         kwargs["params"] = params
@@ -156,7 +156,7 @@ class ApiKeyContext(RequestContext):
         headers: Dict[str, str] = dict(),
         **kwargs,
     ) -> bytes:
-        endpoint = _get_endpoint(self._key._region, self._environment, path)
+        endpoint = _get_endpoint(self._key.region, self._environment, path)
         if mimetype is None:
             mimetype = (
                 "application/json" if type(body) is str else "application/octet-stream"
@@ -185,7 +185,7 @@ class ApiKeyContext(RequestContext):
         headers: Dict[str, str] = dict(),
         **kwargs,
     ) -> bytes:
-        endpoint = _get_endpoint(self._key._region, self._environment, path)
+        endpoint = _get_endpoint(self._key.region, self._environment, path)
         if mimetype is None:
             mimetype = (
                 "application/json" if type(body) is str else "application/octet-stream"
@@ -209,8 +209,8 @@ class ApiKeyContext(RequestContext):
         self,
         path: str,
         files: List[File],
-    ):
-        endpoint = _get_endpoint(self._key._region, self._environment, path)
+    ) -> bytes:
+        endpoint = _get_endpoint(self._key.region, self._environment, path)
         file_dict = {f._name: (f._name, f._data, f._mimetype) for f in files}
 
         headers = dict()
@@ -256,6 +256,7 @@ class ApiKeyContext(RequestContext):
 
         res = s.send(prepped)
         res.raise_for_status()
+        return res.content
 
     def delete(
         self,
@@ -263,8 +264,8 @@ class ApiKeyContext(RequestContext):
         params: Optional[Dict] = None,
         headers: Dict[str, str] = dict(),
         **kwargs,
-    ):
-        endpoint = _get_endpoint(self._key._region, self._environment, path)
+    ) -> bytes:
+        endpoint = _get_endpoint(self._key.region, self._environment, path)
         headers = _generate_auth_header(
             self._key, "DELETE", path, params, headers, None
         )
@@ -272,3 +273,4 @@ class ApiKeyContext(RequestContext):
         kwargs["params"] = params
         response = requests.delete(endpoint, **kwargs)
         response.raise_for_status()
+        return response.content

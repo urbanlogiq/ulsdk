@@ -112,6 +112,15 @@ struct ParamIndices {
     ParamIndices(const std::vector<uint8_t> &bytes);
 };
 
+///
+/// A RunSpec is the data required in order to kickstart a schematic job.
+/// It includes the ID of the schematic to run along with the parameters.
+/// The param_indices list must be *exactly* as long as the nodes list in
+/// the Schematic. Each entry in the param_indices list is itself a list
+/// that points to all the parameters in the params array. This lets
+/// us reuse the task parameters across nodes (ie: if we want a shared
+/// start_date / end_date to be used in a number of calculations)
+///
 struct RunSpec {
     bool notify_;
     std::vector<ParamIndices> param_indices_;

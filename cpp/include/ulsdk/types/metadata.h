@@ -191,6 +191,23 @@ struct DatacatalogGeometry {
     DatacatalogGeometry(const std::vector<uint8_t> &bytes);
 };
 
+///
+/// For most streams with GeometrySourceType==WorldGraphGeometry, edge_path will
+/// be empty and start_stream_id will be unset.
+///
+/// If edge_path is empty and start_stream_id is unset we just query for nodes
+/// whose stream predicate matches this stream's streamId in order to fetch the stream's geometry.
+///
+/// If edge_path is non-empty and start_stream_id is set: Start at nodes with
+/// streamId=start_stream_id and follow the edge_path. Retrieve geometry from
+/// the last node on that path.
+///
+/// If edge_path is non-empty and start_stream_id is unset: Start at nodes with
+/// streamId=id of this stream and follow the edge_path to retrieve the geeometry.
+///
+/// If edge_path is empty and start_stream_id is set: Just query for nodes with
+/// streamId == start_stream_id.
+///
 struct WorldGraphGeometry {
     std::vector<EdgeTy> edge_path_;
     std::optional<ObjectId> start_stream_id_;

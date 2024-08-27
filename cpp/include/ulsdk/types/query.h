@@ -198,6 +198,14 @@ struct Parameter {
     Parameter(const std::vector<uint8_t> &bytes);
 };
 
+///
+/// The Distinct function defined in fun.fbs is for use in cases like:
+/// SELECT COUNT(DISTINCT c0), SUM(c1) FROM t GROUP BY c2;
+/// The `distinct` field here on the query element is to be used to remove duplicate rows, like:
+/// SELECT DISTINCT * FROM t;
+/// or
+/// SELECT DISTINCT ON (c0, c1) FROM t;
+///
 struct Distinct {
     std::optional<std::vector<Expr>> on_;
 
@@ -351,6 +359,9 @@ struct ParameterizedQuery {
     ParameterizedQuery(const std::vector<uint8_t> &bytes);
 };
 
+///
+/// SetExprs represent the expressions used as part of an UPDATE-type operation
+///
 struct SetExpr {
     std::string col_;
     Expr expr_;

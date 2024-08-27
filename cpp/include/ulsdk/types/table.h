@@ -51,6 +51,9 @@ typedef std::variant<
     std::shared_ptr<Restore>
 > ChangeOp;
 
+///
+/// Table Ops are used to modify the contents of a table.
+///
 typedef std::variant<
     std::shared_ptr<Set>,
     std::shared_ptr<RmRow>,
@@ -84,6 +87,9 @@ struct Restore {
     Restore(const std::vector<uint8_t> &bytes);
 };
 
+///
+/// The Set operation is used to set the value of a cell in a table.
+///
 struct Set {
     std::string col_;
     GenericId row_;
@@ -94,6 +100,9 @@ struct Set {
     Set(const std::vector<uint8_t> &bytes);
 };
 
+///
+/// The RmRow operation is used to remove a row from a table.
+///
 struct RmRow {
     GenericId row_;
 
@@ -102,6 +111,11 @@ struct RmRow {
     RmRow(const std::vector<uint8_t> &bytes);
 };
 
+///
+/// The RestoreRow operation restore a deleted row in the table
+/// "Restore" is implemented by setting the value of the `ul_keep` system column to true.
+/// This means that formerly "removed" rows are no longer treated as "removed" and will then be returned by queries.
+///
 struct RestoreRow {
     GenericId row_;
 
@@ -130,6 +144,10 @@ struct ChangeSet {
     ChangeSet(const std::vector<uint8_t> &bytes);
 };
 
+///
+/// A DiffStream encodes a sequence of operations that should be performed on a table.
+/// The operations are applied in order to the table, i.e. the ordering of the `seq` field is significant.
+///
 struct DiffStream {
     std::optional<std::vector<Attr>> attributes_;
     ContentId base_;
@@ -149,6 +167,9 @@ struct History {
     History(const std::vector<uint8_t> &bytes);
 };
 
+///
+/// Body parameter for POST datacatalog/table/<objectId>
+///
 struct NewTable {
     std::string name_;
     std::optional<ObjectId> parent_;

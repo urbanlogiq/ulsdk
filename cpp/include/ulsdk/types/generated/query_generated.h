@@ -1762,9 +1762,12 @@ struct Vector FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const NullableUint *limit() const {
     return GetPointer<const NullableUint *>(VT_LIMIT);
   }
+  /// List of vectordbs to query. If this is empty, query all available vectordbs.
   const ::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>> *ids() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>> *>(VT_IDS);
   }
+  /// Optionally limit the results to those with a distance value less than
+  /// max_distance. We treat max_distance=0 as no limit.
   float max_distance() const {
     return GetField<float>(VT_MAX_DISTANCE, 0.0f);
   }
@@ -2023,6 +2026,13 @@ struct TableOrderBy FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const OrderBy *order_by() const {
     return GetPointer<const OrderBy *>(VT_ORDER_BY);
   }
+  /// Because the `source` field defaults to 0 when unset, use this field to
+  /// indicate whether the source should be used. In some cases, such as when
+  /// you want to order by an column produced by aggregating on the result of
+  /// a join, the column isn't associated with any table source.
+  ///
+  /// In that case, set `use_source` to false and the verbatim string provided
+  /// in the `field` field of the `OrderBy` structure will be used for the order-by.
   bool use_source() const {
     return GetField<uint8_t>(VT_USE_SOURCE, 1) != 0;
   }
@@ -2078,12 +2088,22 @@ struct TableOrderBy::Traits {
   static auto constexpr Create = CreateTableOrderBy;
 };
 
+/// The Distinct function defined in fun.fbs is for use in cases like:
+/// SELECT COUNT(DISTINCT c0), SUM(c1) FROM t GROUP BY c2;
+/// The `distinct` field here on the query element is to be used to remove duplicate rows, like:
+/// SELECT DISTINCT * FROM t;
+/// or
+/// SELECT DISTINCT ON (c0, c1) FROM t;
 struct Distinct FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef DistinctBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ON = 4
   };
+  /// If `on` is unset or has length 0, then the distinct is:
+  /// SELECT DISTINCT * FROM t;
+  /// If `on` has length > 0, then distinct is:
+  /// SELECT DISTINCT ON (c0, c1) FROM t;
   const ::flatbuffers::Vector<::flatbuffers::Offset<Expr>> *on() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Expr>> *>(VT_ON);
   }
@@ -2364,6 +2384,7 @@ struct BinaryQueryElement::Traits {
   static auto constexpr Create = CreateBinaryQueryElement;
 };
 
+/// SetExprs represent the expressions used as part of an UPDATE-type operation
 struct SetExpr FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SetExprBuilder Builder;
   struct Traits;
@@ -2371,9 +2392,14 @@ struct SetExpr FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_COL = 4,
     VT_EXPR = 6
   };
+  /// Because we cannot refer to multiple tables at once in a single UPDATE
+  /// operation we only need to name the column, we can just a string here
+  /// instead of a Column table.
   const ::flatbuffers::String *col() const {
     return GetPointer<const ::flatbuffers::String *>(VT_COL);
   }
+  /// This is the expression that is evaluted to produce the value that is
+  /// assigned to the column named in the `col` field.
   const Expr *expr() const {
     return GetPointer<const Expr *>(VT_EXPR);
   }

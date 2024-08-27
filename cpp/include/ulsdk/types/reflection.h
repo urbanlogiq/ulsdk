@@ -160,6 +160,11 @@ struct reflection::Schema {
     Schema(const std::vector<uint8_t> &bytes);
 };
 
+///
+/// File specific information.
+/// Symbols declared within a file may be recovered by iterating over all
+/// symbols and examining the `declaration_file` field.
+///
 struct reflection::SchemaFile {
     std::string filename_;
     std::optional<std::vector<std::string>> included_filenames_;

@@ -448,7 +448,7 @@ delete_key(
     std::map<std::string, std::string> params;
 
     std::map<std::string, std::string> headers;
-    const auto res = ctx.get(path, params, headers);
+    const auto res = ctx.del(path, params, headers);
     if (std::holds_alternative<Error>(res)) {
         const auto error = std::get<Error>(res);
         return Result<Void>(error);

@@ -86,6 +86,9 @@ struct Geom {
     Geom(const std::vector<uint8_t> &bytes);
 };
 
+///
+/// The GraphQuery encapsulates the entire world graph query.
+///
 struct GraphQuery {
     uint32_t limit_;
     std::optional<std::vector<OrderBy>> order_by_;

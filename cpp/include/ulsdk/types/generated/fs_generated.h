@@ -948,6 +948,7 @@ inline ::flatbuffers::Offset<Slot> CreateSlotDirect(
       attributes__);
 }
 
+/// This Directory table holds the entries in the actual directory
 struct Directory FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef DirectoryBuilder Builder;
   struct Traits;
@@ -1553,6 +1554,7 @@ inline ::flatbuffers::Offset<DirectoryList> CreateDirectoryListDirect(
       slots__);
 }
 
+/// Body parameter for PUT drive/<object>
 struct NewLink FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef NewLinkBuilder Builder;
   struct Traits;

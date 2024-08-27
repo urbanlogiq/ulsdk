@@ -147,6 +147,7 @@ struct CryptHeader FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_NONCE = 6,
     VT_PLAINTEXT_LEN = 8
   };
+  /// An ID for the key used to encrypt this particular encrypted object.
   const ::flatbuffers::String *kid() const {
     return GetPointer<const ::flatbuffers::String *>(VT_KID);
   }

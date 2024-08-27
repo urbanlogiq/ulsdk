@@ -552,6 +552,8 @@ struct NodeQuery FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::Vector<EntityTy> *entity_tys() const {
     return GetPointer<const ::flatbuffers::Vector<EntityTy> *>(VT_ENTITY_TYS);
   }
+  /// If descriptions are provided here, then results will be ordered by their string similarity to the
+  /// descriptions here. This ordering is secondary to the any top-level order_by that might be provided.
   const ::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>> *descriptions() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>> *>(VT_DESCRIPTIONS);
   }
@@ -821,6 +823,7 @@ inline ::flatbuffers::Offset<OrderBy> CreateOrderByDirect(
       transform);
 }
 
+/// The GraphQuery encapsulates the entire world graph query.
 struct GraphQuery FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef GraphQueryBuilder Builder;
   struct Traits;

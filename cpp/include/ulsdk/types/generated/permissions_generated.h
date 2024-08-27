@@ -22,9 +22,19 @@ struct AccessControlList;
 struct AccessControlListBuilder;
 
 enum class PermissionTy : uint32_t {
+  /// Permission to browse object metadata and content but not necessarily
+  /// stream the data, if it's a data stream. Note that this is for public
+  /// access to the data (ie: explore mode); implicit access to objects for
+  /// derived insights (ie: usecases) can still be granted if the user has
+  /// the BROWSE flag for an object.
   PERM_BROWSE = 1,
+  /// Permission to stream data from streams.
   PERM_READ = 2,
+  /// Permission to add to directories or data collections only, but not modify their contents
   PERM_APPEND = 4,
+  /// Permission to make changes to objects. The "admin role" is not expressly
+  /// modeled with its own permission type but rather is created by having all
+  /// PERM bits set on a permissions list object.
   PERM_MODIFY = 8,
   NONE = 0,
   ANY = 15
@@ -131,6 +141,12 @@ struct AccessControlList FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
   const ::flatbuffers::Vector<::flatbuffers::Offset<Role>> *roles() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Role>> *>(VT_ROLES);
   }
+  /// The "extends" allows us to chain together ACLs without needing to copy
+  /// the whole thing. For example, if want to grant Alice access to a file,
+  /// we would create a new ACL for that file that has Alice in the permissions
+  /// list but extends the parent directory's ACL to retain all the existing
+  /// permissions. This can also be used to selectively revoke access (by
+  /// adding an ACL entry with empty permissions) to an object.
   const ObjectId *extends() const {
     return GetPointer<const ObjectId *>(VT_EXTENDS);
   }

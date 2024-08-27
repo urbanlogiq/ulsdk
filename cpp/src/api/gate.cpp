@@ -34,7 +34,7 @@ AdUser::AdUser(const struct json_value_s *root)
     , id_(std::string())
     , user_principal_name_(std::string())
     , other_mails_()
-    , department_(std::string())
+    , department_(std::nullopt)
     , created_date_time_(std::string()) {
     if (root->type != json_type_object) {
         throw std::runtime_error("expected json value to be of type object");
@@ -97,12 +97,16 @@ AdUser::AdUser(const struct json_value_s *root)
         } else if (std::strcmp(e->name->string, "department") == 0) {
             const struct json_value_s *ad_user_value = e->value;
 
-            if (ad_user_value->type != json_type_string) {
-                throw std::runtime_error("expected field to be of type string");
+            if (ad_user_value->type == json_type_null) {
+                department_ = std::nullopt;
+            } else {
+                if (ad_user_value->type != json_type_string) {
+                    throw std::runtime_error("expected field to be of type string");
+                }
+                
+                const struct json_string_s *department__str = static_cast<const struct json_string_s *>(ad_user_value->payload);
+                department_ = std::string(department__str->string);
             }
-            
-            const struct json_string_s *department__str = static_cast<const struct json_string_s *>(ad_user_value->payload);
-            department_ = std::string(department__str->string);
         } else if (std::strcmp(e->name->string, "createdDateTime") == 0) {
             const struct json_value_s *ad_user_value = e->value;
 
@@ -140,9 +144,12 @@ to_bytes(const AdUser &o) {
     }
     ss << ",";
 
-    ss << "\"department\":";
-    ss << "\"" << o.department_ << "\"";
-    ss << ",";
+    if (o.department_.has_value()) {
+        ss << "\"department\":";
+        const auto &department__value = o.department_.value();
+        ss << "\"" << department__value << "\"";
+        ss << ",";
+    }
 
     ss << "\"createdDateTime\":";
     ss << "\"" << o.created_date_time_ << "\"";

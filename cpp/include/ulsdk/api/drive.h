@@ -19,13 +19,14 @@ namespace drive {
 
 /**
  * Retrieves a directory listing from a unix-style path rooted at `root`. `root` may be one of:
-                - `me` for the current user's drive
-                - `union` for the union of the current user's drive and all shared drives
-                - the UUID of any drive directory
+- `me` for the current user's drive
+- `union` for the union of the current user's drive and all shared drives
+- the UUID of any drive directory
+Paths may include wildcards like `*`.
                 
- * @param root 
- * @param tail 
- * @return 
+ * @param root The root directory to list files for, or one of "me" or "union".
+ * @param tail The unix-style path specifier to use for the file listing.
+ * @return The directory listing
  */
 Result<::ul::types::DirectoryList>
 ls(
@@ -36,12 +37,12 @@ ls(
 
 /**
  * Creates a new file or directory at a specified path rooted at `root`.
- * @param root 
- * @param tail 
+ * @param root The directory into which the new entry will be created
+ * @param tail The name of the new entry
  * @param ty The type of entry to create: `file` or `directory`.
  * @param mime The mime type of the entry to create, if this is a new file entry.
  * @param chunks Number of chunks to expect, if this is a new file entry.
- * @return 
+ * @return A summary of the object created
  */
 Result<::ul::types::ObjectSummary>
 create_entry(
@@ -55,7 +56,7 @@ create_entry(
 
 /**
  * Retrieves a list of the top-level drive root directories that the current user has access to.
- * @return 
+ * @return A listing of all the directory roots.
  */
 Result<::ul::types::DirectoryList>
 get_roots(
@@ -63,11 +64,11 @@ get_roots(
 );
 
 /**
- * Creates a new file in the specified directory with the specified content.
- * @param root 
+ * Creates a new file in the specified directory with the specified content. Please use the `put_file_chunk` endpoint to upload files larger than 1GB.
+ * @param root The directory into which the file will be uploaded
  * @param force Whether to overwrite the file if it already exists.
- * @param files 
- * @return 
+ * @param files The files to upload as part of a multipart upload
+ * @return An updated list of directory entries
  */
 Result<::ul::types::DirectoryList>
 post_file(
@@ -79,8 +80,8 @@ post_file(
 
 /**
  * Removes the specified drive entry from its parent directory.
- * @param entry 
- * @return 
+ * @param entry The ID of the entry to remove
+ * @return An updated list of directory entries
  */
 Result<::ul::types::DirectoryList>
 unlink(
@@ -90,7 +91,7 @@ unlink(
 
 /**
  * Moves a file or directory to a new location.
- * @param move_request 
+ * @param move_request Details of the move operation.
  */
 Result<Void>
 move(
@@ -99,8 +100,8 @@ move(
 );
 
 /**
- * Copies a file or directory to a new location.
- * @param copy_request 
+ * Copies a file or directory to a new location within the drive.
+ * @param copy_request Details of the copy operation.
  */
 Result<Void>
 copy(
@@ -110,8 +111,8 @@ copy(
 
 /**
  * Retrieves a file by id.
- * @param id 
- * @return 
+ * @param id The ID of the file to retrieve
+ * @return The contents of the file referenced by the specified ID
  */
 Result<std::vector<uint8_t>>
 get_file(
@@ -121,15 +122,15 @@ get_file(
 
 /**
  * Uploads a chunk of a file by file id and chunk index.
- * @param id 
- * @param idx 
+ * @param file_id The ID of the file to which to set a file chunk
+ * @param idx The index of the file chunk to set
  * @param hash The hash of the chunk to upload.
- * @param chunk 
+ * @param chunk Binary file chunk data
  */
 Result<Void>
 put_file_chunk(
     ul::RequestContext &ctx,
-    const std::string &id,
+    const std::string &file_id,
     int64_t idx,
     const std::string &hash,
     const std::vector<uint8_t> &chunk
@@ -137,8 +138,8 @@ put_file_chunk(
 
 /**
  * Retrieves the id of the drive root directory for the specified principal (user or group).
- * @param b_2cid 
- * @return 
+ * @param b_2cid The principal (user or group) ID to retrieve the drive root directory for.
+ * @return Drive directory root ID
  */
 Result<::ul::types::ObjectId>
 get_root_id(

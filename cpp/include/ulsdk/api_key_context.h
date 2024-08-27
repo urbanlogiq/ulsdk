@@ -46,7 +46,7 @@ public:
         const std::vector<File>& files
     ) const override;
 
-    Result<Void>
+    Result<std::vector<uint8_t>>
     del(const std::string& path,
         const std::map<std::string, std::string>& params,
         const std::map<std::string, std::string>& headers) const override;

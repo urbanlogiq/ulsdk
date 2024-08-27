@@ -134,8 +134,16 @@ enum class FieldFlags : uint32_t {
   Editable = 8,
   Nullable = 16,
   Aggregated = 32,
+  /// This flag indicates to the front end whether a field is required in order
+  /// to filter on the dataset. Some datasets may have an unreasonably large
+  /// number of results that require a filter in order to make it manageable/interpretable.
   RequiredForFilter = 64,
+  /// This flag indicates to the BE whether a field should be added to the area report
   DoNotIncludeInAreaReport = 128,
+  /// When aggregating this data, such as when building histograms for the area
+  /// report, aggregate this field into buckets with integer ranges. This allows
+  /// us to specify that certain float-type fields, which would normally be
+  /// aggregated into float ranges, should be aggregated into integer ranges instead.
   AggregateIntoIntegerBuckets = 256,
   Readonly = 512,
   NONE = 0,
@@ -183,6 +191,7 @@ enum class FieldUnit : uint32_t {
   U_SECONDS = 4,
   U_DOLLARS_CAD = 5,
   U_DOLLARS_USD = 6,
+  /// Degrees longitude / latitude
   U_DEGREES = 7,
   U_KPH = 8,
   U_MPH = 9,
@@ -3438,12 +3447,17 @@ struct DatasetSource FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_URL = 6,
     VT_DATE = 8
   };
+  /// The entity that created the data (Manifold, Government of Canada, Wejo, City
   const ::flatbuffers::String *source() const {
     return GetPointer<const ::flatbuffers::String *>(VT_SOURCE);
   }
+  /// A URL to where the data set can be fetched. Ideally a direct download but
   const ::flatbuffers::String *url() const {
     return GetPointer<const ::flatbuffers::String *>(VT_URL);
   }
+  /// Date information about the data source, such as the year it was generated.
+  /// This is a free-form text field that isn't interpreted in any means by the
+  /// system.
   const ::flatbuffers::String *date() const {
     return GetPointer<const ::flatbuffers::String *>(VT_DATE);
   }
@@ -3608,6 +3622,21 @@ inline ::flatbuffers::Offset<DatacatalogGeometry> CreateDatacatalogGeometryDirec
       column__);
 }
 
+/// For most streams with GeometrySourceType==WorldGraphGeometry, edge_path will
+/// be empty and start_stream_id will be unset.
+///
+/// If edge_path is empty and start_stream_id is unset we just query for nodes
+/// whose stream predicate matches this stream's streamId in order to fetch the stream's geometry.
+///
+/// If edge_path is non-empty and start_stream_id is set: Start at nodes with
+/// streamId=start_stream_id and follow the edge_path. Retrieve geometry from
+/// the last node on that path.
+///
+/// If edge_path is non-empty and start_stream_id is unset: Start at nodes with
+/// streamId=id of this stream and follow the edge_path to retrieve the geeometry.
+///
+/// If edge_path is empty and start_stream_id is set: Just query for nodes with
+/// streamId == start_stream_id.
 struct WorldGraphGeometry FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef WorldGraphGeometryBuilder Builder;
   struct Traits;
@@ -3615,9 +3644,11 @@ struct WorldGraphGeometry FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
     VT_EDGE_PATH = 4,
     VT_START_STREAM_ID = 6
   };
+  /// Edges to follow to reach the nodes with geometry.
   const ::flatbuffers::Vector<EdgeTy> *edge_path() const {
     return GetPointer<const ::flatbuffers::Vector<EdgeTy> *>(VT_EDGE_PATH);
   }
+  /// Stream id of the starting node in the query path for the geometry
   const ObjectId *start_stream_id() const {
     return GetPointer<const ObjectId *>(VT_START_STREAM_ID);
   }
@@ -3709,12 +3740,16 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::Vector<int32_t> *summary() const {
     return GetPointer<const ::flatbuffers::Vector<int32_t> *>(VT_SUMMARY);
   }
+  /// Organizational category for frontend. Defaults to DC_HIDDEN.
   DatasetCategory dataset_category() const {
     return static_cast<DatasetCategory>(GetField<uint32_t>(VT_DATASET_CATEGORY, 4294967295));
   }
+  /// Field groupings e.g. age ranges, ethnicities or hierarchical codes like zoning and NAICS
   const ::flatbuffers::Vector<::flatbuffers::Offset<UlFieldRelationship>> *field_relationships() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<UlFieldRelationship>> *>(VT_FIELD_RELATIONSHIPS);
   }
+  /// An optional field that is meant to provide information to the user on
+  /// where the data has come from
   const DatasetSource *source() const {
     return GetPointer<const DatasetSource *>(VT_SOURCE);
   }
@@ -3734,9 +3769,11 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const WorldGraphGeometry *geometry_source_as_WorldGraphGeometry() const {
     return geometry_source_type() == GeometrySource::WorldGraphGeometry ? static_cast<const WorldGraphGeometry *>(geometry_source()) : nullptr;
   }
+  /// is to be included in the boundary selection modal
   bool area_selection() const {
     return GetField<uint8_t>(VT_AREA_SELECTION, 0) != 0;
   }
+  /// do not use user's viewport bounding box when fetching this stream's geometry from worldgraph
   bool do_not_filter_geometry_by_viewport() const {
     return GetField<uint8_t>(VT_DO_NOT_FILTER_GEOMETRY_BY_VIEWPORT, 0) != 0;
   }

@@ -848,8 +848,11 @@ inline const char *EnumNameEntityTy(EntityTy e) {
 
 enum class NodeTy : int32_t {
   N_INVALID = 0,
+  /// Entities are world objects with (possible) links to other data sets
   N_ENTITY = 1,
+  /// Emitters link to (possibly) deep sources of data (such as loop data sets)
   N_EMITTER = 2,
+  /// Boundaries are geometry-only delineations of world-space (postal codes, neighbourhoods, cities, etc.)
   N_BOUNDARY = 3,
   MIN = N_INVALID,
   MAX = N_BOUNDARY
@@ -1196,6 +1199,8 @@ inline ::flatbuffers::Offset<MultiLine> CreateMultiLineDirect(
       multiline_geo__);
 }
 
+/// Polygon is an array of arrays of points.
+/// The first array is exterior coords, following are any interior holes
 struct Polygon FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef PolygonBuilder Builder;
   struct Traits;
@@ -1328,24 +1333,30 @@ struct GraphNode FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT__DESCRIPTION = 18,
     VT__UID = 20
   };
+  /// Entity type (ie: traffic loop, road, power line, building, business, demographic data, collision,  ...)
   EntityTy _entity_type() const {
     return static_cast<EntityTy>(GetField<int32_t>(VT__ENTITY_TYPE, 0));
   }
+  /// Node type, such as emitter vs. entity
   NodeTy _node_type() const {
     return static_cast<NodeTy>(GetField<int32_t>(VT__NODE_TYPE, 0));
   }
+  /// ID of the associated data source
   const ObjectId *_stream() const {
     return GetPointer<const ObjectId *>(VT__STREAM);
   }
+  /// Record id in the data source.
   const GenericId *_node_id() const {
     return GetPointer<const GenericId *>(VT__NODE_ID);
   }
+  /// lat/lng point in space, or centroid if not a point
   const Point *_location() const {
     return GetPointer<const Point *>(VT__LOCATION);
   }
   Geometry _geom_type() const {
     return static_cast<Geometry>(GetField<uint8_t>(VT__GEOM_TYPE, 0));
   }
+  /// polygon / line / point / null
   const void *_geom() const {
     return GetPointer<const void *>(VT__GEOM);
   }
@@ -1365,9 +1376,11 @@ struct GraphNode FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const MultiPolygon *_geom_as_MultiPolygon() const {
     return _geom_type() == Geometry::MultiPolygon ? static_cast<const MultiPolygon *>(_geom()) : nullptr;
   }
+  /// A human-centric description of this graph node.
   const ::flatbuffers::String *_description() const {
     return GetPointer<const ::flatbuffers::String *>(VT__DESCRIPTION);
   }
+  /// Unique database-specific identifier
   uint64_t _uid() const {
     return GetField<uint64_t>(VT__UID, 0);
   }

@@ -11,11 +11,6 @@ namespace types {
 
 ::flatbuffers::Offset<::Stream>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Stream &o) {
-    std::optional<decltype(builder.CreateVector(o.axes_.value()))> axes_offset = std::nullopt;
-    if (o.axes_.has_value()) {
-        const decltype(builder.CreateVector(o.axes_.value())) axes_offset_val = builder.CreateVector(o.axes_.value());
-        axes_offset = std::make_optional(axes_offset_val);
-    }
     std::optional<::flatbuffers::Offset<::ObjectId>> metadata_offset = std::nullopt;
     if (o.metadata_.has_value()) {
         const ::flatbuffers::Offset<::ObjectId> metadata_offset_val = serialize_to(builder, o.metadata_.value());
@@ -51,10 +46,6 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Stream &o) {
     const ::flatbuffers::Offset<::flatbuffers::String> url_offset = builder.CreateString(o.url_);
 
     ::StreamBuilder instance_builder = ::StreamBuilder(builder);
-    if (axes_offset.has_value()) {
-        instance_builder.add_axes(axes_offset.value());
-    }
-    instance_builder.add_bucket_width(o.bucket_width_);
     instance_builder.add_flags(o.flags_);
     if (metadata_offset.has_value()) {
         instance_builder.add_metadata(metadata_offset.value());
@@ -85,9 +76,7 @@ std::vector<uint8_t> to_bytes(const Stream &o) {
 }
 
 Stream::Stream()
-    : axes_(std::nullopt)
-    , bucket_width_(0)
-    , flags_(0)
+    : flags_(0)
     , metadata_(std::nullopt)
     , metadata_revision_(std::nullopt)
     , options_(std::nullopt)
@@ -102,9 +91,7 @@ Stream::Stream(const std::vector<uint8_t> &bytes)
 }
 
 Stream::Stream(const ::Stream *root) 
-    : axes_(std::nullopt)
-    , bucket_width_(0)
-    , flags_(0)
+    : flags_(0)
     , metadata_(std::nullopt)
     , metadata_revision_(std::nullopt)
     , options_(std::nullopt)
@@ -116,13 +103,6 @@ Stream::Stream(const ::Stream *root)
         throw std::runtime_error("cannot deserialize flatbuffer type");
     }
 
-    const auto &axes_vector = root->axes();
-    if (axes_vector != nullptr) {
-        decltype(axes_)::value_type axes__target = decltype(axes_)::value_type();
-        std::copy(axes_vector->begin(), axes_vector->end(), std::back_inserter(axes__target));
-        axes_ = std::make_optional(axes__target);
-    }
-    bucket_width_ = root->bucket_width();
     flags_ = root->flags();
     if (root->metadata() != nullptr) {
         metadata_ = decltype(metadata_)(root->metadata());

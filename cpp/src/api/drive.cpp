@@ -38,10 +38,9 @@ ls(
     std::string path = "/v1/api/ulv2/drive/:root/*tail";
     const size_t root_idx = path.find(":root");
     path.replace(root_idx, 2, root);
-    if (path.back() != '/') {
-        path.push_back('/');
-    }
-    path = path + tail;
+    const size_t tail_idx = path.find("*tail");
+    const std::string encoded_tail = ::ul::url_encode(tail);
+    path.replace(tail_idx, 2, encoded_tail);
 
     std::map<std::string, std::string> params;
 
@@ -66,10 +65,9 @@ create_entry(
     std::string path = "/v1/api/ulv2/drive/:root/*tail";
     const size_t root_idx = path.find(":root");
     path.replace(root_idx, 2, root);
-    if (path.back() != '/') {
-        path.push_back('/');
-    }
-    path = path + tail;
+    const size_t tail_idx = path.find("*tail");
+    const std::string encoded_tail = ::ul::url_encode(tail);
+    path.replace(tail_idx, 2, encoded_tail);
 
     std::map<std::string, std::string> params;
     params["ty"] = ty;
@@ -139,7 +137,7 @@ unlink(
     std::map<std::string, std::string> params;
 
     std::map<std::string, std::string> headers;
-    const auto res = ctx.get(path, params, headers);
+    const auto res = ctx.del(path, params, headers);
     if (std::holds_alternative<Error>(res)) {
         const auto error = std::get<Error>(res);
         return Result<::ul::types::DirectoryList>(error);
@@ -204,14 +202,14 @@ get_file(
 Result<Void>
 put_file_chunk(
     ul::RequestContext &ctx,
-    const std::string &id,
+    const std::string &file_id,
     int64_t idx,
     const std::string &hash,
     const std::vector<uint8_t> &chunk
 ) {
-    std::string path = "/v1/api/ulv2/drive/file/:id/:idx";
-    const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id);
+    std::string path = "/v1/api/ulv2/drive/file/:file_id/:idx";
+    const size_t file_id_idx = path.find(":file_id");
+    path.replace(file_id_idx, 2, file_id);
     const size_t idx_idx = path.find(":idx");
     path.replace(idx_idx, 2, std::to_string(idx));
 

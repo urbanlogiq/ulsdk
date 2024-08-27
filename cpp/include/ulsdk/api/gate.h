@@ -22,7 +22,7 @@ struct AdUser {
     std::string id_;
     std::string user_principal_name_;
     std::vector<std::string> other_mails_;
-    std::string department_;
+    std::optional<std::string> department_;
     std::string created_date_time_;
 
     AdUser() = default;
@@ -72,7 +72,7 @@ to_bytes(const Bootstrap &o);
 
 /**
  * Retrieves the current user's details, groups they belong to, and secrets that are only available when authenticated.
- * @return 
+ * @return The current user details needed to start the UrbanLogiq web application.
  */
 Result<Bootstrap>
 bootstrap(

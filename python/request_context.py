@@ -22,9 +22,9 @@ def _get_endpoint(region: Region, environment: Environment, api: str) -> str:
 
 
 class File(NamedTuple):
-    _name: str
-    _mimetype: str
-    _data: bytes
+    name: str
+    mimetype: str
+    data: bytes
 
 
 # A RequestContext is a superclass that enables code to use either signed
@@ -77,7 +77,7 @@ class RequestContext(ABC):
         self,
         path: str,
         files: List[File],
-    ):
+    ) -> bytes:
         """Upload a batch of files to the specified endpoint using a multipart POST request"""
 
     @abstractmethod
@@ -87,5 +87,5 @@ class RequestContext(ABC):
         params: Optional[Dict] = None,
         headers: Dict[str, str] = dict(),
         **kwargs,
-    ):
+    ) -> bytes:
         """Make a DELETE request to the given path with optional parameters and headers"""
