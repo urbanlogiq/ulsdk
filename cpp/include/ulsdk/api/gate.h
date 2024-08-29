@@ -54,11 +54,17 @@ struct Bootstrap {
         std::free((void *)client_secrets_);
     }
 
-    Bootstrap(const Bootstrap &o) {
+    Bootstrap(const Bootstrap &o)
+        : user_(o.user_)
+        , groups_(o.groups_)
+        , v_2groups_(o.v_2groups_) {
         client_secrets_ = json_extract_value(o.client_secrets_);
     }
 
-    Bootstrap(Bootstrap &&o) {
+    Bootstrap(Bootstrap &&o)
+        : user_(std::move(o.user_))
+        , groups_(std::move(o.groups_))
+        , v_2groups_(std::move(o.v_2groups_)) {
         client_secrets_ = o.client_secrets_;
         o.client_secrets_ = nullptr;
     }
