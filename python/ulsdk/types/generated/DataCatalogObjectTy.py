@@ -17,3 +17,4 @@ class DataCatalogObjectTy(object):
     DirectoryEntry = 11
     Notification = 12
     Model = 13
+    Ingestion = 14

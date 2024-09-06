@@ -1629,7 +1629,7 @@ get_principal(
 ) {
     std::string path = "/v1/api/uldirectory/v1/principal/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -1654,7 +1654,7 @@ get_principals(
 ) {
     std::string path = "/v1/api/uldirectory/v1/principal/:ids";
     const size_t ids_idx = path.find(":ids");
-    path.replace(ids_idx, 2, ids);
+    path.replace(ids_idx, 4, ids);
 
     std::map<std::string, std::string> params;
 
@@ -1692,7 +1692,7 @@ query_principals(
 ) {
     std::string path = "/v1/api/uldirectory/v1/principals/:query";
     const size_t query_idx = path.find(":query");
-    path.replace(query_idx, 2, query);
+    path.replace(query_idx, 6, query);
 
     std::map<std::string, std::string> params;
 
@@ -1870,7 +1870,7 @@ get_user(
 ) {
     std::string path = "/v1/api/uldirectory/v1/user/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
     if (audit_log.has_value()) {
@@ -1900,7 +1900,7 @@ update_user(
 ) {
     std::string path = "/v1/api/uldirectory/v1/user/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -1921,7 +1921,7 @@ delete_user(
 ) {
     std::string path = "/v1/api/uldirectory/v1/user/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -2000,7 +2000,7 @@ get_group_members(
 ) {
     std::string path = "/v1/api/uldirectory/v1/group/:id/members";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -2038,7 +2038,7 @@ delete_group(
 ) {
     std::string path = "/v1/api/uldirectory/v1/group/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -2059,9 +2059,9 @@ add_group_member(
 ) {
     std::string path = "/v1/api/uldirectory/v1/group/:group/:member";
     const size_t group_idx = path.find(":group");
-    path.replace(group_idx, 2, group.to_string());
+    path.replace(group_idx, 6, group.to_string());
     const size_t member_idx = path.find(":member");
-    path.replace(member_idx, 2, member.to_string());
+    path.replace(member_idx, 7, member.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -2083,9 +2083,9 @@ remove_group_member(
 ) {
     std::string path = "/v1/api/uldirectory/v1/group/:group/:member";
     const size_t group_idx = path.find(":group");
-    path.replace(group_idx, 2, group.to_string());
+    path.replace(group_idx, 6, group.to_string());
     const size_t member_idx = path.find(":member");
-    path.replace(member_idx, 2, member.to_string());
+    path.replace(member_idx, 7, member.to_string());
 
     std::map<std::string, std::string> params;
 

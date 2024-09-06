@@ -186,8 +186,22 @@ class Metadata(object):
             return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
         return 0
 
+    # Many geospatial datasets whose rows correspond to map locations have a
+    # column that should be used as the human-friendly display name of the location.
+    # For example, for a stream containing stores, this field might be "store_name".
+    # If the stream contains multiple rows with the same ul_node_id, then those rows
+    # should have the same value for the location_description_field.
+    # This attribute holds the index of the field in the dataset that should be
+    # used as the location description.
+    # Metadata
+    def LocationDescriptionField(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(30))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
+        return -1
+
 def MetadataStart(builder: flatbuffers.Builder):
-    builder.StartObject(13)
+    builder.StartObject(14)
 
 def Start(builder: flatbuffers.Builder):
     MetadataStart(builder)
@@ -287,6 +301,12 @@ def MetadataAddUpdateCadence(builder: flatbuffers.Builder, updateCadence: int):
 
 def AddUpdateCadence(builder: flatbuffers.Builder, updateCadence: int):
     MetadataAddUpdateCadence(builder, updateCadence)
+
+def MetadataAddLocationDescriptionField(builder: flatbuffers.Builder, locationDescriptionField: int):
+    builder.PrependInt32Slot(13, locationDescriptionField, -1)
+
+def AddLocationDescriptionField(builder: flatbuffers.Builder, locationDescriptionField: int):
+    MetadataAddLocationDescriptionField(builder, locationDescriptionField)
 
 def MetadataEnd(builder: flatbuffers.Builder) -> int:
     return builder.EndObject()

@@ -98,11 +98,11 @@ share(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to/:permission";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
     const size_t to_idx = path.find(":to");
-    path.replace(to_idx, 2, to.to_string());
+    path.replace(to_idx, 3, to.to_string());
     const size_t permission_idx = path.find(":permission");
-    path.replace(permission_idx, 2, std::to_string(permission_bits));
+    path.replace(permission_idx, 11, std::to_string(permission_bits));
 
     std::map<std::string, std::string> params;
 
@@ -126,11 +126,11 @@ share_with_details(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to/:permission";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
     const size_t to_idx = path.find(":to");
-    path.replace(to_idx, 2, to.to_string());
+    path.replace(to_idx, 3, to.to_string());
     const size_t permission_idx = path.find(":permission");
-    path.replace(permission_idx, 2, std::to_string(permission_bits));
+    path.replace(permission_idx, 11, std::to_string(permission_bits));
 
     std::map<std::string, std::string> params;
 
@@ -152,9 +152,9 @@ share_all(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
     const size_t to_idx = path.find(":to");
-    path.replace(to_idx, 2, to.to_string());
+    path.replace(to_idx, 3, to.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -177,9 +177,9 @@ share_all_with_details(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
     const size_t to_idx = path.find(":to");
-    path.replace(to_idx, 2, to.to_string());
+    path.replace(to_idx, 3, to.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -202,11 +202,11 @@ grant(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to/:permission";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
     const size_t to_idx = path.find(":to");
-    path.replace(to_idx, 2, to.to_string());
+    path.replace(to_idx, 3, to.to_string());
     const size_t permission_idx = path.find(":permission");
-    path.replace(permission_idx, 2, std::to_string(permission_bits));
+    path.replace(permission_idx, 11, std::to_string(permission_bits));
 
     std::map<std::string, std::string> params;
 
@@ -230,11 +230,11 @@ grant_with_details(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to/:permission";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
     const size_t to_idx = path.find(":to");
-    path.replace(to_idx, 2, to.to_string());
+    path.replace(to_idx, 3, to.to_string());
     const size_t permission_idx = path.find(":permission");
-    path.replace(permission_idx, 2, std::to_string(permission_bits));
+    path.replace(permission_idx, 11, std::to_string(permission_bits));
 
     std::map<std::string, std::string> params;
 
@@ -256,9 +256,9 @@ grant_all(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
     const size_t to_idx = path.find(":to");
-    path.replace(to_idx, 2, to.to_string());
+    path.replace(to_idx, 3, to.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -281,9 +281,9 @@ grant_all_with_details(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
     const size_t to_idx = path.find(":to");
-    path.replace(to_idx, 2, to.to_string());
+    path.replace(to_idx, 3, to.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -305,9 +305,9 @@ revoke(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/revoke/:id/:from";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
     const size_t from_idx = path.find(":from");
-    path.replace(from_idx, 2, from.to_string());
+    path.replace(from_idx, 5, from.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -328,7 +328,7 @@ get_permissions(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/perms/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -349,9 +349,9 @@ set(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/set/:id/:acl_id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
     const size_t acl_id_idx = path.find(":acl_id");
-    path.replace(acl_id_idx, 2, acl_id.to_string());
+    path.replace(acl_id_idx, 7, acl_id.to_string());
 
     std::map<std::string, std::string> params;
 

@@ -9,3 +9,4 @@ class TableSourceUnion(object):
     GraphQuery = 3
     QueryTableSource = 4
     Vector = 5
+    RecordBatchPlaceholder = 6

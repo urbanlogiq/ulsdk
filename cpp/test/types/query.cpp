@@ -217,6 +217,16 @@ test_query_table_source() {
 TypeTest test_query_table_source_obj(test_query_table_source, "QueryTableSource");
 
 bool
+test_record_batch_placeholder() {
+    ::ul::types::RecordBatchPlaceholder t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::RecordBatchPlaceholder deserialized = ::ul::types::RecordBatchPlaceholder(bytes);
+    return true;
+}
+
+TypeTest test_record_batch_placeholder_obj(test_record_batch_placeholder, "RecordBatchPlaceholder");
+
+bool
 test_set_expr() {
     ::ul::types::SetExpr t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);

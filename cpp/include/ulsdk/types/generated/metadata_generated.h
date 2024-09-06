@@ -3726,7 +3726,8 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_AREA_SELECTION = 22,
     VT_DO_NOT_FILTER_GEOMETRY_BY_VIEWPORT = 24,
     VT_ENTITY_TY = 26,
-    VT_UPDATE_CADENCE = 28
+    VT_UPDATE_CADENCE = 28,
+    VT_LOCATION_DESCRIPTION_FIELD = 30
   };
   const ::flatbuffers::String *display_name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_DISPLAY_NAME);
@@ -3783,6 +3784,16 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   UpdateCadence update_cadence() const {
     return static_cast<UpdateCadence>(GetField<uint32_t>(VT_UPDATE_CADENCE, 0));
   }
+  /// Many geospatial datasets whose rows correspond to map locations have a
+  /// column that should be used as the human-friendly display name of the location.
+  /// For example, for a stream containing stores, this field might be "store_name".
+  /// If the stream contains multiple rows with the same ul_node_id, then those rows
+  /// should have the same value for the location_description_field.
+  /// This attribute holds the index of the field in the dataset that should be
+  /// used as the location description.
+  int32_t location_description_field() const {
+    return GetField<int32_t>(VT_LOCATION_DESCRIPTION_FIELD, -1);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_DISPLAY_NAME) &&
@@ -3807,6 +3818,7 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_DO_NOT_FILTER_GEOMETRY_BY_VIEWPORT, 1) &&
            VerifyField<int32_t>(verifier, VT_ENTITY_TY, 4) &&
            VerifyField<uint32_t>(verifier, VT_UPDATE_CADENCE, 4) &&
+           VerifyField<int32_t>(verifier, VT_LOCATION_DESCRIPTION_FIELD, 4) &&
            verifier.EndTable();
   }
 };
@@ -3866,6 +3878,9 @@ struct MetadataBuilder {
   void add_update_cadence(UpdateCadence update_cadence) {
     fbb_.AddElement<uint32_t>(Metadata::VT_UPDATE_CADENCE, static_cast<uint32_t>(update_cadence), 0);
   }
+  void add_location_description_field(int32_t location_description_field) {
+    fbb_.AddElement<int32_t>(Metadata::VT_LOCATION_DESCRIPTION_FIELD, location_description_field, -1);
+  }
   explicit MetadataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -3891,8 +3906,10 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadata(
     bool area_selection = false,
     bool do_not_filter_geometry_by_viewport = false,
     EntityTy entity_ty = EntityTy::T_INVALID,
-    UpdateCadence update_cadence = UpdateCadence::UC_UNSET) {
+    UpdateCadence update_cadence = UpdateCadence::UC_UNSET,
+    int32_t location_description_field = -1) {
   MetadataBuilder builder_(_fbb);
+  builder_.add_location_description_field(location_description_field);
   builder_.add_update_cadence(update_cadence);
   builder_.add_entity_ty(entity_ty);
   builder_.add_geometry_source(geometry_source);
@@ -3928,7 +3945,8 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadataDirect(
     bool area_selection = false,
     bool do_not_filter_geometry_by_viewport = false,
     EntityTy entity_ty = EntityTy::T_INVALID,
-    UpdateCadence update_cadence = UpdateCadence::UC_UNSET) {
+    UpdateCadence update_cadence = UpdateCadence::UC_UNSET,
+    int32_t location_description_field = -1) {
   auto display_name__ = display_name ? _fbb.CreateString(display_name) : 0;
   auto description__ = description ? _fbb.CreateString(description) : 0;
   auto fields__ = fields ? _fbb.CreateVector<::flatbuffers::Offset<UlField>>(*fields) : 0;
@@ -3948,7 +3966,8 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadataDirect(
       area_selection,
       do_not_filter_geometry_by_viewport,
       entity_ty,
-      update_cadence);
+      update_cadence,
+      location_description_field);
 }
 
 inline bool VerifyComponentData(::flatbuffers::Verifier &verifier, const void *obj, ComponentData type) {

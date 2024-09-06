@@ -43,6 +43,7 @@ struct Partition;
 struct Query;
 struct QueryElement;
 struct QueryTableSource;
+struct RecordBatchPlaceholder;
 struct SetExpr;
 struct TableOrderBy;
 struct TableSource;
@@ -91,7 +92,8 @@ typedef std::variant<
     std::shared_ptr<Arrow>,
     std::shared_ptr<GraphQuery>,
     std::shared_ptr<QueryTableSource>,
-    std::shared_ptr<Vector>
+    std::shared_ptr<Vector>,
+    std::shared_ptr<RecordBatchPlaceholder>
 > TableSourceUnion;
 
 using ::TypeHint;
@@ -310,6 +312,14 @@ struct Vector {
     Vector(const std::vector<uint8_t> &bytes);
 };
 
+struct RecordBatchPlaceholder {
+    uint32_t idx_;
+
+    RecordBatchPlaceholder();
+    RecordBatchPlaceholder(const ::RecordBatchPlaceholder *root);
+    RecordBatchPlaceholder(const std::vector<uint8_t> &bytes);
+};
+
 struct UpdateQueryElement {
     std::optional<Function> filter_;
     std::vector<SetExpr> sets_;
@@ -481,6 +491,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const QueryTableSource &
 ::flatbuffers::Offset<::Vector>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Vector &);
 
+::flatbuffers::Offset<::RecordBatchPlaceholder>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const RecordBatchPlaceholder &);
+
 ::flatbuffers::Offset<::UpdateQueryElement>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UpdateQueryElement &);
 
@@ -577,6 +590,9 @@ to_bytes(const QueryTableSource &o);
 
 std::vector<uint8_t>
 to_bytes(const Vector &o);
+
+std::vector<uint8_t>
+to_bytes(const RecordBatchPlaceholder &o);
 
 std::vector<uint8_t>
 to_bytes(const UpdateQueryElement &o);

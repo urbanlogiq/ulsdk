@@ -2536,6 +2536,15 @@ class Metadata:
 
     geometry_source: Optional["GeometrySource"]
 
+    # Many geospatial datasets whose rows correspond to map locations have a
+    # column that should be used as the human-friendly display name of the location.
+    # For example, for a stream containing stores, this field might be "store_name".
+    # If the stream contains multiple rows with the same ul_node_id, then those rows
+    # should have the same value for the location_description_field.
+    # This attribute holds the index of the field in the dataset that should be
+    # used as the location description.
+    location_description_field: "int"
+
     # An optional field that is meant to provide information to the user on
     # where the data has come from
     source: Optional["DatasetSource"]
@@ -2579,6 +2588,7 @@ class Metadata:
         if geometry_source_val is not None:
             geometry_source_ty = o.GeometrySourceType()
             geometry_source = GeometrySource.from_fbs(geometry_source_val, geometry_source_ty)
+        location_description_field = o.LocationDescriptionField()
         source = None
         source_obj = o.Source()
         if source_obj is not None:
@@ -2588,7 +2598,7 @@ class Metadata:
             for i in range(o.SummaryLength()):
                 summary.append(o.Summary(i))
         update_cadence = UpdateCadence(o.UpdateCadence())
-        return cls(area_selection, dataset_category, description, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, source, summary, update_cadence)
+        return cls(area_selection, dataset_category, description, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, source, summary, update_cadence)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -2611,6 +2621,7 @@ class Metadata:
             StartFieldsVector,
             AddGeometrySource,
             AddGeometrySourceType,
+            AddLocationDescriptionField,
             AddSource,
             AddSummary,
             StartSummaryVector,
@@ -2670,6 +2681,7 @@ class Metadata:
         if geometry_source_offset is not None and geometry_source_ty is not None:
             AddGeometrySource(builder, geometry_source_offset)
             AddGeometrySourceType(builder, geometry_source_ty)
+        AddLocationDescriptionField(builder, self.location_description_field)
         if source_offset is not None:
             AddSource(builder, source_offset)
         if summary_offset is not None:
@@ -2694,10 +2706,11 @@ class Metadata:
         field_relationships = []
         fields = []
         geometry_source = GeometrySource.make_default()
+        location_description_field = 0
         source = DatasetSource.make_default()
         summary = []
         update_cadence = UpdateCadence(0)
-        return cls(area_selection, dataset_category, description, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, source, summary, update_cadence)
+        return cls(area_selection, dataset_category, description, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, source, summary, update_cadence)
 
     def __eq__(self, other) -> bool:
         eq = True
@@ -2730,6 +2743,7 @@ class Metadata:
         elif self_fields is None and other_fields is not None:
             return False
         eq = eq and self.geometry_source == other.geometry_source
+        eq = eq and self.location_description_field == other.location_description_field
         eq = eq and self.source == other.source
         self_summary = self.summary
         other_summary = other.summary

@@ -37,9 +37,9 @@ get_object_at_revision(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/content/:object_id/:content_id";
     const size_t object_id_idx = path.find(":object_id");
-    path.replace(object_id_idx, 2, object_id.to_string());
+    path.replace(object_id_idx, 10, object_id.to_string());
     const size_t content_id_idx = path.find(":content_id");
-    path.replace(content_id_idx, 2, content_id.to_string());
+    path.replace(content_id_idx, 11, content_id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -59,7 +59,7 @@ get_acl(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/object/acl/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -79,7 +79,7 @@ get_head_revision(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/object/head/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -99,7 +99,7 @@ get_object(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/object/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -120,7 +120,7 @@ update_object(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/object/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -143,7 +143,7 @@ update_attribute(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/object/:id/attributes";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
     params["overwrite"] = overwrite ? "true" : "false";
@@ -186,9 +186,9 @@ delete_attribute(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/object/:id/attributes/:key";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
     const size_t key_idx = path.find(":key");
-    path.replace(key_idx, 2, key);
+    path.replace(key_idx, 4, key);
 
     std::map<std::string, std::string> params;
 
@@ -362,7 +362,7 @@ stream_get_arrow(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -385,7 +385,7 @@ stream_get_parquet(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -402,7 +402,7 @@ stream_get_csv(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -419,7 +419,7 @@ stream_get_xlsx(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -436,7 +436,7 @@ stream_get_json(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -453,7 +453,7 @@ stream_get_text(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -470,7 +470,7 @@ stream_get_html(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -489,7 +489,7 @@ stream_put_arrow(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
     if (subcollection.has_value()) {
@@ -516,7 +516,7 @@ stream_put_diffstream(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
     if (subcollection.has_value()) {
@@ -543,7 +543,7 @@ stream_put_json(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
     if (subcollection.has_value()) {
@@ -598,7 +598,7 @@ generate_metadata(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id/generated/metadata";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -619,7 +619,7 @@ update_metadata(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id/metadata";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -645,7 +645,7 @@ stream_compact(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id/compact";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
     if (subcollection.has_value()) {
@@ -671,9 +671,9 @@ table_row_history(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/table/:id/history/:row";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
     const size_t row_idx = path.find(":row");
-    path.replace(row_idx, 2, row.to_string());
+    path.replace(row_idx, 4, row.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -693,7 +693,7 @@ table_history(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/table/:id/history";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -714,9 +714,9 @@ get_table_attachments_directory(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/table/:id/attachments/:row";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
     const size_t row_idx = path.find(":row");
-    path.replace(row_idx, 2, row.to_string());
+    path.replace(row_idx, 4, row.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -737,9 +737,9 @@ get_or_create_table_attachments_directory(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/table/:id/attachments/:row";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
     const size_t row_idx = path.find(":row");
-    path.replace(row_idx, 2, row.to_string());
+    path.replace(row_idx, 4, row.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -761,7 +761,7 @@ create_table(
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/table/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 

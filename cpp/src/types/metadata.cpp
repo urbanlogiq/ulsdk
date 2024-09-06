@@ -1585,6 +1585,7 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Metadata &o) {
         instance_builder.add_geometry_source(geometry_source_opt.first);
         instance_builder.add_geometry_source_type(geometry_source_opt.second);
     }
+    instance_builder.add_location_description_field(o.location_description_field_);
     if (source_offset.has_value()) {
         instance_builder.add_source(source_offset.value());
     }
@@ -1613,6 +1614,7 @@ Metadata::Metadata()
     , field_relationships_(std::nullopt)
     , fields_(std::nullopt)
     , geometry_source_(std::nullopt)
+    , location_description_field_(-1)
     , source_(std::nullopt)
     , summary_(std::nullopt)
     , update_cadence_(UpdateCadence(0)) {
@@ -1632,6 +1634,7 @@ Metadata::Metadata(const ::Metadata *root)
     , field_relationships_(std::nullopt)
     , fields_(std::nullopt)
     , geometry_source_(std::nullopt)
+    , location_description_field_(-1)
     , source_(std::nullopt)
     , summary_(std::nullopt)
     , update_cadence_(UpdateCadence(0)) {
@@ -1691,6 +1694,7 @@ Metadata::Metadata(const ::Metadata *root)
             default: throw std::runtime_error("unknown union variant");
         }
     }
+    location_description_field_ = root->location_description_field();
     if (root->source() != nullptr) {
         source_ = decltype(source_)(root->source());
     }

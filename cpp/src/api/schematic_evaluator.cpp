@@ -56,7 +56,7 @@ get_job(
 ) {
     std::string path = "/v1/api/ulv2/schematicevaluator/jobs/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
     if (timeout.has_value()) {
@@ -80,7 +80,7 @@ get_task(
 ) {
     std::string path = "/v1/api/ulv2/schematicevaluator/tasks/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 

@@ -185,6 +185,7 @@ from .query import (
     QueryElementOp,
     QueryElementUnion,
     QueryTableSource,
+    RecordBatchPlaceholder,
     SetExpr,
     Subcollection,
     TableOrderBy,
@@ -376,6 +377,7 @@ from .generated.Query import Query as FbsQuery
 from .generated.QueryElement import QueryElement as FbsQueryElement
 from .generated.QueryPathElement import QueryPathElement as FbsQueryPathElement
 from .generated.QueryTableSource import QueryTableSource as FbsQueryTableSource
+from .generated.RecordBatchPlaceholder import RecordBatchPlaceholder as FbsRecordBatchPlaceholder
 from .generated.Restore import Restore as FbsRestore
 from .generated.RestoreRow import RestoreRow as FbsRestoreRow
 from .generated.RmRow import RmRow as FbsRmRow

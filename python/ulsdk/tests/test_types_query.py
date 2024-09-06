@@ -109,6 +109,11 @@ def test_query_table_source():
     _b = _t0.to_bytes()
     _t1 = QueryTableSource.from_bytes(_b)
     assert _t0 == _t1
+def test_record_batch_placeholder():
+    _t0 = RecordBatchPlaceholder.make_default()
+    _b = _t0.to_bytes()
+    _t1 = RecordBatchPlaceholder.from_bytes(_b)
+    assert _t0 == _t1
 def test_set_expr():
     _t0 = SetExpr.make_default()
     _b = _t0.to_bytes()

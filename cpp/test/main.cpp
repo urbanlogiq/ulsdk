@@ -12,6 +12,7 @@
 ApiTest *idempotent_api_test_root;
 ApiTest *mutating_api_test_root;
 ApiTest *link_only_api_test_root;
+ApiTest *regression_test_root;
 TypeTest *type_test_root;
 
 struct TestConfig {
@@ -31,6 +32,25 @@ std::string string_from_cstr(char *s) {
     }
 
     return std::string(s);
+}
+
+void run_api_tests(ul::ApiKeyContext &ctx, ApiTest *p, int &failed) {
+    while (p != nullptr) {
+        std::cout << "  Running test " << p->name << " ... ";
+        const auto result = p->fn(ctx);
+        if (std::holds_alternative<ul::Error>(result)) {
+            const ul::Error error = std::get<ul::Error>(result);
+            std::cout << "FAILED (";
+            if (error.code_ != 0) {
+                std::cout << "code: " << error.code_ << " ";
+            }
+            std::cout << "message: " << error.message_ << ")" << std::endl;
+            ++failed;
+        } else {
+            std::cout << "ok" << std::endl;
+        }
+        p = p->next;
+    }
 }
 
 int main(void) {
@@ -61,42 +81,11 @@ int main(void) {
 
         std::cout << "Running tests for " << (config.region_ == ul::Region::CA ? "CA" : "US") << std::endl;
 
-        ApiTest *p = idempotent_api_test_root;
-        while (p != nullptr) {
-            std::cout << "  Running test " << p->name << " ... ";
-            const auto result = p->fn(ctx);
-            if (std::holds_alternative<ul::Error>(result)) {
-                const ul::Error error = std::get<ul::Error>(result);
-                std::cout << "FAILED (";
-                if (error.code_ != 0) {
-                    std::cout << "code: " << error.code_ << " ";
-                }
-                std::cout << "message: " << error.message_ << ")" << std::endl;
-                ++failed;
-            } else {
-                std::cout << "ok" << std::endl;
-            }
-            p = p->next;
-        }
+        run_api_tests(ctx, idempotent_api_test_root, failed);
+        run_api_tests(ctx, regression_test_root, failed);
 
         if (run_mutating_tests.empty()) {
-            p = mutating_api_test_root;
-            while (p != nullptr) {
-                std::cout << "  Running test " << p->name << " ... ";
-                const auto result = p->fn(ctx);
-                if (std::holds_alternative<ul::Error>(result)) {
-                    const ul::Error error = std::get<ul::Error>(result);
-                    std::cout << "FAILED (";
-                    if (error.code_ != 0) {
-                        std::cout << "code: " << error.code_ << " ";
-                    }
-                    std::cout << "message: " << error.message_ << ")" << std::endl;
-                    ++failed;
-                } else {
-                    std::cout << "ok" << std::endl;
-                }
-                p = p->next;
-            }
+            run_api_tests(ctx, mutating_api_test_root, failed);
         }
     }
 

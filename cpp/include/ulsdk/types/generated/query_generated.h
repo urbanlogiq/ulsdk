@@ -73,6 +73,9 @@ struct DataCatalogBuilder;
 struct QueryTableSource;
 struct QueryTableSourceBuilder;
 
+struct RecordBatchPlaceholder;
+struct RecordBatchPlaceholderBuilder;
+
 struct Vector;
 struct VectorBuilder;
 
@@ -345,37 +348,40 @@ enum class TableSourceUnion : uint8_t {
   GraphQuery = 3,
   QueryTableSource = 4,
   Vector = 5,
+  RecordBatchPlaceholder = 6,
   MIN = NONE,
-  MAX = Vector
+  MAX = RecordBatchPlaceholder
 };
 
-inline const TableSourceUnion (&EnumValuesTableSourceUnion())[6] {
+inline const TableSourceUnion (&EnumValuesTableSourceUnion())[7] {
   static const TableSourceUnion values[] = {
     TableSourceUnion::NONE,
     TableSourceUnion::DataCatalog,
     TableSourceUnion::Arrow,
     TableSourceUnion::GraphQuery,
     TableSourceUnion::QueryTableSource,
-    TableSourceUnion::Vector
+    TableSourceUnion::Vector,
+    TableSourceUnion::RecordBatchPlaceholder
   };
   return values;
 }
 
 inline const char * const *EnumNamesTableSourceUnion() {
-  static const char * const names[7] = {
+  static const char * const names[8] = {
     "NONE",
     "DataCatalog",
     "Arrow",
     "GraphQuery",
     "QueryTableSource",
     "Vector",
+    "RecordBatchPlaceholder",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameTableSourceUnion(TableSourceUnion e) {
-  if (::flatbuffers::IsOutRange(e, TableSourceUnion::NONE, TableSourceUnion::Vector)) return "";
+  if (::flatbuffers::IsOutRange(e, TableSourceUnion::NONE, TableSourceUnion::RecordBatchPlaceholder)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesTableSourceUnion()[index];
 }
@@ -402,6 +408,10 @@ template<> struct TableSourceUnionTraits<QueryTableSource> {
 
 template<> struct TableSourceUnionTraits<Vector> {
   static const TableSourceUnion enum_value = TableSourceUnion::Vector;
+};
+
+template<> struct TableSourceUnionTraits<RecordBatchPlaceholder> {
+  static const TableSourceUnion enum_value = TableSourceUnion::RecordBatchPlaceholder;
 };
 
 bool VerifyTableSourceUnion(::flatbuffers::Verifier &verifier, const void *obj, TableSourceUnion type);
@@ -1747,6 +1757,53 @@ struct QueryTableSource::Traits {
   static auto constexpr Create = CreateQueryTableSource;
 };
 
+struct RecordBatchPlaceholder FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef RecordBatchPlaceholderBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_IDX = 4
+  };
+  uint32_t idx() const {
+    return GetField<uint32_t>(VT_IDX, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint32_t>(verifier, VT_IDX, 4) &&
+           verifier.EndTable();
+  }
+};
+
+struct RecordBatchPlaceholderBuilder {
+  typedef RecordBatchPlaceholder Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_idx(uint32_t idx) {
+    fbb_.AddElement<uint32_t>(RecordBatchPlaceholder::VT_IDX, idx, 0);
+  }
+  explicit RecordBatchPlaceholderBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<RecordBatchPlaceholder> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<RecordBatchPlaceholder>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<RecordBatchPlaceholder> CreateRecordBatchPlaceholder(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint32_t idx = 0) {
+  RecordBatchPlaceholderBuilder builder_(_fbb);
+  builder_.add_idx(idx);
+  return builder_.Finish();
+}
+
+struct RecordBatchPlaceholder::Traits {
+  using type = RecordBatchPlaceholder;
+  static auto constexpr Create = CreateRecordBatchPlaceholder;
+};
+
 struct Vector FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef VectorBuilder Builder;
   struct Traits;
@@ -1882,6 +1939,9 @@ struct TableSource FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const Vector *t_as_Vector() const {
     return t_type() == TableSourceUnion::Vector ? static_cast<const Vector *>(t()) : nullptr;
   }
+  const RecordBatchPlaceholder *t_as_RecordBatchPlaceholder() const {
+    return t_type() == TableSourceUnion::RecordBatchPlaceholder ? static_cast<const RecordBatchPlaceholder *>(t()) : nullptr;
+  }
   const ::flatbuffers::Vector<::flatbuffers::Offset<Expr>> *fields() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Expr>> *>(VT_FIELDS);
   }
@@ -1932,6 +1992,10 @@ template<> inline const QueryTableSource *TableSource::t_as<QueryTableSource>() 
 
 template<> inline const Vector *TableSource::t_as<Vector>() const {
   return t_as_Vector();
+}
+
+template<> inline const RecordBatchPlaceholder *TableSource::t_as<RecordBatchPlaceholder>() const {
+  return t_as_RecordBatchPlaceholder();
 }
 
 struct TableSourceBuilder {
@@ -2493,6 +2557,9 @@ struct UpdateQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   const Vector *source_as_Vector() const {
     return source_type() == TableSourceUnion::Vector ? static_cast<const Vector *>(source()) : nullptr;
   }
+  const RecordBatchPlaceholder *source_as_RecordBatchPlaceholder() const {
+    return source_type() == TableSourceUnion::RecordBatchPlaceholder ? static_cast<const RecordBatchPlaceholder *>(source()) : nullptr;
+  }
   const ::flatbuffers::Vector<::flatbuffers::Offset<SetExpr>> *sets() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<SetExpr>> *>(VT_SETS);
   }
@@ -2531,6 +2598,10 @@ template<> inline const QueryTableSource *UpdateQueryElement::source_as<QueryTab
 
 template<> inline const Vector *UpdateQueryElement::source_as<Vector>() const {
   return source_as_Vector();
+}
+
+template<> inline const RecordBatchPlaceholder *UpdateQueryElement::source_as<RecordBatchPlaceholder>() const {
+  return source_as_RecordBatchPlaceholder();
 }
 
 struct UpdateQueryElementBuilder {
@@ -2626,6 +2697,9 @@ struct DeleteQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   const Vector *source_as_Vector() const {
     return source_type() == TableSourceUnion::Vector ? static_cast<const Vector *>(source()) : nullptr;
   }
+  const RecordBatchPlaceholder *source_as_RecordBatchPlaceholder() const {
+    return source_type() == TableSourceUnion::RecordBatchPlaceholder ? static_cast<const RecordBatchPlaceholder *>(source()) : nullptr;
+  }
   const Function *filter() const {
     return GetPointer<const Function *>(VT_FILTER);
   }
@@ -2658,6 +2732,10 @@ template<> inline const QueryTableSource *DeleteQueryElement::source_as<QueryTab
 
 template<> inline const Vector *DeleteQueryElement::source_as<Vector>() const {
   return source_as_Vector();
+}
+
+template<> inline const RecordBatchPlaceholder *DeleteQueryElement::source_as<RecordBatchPlaceholder>() const {
+  return source_as_RecordBatchPlaceholder();
 }
 
 struct DeleteQueryElementBuilder {
@@ -3222,6 +3300,10 @@ inline bool VerifyTableSourceUnion(::flatbuffers::Verifier &verifier, const void
     }
     case TableSourceUnion::Vector: {
       auto ptr = reinterpret_cast<const Vector *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case TableSourceUnion::RecordBatchPlaceholder: {
+      auto ptr = reinterpret_cast<const RecordBatchPlaceholder *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

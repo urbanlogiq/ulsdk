@@ -127,6 +127,10 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TableSourceUnion &
         const std::shared_ptr<Vector> &v = std::get<std::shared_ptr<Vector>>(o);
         const auto offset = serialize_to(builder, *v);
         return std::make_pair(offset.Union(), ::TableSourceUnion::Vector);
+    } else if (std::holds_alternative<std::shared_ptr<RecordBatchPlaceholder>>(o)) {
+        const std::shared_ptr<RecordBatchPlaceholder> &v = std::get<std::shared_ptr<RecordBatchPlaceholder>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::TableSourceUnion::RecordBatchPlaceholder);
     } else { 
         throw std::runtime_error("unreachable");
     }
@@ -1428,6 +1432,39 @@ Vector::Vector(const ::Vector *root)
         query_ = std::string(*root->query()->begin(), *root->query()->end());
 }
 
+::flatbuffers::Offset<::RecordBatchPlaceholder>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const RecordBatchPlaceholder &o) {
+
+    ::RecordBatchPlaceholderBuilder instance_builder = ::RecordBatchPlaceholderBuilder(builder);
+    instance_builder.add_idx(o.idx_);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const RecordBatchPlaceholder &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+RecordBatchPlaceholder::RecordBatchPlaceholder()
+    : idx_(0) {
+}
+
+RecordBatchPlaceholder::RecordBatchPlaceholder(const std::vector<uint8_t> &bytes)
+    : RecordBatchPlaceholder(::flatbuffers::GetSizePrefixedRoot<::RecordBatchPlaceholder>(bytes.data())) {
+}
+
+RecordBatchPlaceholder::RecordBatchPlaceholder(const ::RecordBatchPlaceholder *root) 
+    : idx_(0) {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    idx_ = root->idx();
+}
+
 ::flatbuffers::Offset<::UpdateQueryElement>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UpdateQueryElement &o) {
     std::optional<::flatbuffers::Offset<::Function>> filter_offset = std::nullopt;
@@ -1522,6 +1559,12 @@ UpdateQueryElement::UpdateQueryElement(const ::UpdateQueryElement *root)
                 source_ = source__shared;
                 break;
             }
+            case ::TableSourceUnion::RecordBatchPlaceholder: {
+                const auto source__local = static_cast<const ::RecordBatchPlaceholder *>(root->source());
+                std::shared_ptr<RecordBatchPlaceholder> source__shared = std::make_shared<RecordBatchPlaceholder>(source__local);
+                source_ = source__shared;
+                break;
+            }
             default: throw std::runtime_error("unknown union variant");
         }
     }
@@ -1602,6 +1645,12 @@ DeleteQueryElement::DeleteQueryElement(const ::DeleteQueryElement *root)
             case ::TableSourceUnion::Vector: {
                 const auto source__local = static_cast<const ::Vector *>(root->source());
                 std::shared_ptr<Vector> source__shared = std::make_shared<Vector>(source__local);
+                source_ = source__shared;
+                break;
+            }
+            case ::TableSourceUnion::RecordBatchPlaceholder: {
+                const auto source__local = static_cast<const ::RecordBatchPlaceholder *>(root->source());
+                std::shared_ptr<RecordBatchPlaceholder> source__shared = std::make_shared<RecordBatchPlaceholder>(source__local);
                 source_ = source__shared;
                 break;
             }
@@ -2029,6 +2078,12 @@ TableSource::TableSource(const ::TableSource *root)
             case ::TableSourceUnion::Vector: {
                 const auto t__local = static_cast<const ::Vector *>(root->t());
                 std::shared_ptr<Vector> t__shared = std::make_shared<Vector>(t__local);
+                t_ = t__shared;
+                break;
+            }
+            case ::TableSourceUnion::RecordBatchPlaceholder: {
+                const auto t__local = static_cast<const ::RecordBatchPlaceholder *>(root->t());
+                std::shared_ptr<RecordBatchPlaceholder> t__shared = std::make_shared<RecordBatchPlaceholder>(t__local);
                 t_ = t__shared;
                 break;
             }

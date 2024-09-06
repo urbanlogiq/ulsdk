@@ -371,6 +371,7 @@ struct Metadata {
     std::optional<std::vector<UlFieldRelationship>> field_relationships_;
     std::optional<std::vector<UlField>> fields_;
     std::optional<GeometrySource> geometry_source_;
+    int32_t location_description_field_;
     std::optional<DatasetSource> source_;
     std::optional<std::vector<int32_t>> summary_;
     UpdateCadence update_cadence_;

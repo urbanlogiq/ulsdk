@@ -115,6 +115,7 @@ from .query import (
     QueryElementOp,
     QueryElementUnion,
     QueryTableSource,
+    RecordBatchPlaceholder,
     SetExpr,
     Subcollection,
     TableOrderBy,
@@ -229,6 +230,7 @@ from .generated.Query import Query as FbsQuery
 from .generated.QueryElement import QueryElement as FbsQueryElement
 from .generated.QueryPathElement import QueryPathElement as FbsQueryPathElement
 from .generated.QueryTableSource import QueryTableSource as FbsQueryTableSource
+from .generated.RecordBatchPlaceholder import RecordBatchPlaceholder as FbsRecordBatchPlaceholder
 from .generated.Schema import Schema as FbsSchema
 from .generated.SetExpr import SetExpr as FbsSetExpr
 from .generated.StreamId import StreamId as FbsStreamId

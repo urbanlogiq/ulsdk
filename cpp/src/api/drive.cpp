@@ -37,10 +37,10 @@ ls(
 ) {
     std::string path = "/v1/api/ulv2/drive/:root/*tail";
     const size_t root_idx = path.find(":root");
-    path.replace(root_idx, 2, root);
+    path.replace(root_idx, 5, root);
     const size_t tail_idx = path.find("*tail");
     const std::string encoded_tail = ::ul::url_encode(tail);
-    path.replace(tail_idx, 2, encoded_tail);
+    path.replace(tail_idx, 5, encoded_tail);
 
     std::map<std::string, std::string> params;
 
@@ -64,10 +64,10 @@ create_entry(
 ) {
     std::string path = "/v1/api/ulv2/drive/:root/*tail";
     const size_t root_idx = path.find(":root");
-    path.replace(root_idx, 2, root);
+    path.replace(root_idx, 5, root);
     const size_t tail_idx = path.find("*tail");
     const std::string encoded_tail = ::ul::url_encode(tail);
-    path.replace(tail_idx, 2, encoded_tail);
+    path.replace(tail_idx, 5, encoded_tail);
 
     std::map<std::string, std::string> params;
     params["ty"] = ty;
@@ -110,7 +110,7 @@ post_file(
 ) {
     std::string path = "/v1/api/ulv2/drive/:root";
     const size_t root_idx = path.find(":root");
-    path.replace(root_idx, 2, root);
+    path.replace(root_idx, 5, root);
 
     std::map<std::string, std::string> params;
     params["force"] = force ? "true" : "false";
@@ -132,7 +132,7 @@ unlink(
 ) {
     std::string path = "/v1/api/ulv2/drive/:entry";
     const size_t entry_idx = path.find(":entry");
-    path.replace(entry_idx, 2, entry);
+    path.replace(entry_idx, 6, entry);
 
     std::map<std::string, std::string> params;
 
@@ -190,7 +190,7 @@ get_file(
 ) {
     std::string path = "/v1/api/ulv2/drive/file/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id);
+    path.replace(id_idx, 3, id);
 
     std::map<std::string, std::string> params;
 
@@ -209,9 +209,9 @@ put_file_chunk(
 ) {
     std::string path = "/v1/api/ulv2/drive/file/:file_id/:idx";
     const size_t file_id_idx = path.find(":file_id");
-    path.replace(file_id_idx, 2, file_id);
+    path.replace(file_id_idx, 8, file_id);
     const size_t idx_idx = path.find(":idx");
-    path.replace(idx_idx, 2, std::to_string(idx));
+    path.replace(idx_idx, 4, std::to_string(idx));
 
     std::map<std::string, std::string> params;
     params["hash"] = hash;
@@ -233,7 +233,7 @@ get_root_id(
 ) {
     std::string path = "/v1/api/ulv2/drive/root/:b2cid";
     const size_t b2cid_idx = path.find(":b2cid");
-    path.replace(b2cid_idx, 2, b_2cid);
+    path.replace(b2cid_idx, 6, b_2cid);
 
     std::map<std::string, std::string> params;
 

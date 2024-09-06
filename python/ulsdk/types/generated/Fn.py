@@ -77,6 +77,8 @@ class Fn(object):
     ToChar = 71
     ArrayToString = 72
     ArraySort = 73
+    ArrowCast = 74
+    RaiseCaseNotHandled = 75
     UlTimezone = 32764
     UlArrayContains = 32765
     UlArrayAny = 32766

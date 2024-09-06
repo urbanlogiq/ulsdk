@@ -36,7 +36,7 @@ fetch(
 ) {
     std::string path = "/v1/api/ulv2/inbox/:folder";
     const size_t folder_idx = path.find(":folder");
-    path.replace(folder_idx, 2, folder);
+    path.replace(folder_idx, 7, folder);
 
     std::map<std::string, std::string> params;
 
@@ -56,7 +56,7 @@ clear_all_status(
 ) {
     std::string path = "/v1/api/ulv2/inbox/:folder";
     const size_t folder_idx = path.find(":folder");
-    path.replace(folder_idx, 2, folder);
+    path.replace(folder_idx, 7, folder);
 
     std::map<std::string, std::string> params;
 
@@ -78,11 +78,11 @@ set_status(
 ) {
     std::string path = "/v1/api/ulv2/inbox/:folder/:id/status/:status";
     const size_t folder_idx = path.find(":folder");
-    path.replace(folder_idx, 2, folder);
+    path.replace(folder_idx, 7, folder);
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
     const size_t status_idx = path.find(":status");
-    path.replace(status_idx, 2, std::to_string(status));
+    path.replace(status_idx, 7, std::to_string(status));
 
     std::map<std::string, std::string> params;
 
@@ -104,9 +104,9 @@ clear_status(
 ) {
     std::string path = "/v1/api/ulv2/inbox/:folder/:id";
     const size_t folder_idx = path.find(":folder");
-    path.replace(folder_idx, 2, folder);
+    path.replace(folder_idx, 7, folder);
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 

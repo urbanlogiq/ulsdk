@@ -129,6 +129,7 @@ from .generated.Query import Query as FbsQuery
 from .generated.QueryElement import QueryElement as FbsQueryElement
 from .generated.QueryPathElement import QueryPathElement as FbsQueryPathElement
 from .generated.QueryTableSource import QueryTableSource as FbsQueryTableSource
+from .generated.RecordBatchPlaceholder import RecordBatchPlaceholder as FbsRecordBatchPlaceholder
 from .generated.SetExpr import SetExpr as FbsSetExpr
 from .generated.StreamId import StreamId as FbsStreamId
 from .generated.TableOrderBy import TableOrderBy as FbsTableOrderBy
@@ -1987,6 +1988,49 @@ class Vector:
         return eq
 
 @dataclass
+class RecordBatchPlaceholder:
+    idx: "int"
+
+    @classmethod
+    def from_fbs(cls, o: FbsRecordBatchPlaceholder) -> Self:
+        idx = o.Idx()
+        return cls(idx)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsRecordBatchPlaceholder.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.RecordBatchPlaceholder import (
+            Start,
+            AddIdx,
+            End,
+        )
+        
+        Start(builder)
+        AddIdx(builder, self.idx)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        idx = 0
+        return cls(idx)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.idx == other.idx
+
+        return eq
+
+@dataclass
 class TableSourceUnion:
     value: Union[
         "DataCatalog",
@@ -1994,6 +2038,7 @@ class TableSourceUnion:
         "GraphQuery",
         "QueryTableSource",
         "Vector",
+        "RecordBatchPlaceholder",
     ]
 
     def serialize_to(self, builder: Builder) -> Tuple[int, int]:
@@ -2009,6 +2054,8 @@ class TableSourceUnion:
             return (offset, TableSourceUnion().QueryTableSource)
         elif isinstance(self.value, Vector):
             return (offset, TableSourceUnion().Vector)
+        elif isinstance(self.value, RecordBatchPlaceholder):
+            return (offset, TableSourceUnion().RecordBatchPlaceholder)
         raise ValueError("Invalid union type")
 
     @classmethod
@@ -2037,6 +2084,10 @@ class TableSourceUnion:
             val = FbsVector();
             val.Init(source, pos)
             return cls(Vector.from_fbs(val))
+        elif ty == TableSourceUnion_ty_instance.RecordBatchPlaceholder:
+            val = FbsRecordBatchPlaceholder();
+            val.Init(source, pos)
+            return cls(RecordBatchPlaceholder.from_fbs(val))
         else:
             raise ValueError("Invalid union type")
 

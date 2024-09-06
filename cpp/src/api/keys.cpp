@@ -397,7 +397,7 @@ update_key(
 ) {
     std::string path = "/v1/api/uldirectory/v1/keys/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -418,7 +418,7 @@ get_key(
 ) {
     std::string path = "/v1/api/uldirectory/v1/keys/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -443,7 +443,7 @@ delete_key(
 ) {
     std::string path = "/v1/api/uldirectory/v1/keys/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 2, id.to_string());
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
