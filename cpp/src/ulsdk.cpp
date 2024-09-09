@@ -95,17 +95,15 @@ std::string Uuid::to_string() const {
     return result;
 }
 
-std::string
-url_encode(const std::string& input) {
-    CURL *curl = curl_easy_init();
-    char *output = curl_easy_escape(curl, input.c_str(), input.size());
+std::string url_encode(const std::string& input) {
+    CURL* curl = curl_easy_init();
+    char* output = curl_easy_escape(curl, input.c_str(), input.size());
     std::string result = std::string(output);
     curl_free(output);
     curl_easy_cleanup(curl);
 
     return result;
 }
-
 
 int init() {
     if (sodium_init() == -1) {

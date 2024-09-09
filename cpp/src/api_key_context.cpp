@@ -72,7 +72,20 @@ public:
     }
 };
 
-std::string add_params(
+static Result<std::vector<uint8_t>>
+raise_for_status(CURL* curl, std::vector<uint8_t> response) {
+    long code = 0;
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
+    if (code >= 400) {
+        return Result<std::vector<uint8_t>>(
+            Error((int)code, std::string(response.begin(), response.end()))
+        );
+    }
+
+    return Result<std::vector<uint8_t>>(response);
+}
+
+static std::string add_params(
     CURL* curl,
     const std::string& url,
     const std::vector<std::pair<std::string, std::string>>& params
@@ -407,7 +420,7 @@ Result<std::vector<uint8_t>> ApiKeyContext::get(
         return Result<std::vector<uint8_t>>(Error(curl.error_buffer()));
     }
 
-    return Result<std::vector<uint8_t>>(response);
+    return raise_for_status(curl, response);
 }
 
 Result<std::vector<uint8_t>> ApiKeyContext::put(
@@ -479,7 +492,7 @@ Result<std::vector<uint8_t>> ApiKeyContext::put(
         return Result<std::vector<uint8_t>>(Error(curl.error_buffer()));
     }
 
-    return Result<std::vector<uint8_t>>(response);
+    return raise_for_status(curl, response);
 }
 
 Result<std::vector<uint8_t>> ApiKeyContext::post(
@@ -551,7 +564,7 @@ Result<std::vector<uint8_t>> ApiKeyContext::post(
         return Result<std::vector<uint8_t>>(Error(curl.error_buffer()));
     }
 
-    return Result<std::vector<uint8_t>>(response);
+    return raise_for_status(curl, response);
 }
 
 Result<std::vector<uint8_t>> ApiKeyContext::upload(
@@ -665,6 +678,6 @@ Result<std::vector<uint8_t>> ApiKeyContext::del(
         return Result<std::vector<uint8_t>>(Error(curl.error_buffer()));
     }
 
-    return Result<std::vector<uint8_t>>(response);
+    return raise_for_status(curl, response);
 }
 }  // namespace ul
