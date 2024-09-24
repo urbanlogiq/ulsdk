@@ -484,6 +484,7 @@ Result<std::vector<uint8_t>> ApiKeyContext::put(
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 0L);
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.data());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data.size());
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
@@ -556,6 +557,7 @@ Result<std::vector<uint8_t>> ApiKeyContext::post(
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 0L);
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.data());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data.size());
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
