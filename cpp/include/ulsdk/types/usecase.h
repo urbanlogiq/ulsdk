@@ -30,7 +30,7 @@ struct UseCaseInputPair;
 typedef std::variant<
     std::shared_ptr<ObjectId>,
     std::shared_ptr<Schema>,
-    std::shared_ptr<ParameterizedQuery>,
+    std::shared_ptr<Query>,
     std::shared_ptr<ValueInstance>
 > UseCaseInput;
 

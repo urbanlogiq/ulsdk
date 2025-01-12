@@ -18,3 +18,4 @@ class DataCatalogObjectTy(object):
     Notification = 12
     Model = 13
     Ingestion = 14
+    View = 15

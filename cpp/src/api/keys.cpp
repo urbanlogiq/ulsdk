@@ -50,7 +50,7 @@ Key::Key(const struct json_value_s *root)
             if (key_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *id__str = static_cast<const struct json_string_s *>(key_value->payload);
             id_ = std::string(id__str->string);
         } else if (std::strcmp(e->name->string, "pubkey") == 0) {
@@ -62,7 +62,7 @@ Key::Key(const struct json_value_s *root)
                 if (key_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *pubkey__str = static_cast<const struct json_string_s *>(key_value->payload);
                 pubkey_ = std::string(pubkey__str->string);
             }
@@ -72,7 +72,7 @@ Key::Key(const struct json_value_s *root)
             if (key_value->type != json_type_number) {
                 throw std::runtime_error("expected field to be of type number");
             }
-            
+
             const struct json_number_s *created__num = static_cast<const struct json_number_s *>(key_value->payload);
             created_ = std::stoll(created__num->number);
         } else if (std::strcmp(e->name->string, "last") == 0) {
@@ -84,7 +84,7 @@ Key::Key(const struct json_value_s *root)
                 if (key_value->type != json_type_number) {
                     throw std::runtime_error("expected field to be of type number");
                 }
-                
+
                 const struct json_number_s *last__num = static_cast<const struct json_number_s *>(key_value->payload);
                 last_ = std::stoll(last__num->number);
             }
@@ -97,7 +97,7 @@ Key::Key(const struct json_value_s *root)
                 if (key_value->type != json_type_number) {
                     throw std::runtime_error("expected field to be of type number");
                 }
-                
+
                 const struct json_number_s *expiry__num = static_cast<const struct json_number_s *>(key_value->payload);
                 expiry_ = std::stoll(expiry__num->number);
             }
@@ -110,7 +110,7 @@ Key::Key(const struct json_value_s *root)
                 if (key_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *comment__str = static_cast<const struct json_string_s *>(key_value->payload);
                 comment_ = std::string(comment__str->string);
             }
@@ -183,7 +183,7 @@ GetKeys::GetKeys(const struct json_value_s *root)
             if (get_keys_value->type != json_type_array) {
                 throw std::runtime_error("expected field to be of type array");
             }
-            
+
             const struct json_array_s *keys__array = static_cast<const struct json_array_s *>(get_keys_value->payload);
             const struct json_array_element_s *keys__element = keys__array->start;
             std::vector<Key> keys__vec = std::vector<Key>();
@@ -193,7 +193,7 @@ GetKeys::GetKeys(const struct json_value_s *root)
             if (get_keys_value_0->type != json_type_object) {
                 throw std::runtime_error("expected field to be of type object");
             }
-            
+
             keys__value = Key(get_keys_value_0);
                 keys__vec.push_back(keys__value);
                 keys__element = keys__element->next;
@@ -240,7 +240,7 @@ CreateKey::CreateKey(const struct json_value_s *root)
             if (create_key_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *id__str = static_cast<const struct json_string_s *>(create_key_value->payload);
             id_ = std::string(id__str->string);
         } else if (std::strcmp(e->name->string, "secretKey") == 0) {
@@ -249,7 +249,7 @@ CreateKey::CreateKey(const struct json_value_s *root)
             if (create_key_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *secret_key__str = static_cast<const struct json_string_s *>(create_key_value->payload);
             secret_key_ = std::string(secret_key__str->string);
         }
@@ -296,7 +296,7 @@ UpdateKey::UpdateKey(const struct json_value_s *root)
                 if (update_key_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *comment__str = static_cast<const struct json_string_s *>(update_key_value->payload);
                 comment_ = std::string(comment__str->string);
             }
@@ -309,7 +309,7 @@ UpdateKey::UpdateKey(const struct json_value_s *root)
                 if (update_key_value->type != json_type_number) {
                     throw std::runtime_error("expected field to be of type number");
                 }
-                
+
                 const struct json_number_s *expiry__num = static_cast<const struct json_number_s *>(update_key_value->payload);
                 expiry_ = std::stoll(expiry__num->number);
             }

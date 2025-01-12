@@ -9,46 +9,55 @@ def test_reflection_enum():
     _b = _t0.to_bytes()
     _t1 = ReflectionEnum.from_bytes(_b)
     assert _t0 == _t1
+
 def test_reflection_enum_val():
     _t0 = ReflectionEnumVal.make_default()
     _b = _t0.to_bytes()
     _t1 = ReflectionEnumVal.from_bytes(_b)
     assert _t0 == _t1
+
 def test_reflection_field():
     _t0 = ReflectionField.make_default()
     _b = _t0.to_bytes()
     _t1 = ReflectionField.from_bytes(_b)
     assert _t0 == _t1
+
 def test_reflection_key_value():
     _t0 = ReflectionKeyValue.make_default()
     _b = _t0.to_bytes()
     _t1 = ReflectionKeyValue.from_bytes(_b)
     assert _t0 == _t1
+
 def test_reflection_object():
     _t0 = ReflectionObject.make_default()
     _b = _t0.to_bytes()
     _t1 = ReflectionObject.from_bytes(_b)
     assert _t0 == _t1
+
 def test_reflection_rpc_call():
     _t0 = ReflectionRPCCall.make_default()
     _b = _t0.to_bytes()
     _t1 = ReflectionRPCCall.from_bytes(_b)
     assert _t0 == _t1
+
 def test_reflection_schema():
     _t0 = ReflectionSchema.make_default()
     _b = _t0.to_bytes()
     _t1 = ReflectionSchema.from_bytes(_b)
     assert _t0 == _t1
+
 def test_reflection_schema_file():
     _t0 = ReflectionSchemaFile.make_default()
     _b = _t0.to_bytes()
     _t1 = ReflectionSchemaFile.from_bytes(_b)
     assert _t0 == _t1
+
 def test_reflection_service():
     _t0 = ReflectionService.make_default()
     _b = _t0.to_bytes()
     _t1 = ReflectionService.from_bytes(_b)
     assert _t0 == _t1
+
 def test_reflection_type():
     _t0 = ReflectionType.make_default()
     _b = _t0.to_bytes()

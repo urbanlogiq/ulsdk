@@ -9,21 +9,25 @@ def test_attribute_pair():
     _b = _t0.to_bytes()
     _t1 = AttributePair.from_bytes(_b)
     assert _t0 == _t1
+
 def test_direction_and_road_name():
     _t0 = DirectionAndRoadName.make_default()
     _b = _t0.to_bytes()
     _t1 = DirectionAndRoadName.from_bytes(_b)
     assert _t0 == _t1
+
 def test_direction_and_road_names():
     _t0 = DirectionAndRoadNames.make_default()
     _b = _t0.to_bytes()
     _t1 = DirectionAndRoadNames.from_bytes(_b)
     assert _t0 == _t1
+
 def test_named_parameter():
     _t0 = NamedParameter.make_default()
     _b = _t0.to_bytes()
     _t1 = NamedParameter.from_bytes(_b)
     assert _t0 == _t1
+
 def test_source():
     _t0 = Source.make_default()
     _b = _t0.to_bytes()

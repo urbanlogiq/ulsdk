@@ -22,6 +22,7 @@ namespace drive {
 - `me` for the current user's drive
 - `union` for the union of the current user's drive and all shared drives
 - the UUID of any drive directory
+
 Paths may include wildcards like `*`.
                 
  * @param root The root directory to list files for, or one of "me" or "union".

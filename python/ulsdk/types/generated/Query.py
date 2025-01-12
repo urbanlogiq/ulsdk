@@ -6,6 +6,7 @@ import flatbuffers
 from flatbuffers.compat import import_numpy
 from typing import Any
 from .QueryElement import QueryElement
+from .TableSourceInstance import TableSourceInstance
 from .ValueInstance import ValueInstance
 from typing import Optional
 np = import_numpy()
@@ -69,8 +70,32 @@ class Query(object):
             return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
         return 0
 
+    # Query
+    def BoundSources(self, j: int) -> Optional[TableSourceInstance]:
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        if o != 0:
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
+            x = self._tab.Indirect(x)
+            obj = TableSourceInstance()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+    # Query
+    def BoundSourcesLength(self) -> int:
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # Query
+    def BoundSourcesIsNone(self) -> bool:
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        return o == 0
+
 def QueryStart(builder: flatbuffers.Builder):
-    builder.StartObject(3)
+    builder.StartObject(4)
 
 def Start(builder: flatbuffers.Builder):
     QueryStart(builder)
@@ -98,6 +123,18 @@ def QueryAddLimit(builder: flatbuffers.Builder, limit: int):
 
 def AddLimit(builder: flatbuffers.Builder, limit: int):
     QueryAddLimit(builder, limit)
+
+def QueryAddBoundSources(builder: flatbuffers.Builder, boundSources: int):
+    builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(boundSources), 0)
+
+def AddBoundSources(builder: flatbuffers.Builder, boundSources: int):
+    QueryAddBoundSources(builder, boundSources)
+
+def QueryStartBoundSourcesVector(builder, numElems: int) -> int:
+    return builder.StartVector(4, numElems, 4)
+
+def StartBoundSourcesVector(builder, numElems: int) -> int:
+    return QueryStartBoundSourcesVector(builder, numElems)
 
 def QueryEnd(builder: flatbuffers.Builder) -> int:
     return builder.EndObject()

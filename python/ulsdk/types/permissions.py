@@ -89,7 +89,7 @@ class AccessControlList:
         for i in reversed(range(len(self.roles))):
             builder.PrependUOffsetTRelative(roles_offsets[i])
         roles_offset = builder.EndVector()
-        
+
         Start(builder)
         if extends_offset is not None:
             AddExtends(builder, extends_offset)
@@ -148,7 +148,7 @@ class Role:
             End,
         )
         principal_offset = self.principal.serialize_to(builder)
-        
+
         Start(builder)
         AddPermission(builder, self.permission)
         AddPrincipal(builder, principal_offset)

@@ -100,7 +100,7 @@ class Null:
             Start,
             End,
         )
-        
+
         Start(builder)
         return End(builder)
 
@@ -144,7 +144,7 @@ class Int:
             AddIsSigned,
             End,
         )
-        
+
         Start(builder)
         AddBitWidth(builder, self.bitWidth)
         AddIsSigned(builder, self.is_signed)
@@ -190,7 +190,7 @@ class FloatingPoint:
             AddPrecision,
             End,
         )
-        
+
         Start(builder)
         AddPrecision(builder, self.precision.value)
         return End(builder)
@@ -232,7 +232,7 @@ class Binary:
             Start,
             End,
         )
-        
+
         Start(builder)
         return End(builder)
 
@@ -271,7 +271,7 @@ class Utf8:
             Start,
             End,
         )
-        
+
         Start(builder)
         return End(builder)
 
@@ -307,7 +307,7 @@ class Bool:
             Start,
             End,
         )
-        
+
         Start(builder)
         return End(builder)
 
@@ -365,7 +365,7 @@ class Decimal:
             AddScale,
             End,
         )
-        
+
         Start(builder)
         AddBitWidth(builder, self.bitWidth)
         AddPrecision(builder, self.precision)
@@ -422,7 +422,7 @@ class Date:
             AddUnit,
             End,
         )
-        
+
         Start(builder)
         AddUnit(builder, self.unit.value)
         return End(builder)
@@ -485,7 +485,7 @@ class Time:
             AddUnit,
             End,
         )
-        
+
         Start(builder)
         AddBitWidth(builder, self.bitWidth)
         AddUnit(builder, self.unit.value)
@@ -658,7 +658,7 @@ class Timestamp:
         timezone_offset = None
         if self.timezone is not None:
             timezone_offset = builder.CreateString(self.timezone)
-        
+
         Start(builder)
         if timezone_offset is not None:
             AddTimezone(builder, timezone_offset)
@@ -705,7 +705,7 @@ class Interval:
             AddUnit,
             End,
         )
-        
+
         Start(builder)
         AddUnit(builder, self.unit.value)
         return End(builder)
@@ -744,7 +744,7 @@ class List_:
             Start,
             End,
         )
-        
+
         Start(builder)
         return End(builder)
 
@@ -785,7 +785,7 @@ class Struct_:
             Start,
             End,
         )
-        
+
         Start(builder)
         return End(builder)
 
@@ -845,7 +845,7 @@ class Union_:
             for i in reversed(range(len(self.typeIds))):
                 builder.PrependInt32(self.typeIds[i])
             typeIds_offset = builder.EndVector()
-        
+
         Start(builder)
         AddMode(builder, self.mode.value)
         if typeIds_offset is not None:
@@ -903,7 +903,7 @@ class FixedSizeBinary:
             AddByteWidth,
             End,
         )
-        
+
         Start(builder)
         AddByteWidth(builder, self.byteWidth)
         return End(builder)
@@ -947,7 +947,7 @@ class FixedSizeList:
             AddListSize,
             End,
         )
-        
+
         Start(builder)
         AddListSize(builder, self.listSize)
         return End(builder)
@@ -1018,7 +1018,7 @@ class Map:
             AddKeysSorted,
             End,
         )
-        
+
         Start(builder)
         AddKeysSorted(builder, self.keysSorted)
         return End(builder)
@@ -1061,7 +1061,7 @@ class Duration:
             AddUnit,
             End,
         )
-        
+
         Start(builder)
         AddUnit(builder, self.unit.value)
         return End(builder)
@@ -1104,7 +1104,7 @@ class LargeBinary:
             Start,
             End,
         )
-        
+
         Start(builder)
         return End(builder)
 
@@ -1144,7 +1144,7 @@ class LargeUtf8:
             Start,
             End,
         )
-        
+
         Start(builder)
         return End(builder)
 
@@ -1184,7 +1184,7 @@ class LargeList:
             Start,
             End,
         )
-        
+
         Start(builder)
         return End(builder)
 
@@ -1208,7 +1208,7 @@ class Type:
     """ ----------------------------------------------------------------------
      Top-level Type value, enabling extensible type-specific metadata. We can
      add new logical types to Type without breaking backwards compatibility
-"""
+    """
 
     value: Union[
         "Null",
@@ -1476,7 +1476,7 @@ class DictionaryEncoding:
         indexType_offset = None
         if self.indexType is not None:
             indexType_offset = self.indexType.serialize_to(builder)
-        
+
         Start(builder)
         AddDictionaryKind(builder, self.dictionaryKind.value)
         AddId(builder, self.id)
@@ -1615,7 +1615,7 @@ class Field:
         type_offset, type_ty = (None, None)
         if self.type is not None:
             type_offset, type_ty = self.type.serialize_to(builder)
-        
+
         Start(builder)
         if children_offset is not None:
             AddChildren(builder, children_offset)
@@ -1720,7 +1720,7 @@ class KeyValue:
         value_offset = None
         if self.value is not None:
             value_offset = builder.CreateString(self.value)
-        
+
         Start(builder)
         if key_offset is not None:
             AddKey(builder, key_offset)
@@ -1832,7 +1832,7 @@ class Schema:
             for i in reversed(range(len(self.fields))):
                 builder.PrependUOffsetTRelative(fields_offsets[i])
             fields_offset = builder.EndVector()
-        
+
         Start(builder)
         if custom_metadata_offset is not None:
             AddCustomMetadata(builder, custom_metadata_offset)

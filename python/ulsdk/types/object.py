@@ -126,6 +126,7 @@ from .value import (
     VI8,
     VIsize,
     VNull,
+    VPlaceholder,
     VStr,
     VTimestampMs,
     VTimestampMsUtc,
@@ -235,6 +236,7 @@ from .generated.VI64 import VI64 as FbsVI64
 from .generated.VI8 import VI8 as FbsVI8
 from .generated.VIsize import VIsize as FbsVIsize
 from .generated.VNull import VNull as FbsVNull
+from .generated.VPlaceholder import VPlaceholder as FbsVPlaceholder
 from .generated.VStr import VStr as FbsVStr
 from .generated.VTimestampMs import VTimestampMs as FbsVTimestampMs
 from .generated.VTimestampMsUtc import VTimestampMsUtc as FbsVTimestampMsUtc
@@ -286,6 +288,7 @@ class DataCatalogObjectTy(Enum):
     Notification = 12
     Model = 13
     Ingestion = 14
+    View = 15
 
 
 @dataclass
@@ -439,7 +442,7 @@ class DataCatalogObject:
                 builder.PrependUOffsetTRelative(tags_offsets[i])
             tags_offset = builder.EndVector()
         user_offset = self.user.serialize_to(builder)
-        
+
         Start(builder)
         if attributes_offset is not None:
             AddAttributes(builder, attributes_offset)
@@ -570,7 +573,7 @@ class ObjectIdList:
         for i in reversed(range(len(self.ids))):
             builder.PrependUOffsetTRelative(ids_offsets[i])
         ids_offset = builder.EndVector()
-        
+
         Start(builder)
         AddIds(builder, ids_offset)
         return End(builder)
@@ -635,7 +638,7 @@ class ObjectIdPair:
             for i in reversed(range(len(self.object))):
                 builder.PrependUint8(self.object[i])
             object_offset = builder.EndVector()
-        
+
         Start(builder)
         AddId(builder, id_offset)
         if object_offset is not None:
@@ -707,7 +710,7 @@ class ObjectIdPairList:
         for i in reversed(range(len(self.pairs))):
             builder.PrependUOffsetTRelative(pairs_offsets[i])
         pairs_offset = builder.EndVector()
-        
+
         Start(builder)
         AddPairs(builder, pairs_offset)
         return End(builder)
@@ -789,7 +792,7 @@ class ObjectSummary:
             acl_offset = self.acl.serialize_to(builder)
         head_revision_offset = self.head_revision.serialize_to(builder)
         id_offset = self.id.serialize_to(builder)
-        
+
         Start(builder)
         if acl_offset is not None:
             AddAcl(builder, acl_offset)
@@ -863,7 +866,7 @@ class ObjectSummaryList:
         for i in reversed(range(len(self.pairs))):
             builder.PrependUOffsetTRelative(pairs_offsets[i])
         pairs_offset = builder.EndVector()
-        
+
         Start(builder)
         AddPairs(builder, pairs_offset)
         return End(builder)

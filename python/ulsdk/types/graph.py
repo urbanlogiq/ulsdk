@@ -123,7 +123,7 @@ class GeomOp:
         for i in reversed(range(len(self.geoms))):
             builder.PrependUOffsetTRelative(geoms_offsets[i])
         geoms_offset = builder.EndVector()
-        
+
         Start(builder)
         AddGeoms(builder, geoms_offset)
         AddOp(builder, self.op.value)
@@ -277,7 +277,7 @@ class NodeQuery:
             for i in reversed(range(len(self.stream_ids))):
                 builder.PrependUOffsetTRelative(stream_ids_offsets[i])
             stream_ids_offset = builder.EndVector()
-        
+
         Start(builder)
         if descriptions_offset is not None:
             AddDescriptions(builder, descriptions_offset)
@@ -391,7 +391,7 @@ class EdgeQuery:
             AddEdgeTy,
             End,
         )
-        
+
         Start(builder)
         AddEdgeTy(builder, self.edge_ty.value)
         return End(builder)
@@ -491,7 +491,7 @@ class EdgeList:
         for i in reversed(range(len(self.edges))):
             builder.PrependUOffsetTRelative(edges_offsets[i])
         edges_offset = builder.EndVector()
-        
+
         Start(builder)
         AddEdges(builder, edges_offset)
         return End(builder)
@@ -544,7 +544,7 @@ class Geom:
             End,
         )
         geom_offset, geom_ty = self.geom.serialize_to(builder)
-        
+
         Start(builder)
         AddGeom(builder, geom_offset)
         AddGeomType(builder, geom_ty)
@@ -631,7 +631,7 @@ class GraphQuery:
         for i in reversed(range(len(self.path))):
             builder.PrependUOffsetTRelative(path_offsets[i])
         path_offset = builder.EndVector()
-        
+
         Start(builder)
         AddLimit(builder, self.limit)
         if order_by_offset is not None:
@@ -709,7 +709,7 @@ class NodeIdPair:
         stream_id_offset = None
         if self.stream_id is not None:
             stream_id_offset = self.stream_id.serialize_to(builder)
-        
+
         Start(builder)
         AddNodeId(builder, node_id_offset)
         if stream_id_offset is not None:
@@ -771,7 +771,7 @@ class NodeList:
         for i in reversed(range(len(self.nodes))):
             builder.PrependUOffsetTRelative(nodes_offsets[i])
         nodes_offset = builder.EndVector()
-        
+
         Start(builder)
         AddNodes(builder, nodes_offset)
         return End(builder)
@@ -828,7 +828,7 @@ class OrderBy:
             End,
         )
         field_offset = builder.CreateString(self.field)
-        
+
         Start(builder)
         AddField(builder, field_offset)
         AddSort(builder, self.sort.value)
@@ -884,7 +884,7 @@ class Projection:
             End,
         )
         alias_offset = builder.CreateString(self.alias)
-        
+
         Start(builder)
         AddAlias(builder, alias_offset)
         AddPredicate(builder, self.predicate.value)
@@ -937,7 +937,7 @@ class QueryPathElement:
             End,
         )
         element_offset, element_ty = self.element.serialize_to(builder)
-        
+
         Start(builder)
         AddElement(builder, element_offset)
         AddElementType(builder, element_ty)

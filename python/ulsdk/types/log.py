@@ -24,6 +24,7 @@ from .value import (
     VI8,
     VIsize,
     VNull,
+    VPlaceholder,
     VStr,
     VTimestampMs,
     VTimestampMsUtc,
@@ -58,6 +59,7 @@ from .generated.VI64 import VI64 as FbsVI64
 from .generated.VI8 import VI8 as FbsVI8
 from .generated.VIsize import VIsize as FbsVIsize
 from .generated.VNull import VNull as FbsVNull
+from .generated.VPlaceholder import VPlaceholder as FbsVPlaceholder
 from .generated.VStr import VStr as FbsVStr
 from .generated.VTimestampMs import VTimestampMs as FbsVTimestampMs
 from .generated.VTimestampMsUtc import VTimestampMsUtc as FbsVTimestampMsUtc
@@ -113,7 +115,7 @@ class Label:
         )
         key_offset = builder.CreateString(self.key)
         value_offset = builder.CreateString(self.value)
-        
+
         Start(builder)
         AddKey(builder, key_offset)
         AddValue(builder, value_offset)
@@ -197,7 +199,7 @@ class Log:
         for i in reversed(range(len(self.pairs))):
             builder.PrependUOffsetTRelative(pairs_offsets[i])
         pairs_offset = builder.EndVector()
-        
+
         Start(builder)
         AddLabels(builder, labels_offset)
         AddPairs(builder, pairs_offset)
@@ -266,7 +268,7 @@ class Pair:
         )
         key_offset = builder.CreateString(self.key)
         value_offset, value_ty = self.value.serialize_to(builder)
-        
+
         Start(builder)
         AddKey(builder, key_offset)
         AddValue(builder, value_offset)

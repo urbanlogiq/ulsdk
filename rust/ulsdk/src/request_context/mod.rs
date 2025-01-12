@@ -49,7 +49,7 @@ pub trait RequestContext {
         params: Option<ParamMap>,
         headers: Option<HeaderMap>,
     ) -> Result<Vec<u8>, Error>;
-    async fn upload(&self, path: &str, files: Vec<File>) -> Result<(), Error>;
+    async fn upload(&self, path: &str, files: Vec<File>) -> Result<Vec<u8>, Error>;
     async fn delete(
         &self,
         path: &str,

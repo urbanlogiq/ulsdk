@@ -9,31 +9,37 @@ def test_graph_edge():
     _b = _t0.to_bytes()
     _t1 = GraphEdge.from_bytes(_b)
     assert _t0 == _t1
+
 def test_graph_node():
     _t0 = GraphNode.make_default()
     _b = _t0.to_bytes()
     _t1 = GraphNode.from_bytes(_b)
     assert _t0 == _t1
+
 def test_line():
     _t0 = Line.make_default()
     _b = _t0.to_bytes()
     _t1 = Line.from_bytes(_b)
     assert _t0 == _t1
+
 def test_multi_line():
     _t0 = MultiLine.make_default()
     _b = _t0.to_bytes()
     _t1 = MultiLine.from_bytes(_b)
     assert _t0 == _t1
+
 def test_multi_polygon():
     _t0 = MultiPolygon.make_default()
     _b = _t0.to_bytes()
     _t1 = MultiPolygon.from_bytes(_b)
     assert _t0 == _t1
+
 def test_point():
     _t0 = Point.make_default()
     _b = _t0.to_bytes()
     _t1 = Point.from_bytes(_b)
     assert _t0 == _t1
+
 def test_polygon():
     _t0 = Polygon.make_default()
     _b = _t0.to_bytes()

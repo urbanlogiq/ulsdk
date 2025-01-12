@@ -24,3 +24,6 @@ class UseCaseTy(object):
     FreightAnalysis = 18
     CorridorAnalysis = 19
     Ethica = 20
+    # usecase object whose implementation is determined by the frontend using its `slug` field.
+    # This usecase object is used only to gatekeep which users can access the view associated with the url containing the slug.
+    UrlBased = 21

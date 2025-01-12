@@ -270,7 +270,7 @@ class AttributePair:
         value_offset = None
         if self.value is not None:
             value_offset = builder.CreateString(self.value)
-        
+
         Start(builder)
         if key_offset is not None:
             AddKey(builder, key_offset)
@@ -328,7 +328,7 @@ class DirectionAndRoadName:
         )
         direction_offset = builder.CreateString(self.direction)
         road_name_offset = builder.CreateString(self.road_name)
-        
+
         Start(builder)
         AddDirection(builder, direction_offset)
         AddRoadName(builder, road_name_offset)
@@ -391,7 +391,7 @@ class DirectionAndRoadNames:
             for i in reversed(range(len(self.direction_and_road_names))):
                 builder.PrependUOffsetTRelative(direction_and_road_names_offsets[i])
             direction_and_road_names_offset = builder.EndVector()
-        
+
         Start(builder)
         if direction_and_road_names_offset is not None:
             AddDirectionAndRoadNames(builder, direction_and_road_names_offset)
@@ -472,7 +472,7 @@ class NamedParameter:
         schema_offset = None
         if self.schema is not None:
             schema_offset = self.schema.serialize_to(builder)
-        
+
         Start(builder)
         if description_offset is not None:
             AddDescription(builder, description_offset)
@@ -612,7 +612,7 @@ class Source:
                 builder.PrependUOffsetTRelative(schemas_offsets[i])
             schemas_offset = builder.EndVector()
         url_offset = builder.CreateString(self.url)
-        
+
         Start(builder)
         if metadata_offset is not None:
             AddMetadata(builder, metadata_offset)

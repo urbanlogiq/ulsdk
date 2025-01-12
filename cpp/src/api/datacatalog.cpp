@@ -367,7 +367,7 @@ stream_get_arrow(
     std::map<std::string, std::string> params;
 
     std::map<std::string, std::string> headers;
-    headers["Accept"] = "application/vnd.apache.arrow.stream";
+    headers["accept"] = "application/vnd.apache.arrow.stream";
     const Result<std::vector<uint8_t>> res = ctx.get(path, params, headers);
     if (std::holds_alternative<Error>(res)) {
         const auto error = std::get<Error>(res);
@@ -390,7 +390,7 @@ stream_get_parquet(
     std::map<std::string, std::string> params;
 
     std::map<std::string, std::string> headers;
-    headers["Accept"] = "application/vnd.apache.parquet";
+    headers["accept"] = "application/vnd.apache.parquet";
     const Result<std::vector<uint8_t>> res = ctx.get(path, params, headers);
     return res;
 }
@@ -407,7 +407,7 @@ stream_get_csv(
     std::map<std::string, std::string> params;
 
     std::map<std::string, std::string> headers;
-    headers["Accept"] = "text/csv";
+    headers["accept"] = "text/csv";
     const Result<std::vector<uint8_t>> res = ctx.get(path, params, headers);
     return res;
 }
@@ -424,7 +424,7 @@ stream_get_xlsx(
     std::map<std::string, std::string> params;
 
     std::map<std::string, std::string> headers;
-    headers["Accept"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    headers["accept"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     const Result<std::vector<uint8_t>> res = ctx.get(path, params, headers);
     return res;
 }
@@ -441,7 +441,7 @@ stream_get_json(
     std::map<std::string, std::string> params;
 
     std::map<std::string, std::string> headers;
-    headers["Accept"] = "application/json";
+    headers["accept"] = "application/json";
     const Result<std::vector<uint8_t>> res = ctx.get(path, params, headers);
     return res;
 }
@@ -458,7 +458,7 @@ stream_get_text(
     std::map<std::string, std::string> params;
 
     std::map<std::string, std::string> headers;
-    headers["Accept"] = "text/plain";
+    headers["accept"] = "text/plain";
     const Result<std::vector<uint8_t>> res = ctx.get(path, params, headers);
     return res;
 }
@@ -475,7 +475,7 @@ stream_get_html(
     std::map<std::string, std::string> params;
 
     std::map<std::string, std::string> headers;
-    headers["Accept"] = "text/html";
+    headers["accept"] = "text/html";
     const Result<std::vector<uint8_t>> res = ctx.get(path, params, headers);
     return res;
 }
@@ -484,7 +484,6 @@ Result<Void>
 stream_put_arrow(
     ul::RequestContext &ctx,
     const Uuid &id,
-    std::optional<std::string> subcollection,
     const std::vector<std::shared_ptr<::arrow::RecordBatch>> &data
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
@@ -492,10 +491,6 @@ stream_put_arrow(
     path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
-    if (subcollection.has_value()) {
-        const auto subcollection_value = subcollection.value();
-        params["subcollection"] = subcollection_value;
-    }
 
     std::map<std::string, std::string> headers;
     std::vector<uint8_t> body = ul::to_bytes(data);
@@ -511,7 +506,6 @@ Result<Void>
 stream_put_diffstream(
     ul::RequestContext &ctx,
     const Uuid &id,
-    std::optional<std::string> subcollection,
     const ::ul::types::DiffStream &data
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
@@ -519,10 +513,6 @@ stream_put_diffstream(
     path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
-    if (subcollection.has_value()) {
-        const auto subcollection_value = subcollection.value();
-        params["subcollection"] = subcollection_value;
-    }
 
     std::map<std::string, std::string> headers;
     const std::vector<uint8_t> body = ::ul::types::to_bytes(data);
@@ -538,7 +528,6 @@ Result<Void>
 stream_put_json(
     ul::RequestContext &ctx,
     const Uuid &id,
-    std::optional<std::string> subcollection,
     const std::vector<std::map<std::string, ul::JsonValue>> &data
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
@@ -546,10 +535,6 @@ stream_put_json(
     path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
-    if (subcollection.has_value()) {
-        const auto subcollection_value = subcollection.value();
-        params["subcollection"] = subcollection_value;
-    }
 
     std::map<std::string, std::string> headers;
         std::stringstream body_ss;
@@ -640,18 +625,13 @@ update_metadata(
 Result<Void>
 stream_compact(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    std::optional<std::string> subcollection
+    const Uuid &id
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id/compact";
     const size_t id_idx = path.find(":id");
     path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
-    if (subcollection.has_value()) {
-        const auto subcollection_value = subcollection.value();
-        params["subcollection"] = subcollection_value;
-    }
 
     std::map<std::string, std::string> headers;
     const std::vector<uint8_t> body;
@@ -785,7 +765,7 @@ query_arrow(
     std::map<std::string, std::string> params;
 
     std::map<std::string, std::string> headers;
-    headers["Accept"] = "application/vnd.apache.arrow.stream";
+    headers["accept"] = "application/vnd.apache.arrow.stream";
     const std::vector<uint8_t> body = ::ul::types::to_bytes(query);
     const Result<std::vector<uint8_t>> res = ctx.post(path, body, "application/octet-stream", params, headers);
     if (std::holds_alternative<Error>(res)) {
@@ -807,7 +787,7 @@ query_parquet(
     std::map<std::string, std::string> params;
 
     std::map<std::string, std::string> headers;
-    headers["Accept"] = "application/vnd.apache.parquet";
+    headers["accept"] = "application/vnd.apache.parquet";
     const std::vector<uint8_t> body = ::ul::types::to_bytes(query);
     const Result<std::vector<uint8_t>> res = ctx.post(path, body, "application/octet-stream", params, headers);
     return res;
@@ -823,7 +803,7 @@ query_csv(
     std::map<std::string, std::string> params;
 
     std::map<std::string, std::string> headers;
-    headers["Accept"] = "text/csv";
+    headers["accept"] = "text/csv";
     const std::vector<uint8_t> body = ::ul::types::to_bytes(query);
     const Result<std::vector<uint8_t>> res = ctx.post(path, body, "application/octet-stream", params, headers);
     return res;
@@ -839,7 +819,7 @@ query_xlsx(
     std::map<std::string, std::string> params;
 
     std::map<std::string, std::string> headers;
-    headers["Accept"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    headers["accept"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     const std::vector<uint8_t> body = ::ul::types::to_bytes(query);
     const Result<std::vector<uint8_t>> res = ctx.post(path, body, "application/octet-stream", params, headers);
     return res;
@@ -855,7 +835,7 @@ query_json(
     std::map<std::string, std::string> params;
 
     std::map<std::string, std::string> headers;
-    headers["Accept"] = "application/json";
+    headers["accept"] = "application/json";
     const std::vector<uint8_t> body = ::ul::types::to_bytes(query);
     const Result<std::vector<uint8_t>> res = ctx.post(path, body, "application/octet-stream", params, headers);
     return res;
@@ -871,7 +851,7 @@ query_text(
     std::map<std::string, std::string> params;
 
     std::map<std::string, std::string> headers;
-    headers["Accept"] = "text/plain";
+    headers["accept"] = "text/plain";
     const std::vector<uint8_t> body = ::ul::types::to_bytes(query);
     const Result<std::vector<uint8_t>> res = ctx.post(path, body, "application/octet-stream", params, headers);
     return res;
@@ -887,7 +867,7 @@ query_html(
     std::map<std::string, std::string> params;
 
     std::map<std::string, std::string> headers;
-    headers["Accept"] = "text/html";
+    headers["accept"] = "text/html";
     const std::vector<uint8_t> body = ::ul::types::to_bytes(query);
     const Result<std::vector<uint8_t>> res = ctx.post(path, body, "application/octet-stream", params, headers);
     return res;

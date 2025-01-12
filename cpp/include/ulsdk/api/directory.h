@@ -235,10 +235,12 @@ get_principals(
 
 /**
  * Queries for principals. The query is performed as a substring match against the following fields:
+
 For users:
 - displayName
 - id
 - otherMails
+
 For groups:
 - displayName
 - id

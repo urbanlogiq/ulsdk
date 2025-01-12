@@ -4,11 +4,14 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+arrow = { workspace = true }
 async-trait = { workspace = true }
 base64 = { workspace = true }
+bitflags = { workspace = true }
 bytes = { workspace = true }
 dirs = { workspace = true }
 ed25519-dalek = { workspace = true }
+flatbuffers = { workspace = true }
 hex = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }

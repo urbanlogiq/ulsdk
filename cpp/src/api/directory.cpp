@@ -50,7 +50,7 @@ Principal::Principal(const struct json_value_s *root)
             if (principal_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *principal_type__str = static_cast<const struct json_string_s *>(principal_value->payload);
             principal_type_ = std::string(principal_type__str->string);
         } else if (std::strcmp(e->name->string, "displayName") == 0) {
@@ -59,7 +59,7 @@ Principal::Principal(const struct json_value_s *root)
             if (principal_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *display_name__str = static_cast<const struct json_string_s *>(principal_value->payload);
             display_name_ = std::string(display_name__str->string);
         } else if (std::strcmp(e->name->string, "id") == 0) {
@@ -68,7 +68,7 @@ Principal::Principal(const struct json_value_s *root)
             if (principal_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *id__str = static_cast<const struct json_string_s *>(principal_value->payload);
             id_ = std::string(id__str->string);
         } else if (std::strcmp(e->name->string, "email") == 0) {
@@ -80,7 +80,7 @@ Principal::Principal(const struct json_value_s *root)
                 if (principal_value->type != json_type_array) {
                     throw std::runtime_error("expected field to be of type array");
                 }
-                
+
                 const struct json_array_s *email__array = static_cast<const struct json_array_s *>(principal_value->payload);
                 const struct json_array_element_s *email__element = email__array->start;
                 std::vector<std::string> email__vec = std::vector<std::string>();
@@ -90,7 +90,7 @@ Principal::Principal(const struct json_value_s *root)
                     if (principal_value_1->type != json_type_string) {
                         throw std::runtime_error("expected field to be of type string");
                     }
-                    
+
                     const struct json_string_s *email__value_str = static_cast<const struct json_string_s *>(principal_value_1->payload);
                     email__value = std::string(email__value_str->string);
                     email__vec.push_back(email__value);
@@ -107,7 +107,7 @@ Principal::Principal(const struct json_value_s *root)
                 if (principal_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *description__str = static_cast<const struct json_string_s *>(principal_value->payload);
                 description_ = std::string(description__str->string);
             }
@@ -120,7 +120,7 @@ Principal::Principal(const struct json_value_s *root)
                 if (principal_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *department__str = static_cast<const struct json_string_s *>(principal_value->payload);
                 department_ = std::string(department__str->string);
             }
@@ -197,7 +197,7 @@ AdUser::AdUser(const struct json_value_s *root)
             if (ad_user_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *display_name__str = static_cast<const struct json_string_s *>(ad_user_value->payload);
             display_name_ = std::string(display_name__str->string);
         } else if (std::strcmp(e->name->string, "id") == 0) {
@@ -206,7 +206,7 @@ AdUser::AdUser(const struct json_value_s *root)
             if (ad_user_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *id__str = static_cast<const struct json_string_s *>(ad_user_value->payload);
             id_ = std::string(id__str->string);
         } else if (std::strcmp(e->name->string, "userPrincipalName") == 0) {
@@ -215,7 +215,7 @@ AdUser::AdUser(const struct json_value_s *root)
             if (ad_user_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *user_principal_name__str = static_cast<const struct json_string_s *>(ad_user_value->payload);
             user_principal_name_ = std::string(user_principal_name__str->string);
         } else if (std::strcmp(e->name->string, "otherMails") == 0) {
@@ -224,7 +224,7 @@ AdUser::AdUser(const struct json_value_s *root)
             if (ad_user_value->type != json_type_array) {
                 throw std::runtime_error("expected field to be of type array");
             }
-            
+
             const struct json_array_s *other_mails__array = static_cast<const struct json_array_s *>(ad_user_value->payload);
             const struct json_array_element_s *other_mails__element = other_mails__array->start;
             std::vector<std::string> other_mails__vec = std::vector<std::string>();
@@ -234,7 +234,7 @@ AdUser::AdUser(const struct json_value_s *root)
             if (ad_user_value_0->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *other_mails__value_str = static_cast<const struct json_string_s *>(ad_user_value_0->payload);
             other_mails__value = std::string(other_mails__value_str->string);
                 other_mails__vec.push_back(other_mails__value);
@@ -250,7 +250,7 @@ AdUser::AdUser(const struct json_value_s *root)
                 if (ad_user_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *department__str = static_cast<const struct json_string_s *>(ad_user_value->payload);
                 department_ = std::string(department__str->string);
             }
@@ -260,7 +260,7 @@ AdUser::AdUser(const struct json_value_s *root)
             if (ad_user_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *created_date_time__str = static_cast<const struct json_string_s *>(ad_user_value->payload);
             created_date_time_ = std::string(created_date_time__str->string);
         }
@@ -325,7 +325,7 @@ DisplayNames::DisplayNames(const struct json_value_s *root)
             if (display_names_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *display_name__str = static_cast<const struct json_string_s *>(display_names_value->payload);
             display_name_ = std::string(display_name__str->string);
         } else if (std::strcmp(e->name->string, "id") == 0) {
@@ -334,7 +334,7 @@ DisplayNames::DisplayNames(const struct json_value_s *root)
             if (display_names_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *id__str = static_cast<const struct json_string_s *>(display_names_value->payload);
             id_ = std::string(id__str->string);
         }
@@ -385,7 +385,7 @@ DeviceDetail::DeviceDetail(const struct json_value_s *root)
                 if (device_detail_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *device_id__str = static_cast<const struct json_string_s *>(device_detail_value->payload);
                 device_id_ = std::string(device_id__str->string);
             }
@@ -398,7 +398,7 @@ DeviceDetail::DeviceDetail(const struct json_value_s *root)
                 if (device_detail_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *operating_system__str = static_cast<const struct json_string_s *>(device_detail_value->payload);
                 operating_system_ = std::string(operating_system__str->string);
             }
@@ -411,7 +411,7 @@ DeviceDetail::DeviceDetail(const struct json_value_s *root)
                 if (device_detail_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *browser__str = static_cast<const struct json_string_s *>(device_detail_value->payload);
                 browser_ = std::string(browser__str->string);
             }
@@ -452,7 +452,7 @@ DeviceDetail::DeviceDetail(const struct json_value_s *root)
                 if (device_detail_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *trust_type__str = static_cast<const struct json_string_s *>(device_detail_value->payload);
                 trust_type_ = std::string(trust_type__str->string);
             }
@@ -536,7 +536,7 @@ Coordinates::Coordinates(const struct json_value_s *root)
                 if (coordinates_value->type != json_type_number) {
                     throw std::runtime_error("expected field to be of type number");
                 }
-                
+
                 const struct json_number_s *latitude__num = static_cast<const struct json_number_s *>(coordinates_value->payload);
                 latitude_ = std::stod(latitude__num->number);
             }
@@ -549,7 +549,7 @@ Coordinates::Coordinates(const struct json_value_s *root)
                 if (coordinates_value->type != json_type_number) {
                     throw std::runtime_error("expected field to be of type number");
                 }
-                
+
                 const struct json_number_s *longitude__num = static_cast<const struct json_number_s *>(coordinates_value->payload);
                 longitude_ = std::stod(longitude__num->number);
             }
@@ -562,7 +562,7 @@ Coordinates::Coordinates(const struct json_value_s *root)
                 if (coordinates_value->type != json_type_number) {
                     throw std::runtime_error("expected field to be of type number");
                 }
-                
+
                 const struct json_number_s *altitude__num = static_cast<const struct json_number_s *>(coordinates_value->payload);
                 altitude_ = std::stod(altitude__num->number);
             }
@@ -626,7 +626,7 @@ Location::Location(const struct json_value_s *root)
                 if (location_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *city__str = static_cast<const struct json_string_s *>(location_value->payload);
                 city_ = std::string(city__str->string);
             }
@@ -639,7 +639,7 @@ Location::Location(const struct json_value_s *root)
                 if (location_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *state__str = static_cast<const struct json_string_s *>(location_value->payload);
                 state_ = std::string(state__str->string);
             }
@@ -652,7 +652,7 @@ Location::Location(const struct json_value_s *root)
                 if (location_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *country_or_region__str = static_cast<const struct json_string_s *>(location_value->payload);
                 country_or_region_ = std::string(country_or_region__str->string);
             }
@@ -665,7 +665,7 @@ Location::Location(const struct json_value_s *root)
                 if (location_value->type != json_type_object) {
                     throw std::runtime_error("expected field to be of type object");
                 }
-                
+
                 geo_coordinates_ = Coordinates(location_value);
             }
         }
@@ -740,7 +740,7 @@ AuditLogEntry::AuditLogEntry(const struct json_value_s *root)
                 if (audit_log_entry_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *id__str = static_cast<const struct json_string_s *>(audit_log_entry_value->payload);
                 id_ = std::string(id__str->string);
             }
@@ -753,7 +753,7 @@ AuditLogEntry::AuditLogEntry(const struct json_value_s *root)
                 if (audit_log_entry_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *user_principal_name__str = static_cast<const struct json_string_s *>(audit_log_entry_value->payload);
                 user_principal_name_ = std::string(user_principal_name__str->string);
             }
@@ -766,7 +766,7 @@ AuditLogEntry::AuditLogEntry(const struct json_value_s *root)
                 if (audit_log_entry_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *user_id__str = static_cast<const struct json_string_s *>(audit_log_entry_value->payload);
                 user_id_ = std::string(user_id__str->string);
             }
@@ -779,7 +779,7 @@ AuditLogEntry::AuditLogEntry(const struct json_value_s *root)
                 if (audit_log_entry_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *created_date_time__str = static_cast<const struct json_string_s *>(audit_log_entry_value->payload);
                 created_date_time_ = std::string(created_date_time__str->string);
             }
@@ -792,7 +792,7 @@ AuditLogEntry::AuditLogEntry(const struct json_value_s *root)
                 if (audit_log_entry_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *ip_address__str = static_cast<const struct json_string_s *>(audit_log_entry_value->payload);
                 ip_address_ = std::string(ip_address__str->string);
             }
@@ -805,7 +805,7 @@ AuditLogEntry::AuditLogEntry(const struct json_value_s *root)
                 if (audit_log_entry_value->type != json_type_object) {
                     throw std::runtime_error("expected field to be of type object");
                 }
-                
+
                 device_detail_ = DeviceDetail(audit_log_entry_value);
             }
         } else if (std::strcmp(e->name->string, "location") == 0) {
@@ -817,7 +817,7 @@ AuditLogEntry::AuditLogEntry(const struct json_value_s *root)
                 if (audit_log_entry_value->type != json_type_object) {
                     throw std::runtime_error("expected field to be of type object");
                 }
-                
+
                 location_ = Location(audit_log_entry_value);
             }
         }
@@ -906,7 +906,7 @@ AuditLog::AuditLog(const struct json_value_s *root)
             if (audit_log_value->type != json_type_array) {
                 throw std::runtime_error("expected field to be of type array");
             }
-            
+
             const struct json_array_s *value__array = static_cast<const struct json_array_s *>(audit_log_value->payload);
             const struct json_array_element_s *value__element = value__array->start;
             std::vector<std::vector<AuditLogEntry>> value__vec = std::vector<std::vector<AuditLogEntry>>();
@@ -916,7 +916,7 @@ AuditLog::AuditLog(const struct json_value_s *root)
             if (audit_log_value_0->type != json_type_array) {
                 throw std::runtime_error("expected field to be of type array");
             }
-            
+
             const struct json_array_s *value__value_array = static_cast<const struct json_array_s *>(audit_log_value_0->payload);
             const struct json_array_element_s *value__value_element = value__value_array->start;
             std::vector<AuditLogEntry> value__value_vec = std::vector<AuditLogEntry>();
@@ -926,7 +926,7 @@ AuditLog::AuditLog(const struct json_value_s *root)
             if (audit_log_value_0_0->type != json_type_object) {
                 throw std::runtime_error("expected field to be of type object");
             }
-            
+
             value__value_value = AuditLogEntry(audit_log_value_0_0);
                 value__value_vec.push_back(value__value_value);
                 value__value_element = value__value_element->next;
@@ -984,7 +984,7 @@ AdUserWithAuditLog::AdUserWithAuditLog(const struct json_value_s *root)
             if (ad_user_with_audit_log_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *display_name__str = static_cast<const struct json_string_s *>(ad_user_with_audit_log_value->payload);
             display_name_ = std::string(display_name__str->string);
         } else if (std::strcmp(e->name->string, "id") == 0) {
@@ -993,7 +993,7 @@ AdUserWithAuditLog::AdUserWithAuditLog(const struct json_value_s *root)
             if (ad_user_with_audit_log_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *id__str = static_cast<const struct json_string_s *>(ad_user_with_audit_log_value->payload);
             id_ = std::string(id__str->string);
         } else if (std::strcmp(e->name->string, "userPrincipalName") == 0) {
@@ -1002,7 +1002,7 @@ AdUserWithAuditLog::AdUserWithAuditLog(const struct json_value_s *root)
             if (ad_user_with_audit_log_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *user_principal_name__str = static_cast<const struct json_string_s *>(ad_user_with_audit_log_value->payload);
             user_principal_name_ = std::string(user_principal_name__str->string);
         } else if (std::strcmp(e->name->string, "otherMails") == 0) {
@@ -1011,7 +1011,7 @@ AdUserWithAuditLog::AdUserWithAuditLog(const struct json_value_s *root)
             if (ad_user_with_audit_log_value->type != json_type_array) {
                 throw std::runtime_error("expected field to be of type array");
             }
-            
+
             const struct json_array_s *other_mails__array = static_cast<const struct json_array_s *>(ad_user_with_audit_log_value->payload);
             const struct json_array_element_s *other_mails__element = other_mails__array->start;
             std::vector<std::string> other_mails__vec = std::vector<std::string>();
@@ -1021,7 +1021,7 @@ AdUserWithAuditLog::AdUserWithAuditLog(const struct json_value_s *root)
             if (ad_user_with_audit_log_value_0->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *other_mails__value_str = static_cast<const struct json_string_s *>(ad_user_with_audit_log_value_0->payload);
             other_mails__value = std::string(other_mails__value_str->string);
                 other_mails__vec.push_back(other_mails__value);
@@ -1037,7 +1037,7 @@ AdUserWithAuditLog::AdUserWithAuditLog(const struct json_value_s *root)
                 if (ad_user_with_audit_log_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *department__str = static_cast<const struct json_string_s *>(ad_user_with_audit_log_value->payload);
                 department_ = std::string(department__str->string);
             }
@@ -1047,7 +1047,7 @@ AdUserWithAuditLog::AdUserWithAuditLog(const struct json_value_s *root)
             if (ad_user_with_audit_log_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *created_date_time__str = static_cast<const struct json_string_s *>(ad_user_with_audit_log_value->payload);
             created_date_time_ = std::string(created_date_time__str->string);
         } else if (std::strcmp(e->name->string, "auditLog") == 0) {
@@ -1059,7 +1059,7 @@ AdUserWithAuditLog::AdUserWithAuditLog(const struct json_value_s *root)
                 if (ad_user_with_audit_log_value->type != json_type_object) {
                     throw std::runtime_error("expected field to be of type object");
                 }
-                
+
                 audit_log_ = AuditLog(ad_user_with_audit_log_value);
             }
         }
@@ -1134,7 +1134,7 @@ CreateUser::CreateUser(const struct json_value_s *root)
             if (create_user_value->type != json_type_object) {
                 throw std::runtime_error("expected field to be of type object");
             }
-            
+
             user_ = AdUser(create_user_value);
         } else if (std::strcmp(e->name->string, "password") == 0) {
             const struct json_value_s *create_user_value = e->value;
@@ -1142,7 +1142,7 @@ CreateUser::CreateUser(const struct json_value_s *root)
             if (create_user_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *password__str = static_cast<const struct json_string_s *>(create_user_value->payload);
             password_ = std::string(password__str->string);
         }
@@ -1191,7 +1191,7 @@ UpdateCurrentUser::UpdateCurrentUser(const struct json_value_s *root)
                 if (update_current_user_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *display_name__str = static_cast<const struct json_string_s *>(update_current_user_value->payload);
                 display_name_ = std::string(display_name__str->string);
             }
@@ -1204,7 +1204,7 @@ UpdateCurrentUser::UpdateCurrentUser(const struct json_value_s *root)
                 if (update_current_user_value->type != json_type_array) {
                     throw std::runtime_error("expected field to be of type array");
                 }
-                
+
                 const struct json_array_s *other_mails__array = static_cast<const struct json_array_s *>(update_current_user_value->payload);
                 const struct json_array_element_s *other_mails__element = other_mails__array->start;
                 std::vector<std::string> other_mails__vec = std::vector<std::string>();
@@ -1214,7 +1214,7 @@ UpdateCurrentUser::UpdateCurrentUser(const struct json_value_s *root)
                     if (update_current_user_value_1->type != json_type_string) {
                         throw std::runtime_error("expected field to be of type string");
                     }
-                    
+
                     const struct json_string_s *other_mails__value_str = static_cast<const struct json_string_s *>(update_current_user_value_1->payload);
                     other_mails__value = std::string(other_mails__value_str->string);
                     other_mails__vec.push_back(other_mails__value);
@@ -1275,7 +1275,7 @@ UpdateUser::UpdateUser(const struct json_value_s *root)
                 if (update_user_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *display_name__str = static_cast<const struct json_string_s *>(update_user_value->payload);
                 display_name_ = std::string(display_name__str->string);
             }
@@ -1288,7 +1288,7 @@ UpdateUser::UpdateUser(const struct json_value_s *root)
                 if (update_user_value->type != json_type_array) {
                     throw std::runtime_error("expected field to be of type array");
                 }
-                
+
                 const struct json_array_s *other_mails__array = static_cast<const struct json_array_s *>(update_user_value->payload);
                 const struct json_array_element_s *other_mails__element = other_mails__array->start;
                 std::vector<std::string> other_mails__vec = std::vector<std::string>();
@@ -1298,7 +1298,7 @@ UpdateUser::UpdateUser(const struct json_value_s *root)
                     if (update_user_value_1->type != json_type_string) {
                         throw std::runtime_error("expected field to be of type string");
                     }
-                    
+
                     const struct json_string_s *other_mails__value_str = static_cast<const struct json_string_s *>(update_user_value_1->payload);
                     other_mails__value = std::string(other_mails__value_str->string);
                     other_mails__vec.push_back(other_mails__value);
@@ -1357,7 +1357,7 @@ AdGroup::AdGroup(const struct json_value_s *root)
             if (ad_group_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *id__str = static_cast<const struct json_string_s *>(ad_group_value->payload);
             id_ = std::string(id__str->string);
         } else if (std::strcmp(e->name->string, "displayName") == 0) {
@@ -1366,7 +1366,7 @@ AdGroup::AdGroup(const struct json_value_s *root)
             if (ad_group_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *display_name__str = static_cast<const struct json_string_s *>(ad_group_value->payload);
             display_name_ = std::string(display_name__str->string);
         } else if (std::strcmp(e->name->string, "description") == 0) {
@@ -1378,7 +1378,7 @@ AdGroup::AdGroup(const struct json_value_s *root)
                 if (ad_group_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *description__str = static_cast<const struct json_string_s *>(ad_group_value->payload);
                 description_ = std::string(description__str->string);
             }
@@ -1431,7 +1431,7 @@ CreateGroup::CreateGroup(const struct json_value_s *root)
             if (create_group_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *display_name__str = static_cast<const struct json_string_s *>(create_group_value->payload);
             display_name_ = std::string(display_name__str->string);
         } else if (std::strcmp(e->name->string, "description") == 0) {
@@ -1443,7 +1443,7 @@ CreateGroup::CreateGroup(const struct json_value_s *root)
                 if (create_group_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *description__str = static_cast<const struct json_string_s *>(create_group_value->payload);
                 description_ = std::string(description__str->string);
             }
@@ -1496,7 +1496,7 @@ GroupMembership::GroupMembership(const struct json_value_s *root)
             if (group_membership_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *id__str = static_cast<const struct json_string_s *>(group_membership_value->payload);
             id_ = std::string(id__str->string);
         } else if (std::strcmp(e->name->string, "objectType") == 0) {
@@ -1505,7 +1505,7 @@ GroupMembership::GroupMembership(const struct json_value_s *root)
             if (group_membership_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *object_type__str = static_cast<const struct json_string_s *>(group_membership_value->payload);
             object_type_ = std::string(object_type__str->string);
         } else if (std::strcmp(e->name->string, "displayName") == 0) {
@@ -1514,7 +1514,7 @@ GroupMembership::GroupMembership(const struct json_value_s *root)
             if (group_membership_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *display_name__str = static_cast<const struct json_string_s *>(group_membership_value->payload);
             display_name_ = std::string(display_name__str->string);
         } else if (std::strcmp(e->name->string, "otherMails") == 0) {
@@ -1526,7 +1526,7 @@ GroupMembership::GroupMembership(const struct json_value_s *root)
                 if (group_membership_value->type != json_type_array) {
                     throw std::runtime_error("expected field to be of type array");
                 }
-                
+
                 const struct json_array_s *other_mails__array = static_cast<const struct json_array_s *>(group_membership_value->payload);
                 const struct json_array_element_s *other_mails__element = other_mails__array->start;
                 std::vector<std::string> other_mails__vec = std::vector<std::string>();
@@ -1536,7 +1536,7 @@ GroupMembership::GroupMembership(const struct json_value_s *root)
                     if (group_membership_value_1->type != json_type_string) {
                         throw std::runtime_error("expected field to be of type string");
                     }
-                    
+
                     const struct json_string_s *other_mails__value_str = static_cast<const struct json_string_s *>(group_membership_value_1->payload);
                     other_mails__value = std::string(other_mails__value_str->string);
                     other_mails__vec.push_back(other_mails__value);
@@ -1553,7 +1553,7 @@ GroupMembership::GroupMembership(const struct json_value_s *root)
                 if (group_membership_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *department__str = static_cast<const struct json_string_s *>(group_membership_value->payload);
                 department_ = std::string(department__str->string);
             }
@@ -1566,7 +1566,7 @@ GroupMembership::GroupMembership(const struct json_value_s *root)
                 if (group_membership_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *created_date_time__str = static_cast<const struct json_string_s *>(group_membership_value->payload);
                 created_date_time_ = std::string(created_date_time__str->string);
             }

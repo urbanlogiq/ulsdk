@@ -99,6 +99,7 @@ from .fs import (
     NewLink,
     ObjectRef,
     Slot,
+    StorageTier,
     TopLevelDirectory,
 )
 from .fun import Fn
@@ -172,24 +173,21 @@ from .query import (
     Function,
     Join,
     JoinTy,
-    MvdbSubcollection,
+    MvdbPartition,
     NullableUint,
     OrderByExpr,
-    Parameter,
-    ParameterInstance,
-    ParameterSlot,
-    ParameterizedQuery,
     Partition,
+    Placeholder,
     Query,
     QueryElement,
     QueryElementOp,
     QueryElementUnion,
     QueryTableSource,
-    RecordBatchPlaceholder,
     SetExpr,
-    Subcollection,
     TableOrderBy,
+    TablePartition,
     TableSource,
+    TableSourceInstance,
     TableSourceUnion,
     TypeHint,
     UnaryQueryElement,
@@ -199,7 +197,7 @@ from .query import (
     Vector,
     When,
     Window,
-    WorklogSubcollection,
+    WorklogPartition,
 )
 from .reflection import (
     ReflectionAdvancedFeatures,
@@ -237,6 +235,7 @@ from .value import (
     VI8,
     VIsize,
     VNull,
+    VPlaceholder,
     VStr,
     VTimestampMs,
     VTimestampMsUtc,
@@ -343,7 +342,7 @@ from .generated.Modify import Modify as FbsModify
 from .generated.MoveRequest import MoveRequest as FbsMoveRequest
 from .generated.MultiLine import MultiLine as FbsMultiLine
 from .generated.MultiPolygon import MultiPolygon as FbsMultiPolygon
-from .generated.MvdbSubcollection import MvdbSubcollection as FbsMvdbSubcollection
+from .generated.MvdbPartition import MvdbPartition as FbsMvdbPartition
 from .generated.NamedParameter import NamedParameter as FbsNamedParameter
 from .generated.NewLink import NewLink as FbsNewLink
 from .generated.NewTable import NewTable as FbsNewTable
@@ -364,11 +363,9 @@ from .generated.OpEntry import OpEntry as FbsOpEntry
 from .generated.OrderBy import OrderBy as FbsOrderBy
 from .generated.OrderByExpr import OrderByExpr as FbsOrderByExpr
 from .generated.ParamIndices import ParamIndices as FbsParamIndices
-from .generated.Parameter import Parameter as FbsParameter
 from .generated.ParameterFlags import ParameterFlags as FbsParameterFlags
-from .generated.ParameterInstance import ParameterInstance as FbsParameterInstance
-from .generated.ParameterizedQuery import ParameterizedQuery as FbsParameterizedQuery
 from .generated.Partition import Partition as FbsPartition
+from .generated.Placeholder import Placeholder as FbsPlaceholder
 from .generated.Point import Point as FbsPoint
 from .generated.Point2D import Point2D as FbsPoint2D
 from .generated.Polygon import Polygon as FbsPolygon
@@ -377,7 +374,6 @@ from .generated.Query import Query as FbsQuery
 from .generated.QueryElement import QueryElement as FbsQueryElement
 from .generated.QueryPathElement import QueryPathElement as FbsQueryPathElement
 from .generated.QueryTableSource import QueryTableSource as FbsQueryTableSource
-from .generated.RecordBatchPlaceholder import RecordBatchPlaceholder as FbsRecordBatchPlaceholder
 from .generated.Restore import Restore as FbsRestore
 from .generated.RestoreRow import RestoreRow as FbsRestoreRow
 from .generated.RmRow import RmRow as FbsRmRow
@@ -395,6 +391,7 @@ from .generated.StreamId import StreamId as FbsStreamId
 from .generated.Struct_ import Struct_ as FbsStruct_
 from .generated.TableOrderBy import TableOrderBy as FbsTableOrderBy
 from .generated.TableSource import TableSource as FbsTableSource
+from .generated.TableSourceInstance import TableSourceInstance as FbsTableSourceInstance
 from .generated.Task import Task as FbsTask
 from .generated.TaskList import TaskList as FbsTaskList
 from .generated.TaskParameter import TaskParameter as FbsTaskParameter
@@ -423,6 +420,7 @@ from .generated.VI64 import VI64 as FbsVI64
 from .generated.VI8 import VI8 as FbsVI8
 from .generated.VIsize import VIsize as FbsVIsize
 from .generated.VNull import VNull as FbsVNull
+from .generated.VPlaceholder import VPlaceholder as FbsVPlaceholder
 from .generated.VStr import VStr as FbsVStr
 from .generated.VTimestampMs import VTimestampMs as FbsVTimestampMs
 from .generated.VTimestampMsUtc import VTimestampMsUtc as FbsVTimestampMsUtc
@@ -442,7 +440,7 @@ from .generated.When import When as FbsWhen
 from .generated.Window import Window as FbsWindow
 from .generated.WorkLog import WorkLog as FbsWorkLog
 from .generated.WorklogParameter import WorklogParameter as FbsWorklogParameter
-from .generated.WorklogSubcollection import WorklogSubcollection as FbsWorklogSubcollection
+from .generated.WorklogPartition import WorklogPartition as FbsWorklogPartition
 from .generated.reflection.Enum import Enum as FbsEnum
 from .generated.reflection.EnumVal import EnumVal as FbsEnumVal
 from .generated.reflection.Field import Field as FbsField
@@ -460,11 +458,10 @@ from .generated.ExprUnion import ExprUnion as FbsExprUnion
 from .generated.Geometry import Geometry as FbsGeometry
 from .generated.ListEntry import ListEntry as FbsListEntry
 from .generated.Op import Op as FbsOp
-from .generated.ParameterSlot import ParameterSlot as FbsParameterSlot
 from .generated.ParameterValue import ParameterValue as FbsParameterValue
 from .generated.QueryElementUnion import QueryElementUnion as FbsQueryElementUnion
 from .generated.QueryPathElementUnion import QueryPathElementUnion as FbsQueryPathElementUnion
-from .generated.Subcollection import Subcollection as FbsSubcollection
+from .generated.TablePartition import TablePartition as FbsTablePartition
 from .generated.TableSourceUnion import TableSourceUnion as FbsTableSourceUnion
 from .generated.TaskParameterValue import TaskParameterValue as FbsTaskParameterValue
 from .generated.Type import Type as FbsType
@@ -523,7 +520,7 @@ class Modify:
             previous_offset = self.previous.serialize_to(builder)
         row_offset = self.row.serialize_to(builder)
         value_offset = self.value.serialize_to(builder)
-        
+
         Start(builder)
         AddCol(builder, col_offset)
         if previous_offset is not None:
@@ -581,7 +578,7 @@ class Delete:
             End,
         )
         row_offset = self.row.serialize_to(builder)
-        
+
         Start(builder)
         AddRow(builder, row_offset)
         return End(builder)
@@ -629,7 +626,7 @@ class Restore:
             End,
         )
         row_offset = self.row.serialize_to(builder)
-        
+
         Start(builder)
         AddRow(builder, row_offset)
         return End(builder)
@@ -748,7 +745,7 @@ class Set:
         col_offset = builder.CreateString(self.col)
         row_offset = self.row.serialize_to(builder)
         value_offset = self.value.serialize_to(builder)
-        
+
         Start(builder)
         AddCol(builder, col_offset)
         AddRow(builder, row_offset)
@@ -806,7 +803,7 @@ class RmRow:
             End,
         )
         row_offset = self.row.serialize_to(builder)
-        
+
         Start(builder)
         AddRow(builder, row_offset)
         return End(builder)
@@ -860,7 +857,7 @@ class RestoreRow:
             End,
         )
         row_offset = self.row.serialize_to(builder)
-        
+
         Start(builder)
         AddRow(builder, row_offset)
         return End(builder)
@@ -885,7 +882,7 @@ class RestoreRow:
 @dataclass
 class Op:
     """ Table Ops are used to modify the contents of a table.
-"""
+    """
 
     value: Union[
         "Set",
@@ -962,7 +959,7 @@ class ChangeOpEntry:
             End,
         )
         op_offset, op_ty = self.op.serialize_to(builder)
-        
+
         Start(builder)
         AddOp(builder, op_offset)
         AddOpType(builder, op_ty)
@@ -1064,7 +1061,7 @@ class ChangeSet:
         ops_offset = builder.EndVector()
         revision_offset = self.revision.serialize_to(builder)
         who_offset = self.who.serialize_to(builder)
-        
+
         Start(builder)
         if attributes_offset is not None:
             AddAttributes(builder, attributes_offset)
@@ -1186,7 +1183,7 @@ class DiffStream:
         for i in reversed(range(len(self.seq))):
             builder.PrependUOffsetTRelative(seq_offsets[i])
         seq_offset = builder.EndVector()
-        
+
         Start(builder)
         if attributes_offset is not None:
             AddAttributes(builder, attributes_offset)
@@ -1274,7 +1271,7 @@ class History:
         continuation_id_offset = None
         if self.continuation_id is not None:
             continuation_id_offset = self.continuation_id.serialize_to(builder)
-        
+
         Start(builder)
         AddChanges(builder, changes_offset)
         if continuation_id_offset is not None:
@@ -1351,7 +1348,7 @@ class NewTable:
         target_offset = None
         if self.target is not None:
             target_offset = self.target.serialize_to(builder)
-        
+
         Start(builder)
         AddName(builder, name_offset)
         if parent_offset is not None:
@@ -1409,7 +1406,7 @@ class OpEntry:
             End,
         )
         op_offset, op_ty = self.op.serialize_to(builder)
-        
+
         Start(builder)
         AddOp(builder, op_offset)
         AddOpType(builder, op_ty)

@@ -43,7 +43,7 @@ class AdUser:
         other_mails = None
         department = None
         created_date_time = None
-    
+
         for key in o:
             if key == "displayName":
                 display_name_var = o[key]
@@ -77,13 +77,13 @@ class AdUser:
                 created_date_time_var = o[key]
                 assert type(created_date_time_var) is str
                 created_date_time = created_date_time_var
-    
+
         assert display_name is not None
         assert id_ is not None
         assert user_principal_name is not None
         assert other_mails is not None
         assert created_date_time is not None
-    
+
         return cls(display_name, id_, user_principal_name, other_mails, department, created_date_time)
 
     @classmethod
@@ -94,7 +94,7 @@ class AdUser:
         otherMails = []
         department = None
         createdDateTime = ""
-    
+
         return cls(displayName, id, userPrincipalName, otherMails, department, createdDateTime)
 
 @dataclass
@@ -117,7 +117,7 @@ class AdGroup:
         id_ = None
         display_name = None
         description = None
-    
+
         for key in o:
             if key == "id":
                 id__var = o[key]
@@ -134,10 +134,10 @@ class AdGroup:
                     description = description_var
                 else:
                     description = None
-    
+
         assert id_ is not None
         assert display_name is not None
-    
+
         return cls(id_, display_name, description)
 
     @classmethod
@@ -145,7 +145,7 @@ class AdGroup:
         id = ""
         displayName = ""
         description = None
-    
+
         return cls(id, displayName, description)
 
 @dataclass
@@ -177,7 +177,7 @@ class Bootstrap:
         groups = None
         v_2groups = None
         client_secrets = None
-    
+
         for key in o:
             if key == "user":
                 user_var = o[key]
@@ -205,12 +205,12 @@ class Bootstrap:
                 client_secrets_var = o[key]
                 assert type(client_secrets_var) is dict
                 client_secrets = client_secrets_var
-    
+
         assert user is not None
         assert groups is not None
         assert v_2groups is not None
         assert client_secrets is not None
-    
+
         return cls(user, groups, v_2groups, client_secrets)
 
     @classmethod
@@ -219,7 +219,7 @@ class Bootstrap:
         groups = []
         v2groups = []
         clientSecrets = dict()
-    
+
         return cls(user, groups, v2groups, clientSecrets)
 
 def bootstrap(

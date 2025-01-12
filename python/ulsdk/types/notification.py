@@ -114,7 +114,7 @@ class Share:
         if self.msg is not None:
             msg_offset = builder.CreateString(self.msg)
         object_offset = self.object.serialize_to(builder)
-        
+
         Start(builder)
         if dest_offset is not None:
             AddDest(builder, dest_offset)
@@ -176,7 +176,7 @@ class JobComplete:
             End,
         )
         job_offset = self.job.serialize_to(builder)
-        
+
         Start(builder)
         AddJob(builder, job_offset)
         return End(builder)
@@ -246,7 +246,7 @@ class AccessRequest:
         if self.msg is not None:
             msg_offset = builder.CreateString(self.msg)
         object_offset = self.object.serialize_to(builder)
-        
+
         Start(builder)
         if msg_offset is not None:
             AddMsg(builder, msg_offset)
@@ -320,7 +320,7 @@ class DriveChange:
         )
         object_offset = self.object.serialize_to(builder)
         root_offset = self.root.serialize_to(builder)
-        
+
         Start(builder)
         AddAction(builder, self.action.value)
         AddObject(builder, object_offset)
@@ -440,7 +440,7 @@ class Inbox:
         for i in reversed(range(len(self.items))):
             builder.PrependUOffsetTRelative(items_offsets[i])
         items_offset = builder.EndVector()
-        
+
         Start(builder)
         AddItems(builder, items_offset)
         return End(builder)
@@ -499,7 +499,7 @@ class InboxItem:
             End,
         )
         notification_offset = self.notification.serialize_to(builder)
-        
+
         Start(builder)
         AddNotification(builder, notification_offset)
         AddStatus(builder, self.status.value)
@@ -566,7 +566,7 @@ class Notification:
         sender_offset = None
         if self.sender is not None:
             sender_offset = self.sender.serialize_to(builder)
-        
+
         Start(builder)
         if notification_offset is not None and notification_ty is not None:
             AddNotification(builder, notification_offset)
@@ -621,7 +621,7 @@ class Response:
         msg_offset = None
         if self.msg is not None:
             msg_offset = builder.CreateString(self.msg)
-        
+
         Start(builder)
         if msg_offset is not None:
             AddMsg(builder, msg_offset)
@@ -675,7 +675,7 @@ class ShareDetails:
         msg_offset = None
         if self.msg is not None:
             msg_offset = builder.CreateString(self.msg)
-        
+
         Start(builder)
         if msg_offset is not None:
             AddMsg(builder, msg_offset)

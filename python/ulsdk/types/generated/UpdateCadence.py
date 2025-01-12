@@ -11,3 +11,4 @@ class UpdateCadence(object):
     UC_WEEKLY = 3
     UC_BI_WEEKLY = 4
     UC_MONTHLY = 5
+    UC_YEARLY = 6

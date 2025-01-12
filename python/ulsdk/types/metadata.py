@@ -132,6 +132,7 @@ from .value import (
     VI8,
     VIsize,
     VNull,
+    VPlaceholder,
     VStr,
     VTimestampMs,
     VTimestampMsUtc,
@@ -255,6 +256,7 @@ from .generated.VI64 import VI64 as FbsVI64
 from .generated.VI8 import VI8 as FbsVI8
 from .generated.VIsize import VIsize as FbsVIsize
 from .generated.VNull import VNull as FbsVNull
+from .generated.VPlaceholder import VPlaceholder as FbsVPlaceholder
 from .generated.VStr import VStr as FbsVStr
 from .generated.VTimestampMs import VTimestampMs as FbsVTimestampMs
 from .generated.VTimestampMsUtc import VTimestampMsUtc as FbsVTimestampMsUtc
@@ -376,6 +378,7 @@ class UpdateCadence(Enum):
     UC_WEEKLY = 3
     UC_BI_WEEKLY = 4
     UC_MONTHLY = 5
+    UC_YEARLY = 6
 
 
 @dataclass
@@ -412,7 +415,7 @@ class StringCategories:
             for i in reversed(range(len(self.categories))):
                 builder.PrependUOffsetTRelative(categories_offsets[i])
             categories_offset = builder.EndVector()
-        
+
         Start(builder)
         if categories_offset is not None:
             AddCategories(builder, categories_offset)
@@ -478,7 +481,7 @@ class NumericalFieldFormat:
             AddValueType,
             End,
         )
-        
+
         Start(builder)
         AddDecimalPlaces(builder, self.decimal_places)
         AddOffset(builder, self.offset)
@@ -579,7 +582,7 @@ class IntRange:
         field_format_offset = None
         if self.field_format is not None:
             field_format_offset = self.field_format.serialize_to(builder)
-        
+
         Start(builder)
         AddAggregationProtocol(builder, self.aggregation_protocol.value)
         if display_strings_offset is not None:
@@ -668,7 +671,7 @@ class FloatRange:
         field_format_offset = None
         if self.field_format is not None:
             field_format_offset = self.field_format.serialize_to(builder)
-        
+
         Start(builder)
         AddAggregationProtocol(builder, self.aggregation_protocol.value)
         if field_format_offset is not None:
@@ -746,7 +749,7 @@ class DatetimeRange:
             for i in reversed(range(len(self.intervals))):
                 builder.PrependUOffsetTRelative(intervals_offsets[i])
             intervals_offset = builder.EndVector()
-        
+
         Start(builder)
         if intervals_offset is not None:
             AddIntervals(builder, intervals_offset)
@@ -838,7 +841,7 @@ class Dates:
             for i in reversed(range(len(self.unique_values))):
                 builder.PrependInt64(self.unique_values[i])
             unique_values_offset = builder.EndVector()
-        
+
         Start(builder)
         AddMax(builder, self.max)
         AddMin(builder, self.min)
@@ -927,7 +930,7 @@ class NestedStringCategories:
         for i in reversed(range(len(self.nesting_tree))):
             builder.PrependUOffsetTRelative(nesting_tree_offsets[i])
         nesting_tree_offset = builder.EndVector()
-        
+
         Start(builder)
         AddNestingTree(builder, nesting_tree_offset)
         return End(builder)
@@ -1051,7 +1054,7 @@ class RawGeom:
         for i in reversed(range(len(self.geom))):
             builder.PrependUint8(self.geom[i])
         geom_offset = builder.EndVector()
-        
+
         Start(builder)
         AddGeom(builder, geom_offset)
         return End(builder)
@@ -1135,7 +1138,7 @@ class NoGeometry:
             Start,
             End,
         )
-        
+
         Start(builder)
         return End(builder)
 
@@ -1178,7 +1181,7 @@ class DatacatalogGeometry:
             End,
         )
         column_offset = builder.CreateString(self.column)
-        
+
         Start(builder)
         AddColumn(builder, column_offset)
         return End(builder)
@@ -1258,7 +1261,7 @@ class WorldGraphGeometry:
         start_stream_id_offset = None
         if self.start_stream_id is not None:
             start_stream_id_offset = self.start_stream_id.serialize_to(builder)
-        
+
         Start(builder)
         AddEdgePath(builder, edge_path_offset)
         if start_stream_id_offset is not None:
@@ -1374,7 +1377,7 @@ class HierarchyRelationshipData:
             for i in reversed(range(len(self.hierarchy))):
                 builder.PrependUOffsetTRelative(hierarchy_offsets[i])
             hierarchy_offset = builder.EndVector()
-        
+
         Start(builder)
         if hierarchy_offset is not None:
             AddHierarchy(builder, hierarchy_offset)
@@ -1452,7 +1455,7 @@ class CategoryRelationshipData:
             for i in reversed(range(len(self.categories))):
                 builder.PrependInt32(self.categories[i])
             categories_offset = builder.EndVector()
-        
+
         Start(builder)
         if associated_fields_offset is not None:
             AddAssociatedFields(builder, associated_fields_offset)
@@ -1537,7 +1540,7 @@ class NestedCategoryRelationshipData:
             for i in reversed(range(len(self.categories))):
                 builder.PrependUOffsetTRelative(categories_offsets[i])
             categories_offset = builder.EndVector()
-        
+
         Start(builder)
         if categories_offset is not None:
             AddCategories(builder, categories_offset)
@@ -1608,7 +1611,7 @@ class NestedHierarchyRelationshipData:
             for i in reversed(range(len(self.nodes))):
                 builder.PrependUOffsetTRelative(nodes_offsets[i])
             nodes_offset = builder.EndVector()
-        
+
         Start(builder)
         if nodes_offset is not None:
             AddNodes(builder, nodes_offset)
@@ -1764,7 +1767,7 @@ class ContactInfo:
         url_offset = None
         if self.url is not None:
             url_offset = builder.CreateString(self.url)
-        
+
         Start(builder)
         if address_offset is not None:
             AddAddress(builder, address_offset)
@@ -1855,7 +1858,7 @@ class DatasetSource:
         url_offset = None
         if self.url is not None:
             url_offset = builder.CreateString(self.url)
-        
+
         Start(builder)
         if date_offset is not None:
             AddDate(builder, date_offset)
@@ -1943,7 +1946,7 @@ class Document:
         url_offset = None
         if self.url is not None:
             url_offset = builder.CreateString(self.url)
-        
+
         Start(builder)
         if display_name_offset is not None:
             AddDisplayName(builder, display_name_offset)
@@ -2016,7 +2019,7 @@ class Documents:
             for i in reversed(range(len(self.documents))):
                 builder.PrependUOffsetTRelative(documents_offsets[i])
             documents_offset = builder.EndVector()
-        
+
         Start(builder)
         if documents_offset is not None:
             AddDocuments(builder, documents_offset)
@@ -2111,7 +2114,7 @@ class FloatAggregate:
             for i in reversed(range(len(self.histo))):
                 builder.PrependUOffsetTRelative(histo_offsets[i])
             histo_offset = builder.EndVector()
-        
+
         Start(builder)
         AddCount(builder, self.count)
         if histo_offset is not None:
@@ -2221,7 +2224,7 @@ class GeometryData:
             End,
         )
         data_offset, data_ty = self.data.serialize_to(builder)
-        
+
         Start(builder)
         AddData(builder, data_offset)
         AddDataType(builder, data_ty)
@@ -2279,7 +2282,7 @@ class HierarchicalRelationship:
             for i in reversed(range(len(self.children))):
                 builder.PrependInt32(self.children[i])
             children_offset = builder.EndVector()
-        
+
         Start(builder)
         if children_offset is not None:
             AddChildren(builder, children_offset)
@@ -2377,7 +2380,7 @@ class IntAggregate:
             for i in reversed(range(len(self.histo))):
                 builder.PrependUOffsetTRelative(histo_offsets[i])
             histo_offset = builder.EndVector()
-        
+
         Start(builder)
         AddCount(builder, self.count)
         if histo_offset is not None:
@@ -2487,7 +2490,7 @@ class IntegerDisplayString:
             End,
         )
         display_name_offset = builder.CreateString(self.display_name)
-        
+
         Start(builder)
         AddDisplayName(builder, display_name_offset)
         AddValue(builder, self.value)
@@ -2664,7 +2667,7 @@ class Metadata:
             for i in reversed(range(len(self.summary))):
                 builder.PrependInt32(self.summary[i])
             summary_offset = builder.EndVector()
-        
+
         Start(builder)
         AddAreaSelection(builder, self.area_selection)
         AddDatasetCategory(builder, self.dataset_category.value)
@@ -2795,7 +2798,7 @@ class NestedCategoryRelationshipNode:
             for i in reversed(range(len(self.child_columns))):
                 builder.PrependInt32(self.child_columns[i])
             child_columns_offset = builder.EndVector()
-        
+
         Start(builder)
         if child_columns_offset is not None:
             AddChildColumns(builder, child_columns_offset)
@@ -2886,7 +2889,7 @@ class NestedHierarchyRelationshipNode:
         label_offset = None
         if self.label is not None:
             label_offset = builder.CreateString(self.label)
-        
+
         Start(builder)
         if child_columns_offset is not None:
             AddChildColumns(builder, child_columns_offset)
@@ -2979,7 +2982,7 @@ class NestedStringCategoryNode:
         value_offset = None
         if self.value is not None:
             value_offset = builder.CreateString(self.value)
-        
+
         Start(builder)
         AddChildValues(builder, child_values_offset)
         if value_offset is not None:
@@ -3039,7 +3042,7 @@ class StringAggregate:
         str_offset = None
         if self.str is not None:
             str_offset = builder.CreateString(self.str)
-        
+
         Start(builder)
         AddCount(builder, self.count)
         if str_offset is not None:
@@ -3090,7 +3093,7 @@ class TimeInterval:
             AddMin,
             End,
         )
-        
+
         Start(builder)
         AddMax(builder, self.max)
         AddMin(builder, self.min)
@@ -3177,7 +3180,7 @@ class UIntAggregate:
             for i in reversed(range(len(self.histo))):
                 builder.PrependUOffsetTRelative(histo_offsets[i])
             histo_offset = builder.EndVector()
-        
+
         Start(builder)
         AddCount(builder, self.count)
         if histo_offset is not None:
@@ -3362,7 +3365,7 @@ class UlField:
         storage_type_offset, storage_type_ty = (None, None)
         if self.storage_type is not None:
             storage_type_offset, storage_type_ty = self.storage_type.serialize_to(builder)
-        
+
         Start(builder)
         if breakdown_display_name_offset is not None:
             AddBreakdownDisplayName(builder, breakdown_display_name_offset)
@@ -3459,7 +3462,7 @@ class UlFieldRelationship:
         relationship_display_name_offset = None
         if self.relationship_display_name is not None:
             relationship_display_name_offset = builder.CreateString(self.relationship_display_name)
-        
+
         Start(builder)
         if relationship_data_offset is not None and relationship_data_ty is not None:
             AddRelationshipData(builder, relationship_data_offset)

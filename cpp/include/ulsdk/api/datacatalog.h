@@ -279,42 +279,36 @@ stream_get_html(
 /**
  * Append data, in Apache Arrow format, to the specified stream
  * @param id The ID of the stream to append data to
- * @param subcollection Subcollection to append data to, if necessary
  * @param data The Arrow record batches to append
  */
 Result<Void>
 stream_put_arrow(
     ul::RequestContext &ctx,
     const Uuid &id,
-    std::optional<std::string> subcollection,
     const std::vector<std::shared_ptr<::arrow::RecordBatch>> &data
 );
 
 /**
  * Append a diffstream to the specified stream
  * @param id The ID of the stream to append data to
- * @param subcollection Subcollection to append data to, if necessary
  * @param data The Arrow record batches to append
  */
 Result<Void>
 stream_put_diffstream(
     ul::RequestContext &ctx,
     const Uuid &id,
-    std::optional<std::string> subcollection,
     const ::ul::types::DiffStream &data
 );
 
 /**
  * Append JSON data to the specified stream
  * @param id The ID of the stream to append data to
- * @param subcollection Subcollection to append data to, if necessary
  * @param data The Arrow record batches to append
  */
 Result<Void>
 stream_put_json(
     ul::RequestContext &ctx,
     const Uuid &id,
-    std::optional<std::string> subcollection,
     const std::vector<std::map<std::string, ul::JsonValue>> &data
 );
 
@@ -334,6 +328,7 @@ generate_metadata(
 - the existing metadata
 - the provided metadata
 - the generated metadata
+
 Also, update the stream object to point to the updated metadata and to have an updated schema.
  * @param id The ID of the stream to update metadata for
  * @param metadata The metadata to update the stream with
@@ -348,13 +343,11 @@ update_metadata(
 /**
  * Compact the specified stream
  * @param id The ID of the stream to compact
- * @param subcollection Subcollection to append data to, if necessary
  */
 Result<Void>
 stream_compact(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    std::optional<std::string> subcollection
+    const Uuid &id
 );
 
 /**

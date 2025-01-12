@@ -102,24 +102,21 @@ from .query import (
     Function,
     Join,
     JoinTy,
-    MvdbSubcollection,
+    MvdbPartition,
     NullableUint,
     OrderByExpr,
-    Parameter,
-    ParameterInstance,
-    ParameterSlot,
-    ParameterizedQuery,
     Partition,
+    Placeholder,
     Query,
     QueryElement,
     QueryElementOp,
     QueryElementUnion,
     QueryTableSource,
-    RecordBatchPlaceholder,
     SetExpr,
-    Subcollection,
     TableOrderBy,
+    TablePartition,
     TableSource,
+    TableSourceInstance,
     TableSourceUnion,
     TypeHint,
     UnaryQueryElement,
@@ -129,7 +126,7 @@ from .query import (
     Vector,
     When,
     Window,
-    WorklogSubcollection,
+    WorklogPartition,
 )
 from .usecase import (
     UseCase,
@@ -154,6 +151,7 @@ from .value import (
     VI8,
     VIsize,
     VNull,
+    VPlaceholder,
     VStr,
     VTimestampMs,
     VTimestampMsUtc,
@@ -216,7 +214,7 @@ from .generated.List import List as FbsList
 from .generated.Map import Map as FbsMap
 from .generated.MultiLine import MultiLine as FbsMultiLine
 from .generated.MultiPolygon import MultiPolygon as FbsMultiPolygon
-from .generated.MvdbSubcollection import MvdbSubcollection as FbsMvdbSubcollection
+from .generated.MvdbPartition import MvdbPartition as FbsMvdbPartition
 from .generated.NodeIdPair import NodeIdPair as FbsNodeIdPair
 from .generated.NodeList import NodeList as FbsNodeList
 from .generated.NodeQuery import NodeQuery as FbsNodeQuery
@@ -225,10 +223,8 @@ from .generated.NullableUint import NullableUint as FbsNullableUint
 from .generated.ObjectId import ObjectId as FbsObjectId
 from .generated.OrderBy import OrderBy as FbsOrderBy
 from .generated.OrderByExpr import OrderByExpr as FbsOrderByExpr
-from .generated.Parameter import Parameter as FbsParameter
-from .generated.ParameterInstance import ParameterInstance as FbsParameterInstance
-from .generated.ParameterizedQuery import ParameterizedQuery as FbsParameterizedQuery
 from .generated.Partition import Partition as FbsPartition
+from .generated.Placeholder import Placeholder as FbsPlaceholder
 from .generated.Point import Point as FbsPoint
 from .generated.Point2D import Point2D as FbsPoint2D
 from .generated.Polygon import Polygon as FbsPolygon
@@ -237,13 +233,13 @@ from .generated.Query import Query as FbsQuery
 from .generated.QueryElement import QueryElement as FbsQueryElement
 from .generated.QueryPathElement import QueryPathElement as FbsQueryPathElement
 from .generated.QueryTableSource import QueryTableSource as FbsQueryTableSource
-from .generated.RecordBatchPlaceholder import RecordBatchPlaceholder as FbsRecordBatchPlaceholder
 from .generated.Schema import Schema as FbsSchema
 from .generated.SetExpr import SetExpr as FbsSetExpr
 from .generated.StreamId import StreamId as FbsStreamId
 from .generated.Struct_ import Struct_ as FbsStruct_
 from .generated.TableOrderBy import TableOrderBy as FbsTableOrderBy
 from .generated.TableSource import TableSource as FbsTableSource
+from .generated.TableSourceInstance import TableSourceInstance as FbsTableSourceInstance
 from .generated.Time import Time as FbsTime
 from .generated.Timestamp import Timestamp as FbsTimestamp
 from .generated.Tri2D import Tri2D as FbsTri2D
@@ -268,6 +264,7 @@ from .generated.VI64 import VI64 as FbsVI64
 from .generated.VI8 import VI8 as FbsVI8
 from .generated.VIsize import VIsize as FbsVIsize
 from .generated.VNull import VNull as FbsVNull
+from .generated.VPlaceholder import VPlaceholder as FbsVPlaceholder
 from .generated.VStr import VStr as FbsVStr
 from .generated.VTimestampMs import VTimestampMs as FbsVTimestampMs
 from .generated.VTimestampMsUtc import VTimestampMsUtc as FbsVTimestampMsUtc
@@ -285,13 +282,12 @@ from .generated.ValueInstance import ValueInstance as FbsValueInstance
 from .generated.Vector import Vector as FbsVector
 from .generated.When import When as FbsWhen
 from .generated.Window import Window as FbsWindow
-from .generated.WorklogSubcollection import WorklogSubcollection as FbsWorklogSubcollection
+from .generated.WorklogPartition import WorklogPartition as FbsWorklogPartition
 from .generated.ExprUnion import ExprUnion as FbsExprUnion
 from .generated.Geometry import Geometry as FbsGeometry
-from .generated.ParameterSlot import ParameterSlot as FbsParameterSlot
 from .generated.QueryElementUnion import QueryElementUnion as FbsQueryElementUnion
 from .generated.QueryPathElementUnion import QueryPathElementUnion as FbsQueryPathElementUnion
-from .generated.Subcollection import Subcollection as FbsSubcollection
+from .generated.TablePartition import TablePartition as FbsTablePartition
 from .generated.TableSourceUnion import TableSourceUnion as FbsTableSourceUnion
 from .generated.Type import Type as FbsType
 from .generated.UseCaseInput import UseCaseInput as FbsUseCaseInput
@@ -307,7 +303,7 @@ class Units(Enum):
 class UserPreferences:
     center: Optional["Point"]
 
-    defaultAreaReportTemplate: Optional["ObjectId"]
+    default_area_report_template: Optional["ObjectId"]
 
     homepage_usecase_id: Optional["ObjectId"]
 
@@ -323,10 +319,10 @@ class UserPreferences:
         center_obj = o.Center()
         if center_obj is not None:
             center = Point.from_fbs(center_obj)
-        defaultAreaReportTemplate = None
-        defaultAreaReportTemplate_obj = o.DefaultAreaReportTemplate()
-        if defaultAreaReportTemplate_obj is not None:
-            defaultAreaReportTemplate = ObjectId.from_fbs(defaultAreaReportTemplate_obj)
+        default_area_report_template = None
+        default_area_report_template_obj = o.DefaultAreaReportTemplate()
+        if default_area_report_template_obj is not None:
+            default_area_report_template = ObjectId.from_fbs(default_area_report_template_obj)
         homepage_usecase_id = None
         homepage_usecase_id_obj = o.HomepageUsecaseId()
         if homepage_usecase_id_obj is not None:
@@ -337,7 +333,7 @@ class UserPreferences:
             timezone = timezone_str.decode('utf-8')
         units = Units(o.Units())
         zoom = o.Zoom()
-        return cls(center, defaultAreaReportTemplate, homepage_usecase_id, timezone, units, zoom)
+        return cls(center, default_area_report_template, homepage_usecase_id, timezone, units, zoom)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -359,21 +355,21 @@ class UserPreferences:
         center_offset = None
         if self.center is not None:
             center_offset = self.center.serialize_to(builder)
-        defaultAreaReportTemplate_offset = None
-        if self.defaultAreaReportTemplate is not None:
-            defaultAreaReportTemplate_offset = self.defaultAreaReportTemplate.serialize_to(builder)
+        default_area_report_template_offset = None
+        if self.default_area_report_template is not None:
+            default_area_report_template_offset = self.default_area_report_template.serialize_to(builder)
         homepage_usecase_id_offset = None
         if self.homepage_usecase_id is not None:
             homepage_usecase_id_offset = self.homepage_usecase_id.serialize_to(builder)
         timezone_offset = None
         if self.timezone is not None:
             timezone_offset = builder.CreateString(self.timezone)
-        
+
         Start(builder)
         if center_offset is not None:
             AddCenter(builder, center_offset)
-        if defaultAreaReportTemplate_offset is not None:
-            AddDefaultAreaReportTemplate(builder, defaultAreaReportTemplate_offset)
+        if default_area_report_template_offset is not None:
+            AddDefaultAreaReportTemplate(builder, default_area_report_template_offset)
         if homepage_usecase_id_offset is not None:
             AddHomepageUsecaseId(builder, homepage_usecase_id_offset)
         if timezone_offset is not None:
@@ -391,17 +387,17 @@ class UserPreferences:
     @classmethod
     def make_default(cls) -> Self:
         center = Point.make_default()
-        defaultAreaReportTemplate = ObjectId.make_default()
+        default_area_report_template = ObjectId.make_default()
         homepage_usecase_id = ObjectId.make_default()
         timezone = ""
         units = Units(0)
         zoom = 0.0
-        return cls(center, defaultAreaReportTemplate, homepage_usecase_id, timezone, units, zoom)
+        return cls(center, default_area_report_template, homepage_usecase_id, timezone, units, zoom)
 
     def __eq__(self, other) -> bool:
         eq = True
         eq = eq and self.center == other.center
-        eq = eq and self.defaultAreaReportTemplate == other.defaultAreaReportTemplate
+        eq = eq and self.default_area_report_template == other.default_area_report_template
         eq = eq and self.homepage_usecase_id == other.homepage_usecase_id
         eq = eq and self.timezone == other.timezone
         eq = eq and self.units == other.units

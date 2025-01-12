@@ -220,41 +220,35 @@ def test_stream_get_html():
 
 def test_stream_put_arrow():
     p0 = UUID("00000000-0000-0000-0000-000000000000")
-    p1 = None
-    p2 = []
+    p1 = []
 
     if False:
         stream_put_arrow(
             ctx,
             p0,
             p1,
-            p2,
         )
 
 def test_stream_put_diffstream():
     p0 = UUID("00000000-0000-0000-0000-000000000000")
-    p1 = None
-    p2 = DiffStream.make_default()
+    p1 = DiffStream.make_default()
 
     if False:
         stream_put_diffstream(
             ctx,
             p0,
             p1,
-            p2,
         )
 
 def test_stream_put_json():
     p0 = UUID("00000000-0000-0000-0000-000000000000")
-    p1 = None
-    p2 = []
+    p1 = []
 
     if False:
         stream_put_json(
             ctx,
             p0,
             p1,
-            p2,
         )
 
 def test_generate_metadata():
@@ -279,13 +273,11 @@ def test_update_metadata():
 
 def test_stream_compact():
     p0 = UUID("00000000-0000-0000-0000-000000000000")
-    p1 = None
 
     if False:
         stream_compact(
             ctx,
             p0,
-            p1,
         )
 
 def test_table_row_history():

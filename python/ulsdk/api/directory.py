@@ -47,7 +47,7 @@ class Principal:
         email = None
         description = None
         department = None
-    
+
         for key in o:
             if key == "principalType":
                 principal_type_var = o[key]
@@ -87,11 +87,11 @@ class Principal:
                     department = department_var
                 else:
                     department = None
-    
+
         assert principal_type is not None
         assert display_name is not None
         assert id_ is not None
-    
+
         return cls(principal_type, display_name, id_, email, description, department)
 
     @classmethod
@@ -102,7 +102,7 @@ class Principal:
         email = None
         description = None
         department = None
-    
+
         return cls(principalType, displayName, id, email, description, department)
 
 @dataclass
@@ -138,7 +138,7 @@ class AdUser:
         other_mails = None
         department = None
         created_date_time = None
-    
+
         for key in o:
             if key == "displayName":
                 display_name_var = o[key]
@@ -172,13 +172,13 @@ class AdUser:
                 created_date_time_var = o[key]
                 assert type(created_date_time_var) is str
                 created_date_time = created_date_time_var
-    
+
         assert display_name is not None
         assert id_ is not None
         assert user_principal_name is not None
         assert other_mails is not None
         assert created_date_time is not None
-    
+
         return cls(display_name, id_, user_principal_name, other_mails, department, created_date_time)
 
     @classmethod
@@ -189,7 +189,7 @@ class AdUser:
         otherMails = []
         department = None
         createdDateTime = ""
-    
+
         return cls(displayName, id, userPrincipalName, otherMails, department, createdDateTime)
 
 @dataclass
@@ -207,7 +207,7 @@ class DisplayNames:
     def from_dict(cls, o: Dict[str, Any]) -> Self:
         display_name = None
         id_ = None
-    
+
         for key in o:
             if key == "displayName":
                 display_name_var = o[key]
@@ -217,17 +217,17 @@ class DisplayNames:
                 id__var = o[key]
                 assert type(id__var) is str
                 id_ = id__var
-    
+
         assert display_name is not None
         assert id_ is not None
-    
+
         return cls(display_name, id_)
 
     @classmethod
     def make_default(cls) -> Self:
         displayName = ""
         id = ""
-    
+
         return cls(displayName, id)
 
 @dataclass
@@ -269,7 +269,7 @@ class DeviceDetail:
         is_compliant = None
         is_managed = None
         trust_type = None
-    
+
         for key in o:
             if key == "deviceId":
                 if o[key] is not None:
@@ -313,8 +313,8 @@ class DeviceDetail:
                     trust_type = trust_type_var
                 else:
                     trust_type = None
-    
-    
+
+
         return cls(device_id, operating_system, browser, is_compliant, is_managed, trust_type)
 
     @classmethod
@@ -325,7 +325,7 @@ class DeviceDetail:
         isCompliant = None
         isManaged = None
         trustType = None
-    
+
         return cls(deviceId, operatingSystem, browser, isCompliant, isManaged, trustType)
 
 @dataclass
@@ -352,7 +352,7 @@ class Coordinates:
         latitude = None
         longitude = None
         altitude = None
-    
+
         for key in o:
             if key == "latitude":
                 if o[key] is not None:
@@ -375,8 +375,8 @@ class Coordinates:
                     altitude = altitude_var
                 else:
                     altitude = None
-    
-    
+
+
         return cls(latitude, longitude, altitude)
 
     @classmethod
@@ -384,7 +384,7 @@ class Coordinates:
         latitude = None
         longitude = None
         altitude = None
-    
+
         return cls(latitude, longitude, altitude)
 
 @dataclass
@@ -416,7 +416,7 @@ class Location:
         state = None
         country_or_region = None
         geo_coordinates = None
-    
+
         for key in o:
             if key == "city":
                 if o[key] is not None:
@@ -446,8 +446,8 @@ class Location:
                     geo_coordinates = Coordinates.from_dict(geo_coordinates_var)
                 else:
                     geo_coordinates = None
-    
-    
+
+
         return cls(city, state, country_or_region, geo_coordinates)
 
     @classmethod
@@ -456,7 +456,7 @@ class Location:
         state = None
         countryOrRegion = None
         geoCoordinates = None
-    
+
         return cls(city, state, countryOrRegion, geoCoordinates)
 
 @dataclass
@@ -503,7 +503,7 @@ class AuditLogEntry:
         ip_address = None
         device_detail = None
         location = None
-    
+
         for key in o:
             if key == "id":
                 if o[key] is not None:
@@ -554,8 +554,8 @@ class AuditLogEntry:
                     location = Location.from_dict(location_var)
                 else:
                     location = None
-    
-    
+
+
         return cls(id_, user_principal_name, user_id, created_date_time, ip_address, device_detail, location)
 
     @classmethod
@@ -567,7 +567,7 @@ class AuditLogEntry:
         ipAddress = None
         deviceDetail = None
         location = None
-    
+
         return cls(id, userPrincipalName, userId, createdDateTime, ipAddress, deviceDetail, location)
 
 @dataclass
@@ -590,7 +590,7 @@ class AuditLog:
     @classmethod
     def from_dict(cls, o: Dict[str, Any]) -> Self:
         value = None
-    
+
         for key in o:
             if key == "value":
                 value_var = o[key]
@@ -606,15 +606,15 @@ class AuditLog:
                         value_item_item = AuditLogEntry.from_dict(value_item_item_var)
                         value_item.append(value_item_item)
                     value.append(value_item)
-    
+
         assert value is not None
-    
+
         return cls(value)
 
     @classmethod
     def make_default(cls) -> Self:
         value = []
-    
+
         return cls(value)
 
 @dataclass
@@ -655,7 +655,7 @@ class AdUserWithAuditLog:
         department = None
         created_date_time = None
         audit_log = None
-    
+
         for key in o:
             if key == "displayName":
                 display_name_var = o[key]
@@ -696,13 +696,13 @@ class AdUserWithAuditLog:
                     audit_log = AuditLog.from_dict(audit_log_var)
                 else:
                     audit_log = None
-    
+
         assert display_name is not None
         assert id_ is not None
         assert user_principal_name is not None
         assert other_mails is not None
         assert created_date_time is not None
-    
+
         return cls(display_name, id_, user_principal_name, other_mails, department, created_date_time, audit_log)
 
     @classmethod
@@ -714,7 +714,7 @@ class AdUserWithAuditLog:
         department = None
         createdDateTime = ""
         auditLog = None
-    
+
         return cls(displayName, id, userPrincipalName, otherMails, department, createdDateTime, auditLog)
 
 @dataclass
@@ -732,7 +732,7 @@ class CreateUser:
     def from_dict(cls, o: Dict[str, Any]) -> Self:
         user = None
         password = None
-    
+
         for key in o:
             if key == "user":
                 user_var = o[key]
@@ -742,17 +742,17 @@ class CreateUser:
                 password_var = o[key]
                 assert type(password_var) is str
                 password = password_var
-    
+
         assert user is not None
         assert password is not None
-    
+
         return cls(user, password)
 
     @classmethod
     def make_default(cls) -> Self:
         user = AdUser.make_default()
         password = ""
-    
+
         return cls(user, password)
 
 @dataclass
@@ -778,7 +778,7 @@ class UpdateCurrentUser:
     def from_dict(cls, o: Dict[str, Any]) -> Self:
         display_name = None
         other_mails = None
-    
+
         for key in o:
             if key == "displayName":
                 if o[key] is not None:
@@ -799,15 +799,15 @@ class UpdateCurrentUser:
                         other_mails.append(other_mails_item)
                 else:
                     other_mails = None
-    
-    
+
+
         return cls(display_name, other_mails)
 
     @classmethod
     def make_default(cls) -> Self:
         displayName = None
         otherMails = None
-    
+
         return cls(displayName, otherMails)
 
 @dataclass
@@ -833,7 +833,7 @@ class UpdateUser:
     def from_dict(cls, o: Dict[str, Any]) -> Self:
         display_name = None
         other_mails = None
-    
+
         for key in o:
             if key == "displayName":
                 if o[key] is not None:
@@ -854,15 +854,15 @@ class UpdateUser:
                         other_mails.append(other_mails_item)
                 else:
                     other_mails = None
-    
-    
+
+
         return cls(display_name, other_mails)
 
     @classmethod
     def make_default(cls) -> Self:
         displayName = None
         otherMails = None
-    
+
         return cls(displayName, otherMails)
 
 @dataclass
@@ -885,7 +885,7 @@ class AdGroup:
         id_ = None
         display_name = None
         description = None
-    
+
         for key in o:
             if key == "id":
                 id__var = o[key]
@@ -902,10 +902,10 @@ class AdGroup:
                     description = description_var
                 else:
                     description = None
-    
+
         assert id_ is not None
         assert display_name is not None
-    
+
         return cls(id_, display_name, description)
 
     @classmethod
@@ -913,7 +913,7 @@ class AdGroup:
         id = ""
         displayName = ""
         description = None
-    
+
         return cls(id, displayName, description)
 
 @dataclass
@@ -933,7 +933,7 @@ class CreateGroup:
     def from_dict(cls, o: Dict[str, Any]) -> Self:
         display_name = None
         description = None
-    
+
         for key in o:
             if key == "displayName":
                 display_name_var = o[key]
@@ -946,16 +946,16 @@ class CreateGroup:
                     description = description_var
                 else:
                     description = None
-    
+
         assert display_name is not None
-    
+
         return cls(display_name, description)
 
     @classmethod
     def make_default(cls) -> Self:
         displayName = ""
         description = None
-    
+
         return cls(displayName, description)
 
 @dataclass
@@ -995,7 +995,7 @@ class GroupMembership:
         other_mails = None
         department = None
         created_date_time = None
-    
+
         for key in o:
             if key == "id":
                 id__var = o[key]
@@ -1035,11 +1035,11 @@ class GroupMembership:
                     created_date_time = created_date_time_var
                 else:
                     created_date_time = None
-    
+
         assert id_ is not None
         assert object_type is not None
         assert display_name is not None
-    
+
         return cls(id_, object_type, display_name, other_mails, department, created_date_time)
 
     @classmethod
@@ -1050,7 +1050,7 @@ class GroupMembership:
         otherMails = None
         department = None
         createdDateTime = None
-    
+
         return cls(id, objectType, displayName, otherMails, department, createdDateTime)
 
 def get_principal(
@@ -1107,10 +1107,12 @@ def query_principals(
     query: str,
 ) -> List[Principal]:
     """Queries for principals. The query is performed as a substring match against the following fields:
+    
     For users:
     - displayName
     - id
     - otherMails
+    
     For groups:
     - displayName
     - id

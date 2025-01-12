@@ -299,11 +299,15 @@ enum class EntityTy : int32_t {
   T_STATE_PROVINCE = 259,
   T_FEDERAL = 260,
   T_CANNABIS_AND_LIQUOR_STORES_TRANSFER = 261,
+  T_STATE_OWNED_ROAD = 262,
+  T_AIR_QUALITY_MONITORING_STATION = 263,
+  T_AOI = 264,
+  T_PERFORMANCE_MEASURE = 265,
   MIN = T_INVALID,
-  MAX = T_CANNABIS_AND_LIQUOR_STORES_TRANSFER
+  MAX = T_PERFORMANCE_MEASURE
 };
 
-inline const EntityTy (&EnumValuesEntityTy())[262] {
+inline const EntityTy (&EnumValuesEntityTy())[266] {
   static const EntityTy values[] = {
     EntityTy::T_INVALID,
     EntityTy::T_TFC,
@@ -566,13 +570,17 @@ inline const EntityTy (&EnumValuesEntityTy())[262] {
     EntityTy::T_CENSUS_DIVISION,
     EntityTy::T_STATE_PROVINCE,
     EntityTy::T_FEDERAL,
-    EntityTy::T_CANNABIS_AND_LIQUOR_STORES_TRANSFER
+    EntityTy::T_CANNABIS_AND_LIQUOR_STORES_TRANSFER,
+    EntityTy::T_STATE_OWNED_ROAD,
+    EntityTy::T_AIR_QUALITY_MONITORING_STATION,
+    EntityTy::T_AOI,
+    EntityTy::T_PERFORMANCE_MEASURE
   };
   return values;
 }
 
 inline const char * const *EnumNamesEntityTy() {
-  static const char * const names[263] = {
+  static const char * const names[267] = {
     "T_INVALID",
     "T_TFC",
     "T_TFC_LOOP",
@@ -835,13 +843,17 @@ inline const char * const *EnumNamesEntityTy() {
     "T_STATE_PROVINCE",
     "T_FEDERAL",
     "T_CANNABIS_AND_LIQUOR_STORES_TRANSFER",
+    "T_STATE_OWNED_ROAD",
+    "T_AIR_QUALITY_MONITORING_STATION",
+    "T_AOI",
+    "T_PERFORMANCE_MEASURE",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameEntityTy(EntityTy e) {
-  if (::flatbuffers::IsOutRange(e, EntityTy::T_INVALID, EntityTy::T_CANNABIS_AND_LIQUOR_STORES_TRANSFER)) return "";
+  if (::flatbuffers::IsOutRange(e, EntityTy::T_INVALID, EntityTy::T_PERFORMANCE_MEASURE)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesEntityTy()[index];
 }

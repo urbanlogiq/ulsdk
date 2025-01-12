@@ -61,11 +61,11 @@ struct JoinBuilder;
 struct Arrow;
 struct ArrowBuilder;
 
-struct MvdbSubcollection;
-struct MvdbSubcollectionBuilder;
+struct MvdbPartition;
+struct MvdbPartitionBuilder;
 
-struct WorklogSubcollection;
-struct WorklogSubcollectionBuilder;
+struct WorklogPartition;
+struct WorklogPartitionBuilder;
 
 struct DataCatalog;
 struct DataCatalogBuilder;
@@ -73,11 +73,14 @@ struct DataCatalogBuilder;
 struct QueryTableSource;
 struct QueryTableSourceBuilder;
 
-struct RecordBatchPlaceholder;
-struct RecordBatchPlaceholderBuilder;
+struct Placeholder;
+struct PlaceholderBuilder;
 
 struct Vector;
 struct VectorBuilder;
+
+struct TableSourceInstance;
+struct TableSourceInstanceBuilder;
 
 struct TableSource;
 struct TableSourceBuilder;
@@ -108,15 +111,6 @@ struct QueryElementBuilder;
 
 struct Query;
 struct QueryBuilder;
-
-struct Parameter;
-struct ParameterBuilder;
-
-struct ParameterInstance;
-struct ParameterInstanceBuilder;
-
-struct ParameterizedQuery;
-struct ParameterizedQueryBuilder;
 
 enum class TypeHint : int8_t {
   None = 0,
@@ -293,53 +287,53 @@ inline const char *EnumNameJoinTy(JoinTy e) {
   return EnumNamesJoinTy()[index];
 }
 
-enum class Subcollection : uint8_t {
+enum class TablePartition : uint8_t {
   NONE = 0,
-  MvdbSubcollection = 1,
-  WorklogSubcollection = 2,
+  MvdbPartition = 1,
+  WorklogPartition = 2,
   MIN = NONE,
-  MAX = WorklogSubcollection
+  MAX = WorklogPartition
 };
 
-inline const Subcollection (&EnumValuesSubcollection())[3] {
-  static const Subcollection values[] = {
-    Subcollection::NONE,
-    Subcollection::MvdbSubcollection,
-    Subcollection::WorklogSubcollection
+inline const TablePartition (&EnumValuesTablePartition())[3] {
+  static const TablePartition values[] = {
+    TablePartition::NONE,
+    TablePartition::MvdbPartition,
+    TablePartition::WorklogPartition
   };
   return values;
 }
 
-inline const char * const *EnumNamesSubcollection() {
+inline const char * const *EnumNamesTablePartition() {
   static const char * const names[4] = {
     "NONE",
-    "MvdbSubcollection",
-    "WorklogSubcollection",
+    "MvdbPartition",
+    "WorklogPartition",
     nullptr
   };
   return names;
 }
 
-inline const char *EnumNameSubcollection(Subcollection e) {
-  if (::flatbuffers::IsOutRange(e, Subcollection::NONE, Subcollection::WorklogSubcollection)) return "";
+inline const char *EnumNameTablePartition(TablePartition e) {
+  if (::flatbuffers::IsOutRange(e, TablePartition::NONE, TablePartition::WorklogPartition)) return "";
   const size_t index = static_cast<size_t>(e);
-  return EnumNamesSubcollection()[index];
+  return EnumNamesTablePartition()[index];
 }
 
-template<typename T> struct SubcollectionTraits {
-  static const Subcollection enum_value = Subcollection::NONE;
+template<typename T> struct TablePartitionTraits {
+  static const TablePartition enum_value = TablePartition::NONE;
 };
 
-template<> struct SubcollectionTraits<MvdbSubcollection> {
-  static const Subcollection enum_value = Subcollection::MvdbSubcollection;
+template<> struct TablePartitionTraits<MvdbPartition> {
+  static const TablePartition enum_value = TablePartition::MvdbPartition;
 };
 
-template<> struct SubcollectionTraits<WorklogSubcollection> {
-  static const Subcollection enum_value = Subcollection::WorklogSubcollection;
+template<> struct TablePartitionTraits<WorklogPartition> {
+  static const TablePartition enum_value = TablePartition::WorklogPartition;
 };
 
-bool VerifySubcollection(::flatbuffers::Verifier &verifier, const void *obj, Subcollection type);
-bool VerifySubcollectionVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<Subcollection> *types);
+bool VerifyTablePartition(::flatbuffers::Verifier &verifier, const void *obj, TablePartition type);
+bool VerifyTablePartitionVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<TablePartition> *types);
 
 enum class TableSourceUnion : uint8_t {
   NONE = 0,
@@ -348,9 +342,9 @@ enum class TableSourceUnion : uint8_t {
   GraphQuery = 3,
   QueryTableSource = 4,
   Vector = 5,
-  RecordBatchPlaceholder = 6,
+  Placeholder = 6,
   MIN = NONE,
-  MAX = RecordBatchPlaceholder
+  MAX = Placeholder
 };
 
 inline const TableSourceUnion (&EnumValuesTableSourceUnion())[7] {
@@ -361,7 +355,7 @@ inline const TableSourceUnion (&EnumValuesTableSourceUnion())[7] {
     TableSourceUnion::GraphQuery,
     TableSourceUnion::QueryTableSource,
     TableSourceUnion::Vector,
-    TableSourceUnion::RecordBatchPlaceholder
+    TableSourceUnion::Placeholder
   };
   return values;
 }
@@ -374,14 +368,14 @@ inline const char * const *EnumNamesTableSourceUnion() {
     "GraphQuery",
     "QueryTableSource",
     "Vector",
-    "RecordBatchPlaceholder",
+    "Placeholder",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameTableSourceUnion(TableSourceUnion e) {
-  if (::flatbuffers::IsOutRange(e, TableSourceUnion::NONE, TableSourceUnion::RecordBatchPlaceholder)) return "";
+  if (::flatbuffers::IsOutRange(e, TableSourceUnion::NONE, TableSourceUnion::Placeholder)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesTableSourceUnion()[index];
 }
@@ -410,8 +404,8 @@ template<> struct TableSourceUnionTraits<Vector> {
   static const TableSourceUnion enum_value = TableSourceUnion::Vector;
 };
 
-template<> struct TableSourceUnionTraits<RecordBatchPlaceholder> {
-  static const TableSourceUnion enum_value = TableSourceUnion::RecordBatchPlaceholder;
+template<> struct TableSourceUnionTraits<Placeholder> {
+  static const TableSourceUnion enum_value = TableSourceUnion::Placeholder;
 };
 
 bool VerifyTableSourceUnion(::flatbuffers::Verifier &verifier, const void *obj, TableSourceUnion type);
@@ -511,54 +505,6 @@ template<> struct QueryElementUnionTraits<DeleteQueryElement> {
 
 bool VerifyQueryElementUnion(::flatbuffers::Verifier &verifier, const void *obj, QueryElementUnion type);
 bool VerifyQueryElementUnionVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<QueryElementUnion> *types);
-
-enum class ParameterSlot : uint8_t {
-  NONE = 0,
-  Parameter = 1,
-  ValueInstance = 2,
-  MIN = NONE,
-  MAX = ValueInstance
-};
-
-inline const ParameterSlot (&EnumValuesParameterSlot())[3] {
-  static const ParameterSlot values[] = {
-    ParameterSlot::NONE,
-    ParameterSlot::Parameter,
-    ParameterSlot::ValueInstance
-  };
-  return values;
-}
-
-inline const char * const *EnumNamesParameterSlot() {
-  static const char * const names[4] = {
-    "NONE",
-    "Parameter",
-    "ValueInstance",
-    nullptr
-  };
-  return names;
-}
-
-inline const char *EnumNameParameterSlot(ParameterSlot e) {
-  if (::flatbuffers::IsOutRange(e, ParameterSlot::NONE, ParameterSlot::ValueInstance)) return "";
-  const size_t index = static_cast<size_t>(e);
-  return EnumNamesParameterSlot()[index];
-}
-
-template<typename T> struct ParameterSlotTraits {
-  static const ParameterSlot enum_value = ParameterSlot::NONE;
-};
-
-template<> struct ParameterSlotTraits<Parameter> {
-  static const ParameterSlot enum_value = ParameterSlot::Parameter;
-};
-
-template<> struct ParameterSlotTraits<ValueInstance> {
-  static const ParameterSlot enum_value = ParameterSlot::ValueInstance;
-};
-
-bool VerifyParameterSlot(::flatbuffers::Verifier &verifier, const void *obj, ParameterSlot type);
-bool VerifyParameterSlotVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<ParameterSlot> *types);
 
 struct ValueIndex FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef ValueIndexBuilder Builder;
@@ -1507,66 +1453,68 @@ inline ::flatbuffers::Offset<Arrow> CreateArrowDirect(
       value__);
 }
 
-struct MvdbSubcollection FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef MvdbSubcollectionBuilder Builder;
+/// Some multiverse databases are partitioned, and we need to refer to a specific
+/// partition within the database. This is used for that purpose.
+struct MvdbPartition FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef MvdbPartitionBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_SUBCOLLECTION = 4
+    VT_PARTITION = 4
   };
-  const ::flatbuffers::String *subcollection() const {
-    return GetPointer<const ::flatbuffers::String *>(VT_SUBCOLLECTION);
+  const ::flatbuffers::String *partition() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_PARTITION);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffsetRequired(verifier, VT_SUBCOLLECTION) &&
-           verifier.VerifyString(subcollection()) &&
+           VerifyOffsetRequired(verifier, VT_PARTITION) &&
+           verifier.VerifyString(partition()) &&
            verifier.EndTable();
   }
 };
 
-struct MvdbSubcollectionBuilder {
-  typedef MvdbSubcollection Table;
+struct MvdbPartitionBuilder {
+  typedef MvdbPartition Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_subcollection(::flatbuffers::Offset<::flatbuffers::String> subcollection) {
-    fbb_.AddOffset(MvdbSubcollection::VT_SUBCOLLECTION, subcollection);
+  void add_partition(::flatbuffers::Offset<::flatbuffers::String> partition) {
+    fbb_.AddOffset(MvdbPartition::VT_PARTITION, partition);
   }
-  explicit MvdbSubcollectionBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit MvdbPartitionBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<MvdbSubcollection> Finish() {
+  ::flatbuffers::Offset<MvdbPartition> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<MvdbSubcollection>(end);
-    fbb_.Required(o, MvdbSubcollection::VT_SUBCOLLECTION);
+    auto o = ::flatbuffers::Offset<MvdbPartition>(end);
+    fbb_.Required(o, MvdbPartition::VT_PARTITION);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<MvdbSubcollection> CreateMvdbSubcollection(
+inline ::flatbuffers::Offset<MvdbPartition> CreateMvdbPartition(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::String> subcollection = 0) {
-  MvdbSubcollectionBuilder builder_(_fbb);
-  builder_.add_subcollection(subcollection);
+    ::flatbuffers::Offset<::flatbuffers::String> partition = 0) {
+  MvdbPartitionBuilder builder_(_fbb);
+  builder_.add_partition(partition);
   return builder_.Finish();
 }
 
-struct MvdbSubcollection::Traits {
-  using type = MvdbSubcollection;
-  static auto constexpr Create = CreateMvdbSubcollection;
+struct MvdbPartition::Traits {
+  using type = MvdbPartition;
+  static auto constexpr Create = CreateMvdbPartition;
 };
 
-inline ::flatbuffers::Offset<MvdbSubcollection> CreateMvdbSubcollectionDirect(
+inline ::flatbuffers::Offset<MvdbPartition> CreateMvdbPartitionDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const char *subcollection = nullptr) {
-  auto subcollection__ = subcollection ? _fbb.CreateString(subcollection) : 0;
-  return CreateMvdbSubcollection(
+    const char *partition = nullptr) {
+  auto partition__ = partition ? _fbb.CreateString(partition) : 0;
+  return CreateMvdbPartition(
       _fbb,
-      subcollection__);
+      partition__);
 }
 
-struct WorklogSubcollection FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef WorklogSubcollectionBuilder Builder;
+struct WorklogPartition FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef WorklogPartitionBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_IDX = 4
@@ -1581,35 +1529,35 @@ struct WorklogSubcollection FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Tab
   }
 };
 
-struct WorklogSubcollectionBuilder {
-  typedef WorklogSubcollection Table;
+struct WorklogPartitionBuilder {
+  typedef WorklogPartition Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_idx(uint32_t idx) {
-    fbb_.AddElement<uint32_t>(WorklogSubcollection::VT_IDX, idx, 0);
+    fbb_.AddElement<uint32_t>(WorklogPartition::VT_IDX, idx, 0);
   }
-  explicit WorklogSubcollectionBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit WorklogPartitionBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<WorklogSubcollection> Finish() {
+  ::flatbuffers::Offset<WorklogPartition> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<WorklogSubcollection>(end);
+    auto o = ::flatbuffers::Offset<WorklogPartition>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<WorklogSubcollection> CreateWorklogSubcollection(
+inline ::flatbuffers::Offset<WorklogPartition> CreateWorklogPartition(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t idx = 0) {
-  WorklogSubcollectionBuilder builder_(_fbb);
+  WorklogPartitionBuilder builder_(_fbb);
   builder_.add_idx(idx);
   return builder_.Finish();
 }
 
-struct WorklogSubcollection::Traits {
-  using type = WorklogSubcollection;
-  static auto constexpr Create = CreateWorklogSubcollection;
+struct WorklogPartition::Traits {
+  using type = WorklogPartition;
+  static auto constexpr Create = CreateWorklogPartition;
 };
 
 struct DataCatalog FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -1617,25 +1565,26 @@ struct DataCatalog FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ID = 4,
-    VT_SUBCOLLECTION_TYPE = 6,
-    VT_SUBCOLLECTION = 8,
+    VT_PARTITION_TYPE = 6,
+    VT_PARTITION = 8,
     VT_REVISION = 10
   };
   const ObjectId *id() const {
     return GetPointer<const ObjectId *>(VT_ID);
   }
-  Subcollection subcollection_type() const {
-    return static_cast<Subcollection>(GetField<uint8_t>(VT_SUBCOLLECTION_TYPE, 0));
+  TablePartition partition_type() const {
+    return static_cast<TablePartition>(GetField<uint8_t>(VT_PARTITION_TYPE, 0));
   }
-  const void *subcollection() const {
-    return GetPointer<const void *>(VT_SUBCOLLECTION);
+  /// The partition of the table to query; can be null.
+  const void *partition() const {
+    return GetPointer<const void *>(VT_PARTITION);
   }
-  template<typename T> const T *subcollection_as() const;
-  const MvdbSubcollection *subcollection_as_MvdbSubcollection() const {
-    return subcollection_type() == Subcollection::MvdbSubcollection ? static_cast<const MvdbSubcollection *>(subcollection()) : nullptr;
+  template<typename T> const T *partition_as() const;
+  const MvdbPartition *partition_as_MvdbPartition() const {
+    return partition_type() == TablePartition::MvdbPartition ? static_cast<const MvdbPartition *>(partition()) : nullptr;
   }
-  const WorklogSubcollection *subcollection_as_WorklogSubcollection() const {
-    return subcollection_type() == Subcollection::WorklogSubcollection ? static_cast<const WorklogSubcollection *>(subcollection()) : nullptr;
+  const WorklogPartition *partition_as_WorklogPartition() const {
+    return partition_type() == TablePartition::WorklogPartition ? static_cast<const WorklogPartition *>(partition()) : nullptr;
   }
   const ContentId *revision() const {
     return GetPointer<const ContentId *>(VT_REVISION);
@@ -1644,21 +1593,21 @@ struct DataCatalog FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_ID) &&
            verifier.VerifyTable(id()) &&
-           VerifyField<uint8_t>(verifier, VT_SUBCOLLECTION_TYPE, 1) &&
-           VerifyOffset(verifier, VT_SUBCOLLECTION) &&
-           VerifySubcollection(verifier, subcollection(), subcollection_type()) &&
+           VerifyField<uint8_t>(verifier, VT_PARTITION_TYPE, 1) &&
+           VerifyOffset(verifier, VT_PARTITION) &&
+           VerifyTablePartition(verifier, partition(), partition_type()) &&
            VerifyOffset(verifier, VT_REVISION) &&
            verifier.VerifyTable(revision()) &&
            verifier.EndTable();
   }
 };
 
-template<> inline const MvdbSubcollection *DataCatalog::subcollection_as<MvdbSubcollection>() const {
-  return subcollection_as_MvdbSubcollection();
+template<> inline const MvdbPartition *DataCatalog::partition_as<MvdbPartition>() const {
+  return partition_as_MvdbPartition();
 }
 
-template<> inline const WorklogSubcollection *DataCatalog::subcollection_as<WorklogSubcollection>() const {
-  return subcollection_as_WorklogSubcollection();
+template<> inline const WorklogPartition *DataCatalog::partition_as<WorklogPartition>() const {
+  return partition_as_WorklogPartition();
 }
 
 struct DataCatalogBuilder {
@@ -1668,11 +1617,11 @@ struct DataCatalogBuilder {
   void add_id(::flatbuffers::Offset<ObjectId> id) {
     fbb_.AddOffset(DataCatalog::VT_ID, id);
   }
-  void add_subcollection_type(Subcollection subcollection_type) {
-    fbb_.AddElement<uint8_t>(DataCatalog::VT_SUBCOLLECTION_TYPE, static_cast<uint8_t>(subcollection_type), 0);
+  void add_partition_type(TablePartition partition_type) {
+    fbb_.AddElement<uint8_t>(DataCatalog::VT_PARTITION_TYPE, static_cast<uint8_t>(partition_type), 0);
   }
-  void add_subcollection(::flatbuffers::Offset<void> subcollection) {
-    fbb_.AddOffset(DataCatalog::VT_SUBCOLLECTION, subcollection);
+  void add_partition(::flatbuffers::Offset<void> partition) {
+    fbb_.AddOffset(DataCatalog::VT_PARTITION, partition);
   }
   void add_revision(::flatbuffers::Offset<ContentId> revision) {
     fbb_.AddOffset(DataCatalog::VT_REVISION, revision);
@@ -1692,14 +1641,14 @@ struct DataCatalogBuilder {
 inline ::flatbuffers::Offset<DataCatalog> CreateDataCatalog(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<ObjectId> id = 0,
-    Subcollection subcollection_type = Subcollection::NONE,
-    ::flatbuffers::Offset<void> subcollection = 0,
+    TablePartition partition_type = TablePartition::NONE,
+    ::flatbuffers::Offset<void> partition = 0,
     ::flatbuffers::Offset<ContentId> revision = 0) {
   DataCatalogBuilder builder_(_fbb);
   builder_.add_revision(revision);
-  builder_.add_subcollection(subcollection);
+  builder_.add_partition(partition);
   builder_.add_id(id);
-  builder_.add_subcollection_type(subcollection_type);
+  builder_.add_partition_type(partition_type);
   return builder_.Finish();
 }
 
@@ -1757,8 +1706,8 @@ struct QueryTableSource::Traits {
   static auto constexpr Create = CreateQueryTableSource;
 };
 
-struct RecordBatchPlaceholder FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef RecordBatchPlaceholderBuilder Builder;
+struct Placeholder FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef PlaceholderBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_IDX = 4
@@ -1773,35 +1722,35 @@ struct RecordBatchPlaceholder FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::T
   }
 };
 
-struct RecordBatchPlaceholderBuilder {
-  typedef RecordBatchPlaceholder Table;
+struct PlaceholderBuilder {
+  typedef Placeholder Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_idx(uint32_t idx) {
-    fbb_.AddElement<uint32_t>(RecordBatchPlaceholder::VT_IDX, idx, 0);
+    fbb_.AddElement<uint32_t>(Placeholder::VT_IDX, idx, 0);
   }
-  explicit RecordBatchPlaceholderBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit PlaceholderBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<RecordBatchPlaceholder> Finish() {
+  ::flatbuffers::Offset<Placeholder> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<RecordBatchPlaceholder>(end);
+    auto o = ::flatbuffers::Offset<Placeholder>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<RecordBatchPlaceholder> CreateRecordBatchPlaceholder(
+inline ::flatbuffers::Offset<Placeholder> CreatePlaceholder(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t idx = 0) {
-  RecordBatchPlaceholderBuilder builder_(_fbb);
+  PlaceholderBuilder builder_(_fbb);
   builder_.add_idx(idx);
   return builder_.Finish();
 }
 
-struct RecordBatchPlaceholder::Traits {
-  using type = RecordBatchPlaceholder;
-  static auto constexpr Create = CreateRecordBatchPlaceholder;
+struct Placeholder::Traits {
+  using type = Placeholder;
+  static auto constexpr Create = CreatePlaceholder;
 };
 
 struct Vector FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -1906,6 +1855,108 @@ inline ::flatbuffers::Offset<Vector> CreateVectorDirect(
       max_distance);
 }
 
+struct TableSourceInstance FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef TableSourceInstanceBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_T_TYPE = 4,
+    VT_T = 6
+  };
+  TableSourceUnion t_type() const {
+    return static_cast<TableSourceUnion>(GetField<uint8_t>(VT_T_TYPE, 0));
+  }
+  const void *t() const {
+    return GetPointer<const void *>(VT_T);
+  }
+  template<typename T> const T *t_as() const;
+  const DataCatalog *t_as_DataCatalog() const {
+    return t_type() == TableSourceUnion::DataCatalog ? static_cast<const DataCatalog *>(t()) : nullptr;
+  }
+  const Arrow *t_as_Arrow() const {
+    return t_type() == TableSourceUnion::Arrow ? static_cast<const Arrow *>(t()) : nullptr;
+  }
+  const GraphQuery *t_as_GraphQuery() const {
+    return t_type() == TableSourceUnion::GraphQuery ? static_cast<const GraphQuery *>(t()) : nullptr;
+  }
+  const QueryTableSource *t_as_QueryTableSource() const {
+    return t_type() == TableSourceUnion::QueryTableSource ? static_cast<const QueryTableSource *>(t()) : nullptr;
+  }
+  const Vector *t_as_Vector() const {
+    return t_type() == TableSourceUnion::Vector ? static_cast<const Vector *>(t()) : nullptr;
+  }
+  const Placeholder *t_as_Placeholder() const {
+    return t_type() == TableSourceUnion::Placeholder ? static_cast<const Placeholder *>(t()) : nullptr;
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_T_TYPE, 1) &&
+           VerifyOffsetRequired(verifier, VT_T) &&
+           VerifyTableSourceUnion(verifier, t(), t_type()) &&
+           verifier.EndTable();
+  }
+};
+
+template<> inline const DataCatalog *TableSourceInstance::t_as<DataCatalog>() const {
+  return t_as_DataCatalog();
+}
+
+template<> inline const Arrow *TableSourceInstance::t_as<Arrow>() const {
+  return t_as_Arrow();
+}
+
+template<> inline const GraphQuery *TableSourceInstance::t_as<GraphQuery>() const {
+  return t_as_GraphQuery();
+}
+
+template<> inline const QueryTableSource *TableSourceInstance::t_as<QueryTableSource>() const {
+  return t_as_QueryTableSource();
+}
+
+template<> inline const Vector *TableSourceInstance::t_as<Vector>() const {
+  return t_as_Vector();
+}
+
+template<> inline const Placeholder *TableSourceInstance::t_as<Placeholder>() const {
+  return t_as_Placeholder();
+}
+
+struct TableSourceInstanceBuilder {
+  typedef TableSourceInstance Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_t_type(TableSourceUnion t_type) {
+    fbb_.AddElement<uint8_t>(TableSourceInstance::VT_T_TYPE, static_cast<uint8_t>(t_type), 0);
+  }
+  void add_t(::flatbuffers::Offset<void> t) {
+    fbb_.AddOffset(TableSourceInstance::VT_T, t);
+  }
+  explicit TableSourceInstanceBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<TableSourceInstance> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<TableSourceInstance>(end);
+    fbb_.Required(o, TableSourceInstance::VT_T);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<TableSourceInstance> CreateTableSourceInstance(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    TableSourceUnion t_type = TableSourceUnion::NONE,
+    ::flatbuffers::Offset<void> t = 0) {
+  TableSourceInstanceBuilder builder_(_fbb);
+  builder_.add_t(t);
+  builder_.add_t_type(t_type);
+  return builder_.Finish();
+}
+
+struct TableSourceInstance::Traits {
+  using type = TableSourceInstance;
+  static auto constexpr Create = CreateTableSourceInstance;
+};
+
 struct TableSource FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef TableSourceBuilder Builder;
   struct Traits;
@@ -1939,8 +1990,8 @@ struct TableSource FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const Vector *t_as_Vector() const {
     return t_type() == TableSourceUnion::Vector ? static_cast<const Vector *>(t()) : nullptr;
   }
-  const RecordBatchPlaceholder *t_as_RecordBatchPlaceholder() const {
-    return t_type() == TableSourceUnion::RecordBatchPlaceholder ? static_cast<const RecordBatchPlaceholder *>(t()) : nullptr;
+  const Placeholder *t_as_Placeholder() const {
+    return t_type() == TableSourceUnion::Placeholder ? static_cast<const Placeholder *>(t()) : nullptr;
   }
   const ::flatbuffers::Vector<::flatbuffers::Offset<Expr>> *fields() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Expr>> *>(VT_FIELDS);
@@ -1994,8 +2045,8 @@ template<> inline const Vector *TableSource::t_as<Vector>() const {
   return t_as_Vector();
 }
 
-template<> inline const RecordBatchPlaceholder *TableSource::t_as<RecordBatchPlaceholder>() const {
-  return t_as_RecordBatchPlaceholder();
+template<> inline const Placeholder *TableSource::t_as<Placeholder>() const {
+  return t_as_Placeholder();
 }
 
 struct TableSourceBuilder {
@@ -2557,8 +2608,8 @@ struct UpdateQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   const Vector *source_as_Vector() const {
     return source_type() == TableSourceUnion::Vector ? static_cast<const Vector *>(source()) : nullptr;
   }
-  const RecordBatchPlaceholder *source_as_RecordBatchPlaceholder() const {
-    return source_type() == TableSourceUnion::RecordBatchPlaceholder ? static_cast<const RecordBatchPlaceholder *>(source()) : nullptr;
+  const Placeholder *source_as_Placeholder() const {
+    return source_type() == TableSourceUnion::Placeholder ? static_cast<const Placeholder *>(source()) : nullptr;
   }
   const ::flatbuffers::Vector<::flatbuffers::Offset<SetExpr>> *sets() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<SetExpr>> *>(VT_SETS);
@@ -2600,8 +2651,8 @@ template<> inline const Vector *UpdateQueryElement::source_as<Vector>() const {
   return source_as_Vector();
 }
 
-template<> inline const RecordBatchPlaceholder *UpdateQueryElement::source_as<RecordBatchPlaceholder>() const {
-  return source_as_RecordBatchPlaceholder();
+template<> inline const Placeholder *UpdateQueryElement::source_as<Placeholder>() const {
+  return source_as_Placeholder();
 }
 
 struct UpdateQueryElementBuilder {
@@ -2697,8 +2748,8 @@ struct DeleteQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   const Vector *source_as_Vector() const {
     return source_type() == TableSourceUnion::Vector ? static_cast<const Vector *>(source()) : nullptr;
   }
-  const RecordBatchPlaceholder *source_as_RecordBatchPlaceholder() const {
-    return source_type() == TableSourceUnion::RecordBatchPlaceholder ? static_cast<const RecordBatchPlaceholder *>(source()) : nullptr;
+  const Placeholder *source_as_Placeholder() const {
+    return source_type() == TableSourceUnion::Placeholder ? static_cast<const Placeholder *>(source()) : nullptr;
   }
   const Function *filter() const {
     return GetPointer<const Function *>(VT_FILTER);
@@ -2734,8 +2785,8 @@ template<> inline const Vector *DeleteQueryElement::source_as<Vector>() const {
   return source_as_Vector();
 }
 
-template<> inline const RecordBatchPlaceholder *DeleteQueryElement::source_as<RecordBatchPlaceholder>() const {
-  return source_as_RecordBatchPlaceholder();
+template<> inline const Placeholder *DeleteQueryElement::source_as<Placeholder>() const {
+  return source_as_Placeholder();
 }
 
 struct DeleteQueryElementBuilder {
@@ -2873,7 +2924,8 @@ struct Query FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_QUERY = 4,
     VT_VALUES = 6,
-    VT_LIMIT = 8
+    VT_LIMIT = 8,
+    VT_BOUND_SOURCES = 10
   };
   const QueryElement *query() const {
     return GetPointer<const QueryElement *>(VT_QUERY);
@@ -2884,6 +2936,9 @@ struct Query FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   uint32_t limit() const {
     return GetField<uint32_t>(VT_LIMIT, 0);
   }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<TableSourceInstance>> *bound_sources() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<TableSourceInstance>> *>(VT_BOUND_SOURCES);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_QUERY) &&
@@ -2892,6 +2947,9 @@ struct Query FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyVector(values()) &&
            verifier.VerifyVectorOfTables(values()) &&
            VerifyField<uint32_t>(verifier, VT_LIMIT, 4) &&
+           VerifyOffset(verifier, VT_BOUND_SOURCES) &&
+           verifier.VerifyVector(bound_sources()) &&
+           verifier.VerifyVectorOfTables(bound_sources()) &&
            verifier.EndTable();
   }
 };
@@ -2909,6 +2967,9 @@ struct QueryBuilder {
   void add_limit(uint32_t limit) {
     fbb_.AddElement<uint32_t>(Query::VT_LIMIT, limit, 0);
   }
+  void add_bound_sources(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<TableSourceInstance>>> bound_sources) {
+    fbb_.AddOffset(Query::VT_BOUND_SOURCES, bound_sources);
+  }
   explicit QueryBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -2925,8 +2986,10 @@ inline ::flatbuffers::Offset<Query> CreateQuery(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<QueryElement> query = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ValueInstance>>> values = 0,
-    uint32_t limit = 0) {
+    uint32_t limit = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<TableSourceInstance>>> bound_sources = 0) {
   QueryBuilder builder_(_fbb);
+  builder_.add_bound_sources(bound_sources);
   builder_.add_limit(limit);
   builder_.add_values(values);
   builder_.add_query(query);
@@ -2942,253 +3005,16 @@ inline ::flatbuffers::Offset<Query> CreateQueryDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<QueryElement> query = 0,
     const std::vector<::flatbuffers::Offset<ValueInstance>> *values = nullptr,
-    uint32_t limit = 0) {
+    uint32_t limit = 0,
+    const std::vector<::flatbuffers::Offset<TableSourceInstance>> *bound_sources = nullptr) {
   auto values__ = values ? _fbb.CreateVector<::flatbuffers::Offset<ValueInstance>>(*values) : 0;
+  auto bound_sources__ = bound_sources ? _fbb.CreateVector<::flatbuffers::Offset<TableSourceInstance>>(*bound_sources) : 0;
   return CreateQuery(
       _fbb,
       query,
       values__,
-      limit);
-}
-
-struct Parameter FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef ParameterBuilder Builder;
-  struct Traits;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_NAME = 4,
-    VT_TY = 6,
-    VT_HINT = 8
-  };
-  const ::flatbuffers::String *name() const {
-    return GetPointer<const ::flatbuffers::String *>(VT_NAME);
-  }
-  ValueTy ty() const {
-    return static_cast<ValueTy>(GetField<uint8_t>(VT_TY, 0));
-  }
-  TypeHint hint() const {
-    return static_cast<TypeHint>(GetField<int8_t>(VT_HINT, 0));
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyOffsetRequired(verifier, VT_NAME) &&
-           verifier.VerifyString(name()) &&
-           VerifyField<uint8_t>(verifier, VT_TY, 1) &&
-           VerifyField<int8_t>(verifier, VT_HINT, 1) &&
-           verifier.EndTable();
-  }
-};
-
-struct ParameterBuilder {
-  typedef Parameter Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
-    fbb_.AddOffset(Parameter::VT_NAME, name);
-  }
-  void add_ty(ValueTy ty) {
-    fbb_.AddElement<uint8_t>(Parameter::VT_TY, static_cast<uint8_t>(ty), 0);
-  }
-  void add_hint(TypeHint hint) {
-    fbb_.AddElement<int8_t>(Parameter::VT_HINT, static_cast<int8_t>(hint), 0);
-  }
-  explicit ParameterBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<Parameter> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<Parameter>(end);
-    fbb_.Required(o, Parameter::VT_NAME);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<Parameter> CreateParameter(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::String> name = 0,
-    ValueTy ty = ValueTy::Bool,
-    TypeHint hint = TypeHint::None) {
-  ParameterBuilder builder_(_fbb);
-  builder_.add_name(name);
-  builder_.add_hint(hint);
-  builder_.add_ty(ty);
-  return builder_.Finish();
-}
-
-struct Parameter::Traits {
-  using type = Parameter;
-  static auto constexpr Create = CreateParameter;
-};
-
-inline ::flatbuffers::Offset<Parameter> CreateParameterDirect(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    const char *name = nullptr,
-    ValueTy ty = ValueTy::Bool,
-    TypeHint hint = TypeHint::None) {
-  auto name__ = name ? _fbb.CreateString(name) : 0;
-  return CreateParameter(
-      _fbb,
-      name__,
-      ty,
-      hint);
-}
-
-struct ParameterInstance FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef ParameterInstanceBuilder Builder;
-  struct Traits;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_P_TYPE = 4,
-    VT_P = 6
-  };
-  ParameterSlot p_type() const {
-    return static_cast<ParameterSlot>(GetField<uint8_t>(VT_P_TYPE, 0));
-  }
-  const void *p() const {
-    return GetPointer<const void *>(VT_P);
-  }
-  template<typename T> const T *p_as() const;
-  const Parameter *p_as_Parameter() const {
-    return p_type() == ParameterSlot::Parameter ? static_cast<const Parameter *>(p()) : nullptr;
-  }
-  const ValueInstance *p_as_ValueInstance() const {
-    return p_type() == ParameterSlot::ValueInstance ? static_cast<const ValueInstance *>(p()) : nullptr;
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<uint8_t>(verifier, VT_P_TYPE, 1) &&
-           VerifyOffsetRequired(verifier, VT_P) &&
-           VerifyParameterSlot(verifier, p(), p_type()) &&
-           verifier.EndTable();
-  }
-};
-
-template<> inline const Parameter *ParameterInstance::p_as<Parameter>() const {
-  return p_as_Parameter();
-}
-
-template<> inline const ValueInstance *ParameterInstance::p_as<ValueInstance>() const {
-  return p_as_ValueInstance();
-}
-
-struct ParameterInstanceBuilder {
-  typedef ParameterInstance Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_p_type(ParameterSlot p_type) {
-    fbb_.AddElement<uint8_t>(ParameterInstance::VT_P_TYPE, static_cast<uint8_t>(p_type), 0);
-  }
-  void add_p(::flatbuffers::Offset<void> p) {
-    fbb_.AddOffset(ParameterInstance::VT_P, p);
-  }
-  explicit ParameterInstanceBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<ParameterInstance> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<ParameterInstance>(end);
-    fbb_.Required(o, ParameterInstance::VT_P);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<ParameterInstance> CreateParameterInstance(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    ParameterSlot p_type = ParameterSlot::NONE,
-    ::flatbuffers::Offset<void> p = 0) {
-  ParameterInstanceBuilder builder_(_fbb);
-  builder_.add_p(p);
-  builder_.add_p_type(p_type);
-  return builder_.Finish();
-}
-
-struct ParameterInstance::Traits {
-  using type = ParameterInstance;
-  static auto constexpr Create = CreateParameterInstance;
-};
-
-struct ParameterizedQuery FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef ParameterizedQueryBuilder Builder;
-  struct Traits;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_QUERY = 4,
-    VT_PARAMETERS = 6,
-    VT_LIMIT = 8
-  };
-  const QueryElement *query() const {
-    return GetPointer<const QueryElement *>(VT_QUERY);
-  }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<ParameterInstance>> *parameters() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<ParameterInstance>> *>(VT_PARAMETERS);
-  }
-  uint32_t limit() const {
-    return GetField<uint32_t>(VT_LIMIT, 0);
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyOffsetRequired(verifier, VT_QUERY) &&
-           verifier.VerifyTable(query()) &&
-           VerifyOffset(verifier, VT_PARAMETERS) &&
-           verifier.VerifyVector(parameters()) &&
-           verifier.VerifyVectorOfTables(parameters()) &&
-           VerifyField<uint32_t>(verifier, VT_LIMIT, 4) &&
-           verifier.EndTable();
-  }
-};
-
-struct ParameterizedQueryBuilder {
-  typedef ParameterizedQuery Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_query(::flatbuffers::Offset<QueryElement> query) {
-    fbb_.AddOffset(ParameterizedQuery::VT_QUERY, query);
-  }
-  void add_parameters(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ParameterInstance>>> parameters) {
-    fbb_.AddOffset(ParameterizedQuery::VT_PARAMETERS, parameters);
-  }
-  void add_limit(uint32_t limit) {
-    fbb_.AddElement<uint32_t>(ParameterizedQuery::VT_LIMIT, limit, 0);
-  }
-  explicit ParameterizedQueryBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<ParameterizedQuery> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<ParameterizedQuery>(end);
-    fbb_.Required(o, ParameterizedQuery::VT_QUERY);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<ParameterizedQuery> CreateParameterizedQuery(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<QueryElement> query = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ParameterInstance>>> parameters = 0,
-    uint32_t limit = 0) {
-  ParameterizedQueryBuilder builder_(_fbb);
-  builder_.add_limit(limit);
-  builder_.add_parameters(parameters);
-  builder_.add_query(query);
-  return builder_.Finish();
-}
-
-struct ParameterizedQuery::Traits {
-  using type = ParameterizedQuery;
-  static auto constexpr Create = CreateParameterizedQuery;
-};
-
-inline ::flatbuffers::Offset<ParameterizedQuery> CreateParameterizedQueryDirect(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<QueryElement> query = 0,
-    const std::vector<::flatbuffers::Offset<ParameterInstance>> *parameters = nullptr,
-    uint32_t limit = 0) {
-  auto parameters__ = parameters ? _fbb.CreateVector<::flatbuffers::Offset<ParameterInstance>>(*parameters) : 0;
-  return CreateParameterizedQuery(
-      _fbb,
-      query,
-      parameters__,
-      limit);
+      limit,
+      bound_sources__);
 }
 
 inline bool VerifyExprUnion(::flatbuffers::Verifier &verifier, const void *obj, ExprUnion type) {
@@ -3248,29 +3074,29 @@ inline bool VerifyExprUnionVector(::flatbuffers::Verifier &verifier, const ::fla
   return true;
 }
 
-inline bool VerifySubcollection(::flatbuffers::Verifier &verifier, const void *obj, Subcollection type) {
+inline bool VerifyTablePartition(::flatbuffers::Verifier &verifier, const void *obj, TablePartition type) {
   switch (type) {
-    case Subcollection::NONE: {
+    case TablePartition::NONE: {
       return true;
     }
-    case Subcollection::MvdbSubcollection: {
-      auto ptr = reinterpret_cast<const MvdbSubcollection *>(obj);
+    case TablePartition::MvdbPartition: {
+      auto ptr = reinterpret_cast<const MvdbPartition *>(obj);
       return verifier.VerifyTable(ptr);
     }
-    case Subcollection::WorklogSubcollection: {
-      auto ptr = reinterpret_cast<const WorklogSubcollection *>(obj);
+    case TablePartition::WorklogPartition: {
+      auto ptr = reinterpret_cast<const WorklogPartition *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;
   }
 }
 
-inline bool VerifySubcollectionVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<Subcollection> *types) {
+inline bool VerifyTablePartitionVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<TablePartition> *types) {
   if (!values || !types) return !values && !types;
   if (values->size() != types->size()) return false;
   for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
-    if (!VerifySubcollection(
-        verifier,  values->Get(i), types->GetEnum<Subcollection>(i))) {
+    if (!VerifyTablePartition(
+        verifier,  values->Get(i), types->GetEnum<TablePartition>(i))) {
       return false;
     }
   }
@@ -3302,8 +3128,8 @@ inline bool VerifyTableSourceUnion(::flatbuffers::Verifier &verifier, const void
       auto ptr = reinterpret_cast<const Vector *>(obj);
       return verifier.VerifyTable(ptr);
     }
-    case TableSourceUnion::RecordBatchPlaceholder: {
-      auto ptr = reinterpret_cast<const RecordBatchPlaceholder *>(obj);
+    case TableSourceUnion::Placeholder: {
+      auto ptr = reinterpret_cast<const Placeholder *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;
@@ -3353,35 +3179,6 @@ inline bool VerifyQueryElementUnionVector(::flatbuffers::Verifier &verifier, con
   for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
     if (!VerifyQueryElementUnion(
         verifier,  values->Get(i), types->GetEnum<QueryElementUnion>(i))) {
-      return false;
-    }
-  }
-  return true;
-}
-
-inline bool VerifyParameterSlot(::flatbuffers::Verifier &verifier, const void *obj, ParameterSlot type) {
-  switch (type) {
-    case ParameterSlot::NONE: {
-      return true;
-    }
-    case ParameterSlot::Parameter: {
-      auto ptr = reinterpret_cast<const Parameter *>(obj);
-      return verifier.VerifyTable(ptr);
-    }
-    case ParameterSlot::ValueInstance: {
-      auto ptr = reinterpret_cast<const ValueInstance *>(obj);
-      return verifier.VerifyTable(ptr);
-    }
-    default: return true;
-  }
-}
-
-inline bool VerifyParameterSlotVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<ParameterSlot> *types) {
-  if (!values || !types) return !values && !types;
-  if (values->size() != types->size()) return false;
-  for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
-    if (!VerifyParameterSlot(
-        verifier,  values->Get(i), types->GetEnum<ParameterSlot>(i))) {
       return false;
     }
   }

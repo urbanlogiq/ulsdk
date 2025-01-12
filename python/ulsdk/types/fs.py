@@ -143,6 +143,7 @@ from .value import (
     VI8,
     VIsize,
     VNull,
+    VPlaceholder,
     VStr,
     VTimestampMs,
     VTimestampMsUtc,
@@ -271,6 +272,7 @@ from .generated.VI64 import VI64 as FbsVI64
 from .generated.VI8 import VI8 as FbsVI8
 from .generated.VIsize import VIsize as FbsVIsize
 from .generated.VNull import VNull as FbsVNull
+from .generated.VPlaceholder import VPlaceholder as FbsVPlaceholder
 from .generated.VStr import VStr as FbsVStr
 from .generated.VTimestampMs import VTimestampMs as FbsVTimestampMs
 from .generated.VTimestampMsUtc import VTimestampMsUtc as FbsVTimestampMsUtc
@@ -310,6 +312,12 @@ class EntryTy(Enum):
     Object = 2
     TopLevelDirectory = 3
 
+class StorageTier(Enum):
+    Cold = -2
+    Cool = -1
+    Hot = 0
+    Blazing = 1
+
 
 @dataclass
 class File:
@@ -326,6 +334,8 @@ class File:
     mime: "str"
 
     size: "int"
+
+    tier: "StorageTier"
 
     virus: Optional["str"]
 
@@ -359,11 +369,12 @@ class File:
         assert mime_str is not None
         mime = mime_str.decode('utf-8')
         size = o.Size()
+        tier = StorageTier(o.Tier())
         virus = None
         virus_str = o.Virus()
         if virus_str is not None:
             virus = virus_str.decode('utf-8')
-        return cls(account, blob, chunks, container, digest, mime, size, virus)
+        return cls(account, blob, chunks, container, digest, mime, size, tier, virus)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -383,6 +394,7 @@ class File:
             AddDigestType,
             AddMime,
             AddSize,
+            AddTier,
             AddVirus,
             End,
         )
@@ -409,7 +421,7 @@ class File:
         virus_offset = None
         if self.virus is not None:
             virus_offset = builder.CreateString(self.virus)
-        
+
         Start(builder)
         AddAccount(builder, account_offset)
         if blob_offset is not None:
@@ -423,6 +435,7 @@ class File:
             AddDigestType(builder, digest_ty)
         AddMime(builder, mime_offset)
         AddSize(builder, self.size)
+        AddTier(builder, self.tier.value)
         if virus_offset is not None:
             AddVirus(builder, virus_offset)
         return End(builder)
@@ -442,8 +455,9 @@ class File:
         digest = Digest.make_default()
         mime = ""
         size = 0
+        tier = StorageTier(-2)
         virus = ""
-        return cls(account, blob, chunks, container, digest, mime, size, virus)
+        return cls(account, blob, chunks, container, digest, mime, size, tier, virus)
 
     def __eq__(self, other) -> bool:
         eq = True
@@ -464,6 +478,7 @@ class File:
         eq = eq and self.digest == other.digest
         eq = eq and self.mime == other.mime
         eq = eq and self.size == other.size
+        eq = eq and self.tier == other.tier
         eq = eq and self.virus == other.virus
 
         return eq
@@ -528,7 +543,7 @@ class Directory:
         for i in reversed(range(len(self.slots))):
             builder.PrependUOffsetTRelative(slots_offsets[i])
         slots_offset = builder.EndVector()
-        
+
         Start(builder)
         if notifications_offset is not None:
             AddNotifications(builder, notifications_offset)
@@ -597,7 +612,7 @@ class ObjectRef:
             End,
         )
         id_offset = self.id.serialize_to(builder)
-        
+
         Start(builder)
         AddId(builder, id_offset)
         AddTy(builder, self.ty.value)
@@ -709,7 +724,7 @@ class ListFile:
         virus_offset = None
         if self.virus is not None:
             virus_offset = builder.CreateString(self.virus)
-        
+
         Start(builder)
         AddMime(builder, mime_offset)
         AddSize(builder, self.size)
@@ -755,7 +770,7 @@ class ListDirectory:
             Start,
             End,
         )
-        
+
         Start(builder)
         return End(builder)
 
@@ -808,7 +823,7 @@ class ListObject:
             End,
         )
         id_offset = self.id.serialize_to(builder)
-        
+
         Start(builder)
         AddId(builder, id_offset)
         AddSize(builder, self.size)
@@ -862,7 +877,7 @@ class TopLevelDirectory:
             End,
         )
         b2c_entity_offset = self.b2c_entity.serialize_to(builder)
-        
+
         Start(builder)
         AddB2cEntity(builder, b2c_entity_offset)
         return End(builder)
@@ -975,7 +990,7 @@ class Attr:
         )
         key_offset = builder.CreateString(self.key)
         v_offset, v_ty = self.v.serialize_to(builder)
-        
+
         Start(builder)
         AddKey(builder, key_offset)
         AddV(builder, v_offset)
@@ -1042,7 +1057,7 @@ class Chunk:
         )
         blob_offset = self.blob.serialize_to(builder)
         digest_offset, digest_ty = self.digest.serialize_to(builder)
-        
+
         Start(builder)
         AddBlob(builder, blob_offset)
         AddDigest(builder, digest_offset)
@@ -1108,7 +1123,7 @@ class DirectoryEntry:
         )
         entry_offset, entry_ty = self.entry.serialize_to(builder)
         parent_offset = self.parent.serialize_to(builder)
-        
+
         Start(builder)
         AddEntry(builder, entry_offset)
         AddEntryType(builder, entry_ty)
@@ -1170,7 +1185,7 @@ class DirectoryList:
         for i in reversed(range(len(self.slots))):
             builder.PrependUOffsetTRelative(slots_offsets[i])
         slots_offset = builder.EndVector()
-        
+
         Start(builder)
         AddSlots(builder, slots_offset)
         return End(builder)
@@ -1282,7 +1297,7 @@ class ListSlot:
         if self.last_modified_by is not None:
             last_modified_by_offset = self.last_modified_by.serialize_to(builder)
         name_offset = builder.CreateString(self.name)
-        
+
         Start(builder)
         if attributes_offset is not None:
             AddAttributes(builder, attributes_offset)
@@ -1388,7 +1403,7 @@ class MoveRequest:
         if self.dest_root is not None:
             dest_root_offset = self.dest_root.serialize_to(builder)
         entry_offset = self.entry.serialize_to(builder)
-        
+
         Start(builder)
         if dest_name_offset is not None:
             AddDestName(builder, dest_name_offset)
@@ -1457,7 +1472,7 @@ class NewLink:
         )
         name_offset = builder.CreateString(self.name)
         obj_offset = self.obj.serialize_to(builder)
-        
+
         Start(builder)
         AddName(builder, name_offset)
         AddObj(builder, obj_offset)
@@ -1540,7 +1555,7 @@ class Slot:
             attributes_offset = builder.EndVector()
         id_offset = self.id.serialize_to(builder)
         name_offset = builder.CreateString(self.name)
-        
+
         Start(builder)
         if attributes_offset is not None:
             AddAttributes(builder, attributes_offset)

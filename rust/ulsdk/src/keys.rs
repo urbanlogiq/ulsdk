@@ -27,15 +27,15 @@ impl Key {
     pub fn try_new(
         user_id: Uuid,
         region: Region,
-        access_key: String,
-        secret_key: String,
+        access_key: &str,
+        secret_key: &str,
     ) -> Result<Self, Error> {
         let secret_key = format!("{}==", secret_key);
 
         Ok(Key {
             user_id,
             region,
-            access_key,
+            access_key: access_key.to_owned(),
             secret_key: base64::decode(secret_key).map_err(|e| Error::from(e.to_string()))?,
         })
     }

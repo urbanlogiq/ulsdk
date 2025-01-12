@@ -65,6 +65,42 @@ struct NewLinkBuilder;
 struct MoveRequest;
 struct MoveRequestBuilder;
 
+enum class StorageTier : int8_t {
+  Cold = -2,
+  Cool = -1,
+  Hot = 0,
+  Blazing = 1,
+  MIN = Cold,
+  MAX = Blazing
+};
+
+inline const StorageTier (&EnumValuesStorageTier())[4] {
+  static const StorageTier values[] = {
+    StorageTier::Cold,
+    StorageTier::Cool,
+    StorageTier::Hot,
+    StorageTier::Blazing
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesStorageTier() {
+  static const char * const names[5] = {
+    "Cold",
+    "Cool",
+    "Hot",
+    "Blazing",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameStorageTier(StorageTier e) {
+  if (::flatbuffers::IsOutRange(e, StorageTier::Cold, StorageTier::Blazing)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(StorageTier::Cold);
+  return EnumNamesStorageTier()[index];
+}
+
 enum class EntryTy : uint32_t {
   File = 0,
   Directory = 1,
@@ -311,6 +347,9 @@ struct Attr FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const VTimestampNs *v_as_VTimestampNs() const {
     return v_type() == Value::VTimestampNs ? static_cast<const VTimestampNs *>(v()) : nullptr;
   }
+  const VPlaceholder *v_as_VPlaceholder() const {
+    return v_type() == Value::VPlaceholder ? static_cast<const VPlaceholder *>(v()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_KEY) &&
@@ -420,6 +459,10 @@ template<> inline const VTimestampNsUtc *Attr::v_as<VTimestampNsUtc>() const {
 
 template<> inline const VTimestampNs *Attr::v_as<VTimestampNs>() const {
   return v_as_VTimestampNs();
+}
+
+template<> inline const VPlaceholder *Attr::v_as<VPlaceholder>() const {
+  return v_as_VPlaceholder();
 }
 
 struct AttrBuilder {
@@ -687,7 +730,8 @@ struct File FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_DIGEST = 14,
     VT_ACCOUNT = 16,
     VT_CONTAINER = 18,
-    VT_CHUNKS = 20
+    VT_CHUNKS = 20,
+    VT_TIER = 22
   };
   const ::flatbuffers::String *mime() const {
     return GetPointer<const ::flatbuffers::String *>(VT_MIME);
@@ -720,6 +764,9 @@ struct File FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::Vector<::flatbuffers::Offset<Chunk>> *chunks() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Chunk>> *>(VT_CHUNKS);
   }
+  StorageTier tier() const {
+    return static_cast<StorageTier>(GetField<int8_t>(VT_TIER, 0));
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_MIME) &&
@@ -739,6 +786,7 @@ struct File FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_CHUNKS) &&
            verifier.VerifyVector(chunks()) &&
            verifier.VerifyVectorOfTables(chunks()) &&
+           VerifyField<int8_t>(verifier, VT_TIER, 1) &&
            verifier.EndTable();
   }
 };
@@ -778,6 +826,9 @@ struct FileBuilder {
   void add_chunks(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Chunk>>> chunks) {
     fbb_.AddOffset(File::VT_CHUNKS, chunks);
   }
+  void add_tier(StorageTier tier) {
+    fbb_.AddElement<int8_t>(File::VT_TIER, static_cast<int8_t>(tier), 0);
+  }
   explicit FileBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -801,7 +852,8 @@ inline ::flatbuffers::Offset<File> CreateFile(
     ::flatbuffers::Offset<void> digest = 0,
     ::flatbuffers::Offset<::flatbuffers::String> account = 0,
     ::flatbuffers::Offset<::flatbuffers::String> container = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Chunk>>> chunks = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Chunk>>> chunks = 0,
+    StorageTier tier = StorageTier::Hot) {
   FileBuilder builder_(_fbb);
   builder_.add_size(size);
   builder_.add_chunks(chunks);
@@ -811,6 +863,7 @@ inline ::flatbuffers::Offset<File> CreateFile(
   builder_.add_virus(virus);
   builder_.add_blob(blob);
   builder_.add_mime(mime);
+  builder_.add_tier(tier);
   builder_.add_digest_type(digest_type);
   return builder_.Finish();
 }
@@ -830,7 +883,8 @@ inline ::flatbuffers::Offset<File> CreateFileDirect(
     ::flatbuffers::Offset<void> digest = 0,
     const char *account = nullptr,
     const char *container = nullptr,
-    const std::vector<::flatbuffers::Offset<Chunk>> *chunks = nullptr) {
+    const std::vector<::flatbuffers::Offset<Chunk>> *chunks = nullptr,
+    StorageTier tier = StorageTier::Hot) {
   auto mime__ = mime ? _fbb.CreateString(mime) : 0;
   auto virus__ = virus ? _fbb.CreateString(virus) : 0;
   auto account__ = account ? _fbb.CreateString(account) : 0;
@@ -846,7 +900,8 @@ inline ::flatbuffers::Offset<File> CreateFileDirect(
       digest,
       account__,
       container__,
-      chunks__);
+      chunks__,
+      tier);
 }
 
 struct Slot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

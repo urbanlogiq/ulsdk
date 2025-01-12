@@ -6,9 +6,11 @@ use std::fmt::{self, Display, Formatter};
 pub enum Error {
     Unclassified(Box<dyn std::error::Error>),
     IoError(std::io::Error),
-    ReqwestError(reqwest::Error),
+    Reqwest(reqwest::Error),
     FailedRequest(String, String, reqwest::StatusCode, String),
-    SerdeJsonError(serde_json::error::Error),
+    SerdeJson(serde_json::error::Error),
+    Arrow(arrow::error::ArrowError),
+    InvalidFlatbuffer(flatbuffers::InvalidFlatbuffer),
 }
 
 // TODO: Blech.
@@ -22,15 +24,17 @@ impl Display for Error {
         match self {
             Error::Unclassified(err) => write!(f, "{}", err),
             Error::IoError(err) => write!(f, "I/O Error: {}", err),
-            Error::ReqwestError(err) => write!(f, "API error: {}", err),
+            Error::Reqwest(err) => write!(f, "API error: {}", err),
             Error::FailedRequest(endpoint, err, status, body) => write!(
                 f,
                 "Failed request to {}: {} ({}) Body: {}",
                 endpoint, err, status, body
             ),
-            Error::SerdeJsonError(err) => {
+            Error::SerdeJson(err) => {
                 write!(f, "Json deserialization error: {}", err)
             }
+            Error::Arrow(err) => write!(f, "Arrow Error: {}", err),
+            Error::InvalidFlatbuffer(err) => write!(f, "Invalid Flatbuffer Error: {}", err),
         }
     }
 }
@@ -49,12 +53,24 @@ impl From<std::io::Error> for Error {
 
 impl From<reqwest::Error> for Error {
     fn from(error: reqwest::Error) -> Self {
-        Error::ReqwestError(error)
+        Error::Reqwest(error)
     }
 }
 
 impl From<serde_json::error::Error> for Error {
     fn from(e: serde_json::error::Error) -> Self {
-        Error::SerdeJsonError(e)
+        Error::SerdeJson(e)
+    }
+}
+
+impl From<arrow::error::ArrowError> for Error {
+    fn from(e: arrow::error::ArrowError) -> Self {
+        Error::Arrow(e)
+    }
+}
+
+impl From<flatbuffers::InvalidFlatbuffer> for Error {
+    fn from(e: flatbuffers::InvalidFlatbuffer) -> Self {
+        Error::InvalidFlatbuffer(e)
     }
 }

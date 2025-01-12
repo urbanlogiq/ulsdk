@@ -101,6 +101,7 @@ from .value import (
     VI8,
     VIsize,
     VNull,
+    VPlaceholder,
     VStr,
     VTimestampMs,
     VTimestampMsUtc,
@@ -183,6 +184,7 @@ from .generated.VI64 import VI64 as FbsVI64
 from .generated.VI8 import VI8 as FbsVI8
 from .generated.VIsize import VIsize as FbsVIsize
 from .generated.VNull import VNull as FbsVNull
+from .generated.VPlaceholder import VPlaceholder as FbsVPlaceholder
 from .generated.VStr import VStr as FbsVStr
 from .generated.VTimestampMs import VTimestampMs as FbsVTimestampMs
 from .generated.VTimestampMsUtc import VTimestampMsUtc as FbsVTimestampMsUtc
@@ -259,7 +261,7 @@ class EmbeddedTable:
         for i in reversed(range(len(self.v))):
             builder.PrependUint8(self.v[i])
         v_offset = builder.EndVector()
-        
+
         Start(builder)
         AddV(builder, v_offset)
         return End(builder)
@@ -401,7 +403,7 @@ class DeprecatedRunSpec:
             builder.PrependUOffsetTRelative(params_offsets[i])
         params_offset = builder.EndVector()
         schematic_offset = self.schematic.serialize_to(builder)
-        
+
         Start(builder)
         AddParamIndices(builder, param_indices_offset)
         AddParams(builder, params_offset)
@@ -490,7 +492,7 @@ class DeprecatedTaskParameter:
             for i in reversed(range(len(self.value))):
                 builder.PrependUint8(self.value[i])
             value_offset = builder.EndVector()
-        
+
         Start(builder)
         AddFlags(builder, self.flags)
         AddKey(builder, key_offset)
@@ -558,7 +560,7 @@ class Edge:
             AddTo,
             End,
         )
-        
+
         Start(builder)
         AddFrom_(builder, self.from_)
         AddTo(builder, self.to)
@@ -669,7 +671,7 @@ class Job:
             builder.PrependUOffsetTRelative(tasks_offsets[i])
         tasks_offset = builder.EndVector()
         user_id_offset = self.user_id.serialize_to(builder)
-        
+
         Start(builder)
         if error_tys_offset is not None:
             AddErrorTys(builder, error_tys_offset)
@@ -753,7 +755,7 @@ class Node:
         )
         name_offset = builder.CreateString(self.name)
         obj_offset = self.obj.serialize_to(builder)
-        
+
         Start(builder)
         AddName(builder, name_offset)
         AddObj(builder, obj_offset)
@@ -807,7 +809,7 @@ class ParamIndices:
         for i in reversed(range(len(self.idxs))):
             builder.PrependInt32(self.idxs[i])
         idxs_offset = builder.EndVector()
-        
+
         Start(builder)
         AddIdxs(builder, idxs_offset)
         return End(builder)
@@ -917,7 +919,7 @@ class RunSpec:
             builder.PrependUOffsetTRelative(params_offsets[i])
         params_offset = builder.EndVector()
         schematic_offset = self.schematic.serialize_to(builder)
-        
+
         Start(builder)
         AddNotify(builder, self.notify)
         AddParamIndices(builder, param_indices_offset)
@@ -1044,7 +1046,7 @@ class Schematic:
         for i in reversed(range(len(self.nodes))):
             builder.PrependUOffsetTRelative(nodes_offsets[i])
         nodes_offset = builder.EndVector()
-        
+
         Start(builder)
         AddAttributes(builder, attributes_offset)
         AddEdges(builder, edges_offset)
@@ -1291,7 +1293,7 @@ class Task:
             builder.PrependUOffsetTRelative(upstream_offsets[i])
         upstream_offset = builder.EndVector()
         user_id_offset = self.user_id.serialize_to(builder)
-        
+
         Start(builder)
         Add_Id(builder, _id_offset)
         AddBarrierCount(builder, self.barrier_count)
@@ -1421,7 +1423,7 @@ class TaskList:
         for i in reversed(range(len(self.tasks))):
             builder.PrependUOffsetTRelative(tasks_offsets[i])
         tasks_offset = builder.EndVector()
-        
+
         Start(builder)
         AddTasks(builder, tasks_offset)
         return End(builder)
@@ -1481,7 +1483,7 @@ class TaskParameter:
         )
         key_offset = builder.CreateString(self.key)
         value_offset, value_ty = self.value.serialize_to(builder)
-        
+
         Start(builder)
         AddKey(builder, key_offset)
         AddValue(builder, value_offset)

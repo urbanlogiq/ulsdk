@@ -28,3 +28,4 @@ class ValueTy(object):
     TimestampMs = 22
     TimestampNsUtc = 23
     TimestampNs = 24
+    Placeholder = 25

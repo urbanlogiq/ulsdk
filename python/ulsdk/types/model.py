@@ -73,7 +73,7 @@ class Model:
         source_offset = None
         if self.source is not None:
             source_offset = builder.CreateString(self.source)
-        
+
         Start(builder)
         AddLocation(builder, location_offset)
         AddName(builder, name_offset)

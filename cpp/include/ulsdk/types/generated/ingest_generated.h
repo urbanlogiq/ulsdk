@@ -157,6 +157,9 @@ struct DefaultValue FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const VTimestampNs *value_as_VTimestampNs() const {
     return value_type() == Value::VTimestampNs ? static_cast<const VTimestampNs *>(value()) : nullptr;
   }
+  const VPlaceholder *value_as_VPlaceholder() const {
+    return value_type() == Value::VPlaceholder ? static_cast<const VPlaceholder *>(value()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_FIELD) &&
@@ -266,6 +269,10 @@ template<> inline const VTimestampNsUtc *DefaultValue::value_as<VTimestampNsUtc>
 
 template<> inline const VTimestampNs *DefaultValue::value_as<VTimestampNs>() const {
   return value_as_VTimestampNs();
+}
+
+template<> inline const VPlaceholder *DefaultValue::value_as<VPlaceholder>() const {
+  return value_as_VPlaceholder();
 }
 
 struct DefaultValueBuilder {

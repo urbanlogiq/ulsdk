@@ -62,7 +62,7 @@ struct UserPreferences FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_TIMEZONE = 8,
     VT_CENTER = 10,
     VT_ZOOM = 12,
-    VT_DEFAULTAREAREPORTTEMPLATE = 14
+    VT_DEFAULT_AREA_REPORT_TEMPLATE = 14
   };
   Units units() const {
     return static_cast<Units>(GetField<uint32_t>(VT_UNITS, 0));
@@ -79,8 +79,8 @@ struct UserPreferences FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   float zoom() const {
     return GetField<float>(VT_ZOOM, 0.0f);
   }
-  const ObjectId *defaultAreaReportTemplate() const {
-    return GetPointer<const ObjectId *>(VT_DEFAULTAREAREPORTTEMPLATE);
+  const ObjectId *default_area_report_template() const {
+    return GetPointer<const ObjectId *>(VT_DEFAULT_AREA_REPORT_TEMPLATE);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -92,8 +92,8 @@ struct UserPreferences FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_CENTER) &&
            verifier.VerifyTable(center()) &&
            VerifyField<float>(verifier, VT_ZOOM, 4) &&
-           VerifyOffset(verifier, VT_DEFAULTAREAREPORTTEMPLATE) &&
-           verifier.VerifyTable(defaultAreaReportTemplate()) &&
+           VerifyOffset(verifier, VT_DEFAULT_AREA_REPORT_TEMPLATE) &&
+           verifier.VerifyTable(default_area_report_template()) &&
            verifier.EndTable();
   }
 };
@@ -117,8 +117,8 @@ struct UserPreferencesBuilder {
   void add_zoom(float zoom) {
     fbb_.AddElement<float>(UserPreferences::VT_ZOOM, zoom, 0.0f);
   }
-  void add_defaultAreaReportTemplate(::flatbuffers::Offset<ObjectId> defaultAreaReportTemplate) {
-    fbb_.AddOffset(UserPreferences::VT_DEFAULTAREAREPORTTEMPLATE, defaultAreaReportTemplate);
+  void add_default_area_report_template(::flatbuffers::Offset<ObjectId> default_area_report_template) {
+    fbb_.AddOffset(UserPreferences::VT_DEFAULT_AREA_REPORT_TEMPLATE, default_area_report_template);
   }
   explicit UserPreferencesBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -138,9 +138,9 @@ inline ::flatbuffers::Offset<UserPreferences> CreateUserPreferences(
     ::flatbuffers::Offset<::flatbuffers::String> timezone = 0,
     ::flatbuffers::Offset<Point> center = 0,
     float zoom = 0.0f,
-    ::flatbuffers::Offset<ObjectId> defaultAreaReportTemplate = 0) {
+    ::flatbuffers::Offset<ObjectId> default_area_report_template = 0) {
   UserPreferencesBuilder builder_(_fbb);
-  builder_.add_defaultAreaReportTemplate(defaultAreaReportTemplate);
+  builder_.add_default_area_report_template(default_area_report_template);
   builder_.add_zoom(zoom);
   builder_.add_center(center);
   builder_.add_timezone(timezone);
@@ -161,7 +161,7 @@ inline ::flatbuffers::Offset<UserPreferences> CreateUserPreferencesDirect(
     const char *timezone = nullptr,
     ::flatbuffers::Offset<Point> center = 0,
     float zoom = 0.0f,
-    ::flatbuffers::Offset<ObjectId> defaultAreaReportTemplate = 0) {
+    ::flatbuffers::Offset<ObjectId> default_area_report_template = 0) {
   auto timezone__ = timezone ? _fbb.CreateString(timezone) : 0;
   return CreateUserPreferences(
       _fbb,
@@ -170,7 +170,7 @@ inline ::flatbuffers::Offset<UserPreferences> CreateUserPreferencesDirect(
       timezone__,
       center,
       zoom,
-      defaultAreaReportTemplate);
+      default_area_report_template);
 }
 
 inline const UserPreferences *GetUserPreferences(const void *buf) {

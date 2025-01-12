@@ -137,6 +137,16 @@ test_v_null() {
 TypeTest test_v_null_obj(test_v_null, "VNull");
 
 bool
+test_v_placeholder() {
+    ::ul::types::VPlaceholder t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::VPlaceholder deserialized = ::ul::types::VPlaceholder(bytes);
+    return true;
+}
+
+TypeTest test_v_placeholder_obj(test_v_placeholder, "VPlaceholder");
+
+bool
 test_v_str() {
     ::ul::types::VStr t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);

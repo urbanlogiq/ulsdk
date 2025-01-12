@@ -82,6 +82,9 @@ struct VBytesBuilder;
 struct VFixedSizeBytes;
 struct VFixedSizeBytesBuilder;
 
+struct VPlaceholder;
+struct VPlaceholderBuilder;
+
 struct Point2D;
 
 struct Tri2D;
@@ -94,6 +97,108 @@ struct VArrayBuilder;
 
 struct ValueInstance;
 struct ValueInstanceBuilder;
+
+enum class ValueTy : uint8_t {
+  Bool = 0,
+  Unit = 1,
+  Char = 2,
+  Null = 3,
+  I8 = 4,
+  U8 = 5,
+  I16 = 6,
+  U16 = 7,
+  I32 = 8,
+  U32 = 9,
+  F32 = 10,
+  Isize = 11,
+  Usize = 12,
+  I64 = 13,
+  U64 = 14,
+  F64 = 15,
+  Str = 16,
+  Bytes = 17,
+  Array = 18,
+  Tri2D = 19,
+  FixedSizeBytes = 20,
+  TimestampMsUtc = 21,
+  TimestampMs = 22,
+  TimestampNsUtc = 23,
+  TimestampNs = 24,
+  Placeholder = 25,
+  MIN = Bool,
+  MAX = Placeholder
+};
+
+inline const ValueTy (&EnumValuesValueTy())[26] {
+  static const ValueTy values[] = {
+    ValueTy::Bool,
+    ValueTy::Unit,
+    ValueTy::Char,
+    ValueTy::Null,
+    ValueTy::I8,
+    ValueTy::U8,
+    ValueTy::I16,
+    ValueTy::U16,
+    ValueTy::I32,
+    ValueTy::U32,
+    ValueTy::F32,
+    ValueTy::Isize,
+    ValueTy::Usize,
+    ValueTy::I64,
+    ValueTy::U64,
+    ValueTy::F64,
+    ValueTy::Str,
+    ValueTy::Bytes,
+    ValueTy::Array,
+    ValueTy::Tri2D,
+    ValueTy::FixedSizeBytes,
+    ValueTy::TimestampMsUtc,
+    ValueTy::TimestampMs,
+    ValueTy::TimestampNsUtc,
+    ValueTy::TimestampNs,
+    ValueTy::Placeholder
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesValueTy() {
+  static const char * const names[27] = {
+    "Bool",
+    "Unit",
+    "Char",
+    "Null",
+    "I8",
+    "U8",
+    "I16",
+    "U16",
+    "I32",
+    "U32",
+    "F32",
+    "Isize",
+    "Usize",
+    "I64",
+    "U64",
+    "F64",
+    "Str",
+    "Bytes",
+    "Array",
+    "Tri2D",
+    "FixedSizeBytes",
+    "TimestampMsUtc",
+    "TimestampMs",
+    "TimestampNsUtc",
+    "TimestampNs",
+    "Placeholder",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameValueTy(ValueTy e) {
+  if (::flatbuffers::IsOutRange(e, ValueTy::Bool, ValueTy::Placeholder)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesValueTy()[index];
+}
 
 enum class Value : uint8_t {
   NONE = 0,
@@ -122,11 +227,12 @@ enum class Value : uint8_t {
   VTimestampMs = 23,
   VTimestampNsUtc = 24,
   VTimestampNs = 25,
+  VPlaceholder = 26,
   MIN = NONE,
-  MAX = VTimestampNs
+  MAX = VPlaceholder
 };
 
-inline const Value (&EnumValuesValue())[26] {
+inline const Value (&EnumValuesValue())[27] {
   static const Value values[] = {
     Value::NONE,
     Value::VBool,
@@ -153,13 +259,14 @@ inline const Value (&EnumValuesValue())[26] {
     Value::VTimestampMsUtc,
     Value::VTimestampMs,
     Value::VTimestampNsUtc,
-    Value::VTimestampNs
+    Value::VTimestampNs,
+    Value::VPlaceholder
   };
   return values;
 }
 
 inline const char * const *EnumNamesValue() {
-  static const char * const names[27] = {
+  static const char * const names[28] = {
     "NONE",
     "VBool",
     "VUnit",
@@ -186,13 +293,14 @@ inline const char * const *EnumNamesValue() {
     "VTimestampMs",
     "VTimestampNsUtc",
     "VTimestampNs",
+    "VPlaceholder",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameValue(Value e) {
-  if (::flatbuffers::IsOutRange(e, Value::NONE, Value::VTimestampNs)) return "";
+  if (::flatbuffers::IsOutRange(e, Value::NONE, Value::VPlaceholder)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesValue()[index];
 }
@@ -301,107 +409,12 @@ template<> struct ValueTraits<VTimestampNs> {
   static const Value enum_value = Value::VTimestampNs;
 };
 
-bool VerifyValue(::flatbuffers::Verifier &verifier, const void *obj, Value type);
-bool VerifyValueVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<Value> *types);
-
-enum class ValueTy : uint8_t {
-  Bool = 0,
-  Unit = 1,
-  Char = 2,
-  Null = 3,
-  I8 = 4,
-  U8 = 5,
-  I16 = 6,
-  U16 = 7,
-  I32 = 8,
-  U32 = 9,
-  F32 = 10,
-  Isize = 11,
-  Usize = 12,
-  I64 = 13,
-  U64 = 14,
-  F64 = 15,
-  Str = 16,
-  Bytes = 17,
-  Array = 18,
-  Tri2D = 19,
-  FixedSizeBytes = 20,
-  TimestampMsUtc = 21,
-  TimestampMs = 22,
-  TimestampNsUtc = 23,
-  TimestampNs = 24,
-  MIN = Bool,
-  MAX = TimestampNs
+template<> struct ValueTraits<VPlaceholder> {
+  static const Value enum_value = Value::VPlaceholder;
 };
 
-inline const ValueTy (&EnumValuesValueTy())[25] {
-  static const ValueTy values[] = {
-    ValueTy::Bool,
-    ValueTy::Unit,
-    ValueTy::Char,
-    ValueTy::Null,
-    ValueTy::I8,
-    ValueTy::U8,
-    ValueTy::I16,
-    ValueTy::U16,
-    ValueTy::I32,
-    ValueTy::U32,
-    ValueTy::F32,
-    ValueTy::Isize,
-    ValueTy::Usize,
-    ValueTy::I64,
-    ValueTy::U64,
-    ValueTy::F64,
-    ValueTy::Str,
-    ValueTy::Bytes,
-    ValueTy::Array,
-    ValueTy::Tri2D,
-    ValueTy::FixedSizeBytes,
-    ValueTy::TimestampMsUtc,
-    ValueTy::TimestampMs,
-    ValueTy::TimestampNsUtc,
-    ValueTy::TimestampNs
-  };
-  return values;
-}
-
-inline const char * const *EnumNamesValueTy() {
-  static const char * const names[26] = {
-    "Bool",
-    "Unit",
-    "Char",
-    "Null",
-    "I8",
-    "U8",
-    "I16",
-    "U16",
-    "I32",
-    "U32",
-    "F32",
-    "Isize",
-    "Usize",
-    "I64",
-    "U64",
-    "F64",
-    "Str",
-    "Bytes",
-    "Array",
-    "Tri2D",
-    "FixedSizeBytes",
-    "TimestampMsUtc",
-    "TimestampMs",
-    "TimestampNsUtc",
-    "TimestampNs",
-    nullptr
-  };
-  return names;
-}
-
-inline const char *EnumNameValueTy(ValueTy e) {
-  if (::flatbuffers::IsOutRange(e, ValueTy::Bool, ValueTy::TimestampNs)) return "";
-  const size_t index = static_cast<size_t>(e);
-  return EnumNamesValueTy()[index];
-}
+bool VerifyValue(::flatbuffers::Verifier &verifier, const void *obj, Value type);
+bool VerifyValueVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<Value> *types);
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Point2D FLATBUFFERS_FINAL_CLASS {
  private:
@@ -1567,6 +1580,76 @@ inline ::flatbuffers::Offset<VFixedSizeBytes> CreateVFixedSizeBytesDirect(
       sz);
 }
 
+struct VPlaceholder FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef VPlaceholderBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_NAME = 4,
+    VT_TY = 6
+  };
+  const ::flatbuffers::String *name() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_NAME);
+  }
+  ValueTy ty() const {
+    return static_cast<ValueTy>(GetField<uint8_t>(VT_TY, 0));
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
+           VerifyField<uint8_t>(verifier, VT_TY, 1) &&
+           verifier.EndTable();
+  }
+};
+
+struct VPlaceholderBuilder {
+  typedef VPlaceholder Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
+    fbb_.AddOffset(VPlaceholder::VT_NAME, name);
+  }
+  void add_ty(ValueTy ty) {
+    fbb_.AddElement<uint8_t>(VPlaceholder::VT_TY, static_cast<uint8_t>(ty), 0);
+  }
+  explicit VPlaceholderBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<VPlaceholder> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<VPlaceholder>(end);
+    fbb_.Required(o, VPlaceholder::VT_NAME);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<VPlaceholder> CreateVPlaceholder(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::String> name = 0,
+    ValueTy ty = ValueTy::Bool) {
+  VPlaceholderBuilder builder_(_fbb);
+  builder_.add_name(name);
+  builder_.add_ty(ty);
+  return builder_.Finish();
+}
+
+struct VPlaceholder::Traits {
+  using type = VPlaceholder;
+  static auto constexpr Create = CreateVPlaceholder;
+};
+
+inline ::flatbuffers::Offset<VPlaceholder> CreateVPlaceholderDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const char *name = nullptr,
+    ValueTy ty = ValueTy::Bool) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  return CreateVPlaceholder(
+      _fbb,
+      name__,
+      ty);
+}
+
 struct VTri2D FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef VTri2DBuilder Builder;
   struct Traits;
@@ -1763,6 +1846,9 @@ struct ValueInstance FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const VTimestampNs *v_as_VTimestampNs() const {
     return v_type() == Value::VTimestampNs ? static_cast<const VTimestampNs *>(v()) : nullptr;
   }
+  const VPlaceholder *v_as_VPlaceholder() const {
+    return v_type() == Value::VPlaceholder ? static_cast<const VPlaceholder *>(v()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_V_TYPE, 1) &&
@@ -1870,6 +1956,10 @@ template<> inline const VTimestampNsUtc *ValueInstance::v_as<VTimestampNsUtc>() 
 
 template<> inline const VTimestampNs *ValueInstance::v_as<VTimestampNs>() const {
   return v_as_VTimestampNs();
+}
+
+template<> inline const VPlaceholder *ValueInstance::v_as<VPlaceholder>() const {
+  return v_as_VPlaceholder();
 }
 
 struct ValueInstanceBuilder {
@@ -2012,6 +2102,10 @@ inline bool VerifyValue(::flatbuffers::Verifier &verifier, const void *obj, Valu
     }
     case Value::VTimestampNs: {
       auto ptr = reinterpret_cast<const VTimestampNs *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case Value::VPlaceholder: {
+      auto ptr = reinterpret_cast<const VPlaceholder *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

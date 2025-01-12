@@ -33,20 +33,18 @@ struct Distinct;
 struct Expr;
 struct Function;
 struct Join;
-struct MvdbSubcollection;
+struct MvdbPartition;
 struct NullableUint;
 struct OrderByExpr;
-struct Parameter;
-struct ParameterInstance;
-struct ParameterizedQuery;
 struct Partition;
+struct Placeholder;
 struct Query;
 struct QueryElement;
 struct QueryTableSource;
-struct RecordBatchPlaceholder;
 struct SetExpr;
 struct TableOrderBy;
 struct TableSource;
+struct TableSourceInstance;
 struct UnaryQueryElement;
 struct UnsetArgument;
 struct UpdateQueryElement;
@@ -54,7 +52,7 @@ struct ValueIndex;
 struct Vector;
 struct When;
 struct Window;
-struct WorklogSubcollection;
+struct WorklogPartition;
 
 typedef std::variant<
     std::shared_ptr<ValueIndex>,
@@ -69,11 +67,6 @@ typedef std::variant<
 > ExprUnion;
 
 using ::JoinTy;
-typedef std::variant<
-    std::shared_ptr<Parameter>,
-    std::shared_ptr<ValueInstance>
-> ParameterSlot;
-
 using ::QueryElementOp;
 typedef std::variant<
     std::shared_ptr<UnaryQueryElement>,
@@ -83,9 +76,9 @@ typedef std::variant<
 > QueryElementUnion;
 
 typedef std::variant<
-    std::shared_ptr<MvdbSubcollection>,
-    std::shared_ptr<WorklogSubcollection>
-> Subcollection;
+    std::shared_ptr<MvdbPartition>,
+    std::shared_ptr<WorklogPartition>
+> TablePartition;
 
 typedef std::variant<
     std::shared_ptr<DataCatalog>,
@@ -93,7 +86,7 @@ typedef std::variant<
     std::shared_ptr<GraphQuery>,
     std::shared_ptr<QueryTableSource>,
     std::shared_ptr<Vector>,
-    std::shared_ptr<RecordBatchPlaceholder>
+    std::shared_ptr<Placeholder>
 > TableSourceUnion;
 
 using ::TypeHint;
@@ -190,16 +183,6 @@ struct Window {
     Window(const std::vector<uint8_t> &bytes);
 };
 
-struct Parameter {
-    TypeHint hint_;
-    std::string name_;
-    ValueTy ty_;
-
-    Parameter();
-    Parameter(const ::Parameter *root);
-    Parameter(const std::vector<uint8_t> &bytes);
-};
-
 ///
 /// The Distinct function defined in fun.fbs is for use in cases like:
 /// SELECT COUNT(DISTINCT c0), SUM(c1) FROM t GROUP BY c2;
@@ -249,26 +232,30 @@ struct BinaryQueryElement {
     BinaryQueryElement(const std::vector<uint8_t> &bytes);
 };
 
-struct MvdbSubcollection {
-    std::string subcollection_;
+///
+/// Some multiverse databases are partitioned, and we need to refer to a specific
+/// partition within the database. This is used for that purpose.
+///
+struct MvdbPartition {
+    std::string partition_;
 
-    MvdbSubcollection();
-    MvdbSubcollection(const ::MvdbSubcollection *root);
-    MvdbSubcollection(const std::vector<uint8_t> &bytes);
+    MvdbPartition();
+    MvdbPartition(const ::MvdbPartition *root);
+    MvdbPartition(const std::vector<uint8_t> &bytes);
 };
 
-struct WorklogSubcollection {
+struct WorklogPartition {
     uint32_t idx_;
 
-    WorklogSubcollection();
-    WorklogSubcollection(const ::WorklogSubcollection *root);
-    WorklogSubcollection(const std::vector<uint8_t> &bytes);
+    WorklogPartition();
+    WorklogPartition(const ::WorklogPartition *root);
+    WorklogPartition(const std::vector<uint8_t> &bytes);
 };
 
 struct DataCatalog {
     ObjectId id_;
+    std::optional<TablePartition> partition_;
     std::optional<ContentId> revision_;
-    std::optional<Subcollection> subcollection_;
 
     DataCatalog();
     DataCatalog(const ::DataCatalog *root);
@@ -284,6 +271,7 @@ struct Arrow {
 };
 
 struct Query {
+    std::optional<std::vector<TableSourceInstance>> bound_sources_;
     uint32_t limit_;
     QueryElement query_;
     std::optional<std::vector<ValueInstance>> values_;
@@ -312,12 +300,12 @@ struct Vector {
     Vector(const std::vector<uint8_t> &bytes);
 };
 
-struct RecordBatchPlaceholder {
+struct Placeholder {
     uint32_t idx_;
 
-    RecordBatchPlaceholder();
-    RecordBatchPlaceholder(const ::RecordBatchPlaceholder *root);
-    RecordBatchPlaceholder(const std::vector<uint8_t> &bytes);
+    Placeholder();
+    Placeholder(const ::Placeholder *root);
+    Placeholder(const std::vector<uint8_t> &bytes);
 };
 
 struct UpdateQueryElement {
@@ -349,24 +337,6 @@ struct Join {
     Join();
     Join(const ::Join *root);
     Join(const std::vector<uint8_t> &bytes);
-};
-
-struct ParameterInstance {
-    ParameterSlot p_;
-
-    ParameterInstance();
-    ParameterInstance(const ::ParameterInstance *root);
-    ParameterInstance(const std::vector<uint8_t> &bytes);
-};
-
-struct ParameterizedQuery {
-    uint32_t limit_;
-    std::optional<std::vector<ParameterInstance>> parameters_;
-    QueryElement query_;
-
-    ParameterizedQuery();
-    ParameterizedQuery(const ::ParameterizedQuery *root);
-    ParameterizedQuery(const std::vector<uint8_t> &bytes);
 };
 
 ///
@@ -403,6 +373,14 @@ struct TableSource {
     TableSource(const std::vector<uint8_t> &bytes);
 };
 
+struct TableSourceInstance {
+    TableSourceUnion t_;
+
+    TableSourceInstance();
+    TableSourceInstance(const ::TableSourceInstance *root);
+    TableSourceInstance(const std::vector<uint8_t> &bytes);
+};
+
 struct When {
     Expr cond_;
     Expr value_;
@@ -414,12 +392,10 @@ struct When {
 
 std::pair<::flatbuffers::Offset<void>, ::ExprUnion>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ExprUnion &o);
-std::pair<::flatbuffers::Offset<void>, ::ParameterSlot>
-serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ParameterSlot &o);
 std::pair<::flatbuffers::Offset<void>, ::QueryElementUnion>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const QueryElementUnion &o);
-std::pair<::flatbuffers::Offset<void>, ::Subcollection>
-serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Subcollection &o);
+std::pair<::flatbuffers::Offset<void>, ::TablePartition>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TablePartition &o);
 std::pair<::flatbuffers::Offset<void>, ::TableSourceUnion>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TableSourceUnion &o);
 ::flatbuffers::Offset<::ValueIndex>
@@ -455,9 +431,6 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UnsetArgument &);
 ::flatbuffers::Offset<::Window>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Window &);
 
-::flatbuffers::Offset<::Parameter>
-serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Parameter &);
-
 ::flatbuffers::Offset<::Distinct>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Distinct &);
 
@@ -470,11 +443,11 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const QueryElement &);
 ::flatbuffers::Offset<::BinaryQueryElement>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const BinaryQueryElement &);
 
-::flatbuffers::Offset<::MvdbSubcollection>
-serialize_to(::flatbuffers::FlatBufferBuilder &builder, const MvdbSubcollection &);
+::flatbuffers::Offset<::MvdbPartition>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const MvdbPartition &);
 
-::flatbuffers::Offset<::WorklogSubcollection>
-serialize_to(::flatbuffers::FlatBufferBuilder &builder, const WorklogSubcollection &);
+::flatbuffers::Offset<::WorklogPartition>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const WorklogPartition &);
 
 ::flatbuffers::Offset<::DataCatalog>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DataCatalog &);
@@ -491,8 +464,8 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const QueryTableSource &
 ::flatbuffers::Offset<::Vector>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Vector &);
 
-::flatbuffers::Offset<::RecordBatchPlaceholder>
-serialize_to(::flatbuffers::FlatBufferBuilder &builder, const RecordBatchPlaceholder &);
+::flatbuffers::Offset<::Placeholder>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Placeholder &);
 
 ::flatbuffers::Offset<::UpdateQueryElement>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UpdateQueryElement &);
@@ -503,12 +476,6 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DeleteQueryElement
 ::flatbuffers::Offset<::Join>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Join &);
 
-::flatbuffers::Offset<::ParameterInstance>
-serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ParameterInstance &);
-
-::flatbuffers::Offset<::ParameterizedQuery>
-serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ParameterizedQuery &);
-
 ::flatbuffers::Offset<::SetExpr>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const SetExpr &);
 
@@ -517,6 +484,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TableOrderBy &);
 
 ::flatbuffers::Offset<::TableSource>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TableSource &);
+
+::flatbuffers::Offset<::TableSourceInstance>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TableSourceInstance &);
 
 ::flatbuffers::Offset<::When>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const When &);
@@ -556,9 +526,6 @@ std::vector<uint8_t>
 to_bytes(const Window &o);
 
 std::vector<uint8_t>
-to_bytes(const Parameter &o);
-
-std::vector<uint8_t>
 to_bytes(const Distinct &o);
 
 std::vector<uint8_t>
@@ -571,10 +538,10 @@ std::vector<uint8_t>
 to_bytes(const BinaryQueryElement &o);
 
 std::vector<uint8_t>
-to_bytes(const MvdbSubcollection &o);
+to_bytes(const MvdbPartition &o);
 
 std::vector<uint8_t>
-to_bytes(const WorklogSubcollection &o);
+to_bytes(const WorklogPartition &o);
 
 std::vector<uint8_t>
 to_bytes(const DataCatalog &o);
@@ -592,7 +559,7 @@ std::vector<uint8_t>
 to_bytes(const Vector &o);
 
 std::vector<uint8_t>
-to_bytes(const RecordBatchPlaceholder &o);
+to_bytes(const Placeholder &o);
 
 std::vector<uint8_t>
 to_bytes(const UpdateQueryElement &o);
@@ -604,12 +571,6 @@ std::vector<uint8_t>
 to_bytes(const Join &o);
 
 std::vector<uint8_t>
-to_bytes(const ParameterInstance &o);
-
-std::vector<uint8_t>
-to_bytes(const ParameterizedQuery &o);
-
-std::vector<uint8_t>
 to_bytes(const SetExpr &o);
 
 std::vector<uint8_t>
@@ -617,6 +578,9 @@ to_bytes(const TableOrderBy &o);
 
 std::vector<uint8_t>
 to_bytes(const TableSource &o);
+
+std::vector<uint8_t>
+to_bytes(const TableSourceInstance &o);
 
 std::vector<uint8_t>
 to_bytes(const When &o);

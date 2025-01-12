@@ -30,7 +30,7 @@ struct UserPreferences;
 using ::Units;
 struct UserPreferences {
     std::optional<Point> center_;
-    std::optional<ObjectId> defaultAreaReportTemplate_;
+    std::optional<ObjectId> default_area_report_template_;
     std::optional<ObjectId> homepage_usecase_id_;
     std::optional<std::string> timezone_;
     Units units_;

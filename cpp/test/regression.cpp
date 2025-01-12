@@ -9,7 +9,7 @@ regression_test_parameter_replacement(ul::RequestContext&) {
 
     const std::string idstr = "010013a8-0fdb-e894-4885-a50e003ddf6a";
     ul::Uuid id = ul::Uuid(idstr);
-    ul::api::datacatalog::stream_put_json(ctx, id, std::nullopt, {});
+    ul::api::datacatalog::stream_put_json(ctx, id, {});
 
     const std::string& path = ctx.path_;
     if (std::equal(idstr.rbegin(), idstr.rend(), path.rbegin())) {
@@ -45,7 +45,7 @@ ul::Result<ul::Void> derq_ingestion_test(ul::RequestContext& ctx) {
     const std::string idstr = "01009d67-af1f-da68-4f59-bcafb5910204";
     ul::Uuid id = ul::Uuid(idstr);
     const auto result =
-        ul::api::datacatalog::stream_put_json(ctx, id, std::nullopt, data);
+        ul::api::datacatalog::stream_put_json(ctx, id, data);
 
     if (std::holds_alternative<ul::Error>(result)) {
         const ul::Error error = std::get<ul::Error>(result);

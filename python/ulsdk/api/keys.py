@@ -45,7 +45,7 @@ class Key:
         last = None
         expiry = None
         comment = None
-    
+
         for key in o:
             if key == "id":
                 id__var = o[key]
@@ -83,10 +83,10 @@ class Key:
                     comment = comment_var
                 else:
                     comment = None
-    
+
         assert id_ is not None
         assert created is not None
-    
+
         return cls(id_, pubkey, created, last, expiry, comment)
 
     @classmethod
@@ -97,7 +97,7 @@ class Key:
         last = None
         expiry = None
         comment = None
-    
+
         return cls(id, pubkey, created, last, expiry, comment)
 
 @dataclass
@@ -116,7 +116,7 @@ class GetKeys:
     @classmethod
     def from_dict(cls, o: Dict[str, Any]) -> Self:
         keys = None
-    
+
         for key in o:
             if key == "keys":
                 keys_var = o[key]
@@ -127,15 +127,15 @@ class GetKeys:
                     assert type(keys_item_var) is dict
                     keys_item = Key.from_dict(keys_item_var)
                     keys.append(keys_item)
-    
+
         assert keys is not None
-    
+
         return cls(keys)
 
     @classmethod
     def make_default(cls) -> Self:
         keys = []
-    
+
         return cls(keys)
 
 @dataclass
@@ -153,7 +153,7 @@ class CreateKey:
     def from_dict(cls, o: Dict[str, Any]) -> Self:
         id_ = None
         secret_key = None
-    
+
         for key in o:
             if key == "id":
                 id__var = o[key]
@@ -163,17 +163,17 @@ class CreateKey:
                 secret_key_var = o[key]
                 assert type(secret_key_var) is str
                 secret_key = secret_key_var
-    
+
         assert id_ is not None
         assert secret_key is not None
-    
+
         return cls(id_, secret_key)
 
     @classmethod
     def make_default(cls) -> Self:
         id = ""
         secretKey = ""
-    
+
         return cls(id, secretKey)
 
 @dataclass
@@ -195,7 +195,7 @@ class UpdateKey:
     def from_dict(cls, o: Dict[str, Any]) -> Self:
         comment = None
         expiry = None
-    
+
         for key in o:
             if key == "comment":
                 if o[key] is not None:
@@ -211,15 +211,15 @@ class UpdateKey:
                     expiry = expiry_var
                 else:
                     expiry = None
-    
-    
+
+
         return cls(comment, expiry)
 
     @classmethod
     def make_default(cls) -> Self:
         comment = None
         expiry = None
-    
+
         return cls(comment, expiry)
 
 def get_keys(

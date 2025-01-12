@@ -40,14 +40,15 @@ class DataCatalog(object):
         return None
 
     # DataCatalog
-    def SubcollectionType(self):
+    def PartitionType(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.Get(flatbuffers.number_types.Uint8Flags, o + self._tab.Pos)
         return 0
 
+    # The partition of the table to query; can be null.
     # DataCatalog
-    def Subcollection(self) -> Optional[flatbuffers.table.Table]:
+    def Partition(self) -> Optional[flatbuffers.table.Table]:
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             obj = Table(bytearray(), 0)
@@ -77,17 +78,17 @@ def DataCatalogAddId(builder: flatbuffers.Builder, id: int):
 def AddId(builder: flatbuffers.Builder, id: int):
     DataCatalogAddId(builder, id)
 
-def DataCatalogAddSubcollectionType(builder: flatbuffers.Builder, subcollectionType: int):
-    builder.PrependUint8Slot(1, subcollectionType, 0)
+def DataCatalogAddPartitionType(builder: flatbuffers.Builder, partitionType: int):
+    builder.PrependUint8Slot(1, partitionType, 0)
 
-def AddSubcollectionType(builder: flatbuffers.Builder, subcollectionType: int):
-    DataCatalogAddSubcollectionType(builder, subcollectionType)
+def AddPartitionType(builder: flatbuffers.Builder, partitionType: int):
+    DataCatalogAddPartitionType(builder, partitionType)
 
-def DataCatalogAddSubcollection(builder: flatbuffers.Builder, subcollection: int):
-    builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(subcollection), 0)
+def DataCatalogAddPartition(builder: flatbuffers.Builder, partition: int):
+    builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(partition), 0)
 
-def AddSubcollection(builder: flatbuffers.Builder, subcollection: int):
-    DataCatalogAddSubcollection(builder, subcollection)
+def AddPartition(builder: flatbuffers.Builder, partition: int):
+    DataCatalogAddPartition(builder, partition)
 
 def DataCatalogAddRevision(builder: flatbuffers.Builder, revision: int):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(revision), 0)

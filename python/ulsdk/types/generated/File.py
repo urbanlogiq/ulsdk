@@ -114,8 +114,15 @@ class File(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
         return o == 0
 
+    # File
+    def Tier(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(22))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Int8Flags, o + self._tab.Pos)
+        return 0
+
 def FileStart(builder: flatbuffers.Builder):
-    builder.StartObject(9)
+    builder.StartObject(10)
 
 def Start(builder: flatbuffers.Builder):
     FileStart(builder)
@@ -179,6 +186,12 @@ def FileStartChunksVector(builder, numElems: int) -> int:
 
 def StartChunksVector(builder, numElems: int) -> int:
     return FileStartChunksVector(builder, numElems)
+
+def FileAddTier(builder: flatbuffers.Builder, tier: int):
+    builder.PrependInt8Slot(9, tier, 0)
+
+def AddTier(builder: flatbuffers.Builder, tier: int):
+    FileAddTier(builder, tier)
 
 def FileEnd(builder: flatbuffers.Builder) -> int:
     return builder.EndObject()

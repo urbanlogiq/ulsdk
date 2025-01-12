@@ -29,3 +29,4 @@ class Value(object):
     VTimestampMs = 23
     VTimestampNsUtc = 24
     VTimestampNs = 25
+    VPlaceholder = 26

@@ -66,6 +66,7 @@ from .value import (
     VI8,
     VIsize,
     VNull,
+    VPlaceholder,
     VStr,
     VTimestampMs,
     VTimestampMsUtc,
@@ -109,7 +110,7 @@ from .generated.Join import Join as FbsJoin
 from .generated.Line import Line as FbsLine
 from .generated.MultiLine import MultiLine as FbsMultiLine
 from .generated.MultiPolygon import MultiPolygon as FbsMultiPolygon
-from .generated.MvdbSubcollection import MvdbSubcollection as FbsMvdbSubcollection
+from .generated.MvdbPartition import MvdbPartition as FbsMvdbPartition
 from .generated.NodeIdPair import NodeIdPair as FbsNodeIdPair
 from .generated.NodeList import NodeList as FbsNodeList
 from .generated.NodeQuery import NodeQuery as FbsNodeQuery
@@ -117,10 +118,8 @@ from .generated.NullableUint import NullableUint as FbsNullableUint
 from .generated.ObjectId import ObjectId as FbsObjectId
 from .generated.OrderBy import OrderBy as FbsOrderBy
 from .generated.OrderByExpr import OrderByExpr as FbsOrderByExpr
-from .generated.Parameter import Parameter as FbsParameter
-from .generated.ParameterInstance import ParameterInstance as FbsParameterInstance
-from .generated.ParameterizedQuery import ParameterizedQuery as FbsParameterizedQuery
 from .generated.Partition import Partition as FbsPartition
+from .generated.Placeholder import Placeholder as FbsPlaceholder
 from .generated.Point import Point as FbsPoint
 from .generated.Point2D import Point2D as FbsPoint2D
 from .generated.Polygon import Polygon as FbsPolygon
@@ -129,11 +128,11 @@ from .generated.Query import Query as FbsQuery
 from .generated.QueryElement import QueryElement as FbsQueryElement
 from .generated.QueryPathElement import QueryPathElement as FbsQueryPathElement
 from .generated.QueryTableSource import QueryTableSource as FbsQueryTableSource
-from .generated.RecordBatchPlaceholder import RecordBatchPlaceholder as FbsRecordBatchPlaceholder
 from .generated.SetExpr import SetExpr as FbsSetExpr
 from .generated.StreamId import StreamId as FbsStreamId
 from .generated.TableOrderBy import TableOrderBy as FbsTableOrderBy
 from .generated.TableSource import TableSource as FbsTableSource
+from .generated.TableSourceInstance import TableSourceInstance as FbsTableSourceInstance
 from .generated.Tri2D import Tri2D as FbsTri2D
 from .generated.UnaryQueryElement import UnaryQueryElement as FbsUnaryQueryElement
 from .generated.UnsetArgument import UnsetArgument as FbsUnsetArgument
@@ -151,6 +150,7 @@ from .generated.VI64 import VI64 as FbsVI64
 from .generated.VI8 import VI8 as FbsVI8
 from .generated.VIsize import VIsize as FbsVIsize
 from .generated.VNull import VNull as FbsVNull
+from .generated.VPlaceholder import VPlaceholder as FbsVPlaceholder
 from .generated.VStr import VStr as FbsVStr
 from .generated.VTimestampMs import VTimestampMs as FbsVTimestampMs
 from .generated.VTimestampMsUtc import VTimestampMsUtc as FbsVTimestampMsUtc
@@ -168,13 +168,12 @@ from .generated.ValueInstance import ValueInstance as FbsValueInstance
 from .generated.Vector import Vector as FbsVector
 from .generated.When import When as FbsWhen
 from .generated.Window import Window as FbsWindow
-from .generated.WorklogSubcollection import WorklogSubcollection as FbsWorklogSubcollection
+from .generated.WorklogPartition import WorklogPartition as FbsWorklogPartition
 from .generated.ExprUnion import ExprUnion as FbsExprUnion
 from .generated.Geometry import Geometry as FbsGeometry
-from .generated.ParameterSlot import ParameterSlot as FbsParameterSlot
 from .generated.QueryElementUnion import QueryElementUnion as FbsQueryElementUnion
 from .generated.QueryPathElementUnion import QueryPathElementUnion as FbsQueryPathElementUnion
-from .generated.Subcollection import Subcollection as FbsSubcollection
+from .generated.TablePartition import TablePartition as FbsTablePartition
 from .generated.TableSourceUnion import TableSourceUnion as FbsTableSourceUnion
 from .generated.Value import Value as FbsValue
 
@@ -219,7 +218,7 @@ class ValueIndex:
             AddIdx,
             End,
         )
-        
+
         Start(builder)
         AddIdx(builder, self.idx)
         return End(builder)
@@ -262,7 +261,7 @@ class NullableUint:
             AddV,
             End,
         )
-        
+
         Start(builder)
         AddV(builder, self.v)
         return End(builder)
@@ -322,7 +321,7 @@ class Column:
         source_offset = None
         if self.source is not None:
             source_offset = self.source.serialize_to(builder)
-        
+
         Start(builder)
         AddName(builder, name_offset)
         if source_offset is not None:
@@ -391,7 +390,7 @@ class Function:
         for i in reversed(range(len(self.parameters))):
             builder.PrependUOffsetTRelative(parameters_offsets[i])
         parameters_offset = builder.EndVector()
-        
+
         Start(builder)
         AddFn(builder, self.fn.value)
         AddParameters(builder, parameters_offset)
@@ -446,7 +445,7 @@ class AllColumns:
         source_offset = None
         if self.source is not None:
             source_offset = self.source.serialize_to(builder)
-        
+
         Start(builder)
         if source_offset is not None:
             AddSource(builder, source_offset)
@@ -497,7 +496,7 @@ class Expr:
             End,
         )
         exprs_offset, exprs_ty = self.exprs.serialize_to(builder)
-        
+
         Start(builder)
         AddExprs(builder, exprs_offset)
         AddExprsType(builder, exprs_ty)
@@ -566,7 +565,7 @@ class Case:
         for i in reversed(range(len(self.when))):
             builder.PrependUOffsetTRelative(when_offsets[i])
         when_offset = builder.EndVector()
-        
+
         Start(builder)
         if else__offset is not None:
             AddElse_(builder, else__offset)
@@ -631,7 +630,7 @@ class OrderByExpr:
         for i in reversed(range(len(self.order_by))):
             builder.PrependUOffsetTRelative(order_by_offsets[i])
         order_by_offset = builder.EndVector()
-        
+
         Start(builder)
         AddOrderBy(builder, order_by_offset)
         return End(builder)
@@ -682,7 +681,7 @@ class Partition:
             End,
         )
         expr_offset = self.expr.serialize_to(builder)
-        
+
         Start(builder)
         AddExpr(builder, expr_offset)
         return End(builder)
@@ -721,7 +720,7 @@ class UnsetArgument:
             Start,
             End,
         )
-        
+
         Start(builder)
         return End(builder)
 
@@ -808,7 +807,7 @@ class Window:
             for i in reversed(range(len(self.partition))):
                 builder.PrependUOffsetTRelative(partition_offsets[i])
             partition_offset = builder.EndVector()
-        
+
         Start(builder)
         AddFun(builder, fun_offset)
         if order_by_offset is not None:
@@ -950,108 +949,6 @@ class ExprUnion:
         return self.value == other.value
 
 @dataclass
-class Parameter:
-    hint: "TypeHint"
-
-    name: "str"
-
-    ty: "ValueTy"
-
-    @classmethod
-    def from_fbs(cls, o: FbsParameter) -> Self:
-        hint = TypeHint(o.Hint())
-        name_str = o.Name()
-        assert name_str is not None
-        name = name_str.decode('utf-8')
-        ty = ValueTy(o.Ty())
-        return cls(hint, name, ty)
-
-    @classmethod
-    def from_bytes(cls, data: bytes) -> Self:
-        deprefixed = RemoveSizePrefix(data, 0)
-        o = FbsParameter.GetRootAs(deprefixed[0], deprefixed[1])
-        return cls.from_fbs(o)
-
-    def serialize_to(self, builder: Builder) -> int:
-        from .generated.Parameter import (
-            Start,
-            AddHint,
-            AddName,
-            AddTy,
-            End,
-        )
-        name_offset = builder.CreateString(self.name)
-        
-        Start(builder)
-        AddHint(builder, self.hint.value)
-        AddName(builder, name_offset)
-        AddTy(builder, self.ty.value)
-        return End(builder)
-
-    def to_bytes(self) -> bytes:
-        builder = Builder(0)
-        offset = self.serialize_to(builder)
-        builder.FinishSizePrefixed(offset)
-        return builder.Output()
-
-    @classmethod
-    def make_default(cls) -> Self:
-        hint = TypeHint(0)
-        name = ""
-        ty = ValueTy(0)
-        return cls(hint, name, ty)
-
-    def __eq__(self, other) -> bool:
-        eq = True
-        eq = eq and self.hint == other.hint
-        eq = eq and self.name == other.name
-        eq = eq and self.ty == other.ty
-
-        return eq
-
-@dataclass
-class ParameterSlot:
-    value: Union[
-        "Parameter",
-        "ValueInstance",
-    ]
-
-    def serialize_to(self, builder: Builder) -> Tuple[int, int]:
-        from .generated.ParameterSlot import ParameterSlot
-        offset = self.value.serialize_to(builder)
-        if isinstance(self.value, Parameter):
-            return (offset, ParameterSlot().Parameter)
-        elif isinstance(self.value, ValueInstance):
-            return (offset, ParameterSlot().ValueInstance)
-        raise ValueError("Invalid union type")
-
-    @classmethod
-    def from_fbs(cls, o: Optional[Table], ty: int) -> Self:
-        assert o is not None
-        source = o.Bytes
-        pos = o.Pos
-        ParameterSlot_ty_instance = FbsParameterSlot()
-        if ty == ParameterSlot_ty_instance.Parameter:
-            val = FbsParameter();
-            val.Init(source, pos)
-            return cls(Parameter.from_fbs(val))
-        elif ty == ParameterSlot_ty_instance.ValueInstance:
-            val = FbsValueInstance();
-            val.Init(source, pos)
-            return cls(ValueInstance.from_fbs(val))
-        else:
-            raise ValueError("Invalid union type")
-
-    @classmethod
-    def make_default(cls) -> Self:
-        return cls(Parameter.make_default())
-
-    def __eq__(self, other) -> bool:
-        if type(self.value) is not type(other.value):
-            return False
-        return self.value == other.value
-
-@dataclass
 class Distinct:
     """ The Distinct function defined in fun.fbs is for use in cases like:
      SELECT COUNT(DISTINCT c0), SUM(c1) FROM t GROUP BY c2;
@@ -1101,7 +998,7 @@ class Distinct:
             for i in reversed(range(len(self.on))):
                 builder.PrependUOffsetTRelative(on_offsets[i])
             on_offset = builder.EndVector()
-        
+
         Start(builder)
         if on_offset is not None:
             AddOn(builder, on_offset)
@@ -1278,7 +1175,7 @@ class UnaryQueryElement:
         for i in reversed(range(len(self.sources))):
             builder.PrependUOffsetTRelative(sources_offsets[i])
         sources_offset = builder.EndVector()
-        
+
         Start(builder)
         if distinct_offset is not None:
             AddDistinct(builder, distinct_offset)
@@ -1399,7 +1296,7 @@ class QueryElement:
         q_offset, q_ty = (None, None)
         if self.q is not None:
             q_offset, q_ty = self.q.serialize_to(builder)
-        
+
         Start(builder)
         if q_offset is not None and q_ty is not None:
             AddQ(builder, q_offset)
@@ -1462,7 +1359,7 @@ class BinaryQueryElement:
         )
         lhs_offset = self.lhs.serialize_to(builder)
         rhs_offset = self.rhs.serialize_to(builder)
-        
+
         Start(builder)
         AddLhs(builder, lhs_offset)
         AddOp(builder, self.op.value)
@@ -1491,32 +1388,36 @@ class BinaryQueryElement:
         return eq
 
 @dataclass
-class MvdbSubcollection:
-    subcollection: "str"
+class MvdbPartition:
+    """ Some multiverse databases are partitioned, and we need to refer to a specific
+     partition within the database. This is used for that purpose.
+    """
+
+    partition: "str"
 
     @classmethod
-    def from_fbs(cls, o: FbsMvdbSubcollection) -> Self:
-        subcollection_str = o.Subcollection()
-        assert subcollection_str is not None
-        subcollection = subcollection_str.decode('utf-8')
-        return cls(subcollection)
+    def from_fbs(cls, o: FbsMvdbPartition) -> Self:
+        partition_str = o.Partition()
+        assert partition_str is not None
+        partition = partition_str.decode('utf-8')
+        return cls(partition)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
         deprefixed = RemoveSizePrefix(data, 0)
-        o = FbsMvdbSubcollection.GetRootAs(deprefixed[0], deprefixed[1])
+        o = FbsMvdbPartition.GetRootAs(deprefixed[0], deprefixed[1])
         return cls.from_fbs(o)
 
     def serialize_to(self, builder: Builder) -> int:
-        from .generated.MvdbSubcollection import (
+        from .generated.MvdbPartition import (
             Start,
-            AddSubcollection,
+            AddPartition,
             End,
         )
-        subcollection_offset = builder.CreateString(self.subcollection)
-        
+        partition_offset = builder.CreateString(self.partition)
+
         Start(builder)
-        AddSubcollection(builder, subcollection_offset)
+        AddPartition(builder, partition_offset)
         return End(builder)
 
     def to_bytes(self) -> bytes:
@@ -1527,37 +1428,37 @@ class MvdbSubcollection:
 
     @classmethod
     def make_default(cls) -> Self:
-        subcollection = ""
-        return cls(subcollection)
+        partition = ""
+        return cls(partition)
 
     def __eq__(self, other) -> bool:
         eq = True
-        eq = eq and self.subcollection == other.subcollection
+        eq = eq and self.partition == other.partition
 
         return eq
 
 @dataclass
-class WorklogSubcollection:
+class WorklogPartition:
     idx: "int"
 
     @classmethod
-    def from_fbs(cls, o: FbsWorklogSubcollection) -> Self:
+    def from_fbs(cls, o: FbsWorklogPartition) -> Self:
         idx = o.Idx()
         return cls(idx)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
         deprefixed = RemoveSizePrefix(data, 0)
-        o = FbsWorklogSubcollection.GetRootAs(deprefixed[0], deprefixed[1])
+        o = FbsWorklogPartition.GetRootAs(deprefixed[0], deprefixed[1])
         return cls.from_fbs(o)
 
     def serialize_to(self, builder: Builder) -> int:
-        from .generated.WorklogSubcollection import (
+        from .generated.WorklogPartition import (
             Start,
             AddIdx,
             End,
         )
-        
+
         Start(builder)
         AddIdx(builder, self.idx)
         return End(builder)
@@ -1580,19 +1481,19 @@ class WorklogSubcollection:
         return eq
 
 @dataclass
-class Subcollection:
+class TablePartition:
     value: Union[
-        "MvdbSubcollection",
-        "WorklogSubcollection",
+        "MvdbPartition",
+        "WorklogPartition",
     ]
 
     def serialize_to(self, builder: Builder) -> Tuple[int, int]:
-        from .generated.Subcollection import Subcollection
+        from .generated.TablePartition import TablePartition
         offset = self.value.serialize_to(builder)
-        if isinstance(self.value, MvdbSubcollection):
-            return (offset, Subcollection().MvdbSubcollection)
-        elif isinstance(self.value, WorklogSubcollection):
-            return (offset, Subcollection().WorklogSubcollection)
+        if isinstance(self.value, MvdbPartition):
+            return (offset, TablePartition().MvdbPartition)
+        elif isinstance(self.value, WorklogPartition):
+            return (offset, TablePartition().WorklogPartition)
         raise ValueError("Invalid union type")
 
     @classmethod
@@ -1600,21 +1501,21 @@ class Subcollection:
         assert o is not None
         source = o.Bytes
         pos = o.Pos
-        Subcollection_ty_instance = FbsSubcollection()
-        if ty == Subcollection_ty_instance.MvdbSubcollection:
-            val = FbsMvdbSubcollection();
+        TablePartition_ty_instance = FbsTablePartition()
+        if ty == TablePartition_ty_instance.MvdbPartition:
+            val = FbsMvdbPartition();
             val.Init(source, pos)
-            return cls(MvdbSubcollection.from_fbs(val))
-        elif ty == Subcollection_ty_instance.WorklogSubcollection:
-            val = FbsWorklogSubcollection();
+            return cls(MvdbPartition.from_fbs(val))
+        elif ty == TablePartition_ty_instance.WorklogPartition:
+            val = FbsWorklogPartition();
             val.Init(source, pos)
-            return cls(WorklogSubcollection.from_fbs(val))
+            return cls(WorklogPartition.from_fbs(val))
         else:
             raise ValueError("Invalid union type")
 
     @classmethod
     def make_default(cls) -> Self:
-        return cls(MvdbSubcollection.make_default())
+        return cls(MvdbPartition.make_default())
 
     def __eq__(self, other) -> bool:
         if type(self.value) is not type(other.value):
@@ -1625,9 +1526,10 @@ class Subcollection:
 class DataCatalog:
     id: "ObjectId"
 
-    revision: Optional["ContentId"]
+    # The partition of the table to query; can be null.
+    partition: Optional["TablePartition"]
 
-    subcollection: Optional["Subcollection"]
+    revision: Optional["ContentId"]
 
     @classmethod
     def from_fbs(cls, o: FbsDataCatalog) -> Self:
@@ -1636,16 +1538,16 @@ class DataCatalog:
             id = ObjectId.from_fbs(id_obj)
         else:
             raise ValueError("Id is required")
+        partition = None
+        partition_val = o.Partition()
+        if partition_val is not None:
+            partition_ty = o.PartitionType()
+            partition = TablePartition.from_fbs(partition_val, partition_ty)
         revision = None
         revision_obj = o.Revision()
         if revision_obj is not None:
             revision = ContentId.from_fbs(revision_obj)
-        subcollection = None
-        subcollection_val = o.Subcollection()
-        if subcollection_val is not None:
-            subcollection_ty = o.SubcollectionType()
-            subcollection = Subcollection.from_fbs(subcollection_val, subcollection_ty)
-        return cls(id, revision, subcollection)
+        return cls(id, partition, revision)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -1657,26 +1559,26 @@ class DataCatalog:
         from .generated.DataCatalog import (
             Start,
             AddId,
+            AddPartition,
+            AddPartitionType,
             AddRevision,
-            AddSubcollection,
-            AddSubcollectionType,
             End,
         )
         id_offset = self.id.serialize_to(builder)
+        partition_offset, partition_ty = (None, None)
+        if self.partition is not None:
+            partition_offset, partition_ty = self.partition.serialize_to(builder)
         revision_offset = None
         if self.revision is not None:
             revision_offset = self.revision.serialize_to(builder)
-        subcollection_offset, subcollection_ty = (None, None)
-        if self.subcollection is not None:
-            subcollection_offset, subcollection_ty = self.subcollection.serialize_to(builder)
-        
+
         Start(builder)
         AddId(builder, id_offset)
+        if partition_offset is not None and partition_ty is not None:
+            AddPartition(builder, partition_offset)
+            AddPartitionType(builder, partition_ty)
         if revision_offset is not None:
             AddRevision(builder, revision_offset)
-        if subcollection_offset is not None and subcollection_ty is not None:
-            AddSubcollection(builder, subcollection_offset)
-            AddSubcollectionType(builder, subcollection_ty)
         return End(builder)
 
     def to_bytes(self) -> bytes:
@@ -1688,15 +1590,15 @@ class DataCatalog:
     @classmethod
     def make_default(cls) -> Self:
         id = ObjectId.make_default()
+        partition = TablePartition.make_default()
         revision = ContentId.make_default()
-        subcollection = Subcollection.make_default()
-        return cls(id, revision, subcollection)
+        return cls(id, partition, revision)
 
     def __eq__(self, other) -> bool:
         eq = True
         eq = eq and self.id == other.id
+        eq = eq and self.partition == other.partition
         eq = eq and self.revision == other.revision
-        eq = eq and self.subcollection == other.subcollection
 
         return eq
 
@@ -1729,7 +1631,7 @@ class Arrow:
         for i in reversed(range(len(self.value))):
             builder.PrependUint8(self.value[i])
         value_offset = builder.EndVector()
-        
+
         Start(builder)
         AddValue(builder, value_offset)
         return End(builder)
@@ -1756,6 +1658,8 @@ class Arrow:
 
 @dataclass
 class Query:
+    bound_sources: Optional["List[TableSourceInstance]"]
+
     limit: "int"
 
     query: "QueryElement"
@@ -1764,6 +1668,14 @@ class Query:
 
     @classmethod
     def from_fbs(cls, o: FbsQuery) -> Self:
+        bound_sources = list()
+        if not o.BoundSourcesIsNone():
+            for i in range(o.BoundSourcesLength()):
+                bound_sources_val = None
+                bound_sources_obj = o.BoundSources(i)
+                if bound_sources_obj is not None:
+                    bound_sources_val = TableSourceInstance.from_fbs(bound_sources_obj)
+                bound_sources.append(bound_sources_val)
         limit = o.Limit()
         query_obj = o.Query()
         if query_obj is not None:
@@ -1778,7 +1690,7 @@ class Query:
                 if values_obj is not None:
                     values_val = ValueInstance.from_fbs(values_obj)
                 values.append(values_val)
-        return cls(limit, query, values)
+        return cls(bound_sources, limit, query, values)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -1789,12 +1701,23 @@ class Query:
     def serialize_to(self, builder: Builder) -> int:
         from .generated.Query import (
             Start,
+            AddBoundSources,
+            StartBoundSourcesVector,
             AddLimit,
             AddQuery,
             AddValues,
             StartValuesVector,
             End,
         )
+        bound_sources_offset = None
+        if self.bound_sources is not None:
+            bound_sources_offsets = list()
+            for value in self.bound_sources:
+                bound_sources_offsets.append(value.serialize_to(builder))
+            StartBoundSourcesVector(builder, len(self.bound_sources))
+            for i in reversed(range(len(self.bound_sources))):
+                builder.PrependUOffsetTRelative(bound_sources_offsets[i])
+            bound_sources_offset = builder.EndVector()
         query_offset = self.query.serialize_to(builder)
         values_offset = None
         if self.values is not None:
@@ -1805,8 +1728,10 @@ class Query:
             for i in reversed(range(len(self.values))):
                 builder.PrependUOffsetTRelative(values_offsets[i])
             values_offset = builder.EndVector()
-        
+
         Start(builder)
+        if bound_sources_offset is not None:
+            AddBoundSources(builder, bound_sources_offset)
         AddLimit(builder, self.limit)
         AddQuery(builder, query_offset)
         if values_offset is not None:
@@ -1821,13 +1746,25 @@ class Query:
 
     @classmethod
     def make_default(cls) -> Self:
+        bound_sources = []
         limit = 0
         query = QueryElement.make_default()
         values = []
-        return cls(limit, query, values)
+        return cls(bound_sources, limit, query, values)
 
     def __eq__(self, other) -> bool:
         eq = True
+        self_bound_sources = self.bound_sources
+        other_bound_sources = other.bound_sources
+        if self_bound_sources is not None and other_bound_sources is not None:
+            if len(self_bound_sources) != len(other_bound_sources):
+                return False
+            for i in range(len(self_bound_sources)):
+                eq = eq and self_bound_sources[i] == other_bound_sources[i]
+        elif self_bound_sources is not None and other_bound_sources is None:
+            return False
+        elif self_bound_sources is None and other_bound_sources is not None:
+            return False
         eq = eq and self.limit == other.limit
         eq = eq and self.query == other.query
         self_values = self.values
@@ -1870,7 +1807,7 @@ class QueryTableSource:
             End,
         )
         q_offset = self.q.serialize_to(builder)
-        
+
         Start(builder)
         AddQ(builder, q_offset)
         return End(builder)
@@ -1952,7 +1889,7 @@ class Vector:
         if self.limit is not None:
             limit_offset = self.limit.serialize_to(builder)
         query_offset = builder.CreateString(self.query)
-        
+
         Start(builder)
         AddIds(builder, ids_offset)
         if limit_offset is not None:
@@ -1988,27 +1925,27 @@ class Vector:
         return eq
 
 @dataclass
-class RecordBatchPlaceholder:
+class Placeholder:
     idx: "int"
 
     @classmethod
-    def from_fbs(cls, o: FbsRecordBatchPlaceholder) -> Self:
+    def from_fbs(cls, o: FbsPlaceholder) -> Self:
         idx = o.Idx()
         return cls(idx)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
         deprefixed = RemoveSizePrefix(data, 0)
-        o = FbsRecordBatchPlaceholder.GetRootAs(deprefixed[0], deprefixed[1])
+        o = FbsPlaceholder.GetRootAs(deprefixed[0], deprefixed[1])
         return cls.from_fbs(o)
 
     def serialize_to(self, builder: Builder) -> int:
-        from .generated.RecordBatchPlaceholder import (
+        from .generated.Placeholder import (
             Start,
             AddIdx,
             End,
         )
-        
+
         Start(builder)
         AddIdx(builder, self.idx)
         return End(builder)
@@ -2038,7 +1975,7 @@ class TableSourceUnion:
         "GraphQuery",
         "QueryTableSource",
         "Vector",
-        "RecordBatchPlaceholder",
+        "Placeholder",
     ]
 
     def serialize_to(self, builder: Builder) -> Tuple[int, int]:
@@ -2054,8 +1991,8 @@ class TableSourceUnion:
             return (offset, TableSourceUnion().QueryTableSource)
         elif isinstance(self.value, Vector):
             return (offset, TableSourceUnion().Vector)
-        elif isinstance(self.value, RecordBatchPlaceholder):
-            return (offset, TableSourceUnion().RecordBatchPlaceholder)
+        elif isinstance(self.value, Placeholder):
+            return (offset, TableSourceUnion().Placeholder)
         raise ValueError("Invalid union type")
 
     @classmethod
@@ -2084,10 +2021,10 @@ class TableSourceUnion:
             val = FbsVector();
             val.Init(source, pos)
             return cls(Vector.from_fbs(val))
-        elif ty == TableSourceUnion_ty_instance.RecordBatchPlaceholder:
-            val = FbsRecordBatchPlaceholder();
+        elif ty == TableSourceUnion_ty_instance.Placeholder:
+            val = FbsPlaceholder();
             val.Init(source, pos)
-            return cls(RecordBatchPlaceholder.from_fbs(val))
+            return cls(Placeholder.from_fbs(val))
         else:
             raise ValueError("Invalid union type")
 
@@ -2157,7 +2094,7 @@ class UpdateQueryElement:
             builder.PrependUOffsetTRelative(sets_offsets[i])
         sets_offset = builder.EndVector()
         source_offset, source_ty = self.source.serialize_to(builder)
-        
+
         Start(builder)
         if filter_offset is not None:
             AddFilter(builder, filter_offset)
@@ -2228,7 +2165,7 @@ class DeleteQueryElement:
         if self.filter is not None:
             filter_offset = self.filter.serialize_to(builder)
         source_offset, source_ty = self.source.serialize_to(builder)
-        
+
         Start(builder)
         if filter_offset is not None:
             AddFilter(builder, filter_offset)
@@ -2360,7 +2297,7 @@ class Join:
         src_col_offset = None
         if self.src_col is not None:
             src_col_offset = builder.CreateString(self.src_col)
-        
+
         Start(builder)
         if dest_col_offset is not None:
             AddDestCol(builder, dest_col_offset)
@@ -2393,147 +2330,6 @@ class Join:
         eq = eq and self.src_col == other.src_col
         eq = eq and self.src_idx == other.src_idx
         eq = eq and self.ty == other.ty
-
-        return eq
-
-@dataclass
-class ParameterInstance:
-    p: "ParameterSlot"
-
-    @classmethod
-    def from_fbs(cls, o: FbsParameterInstance) -> Self:
-        p_val = o.P()
-        if p_val is not None:
-            p_ty = o.PType()
-            p = ParameterSlot.from_fbs(p_val, p_ty)
-        else:
-            raise ValueError("P is required")
-        return cls(p)
-
-    @classmethod
-    def from_bytes(cls, data: bytes) -> Self:
-        deprefixed = RemoveSizePrefix(data, 0)
-        o = FbsParameterInstance.GetRootAs(deprefixed[0], deprefixed[1])
-        return cls.from_fbs(o)
-
-    def serialize_to(self, builder: Builder) -> int:
-        from .generated.ParameterInstance import (
-            Start,
-            AddP,
-            AddPType,
-            End,
-        )
-        p_offset, p_ty = self.p.serialize_to(builder)
-        
-        Start(builder)
-        AddP(builder, p_offset)
-        AddPType(builder, p_ty)
-        return End(builder)
-
-    def to_bytes(self) -> bytes:
-        builder = Builder(0)
-        offset = self.serialize_to(builder)
-        builder.FinishSizePrefixed(offset)
-        return builder.Output()
-
-    @classmethod
-    def make_default(cls) -> Self:
-        p = ParameterSlot.make_default()
-        return cls(p)
-
-    def __eq__(self, other) -> bool:
-        eq = True
-        eq = eq and self.p == other.p
-
-        return eq
-
-@dataclass
-class ParameterizedQuery:
-    limit: "int"
-
-    parameters: Optional["List[ParameterInstance]"]
-
-    query: "QueryElement"
-
-    @classmethod
-    def from_fbs(cls, o: FbsParameterizedQuery) -> Self:
-        limit = o.Limit()
-        parameters = list()
-        if not o.ParametersIsNone():
-            for i in range(o.ParametersLength()):
-                parameters_val = None
-                parameters_obj = o.Parameters(i)
-                if parameters_obj is not None:
-                    parameters_val = ParameterInstance.from_fbs(parameters_obj)
-                parameters.append(parameters_val)
-        query_obj = o.Query()
-        if query_obj is not None:
-            query = QueryElement.from_fbs(query_obj)
-        else:
-            raise ValueError("Query is required")
-        return cls(limit, parameters, query)
-
-    @classmethod
-    def from_bytes(cls, data: bytes) -> Self:
-        deprefixed = RemoveSizePrefix(data, 0)
-        o = FbsParameterizedQuery.GetRootAs(deprefixed[0], deprefixed[1])
-        return cls.from_fbs(o)
-
-    def serialize_to(self, builder: Builder) -> int:
-        from .generated.ParameterizedQuery import (
-            Start,
-            AddLimit,
-            AddParameters,
-            StartParametersVector,
-            AddQuery,
-            End,
-        )
-        parameters_offset = None
-        if self.parameters is not None:
-            parameters_offsets = list()
-            for value in self.parameters:
-                parameters_offsets.append(value.serialize_to(builder))
-            StartParametersVector(builder, len(self.parameters))
-            for i in reversed(range(len(self.parameters))):
-                builder.PrependUOffsetTRelative(parameters_offsets[i])
-            parameters_offset = builder.EndVector()
-        query_offset = self.query.serialize_to(builder)
-        
-        Start(builder)
-        AddLimit(builder, self.limit)
-        if parameters_offset is not None:
-            AddParameters(builder, parameters_offset)
-        AddQuery(builder, query_offset)
-        return End(builder)
-
-    def to_bytes(self) -> bytes:
-        builder = Builder(0)
-        offset = self.serialize_to(builder)
-        builder.FinishSizePrefixed(offset)
-        return builder.Output()
-
-    @classmethod
-    def make_default(cls) -> Self:
-        limit = 0
-        parameters = []
-        query = QueryElement.make_default()
-        return cls(limit, parameters, query)
-
-    def __eq__(self, other) -> bool:
-        eq = True
-        eq = eq and self.limit == other.limit
-        self_parameters = self.parameters
-        other_parameters = other.parameters
-        if self_parameters is not None and other_parameters is not None:
-            if len(self_parameters) != len(other_parameters):
-                return False
-            for i in range(len(self_parameters)):
-                eq = eq and self_parameters[i] == other_parameters[i]
-        elif self_parameters is not None and other_parameters is None:
-            return False
-        elif self_parameters is None and other_parameters is not None:
-            return False
-        eq = eq and self.query == other.query
 
         return eq
 
@@ -2578,7 +2374,7 @@ class SetExpr:
         )
         col_offset = builder.CreateString(self.col)
         expr_offset = self.expr.serialize_to(builder)
-        
+
         Start(builder)
         AddCol(builder, col_offset)
         AddExpr(builder, expr_offset)
@@ -2644,7 +2440,7 @@ class TableOrderBy:
             End,
         )
         order_by_offset = self.order_by.serialize_to(builder)
-        
+
         Start(builder)
         AddOrderBy(builder, order_by_offset)
         AddSource(builder, self.source)
@@ -2773,7 +2569,7 @@ class TableSource:
                 builder.PrependUOffsetTRelative(order_by_offsets[i])
             order_by_offset = builder.EndVector()
         t_offset, t_ty = self.t.serialize_to(builder)
-        
+
         Start(builder)
         if fields_offset is not None:
             AddFields(builder, fields_offset)
@@ -2843,6 +2639,57 @@ class TableSource:
         return eq
 
 @dataclass
+class TableSourceInstance:
+    t: "TableSourceUnion"
+
+    @classmethod
+    def from_fbs(cls, o: FbsTableSourceInstance) -> Self:
+        t_val = o.T()
+        if t_val is not None:
+            t_ty = o.TType()
+            t = TableSourceUnion.from_fbs(t_val, t_ty)
+        else:
+            raise ValueError("T is required")
+        return cls(t)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsTableSourceInstance.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.TableSourceInstance import (
+            Start,
+            AddT,
+            AddTType,
+            End,
+        )
+        t_offset, t_ty = self.t.serialize_to(builder)
+
+        Start(builder)
+        AddT(builder, t_offset)
+        AddTType(builder, t_ty)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        t = TableSourceUnion.make_default()
+        return cls(t)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.t == other.t
+
+        return eq
+
+@dataclass
 class When:
     cond: "Expr"
 
@@ -2877,7 +2724,7 @@ class When:
         )
         cond_offset = self.cond.serialize_to(builder)
         value_offset = self.value.serialize_to(builder)
-        
+
         Start(builder)
         AddCond(builder, cond_offset)
         AddValue(builder, value_offset)

@@ -120,6 +120,7 @@ from .value import (
     VI8,
     VIsize,
     VNull,
+    VPlaceholder,
     VStr,
     VTimestampMs,
     VTimestampMsUtc,
@@ -208,6 +209,7 @@ from .generated.VI64 import VI64 as FbsVI64
 from .generated.VI8 import VI8 as FbsVI8
 from .generated.VIsize import VIsize as FbsVIsize
 from .generated.VNull import VNull as FbsVNull
+from .generated.VPlaceholder import VPlaceholder as FbsVPlaceholder
 from .generated.VStr import VStr as FbsVStr
 from .generated.VTimestampMs import VTimestampMs as FbsVTimestampMs
 from .generated.VTimestampMsUtc import VTimestampMsUtc as FbsVTimestampMsUtc
@@ -291,7 +293,7 @@ class ByteArray:
             for i in reversed(range(len(self.b))):
                 builder.PrependUint8(self.b[i])
             b_offset = builder.EndVector()
-        
+
         Start(builder)
         if b_offset is not None:
             AddB(builder, b_offset)
@@ -345,7 +347,7 @@ class ParameterFlags:
             AddFlags,
             End,
         )
-        
+
         Start(builder)
         AddFlags(builder, self.flags)
         return End(builder)
@@ -460,7 +462,7 @@ class Layout:
             AddY,
             End,
         )
-        
+
         Start(builder)
         AddHeight(builder, self.height)
         AddWidth(builder, self.width)
@@ -610,7 +612,7 @@ class TileSettings:
             builder.PrependUOffsetTRelative(selected_columns_offsets[i])
         selected_columns_offset = builder.EndVector()
         title_offset = builder.CreateString(self.title)
-        
+
         Start(builder)
         AddAggregation(builder, self.aggregation.value)
         AddCategory(builder, self.category)
@@ -710,7 +712,7 @@ class TileData:
         )
         layout_offset = self.layout.serialize_to(builder)
         tile_settings_offset = self.tile_settings.serialize_to(builder)
-        
+
         Start(builder)
         AddLayout(builder, layout_offset)
         AddTileSettings(builder, tile_settings_offset)
@@ -775,7 +777,7 @@ class UserSettings:
         for i in reversed(range(len(self.tile_data))):
             builder.PrependUOffsetTRelative(tile_data_offsets[i])
         tile_data_offset = builder.EndVector()
-        
+
         Start(builder)
         AddIsTemplate(builder, self.is_template)
         AddTileData(builder, tile_data_offset)
@@ -946,7 +948,7 @@ class WorkLog:
         user_settings_offset = None
         if self.user_settings is not None:
             user_settings_offset = self.user_settings.serialize_to(builder)
-        
+
         Start(builder)
         if input_streams_offset is not None:
             AddInputStreams(builder, input_streams_offset)
@@ -1046,7 +1048,7 @@ class WorklogParameter:
         value_offset, value_ty = (None, None)
         if self.value is not None:
             value_offset, value_ty = self.value.serialize_to(builder)
-        
+
         Start(builder)
         AddKey(builder, key_offset)
         if value_offset is not None and value_ty is not None:

@@ -303,6 +303,12 @@ Pair::Pair(const ::Pair *root)
                 value_ = value__shared;
                 break;
             }
+            case ::Value::VPlaceholder: {
+                const auto value__local = static_cast<const ::VPlaceholder *>(root->value());
+                std::shared_ptr<VPlaceholder> value__shared = std::make_shared<VPlaceholder>(value__local);
+                value_ = value__shared;
+                break;
+            }
             default: throw std::runtime_error("unknown union variant");
         }
     }

@@ -9,6 +9,7 @@ def test_use_case():
     _b = _t0.to_bytes()
     _t1 = UseCase.from_bytes(_b)
     assert _t0 == _t1
+
 def test_use_case_input_pair():
     _t0 = UseCaseInputPair.make_default()
     _b = _t0.to_bytes()

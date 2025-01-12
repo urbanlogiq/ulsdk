@@ -246,7 +246,7 @@ impl RequestContext for ApiKeyContext {
         response
             .bytes()
             .await
-            .map_err(Error::ReqwestError)
+            .map_err(Error::Reqwest)
             .map(|b| b.to_vec())
     }
 
@@ -320,7 +320,7 @@ impl RequestContext for ApiKeyContext {
         response
             .bytes()
             .await
-            .map_err(Error::ReqwestError)
+            .map_err(Error::Reqwest)
             .map(|b| b.to_vec())
     }
 
@@ -394,11 +394,11 @@ impl RequestContext for ApiKeyContext {
         response
             .bytes()
             .await
-            .map_err(Error::ReqwestError)
+            .map_err(Error::Reqwest)
             .map(|b| b.to_vec())
     }
 
-    async fn upload(&self, _path: &str, _files: Vec<File>) -> Result<(), Error> {
+    async fn upload(&self, _path: &str, _files: Vec<File>) -> Result<Vec<u8>, Error> {
         todo!()
     }
 
@@ -465,7 +465,7 @@ impl RequestContext for ApiKeyContext {
         response
             .bytes()
             .await
-            .map_err(Error::ReqwestError)
+            .map_err(Error::Reqwest)
             .map(|b| b.to_vec())
     }
 }

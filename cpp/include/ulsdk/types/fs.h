@@ -56,6 +56,7 @@ typedef std::variant<
     std::shared_ptr<TopLevelDirectory>
 > ListEntry;
 
+using ::StorageTier;
 struct File {
     std::string account_;
     std::optional<GenericId> blob_;
@@ -64,6 +65,7 @@ struct File {
     std::optional<Digest> digest_;
     std::string mime_;
     uint64_t size_;
+    StorageTier tier_;
     std::optional<std::string> virus_;
 
     File();

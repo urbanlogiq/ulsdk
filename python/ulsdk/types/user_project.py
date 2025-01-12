@@ -145,7 +145,7 @@ class CategoryFilter:
         for i in reversed(range(len(self.values))):
             builder.PrependUOffsetTRelative(values_offsets[i])
         values_offset = builder.EndVector()
-        
+
         Start(builder)
         AddColumnGroupId(builder, column_group_id_offset)
         AddComparator(builder, self.comparator.value)
@@ -217,7 +217,7 @@ class RangeFilter:
             End,
         )
         column_group_id_offset = self.column_group_id.serialize_to(builder)
-        
+
         Start(builder)
         AddColumnGroupId(builder, column_group_id_offset)
         AddIncludeNulls(builder, self.include_nulls)
@@ -305,7 +305,7 @@ class RelationshipRangeFilter:
         for i in reversed(range(len(self.columns))):
             builder.PrependUOffsetTRelative(columns_offsets[i])
         columns_offset = builder.EndVector()
-        
+
         Start(builder)
         AddAggregateOp(builder, self.aggregate_op.value)
         AddColumnGroupId(builder, column_group_id_offset)
@@ -420,7 +420,7 @@ class DataStateGeometrySource:
             End,
         )
         data_state_id_offset = self.data_state_id.serialize_to(builder)
-        
+
         Start(builder)
         AddDataStateId(builder, data_state_id_offset)
         return End(builder)
@@ -478,7 +478,7 @@ class RawGeometrySource:
         for i in reversed(range(len(self.geoms))):
             builder.PrependUOffsetTRelative(geoms_offsets[i])
         geoms_offset = builder.EndVector()
-        
+
         Start(builder)
         AddGeoms(builder, geoms_offset)
         return End(builder)
@@ -607,7 +607,7 @@ class ColumnGroup:
         stream_id_offset = None
         if self.stream_id is not None:
             stream_id_offset = self.stream_id.serialize_to(builder)
-        
+
         Start(builder)
         AddColumns(builder, columns_offset)
         AddDisplayName(builder, display_name_offset)
@@ -688,7 +688,7 @@ class DeprecatedDataStateJoin:
         )
         from__offset = self.from_.serialize_to(builder)
         to_offset = self.to.serialize_to(builder)
-        
+
         Start(builder)
         AddDistance(builder, self.distance)
         AddFrom_(builder, from__offset)
@@ -747,7 +747,7 @@ class FieldFilter:
             End,
         )
         filter_offset, filter_ty = self.filter.serialize_to(builder)
-        
+
         Start(builder)
         AddFilter(builder, filter_offset)
         AddFilterType(builder, filter_ty)
@@ -816,7 +816,7 @@ class JoinStackEntry:
         if self.deprecated_data_state_id_do_not_use is not None:
             deprecated_data_state_id_do_not_use_offset = self.deprecated_data_state_id_do_not_use.serialize_to(builder)
         geometry_source_offset, geometry_source_ty = self.geometry_source.serialize_to(builder)
-        
+
         Start(builder)
         AddBuffer(builder, self.buffer)
         if deprecated_data_state_id_do_not_use_offset is not None:
@@ -877,7 +877,7 @@ class RawGeometrySourceGeom:
             End,
         )
         geom_offset, geom_ty = self.geom.serialize_to(builder)
-        
+
         Start(builder)
         AddGeom(builder, geom_offset)
         AddGeomType(builder, geom_ty)
@@ -957,7 +957,7 @@ class StackableDataStateJoin:
             builder.PrependUOffsetTRelative(join_stack_offsets[i])
         join_stack_offset = builder.EndVector()
         target_offset = self.target.serialize_to(builder)
-        
+
         Start(builder)
         AddBuffer(builder, self.buffer)
         AddJoinStack(builder, join_stack_offset)
@@ -1084,7 +1084,7 @@ class UserLayer:
         name_offset = None
         if self.name is not None:
             name_offset = builder.CreateString(self.name)
-        
+
         Start(builder)
         AddDataStates(builder, data_states_offset)
         if deprecated_data_joins_do_not_use_offset is not None:
@@ -1209,7 +1209,7 @@ class UserLayerDataState:
             builder.PrependUOffsetTRelative(filters_offsets[i])
         filters_offset = builder.EndVector()
         stream_id_offset = self.stream_id.serialize_to(builder)
-        
+
         Start(builder)
         AddActiveFields(builder, active_fields_offset)
         AddDataStateId(builder, data_state_id_offset)
@@ -1301,7 +1301,7 @@ class UserProject:
         name_offset = None
         if self.name is not None:
             name_offset = builder.CreateString(self.name)
-        
+
         Start(builder)
         AddId(builder, id_offset)
         AddLayers(builder, layers_offset)

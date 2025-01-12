@@ -46,11 +46,14 @@ enum class UseCaseTy : uint32_t {
   FreightAnalysis = 18,
   CorridorAnalysis = 19,
   Ethica = 20,
+  /// usecase object whose implementation is determined by the frontend using its `slug` field.
+  /// This usecase object is used only to gatekeep which users can access the view associated with the url containing the slug.
+  UrlBased = 21,
   MIN = Invalid,
-  MAX = Ethica
+  MAX = UrlBased
 };
 
-inline const UseCaseTy (&EnumValuesUseCaseTy())[21] {
+inline const UseCaseTy (&EnumValuesUseCaseTy())[22] {
   static const UseCaseTy values[] = {
     UseCaseTy::Invalid,
     UseCaseTy::OriginDestination,
@@ -72,13 +75,14 @@ inline const UseCaseTy (&EnumValuesUseCaseTy())[21] {
     UseCaseTy::MetricsDashboard,
     UseCaseTy::FreightAnalysis,
     UseCaseTy::CorridorAnalysis,
-    UseCaseTy::Ethica
+    UseCaseTy::Ethica,
+    UseCaseTy::UrlBased
   };
   return values;
 }
 
 inline const char * const *EnumNamesUseCaseTy() {
-  static const char * const names[22] = {
+  static const char * const names[23] = {
     "Invalid",
     "OriginDestination",
     "TrafficImpact",
@@ -100,13 +104,14 @@ inline const char * const *EnumNamesUseCaseTy() {
     "FreightAnalysis",
     "CorridorAnalysis",
     "Ethica",
+    "UrlBased",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameUseCaseTy(UseCaseTy e) {
-  if (::flatbuffers::IsOutRange(e, UseCaseTy::Invalid, UseCaseTy::Ethica)) return "";
+  if (::flatbuffers::IsOutRange(e, UseCaseTy::Invalid, UseCaseTy::UrlBased)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesUseCaseTy()[index];
 }
@@ -151,7 +156,7 @@ enum class UseCaseInput : uint8_t {
   NONE = 0,
   ObjectId = 1,
   Schema = 2,
-  ParameterizedQuery = 3,
+  Query = 3,
   ValueInstance = 4,
   MIN = NONE,
   MAX = ValueInstance
@@ -162,7 +167,7 @@ inline const UseCaseInput (&EnumValuesUseCaseInput())[5] {
     UseCaseInput::NONE,
     UseCaseInput::ObjectId,
     UseCaseInput::Schema,
-    UseCaseInput::ParameterizedQuery,
+    UseCaseInput::Query,
     UseCaseInput::ValueInstance
   };
   return values;
@@ -173,7 +178,7 @@ inline const char * const *EnumNamesUseCaseInput() {
     "NONE",
     "ObjectId",
     "Schema",
-    "ParameterizedQuery",
+    "Query",
     "ValueInstance",
     nullptr
   };
@@ -198,8 +203,8 @@ template<> struct UseCaseInputTraits<Schema> {
   static const UseCaseInput enum_value = UseCaseInput::Schema;
 };
 
-template<> struct UseCaseInputTraits<ParameterizedQuery> {
-  static const UseCaseInput enum_value = UseCaseInput::ParameterizedQuery;
+template<> struct UseCaseInputTraits<Query> {
+  static const UseCaseInput enum_value = UseCaseInput::Query;
 };
 
 template<> struct UseCaseInputTraits<ValueInstance> {
@@ -233,8 +238,8 @@ struct UseCaseInputPair FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const Schema *input_as_Schema() const {
     return input_type() == UseCaseInput::Schema ? static_cast<const Schema *>(input()) : nullptr;
   }
-  const ParameterizedQuery *input_as_ParameterizedQuery() const {
-    return input_type() == UseCaseInput::ParameterizedQuery ? static_cast<const ParameterizedQuery *>(input()) : nullptr;
+  const Query *input_as_Query() const {
+    return input_type() == UseCaseInput::Query ? static_cast<const Query *>(input()) : nullptr;
   }
   const ValueInstance *input_as_ValueInstance() const {
     return input_type() == UseCaseInput::ValueInstance ? static_cast<const ValueInstance *>(input()) : nullptr;
@@ -258,8 +263,8 @@ template<> inline const Schema *UseCaseInputPair::input_as<Schema>() const {
   return input_as_Schema();
 }
 
-template<> inline const ParameterizedQuery *UseCaseInputPair::input_as<ParameterizedQuery>() const {
-  return input_as_ParameterizedQuery();
+template<> inline const Query *UseCaseInputPair::input_as<Query>() const {
+  return input_as_Query();
 }
 
 template<> inline const ValueInstance *UseCaseInputPair::input_as<ValueInstance>() const {
@@ -502,8 +507,8 @@ inline bool VerifyUseCaseInput(::flatbuffers::Verifier &verifier, const void *ob
       auto ptr = reinterpret_cast<const Schema *>(obj);
       return verifier.VerifyTable(ptr);
     }
-    case UseCaseInput::ParameterizedQuery: {
-      auto ptr = reinterpret_cast<const ParameterizedQuery *>(obj);
+    case UseCaseInput::Query: {
+      auto ptr = reinterpret_cast<const Query *>(obj);
       return verifier.VerifyTable(ptr);
     }
     case UseCaseInput::ValueInstance: {

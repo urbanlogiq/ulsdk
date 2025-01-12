@@ -9,6 +9,7 @@ def test_access_control_list():
     _b = _t0.to_bytes()
     _t1 = AccessControlList.from_bytes(_b)
     assert _t0 == _t1
+
 def test_role():
     _t0 = Role.make_default()
     _b = _t0.to_bytes()

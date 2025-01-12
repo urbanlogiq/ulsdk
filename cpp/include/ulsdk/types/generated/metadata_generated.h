@@ -410,37 +410,40 @@ enum class UpdateCadence : uint32_t {
   UC_WEEKLY = 3,
   UC_BI_WEEKLY = 4,
   UC_MONTHLY = 5,
+  UC_YEARLY = 6,
   MIN = UC_UNSET,
-  MAX = UC_MONTHLY
+  MAX = UC_YEARLY
 };
 
-inline const UpdateCadence (&EnumValuesUpdateCadence())[6] {
+inline const UpdateCadence (&EnumValuesUpdateCadence())[7] {
   static const UpdateCadence values[] = {
     UpdateCadence::UC_UNSET,
     UpdateCadence::UC_IRREGULAR,
     UpdateCadence::UC_DAILY,
     UpdateCadence::UC_WEEKLY,
     UpdateCadence::UC_BI_WEEKLY,
-    UpdateCadence::UC_MONTHLY
+    UpdateCadence::UC_MONTHLY,
+    UpdateCadence::UC_YEARLY
   };
   return values;
 }
 
 inline const char * const *EnumNamesUpdateCadence() {
-  static const char * const names[7] = {
+  static const char * const names[8] = {
     "UC_UNSET",
     "UC_IRREGULAR",
     "UC_DAILY",
     "UC_WEEKLY",
     "UC_BI_WEEKLY",
     "UC_MONTHLY",
+    "UC_YEARLY",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameUpdateCadence(UpdateCadence e) {
-  if (::flatbuffers::IsOutRange(e, UpdateCadence::UC_UNSET, UpdateCadence::UC_MONTHLY)) return "";
+  if (::flatbuffers::IsOutRange(e, UpdateCadence::UC_UNSET, UpdateCadence::UC_YEARLY)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesUpdateCadence()[index];
 }

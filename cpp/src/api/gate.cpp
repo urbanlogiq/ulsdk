@@ -50,7 +50,7 @@ AdUser::AdUser(const struct json_value_s *root)
             if (ad_user_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *display_name__str = static_cast<const struct json_string_s *>(ad_user_value->payload);
             display_name_ = std::string(display_name__str->string);
         } else if (std::strcmp(e->name->string, "id") == 0) {
@@ -59,7 +59,7 @@ AdUser::AdUser(const struct json_value_s *root)
             if (ad_user_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *id__str = static_cast<const struct json_string_s *>(ad_user_value->payload);
             id_ = std::string(id__str->string);
         } else if (std::strcmp(e->name->string, "userPrincipalName") == 0) {
@@ -68,7 +68,7 @@ AdUser::AdUser(const struct json_value_s *root)
             if (ad_user_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *user_principal_name__str = static_cast<const struct json_string_s *>(ad_user_value->payload);
             user_principal_name_ = std::string(user_principal_name__str->string);
         } else if (std::strcmp(e->name->string, "otherMails") == 0) {
@@ -77,7 +77,7 @@ AdUser::AdUser(const struct json_value_s *root)
             if (ad_user_value->type != json_type_array) {
                 throw std::runtime_error("expected field to be of type array");
             }
-            
+
             const struct json_array_s *other_mails__array = static_cast<const struct json_array_s *>(ad_user_value->payload);
             const struct json_array_element_s *other_mails__element = other_mails__array->start;
             std::vector<std::string> other_mails__vec = std::vector<std::string>();
@@ -87,7 +87,7 @@ AdUser::AdUser(const struct json_value_s *root)
             if (ad_user_value_0->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *other_mails__value_str = static_cast<const struct json_string_s *>(ad_user_value_0->payload);
             other_mails__value = std::string(other_mails__value_str->string);
                 other_mails__vec.push_back(other_mails__value);
@@ -103,7 +103,7 @@ AdUser::AdUser(const struct json_value_s *root)
                 if (ad_user_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *department__str = static_cast<const struct json_string_s *>(ad_user_value->payload);
                 department_ = std::string(department__str->string);
             }
@@ -113,7 +113,7 @@ AdUser::AdUser(const struct json_value_s *root)
             if (ad_user_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *created_date_time__str = static_cast<const struct json_string_s *>(ad_user_value->payload);
             created_date_time_ = std::string(created_date_time__str->string);
         }
@@ -179,7 +179,7 @@ AdGroup::AdGroup(const struct json_value_s *root)
             if (ad_group_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *id__str = static_cast<const struct json_string_s *>(ad_group_value->payload);
             id_ = std::string(id__str->string);
         } else if (std::strcmp(e->name->string, "displayName") == 0) {
@@ -188,7 +188,7 @@ AdGroup::AdGroup(const struct json_value_s *root)
             if (ad_group_value->type != json_type_string) {
                 throw std::runtime_error("expected field to be of type string");
             }
-            
+
             const struct json_string_s *display_name__str = static_cast<const struct json_string_s *>(ad_group_value->payload);
             display_name_ = std::string(display_name__str->string);
         } else if (std::strcmp(e->name->string, "description") == 0) {
@@ -200,7 +200,7 @@ AdGroup::AdGroup(const struct json_value_s *root)
                 if (ad_group_value->type != json_type_string) {
                     throw std::runtime_error("expected field to be of type string");
                 }
-                
+
                 const struct json_string_s *description__str = static_cast<const struct json_string_s *>(ad_group_value->payload);
                 description_ = std::string(description__str->string);
             }
@@ -255,7 +255,7 @@ Bootstrap::Bootstrap(const struct json_value_s *root)
             if (bootstrap_value->type != json_type_object) {
                 throw std::runtime_error("expected field to be of type object");
             }
-            
+
             user_ = AdUser(bootstrap_value);
         } else if (std::strcmp(e->name->string, "groups") == 0) {
             const struct json_value_s *bootstrap_value = e->value;
@@ -263,7 +263,7 @@ Bootstrap::Bootstrap(const struct json_value_s *root)
             if (bootstrap_value->type != json_type_array) {
                 throw std::runtime_error("expected field to be of type array");
             }
-            
+
             const struct json_array_s *groups__array = static_cast<const struct json_array_s *>(bootstrap_value->payload);
             const struct json_array_element_s *groups__element = groups__array->start;
             std::vector<AdGroup> groups__vec = std::vector<AdGroup>();
@@ -273,7 +273,7 @@ Bootstrap::Bootstrap(const struct json_value_s *root)
             if (bootstrap_value_0->type != json_type_object) {
                 throw std::runtime_error("expected field to be of type object");
             }
-            
+
             groups__value = AdGroup(bootstrap_value_0);
                 groups__vec.push_back(groups__value);
                 groups__element = groups__element->next;
@@ -285,7 +285,7 @@ Bootstrap::Bootstrap(const struct json_value_s *root)
             if (bootstrap_value->type != json_type_array) {
                 throw std::runtime_error("expected field to be of type array");
             }
-            
+
             const struct json_array_s *v_2groups__array = static_cast<const struct json_array_s *>(bootstrap_value->payload);
             const struct json_array_element_s *v_2groups__element = v_2groups__array->start;
             std::vector<AdGroup> v_2groups__vec = std::vector<AdGroup>();
@@ -295,7 +295,7 @@ Bootstrap::Bootstrap(const struct json_value_s *root)
             if (bootstrap_value_0->type != json_type_object) {
                 throw std::runtime_error("expected field to be of type object");
             }
-            
+
             v_2groups__value = AdGroup(bootstrap_value_0);
                 v_2groups__vec.push_back(v_2groups__value);
                 v_2groups__element = v_2groups__element->next;
@@ -307,7 +307,7 @@ Bootstrap::Bootstrap(const struct json_value_s *root)
             if (bootstrap_value->type != json_type_object) {
                 throw std::runtime_error("expected field to be of type object");
             }
-            
+
             client_secrets_ = json_extract_value(bootstrap_value);
         }
 

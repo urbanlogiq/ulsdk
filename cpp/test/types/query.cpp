@@ -117,14 +117,14 @@ test_join() {
 TypeTest test_join_obj(test_join, "Join");
 
 bool
-test_mvdb_subcollection() {
-    ::ul::types::MvdbSubcollection t;
+test_mvdb_partition() {
+    ::ul::types::MvdbPartition t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
-    ::ul::types::MvdbSubcollection deserialized = ::ul::types::MvdbSubcollection(bytes);
+    ::ul::types::MvdbPartition deserialized = ::ul::types::MvdbPartition(bytes);
     return true;
 }
 
-TypeTest test_mvdb_subcollection_obj(test_mvdb_subcollection, "MvdbSubcollection");
+TypeTest test_mvdb_partition_obj(test_mvdb_partition, "MvdbPartition");
 
 bool
 test_nullable_uint() {
@@ -147,36 +147,6 @@ test_order_by_expr() {
 TypeTest test_order_by_expr_obj(test_order_by_expr, "OrderByExpr");
 
 bool
-test_parameter() {
-    ::ul::types::Parameter t;
-    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
-    ::ul::types::Parameter deserialized = ::ul::types::Parameter(bytes);
-    return true;
-}
-
-TypeTest test_parameter_obj(test_parameter, "Parameter");
-
-bool
-test_parameter_instance() {
-    ::ul::types::ParameterInstance t;
-    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
-    ::ul::types::ParameterInstance deserialized = ::ul::types::ParameterInstance(bytes);
-    return true;
-}
-
-TypeTest test_parameter_instance_obj(test_parameter_instance, "ParameterInstance");
-
-bool
-test_parameterized_query() {
-    ::ul::types::ParameterizedQuery t;
-    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
-    ::ul::types::ParameterizedQuery deserialized = ::ul::types::ParameterizedQuery(bytes);
-    return true;
-}
-
-TypeTest test_parameterized_query_obj(test_parameterized_query, "ParameterizedQuery");
-
-bool
 test_partition() {
     ::ul::types::Partition t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
@@ -185,6 +155,16 @@ test_partition() {
 }
 
 TypeTest test_partition_obj(test_partition, "Partition");
+
+bool
+test_placeholder() {
+    ::ul::types::Placeholder t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::Placeholder deserialized = ::ul::types::Placeholder(bytes);
+    return true;
+}
+
+TypeTest test_placeholder_obj(test_placeholder, "Placeholder");
 
 bool
 test_query() {
@@ -217,16 +197,6 @@ test_query_table_source() {
 TypeTest test_query_table_source_obj(test_query_table_source, "QueryTableSource");
 
 bool
-test_record_batch_placeholder() {
-    ::ul::types::RecordBatchPlaceholder t;
-    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
-    ::ul::types::RecordBatchPlaceholder deserialized = ::ul::types::RecordBatchPlaceholder(bytes);
-    return true;
-}
-
-TypeTest test_record_batch_placeholder_obj(test_record_batch_placeholder, "RecordBatchPlaceholder");
-
-bool
 test_set_expr() {
     ::ul::types::SetExpr t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
@@ -255,6 +225,16 @@ test_table_source() {
 }
 
 TypeTest test_table_source_obj(test_table_source, "TableSource");
+
+bool
+test_table_source_instance() {
+    ::ul::types::TableSourceInstance t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::TableSourceInstance deserialized = ::ul::types::TableSourceInstance(bytes);
+    return true;
+}
+
+TypeTest test_table_source_instance_obj(test_table_source_instance, "TableSourceInstance");
 
 bool
 test_unary_query_element() {
@@ -327,11 +307,11 @@ test_window() {
 TypeTest test_window_obj(test_window, "Window");
 
 bool
-test_worklog_subcollection() {
-    ::ul::types::WorklogSubcollection t;
+test_worklog_partition() {
+    ::ul::types::WorklogPartition t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
-    ::ul::types::WorklogSubcollection deserialized = ::ul::types::WorklogSubcollection(bytes);
+    ::ul::types::WorklogPartition deserialized = ::ul::types::WorklogPartition(bytes);
     return true;
 }
 
-TypeTest test_worklog_subcollection_obj(test_worklog_subcollection, "WorklogSubcollection");
+TypeTest test_worklog_partition_obj(test_worklog_partition, "WorklogPartition");

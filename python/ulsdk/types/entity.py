@@ -316,6 +316,10 @@ class EntityTy(Enum):
     T_STATE_PROVINCE = 259
     T_FEDERAL = 260
     T_CANNABIS_AND_LIQUOR_STORES_TRANSFER = 261
+    T_STATE_OWNED_ROAD = 262
+    T_AIR_QUALITY_MONITORING_STATION = 263
+    T_AOI = 264
+    T_PERFORMANCE_MEASURE = 265
 
 class NodeTy(Enum):
     N_INVALID = 0
@@ -353,7 +357,7 @@ class Point:
         for i in reversed(range(len(self.point_geo))):
             builder.PrependFloat32(self.point_geo[i])
         point_geo_offset = builder.EndVector()
-        
+
         Start(builder)
         AddPointGeo(builder, point_geo_offset)
         return End(builder)
@@ -414,7 +418,7 @@ class Line:
         for i in reversed(range(len(self.line_geo))):
             builder.PrependUOffsetTRelative(line_geo_offsets[i])
         line_geo_offset = builder.EndVector()
-        
+
         Start(builder)
         AddLineGeo(builder, line_geo_offset)
         return End(builder)
@@ -475,7 +479,7 @@ class MultiLine:
         for i in reversed(range(len(self.multiline_geo))):
             builder.PrependUOffsetTRelative(multiline_geo_offsets[i])
         multiline_geo_offset = builder.EndVector()
-        
+
         Start(builder)
         AddMultilineGeo(builder, multiline_geo_offset)
         return End(builder)
@@ -540,7 +544,7 @@ class Polygon:
         for i in reversed(range(len(self.polygon_geo))):
             builder.PrependUOffsetTRelative(polygon_geo_offsets[i])
         polygon_geo_offset = builder.EndVector()
-        
+
         Start(builder)
         AddPolygonGeo(builder, polygon_geo_offset)
         return End(builder)
@@ -601,7 +605,7 @@ class MultiPolygon:
         for i in reversed(range(len(self.multipolygon_geo))):
             builder.PrependUOffsetTRelative(multipolygon_geo_offsets[i])
         multipolygon_geo_offset = builder.EndVector()
-        
+
         Start(builder)
         AddMultipolygonGeo(builder, multipolygon_geo_offset)
         return End(builder)
@@ -718,7 +722,7 @@ class GraphEdge:
             Add_To,
             End,
         )
-        
+
         Start(builder)
         Add_From(builder, self._from)
         Add_Kind(builder, self._kind.value)
@@ -835,7 +839,7 @@ class GraphNode:
         _stream_offset = None
         if self._stream is not None:
             _stream_offset = self._stream.serialize_to(builder)
-        
+
         Start(builder)
         if _description_offset is not None:
             Add_Description(builder, _description_offset)

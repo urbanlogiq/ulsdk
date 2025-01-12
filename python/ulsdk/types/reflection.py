@@ -91,7 +91,7 @@ class ReflectionType:
             AddIndex,
             End,
         )
-        
+
         Start(builder)
         AddBaseSize(builder, self.base_size)
         AddBaseType(builder, self.base_type.value)
@@ -233,7 +233,7 @@ class ReflectionEnum:
         for i in reversed(range(len(self.values))):
             builder.PrependUOffsetTRelative(values_offsets[i])
         values_offset = builder.EndVector()
-        
+
         Start(builder)
         if attributes_offset is not None:
             AddAttributes(builder, attributes_offset)
@@ -403,7 +403,7 @@ class ReflectionObject:
             builder.PrependUOffsetTRelative(fields_offsets[i])
         fields_offset = builder.EndVector()
         name_offset = builder.CreateString(self.name)
-        
+
         Start(builder)
         if attributes_offset is not None:
             AddAttributes(builder, attributes_offset)
@@ -548,7 +548,7 @@ class ReflectionEnumVal:
         union_type_offset = None
         if self.union_type is not None:
             union_type_offset = self.union_type.serialize_to(builder)
-        
+
         Start(builder)
         if attributes_offset is not None:
             AddAttributes(builder, attributes_offset)
@@ -718,7 +718,7 @@ class ReflectionField:
             documentation_offset = builder.EndVector()
         name_offset = builder.CreateString(self.name)
         type_offset = self.type.serialize_to(builder)
-        
+
         Start(builder)
         if attributes_offset is not None:
             AddAttributes(builder, attributes_offset)
@@ -835,7 +835,7 @@ class ReflectionKeyValue:
         value_offset = None
         if self.value is not None:
             value_offset = builder.CreateString(self.value)
-        
+
         Start(builder)
         AddKey(builder, key_offset)
         if value_offset is not None:
@@ -941,7 +941,7 @@ class ReflectionRPCCall:
         name_offset = builder.CreateString(self.name)
         request_offset = self.request.serialize_to(builder)
         response_offset = self.response.serialize_to(builder)
-        
+
         Start(builder)
         if attributes_offset is not None:
             AddAttributes(builder, attributes_offset)
@@ -1130,7 +1130,7 @@ class ReflectionSchema:
             for i in reversed(range(len(self.services))):
                 builder.PrependUOffsetTRelative(services_offsets[i])
             services_offset = builder.EndVector()
-        
+
         Start(builder)
         AddAdvancedFeatures(builder, self.advanced_features.value)
         AddEnums(builder, enums_offset)
@@ -1252,7 +1252,7 @@ class ReflectionSchemaFile:
             for i in reversed(range(len(self.included_filenames))):
                 builder.PrependUOffsetTRelative(included_filenames_offsets[i])
             included_filenames_offset = builder.EndVector()
-        
+
         Start(builder)
         AddFilename(builder, filename_offset)
         if included_filenames_offset is not None:
@@ -1382,7 +1382,7 @@ class ReflectionService:
                 builder.PrependUOffsetTRelative(documentation_offsets[i])
             documentation_offset = builder.EndVector()
         name_offset = builder.CreateString(self.name)
-        
+
         Start(builder)
         if attributes_offset is not None:
             AddAttributes(builder, attributes_offset)

@@ -375,7 +375,7 @@ def stream_get_arrow(
 
     params = dict()
     headers = dict()
-    headers["Accept"] = "application/vnd.apache.arrow.stream";
+    headers["accept"] = "application/vnd.apache.arrow.stream";
 
     res = ctx.get(path, params=params, headers=headers)
     reader = RecordBatchStreamReader(res)
@@ -400,7 +400,7 @@ def stream_get_parquet(
 
     params = dict()
     headers = dict()
-    headers["Accept"] = "application/vnd.apache.parquet";
+    headers["accept"] = "application/vnd.apache.parquet";
 
     res = ctx.get(path, params=params, headers=headers)
     return res
@@ -424,7 +424,7 @@ def stream_get_csv(
 
     params = dict()
     headers = dict()
-    headers["Accept"] = "text/csv";
+    headers["accept"] = "text/csv";
 
     res = ctx.get(path, params=params, headers=headers)
     return res
@@ -448,7 +448,7 @@ def stream_get_xlsx(
 
     params = dict()
     headers = dict()
-    headers["Accept"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    headers["accept"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
     res = ctx.get(path, params=params, headers=headers)
     return res
@@ -472,7 +472,7 @@ def stream_get_json(
 
     params = dict()
     headers = dict()
-    headers["Accept"] = "application/json";
+    headers["accept"] = "application/json";
 
     res = ctx.get(path, params=params, headers=headers)
     return res
@@ -496,7 +496,7 @@ def stream_get_text(
 
     params = dict()
     headers = dict()
-    headers["Accept"] = "text/plain";
+    headers["accept"] = "text/plain";
 
     res = ctx.get(path, params=params, headers=headers)
     return res
@@ -520,7 +520,7 @@ def stream_get_html(
 
     params = dict()
     headers = dict()
-    headers["Accept"] = "text/html";
+    headers["accept"] = "text/html";
 
     res = ctx.get(path, params=params, headers=headers)
     return res
@@ -528,7 +528,6 @@ def stream_get_html(
 def stream_put_arrow(
     ctx: RequestContext,
     id_: UUID,
-    subcollection: Optional[str],
     data: List[RecordBatch],
 ) -> None:
     """Append data, in Apache Arrow format, to the specified stream
@@ -536,7 +535,6 @@ def stream_put_arrow(
     Arguments:
     ctx: RequestContext -- A request context object
     id_: UUID -- The ID of the stream to append data to
-    subcollection: Optional[str] -- Subcollection to append data to, if necessary
     data: List[RecordBatch] -- The Arrow record batches to append
     """
 
@@ -544,9 +542,6 @@ def stream_put_arrow(
     path.replace(":id", str(id_), 1)
 
     params = dict()
-    if subcollection is not None:
-        params["subcollection"] = subcollection
-
     headers = dict()
     if len(data) == 0:
         raise ValueError("cannot provide zero record batches; at least one required to get the schema")
@@ -563,7 +558,6 @@ def stream_put_arrow(
 def stream_put_diffstream(
     ctx: RequestContext,
     id_: UUID,
-    subcollection: Optional[str],
     data: DiffStream,
 ) -> None:
     """Append a diffstream to the specified stream
@@ -571,7 +565,6 @@ def stream_put_diffstream(
     Arguments:
     ctx: RequestContext -- A request context object
     id_: UUID -- The ID of the stream to append data to
-    subcollection: Optional[str] -- Subcollection to append data to, if necessary
     data: DiffStream -- The Arrow record batches to append
     """
 
@@ -579,9 +572,6 @@ def stream_put_diffstream(
     path.replace(":id", str(id_), 1)
 
     params = dict()
-    if subcollection is not None:
-        params["subcollection"] = subcollection
-
     headers = dict()
     body = data.to_bytes()
     ctx.put(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
@@ -590,7 +580,6 @@ def stream_put_diffstream(
 def stream_put_json(
     ctx: RequestContext,
     id_: UUID,
-    subcollection: Optional[str],
     data: List[Dict[str, Any]],
 ) -> None:
     """Append JSON data to the specified stream
@@ -598,7 +587,6 @@ def stream_put_json(
     Arguments:
     ctx: RequestContext -- A request context object
     id_: UUID -- The ID of the stream to append data to
-    subcollection: Optional[str] -- Subcollection to append data to, if necessary
     data: List[Dict[str, Any]] -- The Arrow record batches to append
     """
 
@@ -606,9 +594,6 @@ def stream_put_json(
     path.replace(":id", str(id_), 1)
 
     params = dict()
-    if subcollection is not None:
-        params["subcollection"] = subcollection
-
     headers = dict()
     body_list = []
     for item in data:
@@ -649,6 +634,7 @@ def update_metadata(
     - the existing metadata
     - the provided metadata
     - the generated metadata
+    
     Also, update the stream object to point to the updated metadata and to have an updated schema.
 
     Arguments:
@@ -671,23 +657,18 @@ def update_metadata(
 def stream_compact(
     ctx: RequestContext,
     id_: UUID,
-    subcollection: Optional[str],
 ) -> None:
     """Compact the specified stream
 
     Arguments:
     ctx: RequestContext -- A request context object
     id_: UUID -- The ID of the stream to compact
-    subcollection: Optional[str] -- Subcollection to append data to, if necessary
     """
 
     path = "/v1/api/ulv2/datacatalog/stream/:id/compact"
     path.replace(":id", str(id_), 1)
 
     params = dict()
-    if subcollection is not None:
-        params["subcollection"] = subcollection
-
     headers = dict()
     body = None
     ctx.post(path, body=body, mimetype="text/plain", params=params, headers=headers)
@@ -833,7 +814,7 @@ def query_arrow(
     path = "/v1/api/ulv2/datacatalog/query"
     params = dict()
     headers = dict()
-    headers["Accept"] = "application/vnd.apache.arrow.stream";
+    headers["accept"] = "application/vnd.apache.arrow.stream";
 
     body = query.to_bytes()
     res = ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
@@ -857,7 +838,7 @@ def query_parquet(
     path = "/v1/api/ulv2/datacatalog/query"
     params = dict()
     headers = dict()
-    headers["Accept"] = "application/vnd.apache.parquet";
+    headers["accept"] = "application/vnd.apache.parquet";
 
     body = query.to_bytes()
     res = ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
@@ -880,7 +861,7 @@ def query_csv(
     path = "/v1/api/ulv2/datacatalog/query"
     params = dict()
     headers = dict()
-    headers["Accept"] = "text/csv";
+    headers["accept"] = "text/csv";
 
     body = query.to_bytes()
     res = ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
@@ -903,7 +884,7 @@ def query_xlsx(
     path = "/v1/api/ulv2/datacatalog/query"
     params = dict()
     headers = dict()
-    headers["Accept"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    headers["accept"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
     body = query.to_bytes()
     res = ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
@@ -926,7 +907,7 @@ def query_json(
     path = "/v1/api/ulv2/datacatalog/query"
     params = dict()
     headers = dict()
-    headers["Accept"] = "application/json";
+    headers["accept"] = "application/json";
 
     body = query.to_bytes()
     res = ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
@@ -949,7 +930,7 @@ def query_text(
     path = "/v1/api/ulv2/datacatalog/query"
     params = dict()
     headers = dict()
-    headers["Accept"] = "text/plain";
+    headers["accept"] = "text/plain";
 
     body = query.to_bytes()
     res = ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
@@ -972,7 +953,7 @@ def query_html(
     path = "/v1/api/ulv2/datacatalog/query"
     params = dict()
     headers = dict()
-    headers["Accept"] = "text/html";
+    headers["accept"] = "text/html";
 
     body = query.to_bytes()
     res = ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)

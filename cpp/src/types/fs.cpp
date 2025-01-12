@@ -105,6 +105,7 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const File &o) {
     }
     instance_builder.add_mime(mime_offset);
     instance_builder.add_size(o.size_);
+    instance_builder.add_tier(o.tier_);
     if (virus_offset.has_value()) {
         instance_builder.add_virus(virus_offset.value());
     }
@@ -127,6 +128,7 @@ File::File()
     , digest_(std::nullopt)
     , mime_()
     , size_(0)
+    , tier_(StorageTier(0))
     , virus_(std::nullopt) {
 }
 
@@ -142,6 +144,7 @@ File::File(const ::File *root)
     , digest_(std::nullopt)
     , mime_()
     , size_(0)
+    , tier_(StorageTier(0))
     , virus_(std::nullopt) {
     if (root == nullptr) {
         throw std::runtime_error("cannot deserialize flatbuffer type");
@@ -177,6 +180,7 @@ File::File(const ::File *root)
     }
         mime_ = std::string(*root->mime()->begin(), *root->mime()->end());
     size_ = root->size();
+    tier_ = root->tier();
     if (root->virus() != nullptr) {
         virus_ = std::string(*root->virus()->begin(), *root->virus()->end());
     }
@@ -639,6 +643,12 @@ Attr::Attr(const ::Attr *root)
             case ::Value::VTimestampNs: {
                 const auto v__local = static_cast<const ::VTimestampNs *>(root->v());
                 std::shared_ptr<VTimestampNs> v__shared = std::make_shared<VTimestampNs>(v__local);
+                v_ = v__shared;
+                break;
+            }
+            case ::Value::VPlaceholder: {
+                const auto v__local = static_cast<const ::VPlaceholder *>(root->v());
+                std::shared_ptr<VPlaceholder> v__shared = std::make_shared<VPlaceholder>(v__local);
                 v_ = v__shared;
                 break;
             }

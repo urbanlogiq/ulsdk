@@ -19,10 +19,10 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UseCaseInput &o) {
         const std::shared_ptr<Schema> &v = std::get<std::shared_ptr<Schema>>(o);
         const auto offset = serialize_to(builder, *v);
         return std::make_pair(offset.Union(), ::UseCaseInput::Schema);
-    } else if (std::holds_alternative<std::shared_ptr<ParameterizedQuery>>(o)) {
-        const std::shared_ptr<ParameterizedQuery> &v = std::get<std::shared_ptr<ParameterizedQuery>>(o);
+    } else if (std::holds_alternative<std::shared_ptr<Query>>(o)) {
+        const std::shared_ptr<Query> &v = std::get<std::shared_ptr<Query>>(o);
         const auto offset = serialize_to(builder, *v);
-        return std::make_pair(offset.Union(), ::UseCaseInput::ParameterizedQuery);
+        return std::make_pair(offset.Union(), ::UseCaseInput::Query);
     } else if (std::holds_alternative<std::shared_ptr<ValueInstance>>(o)) {
         const std::shared_ptr<ValueInstance> &v = std::get<std::shared_ptr<ValueInstance>>(o);
         const auto offset = serialize_to(builder, *v);
@@ -213,9 +213,9 @@ UseCaseInputPair::UseCaseInputPair(const ::UseCaseInputPair *root)
                 input_ = input__shared;
                 break;
             }
-            case ::UseCaseInput::ParameterizedQuery: {
-                const auto input__local = static_cast<const ::ParameterizedQuery *>(root->input());
-                std::shared_ptr<ParameterizedQuery> input__shared = std::make_shared<ParameterizedQuery>(input__local);
+            case ::UseCaseInput::Query: {
+                const auto input__local = static_cast<const ::Query *>(root->input());
+                std::shared_ptr<Query> input__shared = std::make_shared<Query>(input__local);
                 input_ = input__shared;
                 break;
             }

@@ -221,7 +221,7 @@ class Stream:
                 builder.PrependUOffsetTRelative(substreams_offsets[i])
             substreams_offset = builder.EndVector()
         url_offset = builder.CreateString(self.url)
-        
+
         Start(builder)
         AddFlags(builder, self.flags)
         if metadata_offset is not None:

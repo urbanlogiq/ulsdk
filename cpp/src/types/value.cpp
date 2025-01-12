@@ -111,6 +111,10 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Value &o) {
         const std::shared_ptr<VTimestampNs> &v = std::get<std::shared_ptr<VTimestampNs>>(o);
         const auto offset = serialize_to(builder, *v);
         return std::make_pair(offset.Union(), ::Value::VTimestampNs);
+    } else if (std::holds_alternative<std::shared_ptr<VPlaceholder>>(o)) {
+        const std::shared_ptr<VPlaceholder> &v = std::get<std::shared_ptr<VPlaceholder>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::Value::VPlaceholder);
     } else { 
         throw std::runtime_error("unreachable");
     }
@@ -997,6 +1001,44 @@ VTimestampNs::VTimestampNs(const ::VTimestampNs *root)
     v_ = root->v();
 }
 
+::flatbuffers::Offset<::VPlaceholder>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const VPlaceholder &o) {
+    const ::flatbuffers::Offset<::flatbuffers::String> name_offset = builder.CreateString(o.name_);
+
+    ::VPlaceholderBuilder instance_builder = ::VPlaceholderBuilder(builder);
+    instance_builder.add_name(name_offset);
+    instance_builder.add_ty(o.ty_);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const VPlaceholder &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+VPlaceholder::VPlaceholder()
+    : name_()
+    , ty_(ValueTy(0)) {
+}
+
+VPlaceholder::VPlaceholder(const std::vector<uint8_t> &bytes)
+    : VPlaceholder(::flatbuffers::GetSizePrefixedRoot<::VPlaceholder>(bytes.data())) {
+}
+
+VPlaceholder::VPlaceholder(const ::VPlaceholder *root) 
+    : name_()
+    , ty_(ValueTy(0)) {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+        name_ = std::string(*root->name()->begin(), *root->name()->end());
+    ty_ = root->ty();
+}
+
 ::flatbuffers::Offset<::ValueInstance>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ValueInstance &o) {
     const std::pair<::flatbuffers::Offset<void>, ::Value> v_offset = serialize_to(builder, o.v_);
@@ -1179,6 +1221,12 @@ ValueInstance::ValueInstance(const ::ValueInstance *root)
             case ::Value::VTimestampNs: {
                 const auto v__local = static_cast<const ::VTimestampNs *>(root->v());
                 std::shared_ptr<VTimestampNs> v__shared = std::make_shared<VTimestampNs>(v__local);
+                v_ = v__shared;
+                break;
+            }
+            case ::Value::VPlaceholder: {
+                const auto v__local = static_cast<const ::VPlaceholder *>(root->v());
+                std::shared_ptr<VPlaceholder> v__shared = std::make_shared<VPlaceholder>(v__local);
                 v_ = v__shared;
                 break;
             }

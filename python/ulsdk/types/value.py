@@ -23,6 +23,7 @@ from .generated.VI64 import VI64 as FbsVI64
 from .generated.VI8 import VI8 as FbsVI8
 from .generated.VIsize import VIsize as FbsVIsize
 from .generated.VNull import VNull as FbsVNull
+from .generated.VPlaceholder import VPlaceholder as FbsVPlaceholder
 from .generated.VStr import VStr as FbsVStr
 from .generated.VTimestampMs import VTimestampMs as FbsVTimestampMs
 from .generated.VTimestampMsUtc import VTimestampMsUtc as FbsVTimestampMsUtc
@@ -64,6 +65,7 @@ class ValueTy(Enum):
     TimestampMs = 22
     TimestampNsUtc = 23
     TimestampNs = 24
+    Placeholder = 25
 
 
 @dataclass
@@ -87,7 +89,7 @@ class VBool:
             AddV,
             End,
         )
-        
+
         Start(builder)
         AddV(builder, self.v)
         return End(builder)
@@ -126,7 +128,7 @@ class VUnit:
             Start,
             End,
         )
-        
+
         Start(builder)
         return End(builder)
 
@@ -166,7 +168,7 @@ class VChar:
             AddV,
             End,
         )
-        
+
         Start(builder)
         AddV(builder, self.v)
         return End(builder)
@@ -205,7 +207,7 @@ class VNull:
             Start,
             End,
         )
-        
+
         Start(builder)
         return End(builder)
 
@@ -245,7 +247,7 @@ class VI8:
             AddV,
             End,
         )
-        
+
         Start(builder)
         AddV(builder, self.v)
         return End(builder)
@@ -288,7 +290,7 @@ class VU8:
             AddV,
             End,
         )
-        
+
         Start(builder)
         AddV(builder, self.v)
         return End(builder)
@@ -331,7 +333,7 @@ class VI16:
             AddV,
             End,
         )
-        
+
         Start(builder)
         AddV(builder, self.v)
         return End(builder)
@@ -374,7 +376,7 @@ class VU16:
             AddV,
             End,
         )
-        
+
         Start(builder)
         AddV(builder, self.v)
         return End(builder)
@@ -417,7 +419,7 @@ class VI32:
             AddV,
             End,
         )
-        
+
         Start(builder)
         AddV(builder, self.v)
         return End(builder)
@@ -460,7 +462,7 @@ class VU32:
             AddV,
             End,
         )
-        
+
         Start(builder)
         AddV(builder, self.v)
         return End(builder)
@@ -503,7 +505,7 @@ class VF32:
             AddV,
             End,
         )
-        
+
         Start(builder)
         AddV(builder, self.v)
         return End(builder)
@@ -546,7 +548,7 @@ class VIsize:
             AddV,
             End,
         )
-        
+
         Start(builder)
         AddV(builder, self.v)
         return End(builder)
@@ -589,7 +591,7 @@ class VUsize:
             AddV,
             End,
         )
-        
+
         Start(builder)
         AddV(builder, self.v)
         return End(builder)
@@ -632,7 +634,7 @@ class VI64:
             AddV,
             End,
         )
-        
+
         Start(builder)
         AddV(builder, self.v)
         return End(builder)
@@ -675,7 +677,7 @@ class VU64:
             AddV,
             End,
         )
-        
+
         Start(builder)
         AddV(builder, self.v)
         return End(builder)
@@ -718,7 +720,7 @@ class VF64:
             AddV,
             End,
         )
-        
+
         Start(builder)
         AddV(builder, self.v)
         return End(builder)
@@ -764,7 +766,7 @@ class VStr:
             End,
         )
         v_offset = builder.CreateString(self.v)
-        
+
         Start(builder)
         AddV(builder, v_offset)
         return End(builder)
@@ -815,7 +817,7 @@ class VBytes:
         for i in reversed(range(len(self.v))):
             builder.PrependUint8(self.v[i])
         v_offset = builder.EndVector()
-        
+
         Start(builder)
         AddV(builder, v_offset)
         return End(builder)
@@ -876,7 +878,7 @@ class VArray:
         for i in reversed(range(len(self.v))):
             builder.PrependUOffsetTRelative(v_offsets[i])
         v_offset = builder.EndVector()
-        
+
         Start(builder)
         AddV(builder, v_offset)
         return End(builder)
@@ -1007,7 +1009,7 @@ class VTri2D:
             End,
         )
         v_offset = self.v.serialize_to(builder)
-        
+
         Start(builder)
         AddV(builder, v_offset)
         return End(builder)
@@ -1062,7 +1064,7 @@ class VFixedSizeBytes:
         for i in reversed(range(len(self.v))):
             builder.PrependUint8(self.v[i])
         v_offset = builder.EndVector()
-        
+
         Start(builder)
         AddSz(builder, self.sz)
         AddV(builder, v_offset)
@@ -1111,7 +1113,7 @@ class VTimestampMsUtc:
             AddV,
             End,
         )
-        
+
         Start(builder)
         AddV(builder, self.v)
         return End(builder)
@@ -1154,7 +1156,7 @@ class VTimestampMs:
             AddV,
             End,
         )
-        
+
         Start(builder)
         AddV(builder, self.v)
         return End(builder)
@@ -1197,7 +1199,7 @@ class VTimestampNsUtc:
             AddV,
             End,
         )
-        
+
         Start(builder)
         AddV(builder, self.v)
         return End(builder)
@@ -1240,7 +1242,7 @@ class VTimestampNs:
             AddV,
             End,
         )
-        
+
         Start(builder)
         AddV(builder, self.v)
         return End(builder)
@@ -1259,6 +1261,59 @@ class VTimestampNs:
     def __eq__(self, other) -> bool:
         eq = True
         eq = eq and self.v == other.v
+
+        return eq
+
+@dataclass
+class VPlaceholder:
+    name: "str"
+
+    ty: "ValueTy"
+
+    @classmethod
+    def from_fbs(cls, o: FbsVPlaceholder) -> Self:
+        name_str = o.Name()
+        assert name_str is not None
+        name = name_str.decode('utf-8')
+        ty = ValueTy(o.Ty())
+        return cls(name, ty)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsVPlaceholder.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.VPlaceholder import (
+            Start,
+            AddName,
+            AddTy,
+            End,
+        )
+        name_offset = builder.CreateString(self.name)
+
+        Start(builder)
+        AddName(builder, name_offset)
+        AddTy(builder, self.ty.value)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        name = ""
+        ty = ValueTy(0)
+        return cls(name, ty)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.name == other.name
+        eq = eq and self.ty == other.ty
 
         return eq
 
@@ -1290,6 +1345,7 @@ class Value:
         "VTimestampMs",
         "VTimestampNsUtc",
         "VTimestampNs",
+        "VPlaceholder",
     ]
 
     def serialize_to(self, builder: Builder) -> Tuple[int, int]:
@@ -1345,6 +1401,8 @@ class Value:
             return (offset, Value().VTimestampNsUtc)
         elif isinstance(self.value, VTimestampNs):
             return (offset, Value().VTimestampNs)
+        elif isinstance(self.value, VPlaceholder):
+            return (offset, Value().VPlaceholder)
         raise ValueError("Invalid union type")
 
     @classmethod
@@ -1453,6 +1511,10 @@ class Value:
             val = FbsVTimestampNs();
             val.Init(source, pos)
             return cls(VTimestampNs.from_fbs(val))
+        elif ty == Value_ty_instance.VPlaceholder:
+            val = FbsVPlaceholder();
+            val.Init(source, pos)
+            return cls(VPlaceholder.from_fbs(val))
         else:
             raise ValueError("Invalid union type")
 
@@ -1493,7 +1555,7 @@ class ValueInstance:
             End,
         )
         v_offset, v_ty = self.v.serialize_to(builder)
-        
+
         Start(builder)
         AddV(builder, v_offset)
         AddVType(builder, v_ty)

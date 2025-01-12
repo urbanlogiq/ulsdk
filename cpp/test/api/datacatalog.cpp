@@ -271,7 +271,6 @@ test_stream_put_arrow(ul::RequestContext &ctx) {
     ::ul::api::datacatalog::stream_put_arrow(
         ctx,
         ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        std::nullopt,
         std::vector<std::shared_ptr<arrow::RecordBatch>>()
     );
     return ul::Void();
@@ -284,7 +283,6 @@ test_stream_put_diffstream(ul::RequestContext &ctx) {
     ::ul::api::datacatalog::stream_put_diffstream(
         ctx,
         ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        std::nullopt,
         ::ul::types::DiffStream()
     );
     return ul::Void();
@@ -297,7 +295,6 @@ test_stream_put_json(ul::RequestContext &ctx) {
     ::ul::api::datacatalog::stream_put_json(
         ctx,
         ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        std::nullopt,
         {}
     );
     return ul::Void();
@@ -332,8 +329,7 @@ ul::Result<ul::Void>
 test_stream_compact(ul::RequestContext &ctx) {
     ::ul::api::datacatalog::stream_compact(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        std::nullopt
+        ul::Uuid("00000000-0000-0000-0000-000000000000")
     );
     return ul::Void();
 }

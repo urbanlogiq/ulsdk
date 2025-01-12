@@ -9,16 +9,19 @@ def test_crypt_header():
     _b = _t0.to_bytes()
     _t1 = CryptHeader.from_bytes(_b)
     assert _t0 == _t1
+
 def test_encrypted_object():
     _t0 = EncryptedObject.make_default()
     _b = _t0.to_bytes()
     _t1 = EncryptedObject.from_bytes(_b)
     assert _t0 == _t1
+
 def test_sha_256():
     _t0 = Sha256.make_default()
     _b = _t0.to_bytes()
     _t1 = Sha256.from_bytes(_b)
     assert _t0 == _t1
+
 def test_signature():
     _t0 = Signature.make_default()
     _b = _t0.to_bytes()

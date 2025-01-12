@@ -31,6 +31,7 @@ struct VI64;
 struct VI8;
 struct VIsize;
 struct VNull;
+struct VPlaceholder;
 struct VStr;
 struct VTimestampMs;
 struct VTimestampMsUtc;
@@ -70,7 +71,8 @@ typedef std::variant<
     std::shared_ptr<VTimestampMsUtc>,
     std::shared_ptr<VTimestampMs>,
     std::shared_ptr<VTimestampNsUtc>,
-    std::shared_ptr<VTimestampNs>
+    std::shared_ptr<VTimestampNs>,
+    std::shared_ptr<VPlaceholder>
 > Value;
 
 using ::ValueTy;
@@ -290,6 +292,15 @@ struct VTimestampNs {
     VTimestampNs(const std::vector<uint8_t> &bytes);
 };
 
+struct VPlaceholder {
+    std::string name_;
+    ValueTy ty_;
+
+    VPlaceholder();
+    VPlaceholder(const ::VPlaceholder *root);
+    VPlaceholder(const std::vector<uint8_t> &bytes);
+};
+
 struct ValueInstance {
     Value v_;
 
@@ -375,6 +386,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const VTimestampNsUtc &)
 ::flatbuffers::Offset<::VTimestampNs>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const VTimestampNs &);
 
+::flatbuffers::Offset<::VPlaceholder>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const VPlaceholder &);
+
 ::flatbuffers::Offset<::ValueInstance>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ValueInstance &);
 
@@ -453,6 +467,9 @@ to_bytes(const VTimestampNsUtc &o);
 
 std::vector<uint8_t>
 to_bytes(const VTimestampNs &o);
+
+std::vector<uint8_t>
+to_bytes(const VPlaceholder &o);
 
 std::vector<uint8_t>
 to_bytes(const ValueInstance &o);

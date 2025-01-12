@@ -44,7 +44,7 @@ class Sha256:
         for i in reversed(range(len(self.b))):
             builder.PrependUint8(self.b[i])
         b_offset = builder.EndVector()
-        
+
         Start(builder)
         AddB(builder, b_offset)
         return End(builder)
@@ -143,7 +143,7 @@ class CryptHeader:
         for i in reversed(range(len(self.nonce))):
             builder.PrependUint8(self.nonce[i])
         nonce_offset = builder.EndVector()
-        
+
         Start(builder)
         AddKid(builder, kid_offset)
         AddNonce(builder, nonce_offset)
@@ -212,7 +212,7 @@ class EncryptedObject:
         for i in reversed(range(len(self.obj))):
             builder.PrependUint8(self.obj[i])
         obj_offset = builder.EndVector()
-        
+
         Start(builder)
         AddHeader(builder, header_offset)
         AddObj(builder, obj_offset)
@@ -276,7 +276,7 @@ class Signature:
         for i in reversed(range(len(self.sig))):
             builder.PrependUint8(self.sig[i])
         sig_offset = builder.EndVector()
-        
+
         Start(builder)
         AddKid(builder, kid_offset)
         AddSig(builder, sig_offset)

@@ -57,7 +57,7 @@ class B2cId:
         for i in reversed(range(len(self.b))):
             builder.PrependUint8(self.b[i])
         b_offset = builder.EndVector()
-        
+
         Start(builder)
         AddB(builder, b_offset)
         return End(builder)
@@ -111,7 +111,7 @@ class ColumnGroupId:
         for i in reversed(range(len(self.b))):
             builder.PrependUint8(self.b[i])
         b_offset = builder.EndVector()
-        
+
         Start(builder)
         AddB(builder, b_offset)
         return End(builder)
@@ -165,7 +165,7 @@ class ContentId:
         for i in reversed(range(len(self.b))):
             builder.PrependUint8(self.b[i])
         b_offset = builder.EndVector()
-        
+
         Start(builder)
         AddB(builder, b_offset)
         return End(builder)
@@ -219,7 +219,7 @@ class DataStateId:
         for i in reversed(range(len(self.b))):
             builder.PrependUint8(self.b[i])
         b_offset = builder.EndVector()
-        
+
         Start(builder)
         AddB(builder, b_offset)
         return End(builder)
@@ -273,7 +273,7 @@ class GenericId:
         for i in reversed(range(len(self.b))):
             builder.PrependUint8(self.b[i])
         b_offset = builder.EndVector()
-        
+
         Start(builder)
         AddB(builder, b_offset)
         return End(builder)
@@ -327,7 +327,7 @@ class GraphNodeId:
         for i in reversed(range(len(self.b))):
             builder.PrependUint8(self.b[i])
         b_offset = builder.EndVector()
-        
+
         Start(builder)
         AddB(builder, b_offset)
         return End(builder)
@@ -381,7 +381,7 @@ class ObjectId:
         for i in reversed(range(len(self.b))):
             builder.PrependUint8(self.b[i])
         b_offset = builder.EndVector()
-        
+
         Start(builder)
         AddB(builder, b_offset)
         return End(builder)
@@ -435,7 +435,7 @@ class StreamId:
         for i in reversed(range(len(self.b))):
             builder.PrependUint8(self.b[i])
         b_offset = builder.EndVector()
-        
+
         Start(builder)
         AddB(builder, b_offset)
         return End(builder)

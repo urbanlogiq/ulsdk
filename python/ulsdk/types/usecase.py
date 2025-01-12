@@ -102,24 +102,21 @@ from .query import (
     Function,
     Join,
     JoinTy,
-    MvdbSubcollection,
+    MvdbPartition,
     NullableUint,
     OrderByExpr,
-    Parameter,
-    ParameterInstance,
-    ParameterSlot,
-    ParameterizedQuery,
     Partition,
+    Placeholder,
     Query,
     QueryElement,
     QueryElementOp,
     QueryElementUnion,
     QueryTableSource,
-    RecordBatchPlaceholder,
     SetExpr,
-    Subcollection,
     TableOrderBy,
+    TablePartition,
     TableSource,
+    TableSourceInstance,
     TableSourceUnion,
     TypeHint,
     UnaryQueryElement,
@@ -129,7 +126,7 @@ from .query import (
     Vector,
     When,
     Window,
-    WorklogSubcollection,
+    WorklogPartition,
 )
 from .value import (
     Point2D,
@@ -147,6 +144,7 @@ from .value import (
     VI8,
     VIsize,
     VNull,
+    VPlaceholder,
     VStr,
     VTimestampMs,
     VTimestampMsUtc,
@@ -209,7 +207,7 @@ from .generated.List import List as FbsList
 from .generated.Map import Map as FbsMap
 from .generated.MultiLine import MultiLine as FbsMultiLine
 from .generated.MultiPolygon import MultiPolygon as FbsMultiPolygon
-from .generated.MvdbSubcollection import MvdbSubcollection as FbsMvdbSubcollection
+from .generated.MvdbPartition import MvdbPartition as FbsMvdbPartition
 from .generated.NodeIdPair import NodeIdPair as FbsNodeIdPair
 from .generated.NodeList import NodeList as FbsNodeList
 from .generated.NodeQuery import NodeQuery as FbsNodeQuery
@@ -218,10 +216,8 @@ from .generated.NullableUint import NullableUint as FbsNullableUint
 from .generated.ObjectId import ObjectId as FbsObjectId
 from .generated.OrderBy import OrderBy as FbsOrderBy
 from .generated.OrderByExpr import OrderByExpr as FbsOrderByExpr
-from .generated.Parameter import Parameter as FbsParameter
-from .generated.ParameterInstance import ParameterInstance as FbsParameterInstance
-from .generated.ParameterizedQuery import ParameterizedQuery as FbsParameterizedQuery
 from .generated.Partition import Partition as FbsPartition
+from .generated.Placeholder import Placeholder as FbsPlaceholder
 from .generated.Point import Point as FbsPoint
 from .generated.Point2D import Point2D as FbsPoint2D
 from .generated.Polygon import Polygon as FbsPolygon
@@ -230,13 +226,13 @@ from .generated.Query import Query as FbsQuery
 from .generated.QueryElement import QueryElement as FbsQueryElement
 from .generated.QueryPathElement import QueryPathElement as FbsQueryPathElement
 from .generated.QueryTableSource import QueryTableSource as FbsQueryTableSource
-from .generated.RecordBatchPlaceholder import RecordBatchPlaceholder as FbsRecordBatchPlaceholder
 from .generated.Schema import Schema as FbsSchema
 from .generated.SetExpr import SetExpr as FbsSetExpr
 from .generated.StreamId import StreamId as FbsStreamId
 from .generated.Struct_ import Struct_ as FbsStruct_
 from .generated.TableOrderBy import TableOrderBy as FbsTableOrderBy
 from .generated.TableSource import TableSource as FbsTableSource
+from .generated.TableSourceInstance import TableSourceInstance as FbsTableSourceInstance
 from .generated.Time import Time as FbsTime
 from .generated.Timestamp import Timestamp as FbsTimestamp
 from .generated.Tri2D import Tri2D as FbsTri2D
@@ -260,6 +256,7 @@ from .generated.VI64 import VI64 as FbsVI64
 from .generated.VI8 import VI8 as FbsVI8
 from .generated.VIsize import VIsize as FbsVIsize
 from .generated.VNull import VNull as FbsVNull
+from .generated.VPlaceholder import VPlaceholder as FbsVPlaceholder
 from .generated.VStr import VStr as FbsVStr
 from .generated.VTimestampMs import VTimestampMs as FbsVTimestampMs
 from .generated.VTimestampMsUtc import VTimestampMsUtc as FbsVTimestampMsUtc
@@ -277,13 +274,12 @@ from .generated.ValueInstance import ValueInstance as FbsValueInstance
 from .generated.Vector import Vector as FbsVector
 from .generated.When import When as FbsWhen
 from .generated.Window import Window as FbsWindow
-from .generated.WorklogSubcollection import WorklogSubcollection as FbsWorklogSubcollection
+from .generated.WorklogPartition import WorklogPartition as FbsWorklogPartition
 from .generated.ExprUnion import ExprUnion as FbsExprUnion
 from .generated.Geometry import Geometry as FbsGeometry
-from .generated.ParameterSlot import ParameterSlot as FbsParameterSlot
 from .generated.QueryElementUnion import QueryElementUnion as FbsQueryElementUnion
 from .generated.QueryPathElementUnion import QueryPathElementUnion as FbsQueryPathElementUnion
-from .generated.Subcollection import Subcollection as FbsSubcollection
+from .generated.TablePartition import TablePartition as FbsTablePartition
 from .generated.TableSourceUnion import TableSourceUnion as FbsTableSourceUnion
 from .generated.Type import Type as FbsType
 from .generated.UseCaseInput import UseCaseInput as FbsUseCaseInput
@@ -317,6 +313,7 @@ class UseCaseTy(Enum):
     FreightAnalysis = 18
     CorridorAnalysis = 19
     Ethica = 20
+    UrlBased = 21
 
 
 @dataclass
@@ -324,7 +321,7 @@ class UseCaseInput:
     value: Union[
         "ObjectId",
         "Schema",
-        "ParameterizedQuery",
+        "Query",
         "ValueInstance",
     ]
 
@@ -335,8 +332,8 @@ class UseCaseInput:
             return (offset, UseCaseInput().ObjectId)
         elif isinstance(self.value, Schema):
             return (offset, UseCaseInput().Schema)
-        elif isinstance(self.value, ParameterizedQuery):
-            return (offset, UseCaseInput().ParameterizedQuery)
+        elif isinstance(self.value, Query):
+            return (offset, UseCaseInput().Query)
         elif isinstance(self.value, ValueInstance):
             return (offset, UseCaseInput().ValueInstance)
         raise ValueError("Invalid union type")
@@ -355,10 +352,10 @@ class UseCaseInput:
             val = FbsSchema();
             val.Init(source, pos)
             return cls(Schema.from_fbs(val))
-        elif ty == UseCaseInput_ty_instance.ParameterizedQuery:
-            val = FbsParameterizedQuery();
+        elif ty == UseCaseInput_ty_instance.Query:
+            val = FbsQuery();
             val.Init(source, pos)
-            return cls(ParameterizedQuery.from_fbs(val))
+            return cls(Query.from_fbs(val))
         elif ty == UseCaseInput_ty_instance.ValueInstance:
             val = FbsValueInstance();
             val.Init(source, pos)
@@ -476,7 +473,7 @@ class UseCase:
         subtitle_offset = None
         if self.subtitle is not None:
             subtitle_offset = builder.CreateString(self.subtitle)
-        
+
         Start(builder)
         if abbreviation_offset is not None:
             AddAbbreviation(builder, abbreviation_offset)
@@ -566,7 +563,7 @@ class UseCaseInputPair:
         if self.input is not None:
             input_offset, input_ty = self.input.serialize_to(builder)
         name_offset = builder.CreateString(self.name)
-        
+
         Start(builder)
         if input_offset is not None and input_ty is not None:
             AddInput(builder, input_offset)
