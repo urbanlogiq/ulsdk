@@ -275,7 +275,7 @@ def update_key(
     """
 
     path = "/v1/api/uldirectory/v1/keys/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -298,7 +298,7 @@ def get_key(
     """
 
     path = "/v1/api/uldirectory/v1/keys/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -318,7 +318,7 @@ def delete_key(
     """
 
     path = "/v1/api/uldirectory/v1/keys/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()

@@ -26,7 +26,7 @@ def fetch(
     """
 
     path = "/v1/api/ulv2/inbox/:folder"
-    path.replace(":folder", str(folder), 1)
+    path = path.replace(":folder", str(folder), 1)
 
     params = dict()
     headers = dict()
@@ -45,7 +45,7 @@ def clear_all_status(
     """
 
     path = "/v1/api/ulv2/inbox/:folder"
-    path.replace(":folder", str(folder), 1)
+    path = path.replace(":folder", str(folder), 1)
 
     params = dict()
     headers = dict()
@@ -68,9 +68,9 @@ def set_status(
     """
 
     path = "/v1/api/ulv2/inbox/:folder/:id/status/:status"
-    path.replace(":folder", str(folder), 1)
-    path.replace(":id", str(id_), 1)
-    path.replace(":status", str(status), 1)
+    path = path.replace(":folder", str(folder), 1)
+    path = path.replace(":id", str(id_), 1)
+    path = path.replace(":status", str(status), 1)
 
     params = dict()
     headers = dict()
@@ -92,8 +92,8 @@ def clear_status(
     """
 
     path = "/v1/api/ulv2/inbox/:folder/:id"
-    path.replace(":folder", str(folder), 1)
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":folder", str(folder), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()

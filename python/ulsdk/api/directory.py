@@ -1068,7 +1068,7 @@ def get_principal(
     """
 
     path = "/v1/api/uldirectory/v1/principal/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -1091,7 +1091,7 @@ def get_principals(
     """
 
     path = "/v1/api/uldirectory/v1/principal/:ids"
-    path.replace(":ids", str(ids), 1)
+    path = path.replace(":ids", str(ids), 1)
 
     params = dict()
     headers = dict()
@@ -1127,7 +1127,7 @@ def query_principals(
     """
 
     path = "/v1/api/uldirectory/v1/principals/:query"
-    path.replace(":query", str(query), 1)
+    path = path.replace(":query", str(query), 1)
 
     params = dict()
     headers = dict()
@@ -1261,7 +1261,7 @@ def get_user(
     """
 
     path = "/v1/api/uldirectory/v1/user/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     if audit_log is not None:
@@ -1286,7 +1286,7 @@ def update_user(
     """
 
     path = "/v1/api/uldirectory/v1/user/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -1306,7 +1306,7 @@ def delete_user(
     """
 
     path = "/v1/api/uldirectory/v1/user/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -1372,7 +1372,7 @@ def get_group_members(
     """
 
     path = "/v1/api/uldirectory/v1/group/:id/members"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -1395,7 +1395,7 @@ def delete_group(
     """
 
     path = "/v1/api/uldirectory/v1/group/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -1416,8 +1416,8 @@ def add_group_member(
     """
 
     path = "/v1/api/uldirectory/v1/group/:group/:member"
-    path.replace(":group", str(group), 1)
-    path.replace(":member", str(member), 1)
+    path = path.replace(":group", str(group), 1)
+    path = path.replace(":member", str(member), 1)
 
     params = dict()
     headers = dict()
@@ -1439,8 +1439,8 @@ def remove_group_member(
     """
 
     path = "/v1/api/uldirectory/v1/group/:group/:member"
-    path.replace(":group", str(group), 1)
-    path.replace(":member", str(member), 1)
+    path = path.replace(":group", str(group), 1)
+    path = path.replace(":member", str(member), 1)
 
     params = dict()
     headers = dict()

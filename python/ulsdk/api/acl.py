@@ -89,9 +89,9 @@ def share(
     """
 
     path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to/:permission"
-    path.replace(":id", str(id_), 1)
-    path.replace(":to", str(to), 1)
-    path.replace(":permission", str(permission_bits), 1)
+    path = path.replace(":id", str(id_), 1)
+    path = path.replace(":to", str(to), 1)
+    path = path.replace(":permission", str(permission_bits), 1)
 
     params = dict()
     headers = dict()
@@ -117,9 +117,9 @@ def share_with_details(
     """
 
     path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to/:permission"
-    path.replace(":id", str(id_), 1)
-    path.replace(":to", str(to), 1)
-    path.replace(":permission", str(permission_bits), 1)
+    path = path.replace(":id", str(id_), 1)
+    path = path.replace(":to", str(to), 1)
+    path = path.replace(":permission", str(permission_bits), 1)
 
     params = dict()
     headers = dict()
@@ -141,8 +141,8 @@ def share_all(
     """
 
     path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to"
-    path.replace(":id", str(id_), 1)
-    path.replace(":to", str(to), 1)
+    path = path.replace(":id", str(id_), 1)
+    path = path.replace(":to", str(to), 1)
 
     params = dict()
     headers = dict()
@@ -166,8 +166,8 @@ def share_all_with_details(
     """
 
     path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to"
-    path.replace(":id", str(id_), 1)
-    path.replace(":to", str(to), 1)
+    path = path.replace(":id", str(id_), 1)
+    path = path.replace(":to", str(to), 1)
 
     params = dict()
     headers = dict()
@@ -191,9 +191,9 @@ def grant(
     """
 
     path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to/:permission"
-    path.replace(":id", str(id_), 1)
-    path.replace(":to", str(to), 1)
-    path.replace(":permission", str(permission_bits), 1)
+    path = path.replace(":id", str(id_), 1)
+    path = path.replace(":to", str(to), 1)
+    path = path.replace(":permission", str(permission_bits), 1)
 
     params = dict()
     headers = dict()
@@ -219,9 +219,9 @@ def grant_with_details(
     """
 
     path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to/:permission"
-    path.replace(":id", str(id_), 1)
-    path.replace(":to", str(to), 1)
-    path.replace(":permission", str(permission_bits), 1)
+    path = path.replace(":id", str(id_), 1)
+    path = path.replace(":to", str(to), 1)
+    path = path.replace(":permission", str(permission_bits), 1)
 
     params = dict()
     headers = dict()
@@ -243,8 +243,8 @@ def grant_all(
     """
 
     path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to"
-    path.replace(":id", str(id_), 1)
-    path.replace(":to", str(to), 1)
+    path = path.replace(":id", str(id_), 1)
+    path = path.replace(":to", str(to), 1)
 
     params = dict()
     headers = dict()
@@ -268,8 +268,8 @@ def grant_all_with_details(
     """
 
     path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to"
-    path.replace(":id", str(id_), 1)
-    path.replace(":to", str(to), 1)
+    path = path.replace(":id", str(id_), 1)
+    path = path.replace(":to", str(to), 1)
 
     params = dict()
     headers = dict()
@@ -291,8 +291,8 @@ def revoke(
     """
 
     path = "/v1/api/ulv2/datacatalog/acl/revoke/:id/:from"
-    path.replace(":id", str(id_), 1)
-    path.replace(":from", str(from_), 1)
+    path = path.replace(":id", str(id_), 1)
+    path = path.replace(":from", str(from_), 1)
 
     params = dict()
     headers = dict()
@@ -312,7 +312,7 @@ def get_permissions(
     """
 
     path = "/v1/api/ulv2/datacatalog/acl/perms/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -333,8 +333,8 @@ def set(
     """
 
     path = "/v1/api/ulv2/datacatalog/acl/set/:id/:acl_id"
-    path.replace(":id", str(id_), 1)
-    path.replace(":acl_id", str(acl_id), 1)
+    path = path.replace(":id", str(id_), 1)
+    path = path.replace(":acl_id", str(acl_id), 1)
 
     params = dict()
     headers = dict()

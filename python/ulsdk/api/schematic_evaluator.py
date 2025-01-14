@@ -50,7 +50,7 @@ def get_job(
     """
 
     path = "/v1/api/ulv2/schematicevaluator/jobs/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     if timeout is not None:
@@ -75,7 +75,7 @@ def get_task(
     """
 
     path = "/v1/api/ulv2/schematicevaluator/tasks/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()

@@ -38,8 +38,8 @@ def get_object_at_revision(
     """
 
     path = "/v1/api/ulv2/datacatalog/content/:object_id/:content_id"
-    path.replace(":object_id", str(object_id), 1)
-    path.replace(":content_id", str(content_id), 1)
+    path = path.replace(":object_id", str(object_id), 1)
+    path = path.replace(":content_id", str(content_id), 1)
 
     params = dict()
     headers = dict()
@@ -61,7 +61,7 @@ def get_acl(
     """
 
     path = "/v1/api/ulv2/datacatalog/object/acl/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -83,7 +83,7 @@ def get_head_revision(
     """
 
     path = "/v1/api/ulv2/datacatalog/object/head/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -105,7 +105,7 @@ def get_object(
     """
 
     path = "/v1/api/ulv2/datacatalog/object/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -126,7 +126,7 @@ def update_object(
     """
 
     path = "/v1/api/ulv2/datacatalog/object/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -150,7 +150,7 @@ def update_attribute(
     """
 
     path = "/v1/api/ulv2/datacatalog/object/:id/attributes"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     params["overwrite"] = "true" if overwrite else "false"
@@ -174,8 +174,8 @@ def delete_attribute(
     """
 
     path = "/v1/api/ulv2/datacatalog/object/:id/attributes/:key"
-    path.replace(":id", str(id_), 1)
-    path.replace(":key", str(key), 1)
+    path = path.replace(":id", str(id_), 1)
+    path = path.replace(":key", str(key), 1)
 
     params = dict()
     headers = dict()
@@ -371,7 +371,7 @@ def stream_get_arrow(
     """
 
     path = "/v1/api/ulv2/datacatalog/stream/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -396,7 +396,7 @@ def stream_get_parquet(
     """
 
     path = "/v1/api/ulv2/datacatalog/stream/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -420,7 +420,7 @@ def stream_get_csv(
     """
 
     path = "/v1/api/ulv2/datacatalog/stream/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -444,7 +444,7 @@ def stream_get_xlsx(
     """
 
     path = "/v1/api/ulv2/datacatalog/stream/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -468,7 +468,7 @@ def stream_get_json(
     """
 
     path = "/v1/api/ulv2/datacatalog/stream/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -492,7 +492,7 @@ def stream_get_text(
     """
 
     path = "/v1/api/ulv2/datacatalog/stream/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -516,7 +516,7 @@ def stream_get_html(
     """
 
     path = "/v1/api/ulv2/datacatalog/stream/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -539,7 +539,7 @@ def stream_put_arrow(
     """
 
     path = "/v1/api/ulv2/datacatalog/stream/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -569,7 +569,7 @@ def stream_put_diffstream(
     """
 
     path = "/v1/api/ulv2/datacatalog/stream/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -591,7 +591,7 @@ def stream_put_json(
     """
 
     path = "/v1/api/ulv2/datacatalog/stream/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -618,7 +618,7 @@ def generate_metadata(
     """
 
     path = "/v1/api/ulv2/datacatalog/stream/:id/generated/metadata"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -644,7 +644,7 @@ def update_metadata(
     """
 
     path = "/v1/api/ulv2/datacatalog/stream/:id/metadata"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -666,7 +666,7 @@ def stream_compact(
     """
 
     path = "/v1/api/ulv2/datacatalog/stream/:id/compact"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -691,8 +691,8 @@ def table_row_history(
     """
 
     path = "/v1/api/ulv2/datacatalog/table/:id/history/:row"
-    path.replace(":id", str(id_), 1)
-    path.replace(":row", str(row), 1)
+    path = path.replace(":id", str(id_), 1)
+    path = path.replace(":row", str(row), 1)
 
     params = dict()
     headers = dict()
@@ -714,7 +714,7 @@ def table_history(
     """
 
     path = "/v1/api/ulv2/datacatalog/table/:id/history"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -738,8 +738,8 @@ def get_table_attachments_directory(
     """
 
     path = "/v1/api/ulv2/datacatalog/table/:id/attachments/:row"
-    path.replace(":id", str(id_), 1)
-    path.replace(":row", str(row), 1)
+    path = path.replace(":id", str(id_), 1)
+    path = path.replace(":row", str(row), 1)
 
     params = dict()
     headers = dict()
@@ -763,8 +763,8 @@ def get_or_create_table_attachments_directory(
     """
 
     path = "/v1/api/ulv2/datacatalog/table/:id/attachments/:row"
-    path.replace(":id", str(id_), 1)
-    path.replace(":row", str(row), 1)
+    path = path.replace(":id", str(id_), 1)
+    path = path.replace(":row", str(row), 1)
 
     params = dict()
     headers = dict()
@@ -789,7 +789,7 @@ def create_table(
     """
 
     path = "/v1/api/ulv2/datacatalog/table/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()

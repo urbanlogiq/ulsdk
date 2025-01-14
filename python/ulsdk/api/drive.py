@@ -37,8 +37,8 @@ def ls(
     """
 
     path = "/v1/api/ulv2/drive/:root/*tail"
-    path.replace(":root", str(root), 1)
-    path.replace("*tail", quote_plus(tail), 1)
+    path = path.replace(":root", str(root), 1)
+    path = path.replace("*tail", tail, 1)
 
     params = dict()
     headers = dict()
@@ -68,8 +68,8 @@ def create_entry(
     """
 
     path = "/v1/api/ulv2/drive/:root/*tail"
-    path.replace(":root", str(root), 1)
-    path.replace("*tail", quote_plus(tail), 1)
+    path = path.replace(":root", str(root), 1)
+    path = path.replace("*tail", tail, 1)
 
     params = dict()
     params["ty"] = ty
@@ -93,7 +93,7 @@ def get_roots(
     A listing of all the directory roots.
     """
 
-    path = "/v1/api/ulv2/drive"
+    path = "/v1/api/ulv2/drive/*"
     params = dict()
     headers = dict()
     res = ctx.get(path, params=params, headers=headers)
@@ -118,7 +118,7 @@ def post_file(
     """
 
     path = "/v1/api/ulv2/drive/:root"
-    path.replace(":root", str(root), 1)
+    path = path.replace(":root", str(root), 1)
 
     params = dict()
     params["force"] = "true" if force else "false"
@@ -142,7 +142,7 @@ def unlink(
     """
 
     path = "/v1/api/ulv2/drive/:entry"
-    path.replace(":entry", str(entry), 1)
+    path = path.replace(":entry", str(entry), 1)
 
     params = dict()
     headers = dict()
@@ -200,7 +200,7 @@ def get_file(
     """
 
     path = "/v1/api/ulv2/drive/file/:id"
-    path.replace(":id", str(id_), 1)
+    path = path.replace(":id", str(id_), 1)
 
     params = dict()
     headers = dict()
@@ -225,8 +225,8 @@ def put_file_chunk(
     """
 
     path = "/v1/api/ulv2/drive/file/:file_id/:idx"
-    path.replace(":file_id", str(file_id), 1)
-    path.replace(":idx", str(idx), 1)
+    path = path.replace(":file_id", str(file_id), 1)
+    path = path.replace(":idx", str(idx), 1)
 
     params = dict()
     params["hash"] = hash
@@ -251,7 +251,7 @@ def get_root_id(
     """
 
     path = "/v1/api/ulv2/drive/root/:b2cid"
-    path.replace(":b2cid", str(b2cid), 1)
+    path = path.replace(":b2cid", str(b2cid), 1)
 
     params = dict()
     headers = dict()
