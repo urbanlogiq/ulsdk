@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional, Union, NamedTuple
+import uuid
 
 from .keys import Region, Environment
 
@@ -30,11 +31,15 @@ class File(NamedTuple):
 # A RequestContext is a superclass that enables code to use either signed
 # requests-with-api-keys, bearer tokens, or other authentication schemes.
 class RequestContext(ABC):
-    def region(self):
+    def user_id(self) -> uuid.UUID:
+        """Return the user ID of the context, if available"""
+        raise NotImplementedError
+
+    def region(self) -> Region:
         """Return the region of the context, if available"""
         raise NotImplementedError
 
-    def env(self):
+    def env(self) -> Environment:
         """Return the environment of the context, if available"""
         raise NotImplementedError
 
