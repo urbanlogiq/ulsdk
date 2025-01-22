@@ -264,14 +264,14 @@ class ValuesFormatTy(Enum):
 
 @dataclass
 class ByteArray:
-    b: Optional["List[int]"]
+    b: Optional["bytes"]
 
     @classmethod
     def from_fbs(cls, o: FbsByteArray) -> Self:
-        b = list()
-        if not o.BIsNone():
-            for i in range(o.BLength()):
-                b.append(o.B(i))
+        if o.BIsNone():
+            b = b""
+        else:
+            b = bytes(o.BAsNumpy())
         return cls(b)
 
     @classmethod
@@ -307,7 +307,7 @@ class ByteArray:
 
     @classmethod
     def make_default(cls) -> Self:
-        b = []
+        b = b""
         return cls(b)
 
     def __eq__(self, other) -> bool:

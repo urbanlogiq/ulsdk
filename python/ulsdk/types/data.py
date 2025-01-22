@@ -193,6 +193,7 @@ class RoadUserTy(Enum):
     PHYSICALLY_CHALLENGED_PEDS = 31
     CROSSWALKS = 32
     TRAMS = 33
+    TAXIS = 34
 
 class StatisticTy(Enum):
     PERCENTILE_15 = 15
@@ -515,7 +516,7 @@ class Source:
 
     named_parameters: Optional["List[NamedParameter]"]
 
-    options: Optional["List[int]"]
+    options: Optional["bytes"]
 
     schemas: Optional["List[Schema]"]
 
@@ -542,10 +543,10 @@ class Source:
                 if named_parameters_obj is not None:
                     named_parameters_val = NamedParameter.from_fbs(named_parameters_obj)
                 named_parameters.append(named_parameters_val)
-        options = list()
-        if not o.OptionsIsNone():
-            for i in range(o.OptionsLength()):
-                options.append(o.Options(i))
+        if o.OptionsIsNone():
+            options = b""
+        else:
+            options = bytes(o.OptionsAsNumpy())
         schemas = list()
         if not o.SchemasIsNone():
             for i in range(o.SchemasLength()):
@@ -640,7 +641,7 @@ class Source:
         metadata_revision = ContentId.make_default()
         name = ""
         named_parameters = []
-        options = []
+        options = b""
         schemas = []
         url = ""
         return cls(metadata, metadata_revision, name, named_parameters, options, schemas, url)

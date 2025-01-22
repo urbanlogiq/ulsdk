@@ -234,14 +234,14 @@ class TaskRunFlags(Enum):
 
 @dataclass
 class EmbeddedTable:
-    v: "List[int]"
+    v: "bytes"
 
     @classmethod
     def from_fbs(cls, o: FbsEmbeddedTable) -> Self:
-        v = list()
-        if not o.VIsNone():
-            for i in range(o.VLength()):
-                v.append(o.V(i))
+        if o.VIsNone():
+            v = b""
+        else:
+            v = bytes(o.VAsNumpy())
         return cls(v)
 
     @classmethod
@@ -274,7 +274,7 @@ class EmbeddedTable:
 
     @classmethod
     def make_default(cls) -> Self:
-        v = []
+        v = b""
         return cls(v)
 
     def __eq__(self, other) -> bool:
@@ -448,7 +448,7 @@ class DeprecatedTaskParameter:
 
     obj: Optional["ObjectId"]
 
-    value: Optional["List[int]"]
+    value: Optional["bytes"]
 
     @classmethod
     def from_fbs(cls, o: FbsDeprecatedTaskParameter) -> Self:
@@ -460,10 +460,10 @@ class DeprecatedTaskParameter:
         obj_obj = o.Obj()
         if obj_obj is not None:
             obj = ObjectId.from_fbs(obj_obj)
-        value = list()
-        if not o.ValueIsNone():
-            for i in range(o.ValueLength()):
-                value.append(o.Value(i))
+        if o.ValueIsNone():
+            value = b""
+        else:
+            value = bytes(o.ValueAsNumpy())
         return cls(flags, key, obj, value)
 
     @classmethod
@@ -513,7 +513,7 @@ class DeprecatedTaskParameter:
         flags = 0
         key = ""
         obj = ObjectId.make_default()
-        value = []
+        value = b""
         return cls(flags, key, obj, value)
 
     def __eq__(self, other) -> bool:

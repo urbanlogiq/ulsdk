@@ -1604,14 +1604,14 @@ class DataCatalog:
 
 @dataclass
 class Arrow:
-    value: "List[int]"
+    value: "bytes"
 
     @classmethod
     def from_fbs(cls, o: FbsArrow) -> Self:
-        value = list()
-        if not o.ValueIsNone():
-            for i in range(o.ValueLength()):
-                value.append(o.Value(i))
+        if o.ValueIsNone():
+            value = b""
+        else:
+            value = bytes(o.ValueAsNumpy())
         return cls(value)
 
     @classmethod
@@ -1644,7 +1644,7 @@ class Arrow:
 
     @classmethod
     def make_default(cls) -> Self:
-        value = []
+        value = b""
         return cls(value)
 
     def __eq__(self, other) -> bool:
