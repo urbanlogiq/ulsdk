@@ -352,10 +352,10 @@ impl flatbuffers::SimpleToVerifyInSlice for TimeGranularity {}
 #[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
 pub const ENUM_MIN_ROAD_USER_TY: i32 = 0;
 #[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
-pub const ENUM_MAX_ROAD_USER_TY: i32 = 33;
+pub const ENUM_MAX_ROAD_USER_TY: i32 = 34;
 #[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_ROAD_USER_TY: [RoadUserTy; 34] = [
+pub const ENUM_VALUES_ROAD_USER_TY: [RoadUserTy; 35] = [
   RoadUserTy::BIKES,
   RoadUserTy::BUSES,
   RoadUserTy::CARS,
@@ -390,6 +390,7 @@ pub const ENUM_VALUES_ROAD_USER_TY: [RoadUserTy; 34] = [
   RoadUserTy::PHYSICALLY_CHALLENGED_PEDS,
   RoadUserTy::CROSSWALKS,
   RoadUserTy::TRAMS,
+  RoadUserTy::TAXIS,
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
@@ -431,9 +432,10 @@ impl RoadUserTy {
   pub const PHYSICALLY_CHALLENGED_PEDS: Self = Self(31);
   pub const CROSSWALKS: Self = Self(32);
   pub const TRAMS: Self = Self(33);
+  pub const TAXIS: Self = Self(34);
 
   pub const ENUM_MIN: i32 = 0;
-  pub const ENUM_MAX: i32 = 33;
+  pub const ENUM_MAX: i32 = 34;
   pub const ENUM_VALUES: &'static [Self] = &[
     Self::BIKES,
     Self::BUSES,
@@ -469,6 +471,7 @@ impl RoadUserTy {
     Self::PHYSICALLY_CHALLENGED_PEDS,
     Self::CROSSWALKS,
     Self::TRAMS,
+    Self::TAXIS,
   ];
   /// Returns the variant's name or "" if unknown.
   pub fn variant_name(self) -> Option<&'static str> {
@@ -507,6 +510,7 @@ impl RoadUserTy {
       Self::PHYSICALLY_CHALLENGED_PEDS => Some("PHYSICALLY_CHALLENGED_PEDS"),
       Self::CROSSWALKS => Some("CROSSWALKS"),
       Self::TRAMS => Some("TRAMS"),
+      Self::TAXIS => Some("TAXIS"),
       _ => None,
     }
   }

@@ -91,7 +91,8 @@ ApiTest test_get_current_user_obj(test_get_current_user, "directory::get_current
 ul::Result<ul::Void>
 test_create_user(ul::RequestContext &ctx) {
     ::ul::api::directory::create_user(
-        ctx
+        ctx,
+        ::ul::api::directory::CreateUserRequest()
     );
     return ul::Void();
 }

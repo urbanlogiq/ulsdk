@@ -339,6 +339,7 @@ pub enum RoadUserTy {
     PHYSICALLY_CHALLENGED_PEDS = 31,
     CROSSWALKS = 32,
     TRAMS = 33,
+    TAXIS = 34,
 }
 
 impl From<RoadUserTy> for FbsRoadUserTy {
@@ -378,6 +379,7 @@ impl From<RoadUserTy> for FbsRoadUserTy {
             RoadUserTy::PHYSICALLY_CHALLENGED_PEDS => FbsRoadUserTy::PHYSICALLY_CHALLENGED_PEDS,
             RoadUserTy::CROSSWALKS => FbsRoadUserTy::CROSSWALKS,
             RoadUserTy::TRAMS => FbsRoadUserTy::TRAMS,
+            RoadUserTy::TAXIS => FbsRoadUserTy::TAXIS,
         }
     }
 }
@@ -419,6 +421,7 @@ impl From<FbsRoadUserTy> for RoadUserTy {
             31 => Self::PHYSICALLY_CHALLENGED_PEDS,
             32 => Self::CROSSWALKS,
             33 => Self::TRAMS,
+            34 => Self::TAXIS,
             _ => panic!("Invalid value {} when constructing RoadUserTy", fbs.0)
         }
     }

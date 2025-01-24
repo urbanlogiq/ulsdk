@@ -201,11 +201,12 @@ enum class RoadUserTy : int32_t {
   PHYSICALLY_CHALLENGED_PEDS = 31,
   CROSSWALKS = 32,
   TRAMS = 33,
+  TAXIS = 34,
   MIN = BIKES,
-  MAX = TRAMS
+  MAX = TAXIS
 };
 
-inline const RoadUserTy (&EnumValuesRoadUserTy())[34] {
+inline const RoadUserTy (&EnumValuesRoadUserTy())[35] {
   static const RoadUserTy values[] = {
     RoadUserTy::BIKES,
     RoadUserTy::BUSES,
@@ -240,13 +241,14 @@ inline const RoadUserTy (&EnumValuesRoadUserTy())[34] {
     RoadUserTy::PEDS_AND_BIKES,
     RoadUserTy::PHYSICALLY_CHALLENGED_PEDS,
     RoadUserTy::CROSSWALKS,
-    RoadUserTy::TRAMS
+    RoadUserTy::TRAMS,
+    RoadUserTy::TAXIS
   };
   return values;
 }
 
 inline const char * const *EnumNamesRoadUserTy() {
-  static const char * const names[35] = {
+  static const char * const names[36] = {
     "BIKES",
     "BUSES",
     "CARS",
@@ -281,13 +283,14 @@ inline const char * const *EnumNamesRoadUserTy() {
     "PHYSICALLY_CHALLENGED_PEDS",
     "CROSSWALKS",
     "TRAMS",
+    "TAXIS",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameRoadUserTy(RoadUserTy e) {
-  if (::flatbuffers::IsOutRange(e, RoadUserTy::BIKES, RoadUserTy::TRAMS)) return "";
+  if (::flatbuffers::IsOutRange(e, RoadUserTy::BIKES, RoadUserTy::TAXIS)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesRoadUserTy()[index];
 }

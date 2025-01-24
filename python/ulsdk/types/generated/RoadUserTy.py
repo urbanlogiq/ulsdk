@@ -37,3 +37,4 @@ class RoadUserTy(object):
     PHYSICALLY_CHALLENGED_PEDS = 31
     CROSSWALKS = 32
     TRAMS = 33
+    TAXIS = 34
