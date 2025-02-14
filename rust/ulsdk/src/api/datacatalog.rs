@@ -132,7 +132,7 @@ pub async fn update_object(
 /// * `id` - The ID of the object whose attributes will be updated
 /// * `overwrite` - True to overwrite existing attributes or false to fail if there is a conflict.
 /// * `attributes` - A string:string json map with the new attributes
-pub async fn update_attribute(
+pub async fn update_attributes(
     ctx: &dyn RequestContext,
     id: Uuid,
     overwrite: bool,
@@ -970,7 +970,7 @@ mod tests {
 
     #[ignore = "link-only test"]
     #[tokio::test]
-    async fn test_update_attribute() {
+    async fn test_update_attributes() {
         let user = std::env::var("CA_USER").unwrap();
         let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
         let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
@@ -982,7 +982,7 @@ mod tests {
         let p1 = false;
         let p2 = serde_json::Map::new();
 
-        update_attribute(
+        update_attributes(
             &ctx,
             p0,
             p1,
