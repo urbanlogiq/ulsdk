@@ -108,20 +108,6 @@ use crate::types::id::{
     ObjectNamespace,
     StreamId,
 };
-use crate::types::reflection::{
-    ReflectionAdvancedFeatures,
-    ReflectionBaseType,
-    ReflectionEnum,
-    ReflectionEnumVal,
-    ReflectionField,
-    ReflectionKeyValue,
-    ReflectionObject,
-    ReflectionRPCCall,
-    ReflectionSchema,
-    ReflectionSchemaFile,
-    ReflectionService,
-    ReflectionType,
-};
 use crate::types::value::{
     Point2D,
     Tri2D,
@@ -301,20 +287,6 @@ use crate::types::generated::metadata_generated::{
     UlFieldRelationshipData as FbsUlFieldRelationshipData,
     UlFieldType as FbsUlFieldType,
     UpdateCadence as FbsUpdateCadence,
-};
-use crate::types::generated::reflection_generated::{
-    reflection::Enum as FbsReflectionEnum,
-    reflection::EnumVal as FbsReflectionEnumVal,
-    reflection::Field as FbsReflectionField,
-    reflection::KeyValue as FbsReflectionKeyValue,
-    reflection::Object as FbsReflectionObject,
-    reflection::RPCCall as FbsReflectionRPCCall,
-    reflection::Schema as FbsReflectionSchema,
-    reflection::SchemaFile as FbsReflectionSchemaFile,
-    reflection::Service as FbsReflectionService,
-    reflection::Type as FbsReflectionType,
-    reflection::AdvancedFeatures as FbsReflectionAdvancedFeatures,
-    reflection::BaseType as FbsReflectionBaseType,
 };
 use crate::types::generated::value_generated::{
     Point2D as FbsPoint2D,
@@ -709,7 +681,7 @@ impl From<FbsUpdateCadence> for UpdateCadence {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct StringCategories {
-    categories: Option<Vec<String>>,
+    pub categories: Option<Vec<String>>,
 }
 
 impl StringCategories {
@@ -772,10 +744,10 @@ impl From<StringCategories> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct NumericalFieldFormat {
-    decimal_places: u32,
-    offset: f64,
-    scale: f64,
-    value_type: NumericalFieldValueType,
+    pub decimal_places: u32,
+    pub offset: f64,
+    pub scale: f64,
+    pub value_type: NumericalFieldValueType,
 }
 
 impl NumericalFieldFormat {
@@ -825,12 +797,12 @@ impl From<NumericalFieldFormat> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct IntRange {
-    aggregation_protocol: AggregationFunction,
-    display_strings: Option<Vec<IntegerDisplayString>>,
-    enum_name: Option<String>,
-    field_format: Option<NumericalFieldFormat>,
-    max: i64,
-    min: i64,
+    pub aggregation_protocol: AggregationFunction,
+    pub display_strings: Option<Vec<IntegerDisplayString>>,
+    pub enum_name: Option<String>,
+    pub field_format: Option<NumericalFieldFormat>,
+    pub max: i64,
+    pub min: i64,
 }
 
 impl IntRange {
@@ -914,10 +886,10 @@ impl From<IntRange> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct FloatRange {
-    aggregation_protocol: AggregationFunction,
-    field_format: Option<NumericalFieldFormat>,
-    max: f64,
-    min: f64,
+    pub aggregation_protocol: AggregationFunction,
+    pub field_format: Option<NumericalFieldFormat>,
+    pub max: f64,
+    pub min: f64,
 }
 
 impl FloatRange {
@@ -971,9 +943,9 @@ impl From<FloatRange> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct DatetimeRange {
-    intervals: Option<Vec<TimeInterval>>,
-    max: i64,
-    min: i64,
+    pub intervals: Option<Vec<TimeInterval>>,
+    pub max: i64,
+    pub min: i64,
 }
 
 impl DatetimeRange {
@@ -1042,10 +1014,10 @@ impl From<DatetimeRange> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Dates {
-    max: i64,
-    min: i64,
-    unique_value_counts: Option<Vec<u32>>,
-    unique_values: Option<Vec<i64>>,
+    pub max: i64,
+    pub min: i64,
+    pub unique_value_counts: Option<Vec<u32>>,
+    pub unique_values: Option<Vec<i64>>,
 }
 
 impl Dates {
@@ -1128,7 +1100,7 @@ impl From<Dates> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct NestedStringCategories {
-    nesting_tree: Vec<NestedStringCategoryNode>,
+    pub nesting_tree: Vec<NestedStringCategoryNode>,
 }
 
 impl NestedStringCategories {
@@ -1233,7 +1205,7 @@ impl ComponentData {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct RawGeom {
-    geom: Vec<u8>,
+    pub geom: Vec<u8>,
 }
 
 impl RawGeom {
@@ -1346,7 +1318,7 @@ impl From<NoGeometry> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct DatacatalogGeometry {
-    column: String,
+    pub column: String,
 }
 
 impl DatacatalogGeometry {
@@ -1405,9 +1377,9 @@ impl From<DatacatalogGeometry> for Vec<u8> {
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct WorldGraphGeometry {
     /// Edges to follow to reach the nodes with geometry.
-    edge_path: Vec<EdgeTy>,
+    pub edge_path: Vec<EdgeTy>,
     /// Stream id of the starting node in the query path for the geometry
-    start_stream_id: Option<ObjectId>,
+    pub start_stream_id: Option<ObjectId>,
 }
 
 impl WorldGraphGeometry {
@@ -1513,7 +1485,7 @@ impl GeometrySource {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct HierarchyRelationshipData {
-    hierarchy: Option<Vec<HierarchicalRelationship>>,
+    pub hierarchy: Option<Vec<HierarchicalRelationship>>,
 }
 
 impl HierarchyRelationshipData {
@@ -1576,8 +1548,8 @@ impl From<HierarchyRelationshipData> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct CategoryRelationshipData {
-    associated_fields: Option<Vec<i32>>,
-    categories: Option<Vec<i32>>,
+    pub associated_fields: Option<Vec<i32>>,
+    pub categories: Option<Vec<i32>>,
 }
 
 impl CategoryRelationshipData {
@@ -1654,7 +1626,7 @@ impl From<CategoryRelationshipData> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct NestedCategoryRelationshipData {
-    categories: Option<Vec<NestedCategoryRelationshipNode>>,
+    pub categories: Option<Vec<NestedCategoryRelationshipNode>>,
 }
 
 impl NestedCategoryRelationshipData {
@@ -1717,7 +1689,7 @@ impl From<NestedCategoryRelationshipData> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct NestedHierarchyRelationshipData {
-    nodes: Option<Vec<NestedHierarchyRelationshipNode>>,
+    pub nodes: Option<Vec<NestedHierarchyRelationshipNode>>,
 }
 
 impl NestedHierarchyRelationshipData {
@@ -1821,11 +1793,11 @@ impl UlFieldRelationshipData {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ContactInfo {
-    address: Option<String>,
-    email: Option<String>,
-    name: Option<String>,
-    phone: Option<String>,
-    url: Option<String>,
+    pub address: Option<String>,
+    pub email: Option<String>,
+    pub name: Option<String>,
+    pub phone: Option<String>,
+    pub url: Option<String>,
 }
 
 impl ContactInfo {
@@ -1897,11 +1869,11 @@ pub struct DatasetSource {
     /// Date information about the data source, such as the year it was generated.
     /// This is a free-form text field that isn't interpreted in any means by the
     /// system.
-    date: Option<String>,
+    pub date: Option<String>,
     /// The entity that created the data (Manifold, Government of Canada, Wejo, City
-    source: Option<String>,
+    pub source: Option<String>,
     /// A URL to where the data set can be fetched. Ideally a direct download but
-    url: Option<String>,
+    pub url: Option<String>,
 }
 
 impl DatasetSource {
@@ -1958,10 +1930,10 @@ impl From<DatasetSource> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Document {
-    display_name: Option<String>,
-    filename: Option<String>,
-    mime_type: Option<String>,
-    url: Option<String>,
+    pub display_name: Option<String>,
+    pub filename: Option<String>,
+    pub mime_type: Option<String>,
+    pub url: Option<String>,
 }
 
 impl Document {
@@ -2024,7 +1996,7 @@ impl From<Document> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Documents {
-    documents: Option<Vec<Document>>,
+    pub documents: Option<Vec<Document>>,
 }
 
 impl Documents {
@@ -2087,13 +2059,13 @@ impl From<Documents> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct FloatAggregate {
-    count: u64,
-    histo: Option<Vec<FloatBucket>>,
-    max: f64,
-    mean: f64,
-    min: f64,
-    sum: f64,
-    variance: f64,
+    pub count: u64,
+    pub histo: Option<Vec<FloatBucket>>,
+    pub max: f64,
+    pub mean: f64,
+    pub min: f64,
+    pub sum: f64,
+    pub variance: f64,
 }
 
 impl FloatAggregate {
@@ -2169,8 +2141,8 @@ impl From<FloatAggregate> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct FloatBucket {
-    count: u64,
-    max: f64,
+    pub count: u64,
+    pub max: f64,
 }
 
 impl From<FloatBucket> for FbsFloatBucket {
@@ -2193,7 +2165,7 @@ impl From<&FbsFloatBucket> for FloatBucket {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct GeometryData {
-    data: GeometryDataUnion,
+    pub data: GeometryDataUnion,
 }
 
 impl GeometryData {
@@ -2242,8 +2214,8 @@ impl From<GeometryData> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct HierarchicalRelationship {
-    children: Option<Vec<i32>>,
-    parent: i32,
+    pub children: Option<Vec<i32>>,
+    pub parent: i32,
 }
 
 impl HierarchicalRelationship {
@@ -2304,13 +2276,13 @@ impl From<HierarchicalRelationship> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct IntAggregate {
-    count: u64,
-    histo: Option<Vec<UIntBucket>>,
-    max: i64,
-    mean: i64,
-    min: i64,
-    sum: i64,
-    variance: i64,
+    pub count: u64,
+    pub histo: Option<Vec<UIntBucket>>,
+    pub max: i64,
+    pub mean: i64,
+    pub min: i64,
+    pub sum: i64,
+    pub variance: i64,
 }
 
 impl IntAggregate {
@@ -2386,8 +2358,8 @@ impl From<IntAggregate> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct IntBucket {
-    count: u64,
-    max: i64,
+    pub count: u64,
+    pub max: i64,
 }
 
 impl From<IntBucket> for FbsIntBucket {
@@ -2410,8 +2382,8 @@ impl From<&FbsIntBucket> for IntBucket {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct IntegerDisplayString {
-    display_name: String,
-    value: i64,
+    pub display_name: String,
+    pub value: i64,
 }
 
 impl IntegerDisplayString {
@@ -2458,18 +2430,18 @@ impl From<IntegerDisplayString> for Vec<u8> {
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Metadata {
     /// is to be included in the boundary selection modal
-    area_selection: bool,
+    pub area_selection: bool,
     /// Organizational category for frontend. Defaults to DC_HIDDEN.
-    dataset_category: DatasetCategory,
-    description: Option<String>,
-    display_name: Option<String>,
+    pub dataset_category: DatasetCategory,
+    pub description: Option<String>,
+    pub display_name: Option<String>,
     /// do not use user's viewport bounding box when fetching this stream's geometry from worldgraph
-    do_not_filter_geometry_by_viewport: bool,
-    entity_ty: EntityTy,
+    pub do_not_filter_geometry_by_viewport: bool,
+    pub entity_ty: EntityTy,
     /// Field groupings e.g. age ranges, ethnicities or hierarchical codes like zoning and NAICS
-    field_relationships: Option<Vec<UlFieldRelationship>>,
-    fields: Option<Vec<UlField>>,
-    geometry_source: Option<GeometrySource>,
+    pub field_relationships: Option<Vec<UlFieldRelationship>>,
+    pub fields: Option<Vec<UlField>>,
+    pub geometry_source: Option<GeometrySource>,
     /// Many geospatial datasets whose rows correspond to map locations have a
     /// column that should be used as the human-friendly display name of the location.
     /// For example, for a stream containing stores, this field might be "store_name".
@@ -2477,12 +2449,12 @@ pub struct Metadata {
     /// should have the same value for the location_description_field.
     /// This attribute holds the index of the field in the dataset that should be
     /// used as the location description.
-    location_description_field: i32,
+    pub location_description_field: i32,
     /// An optional field that is meant to provide information to the user on
     /// where the data has come from
-    source: Option<DatasetSource>,
-    summary: Option<Vec<i32>>,
-    update_cadence: UpdateCadence,
+    pub source: Option<DatasetSource>,
+    pub summary: Option<Vec<i32>>,
+    pub update_cadence: UpdateCadence,
 }
 
 impl Metadata {
@@ -2643,8 +2615,8 @@ impl From<Metadata> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct NestedCategoryRelationshipNode {
-    child_columns: Option<Vec<i32>>,
-    column: i32,
+    pub child_columns: Option<Vec<i32>>,
+    pub column: i32,
 }
 
 impl NestedCategoryRelationshipNode {
@@ -2705,9 +2677,9 @@ impl From<NestedCategoryRelationshipNode> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct NestedHierarchyRelationshipNode {
-    child_columns: Option<Vec<i32>>,
-    child_nodes: Option<Vec<i32>>,
-    label: Option<String>,
+    pub child_columns: Option<Vec<i32>>,
+    pub child_nodes: Option<Vec<i32>>,
+    pub label: Option<String>,
 }
 
 impl NestedHierarchyRelationshipNode {
@@ -2790,8 +2762,8 @@ impl From<NestedHierarchyRelationshipNode> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct NestedStringCategoryNode {
-    child_values: Vec<String>,
-    value: Option<String>,
+    pub child_values: Vec<String>,
+    pub value: Option<String>,
 }
 
 impl NestedStringCategoryNode {
@@ -2849,8 +2821,8 @@ impl From<NestedStringCategoryNode> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct StringAggregate {
-    count: u64,
-    str: Option<String>,
+    pub count: u64,
+    pub str: Option<String>,
 }
 
 impl StringAggregate {
@@ -2898,8 +2870,8 @@ impl From<StringAggregate> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct TimeInterval {
-    max: i64,
-    min: i64,
+    pub max: i64,
+    pub min: i64,
 }
 
 impl TimeInterval {
@@ -2943,13 +2915,13 @@ impl From<TimeInterval> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct UIntAggregate {
-    count: u64,
-    histo: Option<Vec<UIntBucket>>,
-    max: u64,
-    mean: u64,
-    min: u64,
-    sum: u64,
-    variance: u64,
+    pub count: u64,
+    pub histo: Option<Vec<UIntBucket>>,
+    pub max: u64,
+    pub mean: u64,
+    pub min: u64,
+    pub sum: u64,
+    pub variance: u64,
 }
 
 impl UIntAggregate {
@@ -3025,8 +2997,8 @@ impl From<UIntAggregate> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct UIntBucket {
-    count: u64,
-    max: u64,
+    pub count: u64,
+    pub max: u64,
 }
 
 impl From<UIntBucket> for FbsUIntBucket {
@@ -3049,16 +3021,16 @@ impl From<&FbsUIntBucket> for UIntBucket {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct UlField {
-    breakdown_display_name: Option<String>,
-    component_data: Option<ComponentData>,
-    default: Option<ValueInstance>,
-    description: Option<String>,
-    display_name: Option<String>,
-    field_name: Option<String>,
-    field_type: UlFieldType,
-    flags: u32,
-    storage_type: Option<Type>,
-    unit: FieldUnit,
+    pub breakdown_display_name: Option<String>,
+    pub component_data: Option<ComponentData>,
+    pub default: Option<ValueInstance>,
+    pub description: Option<String>,
+    pub display_name: Option<String>,
+    pub field_name: Option<String>,
+    pub field_type: UlFieldType,
+    pub flags: u32,
+    pub storage_type: Option<Type>,
+    pub unit: FieldUnit,
 }
 
 impl UlField {
@@ -3195,8 +3167,8 @@ impl From<UlField> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct UlFieldRelationship {
-    relationship_data: Option<UlFieldRelationshipData>,
-    relationship_display_name: Option<String>,
+    pub relationship_data: Option<UlFieldRelationshipData>,
+    pub relationship_display_name: Option<String>,
 }
 
 impl UlFieldRelationship {

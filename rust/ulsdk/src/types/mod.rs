@@ -53,6 +53,4 @@ pub mod model;
 #[rustfmt::skip]
 pub mod Schema;
 #[rustfmt::skip]
-pub mod reflection;
-#[rustfmt::skip]
 pub mod view;

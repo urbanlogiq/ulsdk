@@ -970,7 +970,7 @@ impl From<FbsNodeTy> for NodeTy {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Point {
-    point_geo: Vec<f32>,
+    pub point_geo: Vec<f32>,
 }
 
 impl Point {
@@ -1017,7 +1017,7 @@ impl From<Point> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Line {
-    line_geo: Vec<Point>,
+    pub line_geo: Vec<Point>,
 }
 
 impl Line {
@@ -1069,7 +1069,7 @@ impl From<Line> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct MultiLine {
-    multiline_geo: Vec<Line>,
+    pub multiline_geo: Vec<Line>,
 }
 
 impl MultiLine {
@@ -1123,7 +1123,7 @@ impl From<MultiLine> for Vec<u8> {
 /// The first array is exterior coords, following are any interior holes
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Polygon {
-    polygon_geo: Vec<Line>,
+    pub polygon_geo: Vec<Line>,
 }
 
 impl Polygon {
@@ -1175,7 +1175,7 @@ impl From<Polygon> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct MultiPolygon {
-    multipolygon_geo: Vec<Polygon>,
+    pub multipolygon_geo: Vec<Polygon>,
 }
 
 impl MultiPolygon {
@@ -1274,9 +1274,9 @@ impl Geometry {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct GraphEdge {
-    _from: i64,
-    _kind: EdgeTy,
-    _to: i64,
+    pub _from: i64,
+    pub _kind: EdgeTy,
+    pub _to: i64,
 }
 
 impl GraphEdge {
@@ -1324,21 +1324,21 @@ impl From<GraphEdge> for Vec<u8> {
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct GraphNode {
     /// A human-centric description of this graph node.
-    _description: Option<String>,
+    pub _description: Option<String>,
     /// Entity type (ie: traffic loop, road, power line, building, business, demographic data, collision,  ...)
-    _entity_type: EntityTy,
+    pub _entity_type: EntityTy,
     /// polygon / line / point / null
-    _geom: Option<Geometry>,
+    pub _geom: Option<Geometry>,
     /// lat/lng point in space, or centroid if not a point
-    _location: Option<Point>,
+    pub _location: Option<Point>,
     /// Record id in the data source.
-    _node_id: Option<GenericId>,
+    pub _node_id: Option<GenericId>,
     /// Node type, such as emitter vs. entity
-    _node_type: NodeTy,
+    pub _node_type: NodeTy,
     /// ID of the associated data source
-    _stream: Option<ObjectId>,
+    pub _stream: Option<ObjectId>,
     /// Unique database-specific identifier
-    _uid: u64,
+    pub _uid: u64,
 }
 
 impl GraphNode {

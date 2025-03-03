@@ -21,18 +21,18 @@ class AdUser:
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
-        o["displayName"] = self.display_name
+        o["display_name"] = self.display_name
         o["id"] = self.id_
-        o["userPrincipalName"] = self.user_principal_name
+        o["user_principal_name"] = self.user_principal_name
         other_mails_list = []
         for item in self.other_mails:
             other_mails_var = item
             other_mails_list.append(other_mails_var)
-        o["otherMails"] = other_mails_list
+        o["other_mails"] = other_mails_list
         o["department"] = None
         if self.department is not None:
             o["department"] = self.department
-        o["createdDateTime"] = self.created_date_time
+        o["created_date_time"] = self.created_date_time
         return o
 
     @classmethod
@@ -106,7 +106,7 @@ class AdGroup:
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
         o["id"] = self.id_
-        o["displayName"] = self.display_name
+        o["display_name"] = self.display_name
         o["description"] = None
         if self.description is not None:
             o["description"] = self.description
@@ -167,8 +167,8 @@ class Bootstrap:
         for item in self.v_2groups:
             v_2groups_var = item.to_dict()
             v_2groups_list.append(v_2groups_var)
-        o["v2groups"] = v_2groups_list
-        o["clientSecrets"] = self.client_secrets
+        o["v_2groups"] = v_2groups_list
+        o["client_secrets"] = self.client_secrets
         return o
 
     @classmethod

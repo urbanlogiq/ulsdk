@@ -3494,6 +3494,7 @@ impl<'a> flatbuffers::Follow<'a> for ValueInstance<'a> {
 impl<'a> ValueInstance<'a> {
   pub const VT_V_TYPE: flatbuffers::VOffsetT = 4;
   pub const VT_V: flatbuffers::VOffsetT = 6;
+  pub const VT_NAME: flatbuffers::VOffsetT = 8;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -3502,9 +3503,10 @@ impl<'a> ValueInstance<'a> {
   #[allow(unused_mut)]
   pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
     _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
-    args: &'args ValueInstanceArgs
+    args: &'args ValueInstanceArgs<'args>
   ) -> flatbuffers::WIPOffset<ValueInstance<'bldr>> {
     let mut builder = ValueInstanceBuilder::new(_fbb);
+    if let Some(x) = args.name { builder.add_name(x); }
     if let Some(x) = args.v { builder.add_v(x); }
     builder.add_v_type(args.v_type);
     builder.finish()
@@ -3524,6 +3526,13 @@ impl<'a> ValueInstance<'a> {
     // Created from valid Table for this object
     // which contains a valid value in this slot
     unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Table<'a>>>(ValueInstance::VT_V, None).unwrap()}
+  }
+  #[inline]
+  pub fn name(&self) -> Option<&'a str> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<&str>>(ValueInstance::VT_NAME, None)}
   }
   #[inline]
   #[allow(non_snake_case)]
@@ -3929,20 +3938,23 @@ impl flatbuffers::Verifiable for ValueInstance<'_> {
           _ => Ok(()),
         }
      })?
+     .visit_field::<flatbuffers::ForwardsUOffset<&str>>("name", Self::VT_NAME, false)?
      .finish();
     Ok(())
   }
 }
-pub struct ValueInstanceArgs {
+pub struct ValueInstanceArgs<'a> {
     pub v_type: Value,
     pub v: Option<flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>>,
+    pub name: Option<flatbuffers::WIPOffset<&'a str>>,
 }
-impl<'a> Default for ValueInstanceArgs {
+impl<'a> Default for ValueInstanceArgs<'a> {
   #[inline]
   fn default() -> Self {
     ValueInstanceArgs {
       v_type: Value::NONE,
       v: None, // required field
+      name: None,
     }
   }
 }
@@ -3952,7 +3964,7 @@ impl Serialize for ValueInstance<'_> {
   where
     S: Serializer,
   {
-    let mut s = serializer.serialize_struct("ValueInstance", 2)?;
+    let mut s = serializer.serialize_struct("ValueInstance", 3)?;
       s.serialize_field("v_type", &self.v_type())?;
       match self.v_type() {
         Value::NONE => (),
@@ -4088,6 +4100,11 @@ impl Serialize for ValueInstance<'_> {
           }
         _ => unimplemented!(),
       }
+      if let Some(f) = self.name() {
+        s.serialize_field("name", &f)?;
+      } else {
+        s.skip_field("name")?;
+      }
     s.end()
   }
 }
@@ -4104,6 +4121,10 @@ impl<'a: 'b, 'b> ValueInstanceBuilder<'a, 'b> {
   #[inline]
   pub fn add_v(&mut self, v: flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>) {
     self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(ValueInstance::VT_V, v);
+  }
+  #[inline]
+  pub fn add_name(&mut self, name: flatbuffers::WIPOffset<&'b  str>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(ValueInstance::VT_NAME, name);
   }
   #[inline]
   pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ValueInstanceBuilder<'a, 'b> {
@@ -4313,6 +4334,7 @@ impl core::fmt::Debug for ValueInstance<'_> {
           ds.field("v", &x)
         },
       };
+      ds.field("name", &self.name());
       ds.finish()
   }
 }

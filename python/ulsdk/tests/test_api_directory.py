@@ -58,12 +58,10 @@ def test_get_current_user():
         )
 
 def test_create_user():
-    p0 = CreateUserRequest.make_default()
 
     if False:
         create_user(
             ctx,
-            p0,
         )
 
 def test_update_current_user():

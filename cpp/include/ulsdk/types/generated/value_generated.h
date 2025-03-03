@@ -1762,7 +1762,8 @@ struct ValueInstance FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_V_TYPE = 4,
-    VT_V = 6
+    VT_V = 6,
+    VT_NAME = 8
   };
   Value v_type() const {
     return static_cast<Value>(GetField<uint8_t>(VT_V_TYPE, 0));
@@ -1849,11 +1850,16 @@ struct ValueInstance FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const VPlaceholder *v_as_VPlaceholder() const {
     return v_type() == Value::VPlaceholder ? static_cast<const VPlaceholder *>(v()) : nullptr;
   }
+  const ::flatbuffers::String *name() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_NAME);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_V_TYPE, 1) &&
            VerifyOffsetRequired(verifier, VT_V) &&
            VerifyValue(verifier, v(), v_type()) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
            verifier.EndTable();
   }
 };
@@ -1972,6 +1978,9 @@ struct ValueInstanceBuilder {
   void add_v(::flatbuffers::Offset<void> v) {
     fbb_.AddOffset(ValueInstance::VT_V, v);
   }
+  void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
+    fbb_.AddOffset(ValueInstance::VT_NAME, name);
+  }
   explicit ValueInstanceBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1987,8 +1996,10 @@ struct ValueInstanceBuilder {
 inline ::flatbuffers::Offset<ValueInstance> CreateValueInstance(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     Value v_type = Value::NONE,
-    ::flatbuffers::Offset<void> v = 0) {
+    ::flatbuffers::Offset<void> v = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> name = 0) {
   ValueInstanceBuilder builder_(_fbb);
+  builder_.add_name(name);
   builder_.add_v(v);
   builder_.add_v_type(v_type);
   return builder_.Finish();
@@ -1998,6 +2009,19 @@ struct ValueInstance::Traits {
   using type = ValueInstance;
   static auto constexpr Create = CreateValueInstance;
 };
+
+inline ::flatbuffers::Offset<ValueInstance> CreateValueInstanceDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    Value v_type = Value::NONE,
+    ::flatbuffers::Offset<void> v = 0,
+    const char *name = nullptr) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  return CreateValueInstance(
+      _fbb,
+      v_type,
+      v,
+      name__);
+}
 
 inline bool VerifyValue(::flatbuffers::Verifier &verifier, const void *obj, Value type) {
   switch (type) {

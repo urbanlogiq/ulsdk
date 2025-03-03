@@ -43,8 +43,15 @@ class ValueInstance(object):
             return obj
         return None
 
+    # ValueInstance
+    def Name(self) -> Optional[bytes]:
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        if o != 0:
+            return self._tab.String(o + self._tab.Pos)
+        return None
+
 def ValueInstanceStart(builder: flatbuffers.Builder):
-    builder.StartObject(2)
+    builder.StartObject(3)
 
 def Start(builder: flatbuffers.Builder):
     ValueInstanceStart(builder)
@@ -60,6 +67,12 @@ def ValueInstanceAddV(builder: flatbuffers.Builder, v: int):
 
 def AddV(builder: flatbuffers.Builder, v: int):
     ValueInstanceAddV(builder, v)
+
+def ValueInstanceAddName(builder: flatbuffers.Builder, name: int):
+    builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
+
+def AddName(builder: flatbuffers.Builder, name: int):
+    ValueInstanceAddName(builder, name)
 
 def ValueInstanceEnd(builder: flatbuffers.Builder) -> int:
     return builder.EndObject()

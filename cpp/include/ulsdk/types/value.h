@@ -302,6 +302,7 @@ struct VPlaceholder {
 };
 
 struct ValueInstance {
+    std::optional<std::string> name_;
     Value v_;
 
     ValueInstance();

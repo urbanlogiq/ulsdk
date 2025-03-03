@@ -30,7 +30,7 @@ pub const ENUM_MIN_FN: i16 = 0;
 pub const ENUM_MAX_FN: i16 = 32766;
 #[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_FN: [Fn; 79] = [
+pub const ENUM_VALUES_FN: [Fn; 82] = [
   Fn::None,
   Fn::True,
   Fn::False,
@@ -107,6 +107,9 @@ pub const ENUM_VALUES_FN: [Fn; 79] = [
   Fn::ArraySort,
   Fn::ArrowCast,
   Fn::RaiseCaseNotHandled,
+  Fn::Round,
+  Fn::Floor,
+  Fn::Ceil,
   Fn::UlTimezone,
   Fn::UlArrayContains,
   Fn::UlArrayAny,
@@ -193,6 +196,9 @@ impl Fn {
   pub const ArraySort: Self = Self(73);
   pub const ArrowCast: Self = Self(74);
   pub const RaiseCaseNotHandled: Self = Self(75);
+  pub const Round: Self = Self(76);
+  pub const Floor: Self = Self(77);
+  pub const Ceil: Self = Self(78);
   pub const UlTimezone: Self = Self(32764);
   pub const UlArrayContains: Self = Self(32765);
   pub const UlArrayAny: Self = Self(32766);
@@ -276,6 +282,9 @@ impl Fn {
     Self::ArraySort,
     Self::ArrowCast,
     Self::RaiseCaseNotHandled,
+    Self::Round,
+    Self::Floor,
+    Self::Ceil,
     Self::UlTimezone,
     Self::UlArrayContains,
     Self::UlArrayAny,
@@ -359,6 +368,9 @@ impl Fn {
       Self::ArraySort => Some("ArraySort"),
       Self::ArrowCast => Some("ArrowCast"),
       Self::RaiseCaseNotHandled => Some("RaiseCaseNotHandled"),
+      Self::Round => Some("Round"),
+      Self::Floor => Some("Floor"),
+      Self::Ceil => Some("Ceil"),
       Self::UlTimezone => Some("UlTimezone"),
       Self::UlArrayContains => Some("UlArrayContains"),
       Self::UlArrayAny => Some("UlArrayAny"),

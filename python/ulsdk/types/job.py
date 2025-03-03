@@ -71,20 +71,6 @@ from .id import (
     ObjectNamespace,
     StreamId,
 )
-from .reflection import (
-    ReflectionAdvancedFeatures,
-    ReflectionBaseType,
-    ReflectionEnum,
-    ReflectionEnumVal,
-    ReflectionField,
-    ReflectionKeyValue,
-    ReflectionObject,
-    ReflectionRPCCall,
-    ReflectionSchema,
-    ReflectionSchemaFile,
-    ReflectionService,
-    ReflectionType,
-)
 from .value import (
     Point2D,
     Tri2D,
@@ -198,16 +184,6 @@ from .generated.VU8 import VU8 as FbsVU8
 from .generated.VUnit import VUnit as FbsVUnit
 from .generated.VUsize import VUsize as FbsVUsize
 from .generated.ValueInstance import ValueInstance as FbsValueInstance
-from .generated.reflection.Enum import Enum as FbsEnum
-from .generated.reflection.EnumVal import EnumVal as FbsEnumVal
-from .generated.reflection.Field import Field as FbsField
-from .generated.reflection.KeyValue import KeyValue as FbsKeyValue
-from .generated.reflection.Object import Object as FbsObject
-from .generated.reflection.RPCCall import RPCCall as FbsRPCCall
-from .generated.reflection.Schema import Schema as FbsSchema
-from .generated.reflection.SchemaFile import SchemaFile as FbsSchemaFile
-from .generated.reflection.Service import Service as FbsService
-from .generated.reflection.Type import Type as FbsType
 from .generated.TaskParameterValue import TaskParameterValue as FbsTaskParameterValue
 from .generated.Type import Type as FbsType
 from .generated.Value import Value as FbsValue
@@ -234,14 +210,14 @@ class TaskRunFlags(Enum):
 
 @dataclass
 class EmbeddedTable:
-    v: "bytes"
+    v: "List[int]"
 
     @classmethod
     def from_fbs(cls, o: FbsEmbeddedTable) -> Self:
-        if o.VIsNone():
-            v = b""
-        else:
-            v = bytes(o.VAsNumpy())
+        v = list()
+        if not o.VIsNone():
+            for i in range(o.VLength()):
+                v.append(o.V(i))
         return cls(v)
 
     @classmethod
@@ -274,7 +250,7 @@ class EmbeddedTable:
 
     @classmethod
     def make_default(cls) -> Self:
-        v = b""
+        v = []
         return cls(v)
 
     def __eq__(self, other) -> bool:
@@ -448,7 +424,7 @@ class DeprecatedTaskParameter:
 
     obj: Optional["ObjectId"]
 
-    value: Optional["bytes"]
+    value: Optional["List[int]"]
 
     @classmethod
     def from_fbs(cls, o: FbsDeprecatedTaskParameter) -> Self:
@@ -460,10 +436,10 @@ class DeprecatedTaskParameter:
         obj_obj = o.Obj()
         if obj_obj is not None:
             obj = ObjectId.from_fbs(obj_obj)
-        if o.ValueIsNone():
-            value = b""
-        else:
-            value = bytes(o.ValueAsNumpy())
+        value = list()
+        if not o.ValueIsNone():
+            for i in range(o.ValueLength()):
+                value.append(o.Value(i))
         return cls(flags, key, obj, value)
 
     @classmethod
@@ -513,7 +489,7 @@ class DeprecatedTaskParameter:
         flags = 0
         key = ""
         obj = ObjectId.make_default()
-        value = b""
+        value = []
         return cls(flags, key, obj, value)
 
     def __eq__(self, other) -> bool:

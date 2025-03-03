@@ -394,8 +394,8 @@ impl From<Null> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Int {
-    bitWidth: i32,
-    is_signed: bool,
+    pub bitWidth: i32,
+    pub is_signed: bool,
 }
 
 impl Int {
@@ -439,7 +439,7 @@ impl From<Int> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct FloatingPoint {
-    precision: Precision,
+    pub precision: Precision,
 }
 
 impl FloatingPoint {
@@ -599,11 +599,11 @@ impl From<Bool> for Vec<u8> {
 pub struct Decimal {
     /// Number of bits per value. The only accepted widths are 128 and 256.
     /// We use bitWidth for consistency with Int::bitWidth.
-    bitWidth: i32,
+    pub bitWidth: i32,
     /// Total number of decimal digits
-    precision: i32,
+    pub precision: i32,
     /// Number of digits after the decimal point "."
-    scale: i32,
+    pub scale: i32,
 }
 
 impl Decimal {
@@ -656,7 +656,7 @@ impl From<Decimal> for Vec<u8> {
 /// * Days (32 bits) since the UNIX epoch
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Date {
-    unit: DateUnit,
+    pub unit: DateUnit,
 }
 
 impl Date {
@@ -711,8 +711,8 @@ impl From<Date> for Vec<u8> {
 /// into Arrow (for example by replacing the value 86400 with 86399).
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Time {
-    bitWidth: i32,
-    unit: TimeUnit,
+    pub bitWidth: i32,
+    pub unit: TimeUnit,
 }
 
 impl Time {
@@ -871,8 +871,8 @@ pub struct Timestamp {
     /// 
     /// Whether a timezone string is present indicates different semantics about
     /// the data (see above).
-    timezone: Option<String>,
-    unit: TimeUnit,
+    pub timezone: Option<String>,
+    pub unit: TimeUnit,
 }
 
 impl Timestamp {
@@ -920,7 +920,7 @@ impl From<Timestamp> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Interval {
-    unit: IntervalUnit,
+    pub unit: IntervalUnit,
 }
 
 impl Interval {
@@ -1042,8 +1042,8 @@ impl From<Struct_> for Vec<u8> {
 /// for each child `typeIds[offset]` is the id used in the type vector
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Union {
-    mode: UnionMode,
-    typeIds: Option<Vec<i32>>,
+    pub mode: UnionMode,
+    pub typeIds: Option<Vec<i32>>,
 }
 
 impl Union {
@@ -1105,7 +1105,7 @@ impl From<Union> for Vec<u8> {
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct FixedSizeBinary {
     /// Number of bytes per value
-    byteWidth: i32,
+    pub byteWidth: i32,
 }
 
 impl FixedSizeBinary {
@@ -1147,7 +1147,7 @@ impl From<FixedSizeBinary> for Vec<u8> {
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct FixedSizeList {
     /// Number of list items per value
-    listSize: i32,
+    pub listSize: i32,
 }
 
 impl FixedSizeList {
@@ -1214,7 +1214,7 @@ impl From<FixedSizeList> for Vec<u8> {
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Map {
     /// Set to true if the keys within each value are sorted
-    keysSorted: bool,
+    pub keysSorted: bool,
 }
 
 impl Map {
@@ -1255,7 +1255,7 @@ impl From<Map> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Duration {
-    unit: TimeUnit,
+    pub unit: TimeUnit,
 }
 
 impl Duration {
@@ -1566,10 +1566,10 @@ pub struct Buffer {
     /// messages using the encapsulated IPC message, padding bytes may be written
     /// after a buffer, but such padding bytes do not need to be accounted for in
     /// the size here.
-    length: i64,
+    pub length: i64,
     /// The relative offset into the shared memory page where the bytes for this
     /// buffer starts
-    offset: i64,
+    pub offset: i64,
 }
 
 impl From<Buffer> for FbsBuffer {
@@ -1592,22 +1592,22 @@ impl From<&FbsBuffer> for Buffer {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct DictionaryEncoding {
-    dictionaryKind: DictionaryKind,
+    pub dictionaryKind: DictionaryKind,
     /// The known dictionary id in the application where this data is used. In
     /// the file or streaming formats, the dictionary ids are found in the
     /// DictionaryBatch messages
-    id: i64,
+    pub id: i64,
     /// The dictionary indices are constrained to be non-negative integers. If
     /// this field is null, the indices must be signed int32. To maximize
     /// cross-language compatibility and performance, implementations are
     /// recommended to prefer signed integer types over unsigned integer types
     /// and to avoid uint64 indices unless they are required by an application.
-    indexType: Option<Int>,
+    pub indexType: Option<Int>,
     /// By default, dictionaries are not ordered, or the order does not have
     /// semantic meaning. In some statistical, applications, dictionary-encoding
     /// is used to represent ordered categorical data, and we provide a way to
     /// preserve that metadata here
-    isOrdered: bool,
+    pub isOrdered: bool,
 }
 
 impl DictionaryEncoding {
@@ -1666,17 +1666,17 @@ impl From<DictionaryEncoding> for Vec<u8> {
 pub struct Field {
     /// children apply only to nested data types like Struct, List and Union. For
     /// primitive types children will have length 0.
-    children: Option<Vec<Field>>,
+    pub children: Option<Vec<Field>>,
     /// User-defined metadata
-    custom_metadata: Option<Vec<KeyValue>>,
+    pub custom_metadata: Option<Vec<KeyValue>>,
     /// Present only if the field is dictionary encoded.
-    dictionary: Option<DictionaryEncoding>,
+    pub dictionary: Option<DictionaryEncoding>,
     /// Name is not required, in i.e. a List
-    name: Option<String>,
+    pub name: Option<String>,
     /// Whether or not this field can contain nulls. Should be true in general.
-    nullable: bool,
+    pub nullable: bool,
     /// This is the type of the decoded value if the field is dictionary encoded.
-    type_: Option<Type>,
+    pub type_: Option<Type>,
 }
 
 impl Field {
@@ -1818,8 +1818,8 @@ impl From<Field> for Vec<u8> {
 /// key namespacing is the responsibility of the user
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct KeyValue {
-    key: Option<String>,
-    value: Option<String>,
+    pub key: Option<String>,
+    pub value: Option<String>,
 }
 
 impl KeyValue {
@@ -1872,14 +1872,14 @@ impl From<KeyValue> for Vec<u8> {
 /// A Schema describes the columns in a row batch
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Schema {
-    custom_metadata: Option<Vec<KeyValue>>,
+    pub custom_metadata: Option<Vec<KeyValue>>,
     /// endianness of the buffer
     /// it is Little Endian by default
     /// if endianness doesn't match the underlying system then the vectors need to be converted
-    endianness: Endianness,
+    pub endianness: Endianness,
     /// Features used in the stream/file.
-    features: Option<Vec<Feature>>,
-    fields: Option<Vec<Field>>,
+    pub features: Option<Vec<Feature>>,
+    pub fields: Option<Vec<Field>>,
 }
 
 impl Schema {

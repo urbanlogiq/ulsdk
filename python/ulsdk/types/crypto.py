@@ -17,14 +17,14 @@ from .generated.Digest import Digest as FbsDigest
 
 @dataclass
 class Sha256:
-    b: "bytes"
+    b: "List[int]"
 
     @classmethod
     def from_fbs(cls, o: FbsSha256) -> Self:
-        if o.BIsNone():
-            b = b""
-        else:
-            b = bytes(o.BAsNumpy())
+        b = list()
+        if not o.BIsNone():
+            for i in range(o.BLength()):
+                b.append(o.B(i))
         return cls(b)
 
     @classmethod
@@ -57,7 +57,7 @@ class Sha256:
 
     @classmethod
     def make_default(cls) -> Self:
-        b = b""
+        b = []
         return cls(b)
 
     def __eq__(self, other) -> bool:
@@ -107,7 +107,7 @@ class CryptHeader:
     # An ID for the key used to encrypt this particular encrypted object.
     kid: "str"
 
-    nonce: "bytes"
+    nonce: "List[int]"
 
     plaintext_len: "int"
 
@@ -116,10 +116,10 @@ class CryptHeader:
         kid_str = o.Kid()
         assert kid_str is not None
         kid = kid_str.decode('utf-8')
-        if o.NonceIsNone():
-            nonce = b""
-        else:
-            nonce = bytes(o.NonceAsNumpy())
+        nonce = list()
+        if not o.NonceIsNone():
+            for i in range(o.NonceLength()):
+                nonce.append(o.Nonce(i))
         plaintext_len = o.PlaintextLen()
         return cls(kid, nonce, plaintext_len)
 
@@ -159,7 +159,7 @@ class CryptHeader:
     @classmethod
     def make_default(cls) -> Self:
         kid = ""
-        nonce = b""
+        nonce = []
         plaintext_len = 0
         return cls(kid, nonce, plaintext_len)
 
@@ -178,7 +178,7 @@ class CryptHeader:
 class EncryptedObject:
     header: "CryptHeader"
 
-    obj: "bytes"
+    obj: "List[int]"
 
     @classmethod
     def from_fbs(cls, o: FbsEncryptedObject) -> Self:
@@ -187,10 +187,10 @@ class EncryptedObject:
             header = CryptHeader.from_fbs(header_obj)
         else:
             raise ValueError("Header is required")
-        if o.ObjIsNone():
-            obj = b""
-        else:
-            obj = bytes(o.ObjAsNumpy())
+        obj = list()
+        if not o.ObjIsNone():
+            for i in range(o.ObjLength()):
+                obj.append(o.Obj(i))
         return cls(header, obj)
 
     @classmethod
@@ -227,7 +227,7 @@ class EncryptedObject:
     @classmethod
     def make_default(cls) -> Self:
         header = CryptHeader.make_default()
-        obj = b""
+        obj = []
         return cls(header, obj)
 
     def __eq__(self, other) -> bool:
@@ -244,17 +244,17 @@ class EncryptedObject:
 class Signature:
     kid: "str"
 
-    sig: "bytes"
+    sig: "List[int]"
 
     @classmethod
     def from_fbs(cls, o: FbsSignature) -> Self:
         kid_str = o.Kid()
         assert kid_str is not None
         kid = kid_str.decode('utf-8')
-        if o.SigIsNone():
-            sig = b""
-        else:
-            sig = bytes(o.SigAsNumpy())
+        sig = list()
+        if not o.SigIsNone():
+            for i in range(o.SigLength()):
+                sig.append(o.Sig(i))
         return cls(kid, sig)
 
     @classmethod
@@ -291,7 +291,7 @@ class Signature:
     @classmethod
     def make_default(cls) -> Self:
         kid = ""
-        sig = b""
+        sig = []
         return cls(kid, sig)
 
     def __eq__(self, other) -> bool:

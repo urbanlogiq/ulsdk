@@ -277,6 +277,16 @@ test_value_index() {
 TypeTest test_value_index_obj(test_value_index, "ValueIndex");
 
 bool
+test_value_name() {
+    ::ul::types::ValueName t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::ValueName deserialized = ::ul::types::ValueName(bytes);
+    return true;
+}
+
+TypeTest test_value_name_obj(test_value_name, "ValueName");
+
+bool
 test_vector() {
     ::ul::types::Vector t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);

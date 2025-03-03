@@ -194,24 +194,11 @@ from .query import (
     UnsetArgument,
     UpdateQueryElement,
     ValueIndex,
+    ValueName,
     Vector,
     When,
     Window,
     WorklogPartition,
-)
-from .reflection import (
-    ReflectionAdvancedFeatures,
-    ReflectionBaseType,
-    ReflectionEnum,
-    ReflectionEnumVal,
-    ReflectionField,
-    ReflectionKeyValue,
-    ReflectionObject,
-    ReflectionRPCCall,
-    ReflectionSchema,
-    ReflectionSchemaFile,
-    ReflectionService,
-    ReflectionType,
 )
 from .stream import (
     AxisType,
@@ -435,22 +422,13 @@ from .generated.VUnit import VUnit as FbsVUnit
 from .generated.VUsize import VUsize as FbsVUsize
 from .generated.ValueIndex import ValueIndex as FbsValueIndex
 from .generated.ValueInstance import ValueInstance as FbsValueInstance
+from .generated.ValueName import ValueName as FbsValueName
 from .generated.Vector import Vector as FbsVector
 from .generated.When import When as FbsWhen
 from .generated.Window import Window as FbsWindow
 from .generated.WorkLog import WorkLog as FbsWorkLog
 from .generated.WorklogParameter import WorklogParameter as FbsWorklogParameter
 from .generated.WorklogPartition import WorklogPartition as FbsWorklogPartition
-from .generated.reflection.Enum import Enum as FbsEnum
-from .generated.reflection.EnumVal import EnumVal as FbsEnumVal
-from .generated.reflection.Field import Field as FbsField
-from .generated.reflection.KeyValue import KeyValue as FbsKeyValue
-from .generated.reflection.Object import Object as FbsObject
-from .generated.reflection.RPCCall import RPCCall as FbsRPCCall
-from .generated.reflection.Schema import Schema as FbsSchema
-from .generated.reflection.SchemaFile import SchemaFile as FbsSchemaFile
-from .generated.reflection.Service import Service as FbsService
-from .generated.reflection.Type import Type as FbsType
 from .generated.ChangeOp import ChangeOp as FbsChangeOp
 from .generated.Digest import Digest as FbsDigest
 from .generated.Entry import Entry as FbsEntry
@@ -461,6 +439,7 @@ from .generated.Op import Op as FbsOp
 from .generated.ParameterValue import ParameterValue as FbsParameterValue
 from .generated.QueryElementUnion import QueryElementUnion as FbsQueryElementUnion
 from .generated.QueryPathElementUnion import QueryPathElementUnion as FbsQueryPathElementUnion
+from .generated.TableFrom import TableFrom as FbsTableFrom
 from .generated.TablePartition import TablePartition as FbsTablePartition
 from .generated.TableSourceUnion import TableSourceUnion as FbsTableSourceUnion
 from .generated.TaskParameterValue import TaskParameterValue as FbsTaskParameterValue
@@ -932,6 +911,48 @@ class Op:
         return self.value == other.value
 
 @dataclass
+class TableFrom:
+    value: Union[
+        "ObjectId",
+        "Schema",
+    ]
+
+    def serialize_to(self, builder: Builder) -> Tuple[int, int]:
+        from .generated.TableFrom import TableFrom
+        offset = self.value.serialize_to(builder)
+        if isinstance(self.value, ObjectId):
+            return (offset, TableFrom().ObjectId)
+        elif isinstance(self.value, Schema):
+            return (offset, TableFrom().Schema)
+        raise ValueError("Invalid union type")
+
+    @classmethod
+    def from_fbs(cls, o: Optional[Table], ty: int) -> Self:
+        assert o is not None
+        source = o.Bytes
+        pos = o.Pos
+        TableFrom_ty_instance = FbsTableFrom()
+        if ty == TableFrom_ty_instance.ObjectId:
+            val = FbsObjectId();
+            val.Init(source, pos)
+            return cls(ObjectId.from_fbs(val))
+        elif ty == TableFrom_ty_instance.Schema:
+            val = FbsSchema();
+            val.Init(source, pos)
+            return cls(Schema.from_fbs(val))
+        else:
+            raise ValueError("Invalid union type")
+
+    @classmethod
+    def make_default(cls) -> Self:
+        return cls(ObjectId.make_default())
+
+    def __eq__(self, other) -> bool:
+        if type(self.value) is not type(other.value):
+            return False
+        return self.value == other.value
+
+@dataclass
 class ChangeOpEntry:
     op: "ChangeOp"
 
@@ -1302,11 +1323,21 @@ class History:
 
 @dataclass
 class NewTable:
-    """ Body parameter for POST datacatalog/table/<objectId>
+    """ Body parameter for POST datacatalog/table
     """
+
+    # The base to use for the table. If an object ID is provided, this will
+    # take the schema from the provided stream or metadata object. If a
+    # schema is provided, the table will be created, empty, from that.           
+    from_: Optional["TableFrom"]
+
+    # If true, data will be copied into the new table from the source ID
+    # provided.
+    migrate: "bool"
 
     name: "str"
 
+    # Parent drive directory in which the table is to be created.
     parent: Optional["ObjectId"]
 
     # If specified, creates a new table using this as the object ID.
@@ -1314,6 +1345,12 @@ class NewTable:
 
     @classmethod
     def from_fbs(cls, o: FbsNewTable) -> Self:
+        from_ = None
+        from__val = o.From_()
+        if from__val is not None:
+            from__ty = o.FromType()
+            from_ = TableFrom.from_fbs(from__val, from__ty)
+        migrate = o.Migrate()
         name_str = o.Name()
         assert name_str is not None
         name = name_str.decode('utf-8')
@@ -1325,7 +1362,7 @@ class NewTable:
         target_obj = o.Target()
         if target_obj is not None:
             target = ObjectId.from_fbs(target_obj)
-        return cls(name, parent, target)
+        return cls(from_, migrate, name, parent, target)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -1336,11 +1373,17 @@ class NewTable:
     def serialize_to(self, builder: Builder) -> int:
         from .generated.NewTable import (
             Start,
+            AddFrom_,
+            AddFromType,
+            AddMigrate,
             AddName,
             AddParent,
             AddTarget,
             End,
         )
+        from__offset, from__ty = (None, None)
+        if self.from_ is not None:
+            from__offset, from__ty = self.from_.serialize_to(builder)
         name_offset = builder.CreateString(self.name)
         parent_offset = None
         if self.parent is not None:
@@ -1350,6 +1393,10 @@ class NewTable:
             target_offset = self.target.serialize_to(builder)
 
         Start(builder)
+        if from__offset is not None and from__ty is not None:
+            AddFrom_(builder, from__offset)
+            AddFromType(builder, from__ty)
+        AddMigrate(builder, self.migrate)
         AddName(builder, name_offset)
         if parent_offset is not None:
             AddParent(builder, parent_offset)
@@ -1365,13 +1412,17 @@ class NewTable:
 
     @classmethod
     def make_default(cls) -> Self:
+        from_ = TableFrom.make_default()
+        migrate = False
         name = ""
         parent = ObjectId.make_default()
         target = ObjectId.make_default()
-        return cls(name, parent, target)
+        return cls(from_, migrate, name, parent, target)
 
     def __eq__(self, other) -> bool:
         eq = True
+        eq = eq and self.from_ == other.from_
+        eq = eq and self.migrate == other.migrate
         eq = eq and self.name == other.name
         eq = eq and self.parent == other.parent
         eq = eq and self.target == other.target

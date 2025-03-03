@@ -148,7 +148,7 @@ impl From<FbsValueTy> for ValueTy {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VBool {
-    v: bool,
+    pub v: bool,
 }
 
 impl VBool {
@@ -226,7 +226,7 @@ impl From<VUnit> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VChar {
-    v: u32,
+    pub v: u32,
 }
 
 impl VChar {
@@ -304,7 +304,7 @@ impl From<VNull> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VI8 {
-    v: i8,
+    pub v: i8,
 }
 
 impl VI8 {
@@ -345,7 +345,7 @@ impl From<VI8> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VU8 {
-    v: u8,
+    pub v: u8,
 }
 
 impl VU8 {
@@ -386,7 +386,7 @@ impl From<VU8> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VI16 {
-    v: i16,
+    pub v: i16,
 }
 
 impl VI16 {
@@ -427,7 +427,7 @@ impl From<VI16> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VU16 {
-    v: u16,
+    pub v: u16,
 }
 
 impl VU16 {
@@ -468,7 +468,7 @@ impl From<VU16> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VI32 {
-    v: i32,
+    pub v: i32,
 }
 
 impl VI32 {
@@ -509,7 +509,7 @@ impl From<VI32> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VU32 {
-    v: u32,
+    pub v: u32,
 }
 
 impl VU32 {
@@ -550,7 +550,7 @@ impl From<VU32> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VF32 {
-    v: f32,
+    pub v: f32,
 }
 
 impl VF32 {
@@ -591,7 +591,7 @@ impl From<VF32> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VIsize {
-    v: i64,
+    pub v: i64,
 }
 
 impl VIsize {
@@ -632,7 +632,7 @@ impl From<VIsize> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VUsize {
-    v: u64,
+    pub v: u64,
 }
 
 impl VUsize {
@@ -673,7 +673,7 @@ impl From<VUsize> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VI64 {
-    v: i64,
+    pub v: i64,
 }
 
 impl VI64 {
@@ -714,7 +714,7 @@ impl From<VI64> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VU64 {
-    v: u64,
+    pub v: u64,
 }
 
 impl VU64 {
@@ -755,7 +755,7 @@ impl From<VU64> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VF64 {
-    v: f64,
+    pub v: f64,
 }
 
 impl VF64 {
@@ -796,7 +796,7 @@ impl From<VF64> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VStr {
-    v: String,
+    pub v: String,
 }
 
 impl VStr {
@@ -839,7 +839,7 @@ impl From<VStr> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VBytes {
-    v: Vec<u8>,
+    pub v: Vec<u8>,
 }
 
 impl VBytes {
@@ -886,7 +886,7 @@ impl From<VBytes> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VArray {
-    v: Vec<ValueInstance>,
+    pub v: Vec<ValueInstance>,
 }
 
 impl VArray {
@@ -938,8 +938,8 @@ impl From<VArray> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Point2D {
-    x: f32,
-    y: f32,
+    pub x: f32,
+    pub y: f32,
 }
 
 impl From<Point2D> for FbsPoint2D {
@@ -962,9 +962,9 @@ impl From<&FbsPoint2D> for Point2D {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Tri2D {
-    p0: Point2D,
-    p1: Point2D,
-    p2: Point2D,
+    pub p0: Point2D,
+    pub p1: Point2D,
+    pub p2: Point2D,
 }
 
 impl From<Tri2D> for FbsTri2D {
@@ -989,7 +989,7 @@ impl From<&FbsTri2D> for Tri2D {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VTri2D {
-    v: Tri2D,
+    pub v: Tri2D,
 }
 
 impl VTri2D {
@@ -1032,8 +1032,8 @@ impl From<VTri2D> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VFixedSizeBytes {
-    sz: i32,
-    v: Vec<u8>,
+    pub sz: i32,
+    pub v: Vec<u8>,
 }
 
 impl VFixedSizeBytes {
@@ -1083,7 +1083,7 @@ impl From<VFixedSizeBytes> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VTimestampMsUtc {
-    v: i64,
+    pub v: i64,
 }
 
 impl VTimestampMsUtc {
@@ -1124,7 +1124,7 @@ impl From<VTimestampMsUtc> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VTimestampMs {
-    v: i64,
+    pub v: i64,
 }
 
 impl VTimestampMs {
@@ -1165,7 +1165,7 @@ impl From<VTimestampMs> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VTimestampNsUtc {
-    v: i64,
+    pub v: i64,
 }
 
 impl VTimestampNsUtc {
@@ -1206,7 +1206,7 @@ impl From<VTimestampNsUtc> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VTimestampNs {
-    v: i64,
+    pub v: i64,
 }
 
 impl VTimestampNs {
@@ -1247,8 +1247,8 @@ impl From<VTimestampNs> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct VPlaceholder {
-    name: String,
-    ty: ValueTy,
+    pub name: String,
+    pub ty: ValueTy,
 }
 
 impl VPlaceholder {
@@ -1467,16 +1467,21 @@ impl Value {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ValueInstance {
-    v: Value,
+    pub name: Option<String>,
+    pub v: Value,
 }
 
 impl ValueInstance {
     pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsValueInstance<'a>> {
         use crate::types::generated::value_generated::ValueInstanceBuilder as FbsValueInstanceBuilder;
 
+        let name_offset = self.name.as_ref().map(|s| builder.create_string(s));
         let (v_offset, v_ty) = self.v.serialize_to(builder);
 
         let mut bldr = FbsValueInstanceBuilder::new(builder);
+        if let Some(offset) = name_offset {
+            bldr.add_name(offset);
+        }
         bldr.add_v(v_offset);
         bldr.add_v_type(v_ty);
         bldr.finish()
@@ -1485,6 +1490,7 @@ impl ValueInstance {
 
 impl From<FbsValueInstance<'_>> for ValueInstance {
     fn from(fbs: FbsValueInstance<'_>) -> Self {
+        let name = fbs.name().map(ToOwned::to_owned);
         let v = match fbs.v_type() {
             FbsValue::VBool => Value::VBool(VBool::from(fbs.v_as_vbool().unwrap())),
             FbsValue::VUnit => Value::VUnit(VUnit::from(fbs.v_as_vunit().unwrap())),
@@ -1516,6 +1522,7 @@ impl From<FbsValueInstance<'_>> for ValueInstance {
         };
 
         Self {
+            name,
             v,
         }
     }

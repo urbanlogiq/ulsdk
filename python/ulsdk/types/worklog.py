@@ -90,20 +90,6 @@ from .job import (
     TaskPriority,
     TaskRunFlags,
 )
-from .reflection import (
-    ReflectionAdvancedFeatures,
-    ReflectionBaseType,
-    ReflectionEnum,
-    ReflectionEnumVal,
-    ReflectionField,
-    ReflectionKeyValue,
-    ReflectionObject,
-    ReflectionRPCCall,
-    ReflectionSchema,
-    ReflectionSchemaFile,
-    ReflectionService,
-    ReflectionType,
-)
 from .value import (
     Point2D,
     Tri2D,
@@ -225,16 +211,6 @@ from .generated.VUsize import VUsize as FbsVUsize
 from .generated.ValueInstance import ValueInstance as FbsValueInstance
 from .generated.WorkLog import WorkLog as FbsWorkLog
 from .generated.WorklogParameter import WorklogParameter as FbsWorklogParameter
-from .generated.reflection.Enum import Enum as FbsEnum
-from .generated.reflection.EnumVal import EnumVal as FbsEnumVal
-from .generated.reflection.Field import Field as FbsField
-from .generated.reflection.KeyValue import KeyValue as FbsKeyValue
-from .generated.reflection.Object import Object as FbsObject
-from .generated.reflection.RPCCall import RPCCall as FbsRPCCall
-from .generated.reflection.Schema import Schema as FbsSchema
-from .generated.reflection.SchemaFile import SchemaFile as FbsSchemaFile
-from .generated.reflection.Service import Service as FbsService
-from .generated.reflection.Type import Type as FbsType
 from .generated.ParameterValue import ParameterValue as FbsParameterValue
 from .generated.TaskParameterValue import TaskParameterValue as FbsTaskParameterValue
 from .generated.Type import Type as FbsType
@@ -264,14 +240,14 @@ class ValuesFormatTy(Enum):
 
 @dataclass
 class ByteArray:
-    b: Optional["bytes"]
+    b: Optional["List[int]"]
 
     @classmethod
     def from_fbs(cls, o: FbsByteArray) -> Self:
-        if o.BIsNone():
-            b = b""
-        else:
-            b = bytes(o.BAsNumpy())
+        b = list()
+        if not o.BIsNone():
+            for i in range(o.BLength()):
+                b.append(o.B(i))
         return cls(b)
 
     @classmethod
@@ -307,7 +283,7 @@ class ByteArray:
 
     @classmethod
     def make_default(cls) -> Self:
-        b = b""
+        b = []
         return cls(b)
 
     def __eq__(self, other) -> bool:

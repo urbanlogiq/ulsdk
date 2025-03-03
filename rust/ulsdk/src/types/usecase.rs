@@ -129,6 +129,7 @@ use crate::types::query::{
     UnsetArgument,
     UpdateQueryElement,
     ValueIndex,
+    ValueName,
     Vector,
     When,
     Window,
@@ -279,6 +280,7 @@ use crate::types::generated::query_generated::{
     UnsetArgument as FbsUnsetArgument,
     UpdateQueryElement as FbsUpdateQueryElement,
     ValueIndex as FbsValueIndex,
+    ValueName as FbsValueName,
     Vector as FbsVector,
     When as FbsWhen,
     Window as FbsWindow,
@@ -495,15 +497,15 @@ impl UseCaseInput {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct UseCase {
-    abbreviation: Option<String>,
-    description: Option<String>,
-    extended_description: Option<String>,
-    extended_title: Option<String>,
-    inputs: Vec<UseCaseInputPair>,
-    module: UseCaseModule,
-    name: String,
-    subtitle: Option<String>,
-    ty: UseCaseTy,
+    pub abbreviation: Option<String>,
+    pub description: Option<String>,
+    pub extended_description: Option<String>,
+    pub extended_title: Option<String>,
+    pub inputs: Vec<UseCaseInputPair>,
+    pub module: UseCaseModule,
+    pub name: String,
+    pub subtitle: Option<String>,
+    pub ty: UseCaseTy,
 }
 
 impl UseCase {
@@ -595,8 +597,8 @@ impl From<UseCase> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct UseCaseInputPair {
-    input: Option<UseCaseInput>,
-    name: String,
+    pub input: Option<UseCaseInput>,
+    pub name: String,
 }
 
 impl UseCaseInputPair {

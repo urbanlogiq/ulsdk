@@ -113,20 +113,6 @@ use crate::types::object::{
     ObjectSummary,
     ObjectSummaryList,
 };
-use crate::types::reflection::{
-    ReflectionAdvancedFeatures,
-    ReflectionBaseType,
-    ReflectionEnum,
-    ReflectionEnumVal,
-    ReflectionField,
-    ReflectionKeyValue,
-    ReflectionObject,
-    ReflectionRPCCall,
-    ReflectionSchema,
-    ReflectionSchemaFile,
-    ReflectionService,
-    ReflectionType,
-};
 use crate::types::stream::{
     AxisType,
     FormatFlags,
@@ -300,20 +286,6 @@ use crate::types::generated::object_generated::{
     DataCatalogObjectFlags as FbsDataCatalogObjectFlags,
     DataCatalogObjectTy as FbsDataCatalogObjectTy,
 };
-use crate::types::generated::reflection_generated::{
-    reflection::Enum as FbsReflectionEnum,
-    reflection::EnumVal as FbsReflectionEnumVal,
-    reflection::Field as FbsReflectionField,
-    reflection::KeyValue as FbsReflectionKeyValue,
-    reflection::Object as FbsReflectionObject,
-    reflection::RPCCall as FbsReflectionRPCCall,
-    reflection::Schema as FbsReflectionSchema,
-    reflection::SchemaFile as FbsReflectionSchemaFile,
-    reflection::Service as FbsReflectionService,
-    reflection::Type as FbsReflectionType,
-    reflection::AdvancedFeatures as FbsReflectionAdvancedFeatures,
-    reflection::BaseType as FbsReflectionBaseType,
-};
 use crate::types::generated::stream_generated::{
     Stream as FbsStream,
     AxisType as FbsAxisType,
@@ -434,15 +406,15 @@ impl From<FbsStorageTier> for StorageTier {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct File {
-    account: String,
-    blob: Option<GenericId>,
-    chunks: Option<Vec<Chunk>>,
-    container: Option<String>,
-    digest: Option<Digest>,
-    mime: String,
-    size_: u64,
-    tier: StorageTier,
-    virus: Option<String>,
+    pub account: String,
+    pub blob: Option<GenericId>,
+    pub chunks: Option<Vec<Chunk>>,
+    pub container: Option<String>,
+    pub digest: Option<Digest>,
+    pub mime: String,
+    pub size_: u64,
+    pub tier: StorageTier,
+    pub virus: Option<String>,
 }
 
 impl File {
@@ -555,8 +527,8 @@ impl From<File> for Vec<u8> {
 /// This Directory table holds the entries in the actual directory
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Directory {
-    notifications: Option<Vec<B2cId>>,
-    slots: Vec<Slot>,
+    pub notifications: Option<Vec<B2cId>>,
+    pub slots: Vec<Slot>,
 }
 
 impl Directory {
@@ -632,8 +604,8 @@ impl From<Directory> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ObjectRef {
-    id: ObjectId,
-    ty: DataCatalogObjectTy,
+    pub id: ObjectId,
+    pub ty: DataCatalogObjectTy,
 }
 
 impl ObjectRef {
@@ -714,9 +686,9 @@ impl Entry {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ListFile {
-    mime: String,
-    size_: u64,
-    virus: Option<String>,
+    pub mime: String,
+    pub size_: u64,
+    pub virus: Option<String>,
 }
 
 impl ListFile {
@@ -805,9 +777,9 @@ impl From<ListDirectory> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ListObject {
-    id: ObjectId,
-    size_: u64,
-    ty: DataCatalogObjectTy,
+    pub id: ObjectId,
+    pub size_: u64,
+    pub ty: DataCatalogObjectTy,
 }
 
 impl ListObject {
@@ -856,7 +828,7 @@ impl From<ListObject> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct TopLevelDirectory {
-    b2c_entity: B2cId,
+    pub b2c_entity: B2cId,
 }
 
 impl TopLevelDirectory {
@@ -940,8 +912,8 @@ impl ListEntry {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Attr {
-    key: String,
-    v: Value,
+    pub key: String,
+    pub v: Value,
 }
 
 impl Attr {
@@ -1018,9 +990,9 @@ impl From<Attr> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Chunk {
-    blob: GenericId,
-    digest: Digest,
-    size_: u64,
+    pub blob: GenericId,
+    pub digest: Digest,
+    pub size_: u64,
 }
 
 impl Chunk {
@@ -1075,8 +1047,8 @@ impl From<Chunk> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct DirectoryEntry {
-    entry: Entry,
-    parent: ObjectId,
+    pub entry: Entry,
+    pub parent: ObjectId,
 }
 
 impl DirectoryEntry {
@@ -1130,7 +1102,7 @@ impl From<DirectoryEntry> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct DirectoryList {
-    slots: Vec<ListSlot>,
+    pub slots: Vec<ListSlot>,
 }
 
 impl DirectoryList {
@@ -1182,14 +1154,14 @@ impl From<DirectoryList> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ListSlot {
-    attributes: Option<Vec<Attr>>,
-    entry: ListEntry,
-    id: ObjectId,
-    last_modified_by: Option<B2cId>,
-    name: String,
-    size_: u64,
-    time: u64,
-    user_permissions: u32,
+    pub attributes: Option<Vec<Attr>>,
+    pub entry: ListEntry,
+    pub id: ObjectId,
+    pub last_modified_by: Option<B2cId>,
+    pub name: String,
+    pub size_: u64,
+    pub time: u64,
+    pub user_permissions: u32,
 }
 
 impl ListSlot {
@@ -1287,10 +1259,10 @@ impl From<ListSlot> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct MoveRequest {
-    dest_name: Option<String>,
-    dest_root: Option<ObjectId>,
-    entry: ObjectId,
-    overwrite: bool,
+    pub dest_name: Option<String>,
+    pub dest_root: Option<ObjectId>,
+    pub entry: ObjectId,
+    pub overwrite: bool,
 }
 
 impl MoveRequest {
@@ -1349,8 +1321,8 @@ impl From<MoveRequest> for Vec<u8> {
 /// Body parameter for PUT drive/<object>
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct NewLink {
-    name: String,
-    obj: ObjectId,
+    pub name: String,
+    pub obj: ObjectId,
 }
 
 impl NewLink {
@@ -1397,10 +1369,10 @@ impl From<NewLink> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Slot {
-    attributes: Option<Vec<Attr>>,
-    id: ObjectId,
-    name: String,
-    ty: EntryTy,
+    pub attributes: Option<Vec<Attr>>,
+    pub id: ObjectId,
+    pub name: String,
+    pub ty: EntryTy,
 }
 
 impl Slot {

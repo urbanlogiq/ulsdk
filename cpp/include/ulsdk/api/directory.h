@@ -140,17 +140,6 @@ struct AdUserWithAuditLog {
 std::vector<uint8_t>
 to_bytes(const AdUserWithAuditLog &o);
 
-struct CreateUserRequest {
-    std::optional<std::string> display_name_;
-    std::optional<std::string> user_principal_name_;
-
-    CreateUserRequest() = default;
-    CreateUserRequest(const struct json_value_s *root);
-};
-
-std::vector<uint8_t>
-to_bytes(const CreateUserRequest &o);
-
 struct CreateUser {
     AdUser user_;
     std::string password_;
@@ -296,13 +285,11 @@ get_current_user(
 
 /**
  * Creates a new user in the directory.
- * @param create_user_request The details which which to create the new user with
  * @return The details of the user along with their temporary, one-time-use password.
  */
 Result<CreateUser>
 create_user(
-    ul::RequestContext &ctx,
-    const CreateUserRequest &create_user_request
+    ul::RequestContext &ctx
 );
 
 /**

@@ -85,6 +85,7 @@ from .query import (
     UnsetArgument,
     UpdateQueryElement,
     ValueIndex,
+    ValueName,
     Vector,
     When,
     Window,
@@ -205,6 +206,7 @@ from .generated.VUnit import VUnit as FbsVUnit
 from .generated.VUsize import VUsize as FbsVUsize
 from .generated.ValueIndex import ValueIndex as FbsValueIndex
 from .generated.ValueInstance import ValueInstance as FbsValueInstance
+from .generated.ValueName import ValueName as FbsValueName
 from .generated.Vector import Vector as FbsVector
 from .generated.View import View as FbsView
 from .generated.When import When as FbsWhen

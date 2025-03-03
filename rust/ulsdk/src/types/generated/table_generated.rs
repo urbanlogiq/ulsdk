@@ -15,20 +15,19 @@
 
 // @generated
 
+use super::value_generated::*;
 use super::entity_generated::*;
 use super::worklog_generated::*;
 use super::object_generated::*;
 use super::api_generated::*;
-use super::fun_generated::*;
 use super::job_generated::*;
-use super::value_generated::*;
 use super::graph_generated::*;
 use super::data_generated::*;
-use super::reflection_generated::*;
+use super::query_generated::*;
 use super::id_generated::*;
 use super::fs_generated::*;
 use super::stream_generated::*;
-use super::query_generated::*;
+use super::fun_generated::*;
 use super::Schema_generated::*;
 use super::crypto_generated::*;
 use core::mem;
@@ -144,6 +143,106 @@ impl<'a> flatbuffers::Verifiable for Op {
 
 impl flatbuffers::SimpleToVerifyInSlice for Op {}
 pub struct OpUnionTableOffset {}
+
+#[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
+pub const ENUM_MIN_TABLE_FROM: u8 = 0;
+#[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
+pub const ENUM_MAX_TABLE_FROM: u8 = 2;
+#[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
+#[allow(non_camel_case_types)]
+pub const ENUM_VALUES_TABLE_FROM: [TableFrom; 3] = [
+  TableFrom::NONE,
+  TableFrom::ObjectId,
+  TableFrom::Schema,
+];
+
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+#[repr(transparent)]
+pub struct TableFrom(pub u8);
+#[allow(non_upper_case_globals)]
+impl TableFrom {
+  pub const NONE: Self = Self(0);
+  pub const ObjectId: Self = Self(1);
+  pub const Schema: Self = Self(2);
+
+  pub const ENUM_MIN: u8 = 0;
+  pub const ENUM_MAX: u8 = 2;
+  pub const ENUM_VALUES: &'static [Self] = &[
+    Self::NONE,
+    Self::ObjectId,
+    Self::Schema,
+  ];
+  /// Returns the variant's name or "" if unknown.
+  pub fn variant_name(self) -> Option<&'static str> {
+    match self {
+      Self::NONE => Some("NONE"),
+      Self::ObjectId => Some("ObjectId"),
+      Self::Schema => Some("Schema"),
+      _ => None,
+    }
+  }
+}
+impl core::fmt::Debug for TableFrom {
+  fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+    if let Some(name) = self.variant_name() {
+      f.write_str(name)
+    } else {
+      f.write_fmt(format_args!("<UNKNOWN {:?}>", self.0))
+    }
+  }
+}
+impl Serialize for TableFrom {
+  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+  where
+    S: Serializer,
+  {
+    serializer.serialize_unit_variant("TableFrom", self.0 as u32, self.variant_name().unwrap())
+  }
+}
+
+impl<'a> flatbuffers::Follow<'a> for TableFrom {
+  type Inner = Self;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    let b = flatbuffers::read_scalar_at::<u8>(buf, loc);
+    Self(b)
+  }
+}
+
+impl flatbuffers::Push for TableFrom {
+    type Output = TableFrom;
+    #[inline]
+    unsafe fn push(&self, dst: &mut [u8], _written_len: usize) {
+        flatbuffers::emplace_scalar::<u8>(dst, self.0);
+    }
+}
+
+impl flatbuffers::EndianScalar for TableFrom {
+  type Scalar = u8;
+  #[inline]
+  fn to_little_endian(self) -> u8 {
+    self.0.to_le()
+  }
+  #[inline]
+  #[allow(clippy::wrong_self_convention)]
+  fn from_little_endian(v: u8) -> Self {
+    let b = u8::from_le(v);
+    Self(b)
+  }
+}
+
+impl<'a> flatbuffers::Verifiable for TableFrom {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    u8::run_verifier(v, pos)
+  }
+}
+
+impl flatbuffers::SimpleToVerifyInSlice for TableFrom {}
+pub struct TableFromUnionTableOffset {}
 
 #[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
 pub const ENUM_MIN_CHANGE_OP: u8 = 0;
@@ -1002,7 +1101,7 @@ impl core::fmt::Debug for DiffStream<'_> {
 pub enum NewTableOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
-/// Body parameter for POST datacatalog/table/<objectId>
+/// Body parameter for POST datacatalog/table
 pub struct NewTable<'a> {
   pub _tab: flatbuffers::Table<'a>,
 }
@@ -1019,6 +1118,9 @@ impl<'a> NewTable<'a> {
   pub const VT_NAME: flatbuffers::VOffsetT = 4;
   pub const VT_PARENT: flatbuffers::VOffsetT = 6;
   pub const VT_TARGET: flatbuffers::VOffsetT = 8;
+  pub const VT_MIGRATE: flatbuffers::VOffsetT = 10;
+  pub const VT_FROM_TYPE: flatbuffers::VOffsetT = 12;
+  pub const VT_FROM: flatbuffers::VOffsetT = 14;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -1030,9 +1132,12 @@ impl<'a> NewTable<'a> {
     args: &'args NewTableArgs<'args>
   ) -> flatbuffers::WIPOffset<NewTable<'bldr>> {
     let mut builder = NewTableBuilder::new(_fbb);
+    if let Some(x) = args.from { builder.add_from(x); }
     if let Some(x) = args.target { builder.add_target(x); }
     if let Some(x) = args.parent { builder.add_parent(x); }
     if let Some(x) = args.name { builder.add_name(x); }
+    builder.add_from_type(args.from_type);
+    builder.add_migrate(args.migrate);
     builder.finish()
   }
 
@@ -1044,6 +1149,7 @@ impl<'a> NewTable<'a> {
     // which contains a valid value in this slot
     unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<&str>>(NewTable::VT_NAME, None).unwrap()}
   }
+  /// Parent drive directory in which the table is to be created.
   #[inline]
   pub fn parent(&self) -> Option<ObjectId<'a>> {
     // Safety:
@@ -1059,6 +1165,62 @@ impl<'a> NewTable<'a> {
     // which contains a valid value in this slot
     unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<ObjectId>>(NewTable::VT_TARGET, None)}
   }
+  /// If true, data will be copied into the new table from the source ID
+  /// provided.
+  #[inline]
+  pub fn migrate(&self) -> bool {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<bool>(NewTable::VT_MIGRATE, Some(false)).unwrap()}
+  }
+  #[inline]
+  pub fn from_type(&self) -> TableFrom {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<TableFrom>(NewTable::VT_FROM_TYPE, Some(TableFrom::NONE)).unwrap()}
+  }
+  /// The base to use for the table. If an object ID is provided, this will
+  /// take the schema from the provided stream or metadata object. If a
+  /// schema is provided, the table will be created, empty, from that.           
+  #[inline]
+  pub fn from(&self) -> Option<flatbuffers::Table<'a>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Table<'a>>>(NewTable::VT_FROM, None)}
+  }
+  #[inline]
+  #[allow(non_snake_case)]
+  pub fn from_as_object_id(&self) -> Option<ObjectId<'a>> {
+    if self.from_type() == TableFrom::ObjectId {
+      self.from().map(|t| {
+       // Safety:
+       // Created from a valid Table for this object
+       // Which contains a valid union in this slot
+       unsafe { ObjectId::init_from_table(t) }
+     })
+    } else {
+      None
+    }
+  }
+
+  #[inline]
+  #[allow(non_snake_case)]
+  pub fn from_as_schema(&self) -> Option<Schema<'a>> {
+    if self.from_type() == TableFrom::Schema {
+      self.from().map(|t| {
+       // Safety:
+       // Created from a valid Table for this object
+       // Which contains a valid union in this slot
+       unsafe { Schema::init_from_table(t) }
+     })
+    } else {
+      None
+    }
+  }
+
 }
 
 impl flatbuffers::Verifiable for NewTable<'_> {
@@ -1071,6 +1233,14 @@ impl flatbuffers::Verifiable for NewTable<'_> {
      .visit_field::<flatbuffers::ForwardsUOffset<&str>>("name", Self::VT_NAME, true)?
      .visit_field::<flatbuffers::ForwardsUOffset<ObjectId>>("parent", Self::VT_PARENT, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<ObjectId>>("target", Self::VT_TARGET, false)?
+     .visit_field::<bool>("migrate", Self::VT_MIGRATE, false)?
+     .visit_union::<TableFrom, _>("from_type", Self::VT_FROM_TYPE, "from", Self::VT_FROM, false, |key, v, pos| {
+        match key {
+          TableFrom::ObjectId => v.verify_union_variant::<flatbuffers::ForwardsUOffset<ObjectId>>("TableFrom::ObjectId", pos),
+          TableFrom::Schema => v.verify_union_variant::<flatbuffers::ForwardsUOffset<Schema>>("TableFrom::Schema", pos),
+          _ => Ok(()),
+        }
+     })?
      .finish();
     Ok(())
   }
@@ -1079,6 +1249,9 @@ pub struct NewTableArgs<'a> {
     pub name: Option<flatbuffers::WIPOffset<&'a str>>,
     pub parent: Option<flatbuffers::WIPOffset<ObjectId<'a>>>,
     pub target: Option<flatbuffers::WIPOffset<ObjectId<'a>>>,
+    pub migrate: bool,
+    pub from_type: TableFrom,
+    pub from: Option<flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>>,
 }
 impl<'a> Default for NewTableArgs<'a> {
   #[inline]
@@ -1087,6 +1260,9 @@ impl<'a> Default for NewTableArgs<'a> {
       name: None, // required field
       parent: None,
       target: None,
+      migrate: false,
+      from_type: TableFrom::NONE,
+      from: None,
     }
   }
 }
@@ -1096,7 +1272,7 @@ impl Serialize for NewTable<'_> {
   where
     S: Serializer,
   {
-    let mut s = serializer.serialize_struct("NewTable", 3)?;
+    let mut s = serializer.serialize_struct("NewTable", 6)?;
       s.serialize_field("name", &self.name())?;
       if let Some(f) = self.parent() {
         s.serialize_field("parent", &f)?;
@@ -1107,6 +1283,22 @@ impl Serialize for NewTable<'_> {
         s.serialize_field("target", &f)?;
       } else {
         s.skip_field("target")?;
+      }
+      s.serialize_field("migrate", &self.migrate())?;
+      s.serialize_field("from_type", &self.from_type())?;
+      match self.from_type() {
+        TableFrom::NONE => (),
+          TableFrom::ObjectId => {
+            let f = self.from_as_object_id()
+              .expect("Invalid union table, expected `TableFrom::ObjectId`.");
+            s.serialize_field("from", &f)?;
+          }
+          TableFrom::Schema => {
+            let f = self.from_as_schema()
+              .expect("Invalid union table, expected `TableFrom::Schema`.");
+            s.serialize_field("from", &f)?;
+          }
+        _ => unimplemented!(),
       }
     s.end()
   }
@@ -1130,6 +1322,18 @@ impl<'a: 'b, 'b> NewTableBuilder<'a, 'b> {
     self.fbb_.push_slot_always::<flatbuffers::WIPOffset<ObjectId>>(NewTable::VT_TARGET, target);
   }
   #[inline]
+  pub fn add_migrate(&mut self, migrate: bool) {
+    self.fbb_.push_slot::<bool>(NewTable::VT_MIGRATE, migrate, false);
+  }
+  #[inline]
+  pub fn add_from_type(&mut self, from_type: TableFrom) {
+    self.fbb_.push_slot::<TableFrom>(NewTable::VT_FROM_TYPE, from_type, TableFrom::NONE);
+  }
+  #[inline]
+  pub fn add_from(&mut self, from: flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(NewTable::VT_FROM, from);
+  }
+  #[inline]
   pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> NewTableBuilder<'a, 'b> {
     let start = _fbb.start_table();
     NewTableBuilder {
@@ -1151,6 +1355,28 @@ impl core::fmt::Debug for NewTable<'_> {
       ds.field("name", &self.name());
       ds.field("parent", &self.parent());
       ds.field("target", &self.target());
+      ds.field("migrate", &self.migrate());
+      ds.field("from_type", &self.from_type());
+      match self.from_type() {
+        TableFrom::ObjectId => {
+          if let Some(x) = self.from_as_object_id() {
+            ds.field("from", &x)
+          } else {
+            ds.field("from", &"InvalidFlatbuffer: Union discriminant does not match value.")
+          }
+        },
+        TableFrom::Schema => {
+          if let Some(x) = self.from_as_schema() {
+            ds.field("from", &x)
+          } else {
+            ds.field("from", &"InvalidFlatbuffer: Union discriminant does not match value.")
+          }
+        },
+        _ => {
+          let x: Option<()> = None;
+          ds.field("from", &x)
+        },
+      };
       ds.finish()
   }
 }

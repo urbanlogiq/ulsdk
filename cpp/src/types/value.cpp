@@ -1041,9 +1041,17 @@ VPlaceholder::VPlaceholder(const ::VPlaceholder *root)
 
 ::flatbuffers::Offset<::ValueInstance>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ValueInstance &o) {
+    std::optional<::flatbuffers::Offset<::flatbuffers::String>> name_offset = std::nullopt;
+    if (o.name_.has_value()) {
+        const ::flatbuffers::Offset<::flatbuffers::String> name_offset_val = builder.CreateString(o.name_.value());
+        name_offset = std::make_optional(name_offset_val);
+    }
     const std::pair<::flatbuffers::Offset<void>, ::Value> v_offset = serialize_to(builder, o.v_);
 
     ::ValueInstanceBuilder instance_builder = ::ValueInstanceBuilder(builder);
+    if (name_offset.has_value()) {
+        instance_builder.add_name(name_offset.value());
+    }
     instance_builder.add_v(v_offset.first);
     instance_builder.add_v_type(v_offset.second);
     return instance_builder.Finish();
@@ -1058,7 +1066,8 @@ std::vector<uint8_t> to_bytes(const ValueInstance &o) {
 }
 
 ValueInstance::ValueInstance()
-    : v_(std::make_shared<VBool>()) {
+    : name_(std::nullopt)
+    , v_(std::make_shared<VBool>()) {
 }
 
 ValueInstance::ValueInstance(const std::vector<uint8_t> &bytes)
@@ -1066,11 +1075,15 @@ ValueInstance::ValueInstance(const std::vector<uint8_t> &bytes)
 }
 
 ValueInstance::ValueInstance(const ::ValueInstance *root) 
-    : v_(std::make_shared<VBool>()) {
+    : name_(std::nullopt)
+    , v_(std::make_shared<VBool>()) {
     if (root == nullptr) {
         throw std::runtime_error("cannot deserialize flatbuffer type");
     }
 
+    if (root->name() != nullptr) {
+        name_ = std::string(*root->name()->begin(), *root->name()->end());
+    }
     if (root->v() != nullptr) {
         switch (root->v_type()) {
             case ::Value::NONE: throw std::runtime_error("unexpected none variant");

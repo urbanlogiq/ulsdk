@@ -47,6 +47,21 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Op &o) {
     }
 }
 
+std::pair<::flatbuffers::Offset<void>, ::TableFrom>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TableFrom &o) {
+    if (std::holds_alternative<std::shared_ptr<ObjectId>>(o)) {
+        const std::shared_ptr<ObjectId> &v = std::get<std::shared_ptr<ObjectId>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::TableFrom::ObjectId);
+    } else if (std::holds_alternative<std::shared_ptr<Schema>>(o)) {
+        const std::shared_ptr<Schema> &v = std::get<std::shared_ptr<Schema>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::TableFrom::Schema);
+    } else { 
+        throw std::runtime_error("unreachable");
+    }
+}
+
 ::flatbuffers::Offset<::Modify>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Modify &o) {
     const ::flatbuffers::Offset<::flatbuffers::String> col_offset = builder.CreateString(o.col_);
@@ -583,6 +598,11 @@ History::History(const ::History *root)
 
 ::flatbuffers::Offset<::NewTable>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NewTable &o) {
+    std::optional<std::pair<::flatbuffers::Offset<void>, ::TableFrom>> from_offset = std::nullopt;
+    if (o.from_.has_value()) {
+        const std::pair<::flatbuffers::Offset<void>, ::TableFrom> from_offset_val = serialize_to(builder, o.from_.value());
+        from_offset = std::make_optional(from_offset_val);
+    }
     const ::flatbuffers::Offset<::flatbuffers::String> name_offset = builder.CreateString(o.name_);
     std::optional<::flatbuffers::Offset<::ObjectId>> parent_offset = std::nullopt;
     if (o.parent_.has_value()) {
@@ -596,6 +616,12 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NewTable &o) {
     }
 
     ::NewTableBuilder instance_builder = ::NewTableBuilder(builder);
+    if (from_offset.has_value()) {
+        const auto from_opt = from_offset.value();
+        instance_builder.add_from(from_opt.first);
+        instance_builder.add_from_type(from_opt.second);
+    }
+    instance_builder.add_migrate(o.migrate_);
     instance_builder.add_name(name_offset);
     if (parent_offset.has_value()) {
         instance_builder.add_parent(parent_offset.value());
@@ -615,7 +641,9 @@ std::vector<uint8_t> to_bytes(const NewTable &o) {
 }
 
 NewTable::NewTable()
-    : name_()
+    : from_(std::nullopt)
+    , migrate_(false)
+    , name_()
     , parent_(std::nullopt)
     , target_(std::nullopt) {
 }
@@ -625,13 +653,34 @@ NewTable::NewTable(const std::vector<uint8_t> &bytes)
 }
 
 NewTable::NewTable(const ::NewTable *root) 
-    : name_()
+    : from_(std::nullopt)
+    , migrate_(false)
+    , name_()
     , parent_(std::nullopt)
     , target_(std::nullopt) {
     if (root == nullptr) {
         throw std::runtime_error("cannot deserialize flatbuffer type");
     }
 
+    if (root->from() != nullptr) {
+        switch (root->from_type()) {
+            case ::TableFrom::NONE: throw std::runtime_error("unexpected none variant");
+            case ::TableFrom::ObjectId: {
+                const auto from__local = static_cast<const ::ObjectId *>(root->from());
+                std::shared_ptr<ObjectId> from__shared = std::make_shared<ObjectId>(from__local);
+                from_ = from__shared;
+                break;
+            }
+            case ::TableFrom::Schema: {
+                const auto from__local = static_cast<const ::Schema *>(root->from());
+                std::shared_ptr<Schema> from__shared = std::make_shared<Schema>(from__local);
+                from_ = from__shared;
+                break;
+            }
+            default: throw std::runtime_error("unknown union variant");
+        }
+    }
+    migrate_ = root->migrate();
         name_ = std::string(*root->name()->begin(), *root->name()->end());
     if (root->parent() != nullptr) {
         parent_ = decltype(parent_)(root->parent());

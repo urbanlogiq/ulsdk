@@ -22,6 +22,9 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
 struct ValueIndex;
 struct ValueIndexBuilder;
 
+struct ValueName;
+struct ValueNameBuilder;
+
 struct NullableUint;
 struct NullableUintBuilder;
 
@@ -162,11 +165,12 @@ enum class ExprUnion : uint8_t {
   Partition = 7,
   UnsetArgument = 8,
   Window = 9,
+  ValueName = 10,
   MIN = NONE,
-  MAX = Window
+  MAX = ValueName
 };
 
-inline const ExprUnion (&EnumValuesExprUnion())[10] {
+inline const ExprUnion (&EnumValuesExprUnion())[11] {
   static const ExprUnion values[] = {
     ExprUnion::NONE,
     ExprUnion::ValueIndex,
@@ -177,13 +181,14 @@ inline const ExprUnion (&EnumValuesExprUnion())[10] {
     ExprUnion::OrderByExpr,
     ExprUnion::Partition,
     ExprUnion::UnsetArgument,
-    ExprUnion::Window
+    ExprUnion::Window,
+    ExprUnion::ValueName
   };
   return values;
 }
 
 inline const char * const *EnumNamesExprUnion() {
-  static const char * const names[11] = {
+  static const char * const names[12] = {
     "NONE",
     "ValueIndex",
     "Column",
@@ -194,13 +199,14 @@ inline const char * const *EnumNamesExprUnion() {
     "Partition",
     "UnsetArgument",
     "Window",
+    "ValueName",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameExprUnion(ExprUnion e) {
-  if (::flatbuffers::IsOutRange(e, ExprUnion::NONE, ExprUnion::Window)) return "";
+  if (::flatbuffers::IsOutRange(e, ExprUnion::NONE, ExprUnion::ValueName)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesExprUnion()[index];
 }
@@ -243,6 +249,10 @@ template<> struct ExprUnionTraits<UnsetArgument> {
 
 template<> struct ExprUnionTraits<Window> {
   static const ExprUnion enum_value = ExprUnion::Window;
+};
+
+template<> struct ExprUnionTraits<ValueName> {
+  static const ExprUnion enum_value = ExprUnion::ValueName;
 };
 
 bool VerifyExprUnion(::flatbuffers::Verifier &verifier, const void *obj, ExprUnion type);
@@ -552,6 +562,64 @@ struct ValueIndex::Traits {
   using type = ValueIndex;
   static auto constexpr Create = CreateValueIndex;
 };
+
+struct ValueName FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ValueNameBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_NAME = 4
+  };
+  const ::flatbuffers::String *name() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_NAME);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
+           verifier.EndTable();
+  }
+};
+
+struct ValueNameBuilder {
+  typedef ValueName Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
+    fbb_.AddOffset(ValueName::VT_NAME, name);
+  }
+  explicit ValueNameBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<ValueName> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<ValueName>(end);
+    fbb_.Required(o, ValueName::VT_NAME);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<ValueName> CreateValueName(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::String> name = 0) {
+  ValueNameBuilder builder_(_fbb);
+  builder_.add_name(name);
+  return builder_.Finish();
+}
+
+struct ValueName::Traits {
+  using type = ValueName;
+  static auto constexpr Create = CreateValueName;
+};
+
+inline ::flatbuffers::Offset<ValueName> CreateValueNameDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const char *name = nullptr) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  return CreateValueName(
+      _fbb,
+      name__);
+}
 
 struct NullableUint FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef NullableUintBuilder Builder;
@@ -1206,6 +1274,9 @@ struct Expr FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const Window *exprs_as_Window() const {
     return exprs_type() == ExprUnion::Window ? static_cast<const Window *>(exprs()) : nullptr;
   }
+  const ValueName *exprs_as_ValueName() const {
+    return exprs_type() == ExprUnion::ValueName ? static_cast<const ValueName *>(exprs()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_EXPRS_TYPE, 1) &&
@@ -1249,6 +1320,10 @@ template<> inline const UnsetArgument *Expr::exprs_as<UnsetArgument>() const {
 
 template<> inline const Window *Expr::exprs_as<Window>() const {
   return exprs_as_Window();
+}
+
+template<> inline const ValueName *Expr::exprs_as<ValueName>() const {
+  return exprs_as_ValueName();
 }
 
 struct ExprBuilder {
@@ -3056,6 +3131,10 @@ inline bool VerifyExprUnion(::flatbuffers::Verifier &verifier, const void *obj, 
     }
     case ExprUnion::Window: {
       auto ptr = reinterpret_cast<const Window *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case ExprUnion::ValueName: {
+      auto ptr = reinterpret_cast<const ValueName *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

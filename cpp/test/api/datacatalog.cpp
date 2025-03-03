@@ -82,8 +82,8 @@ test_update_object(ul::RequestContext &ctx) {
 ApiTest test_update_object_obj(test_update_object, "datacatalog::update_object", &link_only_api_test_root);
 
 ul::Result<ul::Void>
-test_update_attributes(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::update_attributes(
+test_update_attribute(ul::RequestContext &ctx) {
+    ::ul::api::datacatalog::update_attribute(
         ctx,
         ul::Uuid("00000000-0000-0000-0000-000000000000"),
         false,
@@ -92,7 +92,7 @@ test_update_attributes(ul::RequestContext &ctx) {
     return ul::Void();
 }
 
-ApiTest test_update_attributes_obj(test_update_attributes, "datacatalog::update_attributes", &link_only_api_test_root);
+ApiTest test_update_attribute_obj(test_update_attribute, "datacatalog::update_attribute", &link_only_api_test_root);
 
 ul::Result<ul::Void>
 test_delete_attribute(ul::RequestContext &ctx) {

@@ -42,9 +42,9 @@ use crate::types::generated::model_generated::{
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Model {
-    location: ObjectId,
-    name: String,
-    source: Option<String>,
+    pub location: ObjectId,
+    pub name: String,
+    pub source: Option<String>,
 }
 
 impl Model {

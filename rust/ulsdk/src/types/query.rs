@@ -163,6 +163,7 @@ use crate::types::generated::query_generated::{
     UnsetArgument as FbsUnsetArgument,
     UpdateQueryElement as FbsUpdateQueryElement,
     ValueIndex as FbsValueIndex,
+    ValueName as FbsValueName,
     Vector as FbsVector,
     When as FbsWhen,
     Window as FbsWindow,
@@ -310,7 +311,7 @@ impl From<FbsTypeHint> for TypeHint {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ValueIndex {
-    idx: u32,
+    pub idx: u32,
 }
 
 impl ValueIndex {
@@ -351,7 +352,7 @@ impl From<ValueIndex> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct NullableUint {
-    v: u32,
+    pub v: u32,
 }
 
 impl NullableUint {
@@ -392,9 +393,9 @@ impl From<NullableUint> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Column {
-    name: String,
-    source: Option<NullableUint>,
-    type_hint: TypeHint,
+    pub name: String,
+    pub source: Option<NullableUint>,
+    pub type_hint: TypeHint,
 }
 
 impl Column {
@@ -446,8 +447,8 @@ impl From<Column> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Function {
-    fn_: Fn_,
-    parameters: Vec<Expr>,
+    pub fn_: Fn_,
+    pub parameters: Vec<Expr>,
 }
 
 impl Function {
@@ -502,7 +503,7 @@ impl From<Function> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct AllColumns {
-    source: Option<NullableUint>,
+    pub source: Option<NullableUint>,
 }
 
 impl AllColumns {
@@ -547,7 +548,7 @@ impl From<AllColumns> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Expr {
-    exprs: Box<ExprUnion>,
+    pub exprs: Box<ExprUnion>,
 }
 
 impl Expr {
@@ -575,6 +576,7 @@ impl From<FbsExpr<'_>> for Expr {
             FbsExprUnion::Partition => ExprUnion::Partition(Partition::from(fbs.exprs_as_partition().unwrap())),
             FbsExprUnion::UnsetArgument => ExprUnion::UnsetArgument(UnsetArgument::from(fbs.exprs_as_unset_argument().unwrap())),
             FbsExprUnion::Window => ExprUnion::Window(Window::from(fbs.exprs_as_window().unwrap())),
+            FbsExprUnion::ValueName => ExprUnion::ValueName(ValueName::from(fbs.exprs_as_value_name().unwrap())),
             _ => unreachable!(),
         };
 
@@ -603,8 +605,8 @@ impl From<Expr> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Case {
-    else_: Option<Expr>,
-    when: Vec<When>,
+    pub else_: Option<Expr>,
+    pub when: Vec<When>,
 }
 
 impl Case {
@@ -662,7 +664,7 @@ impl From<Case> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct OrderByExpr {
-    order_by: Vec<OrderBy>,
+    pub order_by: Vec<OrderBy>,
 }
 
 impl OrderByExpr {
@@ -714,7 +716,7 @@ impl From<OrderByExpr> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Partition {
-    expr: Expr,
+    pub expr: Expr,
 }
 
 impl Partition {
@@ -794,9 +796,9 @@ impl From<UnsetArgument> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Window {
-    fun: Function,
-    order_by: Option<Vec<OrderBy>>,
-    partition: Option<Vec<Expr>>,
+    pub fun: Function,
+    pub order_by: Option<Vec<OrderBy>>,
+    pub partition: Option<Vec<Expr>>,
 }
 
 impl Window {
@@ -885,6 +887,49 @@ impl From<Window> for Vec<u8> {
     }
 }
 
+#[derive(Default, PartialEq, Debug, Clone)]
+pub struct ValueName {
+    pub name: String,
+}
+
+impl ValueName {
+    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsValueName<'a>> {
+        use crate::types::generated::query_generated::ValueNameBuilder as FbsValueNameBuilder;
+
+        let name_offset = builder.create_string(&self.name);
+
+        let mut bldr = FbsValueNameBuilder::new(builder);
+        bldr.add_name(name_offset);
+        bldr.finish()
+    }
+}
+
+impl From<FbsValueName<'_>> for ValueName {
+    fn from(fbs: FbsValueName<'_>) -> Self {
+        let name = fbs.name().to_owned();
+        Self {
+            name,
+        }
+    }
+}
+
+impl TryFrom<&[u8]> for ValueName {
+    type Error = flatbuffers::InvalidFlatbuffer;
+    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsValueName>(bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+impl From<ValueName> for Vec<u8> {
+    fn from(obj: ValueName) -> Self {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = obj.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum ExprUnion {
     ValueIndex(ValueIndex),
@@ -896,6 +941,7 @@ pub enum ExprUnion {
     Partition(Partition),
     UnsetArgument(UnsetArgument),
     Window(Window),
+    ValueName(ValueName),
 }
 
 impl Default for ExprUnion {
@@ -952,6 +998,11 @@ impl ExprUnion {
                 let ty = FbsExprUnion::Window;
                 (offset, ty)
             }
+            Self::ValueName(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsExprUnion::ValueName;
+                (offset, ty)
+            }
         }
     }
 }
@@ -968,7 +1019,7 @@ pub struct Distinct {
     /// SELECT DISTINCT * FROM t;
     /// If `on` has length > 0, then distinct is:
     /// SELECT DISTINCT ON (c0, c1) FROM t;
-    on: Option<Vec<Expr>>,
+    pub on: Option<Vec<Expr>>,
 }
 
 impl Distinct {
@@ -1031,14 +1082,14 @@ impl From<Distinct> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct UnaryQueryElement {
-    distinct: Option<Distinct>,
-    fields: Option<Vec<Expr>>,
-    filter: Option<Function>,
-    group_by: Option<Vec<Expr>>,
-    joins: Option<Vec<Join>>,
-    limit: u32,
-    order_by: Option<Vec<TableOrderBy>>,
-    sources: Vec<TableSource>,
+    pub distinct: Option<Distinct>,
+    pub fields: Option<Vec<Expr>>,
+    pub filter: Option<Function>,
+    pub group_by: Option<Vec<Expr>>,
+    pub joins: Option<Vec<Join>>,
+    pub limit: u32,
+    pub order_by: Option<Vec<TableOrderBy>>,
+    pub sources: Vec<TableSource>,
 }
 
 impl UnaryQueryElement {
@@ -1201,7 +1252,7 @@ impl From<UnaryQueryElement> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct QueryElement {
-    q: Option<Box<QueryElementUnion>>,
+    pub q: Option<Box<QueryElementUnion>>,
 }
 
 impl QueryElement {
@@ -1260,9 +1311,9 @@ impl From<QueryElement> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct BinaryQueryElement {
-    lhs: QueryElement,
-    op: QueryElementOp,
-    rhs: QueryElement,
+    pub lhs: QueryElement,
+    pub op: QueryElementOp,
+    pub rhs: QueryElement,
 }
 
 impl BinaryQueryElement {
@@ -1314,7 +1365,7 @@ impl From<BinaryQueryElement> for Vec<u8> {
 /// partition within the database. This is used for that purpose.
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct MvdbPartition {
-    partition: String,
+    pub partition: String,
 }
 
 impl MvdbPartition {
@@ -1357,7 +1408,7 @@ impl From<MvdbPartition> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct WorklogPartition {
-    idx: u32,
+    pub idx: u32,
 }
 
 impl WorklogPartition {
@@ -1427,10 +1478,10 @@ impl TablePartition {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct DataCatalog {
-    id: ObjectId,
+    pub id: ObjectId,
     /// The partition of the table to query; can be null.
-    partition: Option<TablePartition>,
-    revision: Option<ContentId>,
+    pub partition: Option<TablePartition>,
+    pub revision: Option<ContentId>,
 }
 
 impl DataCatalog {
@@ -1497,7 +1548,7 @@ impl From<DataCatalog> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Arrow {
-    value: Vec<u8>,
+    pub value: Vec<u8>,
 }
 
 impl Arrow {
@@ -1544,10 +1595,10 @@ impl From<Arrow> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Query {
-    bound_sources: Option<Vec<TableSourceInstance>>,
-    limit: u32,
-    query: QueryElement,
-    values: Option<Vec<ValueInstance>>,
+    pub bound_sources: Option<Vec<TableSourceInstance>>,
+    pub limit: u32,
+    pub query: QueryElement,
+    pub values: Option<Vec<ValueInstance>>,
 }
 
 impl Query {
@@ -1641,7 +1692,7 @@ impl From<Query> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct QueryTableSource {
-    q: Query,
+    pub q: Query,
 }
 
 impl QueryTableSource {
@@ -1685,12 +1736,12 @@ impl From<QueryTableSource> for Vec<u8> {
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Vector {
     /// List of vectordbs to query. If this is empty, query all available vectordbs.
-    ids: Vec<ObjectId>,
-    limit: Option<NullableUint>,
+    pub ids: Vec<ObjectId>,
+    pub limit: Option<NullableUint>,
     /// Optionally limit the results to those with a distance value less than
     /// max_distance. We treat max_distance=0 as no limit.
-    max_distance: f32,
-    query: String,
+    pub max_distance: f32,
+    pub query: String,
 }
 
 impl Vector {
@@ -1755,7 +1806,7 @@ impl From<Vector> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Placeholder {
-    idx: u32,
+    pub idx: u32,
 }
 
 impl Placeholder {
@@ -1849,9 +1900,9 @@ impl TableSourceUnion {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct UpdateQueryElement {
-    filter: Option<Function>,
-    sets: Vec<SetExpr>,
-    source: TableSourceUnion,
+    pub filter: Option<Function>,
+    pub sets: Vec<SetExpr>,
+    pub source: TableSourceUnion,
 }
 
 impl UpdateQueryElement {
@@ -1923,8 +1974,8 @@ impl From<UpdateQueryElement> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct DeleteQueryElement {
-    filter: Option<Function>,
-    source: TableSourceUnion,
+    pub filter: Option<Function>,
+    pub source: TableSourceUnion,
 }
 
 impl DeleteQueryElement {
@@ -2024,11 +2075,11 @@ impl QueryElementUnion {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Join {
-    dest_col: Option<String>,
-    dest_idx: u32,
-    src_col: Option<String>,
-    src_idx: u32,
-    ty: JoinTy,
+    pub dest_col: Option<String>,
+    pub dest_idx: u32,
+    pub src_col: Option<String>,
+    pub src_idx: u32,
+    pub ty: JoinTy,
 }
 
 impl Join {
@@ -2092,10 +2143,10 @@ pub struct SetExpr {
     /// Because we cannot refer to multiple tables at once in a single UPDATE
     /// operation we only need to name the column, we can just a string here
     /// instead of a Column table.
-    col: String,
+    pub col: String,
     /// This is the expression that is evaluted to produce the value that is
     /// assigned to the column named in the `col` field.
-    expr: Expr,
+    pub expr: Expr,
 }
 
 impl SetExpr {
@@ -2142,8 +2193,8 @@ impl From<SetExpr> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct TableOrderBy {
-    order_by: OrderBy,
-    source: u32,
+    pub order_by: OrderBy,
+    pub source: u32,
     /// Because the `source` field defaults to 0 when unset, use this field to
     /// indicate whether the source should be used. In some cases, such as when
     /// you want to order by an column produced by aggregating on the result of
@@ -2151,7 +2202,7 @@ pub struct TableOrderBy {
     /// 
     /// In that case, set `use_source` to false and the verbatim string provided
     /// in the `field` field of the `OrderBy` structure will be used for the order-by.
-    use_source: bool,
+    pub use_source: bool,
 }
 
 impl TableOrderBy {
@@ -2200,11 +2251,11 @@ impl From<TableOrderBy> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct TableSource {
-    fields: Option<Vec<Expr>>,
-    filter: Option<Function>,
-    group_by: Option<Vec<Expr>>,
-    order_by: Option<Vec<OrderBy>>,
-    t: TableSourceUnion,
+    pub fields: Option<Vec<Expr>>,
+    pub filter: Option<Function>,
+    pub group_by: Option<Vec<Expr>>,
+    pub order_by: Option<Vec<OrderBy>>,
+    pub t: TableSourceUnion,
 }
 
 impl TableSource {
@@ -2335,7 +2386,7 @@ impl From<TableSource> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct TableSourceInstance {
-    t: TableSourceUnion,
+    pub t: TableSourceUnion,
 }
 
 impl TableSourceInstance {
@@ -2388,8 +2439,8 @@ impl From<TableSourceInstance> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct When {
-    cond: Expr,
-    value: Expr,
+    pub cond: Expr,
+    pub value: Expr,
 }
 
 impl When {
@@ -2651,6 +2702,14 @@ mod tests {
         let t0 = ValueIndex::default();
         let buf: Vec<u8> = t0.clone().into();
         let t1 = ValueIndex::try_from(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_value_name() {
+        let t0 = ValueName::default();
+        let buf: Vec<u8> = t0.clone().into();
+        let t1 = ValueName::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 

@@ -13,3 +13,4 @@ class ExprUnion(object):
     Partition = 7
     UnsetArgument = 8
     Window = 9
+    ValueName = 10

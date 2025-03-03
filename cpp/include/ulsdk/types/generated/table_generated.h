@@ -113,6 +113,54 @@ template<> struct OpTraits<RestoreRow> {
 bool VerifyOp(::flatbuffers::Verifier &verifier, const void *obj, Op type);
 bool VerifyOpVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<Op> *types);
 
+enum class TableFrom : uint8_t {
+  NONE = 0,
+  ObjectId = 1,
+  Schema = 2,
+  MIN = NONE,
+  MAX = Schema
+};
+
+inline const TableFrom (&EnumValuesTableFrom())[3] {
+  static const TableFrom values[] = {
+    TableFrom::NONE,
+    TableFrom::ObjectId,
+    TableFrom::Schema
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesTableFrom() {
+  static const char * const names[4] = {
+    "NONE",
+    "ObjectId",
+    "Schema",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameTableFrom(TableFrom e) {
+  if (::flatbuffers::IsOutRange(e, TableFrom::NONE, TableFrom::Schema)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesTableFrom()[index];
+}
+
+template<typename T> struct TableFromTraits {
+  static const TableFrom enum_value = TableFrom::NONE;
+};
+
+template<> struct TableFromTraits<ObjectId> {
+  static const TableFrom enum_value = TableFrom::ObjectId;
+};
+
+template<> struct TableFromTraits<Schema> {
+  static const TableFrom enum_value = TableFrom::Schema;
+};
+
+bool VerifyTableFrom(::flatbuffers::Verifier &verifier, const void *obj, TableFrom type);
+bool VerifyTableFromVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<TableFrom> *types);
+
 enum class ChangeOp : uint8_t {
   NONE = 0,
   Modify = 1,
@@ -537,24 +585,49 @@ inline ::flatbuffers::Offset<DiffStream> CreateDiffStreamDirect(
       attributes__);
 }
 
-/// Body parameter for POST datacatalog/table/<objectId>
+/// Body parameter for POST datacatalog/table
 struct NewTable FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef NewTableBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_NAME = 4,
     VT_PARENT = 6,
-    VT_TARGET = 8
+    VT_TARGET = 8,
+    VT_MIGRATE = 10,
+    VT_FROM_TYPE = 12,
+    VT_FROM = 14
   };
   const ::flatbuffers::String *name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_NAME);
   }
+  /// Parent drive directory in which the table is to be created.
   const ObjectId *parent() const {
     return GetPointer<const ObjectId *>(VT_PARENT);
   }
   /// If specified, creates a new table using this as the object ID.
   const ObjectId *target() const {
     return GetPointer<const ObjectId *>(VT_TARGET);
+  }
+  /// If true, data will be copied into the new table from the source ID
+  /// provided.
+  bool migrate() const {
+    return GetField<uint8_t>(VT_MIGRATE, 0) != 0;
+  }
+  TableFrom from_type() const {
+    return static_cast<TableFrom>(GetField<uint8_t>(VT_FROM_TYPE, 0));
+  }
+  /// The base to use for the table. If an object ID is provided, this will
+  /// take the schema from the provided stream or metadata object. If a
+  /// schema is provided, the table will be created, empty, from that.           
+  const void *from() const {
+    return GetPointer<const void *>(VT_FROM);
+  }
+  template<typename T> const T *from_as() const;
+  const ObjectId *from_as_ObjectId() const {
+    return from_type() == TableFrom::ObjectId ? static_cast<const ObjectId *>(from()) : nullptr;
+  }
+  const Schema *from_as_Schema() const {
+    return from_type() == TableFrom::Schema ? static_cast<const Schema *>(from()) : nullptr;
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -564,9 +637,21 @@ struct NewTable FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyTable(parent()) &&
            VerifyOffset(verifier, VT_TARGET) &&
            verifier.VerifyTable(target()) &&
+           VerifyField<uint8_t>(verifier, VT_MIGRATE, 1) &&
+           VerifyField<uint8_t>(verifier, VT_FROM_TYPE, 1) &&
+           VerifyOffset(verifier, VT_FROM) &&
+           VerifyTableFrom(verifier, from(), from_type()) &&
            verifier.EndTable();
   }
 };
+
+template<> inline const ObjectId *NewTable::from_as<ObjectId>() const {
+  return from_as_ObjectId();
+}
+
+template<> inline const Schema *NewTable::from_as<Schema>() const {
+  return from_as_Schema();
+}
 
 struct NewTableBuilder {
   typedef NewTable Table;
@@ -580,6 +665,15 @@ struct NewTableBuilder {
   }
   void add_target(::flatbuffers::Offset<ObjectId> target) {
     fbb_.AddOffset(NewTable::VT_TARGET, target);
+  }
+  void add_migrate(bool migrate) {
+    fbb_.AddElement<uint8_t>(NewTable::VT_MIGRATE, static_cast<uint8_t>(migrate), 0);
+  }
+  void add_from_type(TableFrom from_type) {
+    fbb_.AddElement<uint8_t>(NewTable::VT_FROM_TYPE, static_cast<uint8_t>(from_type), 0);
+  }
+  void add_from(::flatbuffers::Offset<void> from) {
+    fbb_.AddOffset(NewTable::VT_FROM, from);
   }
   explicit NewTableBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -597,11 +691,17 @@ inline ::flatbuffers::Offset<NewTable> CreateNewTable(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> name = 0,
     ::flatbuffers::Offset<ObjectId> parent = 0,
-    ::flatbuffers::Offset<ObjectId> target = 0) {
+    ::flatbuffers::Offset<ObjectId> target = 0,
+    bool migrate = false,
+    TableFrom from_type = TableFrom::NONE,
+    ::flatbuffers::Offset<void> from = 0) {
   NewTableBuilder builder_(_fbb);
+  builder_.add_from(from);
   builder_.add_target(target);
   builder_.add_parent(parent);
   builder_.add_name(name);
+  builder_.add_from_type(from_type);
+  builder_.add_migrate(migrate);
   return builder_.Finish();
 }
 
@@ -614,13 +714,19 @@ inline ::flatbuffers::Offset<NewTable> CreateNewTableDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *name = nullptr,
     ::flatbuffers::Offset<ObjectId> parent = 0,
-    ::flatbuffers::Offset<ObjectId> target = 0) {
+    ::flatbuffers::Offset<ObjectId> target = 0,
+    bool migrate = false,
+    TableFrom from_type = TableFrom::NONE,
+    ::flatbuffers::Offset<void> from = 0) {
   auto name__ = name ? _fbb.CreateString(name) : 0;
   return CreateNewTable(
       _fbb,
       name__,
       parent,
-      target);
+      target,
+      migrate,
+      from_type,
+      from);
 }
 
 struct Modify FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -1114,6 +1220,35 @@ inline bool VerifyOpVector(::flatbuffers::Verifier &verifier, const ::flatbuffer
   for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
     if (!VerifyOp(
         verifier,  values->Get(i), types->GetEnum<Op>(i))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+inline bool VerifyTableFrom(::flatbuffers::Verifier &verifier, const void *obj, TableFrom type) {
+  switch (type) {
+    case TableFrom::NONE: {
+      return true;
+    }
+    case TableFrom::ObjectId: {
+      auto ptr = reinterpret_cast<const ObjectId *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case TableFrom::Schema: {
+      auto ptr = reinterpret_cast<const Schema *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    default: return true;
+  }
+}
+
+inline bool VerifyTableFromVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<TableFrom> *types) {
+  if (!values || !types) return !values && !types;
+  if (values->size() != types->size()) return false;
+  for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
+    if (!VerifyTableFrom(
+        verifier,  values->Get(i), types->GetEnum<TableFrom>(i))) {
       return false;
     }
   }

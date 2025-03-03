@@ -15,14 +15,14 @@
 
 // @generated
 
+use super::value_generated::*;
 use super::entity_generated::*;
 use super::api_generated::*;
-use super::fun_generated::*;
-use super::value_generated::*;
 use super::graph_generated::*;
+use super::query_generated::*;
 use super::id_generated::*;
 use super::usecase_generated::*;
-use super::query_generated::*;
+use super::fun_generated::*;
 use super::Schema_generated::*;
 use core::mem;
 use core::cmp::Ordering;

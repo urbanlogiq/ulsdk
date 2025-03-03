@@ -19,7 +19,7 @@ def test_ls():
         )
 
 def test_create_entry():
-    p0 = UUID("00000000-0000-0000-0000-000000000000")
+    p0 = ""
     p1 = ""
     p2 = ""
     p3 = ""
@@ -43,7 +43,7 @@ def test_get_roots():
         )
 
 def test_post_file():
-    p0 = UUID("00000000-0000-0000-0000-000000000000")
+    p0 = ""
     p1 = False
     p2 = File("test.txt", "text/plain", bytes())
 
@@ -56,7 +56,7 @@ def test_post_file():
         )
 
 def test_unlink():
-    p0 = UUID("00000000-0000-0000-0000-000000000000")
+    p0 = ""
 
     if False:
         unlink(
@@ -83,7 +83,7 @@ def test_copy():
         )
 
 def test_get_file():
-    p0 = UUID("00000000-0000-0000-0000-000000000000")
+    p0 = ""
 
     if False:
         get_file(
@@ -92,7 +92,7 @@ def test_get_file():
         )
 
 def test_put_file_chunk():
-    p0 = UUID("00000000-0000-0000-0000-000000000000")
+    p0 = ""
     p1 = 0
     p2 = ""
     p3 = bytes()
@@ -107,7 +107,7 @@ def test_put_file_chunk():
         )
 
 def test_get_root_id():
-    p0 = UUID("00000000-0000-0000-0000-000000000000")
+    p0 = ""
 
     if False:
         get_root_id(

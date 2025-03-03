@@ -129,6 +129,7 @@ use crate::types::query::{
     UnsetArgument,
     UpdateQueryElement,
     ValueIndex,
+    ValueName,
     Vector,
     When,
     Window,
@@ -286,6 +287,7 @@ use crate::types::generated::query_generated::{
     UnsetArgument as FbsUnsetArgument,
     UpdateQueryElement as FbsUpdateQueryElement,
     ValueIndex as FbsValueIndex,
+    ValueName as FbsValueName,
     Vector as FbsVector,
     When as FbsWhen,
     Window as FbsWindow,
@@ -374,12 +376,12 @@ impl From<FbsUnits> for Units {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct UserPreferences {
-    center: Option<Point>,
-    default_area_report_template: Option<ObjectId>,
-    homepage_usecase_id: Option<ObjectId>,
-    timezone: Option<String>,
-    units: Units,
-    zoom: f32,
+    pub center: Option<Point>,
+    pub default_area_report_template: Option<ObjectId>,
+    pub homepage_usecase_id: Option<ObjectId>,
+    pub timezone: Option<String>,
+    pub units: Units,
+    pub zoom: f32,
 }
 
 impl UserPreferences {

@@ -96,20 +96,6 @@ use crate::types::job::{
     TaskPriority,
     TaskRunFlags,
 };
-use crate::types::reflection::{
-    ReflectionAdvancedFeatures,
-    ReflectionBaseType,
-    ReflectionEnum,
-    ReflectionEnumVal,
-    ReflectionField,
-    ReflectionKeyValue,
-    ReflectionObject,
-    ReflectionRPCCall,
-    ReflectionSchema,
-    ReflectionSchemaFile,
-    ReflectionService,
-    ReflectionType,
-};
 use crate::types::stream::{
     AxisType,
     FormatFlags,
@@ -254,20 +240,6 @@ use crate::types::generated::object_generated::{
     ObjectSummaryList as FbsObjectSummaryList,
     DataCatalogObjectFlags as FbsDataCatalogObjectFlags,
     DataCatalogObjectTy as FbsDataCatalogObjectTy,
-};
-use crate::types::generated::reflection_generated::{
-    reflection::Enum as FbsReflectionEnum,
-    reflection::EnumVal as FbsReflectionEnumVal,
-    reflection::Field as FbsReflectionField,
-    reflection::KeyValue as FbsReflectionKeyValue,
-    reflection::Object as FbsReflectionObject,
-    reflection::RPCCall as FbsReflectionRPCCall,
-    reflection::Schema as FbsReflectionSchema,
-    reflection::SchemaFile as FbsReflectionSchemaFile,
-    reflection::Service as FbsReflectionService,
-    reflection::Type as FbsReflectionType,
-    reflection::AdvancedFeatures as FbsReflectionAdvancedFeatures,
-    reflection::BaseType as FbsReflectionBaseType,
 };
 use crate::types::generated::stream_generated::{
     Stream as FbsStream,
@@ -418,30 +390,30 @@ impl From<FbsDataCatalogObjectTy> for DataCatalogObjectTy {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct DataCatalogObject {
-    attributes: Option<Vec<AttributePair>>,
+    pub attributes: Option<Vec<AttributePair>>,
     /// Optional change log comment
-    comment: Option<String>,
+    pub comment: Option<String>,
     /// Default protection mode (see PermissionTy in the permissions module).
     /// Purpose is to determine what happens when an object is navigated to
     /// (ie: a directory in the drive). Defaults to 0 (ie: no access)
-    default_mode: u32,
-    flags: u32,
+    pub default_mode: u32,
+    pub flags: u32,
     /// This field is either an embedded flatbuffer containing the actual object
     /// content (ie: worklog, schematic, ...) if the Encrypted flag is unset, or
     /// an EncryptedObject where the obj field of the EncryptedObject table is
     /// the embedded flatbuffer of the object if it is set.
-    obj: Vec<u8>,
+    pub obj: Vec<u8>,
     /// Parent nodes of this commit. To handle the cases of multiple parents (ie:
     /// in cases of parallel mutation), this field allows multiple IDs to be specified.
-    parents: Vec<ContentId>,
-    signature: Option<Vec<u8>>,
-    tags: Option<Vec<String>>,
+    pub parents: Vec<ContentId>,
+    pub signature: Option<Vec<u8>>,
+    pub tags: Option<Vec<String>>,
     /// UTC timestamp (in ms) when this change was made.
-    time: u64,
-    ty: DataCatalogObjectTy,
+    pub time: u64,
+    pub ty: DataCatalogObjectTy,
     /// User ID of the person committing the change.
-    user: B2cId,
-    version: u32,
+    pub user: B2cId,
+    pub version: u32,
 }
 
 impl DataCatalogObject {
@@ -593,7 +565,7 @@ impl From<DataCatalogObject> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ObjectIdList {
-    ids: Vec<ObjectId>,
+    pub ids: Vec<ObjectId>,
 }
 
 impl ObjectIdList {
@@ -645,8 +617,8 @@ impl From<ObjectIdList> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ObjectIdPair {
-    id: ObjectId,
-    object: Option<Vec<u8>>,
+    pub id: ObjectId,
+    pub object: Option<Vec<u8>>,
 }
 
 impl ObjectIdPair {
@@ -708,7 +680,7 @@ impl From<ObjectIdPair> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ObjectIdPairList {
-    pairs: Vec<ObjectIdPair>,
+    pub pairs: Vec<ObjectIdPair>,
 }
 
 impl ObjectIdPairList {
@@ -760,12 +732,12 @@ impl From<ObjectIdPairList> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ObjectSummary {
-    acl: Option<ObjectId>,
-    drive_size: u64,
-    head_revision: ContentId,
-    id: ObjectId,
-    time: u64,
-    ty: DataCatalogObjectTy,
+    pub acl: Option<ObjectId>,
+    pub drive_size: u64,
+    pub head_revision: ContentId,
+    pub id: ObjectId,
+    pub time: u64,
+    pub ty: DataCatalogObjectTy,
 }
 
 impl ObjectSummary {
@@ -827,7 +799,7 @@ impl From<ObjectSummary> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ObjectSummaryList {
-    pairs: Vec<ObjectSummary>,
+    pub pairs: Vec<ObjectSummary>,
 }
 
 impl ObjectSummaryList {

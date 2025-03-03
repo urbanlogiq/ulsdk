@@ -77,20 +77,6 @@ use crate::types::id::{
     ObjectNamespace,
     StreamId,
 };
-use crate::types::reflection::{
-    ReflectionAdvancedFeatures,
-    ReflectionBaseType,
-    ReflectionEnum,
-    ReflectionEnumVal,
-    ReflectionField,
-    ReflectionKeyValue,
-    ReflectionObject,
-    ReflectionRPCCall,
-    ReflectionSchema,
-    ReflectionSchemaFile,
-    ReflectionService,
-    ReflectionType,
-};
 use crate::types::value::{
     Point2D,
     Tri2D,
@@ -205,20 +191,6 @@ use crate::types::generated::job_generated::{
     TaskParameterValue as FbsTaskParameterValue,
     TaskPriority as FbsTaskPriority,
     TaskRunFlags as FbsTaskRunFlags,
-};
-use crate::types::generated::reflection_generated::{
-    reflection::Enum as FbsReflectionEnum,
-    reflection::EnumVal as FbsReflectionEnumVal,
-    reflection::Field as FbsReflectionField,
-    reflection::KeyValue as FbsReflectionKeyValue,
-    reflection::Object as FbsReflectionObject,
-    reflection::RPCCall as FbsReflectionRPCCall,
-    reflection::Schema as FbsReflectionSchema,
-    reflection::SchemaFile as FbsReflectionSchemaFile,
-    reflection::Service as FbsReflectionService,
-    reflection::Type as FbsReflectionType,
-    reflection::AdvancedFeatures as FbsReflectionAdvancedFeatures,
-    reflection::BaseType as FbsReflectionBaseType,
 };
 use crate::types::generated::value_generated::{
     Point2D as FbsPoint2D,
@@ -365,7 +337,7 @@ impl From<FbsTaskRunFlags> for TaskRunFlags {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct EmbeddedTable {
-    v: Vec<u8>,
+    pub v: Vec<u8>,
 }
 
 impl EmbeddedTable {
@@ -447,10 +419,10 @@ impl TaskParameterValue {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct DeprecatedRunSpec {
-    param_indices: Vec<ParamIndices>,
-    params: Vec<DeprecatedTaskParameter>,
-    persist: bool,
-    schematic: ObjectId,
+    pub param_indices: Vec<ParamIndices>,
+    pub params: Vec<DeprecatedTaskParameter>,
+    pub persist: bool,
+    pub schematic: ObjectId,
 }
 
 impl DeprecatedRunSpec {
@@ -522,10 +494,10 @@ impl From<DeprecatedRunSpec> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct DeprecatedTaskParameter {
-    flags: i64,
-    key: String,
-    obj: Option<ObjectId>,
-    value: Option<Vec<u8>>,
+    pub flags: i64,
+    pub key: String,
+    pub obj: Option<ObjectId>,
+    pub value: Option<Vec<u8>>,
 }
 
 impl DeprecatedTaskParameter {
@@ -596,8 +568,8 @@ impl From<DeprecatedTaskParameter> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Edge {
-    from: u32,
-    to: u32,
+    pub from: u32,
+    pub to: u32,
 }
 
 impl Edge {
@@ -641,15 +613,15 @@ impl From<Edge> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Job {
-    error_tys: Option<Vec<TaskErrorTy>>,
+    pub error_tys: Option<Vec<TaskErrorTy>>,
     /// Parameters verbatim from the RunSpec
-    params: Vec<TaskParameter>,
+    pub params: Vec<TaskParameter>,
     /// Is the job complete?
-    status: Status,
+    pub status: Status,
     /// A list of all the tasks that constitute this job.
-    tasks: Vec<Task>,
+    pub tasks: Vec<Task>,
     /// User ID who created this job.
-    user_id: ObjectId,
+    pub user_id: ObjectId,
 }
 
 impl Job {
@@ -745,8 +717,8 @@ impl From<Job> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Node {
-    name: String,
-    obj: ObjectId,
+    pub name: String,
+    pub obj: ObjectId,
 }
 
 impl Node {
@@ -793,7 +765,7 @@ impl From<Node> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ParamIndices {
-    idxs: Vec<i32>,
+    pub idxs: Vec<i32>,
 }
 
 impl ParamIndices {
@@ -847,12 +819,12 @@ impl From<ParamIndices> for Vec<u8> {
 /// start_date / end_date to be used in a number of calculations)
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct RunSpec {
-    notify: bool,
-    param_indices: Vec<ParamIndices>,
-    params: Vec<TaskParameter>,
-    persist: bool,
-    priority: TaskPriority,
-    schematic: ObjectId,
+    pub notify: bool,
+    pub param_indices: Vec<ParamIndices>,
+    pub params: Vec<TaskParameter>,
+    pub persist: bool,
+    pub priority: TaskPriority,
+    pub schematic: ObjectId,
 }
 
 impl RunSpec {
@@ -930,10 +902,10 @@ impl From<RunSpec> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Schematic {
-    attributes: Vec<AttributePair>,
-    edges: Vec<Edge>,
-    name: Option<String>,
-    nodes: Vec<Node>,
+    pub attributes: Vec<AttributePair>,
+    pub edges: Vec<Edge>,
+    pub name: Option<String>,
+    pub nodes: Vec<Node>,
 }
 
 impl Schematic {
@@ -1017,48 +989,48 @@ impl From<Schematic> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Task {
-    _id: ObjectId,
-    barrier_count: i32,
+    pub _id: ObjectId,
+    pub barrier_count: i32,
     /// Task creation time, in ms-since-Unix-epoch UTC.
-    created: u64,
+    pub created: u64,
     /// If false, keep this object if it's a temporary/intermediate after job
     /// creation. This must not be set if the output object above is a provided
     /// stream.
-    discard: bool,
+    pub discard: bool,
     /// The downstream nodes to enable once this task is complete
-    downstream: Vec<ObjectId>,
-    end: u64,
-    error_ty: TaskErrorTy,
-    flags: i32,
+    pub downstream: Vec<ObjectId>,
+    pub end: u64,
+    pub error_ty: TaskErrorTy,
+    pub flags: i32,
     /// Associated Job ID
-    job_id: ObjectId,
+    pub job_id: ObjectId,
     /// Task last poll time, in ms-since-Unix-epoch UTC.
-    last_updated: u64,
-    last_updated_by_pod: Option<String>,
+    pub last_updated: u64,
+    pub last_updated_by_pod: Option<String>,
     /// For errors, generic information.
-    message: Option<String>,
-    name: String,
+    pub message: Option<String>,
+    pub name: String,
     /// The output of this step. If the task is computational (ie: not just a
     /// data stream lookup) this is a blank object where the results will be
     /// written. If it is a lookup of an existing stream, this will be populated
     /// with the stream ID
-    output: ObjectId,
+    pub output: ObjectId,
     /// Parameter indices taken from the RunSpec for this particular task step.
-    params: ParamIndices,
-    retries: i32,
-    schematic_id: Option<ObjectId>,
+    pub params: ParamIndices,
+    pub retries: i32,
+    pub schematic_id: Option<ObjectId>,
     /// Task start time, in ms-since-Unix-epoch UTC.
-    start: u64,
+    pub start: u64,
     /// Task status
-    status: Status,
+    pub status: Status,
     /// Task object, either a source or a stream
-    task: ObjectId,
+    pub task: ObjectId,
     /// The upstream nodes that enabled this task
-    upstream: Vec<ObjectId>,
+    pub upstream: Vec<ObjectId>,
     /// User who created the job. This is the same as the user_id field in the
     /// job structure but duplicated for convenience when looking up task related
     /// information.
-    user_id: ObjectId,
+    pub user_id: ObjectId,
 }
 
 impl Task {
@@ -1199,7 +1171,7 @@ impl From<Task> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct TaskList {
-    tasks: Vec<Task>,
+    pub tasks: Vec<Task>,
 }
 
 impl TaskList {
@@ -1251,8 +1223,8 @@ impl From<TaskList> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct TaskParameter {
-    key: String,
-    value: TaskParameterValue,
+    pub key: String,
+    pub value: TaskParameterValue,
 }
 
 impl TaskParameter {

@@ -134,7 +134,7 @@ def update_object(
     ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
     return
 
-def update_attributes(
+def update_attribute(
     ctx: RequestContext,
     id_: UUID,
     overwrite: bool,

@@ -24,7 +24,7 @@ use crate::types::generated::crypto_generated::{
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Sha256 {
-    b: Vec<u8>,
+    pub b: Vec<u8>,
 }
 
 impl Sha256 {
@@ -95,9 +95,9 @@ impl Digest {
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct CryptHeader {
     /// An ID for the key used to encrypt this particular encrypted object.
-    kid: String,
-    nonce: Vec<u8>,
-    plaintext_len: u32,
+    pub kid: String,
+    pub nonce: Vec<u8>,
+    pub plaintext_len: u32,
 }
 
 impl CryptHeader {
@@ -151,8 +151,8 @@ impl From<CryptHeader> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct EncryptedObject {
-    header: CryptHeader,
-    obj: Vec<u8>,
+    pub header: CryptHeader,
+    pub obj: Vec<u8>,
 }
 
 impl EncryptedObject {
@@ -203,8 +203,8 @@ impl From<EncryptedObject> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Signature {
-    kid: String,
-    sig: Vec<u8>,
+    pub kid: String,
+    pub sig: Vec<u8>,
 }
 
 impl Signature {

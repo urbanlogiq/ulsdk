@@ -47,6 +47,10 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ExprUnion &o) {
         const std::shared_ptr<Window> &v = std::get<std::shared_ptr<Window>>(o);
         const auto offset = serialize_to(builder, *v);
         return std::make_pair(offset.Union(), ::ExprUnion::Window);
+    } else if (std::holds_alternative<std::shared_ptr<ValueName>>(o)) {
+        const std::shared_ptr<ValueName> &v = std::get<std::shared_ptr<ValueName>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::ExprUnion::ValueName);
     } else { 
         throw std::runtime_error("unreachable");
     }
@@ -418,6 +422,12 @@ Expr::Expr(const ::Expr *root)
                 exprs_ = exprs__shared;
                 break;
             }
+            case ::ExprUnion::ValueName: {
+                const auto exprs__local = static_cast<const ::ValueName *>(root->exprs());
+                std::shared_ptr<ValueName> exprs__shared = std::make_shared<ValueName>(exprs__local);
+                exprs_ = exprs__shared;
+                break;
+            }
             default: throw std::runtime_error("unknown union variant");
         }
     }
@@ -675,6 +685,40 @@ Window::Window(const ::Window *root)
         }
         partition_ = std::make_optional(partition__target);
     }
+}
+
+::flatbuffers::Offset<::ValueName>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ValueName &o) {
+    const ::flatbuffers::Offset<::flatbuffers::String> name_offset = builder.CreateString(o.name_);
+
+    ::ValueNameBuilder instance_builder = ::ValueNameBuilder(builder);
+    instance_builder.add_name(name_offset);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const ValueName &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+ValueName::ValueName()
+    : name_() {
+}
+
+ValueName::ValueName(const std::vector<uint8_t> &bytes)
+    : ValueName(::flatbuffers::GetSizePrefixedRoot<::ValueName>(bytes.data())) {
+}
+
+ValueName::ValueName(const ::ValueName *root) 
+    : name_() {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+        name_ = std::string(*root->name()->begin(), *root->name()->end());
 }
 
 ::flatbuffers::Offset<::Distinct>

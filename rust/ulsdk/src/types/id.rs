@@ -72,7 +72,7 @@ impl From<FbsObjectNamespace> for ObjectNamespace {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct B2cId {
-    b: Vec<u8>,
+    pub b: Vec<u8>,
 }
 
 impl B2cId {
@@ -119,7 +119,7 @@ impl From<B2cId> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ColumnGroupId {
-    b: Vec<u8>,
+    pub b: Vec<u8>,
 }
 
 impl ColumnGroupId {
@@ -166,7 +166,7 @@ impl From<ColumnGroupId> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ContentId {
-    b: Vec<u8>,
+    pub b: Vec<u8>,
 }
 
 impl ContentId {
@@ -213,7 +213,7 @@ impl From<ContentId> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct DataStateId {
-    b: Vec<u8>,
+    pub b: Vec<u8>,
 }
 
 impl DataStateId {
@@ -260,7 +260,7 @@ impl From<DataStateId> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct GenericId {
-    b: Vec<u8>,
+    pub b: Vec<u8>,
 }
 
 impl GenericId {
@@ -307,7 +307,7 @@ impl From<GenericId> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct GraphNodeId {
-    b: Vec<u8>,
+    pub b: Vec<u8>,
 }
 
 impl GraphNodeId {
@@ -354,7 +354,7 @@ impl From<GraphNodeId> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ObjectId {
-    b: Vec<u8>,
+    pub b: Vec<u8>,
 }
 
 impl ObjectId {
@@ -401,7 +401,7 @@ impl From<ObjectId> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct StreamId {
-    b: Vec<u8>,
+    pub b: Vec<u8>,
 }
 
 impl StreamId {

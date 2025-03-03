@@ -165,6 +165,7 @@ from .generated.VUnit import VUnit as FbsVUnit
 from .generated.VUsize import VUsize as FbsVUsize
 from .generated.ValueIndex import ValueIndex as FbsValueIndex
 from .generated.ValueInstance import ValueInstance as FbsValueInstance
+from .generated.ValueName import ValueName as FbsValueName
 from .generated.Vector import Vector as FbsVector
 from .generated.When import When as FbsWhen
 from .generated.Window import Window as FbsWindow
@@ -858,6 +859,52 @@ class Window:
         return eq
 
 @dataclass
+class ValueName:
+    name: "str"
+
+    @classmethod
+    def from_fbs(cls, o: FbsValueName) -> Self:
+        name_str = o.Name()
+        assert name_str is not None
+        name = name_str.decode('utf-8')
+        return cls(name)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsValueName.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.ValueName import (
+            Start,
+            AddName,
+            End,
+        )
+        name_offset = builder.CreateString(self.name)
+
+        Start(builder)
+        AddName(builder, name_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        name = ""
+        return cls(name)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.name == other.name
+
+        return eq
+
+@dataclass
 class ExprUnion:
     value: Union[
         "ValueIndex",
@@ -869,6 +916,7 @@ class ExprUnion:
         "Partition",
         "UnsetArgument",
         "Window",
+        "ValueName",
     ]
 
     def serialize_to(self, builder: Builder) -> Tuple[int, int]:
@@ -892,6 +940,8 @@ class ExprUnion:
             return (offset, ExprUnion().UnsetArgument)
         elif isinstance(self.value, Window):
             return (offset, ExprUnion().Window)
+        elif isinstance(self.value, ValueName):
+            return (offset, ExprUnion().ValueName)
         raise ValueError("Invalid union type")
 
     @classmethod
@@ -936,6 +986,10 @@ class ExprUnion:
             val = FbsWindow();
             val.Init(source, pos)
             return cls(Window.from_fbs(val))
+        elif ty == ExprUnion_ty_instance.ValueName:
+            val = FbsValueName();
+            val.Init(source, pos)
+            return cls(ValueName.from_fbs(val))
         else:
             raise ValueError("Invalid union type")
 
@@ -1604,14 +1658,14 @@ class DataCatalog:
 
 @dataclass
 class Arrow:
-    value: "bytes"
+    value: "List[int]"
 
     @classmethod
     def from_fbs(cls, o: FbsArrow) -> Self:
-        if o.ValueIsNone():
-            value = b""
-        else:
-            value = bytes(o.ValueAsNumpy())
+        value = list()
+        if not o.ValueIsNone():
+            for i in range(o.ValueLength()):
+                value.append(o.Value(i))
         return cls(value)
 
     @classmethod
@@ -1644,7 +1698,7 @@ class Arrow:
 
     @classmethod
     def make_default(cls) -> Self:
-        value = b""
+        value = []
         return cls(value)
 
     def __eq__(self, other) -> bool:

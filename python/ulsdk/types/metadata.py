@@ -102,20 +102,6 @@ from .id import (
     ObjectNamespace,
     StreamId,
 )
-from .reflection import (
-    ReflectionAdvancedFeatures,
-    ReflectionBaseType,
-    ReflectionEnum,
-    ReflectionEnumVal,
-    ReflectionField,
-    ReflectionKeyValue,
-    ReflectionObject,
-    ReflectionRPCCall,
-    ReflectionSchema,
-    ReflectionSchemaFile,
-    ReflectionService,
-    ReflectionType,
-)
 from .value import (
     Point2D,
     Tri2D,
@@ -271,16 +257,6 @@ from .generated.VUnit import VUnit as FbsVUnit
 from .generated.VUsize import VUsize as FbsVUsize
 from .generated.ValueInstance import ValueInstance as FbsValueInstance
 from .generated.WorldGraphGeometry import WorldGraphGeometry as FbsWorldGraphGeometry
-from .generated.reflection.Enum import Enum as FbsEnum
-from .generated.reflection.EnumVal import EnumVal as FbsEnumVal
-from .generated.reflection.Field import Field as FbsField
-from .generated.reflection.KeyValue import KeyValue as FbsKeyValue
-from .generated.reflection.Object import Object as FbsObject
-from .generated.reflection.RPCCall import RPCCall as FbsRPCCall
-from .generated.reflection.Schema import Schema as FbsSchema
-from .generated.reflection.SchemaFile import SchemaFile as FbsSchemaFile
-from .generated.reflection.Service import Service as FbsService
-from .generated.reflection.Type import Type as FbsType
 from .generated.ComponentData import ComponentData as FbsComponentData
 from .generated.Geometry import Geometry as FbsGeometry
 from .generated.GeometryDataUnion import GeometryDataUnion as FbsGeometryDataUnion
@@ -1027,14 +1003,14 @@ class ComponentData:
 
 @dataclass
 class RawGeom:
-    geom: "bytes"
+    geom: "List[int]"
 
     @classmethod
     def from_fbs(cls, o: FbsRawGeom) -> Self:
-        if o.GeomIsNone():
-            geom = b""
-        else:
-            geom = bytes(o.GeomAsNumpy())
+        geom = list()
+        if not o.GeomIsNone():
+            for i in range(o.GeomLength()):
+                geom.append(o.Geom(i))
         return cls(geom)
 
     @classmethod
@@ -1067,7 +1043,7 @@ class RawGeom:
 
     @classmethod
     def make_default(cls) -> Self:
-        geom = b""
+        geom = []
         return cls(geom)
 
     def __eq__(self, other) -> bool:

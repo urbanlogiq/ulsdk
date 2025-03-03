@@ -82,8 +82,8 @@ pub struct AccessControlList {
     /// list but extends the parent directory's ACL to retain all the existing
     /// permissions. This can also be used to selectively revoke access (by
     /// adding an ACL entry with empty permissions) to an object.
-    extends: Option<ObjectId>,
-    roles: Vec<Role>,
+    pub extends: Option<ObjectId>,
+    pub roles: Vec<Role>,
 }
 
 impl AccessControlList {
@@ -141,8 +141,8 @@ impl From<AccessControlList> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Role {
-    permission: u32,
-    principal: B2cId,
+    pub permission: u32,
+    pub principal: B2cId,
 }
 
 impl Role {

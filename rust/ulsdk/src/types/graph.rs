@@ -162,9 +162,9 @@ impl From<FbsValueTransform> for ValueTransform {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct GeomOp {
-    geoms: Vec<Geom>,
-    op: Fn_,
-    predicate: Predicate,
+    pub geoms: Vec<Geom>,
+    pub op: Fn_,
+    pub predicate: Predicate,
 }
 
 impl GeomOp {
@@ -224,12 +224,12 @@ impl From<GeomOp> for Vec<u8> {
 pub struct NodeQuery {
     /// If descriptions are provided here, then results will be ordered by their string similarity to the
     /// descriptions here. This ordering is secondary to the any top-level order_by that might be provided.
-    descriptions: Option<Vec<String>>,
-    entity_tys: Option<Vec<EntityTy>>,
-    geom_op: Option<GeomOp>,
-    node_ids: Option<Vec<NodeIdPair>>,
-    projections: Option<Vec<Projection>>,
-    stream_ids: Option<Vec<ObjectId>>,
+    pub descriptions: Option<Vec<String>>,
+    pub entity_tys: Option<Vec<EntityTy>>,
+    pub geom_op: Option<GeomOp>,
+    pub node_ids: Option<Vec<NodeIdPair>>,
+    pub projections: Option<Vec<Projection>>,
+    pub stream_ids: Option<Vec<ObjectId>>,
 }
 
 impl NodeQuery {
@@ -658,7 +658,7 @@ impl From<NodeQuery> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct EdgeQuery {
-    edge_ty: EdgeTy,
+    pub edge_ty: EdgeTy,
 }
 
 impl EdgeQuery {
@@ -728,7 +728,7 @@ impl QueryPathElementUnion {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct EdgeList {
-    edges: Vec<GraphEdge>,
+    pub edges: Vec<GraphEdge>,
 }
 
 impl EdgeList {
@@ -780,7 +780,7 @@ impl From<EdgeList> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Geom {
-    geom: Geometry,
+    pub geom: Geometry,
 }
 
 impl Geom {
@@ -833,9 +833,9 @@ impl From<Geom> for Vec<u8> {
 /// The GraphQuery encapsulates the entire world graph query.
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct GraphQuery {
-    limit: u32,
-    order_by: Option<Vec<OrderBy>>,
-    path: Vec<QueryPathElement>,
+    pub limit: u32,
+    pub order_by: Option<Vec<OrderBy>>,
+    pub path: Vec<QueryPathElement>,
 }
 
 impl GraphQuery {
@@ -914,8 +914,8 @@ impl From<GraphQuery> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct NodeIdPair {
-    node_id: GraphNodeId,
-    stream_id: Option<ObjectId>,
+    pub node_id: GraphNodeId,
+    pub stream_id: Option<ObjectId>,
 }
 
 impl NodeIdPair {
@@ -964,7 +964,7 @@ impl From<NodeIdPair> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct NodeList {
-    nodes: Vec<GraphNode>,
+    pub nodes: Vec<GraphNode>,
 }
 
 impl NodeList {
@@ -1016,9 +1016,9 @@ impl From<NodeList> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct OrderBy {
-    field: String,
-    sort: SortOrder,
-    transform: ValueTransform,
+    pub field: String,
+    pub sort: SortOrder,
+    pub transform: ValueTransform,
 }
 
 impl OrderBy {
@@ -1067,8 +1067,8 @@ impl From<OrderBy> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Projection {
-    alias: String,
-    predicate: Predicate,
+    pub alias: String,
+    pub predicate: Predicate,
 }
 
 impl Projection {
@@ -1114,7 +1114,7 @@ impl From<Projection> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct QueryPathElement {
-    element: QueryPathElementUnion,
+    pub element: QueryPathElementUnion,
 }
 
 impl QueryPathElement {

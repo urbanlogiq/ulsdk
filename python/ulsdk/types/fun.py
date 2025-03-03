@@ -86,6 +86,9 @@ class Fn(Enum):
     ArraySort = 73
     ArrowCast = 74
     RaiseCaseNotHandled = 75
+    Round = 76
+    Floor = 77
+    Ceil = 78
     UlTimezone = 32764
     UlArrayContains = 32765
     UlArrayAny = 32766

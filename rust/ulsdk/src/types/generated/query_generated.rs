@@ -15,12 +15,12 @@
 
 // @generated
 
+use super::value_generated::*;
 use super::entity_generated::*;
 use super::api_generated::*;
-use super::fun_generated::*;
-use super::value_generated::*;
 use super::graph_generated::*;
 use super::id_generated::*;
+use super::fun_generated::*;
 use core::mem;
 use core::cmp::Ordering;
 
@@ -139,10 +139,10 @@ impl flatbuffers::SimpleToVerifyInSlice for TypeHint {}
 #[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
 pub const ENUM_MIN_EXPR_UNION: u8 = 0;
 #[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
-pub const ENUM_MAX_EXPR_UNION: u8 = 9;
+pub const ENUM_MAX_EXPR_UNION: u8 = 10;
 #[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_EXPR_UNION: [ExprUnion; 10] = [
+pub const ENUM_VALUES_EXPR_UNION: [ExprUnion; 11] = [
   ExprUnion::NONE,
   ExprUnion::ValueIndex,
   ExprUnion::Column,
@@ -153,6 +153,7 @@ pub const ENUM_VALUES_EXPR_UNION: [ExprUnion; 10] = [
   ExprUnion::Partition,
   ExprUnion::UnsetArgument,
   ExprUnion::Window,
+  ExprUnion::ValueName,
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
@@ -170,9 +171,10 @@ impl ExprUnion {
   pub const Partition: Self = Self(7);
   pub const UnsetArgument: Self = Self(8);
   pub const Window: Self = Self(9);
+  pub const ValueName: Self = Self(10);
 
   pub const ENUM_MIN: u8 = 0;
-  pub const ENUM_MAX: u8 = 9;
+  pub const ENUM_MAX: u8 = 10;
   pub const ENUM_VALUES: &'static [Self] = &[
     Self::NONE,
     Self::ValueIndex,
@@ -184,6 +186,7 @@ impl ExprUnion {
     Self::Partition,
     Self::UnsetArgument,
     Self::Window,
+    Self::ValueName,
   ];
   /// Returns the variant's name or "" if unknown.
   pub fn variant_name(self) -> Option<&'static str> {
@@ -198,6 +201,7 @@ impl ExprUnion {
       Self::Partition => Some("Partition"),
       Self::UnsetArgument => Some("UnsetArgument"),
       Self::Window => Some("Window"),
+      Self::ValueName => Some("ValueName"),
       _ => None,
     }
   }
@@ -897,6 +901,115 @@ impl core::fmt::Debug for ValueIndex<'_> {
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     let mut ds = f.debug_struct("ValueIndex");
       ds.field("idx", &self.idx());
+      ds.finish()
+  }
+}
+pub enum ValueNameOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct ValueName<'a> {
+  pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for ValueName<'a> {
+  type Inner = ValueName<'a>;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    Self { _tab: flatbuffers::Table::new(buf, loc) }
+  }
+}
+
+impl<'a> ValueName<'a> {
+  pub const VT_NAME: flatbuffers::VOffsetT = 4;
+
+  #[inline]
+  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+    ValueName { _tab: table }
+  }
+  #[allow(unused_mut)]
+  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
+    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    args: &'args ValueNameArgs<'args>
+  ) -> flatbuffers::WIPOffset<ValueName<'bldr>> {
+    let mut builder = ValueNameBuilder::new(_fbb);
+    if let Some(x) = args.name { builder.add_name(x); }
+    builder.finish()
+  }
+
+
+  #[inline]
+  pub fn name(&self) -> &'a str {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<&str>>(ValueName::VT_NAME, None).unwrap()}
+  }
+}
+
+impl flatbuffers::Verifiable for ValueName<'_> {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.visit_table(pos)?
+     .visit_field::<flatbuffers::ForwardsUOffset<&str>>("name", Self::VT_NAME, true)?
+     .finish();
+    Ok(())
+  }
+}
+pub struct ValueNameArgs<'a> {
+    pub name: Option<flatbuffers::WIPOffset<&'a str>>,
+}
+impl<'a> Default for ValueNameArgs<'a> {
+  #[inline]
+  fn default() -> Self {
+    ValueNameArgs {
+      name: None, // required field
+    }
+  }
+}
+
+impl Serialize for ValueName<'_> {
+  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+  where
+    S: Serializer,
+  {
+    let mut s = serializer.serialize_struct("ValueName", 1)?;
+      s.serialize_field("name", &self.name())?;
+    s.end()
+  }
+}
+
+pub struct ValueNameBuilder<'a: 'b, 'b> {
+  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b> ValueNameBuilder<'a, 'b> {
+  #[inline]
+  pub fn add_name(&mut self, name: flatbuffers::WIPOffset<&'b  str>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(ValueName::VT_NAME, name);
+  }
+  #[inline]
+  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ValueNameBuilder<'a, 'b> {
+    let start = _fbb.start_table();
+    ValueNameBuilder {
+      fbb_: _fbb,
+      start_: start,
+    }
+  }
+  #[inline]
+  pub fn finish(self) -> flatbuffers::WIPOffset<ValueName<'a>> {
+    let o = self.fbb_.end_table(self.start_);
+    self.fbb_.required(o, ValueName::VT_NAME,"name");
+    flatbuffers::WIPOffset::new(o.value())
+  }
+}
+
+impl core::fmt::Debug for ValueName<'_> {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    let mut ds = f.debug_struct("ValueName");
+      ds.field("name", &self.name());
       ds.finish()
   }
 }
@@ -2290,6 +2403,20 @@ impl<'a> Expr<'a> {
     }
   }
 
+  #[inline]
+  #[allow(non_snake_case)]
+  pub fn exprs_as_value_name(&self) -> Option<ValueName<'a>> {
+    if self.exprs_type() == ExprUnion::ValueName {
+      let u = self.exprs();
+      // Safety:
+      // Created from a valid Table for this object
+      // Which contains a valid union in this slot
+      Some(unsafe { ValueName::init_from_table(u) })
+    } else {
+      None
+    }
+  }
+
 }
 
 impl flatbuffers::Verifiable for Expr<'_> {
@@ -2310,6 +2437,7 @@ impl flatbuffers::Verifiable for Expr<'_> {
           ExprUnion::Partition => v.verify_union_variant::<flatbuffers::ForwardsUOffset<Partition>>("ExprUnion::Partition", pos),
           ExprUnion::UnsetArgument => v.verify_union_variant::<flatbuffers::ForwardsUOffset<UnsetArgument>>("ExprUnion::UnsetArgument", pos),
           ExprUnion::Window => v.verify_union_variant::<flatbuffers::ForwardsUOffset<Window>>("ExprUnion::Window", pos),
+          ExprUnion::ValueName => v.verify_union_variant::<flatbuffers::ForwardsUOffset<ValueName>>("ExprUnion::ValueName", pos),
           _ => Ok(()),
         }
      })?
@@ -2383,6 +2511,11 @@ impl Serialize for Expr<'_> {
           ExprUnion::Window => {
             let f = self.exprs_as_window()
               .expect("Invalid union table, expected `ExprUnion::Window`.");
+            s.serialize_field("exprs", &f)?;
+          }
+          ExprUnion::ValueName => {
+            let f = self.exprs_as_value_name()
+              .expect("Invalid union table, expected `ExprUnion::ValueName`.");
             s.serialize_field("exprs", &f)?;
           }
         _ => unimplemented!(),
@@ -2483,6 +2616,13 @@ impl core::fmt::Debug for Expr<'_> {
         },
         ExprUnion::Window => {
           if let Some(x) = self.exprs_as_window() {
+            ds.field("exprs", &x)
+          } else {
+            ds.field("exprs", &"InvalidFlatbuffer: Union discriminant does not match value.")
+          }
+        },
+        ExprUnion::ValueName => {
+          if let Some(x) = self.exprs_as_value_name() {
             ds.field("exprs", &x)
           } else {
             ds.field("exprs", &"InvalidFlatbuffer: Union discriminant does not match value.")

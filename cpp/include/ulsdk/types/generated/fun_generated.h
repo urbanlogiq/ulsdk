@@ -90,6 +90,9 @@ enum class Fn : int16_t {
   ArraySort = 73,
   ArrowCast = 74,
   RaiseCaseNotHandled = 75,
+  Round = 76,
+  Floor = 77,
+  Ceil = 78,
   UlTimezone = 32764,
   UlArrayContains = 32765,
   UlArrayAny = 32766,
@@ -97,7 +100,7 @@ enum class Fn : int16_t {
   MAX = UlArrayAny
 };
 
-inline const Fn (&EnumValuesFn())[79] {
+inline const Fn (&EnumValuesFn())[82] {
   static const Fn values[] = {
     Fn::None,
     Fn::True,
@@ -175,6 +178,9 @@ inline const Fn (&EnumValuesFn())[79] {
     Fn::ArraySort,
     Fn::ArrowCast,
     Fn::RaiseCaseNotHandled,
+    Fn::Round,
+    Fn::Floor,
+    Fn::Ceil,
     Fn::UlTimezone,
     Fn::UlArrayContains,
     Fn::UlArrayAny
@@ -260,6 +266,9 @@ inline const char *EnumNameFn(Fn e) {
     case Fn::ArraySort: return "ArraySort";
     case Fn::ArrowCast: return "ArrowCast";
     case Fn::RaiseCaseNotHandled: return "RaiseCaseNotHandled";
+    case Fn::Round: return "Round";
+    case Fn::Floor: return "Floor";
+    case Fn::Ceil: return "Ceil";
     case Fn::UlTimezone: return "UlTimezone";
     case Fn::UlArrayContains: return "UlArrayContains";
     case Fn::UlArrayAny: return "UlArrayAny";

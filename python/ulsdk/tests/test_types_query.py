@@ -166,6 +166,12 @@ def test_value_index():
     _t1 = ValueIndex.from_bytes(_b)
     assert _t0 == _t1
 
+def test_value_name():
+    _t0 = ValueName.make_default()
+    _b = _t0.to_bytes()
+    _t1 = ValueName.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_vector():
     _t0 = Vector.make_default()
     _b = _t0.to_bytes()

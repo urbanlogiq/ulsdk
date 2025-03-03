@@ -9,9 +9,8 @@ import nacl.encoding
 import nacl.signing
 import requests
 from requests import Request, Session
-import uuid
 
-from .keys import Key, Environment, Region
+from .keys import Key, Environment
 from .request_context import RequestContext, _get_endpoint, File
 
 
@@ -118,12 +117,6 @@ def _generate_auth_header(
     return headers
 
 
-def copy_headers(src, dest: Dict[str, str]):
-    dest.clear()
-    for k in src:
-        dest[k] = src[k]
-
-
 class ApiKeyContext(RequestContext):
     def __init__(
         self,
@@ -133,13 +126,10 @@ class ApiKeyContext(RequestContext):
         self._key = key
         self._environment = environment
 
-    def user_id(self) -> uuid.UUID:
-        return self._key.user_id
-
-    def env(self) -> Environment:
+    def env(self):
         return self._environment
 
-    def region(self) -> Region:
+    def region(self):
         return self._key.region
 
     def get(
@@ -154,7 +144,6 @@ class ApiKeyContext(RequestContext):
         kwargs["headers"] = headers
         kwargs["params"] = params
         response = requests.get(endpoint, **kwargs)
-        copy_headers(response.headers, headers)
         response.raise_for_status()
         return response.content
 
@@ -184,7 +173,6 @@ class ApiKeyContext(RequestContext):
         kwargs["data"] = body
         kwargs["params"] = params
         response = requests.put(endpoint, **kwargs)
-        copy_headers(response.headers, headers)
         response.raise_for_status()
         return response.content
 
@@ -214,7 +202,6 @@ class ApiKeyContext(RequestContext):
         kwargs["data"] = body
         kwargs["params"] = params
         response = requests.post(endpoint, **kwargs)
-        copy_headers(response.headers, headers)
         response.raise_for_status()
         return response.content
 
@@ -285,6 +272,5 @@ class ApiKeyContext(RequestContext):
         kwargs["headers"] = headers
         kwargs["params"] = params
         response = requests.delete(endpoint, **kwargs)
-        copy_headers(response.headers, headers)
         response.raise_for_status()
         return response.content

@@ -23,7 +23,6 @@
 #include "ulsdk/types/job.h"
 #include "ulsdk/types/object.h"
 #include "ulsdk/types/query.h"
-#include "ulsdk/types/reflection.h"
 #include "ulsdk/types/stream.h"
 #include "ulsdk/types/value.h"
 #include "ulsdk/types/worklog.h"
@@ -59,6 +58,11 @@ typedef std::variant<
     std::shared_ptr<RmRow>,
     std::shared_ptr<RestoreRow>
 > Op;
+
+typedef std::variant<
+    std::shared_ptr<ObjectId>,
+    std::shared_ptr<Schema>
+> TableFrom;
 
 struct Modify {
     std::string col_;
@@ -168,9 +172,11 @@ struct History {
 };
 
 ///
-/// Body parameter for POST datacatalog/table/<objectId>
+/// Body parameter for POST datacatalog/table
 ///
 struct NewTable {
+    std::optional<TableFrom> from_;
+    bool migrate_;
     std::string name_;
     std::optional<ObjectId> parent_;
     std::optional<ObjectId> target_;
@@ -192,6 +198,8 @@ std::pair<::flatbuffers::Offset<void>, ::ChangeOp>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ChangeOp &o);
 std::pair<::flatbuffers::Offset<void>, ::Op>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Op &o);
+std::pair<::flatbuffers::Offset<void>, ::TableFrom>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TableFrom &o);
 ::flatbuffers::Offset<::Modify>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Modify &);
 

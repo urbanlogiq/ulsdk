@@ -263,10 +263,10 @@ impl From<FbsLayerCombineMode> for LayerCombineMode {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct CategoryFilter {
-    column_group_id: ColumnGroupId,
-    comparator: FieldComparator,
-    include_nulls: bool,
-    values: Vec<String>,
+    pub column_group_id: ColumnGroupId,
+    pub comparator: FieldComparator,
+    pub include_nulls: bool,
+    pub values: Vec<String>,
 }
 
 impl CategoryFilter {
@@ -328,10 +328,10 @@ impl From<CategoryFilter> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct RangeFilter {
-    column_group_id: ColumnGroupId,
-    include_nulls: bool,
-    max: f32,
-    min: f32,
+    pub column_group_id: ColumnGroupId,
+    pub include_nulls: bool,
+    pub max: f32,
+    pub min: f32,
 }
 
 impl RangeFilter {
@@ -383,12 +383,12 @@ impl From<RangeFilter> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct RelationshipRangeFilter {
-    aggregate_op: AggregateOp,
-    column_group_id: ColumnGroupId,
-    columns: Vec<String>,
-    include_nulls: bool,
-    max: f32,
-    min: f32,
+    pub aggregate_op: AggregateOp,
+    pub column_group_id: ColumnGroupId,
+    pub columns: Vec<String>,
+    pub include_nulls: bool,
+    pub max: f32,
+    pub min: f32,
 }
 
 impl RelationshipRangeFilter {
@@ -491,7 +491,7 @@ impl Filter {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct DataStateGeometrySource {
-    data_state_id: DataStateId,
+    pub data_state_id: DataStateId,
 }
 
 impl DataStateGeometrySource {
@@ -534,7 +534,7 @@ impl From<DataStateGeometrySource> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct RawGeometrySource {
-    geoms: Vec<RawGeometrySourceGeom>,
+    pub geoms: Vec<RawGeometrySourceGeom>,
 }
 
 impl RawGeometrySource {
@@ -615,11 +615,11 @@ impl JoinStackEntryGeometrySourceUnion {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ColumnGroup {
-    columns: Vec<String>,
-    display_name: String,
-    id: ColumnGroupId,
-    stream_id: Option<StreamId>,
-    ty: ColumnGroupType,
+    pub columns: Vec<String>,
+    pub display_name: String,
+    pub id: ColumnGroupId,
+    pub stream_id: Option<StreamId>,
+    pub ty: ColumnGroupType,
 }
 
 impl ColumnGroup {
@@ -688,10 +688,10 @@ impl From<ColumnGroup> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct DeprecatedDataStateJoin {
-    distance: f32,
-    from: DataStateId,
-    operation: JoinOperation,
-    to: DataStateId,
+    pub distance: f32,
+    pub from: DataStateId,
+    pub operation: JoinOperation,
+    pub to: DataStateId,
 }
 
 impl DeprecatedDataStateJoin {
@@ -744,7 +744,7 @@ impl From<DeprecatedDataStateJoin> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct FieldFilter {
-    filter: Filter,
+    pub filter: Filter,
 }
 
 impl FieldFilter {
@@ -794,10 +794,10 @@ impl From<FieldFilter> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct JoinStackEntry {
-    buffer: f32,
-    deprecated_data_state_id_do_not_use: Option<DataStateId>,
-    geometry_source: JoinStackEntryGeometrySourceUnion,
-    mode: LayerCombineMode,
+    pub buffer: f32,
+    pub deprecated_data_state_id_do_not_use: Option<DataStateId>,
+    pub geometry_source: JoinStackEntryGeometrySourceUnion,
+    pub mode: LayerCombineMode,
 }
 
 impl JoinStackEntry {
@@ -858,7 +858,7 @@ impl From<JoinStackEntry> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct RawGeometrySourceGeom {
-    geom: Geometry,
+    pub geom: Geometry,
 }
 
 impl RawGeometrySourceGeom {
@@ -910,11 +910,11 @@ impl From<RawGeometrySourceGeom> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct StackableDataStateJoin {
-    buffer: f32,
-    join_stack: Vec<JoinStackEntry>,
-    op: JoinOperation,
-    target: DataStateId,
-    type_: JoinType,
+    pub buffer: f32,
+    pub join_stack: Vec<JoinStackEntry>,
+    pub op: JoinOperation,
+    pub target: DataStateId,
+    pub type_: JoinType,
 }
 
 impl StackableDataStateJoin {
@@ -979,11 +979,11 @@ impl From<StackableDataStateJoin> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct UserLayer {
-    data_states: Vec<UserLayerDataState>,
-    deprecated_data_joins_do_not_use: Option<Vec<DeprecatedDataStateJoin>>,
-    joins: Vec<StackableDataStateJoin>,
-    name: Option<String>,
-    visible: bool,
+    pub data_states: Vec<UserLayerDataState>,
+    pub deprecated_data_joins_do_not_use: Option<Vec<DeprecatedDataStateJoin>>,
+    pub joins: Vec<StackableDataStateJoin>,
+    pub name: Option<String>,
+    pub visible: bool,
 }
 
 impl UserLayer {
@@ -1081,10 +1081,10 @@ impl From<UserLayer> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct UserLayerDataState {
-    active_fields: Vec<ColumnGroup>,
-    data_state_id: DataStateId,
-    filters: Vec<FieldFilter>,
-    stream_id: StreamId,
+    pub active_fields: Vec<ColumnGroup>,
+    pub data_state_id: DataStateId,
+    pub filters: Vec<FieldFilter>,
+    pub stream_id: StreamId,
 }
 
 impl UserLayerDataState {
@@ -1157,9 +1157,9 @@ impl From<UserLayerDataState> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct UserProject {
-    id: GenericId,
-    layers: Vec<UserLayer>,
-    name: Option<String>,
+    pub id: GenericId,
+    pub layers: Vec<UserLayer>,
+    pub name: Option<String>,
 }
 
 impl UserProject {

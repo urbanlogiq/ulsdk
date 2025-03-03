@@ -49,6 +49,7 @@ struct UnaryQueryElement;
 struct UnsetArgument;
 struct UpdateQueryElement;
 struct ValueIndex;
+struct ValueName;
 struct Vector;
 struct When;
 struct Window;
@@ -63,7 +64,8 @@ typedef std::variant<
     std::shared_ptr<OrderByExpr>,
     std::shared_ptr<Partition>,
     std::shared_ptr<UnsetArgument>,
-    std::shared_ptr<Window>
+    std::shared_ptr<Window>,
+    std::shared_ptr<ValueName>
 > ExprUnion;
 
 using ::JoinTy;
@@ -181,6 +183,14 @@ struct Window {
     Window();
     Window(const ::Window *root);
     Window(const std::vector<uint8_t> &bytes);
+};
+
+struct ValueName {
+    std::string name_;
+
+    ValueName();
+    ValueName(const ::ValueName *root);
+    ValueName(const std::vector<uint8_t> &bytes);
 };
 
 ///
@@ -431,6 +441,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UnsetArgument &);
 ::flatbuffers::Offset<::Window>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Window &);
 
+::flatbuffers::Offset<::ValueName>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ValueName &);
+
 ::flatbuffers::Offset<::Distinct>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Distinct &);
 
@@ -524,6 +537,9 @@ to_bytes(const UnsetArgument &o);
 
 std::vector<uint8_t>
 to_bytes(const Window &o);
+
+std::vector<uint8_t>
+to_bytes(const ValueName &o);
 
 std::vector<uint8_t>
 to_bytes(const Distinct &o);

@@ -790,14 +790,14 @@ class VStr:
 
 @dataclass
 class VBytes:
-    v: "bytes"
+    v: "List[int]"
 
     @classmethod
     def from_fbs(cls, o: FbsVBytes) -> Self:
-        if o.VIsNone():
-            v = b""
-        else:
-            v = bytes(o.VAsNumpy())
+        v = list()
+        if not o.VIsNone():
+            for i in range(o.VLength()):
+                v.append(o.V(i))
         return cls(v)
 
     @classmethod
@@ -830,7 +830,7 @@ class VBytes:
 
     @classmethod
     def make_default(cls) -> Self:
-        v = b""
+        v = []
         return cls(v)
 
     def __eq__(self, other) -> bool:
@@ -1035,15 +1035,15 @@ class VTri2D:
 class VFixedSizeBytes:
     sz: "int"
 
-    v: "bytes"
+    v: "List[int]"
 
     @classmethod
     def from_fbs(cls, o: FbsVFixedSizeBytes) -> Self:
         sz = o.Sz()
-        if o.VIsNone():
-            v = b""
-        else:
-            v = bytes(o.VAsNumpy())
+        v = list()
+        if not o.VIsNone():
+            for i in range(o.VLength()):
+                v.append(o.V(i))
         return cls(sz, v)
 
     @classmethod
@@ -1079,7 +1079,7 @@ class VFixedSizeBytes:
     @classmethod
     def make_default(cls) -> Self:
         sz = 0
-        v = b""
+        v = []
         return cls(sz, v)
 
     def __eq__(self, other) -> bool:
@@ -1529,17 +1529,23 @@ class Value:
 
 @dataclass
 class ValueInstance:
+    name: Optional["str"]
+
     v: "Value"
 
     @classmethod
     def from_fbs(cls, o: FbsValueInstance) -> Self:
+        name = None
+        name_str = o.Name()
+        if name_str is not None:
+            name = name_str.decode('utf-8')
         v_val = o.V()
         if v_val is not None:
             v_ty = o.VType()
             v = Value.from_fbs(v_val, v_ty)
         else:
             raise ValueError("V is required")
-        return cls(v)
+        return cls(name, v)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -1550,13 +1556,19 @@ class ValueInstance:
     def serialize_to(self, builder: Builder) -> int:
         from .generated.ValueInstance import (
             Start,
+            AddName,
             AddV,
             AddVType,
             End,
         )
+        name_offset = None
+        if self.name is not None:
+            name_offset = builder.CreateString(self.name)
         v_offset, v_ty = self.v.serialize_to(builder)
 
         Start(builder)
+        if name_offset is not None:
+            AddName(builder, name_offset)
         AddV(builder, v_offset)
         AddVType(builder, v_ty)
         return End(builder)
@@ -1569,11 +1581,13 @@ class ValueInstance:
 
     @classmethod
     def make_default(cls) -> Self:
+        name = ""
         v = Value.make_default()
-        return cls(v)
+        return cls(name, v)
 
     def __eq__(self, other) -> bool:
         eq = True
+        eq = eq and self.name == other.name
         eq = eq and self.v == other.v
 
         return eq

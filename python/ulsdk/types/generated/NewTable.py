@@ -6,10 +6,11 @@ import flatbuffers
 from flatbuffers.compat import import_numpy
 from typing import Any
 from .ObjectId import ObjectId
+from flatbuffers.table import Table
 from typing import Optional
 np = import_numpy()
 
-# Body parameter for POST datacatalog/table/<objectId>
+# Body parameter for POST datacatalog/table
 class NewTable(object):
     __slots__ = ['_tab']
 
@@ -35,6 +36,7 @@ class NewTable(object):
             return self._tab.String(o + self._tab.Pos)
         return None
 
+    # Parent drive directory in which the table is to be created.
     # NewTable
     def Parent(self) -> Optional[ObjectId]:
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
@@ -56,8 +58,36 @@ class NewTable(object):
             return obj
         return None
 
+    # If true, data will be copied into the new table from the source ID
+    # provided.
+    # NewTable
+    def Migrate(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        if o != 0:
+            return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
+        return False
+
+    # NewTable
+    def FromType(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Uint8Flags, o + self._tab.Pos)
+        return 0
+
+    # The base to use for the table. If an object ID is provided, this will
+    # take the schema from the provided stream or metadata object. If a
+    # schema is provided, the table will be created, empty, from that.           
+    # NewTable
+    def From_(self) -> Optional[flatbuffers.table.Table]:
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
+        if o != 0:
+            obj = Table(bytearray(), 0)
+            self._tab.Union(obj, o)
+            return obj
+        return None
+
 def NewTableStart(builder: flatbuffers.Builder):
-    builder.StartObject(3)
+    builder.StartObject(6)
 
 def Start(builder: flatbuffers.Builder):
     NewTableStart(builder)
@@ -79,6 +109,24 @@ def NewTableAddTarget(builder: flatbuffers.Builder, target: int):
 
 def AddTarget(builder: flatbuffers.Builder, target: int):
     NewTableAddTarget(builder, target)
+
+def NewTableAddMigrate(builder: flatbuffers.Builder, migrate: bool):
+    builder.PrependBoolSlot(3, migrate, 0)
+
+def AddMigrate(builder: flatbuffers.Builder, migrate: bool):
+    NewTableAddMigrate(builder, migrate)
+
+def NewTableAddFromType(builder: flatbuffers.Builder, fromType: int):
+    builder.PrependUint8Slot(4, fromType, 0)
+
+def AddFromType(builder: flatbuffers.Builder, fromType: int):
+    NewTableAddFromType(builder, fromType)
+
+def NewTableAddFrom_(builder: flatbuffers.Builder, from_: int):
+    builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(from_), 0)
+
+def AddFrom_(builder: flatbuffers.Builder, from_: int):
+    NewTableAddFrom_(builder, from_)
 
 def NewTableEnd(builder: flatbuffers.Builder) -> int:
     return builder.EndObject()

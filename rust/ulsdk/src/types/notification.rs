@@ -148,11 +148,11 @@ impl From<FbsRequestStatus> for RequestStatus {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Share {
-    dest: Option<String>,
-    msg: Option<String>,
-    new_perms: PermissionTy,
-    object: ObjectId,
-    old_perms: PermissionTy,
+    pub dest: Option<String>,
+    pub msg: Option<String>,
+    pub new_perms: PermissionTy,
+    pub object: ObjectId,
+    pub old_perms: PermissionTy,
 }
 
 impl Share {
@@ -213,7 +213,7 @@ impl From<Share> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct JobComplete {
-    job: ObjectId,
+    pub job: ObjectId,
 }
 
 impl JobComplete {
@@ -256,11 +256,11 @@ impl From<JobComplete> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct AccessRequest {
-    msg: Option<String>,
-    object: ObjectId,
-    perms: u32,
-    requested_ownership: u32,
-    status: RequestStatus,
+    pub msg: Option<String>,
+    pub object: ObjectId,
+    pub perms: u32,
+    pub requested_ownership: u32,
+    pub status: RequestStatus,
 }
 
 impl AccessRequest {
@@ -318,9 +318,9 @@ impl From<AccessRequest> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct DriveChange {
-    action: DriveAction,
-    object: ObjectId,
-    root: ObjectId,
+    pub action: DriveAction,
+    pub object: ObjectId,
+    pub root: ObjectId,
 }
 
 impl DriveChange {
@@ -411,7 +411,7 @@ impl NotificationUnion {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Inbox {
-    items: Vec<InboxItem>,
+    pub items: Vec<InboxItem>,
 }
 
 impl Inbox {
@@ -463,9 +463,9 @@ impl From<Inbox> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct InboxItem {
-    notification: ObjectId,
-    status: ReadStatus,
-    time: u64,
+    pub notification: ObjectId,
+    pub status: ReadStatus,
+    pub time: u64,
 }
 
 impl InboxItem {
@@ -514,8 +514,8 @@ impl From<InboxItem> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Notification {
-    notification: Option<NotificationUnion>,
-    sender: Option<B2cId>,
+    pub notification: Option<NotificationUnion>,
+    pub sender: Option<B2cId>,
 }
 
 impl Notification {
@@ -580,7 +580,7 @@ impl From<Notification> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Response {
-    msg: Option<String>,
+    pub msg: Option<String>,
 }
 
 impl Response {
@@ -625,8 +625,8 @@ impl From<Response> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ShareDetails {
-    msg: Option<String>,
-    notify: bool,
+    pub msg: Option<String>,
+    pub notify: bool,
 }
 
 impl ShareDetails {

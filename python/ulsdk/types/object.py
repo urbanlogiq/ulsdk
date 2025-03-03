@@ -90,20 +90,6 @@ from .job import (
     TaskPriority,
     TaskRunFlags,
 )
-from .reflection import (
-    ReflectionAdvancedFeatures,
-    ReflectionBaseType,
-    ReflectionEnum,
-    ReflectionEnumVal,
-    ReflectionField,
-    ReflectionKeyValue,
-    ReflectionObject,
-    ReflectionRPCCall,
-    ReflectionSchema,
-    ReflectionSchemaFile,
-    ReflectionService,
-    ReflectionType,
-)
 from .stream import (
     AxisType,
     FormatFlags,
@@ -252,16 +238,6 @@ from .generated.VUsize import VUsize as FbsVUsize
 from .generated.ValueInstance import ValueInstance as FbsValueInstance
 from .generated.WorkLog import WorkLog as FbsWorkLog
 from .generated.WorklogParameter import WorklogParameter as FbsWorklogParameter
-from .generated.reflection.Enum import Enum as FbsEnum
-from .generated.reflection.EnumVal import EnumVal as FbsEnumVal
-from .generated.reflection.Field import Field as FbsField
-from .generated.reflection.KeyValue import KeyValue as FbsKeyValue
-from .generated.reflection.Object import Object as FbsObject
-from .generated.reflection.RPCCall import RPCCall as FbsRPCCall
-from .generated.reflection.Schema import Schema as FbsSchema
-from .generated.reflection.SchemaFile import SchemaFile as FbsSchemaFile
-from .generated.reflection.Service import Service as FbsService
-from .generated.reflection.Type import Type as FbsType
 from .generated.ParameterValue import ParameterValue as FbsParameterValue
 from .generated.TaskParameterValue import TaskParameterValue as FbsTaskParameterValue
 from .generated.Type import Type as FbsType
@@ -309,13 +285,13 @@ class DataCatalogObject:
     # content (ie: worklog, schematic, ...) if the Encrypted flag is unset, or
     # an EncryptedObject where the obj field of the EncryptedObject table is
     # the embedded flatbuffer of the object if it is set.
-    obj: "bytes"
+    obj: "List[int]"
 
     # Parent nodes of this commit. To handle the cases of multiple parents (ie:
     # in cases of parallel mutation), this field allows multiple IDs to be specified.
     parents: "List[ContentId]"
 
-    signature: Optional["bytes"]
+    signature: Optional["List[int]"]
 
     tags: Optional["List[str]"]
 
@@ -345,10 +321,10 @@ class DataCatalogObject:
             comment = comment_str.decode('utf-8')
         default_mode = o.DefaultMode()
         flags = o.Flags()
-        if o.ObjIsNone():
-            obj = b""
-        else:
-            obj = bytes(o.ObjAsNumpy())
+        obj = list()
+        if not o.ObjIsNone():
+            for i in range(o.ObjLength()):
+                obj.append(o.Obj(i))
         parents = list()
         if not o.ParentsIsNone():
             for i in range(o.ParentsLength()):
@@ -357,10 +333,10 @@ class DataCatalogObject:
                 if parents_obj is not None:
                     parents_val = ContentId.from_fbs(parents_obj)
                 parents.append(parents_val)
-        if o.SignatureIsNone():
-            signature = b""
-        else:
-            signature = bytes(o.SignatureAsNumpy())
+        signature = list()
+        if not o.SignatureIsNone():
+            for i in range(o.SignatureLength()):
+                signature.append(o.Signature(i))
         tags = list()
         if not o.TagsIsNone():
             for i in range(o.TagsLength()):
@@ -474,9 +450,9 @@ class DataCatalogObject:
         comment = ""
         default_mode = 0
         flags = 0
-        obj = b""
+        obj = []
         parents = []
-        signature = b""
+        signature = []
         tags = []
         time = 0
         ty = DataCatalogObjectTy(0)
@@ -602,7 +578,7 @@ class ObjectIdList:
 class ObjectIdPair:
     id: "ObjectId"
 
-    object: Optional["bytes"]
+    object: Optional["List[int]"]
 
     @classmethod
     def from_fbs(cls, o: FbsObjectIdPair) -> Self:
@@ -611,10 +587,10 @@ class ObjectIdPair:
             id = ObjectId.from_fbs(id_obj)
         else:
             raise ValueError("Id is required")
-        if o.ObjectIsNone():
-            object = b""
-        else:
-            object = bytes(o.ObjectAsNumpy())
+        object = list()
+        if not o.ObjectIsNone():
+            for i in range(o.ObjectLength()):
+                object.append(o.Object(i))
         return cls(id, object)
 
     @classmethod
@@ -654,7 +630,7 @@ class ObjectIdPair:
     @classmethod
     def make_default(cls) -> Self:
         id = ObjectId.make_default()
-        object = b""
+        object = []
         return cls(id, object)
 
     def __eq__(self, other) -> bool:

@@ -1117,74 +1117,6 @@ to_bytes(const AdUserWithAuditLog &o) {
     return std::vector<uint8_t>(str.begin(), str.end());
 }
 
-CreateUserRequest::CreateUserRequest(const struct json_value_s *root)
-    : display_name_(std::nullopt)
-    , user_principal_name_(std::nullopt) {
-    if (root->type != json_type_object) {
-        throw std::runtime_error("expected json value to be of type object");
-    }
-
-    const struct json_object_s *object = static_cast<const struct json_object_s *>(root->payload);
-    const struct json_object_element_s *e = object->start;
-
-    while (e != nullptr) {
-        if (std::strcmp(e->name->string, "displayName") == 0) {
-            const struct json_value_s *create_user_request_value = e->value;
-
-            if (create_user_request_value->type == json_type_null) {
-                display_name_ = std::nullopt;
-            } else {
-                if (create_user_request_value->type != json_type_string) {
-                    throw std::runtime_error("expected field to be of type string");
-                }
-
-                const struct json_string_s *display_name__str = static_cast<const struct json_string_s *>(create_user_request_value->payload);
-                display_name_ = std::string(display_name__str->string);
-            }
-        } else if (std::strcmp(e->name->string, "userPrincipalName") == 0) {
-            const struct json_value_s *create_user_request_value = e->value;
-
-            if (create_user_request_value->type == json_type_null) {
-                user_principal_name_ = std::nullopt;
-            } else {
-                if (create_user_request_value->type != json_type_string) {
-                    throw std::runtime_error("expected field to be of type string");
-                }
-
-                const struct json_string_s *user_principal_name__str = static_cast<const struct json_string_s *>(create_user_request_value->payload);
-                user_principal_name_ = std::string(user_principal_name__str->string);
-            }
-        }
-
-        e = e->next;
-    }
-}
-
-std::vector<uint8_t>
-to_bytes(const CreateUserRequest &o) {
-    std::stringstream ss;
-    ss << "{";
-    if (o.display_name_.has_value()) {
-        ss << "\"displayName\":";
-        const auto &display_name__value = o.display_name_.value();
-        ss << "\"" << display_name__value << "\"";
-        ss << ",";
-    }
-
-    if (o.user_principal_name_.has_value()) {
-        ss << "\"userPrincipalName\":";
-        const auto &user_principal_name__value = o.user_principal_name_.value();
-        ss << "\"" << user_principal_name__value << "\"";
-    }
-
-    std::string str = ss.str();
-    if (str.back() == ',') {
-        str.pop_back();
-    }
-    str.push_back('}');
-    return std::vector<uint8_t>(str.begin(), str.end());
-}
-
 CreateUser::CreateUser(const struct json_value_s *root)
     : user_(AdUser())
     , password_(std::string()) {
@@ -1890,16 +1822,15 @@ get_current_user(
 
 Result<CreateUser>
 create_user(
-    ul::RequestContext &ctx,
-    const CreateUserRequest &create_user_request
+    ul::RequestContext &ctx
 ) {
     std::string path = "/v1/api/uldirectory/v1/user";
 
     std::map<std::string, std::string> params;
 
     std::map<std::string, std::string> headers;
-        const std::vector<uint8_t> body = to_bytes(create_user_request);
-    const Result<std::vector<uint8_t>> res = ctx.post(path, body, "application/json", params, headers);
+    const std::vector<uint8_t> body;
+    const Result<std::vector<uint8_t>> res = ctx.post(path, body, "text/plain", params, headers);
     if (std::holds_alternative<Error>(res)) {
         const auto error = std::get<Error>(res);
         return Result<CreateUser>(error);

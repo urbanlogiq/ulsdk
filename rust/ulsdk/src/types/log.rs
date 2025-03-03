@@ -127,8 +127,8 @@ impl From<FbsSeverity> for Severity {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Label {
-    key: String,
-    value: String,
+    pub key: String,
+    pub value: String,
 }
 
 impl Label {
@@ -175,9 +175,9 @@ impl From<Label> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Log {
-    labels: Vec<Label>,
-    pairs: Vec<Pair>,
-    timestamp: i64,
+    pub labels: Vec<Label>,
+    pub pairs: Vec<Pair>,
+    pub timestamp: i64,
 }
 
 impl Log {
@@ -245,8 +245,8 @@ impl From<Log> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Pair {
-    key: String,
-    value: Value,
+    pub key: String,
+    pub value: Value,
 }
 
 impl Pair {

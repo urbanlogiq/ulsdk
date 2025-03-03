@@ -63,20 +63,6 @@ use crate::types::id::{
     ObjectNamespace,
     StreamId,
 };
-use crate::types::reflection::{
-    ReflectionAdvancedFeatures,
-    ReflectionBaseType,
-    ReflectionEnum,
-    ReflectionEnumVal,
-    ReflectionField,
-    ReflectionKeyValue,
-    ReflectionObject,
-    ReflectionRPCCall,
-    ReflectionSchema,
-    ReflectionSchemaFile,
-    ReflectionService,
-    ReflectionType,
-};
 use crate::types::generated::Schema_generated::{
     Binary as FbsBinary,
     Bool as FbsBool,
@@ -139,20 +125,6 @@ use crate::types::generated::id_generated::{
     ObjectId as FbsObjectId,
     StreamId as FbsStreamId,
     ObjectNamespace as FbsObjectNamespace,
-};
-use crate::types::generated::reflection_generated::{
-    reflection::Enum as FbsReflectionEnum,
-    reflection::EnumVal as FbsReflectionEnumVal,
-    reflection::Field as FbsReflectionField,
-    reflection::KeyValue as FbsReflectionKeyValue,
-    reflection::Object as FbsReflectionObject,
-    reflection::RPCCall as FbsReflectionRPCCall,
-    reflection::Schema as FbsReflectionSchema,
-    reflection::SchemaFile as FbsReflectionSchemaFile,
-    reflection::Service as FbsReflectionService,
-    reflection::Type as FbsReflectionType,
-    reflection::AdvancedFeatures as FbsReflectionAdvancedFeatures,
-    reflection::BaseType as FbsReflectionBaseType,
 };
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -585,8 +557,8 @@ impl From<FbsTurnTy> for TurnTy {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct AttributePair {
-    key: Option<String>,
-    value: Option<String>,
+    pub key: Option<String>,
+    pub value: Option<String>,
 }
 
 impl AttributePair {
@@ -637,8 +609,8 @@ impl From<AttributePair> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct DirectionAndRoadName {
-    direction: String,
-    road_name: String,
+    pub direction: String,
+    pub road_name: String,
 }
 
 impl DirectionAndRoadName {
@@ -685,7 +657,7 @@ impl From<DirectionAndRoadName> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct DirectionAndRoadNames {
-    direction_and_road_names: Option<Vec<DirectionAndRoadName>>,
+    pub direction_and_road_names: Option<Vec<DirectionAndRoadName>>,
 }
 
 impl DirectionAndRoadNames {
@@ -748,10 +720,10 @@ impl From<DirectionAndRoadNames> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct NamedParameter {
-    description: Option<String>,
-    flags: u32,
-    name: String,
-    schema: Option<Schema>,
+    pub description: Option<String>,
+    pub flags: u32,
+    pub name: String,
+    pub schema: Option<Schema>,
 }
 
 impl NamedParameter {
@@ -809,13 +781,13 @@ impl From<NamedParameter> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Source {
-    metadata: Option<ObjectId>,
-    metadata_revision: Option<ContentId>,
-    name: String,
-    named_parameters: Option<Vec<NamedParameter>>,
-    options: Option<Vec<u8>>,
-    schemas: Option<Vec<Schema>>,
-    url: String,
+    pub metadata: Option<ObjectId>,
+    pub metadata_revision: Option<ContentId>,
+    pub name: String,
+    pub named_parameters: Option<Vec<NamedParameter>>,
+    pub options: Option<Vec<u8>>,
+    pub schemas: Option<Vec<Schema>>,
+    pub url: String,
 }
 
 impl Source {

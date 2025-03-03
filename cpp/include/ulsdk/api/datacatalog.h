@@ -91,7 +91,7 @@ update_object(
  * @param attributes A string:string json map with the new attributes
  */
 Result<Void>
-update_attributes(
+update_attribute(
     ul::RequestContext &ctx,
     const Uuid &id,
     bool overwrite,

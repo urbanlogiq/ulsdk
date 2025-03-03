@@ -57,20 +57,6 @@ from .id import (
     ObjectNamespace,
     StreamId,
 )
-from .reflection import (
-    ReflectionAdvancedFeatures,
-    ReflectionBaseType,
-    ReflectionEnum,
-    ReflectionEnumVal,
-    ReflectionField,
-    ReflectionKeyValue,
-    ReflectionObject,
-    ReflectionRPCCall,
-    ReflectionSchema,
-    ReflectionSchemaFile,
-    ReflectionService,
-    ReflectionType,
-)
 from .generated.AttributePair import AttributePair as FbsAttributePair
 from .generated.B2cId import B2cId as FbsB2cId
 from .generated.Binary import Binary as FbsBinary
@@ -110,16 +96,6 @@ from .generated.Time import Time as FbsTime
 from .generated.Timestamp import Timestamp as FbsTimestamp
 from .generated.Union import Union as FbsUnion
 from .generated.Utf8 import Utf8 as FbsUtf8
-from .generated.reflection.Enum import Enum as FbsEnum
-from .generated.reflection.EnumVal import EnumVal as FbsEnumVal
-from .generated.reflection.Field import Field as FbsField
-from .generated.reflection.KeyValue import KeyValue as FbsKeyValue
-from .generated.reflection.Object import Object as FbsObject
-from .generated.reflection.RPCCall import RPCCall as FbsRPCCall
-from .generated.reflection.Schema import Schema as FbsSchema
-from .generated.reflection.SchemaFile import SchemaFile as FbsSchemaFile
-from .generated.reflection.Service import Service as FbsService
-from .generated.reflection.Type import Type as FbsType
 from .generated.Type import Type as FbsType
 
 class DayOfWeek(Enum):
@@ -516,7 +492,7 @@ class Source:
 
     named_parameters: Optional["List[NamedParameter]"]
 
-    options: Optional["bytes"]
+    options: Optional["List[int]"]
 
     schemas: Optional["List[Schema]"]
 
@@ -543,10 +519,10 @@ class Source:
                 if named_parameters_obj is not None:
                     named_parameters_val = NamedParameter.from_fbs(named_parameters_obj)
                 named_parameters.append(named_parameters_val)
-        if o.OptionsIsNone():
-            options = b""
-        else:
-            options = bytes(o.OptionsAsNumpy())
+        options = list()
+        if not o.OptionsIsNone():
+            for i in range(o.OptionsLength()):
+                options.append(o.Options(i))
         schemas = list()
         if not o.SchemasIsNone():
             for i in range(o.SchemasLength()):
@@ -641,7 +617,7 @@ class Source:
         metadata_revision = ContentId.make_default()
         name = ""
         named_parameters = []
-        options = b""
+        options = []
         schemas = []
         url = ""
         return cls(metadata, metadata_revision, name, named_parameters, options, schemas, url)

@@ -91,6 +91,7 @@ use crate::types::query::{
     UnsetArgument,
     UpdateQueryElement,
     ValueIndex,
+    ValueName,
     Vector,
     When,
     Window,
@@ -203,6 +204,7 @@ use crate::types::generated::query_generated::{
     UnsetArgument as FbsUnsetArgument,
     UpdateQueryElement as FbsUpdateQueryElement,
     ValueIndex as FbsValueIndex,
+    ValueName as FbsValueName,
     Vector as FbsVector,
     When as FbsWhen,
     Window as FbsWindow,
@@ -256,7 +258,7 @@ use crate::types::generated::view_generated::{
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct View {
     /// The source query to run
-    query: Query,
+    pub query: Query,
 }
 
 impl View {

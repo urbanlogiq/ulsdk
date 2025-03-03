@@ -200,24 +200,11 @@ use crate::types::query::{
     UnsetArgument,
     UpdateQueryElement,
     ValueIndex,
+    ValueName,
     Vector,
     When,
     Window,
     WorklogPartition,
-};
-use crate::types::reflection::{
-    ReflectionAdvancedFeatures,
-    ReflectionBaseType,
-    ReflectionEnum,
-    ReflectionEnumVal,
-    ReflectionField,
-    ReflectionKeyValue,
-    ReflectionObject,
-    ReflectionRPCCall,
-    ReflectionSchema,
-    ReflectionSchemaFile,
-    ReflectionService,
-    ReflectionType,
 };
 use crate::types::stream::{
     AxisType,
@@ -455,6 +442,7 @@ use crate::types::generated::query_generated::{
     UnsetArgument as FbsUnsetArgument,
     UpdateQueryElement as FbsUpdateQueryElement,
     ValueIndex as FbsValueIndex,
+    ValueName as FbsValueName,
     Vector as FbsVector,
     When as FbsWhen,
     Window as FbsWindow,
@@ -466,20 +454,6 @@ use crate::types::generated::query_generated::{
     TablePartition as FbsTablePartition,
     TableSourceUnion as FbsTableSourceUnion,
     TypeHint as FbsTypeHint,
-};
-use crate::types::generated::reflection_generated::{
-    reflection::Enum as FbsReflectionEnum,
-    reflection::EnumVal as FbsReflectionEnumVal,
-    reflection::Field as FbsReflectionField,
-    reflection::KeyValue as FbsReflectionKeyValue,
-    reflection::Object as FbsReflectionObject,
-    reflection::RPCCall as FbsReflectionRPCCall,
-    reflection::Schema as FbsReflectionSchema,
-    reflection::SchemaFile as FbsReflectionSchemaFile,
-    reflection::Service as FbsReflectionService,
-    reflection::Type as FbsReflectionType,
-    reflection::AdvancedFeatures as FbsReflectionAdvancedFeatures,
-    reflection::BaseType as FbsReflectionBaseType,
 };
 use crate::types::generated::stream_generated::{
     Stream as FbsStream,
@@ -502,6 +476,7 @@ use crate::types::generated::table_generated::{
     Set as FbsSet,
     ChangeOp as FbsChangeOp,
     Op as FbsOp,
+    TableFrom as FbsTableFrom,
 };
 use crate::types::generated::value_generated::{
     Point2D as FbsPoint2D,
@@ -553,10 +528,10 @@ use crate::types::generated::worklog_generated::{
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Modify {
-    col: String,
-    previous: Option<ValueInstance>,
-    row: GenericId,
-    value: ValueInstance,
+    pub col: String,
+    pub previous: Option<ValueInstance>,
+    pub row: GenericId,
+    pub value: ValueInstance,
 }
 
 impl Modify {
@@ -613,7 +588,7 @@ impl From<Modify> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Delete {
-    row: GenericId,
+    pub row: GenericId,
 }
 
 impl Delete {
@@ -656,7 +631,7 @@ impl From<Delete> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Restore {
-    row: GenericId,
+    pub row: GenericId,
 }
 
 impl Restore {
@@ -736,11 +711,11 @@ impl ChangeOp {
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Set {
     /// Name of the column to set.
-    col: String,
+    pub col: String,
     /// The value of the ul_node_id column, which uniquely identifies the row.
-    row: GenericId,
+    pub row: GenericId,
     /// The value to set.
-    value: ValueInstance,
+    pub value: ValueInstance,
 }
 
 impl Set {
@@ -793,7 +768,7 @@ impl From<Set> for Vec<u8> {
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct RmRow {
     /// The value of the ul_node_id column, which uniquely identifies the row.
-    row: GenericId,
+    pub row: GenericId,
 }
 
 impl RmRow {
@@ -840,7 +815,7 @@ impl From<RmRow> for Vec<u8> {
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct RestoreRow {
     /// The value of the ul_node_id column, which uniquely identifies the row.
-    row: GenericId,
+    pub row: GenericId,
 }
 
 impl RestoreRow {
@@ -917,9 +892,38 @@ impl Op {
     }
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub enum TableFrom {
+    ObjectId(ObjectId),
+    Schema(Schema),
+}
+
+impl Default for TableFrom {
+    fn default() -> Self {
+        Self::ObjectId(ObjectId::default())
+    }
+}
+
+impl TableFrom {
+    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsTableFrom) {
+        match self {
+            Self::ObjectId(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsTableFrom::ObjectId;
+                (offset, ty)
+            }
+            Self::Schema(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsTableFrom::Schema;
+                (offset, ty)
+            }
+        }
+    }
+}
+
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ChangeOpEntry {
-    op: ChangeOp,
+    pub op: ChangeOp,
 }
 
 impl ChangeOpEntry {
@@ -969,11 +973,11 @@ impl From<ChangeOpEntry> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ChangeSet {
-    attributes: Option<Vec<Attr>>,
-    ops: Vec<ChangeOpEntry>,
-    revision: ContentId,
-    when: u64,
-    who: B2cId,
+    pub attributes: Option<Vec<Attr>>,
+    pub ops: Vec<ChangeOpEntry>,
+    pub revision: ContentId,
+    pub when: u64,
+    pub who: B2cId,
 }
 
 impl ChangeSet {
@@ -1065,10 +1069,10 @@ pub struct DiffStream {
     /// We can optionally associate attributes with the diffstream.
     /// When the change history of the table is retrieved, the attributes from the diffstream
     /// will be accessible as the `attributes` field on the ChangeSet associated with this diffstream.
-    attributes: Option<Vec<Attr>>,
+    pub attributes: Option<Vec<Attr>>,
     /// This is the head revision of the directory object that contains the table.
-    base: ContentId,
-    seq: Vec<OpEntry>,
+    pub base: ContentId,
+    pub seq: Vec<OpEntry>,
 }
 
 impl DiffStream {
@@ -1148,8 +1152,8 @@ impl From<DiffStream> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct History {
-    changes: Vec<ChangeSet>,
-    continuation_id: Option<ContentId>,
+    pub changes: Vec<ChangeSet>,
+    pub continuation_id: Option<ContentId>,
 }
 
 impl History {
@@ -1205,24 +1209,38 @@ impl From<History> for Vec<u8> {
     }
 }
 
-/// Body parameter for POST datacatalog/table/<objectId>
+/// Body parameter for POST datacatalog/table
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct NewTable {
-    name: String,
-    parent: Option<ObjectId>,
+    /// The base to use for the table. If an object ID is provided, this will
+    /// take the schema from the provided stream or metadata object. If a
+    /// schema is provided, the table will be created, empty, from that.           
+    pub from: Option<TableFrom>,
+    /// If true, data will be copied into the new table from the source ID
+    /// provided.
+    pub migrate: bool,
+    pub name: String,
+    /// Parent drive directory in which the table is to be created.
+    pub parent: Option<ObjectId>,
     /// If specified, creates a new table using this as the object ID.
-    target: Option<ObjectId>,
+    pub target: Option<ObjectId>,
 }
 
 impl NewTable {
     pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsNewTable<'a>> {
         use crate::types::generated::table_generated::NewTableBuilder as FbsNewTableBuilder;
 
+        let from_offset = self.from.as_ref().map(|u| u.serialize_to(builder));
         let name_offset = builder.create_string(&self.name);
         let parent_offset = self.parent.as_ref().map(|o| o.serialize_to(builder));
         let target_offset = self.target.as_ref().map(|o| o.serialize_to(builder));
 
         let mut bldr = FbsNewTableBuilder::new(builder);
+        if let Some((offset, ty)) = from_offset {
+            bldr.add_from(offset);
+            bldr.add_from_type(ty);
+        }
+        bldr.add_migrate(self.migrate);
         bldr.add_name(name_offset);
         if let Some(offset) = parent_offset {
             bldr.add_parent(offset);
@@ -1236,10 +1254,25 @@ impl NewTable {
 
 impl From<FbsNewTable<'_>> for NewTable {
     fn from(fbs: FbsNewTable<'_>) -> Self {
+        let from = if let Some(val) = fbs.from() {
+            let from = match fbs.from_type() {
+                FbsTableFrom::ObjectId => TableFrom::ObjectId(ObjectId::from(fbs.from_as_object_id().unwrap())),
+                FbsTableFrom::Schema => TableFrom::Schema(Schema::from(fbs.from_as_schema().unwrap())),
+                _ => unreachable!(),
+            };
+
+            Some(from)
+        } else {
+            None
+        };
+
+        let migrate = fbs.migrate();
         let name = fbs.name().to_owned();
         let parent = fbs.parent().map(ObjectId::from);
         let target = fbs.target().map(ObjectId::from);
         Self {
+            from,
+            migrate,
             name,
             parent,
             target,
@@ -1266,7 +1299,7 @@ impl From<NewTable> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct OpEntry {
-    op: Op,
+    pub op: Op,
 }
 
 impl OpEntry {

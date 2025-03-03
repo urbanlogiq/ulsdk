@@ -135,7 +135,7 @@ update_object(
 }
 
 Result<Void>
-update_attributes(
+update_attribute(
     ul::RequestContext &ctx,
     const Uuid &id,
     bool overwrite,

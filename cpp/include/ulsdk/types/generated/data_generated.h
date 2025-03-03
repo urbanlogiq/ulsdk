@@ -17,7 +17,6 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
 
 #include "Schema_generated.h"
 #include "id_generated.h"
-#include "reflection_generated.h"
 
 struct NamedParameter;
 struct NamedParameterBuilder;

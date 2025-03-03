@@ -40,7 +40,7 @@ ul::Result<ul::Void>
 test_create_entry(ul::RequestContext &ctx) {
     ::ul::api::drive::create_entry(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
+        std::string(),
         std::string(),
         std::string(),
         std::string(),
@@ -65,7 +65,7 @@ ul::Result<ul::Void>
 test_post_file(ul::RequestContext &ctx) {
     ::ul::api::drive::post_file(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
+        std::string(),
         false,
         std::vector<ul::File>()
     );
@@ -78,7 +78,7 @@ ul::Result<ul::Void>
 test_unlink(ul::RequestContext &ctx) {
     ::ul::api::drive::unlink(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        std::string()
     );
     return ul::Void();
 }
@@ -111,7 +111,7 @@ ul::Result<ul::Void>
 test_get_file(ul::RequestContext &ctx) {
     ::ul::api::drive::get_file(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        std::string()
     );
     return ul::Void();
 }
@@ -122,7 +122,7 @@ ul::Result<ul::Void>
 test_put_file_chunk(ul::RequestContext &ctx) {
     ::ul::api::drive::put_file_chunk(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
+        std::string(),
         0,
         std::string(),
         std::vector<uint8_t>()
@@ -136,7 +136,7 @@ ul::Result<ul::Void>
 test_get_root_id(ul::RequestContext &ctx) {
     ::ul::api::drive::get_root_id(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        std::string()
     );
     return ul::Void();
 }

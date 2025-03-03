@@ -191,14 +191,14 @@ impl From<FbsStreamFlags> for StreamFlags {
 /// read from it.
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Stream {
-    flags: u32,
-    metadata: Option<ObjectId>,
-    metadata_revision: Option<ContentId>,
-    options: Option<Vec<u8>>,
-    parameters: Option<Vec<u8>>,
-    schema: Schema,
-    substreams: Option<Vec<ObjectId>>,
-    url: String,
+    pub flags: u32,
+    pub metadata: Option<ObjectId>,
+    pub metadata_revision: Option<ContentId>,
+    pub options: Option<Vec<u8>>,
+    pub parameters: Option<Vec<u8>>,
+    pub schema: Schema,
+    pub substreams: Option<Vec<ObjectId>>,
+    pub url: String,
 }
 
 impl Stream {

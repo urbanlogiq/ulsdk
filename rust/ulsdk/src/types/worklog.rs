@@ -96,20 +96,6 @@ use crate::types::job::{
     TaskPriority,
     TaskRunFlags,
 };
-use crate::types::reflection::{
-    ReflectionAdvancedFeatures,
-    ReflectionBaseType,
-    ReflectionEnum,
-    ReflectionEnumVal,
-    ReflectionField,
-    ReflectionKeyValue,
-    ReflectionObject,
-    ReflectionRPCCall,
-    ReflectionSchema,
-    ReflectionSchemaFile,
-    ReflectionService,
-    ReflectionType,
-};
 use crate::types::value::{
     Point2D,
     Tri2D,
@@ -224,20 +210,6 @@ use crate::types::generated::job_generated::{
     TaskParameterValue as FbsTaskParameterValue,
     TaskPriority as FbsTaskPriority,
     TaskRunFlags as FbsTaskRunFlags,
-};
-use crate::types::generated::reflection_generated::{
-    reflection::Enum as FbsReflectionEnum,
-    reflection::EnumVal as FbsReflectionEnumVal,
-    reflection::Field as FbsReflectionField,
-    reflection::KeyValue as FbsReflectionKeyValue,
-    reflection::Object as FbsReflectionObject,
-    reflection::RPCCall as FbsReflectionRPCCall,
-    reflection::Schema as FbsReflectionSchema,
-    reflection::SchemaFile as FbsReflectionSchemaFile,
-    reflection::Service as FbsReflectionService,
-    reflection::Type as FbsReflectionType,
-    reflection::AdvancedFeatures as FbsReflectionAdvancedFeatures,
-    reflection::BaseType as FbsReflectionBaseType,
 };
 use crate::types::generated::value_generated::{
     Point2D as FbsPoint2D,
@@ -398,7 +370,7 @@ impl From<FbsValuesFormatTy> for ValuesFormatTy {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ByteArray {
-    b: Option<Vec<u8>>,
+    pub b: Option<Vec<u8>>,
 }
 
 impl ByteArray {
@@ -456,7 +428,7 @@ impl From<ByteArray> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ParameterFlags {
-    flags: i64,
+    pub flags: i64,
 }
 
 impl ParameterFlags {
@@ -539,13 +511,13 @@ impl ParameterValue {
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Layout {
     /// The height of the chart tile in react-grid-layout grid units
-    height: u32,
+    pub height: u32,
     /// The width in react-grid-layout grid units
-    width: u32,
+    pub width: u32,
     /// The x position in react-grid-layout grid units
-    x: u32,
+    pub x: u32,
     /// The y position in react-grid-layout grid units
-    y: u32,
+    pub y: u32,
 }
 
 impl Layout {
@@ -596,37 +568,37 @@ impl From<Layout> for Vec<u8> {
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct TileSettings {
     /// The column of tbe aggregation dataset to use
-    aggregation: AggregationTy,
+    pub aggregation: AggregationTy,
     /// The category
-    category: u32,
+    pub category: u32,
     /// What chart type to display the data as
-    chart_type: ChartTypeTy,
+    pub chart_type: ChartTypeTy,
     /// The field name from the metadata and dataset. Note that if it is a
     /// relationshipField, it will use the displayName instead
-    field_name: String,
+    pub field_name: String,
     /// Whether to group the other fields under "Other" if not showing all columns
-    group_others: bool,
+    pub group_others: bool,
     /// Record-count tiles report on the total number of graph nodes for the stream in the area, rather than
     /// on any specific field in that stream.
-    is_record_count_tile: bool,
+    pub is_record_count_tile: bool,
     /// Whether it is a relationship field (or a non-associated field)
-    is_relationship_field: bool,
+    pub is_relationship_field: bool,
     /// The metadata id for the field shown
-    metadata_id: ObjectId,
+    pub metadata_id: ObjectId,
     /// Which output stream the report belongs to
-    output_stream_index: u32,
-    record_count_stream_id: Option<ObjectId>,
+    pub output_stream_index: u32,
+    pub record_count_stream_id: Option<ObjectId>,
     /// Which columns the user has selected to show. If this is a relationship field, the user
     /// can select which of the relationship fields to show. If it is nonassociated field, it's
     /// possible that they only want to show certain ranges, which would be stored here, but
     /// that isn't currently supported
-    selected_columns: Vec<String>,
+    pub selected_columns: Vec<String>,
     /// Font size for text tiles
-    text_tile_font_size: u32,
+    pub text_tile_font_size: u32,
     /// The title of the tile
-    title: String,
+    pub title: String,
     /// Percentage or RawNumber
-    values_format: ValuesFormatTy,
+    pub values_format: ValuesFormatTy,
 }
 
 impl TileSettings {
@@ -723,8 +695,8 @@ impl From<TileSettings> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct TileData {
-    layout: Layout,
-    tile_settings: TileSettings,
+    pub layout: Layout,
+    pub tile_settings: TileSettings,
 }
 
 impl TileData {
@@ -771,8 +743,8 @@ impl From<TileData> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct UserSettings {
-    is_template: bool,
-    tile_data: Vec<TileData>,
+    pub is_template: bool,
+    pub tile_data: Vec<TileData>,
 }
 
 impl UserSettings {
@@ -828,18 +800,18 @@ impl From<UserSettings> for Vec<u8> {
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct WorkLog {
     /// Input streams and/or worklogs. These may be either work logs or streams.
-    input_streams: Option<Vec<ObjectId>>,
-    job_id: Option<ObjectId>,
+    pub input_streams: Option<Vec<ObjectId>>,
+    pub job_id: Option<ObjectId>,
     /// A human-readable tag.
-    name: Option<String>,
+    pub name: Option<String>,
     /// The output_streams contain a list of Parquet documents that consist of
     /// the results. These documents may expire (ie: if this is a temporary
     /// step) so there should be enough information in the worklog necessary
     /// to reconstruct these output streams.
-    output_streams: Vec<ObjectId>,
+    pub output_streams: Vec<ObjectId>,
     /// These are the serialized parameters passed into the task which created
     /// this worklog.
-    params: Vec<WorklogParameter>,
+    pub params: Vec<WorklogParameter>,
     /// Worklogs can contain multiple "levels". Consider the case where the user
     /// submits a request for multiple ADT reports. We will create separate ADT
     /// reports as required but also one that ties them all together. There are a
@@ -848,11 +820,11 @@ pub struct WorkLog {
     /// worklogs will be generated. Another is that it makes it it easy (or
     /// easier) to organize because we can sort based on "stuff the user requested",
     /// instead of just "stuff the system generated".
-    parent: Option<ObjectId>,
+    pub parent: Option<ObjectId>,
     /// The schematic used behind creating the worklog. This may be empty/null
     /// if we are just layering data, for example.
-    schematic: ObjectId,
-    user_settings: Option<UserSettings>,
+    pub schematic: ObjectId,
+    pub user_settings: Option<UserSettings>,
 }
 
 impl WorkLog {
@@ -969,8 +941,8 @@ impl From<WorkLog> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct WorklogParameter {
-    key: String,
-    value: Option<ParameterValue>,
+    pub key: String,
+    pub value: Option<ParameterValue>,
 }
 
 impl WorklogParameter {

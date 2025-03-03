@@ -48,7 +48,7 @@ ls(
 Result<::ul::types::ObjectSummary>
 create_entry(
     ul::RequestContext &ctx,
-    const Uuid &root,
+    const std::string &root,
     const std::string &tail,
     const std::string &ty,
     const std::string &mime,
@@ -74,7 +74,7 @@ get_roots(
 Result<::ul::types::DirectoryList>
 post_file(
     ul::RequestContext &ctx,
-    const Uuid &root,
+    const std::string &root,
     bool force,
     const std::vector<ul::File> &files
 );
@@ -87,7 +87,7 @@ post_file(
 Result<::ul::types::DirectoryList>
 unlink(
     ul::RequestContext &ctx,
-    const Uuid &entry
+    const std::string &entry
 );
 
 /**
@@ -118,7 +118,7 @@ copy(
 Result<std::vector<uint8_t>>
 get_file(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const std::string &id
 );
 
 /**
@@ -131,7 +131,7 @@ get_file(
 Result<Void>
 put_file_chunk(
     ul::RequestContext &ctx,
-    const Uuid &file_id,
+    const std::string &file_id,
     int64_t idx,
     const std::string &hash,
     const std::vector<uint8_t> &chunk
@@ -145,7 +145,7 @@ put_file_chunk(
 Result<::ul::types::ObjectId>
 get_root_id(
     ul::RequestContext &ctx,
-    const Uuid &b_2cid
+    const std::string &b_2cid
 );
 
 } // namespace drive
