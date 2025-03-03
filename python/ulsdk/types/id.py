@@ -30,14 +30,14 @@ class ObjectNamespace(Enum):
 
 @dataclass
 class B2cId:
-    b: "List[int]"
+    b: "bytes"
 
     @classmethod
     def from_fbs(cls, o: FbsB2cId) -> Self:
-        b = list()
-        if not o.BIsNone():
-            for i in range(o.BLength()):
-                b.append(o.B(i))
+        if o.BIsNone():
+            b = b""
+        else:
+            b = bytes(o.BAsNumpy())
         return cls(b)
 
     @classmethod
@@ -70,7 +70,7 @@ class B2cId:
 
     @classmethod
     def make_default(cls) -> Self:
-        b = []
+        b = b""
         return cls(b)
 
     def __eq__(self, other) -> bool:
@@ -84,14 +84,14 @@ class B2cId:
 
 @dataclass
 class ColumnGroupId:
-    b: "List[int]"
+    b: "bytes"
 
     @classmethod
     def from_fbs(cls, o: FbsColumnGroupId) -> Self:
-        b = list()
-        if not o.BIsNone():
-            for i in range(o.BLength()):
-                b.append(o.B(i))
+        if o.BIsNone():
+            b = b""
+        else:
+            b = bytes(o.BAsNumpy())
         return cls(b)
 
     @classmethod
@@ -124,7 +124,7 @@ class ColumnGroupId:
 
     @classmethod
     def make_default(cls) -> Self:
-        b = []
+        b = b""
         return cls(b)
 
     def __eq__(self, other) -> bool:
@@ -138,14 +138,14 @@ class ColumnGroupId:
 
 @dataclass
 class ContentId:
-    b: "List[int]"
+    b: "bytes"
 
     @classmethod
     def from_fbs(cls, o: FbsContentId) -> Self:
-        b = list()
-        if not o.BIsNone():
-            for i in range(o.BLength()):
-                b.append(o.B(i))
+        if o.BIsNone():
+            b = b""
+        else:
+            b = bytes(o.BAsNumpy())
         return cls(b)
 
     @classmethod
@@ -178,7 +178,7 @@ class ContentId:
 
     @classmethod
     def make_default(cls) -> Self:
-        b = []
+        b = b""
         return cls(b)
 
     def __eq__(self, other) -> bool:
@@ -192,14 +192,14 @@ class ContentId:
 
 @dataclass
 class DataStateId:
-    b: "List[int]"
+    b: "bytes"
 
     @classmethod
     def from_fbs(cls, o: FbsDataStateId) -> Self:
-        b = list()
-        if not o.BIsNone():
-            for i in range(o.BLength()):
-                b.append(o.B(i))
+        if o.BIsNone():
+            b = b""
+        else:
+            b = bytes(o.BAsNumpy())
         return cls(b)
 
     @classmethod
@@ -232,7 +232,7 @@ class DataStateId:
 
     @classmethod
     def make_default(cls) -> Self:
-        b = []
+        b = b""
         return cls(b)
 
     def __eq__(self, other) -> bool:
@@ -246,14 +246,14 @@ class DataStateId:
 
 @dataclass
 class GenericId:
-    b: "List[int]"
+    b: "bytes"
 
     @classmethod
     def from_fbs(cls, o: FbsGenericId) -> Self:
-        b = list()
-        if not o.BIsNone():
-            for i in range(o.BLength()):
-                b.append(o.B(i))
+        if o.BIsNone():
+            b = b""
+        else:
+            b = bytes(o.BAsNumpy())
         return cls(b)
 
     @classmethod
@@ -286,7 +286,7 @@ class GenericId:
 
     @classmethod
     def make_default(cls) -> Self:
-        b = []
+        b = b""
         return cls(b)
 
     def __eq__(self, other) -> bool:
@@ -300,14 +300,14 @@ class GenericId:
 
 @dataclass
 class GraphNodeId:
-    b: "List[int]"
+    b: "bytes"
 
     @classmethod
     def from_fbs(cls, o: FbsGraphNodeId) -> Self:
-        b = list()
-        if not o.BIsNone():
-            for i in range(o.BLength()):
-                b.append(o.B(i))
+        if o.BIsNone():
+            b = b""
+        else:
+            b = bytes(o.BAsNumpy())
         return cls(b)
 
     @classmethod
@@ -340,7 +340,7 @@ class GraphNodeId:
 
     @classmethod
     def make_default(cls) -> Self:
-        b = []
+        b = b""
         return cls(b)
 
     def __eq__(self, other) -> bool:
@@ -354,14 +354,14 @@ class GraphNodeId:
 
 @dataclass
 class ObjectId:
-    b: "List[int]"
+    b: "bytes"
 
     @classmethod
     def from_fbs(cls, o: FbsObjectId) -> Self:
-        b = list()
-        if not o.BIsNone():
-            for i in range(o.BLength()):
-                b.append(o.B(i))
+        if o.BIsNone():
+            b = b""
+        else:
+            b = bytes(o.BAsNumpy())
         return cls(b)
 
     @classmethod
@@ -394,7 +394,7 @@ class ObjectId:
 
     @classmethod
     def make_default(cls) -> Self:
-        b = []
+        b = b""
         return cls(b)
 
     def __eq__(self, other) -> bool:
@@ -408,14 +408,14 @@ class ObjectId:
 
 @dataclass
 class StreamId:
-    b: "List[int]"
+    b: "bytes"
 
     @classmethod
     def from_fbs(cls, o: FbsStreamId) -> Self:
-        b = list()
-        if not o.BIsNone():
-            for i in range(o.BLength()):
-                b.append(o.B(i))
+        if o.BIsNone():
+            b = b""
+        else:
+            b = bytes(o.BAsNumpy())
         return cls(b)
 
     @classmethod
@@ -448,7 +448,7 @@ class StreamId:
 
     @classmethod
     def make_default(cls) -> Self:
-        b = []
+        b = b""
         return cls(b)
 
     def __eq__(self, other) -> bool:

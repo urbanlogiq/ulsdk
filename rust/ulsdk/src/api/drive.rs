@@ -62,14 +62,14 @@ pub async fn ls(
 /// * A summary of the object created
 pub async fn create_entry(
     ctx: &dyn RequestContext,
-    root: &str,
+    root: Uuid,
     tail: &str,
     ty: &str,
     mime: &str,
     chunks: i64,
 ) -> Result<ObjectSummary, Error> {
     let path = "/v1/api/ulv2/drive/:root/*tail"
-        .replace(":root", root)
+        .replace(":root", &root.to_string())
         .replace("*tail", tail);
     let mut params = ParamMap::new();
     params.insert("ty".to_owned(), ty.to_owned());
@@ -110,12 +110,12 @@ pub async fn get_roots(
 /// * An updated list of directory entries
 pub async fn post_file(
     ctx: &dyn RequestContext,
-    root: &str,
+    root: Uuid,
     force: bool,
     files: Vec<File>,
 ) -> Result<DirectoryList, Error> {
     let path = "/v1/api/ulv2/drive/:root"
-        .replace(":root", root);
+        .replace(":root", &root.to_string());
     let mut params = ParamMap::new();
     params.insert("force".to_owned(), if force { "true" } else  { "false" }.to_owned());
 
@@ -134,10 +134,10 @@ pub async fn post_file(
 /// * An updated list of directory entries
 pub async fn unlink(
     ctx: &dyn RequestContext,
-    entry: &str,
+    entry: Uuid,
 ) -> Result<DirectoryList, Error> {
     let path = "/v1/api/ulv2/drive/:entry"
-        .replace(":entry", entry);
+        .replace(":entry", &entry.to_string());
     let res = ctx.delete(&path, None, None).await?;
     res.as_slice().try_into().map_err(Error::from)
 }
@@ -185,10 +185,10 @@ pub async fn copy(
 /// * The contents of the file referenced by the specified ID
 pub async fn get_file(
     ctx: &dyn RequestContext,
-    id: &str,
+    id: Uuid,
 ) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/drive/file/:id"
-        .replace(":id", id);
+        .replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     Ok(res)
 }
@@ -204,13 +204,13 @@ pub async fn get_file(
 /// * `chunk` - Binary file chunk data
 pub async fn put_file_chunk(
     ctx: &dyn RequestContext,
-    file_id: &str,
+    file_id: Uuid,
     idx: i64,
     hash: &str,
     chunk: Vec<u8>,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/drive/file/:file_id/:idx"
-        .replace(":file_id", file_id)
+        .replace(":file_id", &file_id.to_string())
         .replace(":idx", &idx.to_string());
     let mut params = ParamMap::new();
     params.insert("hash".to_owned(), hash.to_owned());
@@ -231,10 +231,10 @@ pub async fn put_file_chunk(
 /// * Drive directory root ID
 pub async fn get_root_id(
     ctx: &dyn RequestContext,
-    b2cid: &str,
+    b2cid: Uuid,
 ) -> Result<ObjectId, Error> {
     let path = "/v1/api/ulv2/drive/root/:b2cid"
-        .replace(":b2cid", b2cid);
+        .replace(":b2cid", &b2cid.to_string());
     let res = ctx.get(&path, None, None).await?;
     res.as_slice().try_into().map_err(Error::from)
 }
@@ -278,7 +278,7 @@ mod tests {
         let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
         let ctx = ApiKeyContext::new(key, Environment::Prod);
 
-        let p0 = "";
+        let p0 = Uuid::nil();
         let p1 = "";
         let p2 = "";
         let p3 = "";
@@ -320,7 +320,7 @@ mod tests {
         let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
         let ctx = ApiKeyContext::new(key, Environment::Prod);
 
-        let p0 = "";
+        let p0 = Uuid::nil();
         let p1 = false;
         let p2 = vec![File { name: "test.txt".to_owned(), mimetype: "text/plain".to_owned() , data: Bytes::new() }];
 
@@ -342,7 +342,7 @@ mod tests {
         let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
         let ctx = ApiKeyContext::new(key, Environment::Prod);
 
-        let p0 = "";
+        let p0 = Uuid::nil();
 
         unlink(
             &ctx,
@@ -396,7 +396,7 @@ mod tests {
         let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
         let ctx = ApiKeyContext::new(key, Environment::Prod);
 
-        let p0 = "";
+        let p0 = Uuid::nil();
 
         get_file(
             &ctx,
@@ -414,7 +414,7 @@ mod tests {
         let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
         let ctx = ApiKeyContext::new(key, Environment::Prod);
 
-        let p0 = "";
+        let p0 = Uuid::nil();
         let p1 = 0;
         let p2 = "";
         let p3 = Vec::new();
@@ -438,7 +438,7 @@ mod tests {
         let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
         let ctx = ApiKeyContext::new(key, Environment::Prod);
 
-        let p0 = "";
+        let p0 = Uuid::nil();
 
         get_root_id(
             &ctx,

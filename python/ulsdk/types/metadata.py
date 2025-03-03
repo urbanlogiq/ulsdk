@@ -1003,14 +1003,14 @@ class ComponentData:
 
 @dataclass
 class RawGeom:
-    geom: "List[int]"
+    geom: "bytes"
 
     @classmethod
     def from_fbs(cls, o: FbsRawGeom) -> Self:
-        geom = list()
-        if not o.GeomIsNone():
-            for i in range(o.GeomLength()):
-                geom.append(o.Geom(i))
+        if o.GeomIsNone():
+            geom = b""
+        else:
+            geom = bytes(o.GeomAsNumpy())
         return cls(geom)
 
     @classmethod
@@ -1043,7 +1043,7 @@ class RawGeom:
 
     @classmethod
     def make_default(cls) -> Self:
-        geom = []
+        geom = b""
         return cls(geom)
 
     def __eq__(self, other) -> bool:

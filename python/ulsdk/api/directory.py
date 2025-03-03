@@ -21,8 +21,8 @@ class Principal:
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
-        o["principal_type"] = self.principal_type
-        o["display_name"] = self.display_name
+        o["principalType"] = self.principal_type
+        o["displayName"] = self.display_name
         o["id"] = self.id_
         o["email"] = None
         if self.email is not None:
@@ -116,18 +116,18 @@ class AdUser:
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
-        o["display_name"] = self.display_name
+        o["displayName"] = self.display_name
         o["id"] = self.id_
-        o["user_principal_name"] = self.user_principal_name
+        o["userPrincipalName"] = self.user_principal_name
         other_mails_list = []
         for item in self.other_mails:
             other_mails_var = item
             other_mails_list.append(other_mails_var)
-        o["other_mails"] = other_mails_list
+        o["otherMails"] = other_mails_list
         o["department"] = None
         if self.department is not None:
             o["department"] = self.department
-        o["created_date_time"] = self.created_date_time
+        o["createdDateTime"] = self.created_date_time
         return o
 
     @classmethod
@@ -199,7 +199,7 @@ class DisplayNames:
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
-        o["display_name"] = self.display_name
+        o["displayName"] = self.display_name
         o["id"] = self.id_
         return o
 
@@ -241,24 +241,24 @@ class DeviceDetail:
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
-        o["device_id"] = None
+        o["deviceId"] = None
         if self.device_id is not None:
-            o["device_id"] = self.device_id
-        o["operating_system"] = None
+            o["deviceId"] = self.device_id
+        o["operatingSystem"] = None
         if self.operating_system is not None:
-            o["operating_system"] = self.operating_system
+            o["operatingSystem"] = self.operating_system
         o["browser"] = None
         if self.browser is not None:
             o["browser"] = self.browser
-        o["is_compliant"] = None
+        o["isCompliant"] = None
         if self.is_compliant is not None:
-            o["is_compliant"] = self.is_compliant
-        o["is_managed"] = None
+            o["isCompliant"] = self.is_compliant
+        o["isManaged"] = None
         if self.is_managed is not None:
-            o["is_managed"] = self.is_managed
-        o["trust_type"] = None
+            o["isManaged"] = self.is_managed
+        o["trustType"] = None
         if self.trust_type is not None:
-            o["trust_type"] = self.trust_type
+            o["trustType"] = self.trust_type
         return o
 
     @classmethod
@@ -402,12 +402,12 @@ class Location:
         o["state"] = None
         if self.state is not None:
             o["state"] = self.state
-        o["country_or_region"] = None
+        o["countryOrRegion"] = None
         if self.country_or_region is not None:
-            o["country_or_region"] = self.country_or_region
-        o["geo_coordinates"] = None
+            o["countryOrRegion"] = self.country_or_region
+        o["geoCoordinates"] = None
         if self.geo_coordinates is not None:
-            o["geo_coordinates"] = self.geo_coordinates.to_dict()
+            o["geoCoordinates"] = self.geo_coordinates.to_dict()
         return o
 
     @classmethod
@@ -474,21 +474,21 @@ class AuditLogEntry:
         o["id"] = None
         if self.id_ is not None:
             o["id"] = self.id_
-        o["user_principal_name"] = None
+        o["userPrincipalName"] = None
         if self.user_principal_name is not None:
-            o["user_principal_name"] = self.user_principal_name
-        o["user_id"] = None
+            o["userPrincipalName"] = self.user_principal_name
+        o["userId"] = None
         if self.user_id is not None:
-            o["user_id"] = self.user_id
-        o["created_date_time"] = None
+            o["userId"] = self.user_id
+        o["createdDateTime"] = None
         if self.created_date_time is not None:
-            o["created_date_time"] = self.created_date_time
-        o["ip_address"] = None
+            o["createdDateTime"] = self.created_date_time
+        o["ipAddress"] = None
         if self.ip_address is not None:
-            o["ip_address"] = self.ip_address
-        o["device_detail"] = None
+            o["ipAddress"] = self.ip_address
+        o["deviceDetail"] = None
         if self.device_detail is not None:
-            o["device_detail"] = self.device_detail.to_dict()
+            o["deviceDetail"] = self.device_detail.to_dict()
         o["location"] = None
         if self.location is not None:
             o["location"] = self.location.to_dict()
@@ -629,21 +629,21 @@ class AdUserWithAuditLog:
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
-        o["display_name"] = self.display_name
+        o["displayName"] = self.display_name
         o["id"] = self.id_
-        o["user_principal_name"] = self.user_principal_name
+        o["userPrincipalName"] = self.user_principal_name
         other_mails_list = []
         for item in self.other_mails:
             other_mails_var = item
             other_mails_list.append(other_mails_var)
-        o["other_mails"] = other_mails_list
+        o["otherMails"] = other_mails_list
         o["department"] = None
         if self.department is not None:
             o["department"] = self.department
-        o["created_date_time"] = self.created_date_time
-        o["audit_log"] = None
+        o["createdDateTime"] = self.created_date_time
+        o["auditLog"] = None
         if self.audit_log is not None:
-            o["audit_log"] = self.audit_log.to_dict()
+            o["auditLog"] = self.audit_log.to_dict()
         return o
 
     @classmethod
@@ -718,6 +718,52 @@ class AdUserWithAuditLog:
         return cls(displayName, id, userPrincipalName, otherMails, department, createdDateTime, auditLog)
 
 @dataclass
+class CreateUserRequest:
+    display_name: "Optional[str]"
+    user_principal_name: "Optional[str]"
+
+    def to_dict(self) -> Dict[str, Any]:
+        o = dict()
+        o["displayName"] = None
+        if self.display_name is not None:
+            o["displayName"] = self.display_name
+        o["userPrincipalName"] = None
+        if self.user_principal_name is not None:
+            o["userPrincipalName"] = self.user_principal_name
+        return o
+
+    @classmethod
+    def from_dict(cls, o: Dict[str, Any]) -> Self:
+        display_name = None
+        user_principal_name = None
+
+        for key in o:
+            if key == "displayName":
+                if o[key] is not None:
+                    display_name_var = o[key]
+                    assert type(display_name_var) is str
+                    display_name = display_name_var
+                else:
+                    display_name = None
+            elif key == "userPrincipalName":
+                if o[key] is not None:
+                    user_principal_name_var = o[key]
+                    assert type(user_principal_name_var) is str
+                    user_principal_name = user_principal_name_var
+                else:
+                    user_principal_name = None
+
+
+        return cls(display_name, user_principal_name)
+
+    @classmethod
+    def make_default(cls) -> Self:
+        displayName = None
+        userPrincipalName = None
+
+        return cls(displayName, userPrincipalName)
+
+@dataclass
 class CreateUser:
     user: "AdUser"
     password: "str"
@@ -762,16 +808,16 @@ class UpdateCurrentUser:
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
-        o["display_name"] = None
+        o["displayName"] = None
         if self.display_name is not None:
-            o["display_name"] = self.display_name
-        o["other_mails"] = None
+            o["displayName"] = self.display_name
+        o["otherMails"] = None
         if self.other_mails is not None:
             other_mails_list = []
             for item in self.other_mails:
                 other_mails_var = item
                 other_mails_list.append(other_mails_var)
-            o["other_mails"] = other_mails_list
+            o["otherMails"] = other_mails_list
         return o
 
     @classmethod
@@ -817,16 +863,16 @@ class UpdateUser:
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
-        o["display_name"] = None
+        o["displayName"] = None
         if self.display_name is not None:
-            o["display_name"] = self.display_name
-        o["other_mails"] = None
+            o["displayName"] = self.display_name
+        o["otherMails"] = None
         if self.other_mails is not None:
             other_mails_list = []
             for item in self.other_mails:
                 other_mails_var = item
                 other_mails_list.append(other_mails_var)
-            o["other_mails"] = other_mails_list
+            o["otherMails"] = other_mails_list
         return o
 
     @classmethod
@@ -874,7 +920,7 @@ class AdGroup:
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
         o["id"] = self.id_
-        o["display_name"] = self.display_name
+        o["displayName"] = self.display_name
         o["description"] = None
         if self.description is not None:
             o["description"] = self.description
@@ -923,7 +969,7 @@ class CreateGroup:
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
-        o["display_name"] = self.display_name
+        o["displayName"] = self.display_name
         o["description"] = None
         if self.description is not None:
             o["description"] = self.description
@@ -970,21 +1016,21 @@ class GroupMembership:
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
         o["id"] = self.id_
-        o["object_type"] = self.object_type
-        o["display_name"] = self.display_name
-        o["other_mails"] = None
+        o["objectType"] = self.object_type
+        o["displayName"] = self.display_name
+        o["otherMails"] = None
         if self.other_mails is not None:
             other_mails_list = []
             for item in self.other_mails:
                 other_mails_var = item
                 other_mails_list.append(other_mails_var)
-            o["other_mails"] = other_mails_list
+            o["otherMails"] = other_mails_list
         o["department"] = None
         if self.department is not None:
             o["department"] = self.department
-        o["created_date_time"] = None
+        o["createdDateTime"] = None
         if self.created_date_time is not None:
-            o["created_date_time"] = self.created_date_time
+            o["createdDateTime"] = self.created_date_time
         return o
 
     @classmethod
@@ -1208,11 +1254,13 @@ def get_current_user(
 
 def create_user(
     ctx: RequestContext,
+    create_user_request: CreateUserRequest,
 ) -> CreateUser:
     """Creates a new user in the directory.
 
     Arguments:
     ctx: RequestContext -- A request context object
+    create_user_request: CreateUserRequest -- The details which which to create the new user with
 
     Returns:
     The details of the user along with their temporary, one-time-use password.
@@ -1221,8 +1269,8 @@ def create_user(
     path = "/v1/api/uldirectory/v1/user"
     params = dict()
     headers = dict()
-    body = None
-    res = ctx.post(path, body=body, mimetype="text/plain", params=params, headers=headers)
+    body = json.dumps(create_user_request.to_dict())
+    res = ctx.post(path, body=body, mimetype="application/json", params=params, headers=headers)
     res_dict = json.loads(res)
     return CreateUser.from_dict(res_dict)
 

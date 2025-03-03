@@ -117,6 +117,14 @@ pub struct AdUserWithAuditLog {
 }
 
 #[derive(Default, Serialize, Deserialize)]
+pub struct CreateUserRequest {
+    #[serde(rename="displayName")]
+    display_name: Option<String>,
+    #[serde(rename="userPrincipalName")]
+    user_principal_name: Option<String>,
+}
+
+#[derive(Default, Serialize, Deserialize)]
 pub struct CreateUser {
     user: AdUser,
     password: String,
@@ -294,15 +302,17 @@ pub async fn get_current_user(
 /// # Arguments
 ///
 /// * `ctx` - A request context object
+/// * `create_user_request` - The details which which to create the new user with
 ///
 /// Returns
 /// * The details of the user along with their temporary, one-time-use password.
 pub async fn create_user(
     ctx: &dyn RequestContext,
+    create_user_request: CreateUserRequest,
 ) -> Result<CreateUser, Error> {
     let path = "/v1/api/uldirectory/v1/user";
-    let body = Bytes::new();
-    let res = ctx.post(&path, body, "text/plain", None, None).await?;
+    let body = Bytes::from(serde_json::to_vec(&create_user_request)?);
+    let res = ctx.post(&path, body, "application/json", None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }
 
@@ -615,9 +625,11 @@ mod tests {
         let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
         let ctx = ApiKeyContext::new(key, Environment::Prod);
 
+        let p0 = CreateUserRequest::default();
 
         create_user(
             &ctx,
+            p0,
         ).await;
     }
 

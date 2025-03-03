@@ -56,13 +56,13 @@ def test_update_object():
             p1,
         )
 
-def test_update_attribute():
+def test_update_attributes():
     p0 = UUID("00000000-0000-0000-0000-000000000000")
     p1 = False
     p2 = dict()
 
     if False:
-        update_attribute(
+        update_attributes(
             ctx,
             p0,
             p1,

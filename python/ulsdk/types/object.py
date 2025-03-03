@@ -285,13 +285,13 @@ class DataCatalogObject:
     # content (ie: worklog, schematic, ...) if the Encrypted flag is unset, or
     # an EncryptedObject where the obj field of the EncryptedObject table is
     # the embedded flatbuffer of the object if it is set.
-    obj: "List[int]"
+    obj: "bytes"
 
     # Parent nodes of this commit. To handle the cases of multiple parents (ie:
     # in cases of parallel mutation), this field allows multiple IDs to be specified.
     parents: "List[ContentId]"
 
-    signature: Optional["List[int]"]
+    signature: Optional["bytes"]
 
     tags: Optional["List[str]"]
 
@@ -321,10 +321,10 @@ class DataCatalogObject:
             comment = comment_str.decode('utf-8')
         default_mode = o.DefaultMode()
         flags = o.Flags()
-        obj = list()
-        if not o.ObjIsNone():
-            for i in range(o.ObjLength()):
-                obj.append(o.Obj(i))
+        if o.ObjIsNone():
+            obj = b""
+        else:
+            obj = bytes(o.ObjAsNumpy())
         parents = list()
         if not o.ParentsIsNone():
             for i in range(o.ParentsLength()):
@@ -333,10 +333,10 @@ class DataCatalogObject:
                 if parents_obj is not None:
                     parents_val = ContentId.from_fbs(parents_obj)
                 parents.append(parents_val)
-        signature = list()
-        if not o.SignatureIsNone():
-            for i in range(o.SignatureLength()):
-                signature.append(o.Signature(i))
+        if o.SignatureIsNone():
+            signature = b""
+        else:
+            signature = bytes(o.SignatureAsNumpy())
         tags = list()
         if not o.TagsIsNone():
             for i in range(o.TagsLength()):
@@ -450,9 +450,9 @@ class DataCatalogObject:
         comment = ""
         default_mode = 0
         flags = 0
-        obj = []
+        obj = b""
         parents = []
-        signature = []
+        signature = b""
         tags = []
         time = 0
         ty = DataCatalogObjectTy(0)
@@ -578,7 +578,7 @@ class ObjectIdList:
 class ObjectIdPair:
     id: "ObjectId"
 
-    object: Optional["List[int]"]
+    object: Optional["bytes"]
 
     @classmethod
     def from_fbs(cls, o: FbsObjectIdPair) -> Self:
@@ -587,10 +587,10 @@ class ObjectIdPair:
             id = ObjectId.from_fbs(id_obj)
         else:
             raise ValueError("Id is required")
-        object = list()
-        if not o.ObjectIsNone():
-            for i in range(o.ObjectLength()):
-                object.append(o.Object(i))
+        if o.ObjectIsNone():
+            object = b""
+        else:
+            object = bytes(o.ObjectAsNumpy())
         return cls(id, object)
 
     @classmethod
@@ -630,7 +630,7 @@ class ObjectIdPair:
     @classmethod
     def make_default(cls) -> Self:
         id = ObjectId.make_default()
-        object = []
+        object = b""
         return cls(id, object)
 
     def __eq__(self, other) -> bool:

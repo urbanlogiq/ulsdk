@@ -146,7 +146,7 @@ class CreateKey:
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
         o["id"] = self.id_
-        o["secret_key"] = self.secret_key
+        o["secretKey"] = self.secret_key
         return o
 
     @classmethod

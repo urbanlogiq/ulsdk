@@ -790,14 +790,14 @@ class VStr:
 
 @dataclass
 class VBytes:
-    v: "List[int]"
+    v: "bytes"
 
     @classmethod
     def from_fbs(cls, o: FbsVBytes) -> Self:
-        v = list()
-        if not o.VIsNone():
-            for i in range(o.VLength()):
-                v.append(o.V(i))
+        if o.VIsNone():
+            v = b""
+        else:
+            v = bytes(o.VAsNumpy())
         return cls(v)
 
     @classmethod
@@ -830,7 +830,7 @@ class VBytes:
 
     @classmethod
     def make_default(cls) -> Self:
-        v = []
+        v = b""
         return cls(v)
 
     def __eq__(self, other) -> bool:
@@ -1035,15 +1035,15 @@ class VTri2D:
 class VFixedSizeBytes:
     sz: "int"
 
-    v: "List[int]"
+    v: "bytes"
 
     @classmethod
     def from_fbs(cls, o: FbsVFixedSizeBytes) -> Self:
         sz = o.Sz()
-        v = list()
-        if not o.VIsNone():
-            for i in range(o.VLength()):
-                v.append(o.V(i))
+        if o.VIsNone():
+            v = b""
+        else:
+            v = bytes(o.VAsNumpy())
         return cls(sz, v)
 
     @classmethod
@@ -1079,7 +1079,7 @@ class VFixedSizeBytes:
     @classmethod
     def make_default(cls) -> Self:
         sz = 0
-        v = []
+        v = b""
         return cls(sz, v)
 
     def __eq__(self, other) -> bool:

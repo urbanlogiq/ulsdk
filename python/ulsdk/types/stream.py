@@ -123,9 +123,9 @@ class Stream:
 
     metadata_revision: Optional["ContentId"]
 
-    options: Optional["List[int]"]
+    options: Optional["bytes"]
 
-    parameters: Optional["List[int]"]
+    parameters: Optional["bytes"]
 
     schema: "Schema"
 
@@ -144,14 +144,14 @@ class Stream:
         metadata_revision_obj = o.MetadataRevision()
         if metadata_revision_obj is not None:
             metadata_revision = ContentId.from_fbs(metadata_revision_obj)
-        options = list()
-        if not o.OptionsIsNone():
-            for i in range(o.OptionsLength()):
-                options.append(o.Options(i))
-        parameters = list()
-        if not o.ParametersIsNone():
-            for i in range(o.ParametersLength()):
-                parameters.append(o.Parameters(i))
+        if o.OptionsIsNone():
+            options = b""
+        else:
+            options = bytes(o.OptionsAsNumpy())
+        if o.ParametersIsNone():
+            parameters = b""
+        else:
+            parameters = bytes(o.ParametersAsNumpy())
         schema_obj = o.Schema()
         if schema_obj is not None:
             schema = Schema.from_fbs(schema_obj)
@@ -249,8 +249,8 @@ class Stream:
         flags = 0
         metadata = ObjectId.make_default()
         metadata_revision = ContentId.make_default()
-        options = []
-        parameters = []
+        options = b""
+        parameters = b""
         schema = Schema.make_default()
         substreams = []
         url = ""

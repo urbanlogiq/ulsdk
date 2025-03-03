@@ -56,7 +56,7 @@ ls(
 Result<::ul::types::ObjectSummary>
 create_entry(
     ul::RequestContext &ctx,
-    const std::string &root,
+    const Uuid &root,
     const std::string &tail,
     const std::string &ty,
     const std::string &mime,
@@ -64,7 +64,7 @@ create_entry(
 ) {
     std::string path = "/v1/api/ulv2/drive/:root/*tail";
     const size_t root_idx = path.find(":root");
-    path.replace(root_idx, 5, root);
+    path.replace(root_idx, 5, root.to_string());
     const size_t tail_idx = path.find("*tail");
     const std::string encoded_tail = ::ul::url_encode(tail);
     path.replace(tail_idx, 5, encoded_tail);
@@ -104,13 +104,13 @@ get_roots(
 Result<::ul::types::DirectoryList>
 post_file(
     ul::RequestContext &ctx,
-    const std::string &root,
+    const Uuid &root,
     bool force,
     const std::vector<ul::File> &files
 ) {
     std::string path = "/v1/api/ulv2/drive/:root";
     const size_t root_idx = path.find(":root");
-    path.replace(root_idx, 5, root);
+    path.replace(root_idx, 5, root.to_string());
 
     std::map<std::string, std::string> params;
     params["force"] = force ? "true" : "false";
@@ -128,11 +128,11 @@ post_file(
 Result<::ul::types::DirectoryList>
 unlink(
     ul::RequestContext &ctx,
-    const std::string &entry
+    const Uuid &entry
 ) {
     std::string path = "/v1/api/ulv2/drive/:entry";
     const size_t entry_idx = path.find(":entry");
-    path.replace(entry_idx, 6, entry);
+    path.replace(entry_idx, 6, entry.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -186,11 +186,11 @@ copy(
 Result<std::vector<uint8_t>>
 get_file(
     ul::RequestContext &ctx,
-    const std::string &id
+    const Uuid &id
 ) {
     std::string path = "/v1/api/ulv2/drive/file/:id";
     const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 3, id);
+    path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
 
@@ -202,14 +202,14 @@ get_file(
 Result<Void>
 put_file_chunk(
     ul::RequestContext &ctx,
-    const std::string &file_id,
+    const Uuid &file_id,
     int64_t idx,
     const std::string &hash,
     const std::vector<uint8_t> &chunk
 ) {
     std::string path = "/v1/api/ulv2/drive/file/:file_id/:idx";
     const size_t file_id_idx = path.find(":file_id");
-    path.replace(file_id_idx, 8, file_id);
+    path.replace(file_id_idx, 8, file_id.to_string());
     const size_t idx_idx = path.find(":idx");
     path.replace(idx_idx, 4, std::to_string(idx));
 
@@ -229,11 +229,11 @@ put_file_chunk(
 Result<::ul::types::ObjectId>
 get_root_id(
     ul::RequestContext &ctx,
-    const std::string &b_2cid
+    const Uuid &b_2cid
 ) {
     std::string path = "/v1/api/ulv2/drive/root/:b2cid";
     const size_t b2cid_idx = path.find(":b2cid");
-    path.replace(b2cid_idx, 6, b_2cid);
+    path.replace(b2cid_idx, 6, b_2cid.to_string());
 
     std::map<std::string, std::string> params;
 
