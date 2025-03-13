@@ -89,6 +89,8 @@ class Fn(Enum):
     Round = 76
     Floor = 77
     Ceil = 78
+    StAstext = 79
+    StIntersection = 80
     UlTimezone = 32764
     UlArrayContains = 32765
     UlArrayAny = 32766

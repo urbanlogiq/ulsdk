@@ -12,6 +12,16 @@ class Environment(Enum):
     Prod = 1
     Stage = 2
 
+    @classmethod
+    def parse(cls, s: str):
+        match s.lower():
+            case "prod":
+                return cls.Prod
+            case "stage":
+                return cls.Stage
+            case _:
+                raise ValueError(f"Unknown environment: {s}")
+
     def str(self):
         return self.name.lower()
 
@@ -19,6 +29,16 @@ class Environment(Enum):
 class Region(Enum):
     CA = 1
     US = 2
+
+    @classmethod
+    def parse(cls, s: str):
+        match s.lower():
+            case "ca":
+                return cls.CA
+            case "us":
+                return cls.US
+            case _:
+                raise ValueError(f"Unknown region: {s}")
 
     def str(self):
         return self.name.lower()
@@ -59,7 +79,7 @@ def load_key(profile: str) -> Key:
 
     config_profile = keys[profile]
     user_id = UUID(config_profile["user_id"])
-    region = Region[config_profile["region"].upper()]
+    region = Region.parse(config_profile["region"])
     access_key = config_profile["access_key"]
     secret_key = config_profile["secret_key"]
 

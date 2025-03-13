@@ -18,6 +18,8 @@ def _get_endpoint(region: Region, environment: Environment, api: str) -> str:
             base = "https://api.urbanlogiq.us"
         case (Region.US, Environment.Stage):
             base = "https://stage.urbanlogiq.us"
+        case _:
+            raise ValueError(f"Unknown region/environment: {region}/{environment}")
 
     return f"{base}{api}"
 

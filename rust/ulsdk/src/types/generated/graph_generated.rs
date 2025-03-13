@@ -17,8 +17,8 @@
 
 use super::entity_generated::*;
 use super::api_generated::*;
-use super::id_generated::*;
 use super::fun_generated::*;
+use super::id_generated::*;
 use core::mem;
 use core::cmp::Ordering;
 
