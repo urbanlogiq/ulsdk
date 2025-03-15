@@ -53,27 +53,7 @@ use crate::types::Schema::{
     Utf8,
 };
 use crate::types::api::SortOrder;
-use crate::types::crypto::{
-    CryptHeader,
-    Digest,
-    EncryptedObject,
-    Sha256,
-    Signature,
-};
-use crate::types::data::{
-    AttributePair,
-    DayOfWeek,
-    DirectionAndRoadName,
-    DirectionAndRoadNames,
-    DirectionTy,
-    NamedParameter,
-    NamedParameterFlags,
-    RoadUserTy,
-    Source,
-    StatisticTy,
-    TimeGranularity,
-    TurnTy,
-};
+use crate::types::attr::Attr;
 use crate::types::entity::{
     EdgeTy,
     EntityTy,
@@ -86,27 +66,6 @@ use crate::types::entity::{
     NodeTy,
     Point,
     Polygon,
-};
-use crate::types::fs::{
-    Attr,
-    Chunk,
-    Directory,
-    DirectoryEntry,
-    DirectoryList,
-    Entry,
-    EntryTy,
-    File,
-    ListDirectory,
-    ListEntry,
-    ListFile,
-    ListObject,
-    ListSlot,
-    MoveRequest,
-    NewLink,
-    ObjectRef,
-    Slot,
-    StorageTier,
-    TopLevelDirectory,
 };
 use crate::types::fun::Fn_;
 use crate::types::graph::{
@@ -135,35 +94,6 @@ use crate::types::id::{
     ObjectId,
     ObjectNamespace,
     StreamId,
-};
-use crate::types::job::{
-    DeprecatedRunSpec,
-    DeprecatedTaskParameter,
-    Edge,
-    EmbeddedTable,
-    Job,
-    Node,
-    ParamIndices,
-    RunSpec,
-    Schematic,
-    Status,
-    Task,
-    TaskErrorTy,
-    TaskList,
-    TaskParameter,
-    TaskParameterValue,
-    TaskPriority,
-    TaskRunFlags,
-};
-use crate::types::object::{
-    DataCatalogObject,
-    DataCatalogObjectFlags,
-    DataCatalogObjectTy,
-    ObjectIdList,
-    ObjectIdPair,
-    ObjectIdPairList,
-    ObjectSummary,
-    ObjectSummaryList,
 };
 use crate::types::query::{
     AllColumns,
@@ -206,12 +136,6 @@ use crate::types::query::{
     Window,
     WorklogPartition,
 };
-use crate::types::stream::{
-    AxisType,
-    FormatFlags,
-    Stream,
-    StreamFlags,
-};
 use crate::types::value::{
     Point2D,
     Tri2D,
@@ -244,20 +168,6 @@ use crate::types::value::{
     Value,
     ValueInstance,
     ValueTy,
-};
-use crate::types::worklog::{
-    AggregationTy,
-    ByteArray,
-    ChartTypeTy,
-    Layout,
-    ParameterFlags,
-    ParameterValue,
-    TileData,
-    TileSettings,
-    UserSettings,
-    ValuesFormatTy,
-    WorkLog,
-    WorklogParameter,
 };
 use crate::types::generated::Schema_generated::{
     Binary as FbsBinary,
@@ -300,26 +210,8 @@ use crate::types::generated::Schema_generated::{
 use crate::types::generated::api_generated::{
     SortOrder as FbsSortOrder,
 };
-use crate::types::generated::crypto_generated::{
-    CryptHeader as FbsCryptHeader,
-    EncryptedObject as FbsEncryptedObject,
-    Sha256 as FbsSha256,
-    Signature as FbsSignature,
-    Digest as FbsDigest,
-};
-use crate::types::generated::data_generated::{
-    AttributePair as FbsAttributePair,
-    DirectionAndRoadName as FbsDirectionAndRoadName,
-    DirectionAndRoadNames as FbsDirectionAndRoadNames,
-    NamedParameter as FbsNamedParameter,
-    Source as FbsSource,
-    DayOfWeek as FbsDayOfWeek,
-    DirectionTy as FbsDirectionTy,
-    NamedParameterFlags as FbsNamedParameterFlags,
-    RoadUserTy as FbsRoadUserTy,
-    StatisticTy as FbsStatisticTy,
-    TimeGranularity as FbsTimeGranularity,
-    TurnTy as FbsTurnTy,
+use crate::types::generated::attr_generated::{
+    Attr as FbsAttr,
 };
 use crate::types::generated::entity_generated::{
     GraphEdge as FbsGraphEdge,
@@ -333,27 +225,6 @@ use crate::types::generated::entity_generated::{
     EntityTy as FbsEntityTy,
     Geometry as FbsGeometry,
     NodeTy as FbsNodeTy,
-};
-use crate::types::generated::fs_generated::{
-    Attr as FbsAttr,
-    Chunk as FbsChunk,
-    Directory as FbsDirectory,
-    DirectoryEntry as FbsDirectoryEntry,
-    DirectoryList as FbsDirectoryList,
-    File as FbsFile,
-    ListDirectory as FbsListDirectory,
-    ListFile as FbsListFile,
-    ListObject as FbsListObject,
-    ListSlot as FbsListSlot,
-    MoveRequest as FbsMoveRequest,
-    NewLink as FbsNewLink,
-    ObjectRef as FbsObjectRef,
-    Slot as FbsSlot,
-    TopLevelDirectory as FbsTopLevelDirectory,
-    Entry as FbsEntry,
-    EntryTy as FbsEntryTy,
-    ListEntry as FbsListEntry,
-    StorageTier as FbsStorageTier,
 };
 use crate::types::generated::fun_generated::{
     Fn as FbsFn,
@@ -384,35 +255,6 @@ use crate::types::generated::id_generated::{
     ObjectId as FbsObjectId,
     StreamId as FbsStreamId,
     ObjectNamespace as FbsObjectNamespace,
-};
-use crate::types::generated::job_generated::{
-    DeprecatedRunSpec as FbsDeprecatedRunSpec,
-    DeprecatedTaskParameter as FbsDeprecatedTaskParameter,
-    Edge as FbsEdge,
-    EmbeddedTable as FbsEmbeddedTable,
-    Job as FbsJob,
-    Node as FbsNode,
-    ParamIndices as FbsParamIndices,
-    RunSpec as FbsRunSpec,
-    Schematic as FbsSchematic,
-    Task as FbsTask,
-    TaskList as FbsTaskList,
-    TaskParameter as FbsTaskParameter,
-    Status as FbsStatus,
-    TaskErrorTy as FbsTaskErrorTy,
-    TaskParameterValue as FbsTaskParameterValue,
-    TaskPriority as FbsTaskPriority,
-    TaskRunFlags as FbsTaskRunFlags,
-};
-use crate::types::generated::object_generated::{
-    DataCatalogObject as FbsDataCatalogObject,
-    ObjectIdList as FbsObjectIdList,
-    ObjectIdPair as FbsObjectIdPair,
-    ObjectIdPairList as FbsObjectIdPairList,
-    ObjectSummary as FbsObjectSummary,
-    ObjectSummaryList as FbsObjectSummaryList,
-    DataCatalogObjectFlags as FbsDataCatalogObjectFlags,
-    DataCatalogObjectTy as FbsDataCatalogObjectTy,
 };
 use crate::types::generated::query_generated::{
     AllColumns as FbsAllColumns,
@@ -454,12 +296,6 @@ use crate::types::generated::query_generated::{
     TablePartition as FbsTablePartition,
     TableSourceUnion as FbsTableSourceUnion,
     TypeHint as FbsTypeHint,
-};
-use crate::types::generated::stream_generated::{
-    Stream as FbsStream,
-    AxisType as FbsAxisType,
-    FormatFlags as FbsFormatFlags,
-    StreamFlags as FbsStreamFlags,
 };
 use crate::types::generated::table_generated::{
     ChangeOpEntry as FbsChangeOpEntry,
@@ -510,20 +346,6 @@ use crate::types::generated::value_generated::{
     ValueInstance as FbsValueInstance,
     Value as FbsValue,
     ValueTy as FbsValueTy,
-};
-use crate::types::generated::worklog_generated::{
-    ByteArray as FbsByteArray,
-    Layout as FbsLayout,
-    ParameterFlags as FbsParameterFlags,
-    TileData as FbsTileData,
-    TileSettings as FbsTileSettings,
-    UserSettings as FbsUserSettings,
-    WorkLog as FbsWorkLog,
-    WorklogParameter as FbsWorklogParameter,
-    AggregationTy as FbsAggregationTy,
-    ChartTypeTy as FbsChartTypeTy,
-    ParameterValue as FbsParameterValue,
-    ValuesFormatTy as FbsValuesFormatTy,
 };
 
 #[derive(Default, PartialEq, Debug, Clone)]

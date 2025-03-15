@@ -15,6 +15,7 @@ pub mod data_generated;
 pub mod view_generated;
 pub mod id_generated;
 pub mod log_generated;
+pub mod attr_generated;
 pub mod object_generated;
 pub mod graph_generated;
 pub mod Schema_generated;

@@ -46,6 +46,7 @@ from .Schema import (
     UnionMode,
     Utf8,
 )
+from .attr import Attr
 from .crypto import (
     CryptHeader,
     Digest,
@@ -930,67 +931,6 @@ class ListEntry:
         if type(self.value) is not type(other.value):
             return False
         return self.value == other.value
-
-@dataclass
-class Attr:
-    key: "str"
-
-    v: "Value"
-
-    @classmethod
-    def from_fbs(cls, o: FbsAttr) -> Self:
-        key_str = o.Key()
-        assert key_str is not None
-        key = key_str.decode('utf-8')
-        v_val = o.V()
-        if v_val is not None:
-            v_ty = o.VType()
-            v = Value.from_fbs(v_val, v_ty)
-        else:
-            raise ValueError("V is required")
-        return cls(key, v)
-
-    @classmethod
-    def from_bytes(cls, data: bytes) -> Self:
-        deprefixed = RemoveSizePrefix(data, 0)
-        o = FbsAttr.GetRootAs(deprefixed[0], deprefixed[1])
-        return cls.from_fbs(o)
-
-    def serialize_to(self, builder: Builder) -> int:
-        from .generated.Attr import (
-            Start,
-            AddKey,
-            AddV,
-            AddVType,
-            End,
-        )
-        key_offset = builder.CreateString(self.key)
-        v_offset, v_ty = self.v.serialize_to(builder)
-
-        Start(builder)
-        AddKey(builder, key_offset)
-        AddV(builder, v_offset)
-        AddVType(builder, v_ty)
-        return End(builder)
-
-    def to_bytes(self) -> bytes:
-        builder = Builder(0)
-        offset = self.serialize_to(builder)
-        builder.FinishSizePrefixed(offset)
-        return builder.Output()
-
-    @classmethod
-    def make_default(cls) -> Self:
-        key = ""
-        v = Value.make_default()
-        return cls(key, v)
-
-    def __eq__(self, other) -> bool:
-        eq = True
-        eq = eq and self.key == other.key
-        eq = eq and self.v == other.v
-
-        return eq
 
 @dataclass
 class Chunk:

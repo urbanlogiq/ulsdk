@@ -12,6 +12,7 @@
 
 #include "flatbuffers/flatbuffers.h"
 #include "ulsdk/types/Schema.h"
+#include "ulsdk/types/attr.h"
 #include "ulsdk/types/data.h"
 #include "ulsdk/types/id.h"
 #include "ulsdk/types/value.h"
@@ -83,6 +84,7 @@ struct Edge {
 };
 
 struct Job {
+    std::optional<std::vector<Attr>> attributes_;
     std::optional<std::vector<TaskErrorTy>> error_tys_;
     std::vector<TaskParameter> params_;
     Status status_;
@@ -121,6 +123,7 @@ struct ParamIndices {
 /// start_date / end_date to be used in a number of calculations)
 ///
 struct RunSpec {
+    std::optional<std::vector<Attr>> attributes_;
     bool notify_;
     std::vector<ParamIndices> param_indices_;
     std::vector<TaskParameter> params_;

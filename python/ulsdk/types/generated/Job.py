@@ -5,6 +5,7 @@
 import flatbuffers
 from flatbuffers.compat import import_numpy
 from typing import Any
+from .Attr import Attr
 from .ObjectId import ObjectId
 from .Task import Task
 from .TaskParameter import TaskParameter
@@ -125,8 +126,32 @@ class Job(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         return o == 0
 
+    # Job
+    def Attributes(self, j: int) -> Optional[Attr]:
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
+        if o != 0:
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
+            x = self._tab.Indirect(x)
+            obj = Attr()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+    # Job
+    def AttributesLength(self) -> int:
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # Job
+    def AttributesIsNone(self) -> bool:
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
+        return o == 0
+
 def JobStart(builder: flatbuffers.Builder):
-    builder.StartObject(5)
+    builder.StartObject(6)
 
 def Start(builder: flatbuffers.Builder):
     JobStart(builder)
@@ -178,6 +203,18 @@ def JobStartErrorTysVector(builder, numElems: int) -> int:
 
 def StartErrorTysVector(builder, numElems: int) -> int:
     return JobStartErrorTysVector(builder, numElems)
+
+def JobAddAttributes(builder: flatbuffers.Builder, attributes: int):
+    builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(attributes), 0)
+
+def AddAttributes(builder: flatbuffers.Builder, attributes: int):
+    JobAddAttributes(builder, attributes)
+
+def JobStartAttributesVector(builder, numElems: int) -> int:
+    return builder.StartVector(4, numElems, 4)
+
+def StartAttributesVector(builder, numElems: int) -> int:
+    return JobStartAttributesVector(builder, numElems)
 
 def JobEnd(builder: flatbuffers.Builder) -> int:
     return builder.EndObject()

@@ -16,8 +16,9 @@
 // @generated
 
 use super::value_generated::*;
-use super::worklog_generated::*;
 use super::job_generated::*;
+use super::worklog_generated::*;
+use super::attr_generated::*;
 use super::data_generated::*;
 use super::id_generated::*;
 use super::stream_generated::*;

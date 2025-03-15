@@ -12,6 +12,7 @@
 
 #include "flatbuffers/flatbuffers.h"
 #include "ulsdk/types/Schema.h"
+#include "ulsdk/types/attr.h"
 #include "ulsdk/types/data.h"
 #include "ulsdk/types/id.h"
 #include "ulsdk/types/job.h"

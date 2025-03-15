@@ -5,6 +5,8 @@
 
 pub mod generated;
 #[rustfmt::skip]
+pub mod attr;
+#[rustfmt::skip]
 pub mod api;
 #[rustfmt::skip]
 pub mod crypto;

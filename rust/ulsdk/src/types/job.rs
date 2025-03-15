@@ -52,6 +52,7 @@ use crate::types::Schema::{
     UnionMode,
     Utf8,
 };
+use crate::types::attr::Attr;
 use crate::types::data::{
     AttributePair,
     DayOfWeek,
@@ -147,6 +148,9 @@ use crate::types::generated::Schema_generated::{
     TimeUnit as FbsTimeUnit,
     Type as FbsType,
     UnionMode as FbsUnionMode,
+};
+use crate::types::generated::attr_generated::{
+    Attr as FbsAttr,
 };
 use crate::types::generated::data_generated::{
     AttributePair as FbsAttributePair,
@@ -613,6 +617,7 @@ impl From<Edge> for Vec<u8> {
 
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct Job {
+    pub attributes: Option<Vec<Attr>>,
     pub error_tys: Option<Vec<TaskErrorTy>>,
     /// Parameters verbatim from the RunSpec
     pub params: Vec<TaskParameter>,
@@ -628,6 +633,15 @@ impl Job {
     pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsJob<'a>> {
         use crate::types::generated::job_generated::JobBuilder as FbsJobBuilder;
 
+        let attributes_offset = self.attributes.as_ref().map(|v| {
+            let mut attributes_offsets = Vec::with_capacity(v.len());
+            for val in v.iter() {
+                let offset = val.serialize_to(builder);
+                attributes_offsets.push(offset);
+            }
+            let attributes_offset = builder.create_vector(&attributes_offsets);
+            attributes_offset
+        });
         let error_tys_offset = self.error_tys.as_ref().map(|v| {
             let error_tys_offset = builder.create_vector_from_iter(v.iter().map(|v| {
                 match v {
@@ -652,6 +666,9 @@ impl Job {
         let user_id_offset = self.user_id.serialize_to(builder);
 
         let mut bldr = FbsJobBuilder::new(builder);
+        if let Some(offset) = attributes_offset {
+            bldr.add_attributes(offset);
+        }
         if let Some(offset) = error_tys_offset {
             bldr.add_error_tys(offset);
         }
@@ -665,6 +682,17 @@ impl Job {
 
 impl From<FbsJob<'_>> for Job {
     fn from(fbs: FbsJob<'_>) -> Self {
+        let attributes = if let Some(val) = fbs.attributes() {
+            let mut attributes = Vec::new();
+            for elem in val {
+                attributes.push(elem.into());
+            }
+
+            Some(attributes)
+        } else {
+            None
+        };
+
         let error_tys = if let Some(val) = fbs.error_tys() {
             let mut error_tys = Vec::new();
             for elem in val {
@@ -689,6 +717,7 @@ impl From<FbsJob<'_>> for Job {
 
         let user_id = ObjectId::from(fbs.user_id());
         Self {
+            attributes,
             error_tys,
             params,
             status,
@@ -819,6 +848,7 @@ impl From<ParamIndices> for Vec<u8> {
 /// start_date / end_date to be used in a number of calculations)
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct RunSpec {
+    pub attributes: Option<Vec<Attr>>,
     pub notify: bool,
     pub param_indices: Vec<ParamIndices>,
     pub params: Vec<TaskParameter>,
@@ -831,6 +861,15 @@ impl RunSpec {
     pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsRunSpec<'a>> {
         use crate::types::generated::job_generated::RunSpecBuilder as FbsRunSpecBuilder;
 
+        let attributes_offset = self.attributes.as_ref().map(|v| {
+            let mut attributes_offsets = Vec::with_capacity(v.len());
+            for val in v.iter() {
+                let offset = val.serialize_to(builder);
+                attributes_offsets.push(offset);
+            }
+            let attributes_offset = builder.create_vector(&attributes_offsets);
+            attributes_offset
+        });
         let mut param_indices_offsets = Vec::with_capacity(self.param_indices.len());
         for val in self.param_indices.iter() {
             let offset = val.serialize_to(builder);
@@ -846,6 +885,9 @@ impl RunSpec {
         let schematic_offset = self.schematic.serialize_to(builder);
 
         let mut bldr = FbsRunSpecBuilder::new(builder);
+        if let Some(offset) = attributes_offset {
+            bldr.add_attributes(offset);
+        }
         bldr.add_notify(self.notify);
         bldr.add_param_indices(param_indices_offset);
         bldr.add_params(params_offset);
@@ -858,6 +900,17 @@ impl RunSpec {
 
 impl From<FbsRunSpec<'_>> for RunSpec {
     fn from(fbs: FbsRunSpec<'_>) -> Self {
+        let attributes = if let Some(val) = fbs.attributes() {
+            let mut attributes = Vec::new();
+            for elem in val {
+                attributes.push(elem.into());
+            }
+
+            Some(attributes)
+        } else {
+            None
+        };
+
         let notify = fbs.notify();
         let mut param_indices = Vec::new();
         for elem in fbs.param_indices() {
@@ -873,6 +926,7 @@ impl From<FbsRunSpec<'_>> for RunSpec {
         let priority = TaskPriority::from(fbs.priority());
         let schematic = ObjectId::from(fbs.schematic());
         Self {
+            attributes,
             notify,
             param_indices,
             params,

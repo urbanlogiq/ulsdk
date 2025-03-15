@@ -7,16 +7,6 @@
 #include "test.h"
 
 bool
-test_attr() {
-    ::ul::types::Attr t;
-    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
-    ::ul::types::Attr deserialized = ::ul::types::Attr(bytes);
-    return true;
-}
-
-TypeTest test_attr_obj(test_attr, "Attr");
-
-bool
 test_chunk() {
     ::ul::types::Chunk t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);

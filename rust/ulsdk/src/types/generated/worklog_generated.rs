@@ -17,6 +17,7 @@
 
 use super::value_generated::*;
 use super::job_generated::*;
+use super::attr_generated::*;
 use super::data_generated::*;
 use super::id_generated::*;
 use super::Schema_generated::*;

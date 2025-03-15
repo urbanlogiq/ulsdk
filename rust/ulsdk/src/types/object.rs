@@ -52,6 +52,7 @@ use crate::types::Schema::{
     UnionMode,
     Utf8,
 };
+use crate::types::attr::Attr;
 use crate::types::data::{
     AttributePair,
     DayOfWeek,
@@ -186,6 +187,9 @@ use crate::types::generated::Schema_generated::{
     TimeUnit as FbsTimeUnit,
     Type as FbsType,
     UnionMode as FbsUnionMode,
+};
+use crate::types::generated::attr_generated::{
+    Attr as FbsAttr,
 };
 use crate::types::generated::data_generated::{
     AttributePair as FbsAttributePair,

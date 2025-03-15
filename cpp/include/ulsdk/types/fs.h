@@ -12,6 +12,7 @@
 
 #include "flatbuffers/flatbuffers.h"
 #include "ulsdk/types/Schema.h"
+#include "ulsdk/types/attr.h"
 #include "ulsdk/types/crypto.h"
 #include "ulsdk/types/data.h"
 #include "ulsdk/types/id.h"
@@ -25,7 +26,6 @@
 namespace ul {
 namespace types {
 
-struct Attr;
 struct Chunk;
 struct Directory;
 struct DirectoryEntry;
@@ -126,15 +126,6 @@ struct TopLevelDirectory {
     TopLevelDirectory();
     TopLevelDirectory(const ::TopLevelDirectory *root);
     TopLevelDirectory(const std::vector<uint8_t> &bytes);
-};
-
-struct Attr {
-    std::string key_;
-    Value v_;
-
-    Attr();
-    Attr(const ::Attr *root);
-    Attr(const std::vector<uint8_t> &bytes);
 };
 
 struct Chunk {
@@ -238,9 +229,6 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ListObject &);
 ::flatbuffers::Offset<::TopLevelDirectory>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TopLevelDirectory &);
 
-::flatbuffers::Offset<::Attr>
-serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Attr &);
-
 ::flatbuffers::Offset<::Chunk>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Chunk &);
 
@@ -283,9 +271,6 @@ to_bytes(const ListObject &o);
 
 std::vector<uint8_t>
 to_bytes(const TopLevelDirectory &o);
-
-std::vector<uint8_t>
-to_bytes(const Attr &o);
 
 std::vector<uint8_t>
 to_bytes(const Chunk &o);

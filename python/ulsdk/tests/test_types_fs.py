@@ -4,12 +4,6 @@
 
 from ..types.fs import *
 
-def test_attr():
-    _t0 = Attr.make_default()
-    _b = _t0.to_bytes()
-    _t1 = Attr.from_bytes(_b)
-    assert _t0 == _t1
-
 def test_chunk():
     _t0 = Chunk.make_default()
     _b = _t0.to_bytes()

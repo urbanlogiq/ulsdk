@@ -5,6 +5,7 @@
 import flatbuffers
 from flatbuffers.compat import import_numpy
 from typing import Any
+from .Attr import Attr
 from .ObjectId import ObjectId
 from .ParamIndices import ParamIndices
 from .TaskParameter import TaskParameter
@@ -115,8 +116,32 @@ class RunSpec(object):
             return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
         return True
 
+    # RunSpec
+    def Attributes(self, j: int) -> Optional[Attr]:
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
+        if o != 0:
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
+            x = self._tab.Indirect(x)
+            obj = Attr()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+    # RunSpec
+    def AttributesLength(self) -> int:
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # RunSpec
+    def AttributesIsNone(self) -> bool:
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
+        return o == 0
+
 def RunSpecStart(builder: flatbuffers.Builder):
-    builder.StartObject(6)
+    builder.StartObject(7)
 
 def Start(builder: flatbuffers.Builder):
     RunSpecStart(builder)
@@ -168,6 +193,18 @@ def RunSpecAddNotify(builder: flatbuffers.Builder, notify: bool):
 
 def AddNotify(builder: flatbuffers.Builder, notify: bool):
     RunSpecAddNotify(builder, notify)
+
+def RunSpecAddAttributes(builder: flatbuffers.Builder, attributes: int):
+    builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(attributes), 0)
+
+def AddAttributes(builder: flatbuffers.Builder, attributes: int):
+    RunSpecAddAttributes(builder, attributes)
+
+def RunSpecStartAttributesVector(builder, numElems: int) -> int:
+    return builder.StartVector(4, numElems, 4)
+
+def StartAttributesVector(builder, numElems: int) -> int:
+    return RunSpecStartAttributesVector(builder, numElems)
 
 def RunSpecEnd(builder: flatbuffers.Builder) -> int:
     return builder.EndObject()

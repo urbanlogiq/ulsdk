@@ -46,6 +46,7 @@ from .Schema import (
     UnionMode,
     Utf8,
 )
+from .attr import Attr
 from .data import (
     AttributePair,
     DayOfWeek,
@@ -104,6 +105,7 @@ from .value import (
     ValueInstance,
     ValueTy,
 )
+from .generated.Attr import Attr as FbsAttr
 from .generated.AttributePair import AttributePair as FbsAttributePair
 from .generated.B2cId import B2cId as FbsB2cId
 from .generated.Binary import Binary as FbsBinary
@@ -563,6 +565,8 @@ class Edge:
 
 @dataclass
 class Job:
+    attributes: Optional["List[Attr]"]
+
     error_tys: Optional["List[TaskErrorTy]"]
 
     # Parameters verbatim from the RunSpec
@@ -579,6 +583,14 @@ class Job:
 
     @classmethod
     def from_fbs(cls, o: FbsJob) -> Self:
+        attributes = list()
+        if not o.AttributesIsNone():
+            for i in range(o.AttributesLength()):
+                attributes_val = None
+                attributes_obj = o.Attributes(i)
+                if attributes_obj is not None:
+                    attributes_val = Attr.from_fbs(attributes_obj)
+                attributes.append(attributes_val)
         error_tys = list()
         if not o.ErrorTysIsNone():
             for i in range(o.ErrorTysLength()):
@@ -605,7 +617,7 @@ class Job:
             user_id = ObjectId.from_fbs(user_id_obj)
         else:
             raise ValueError("UserId is required")
-        return cls(error_tys, params, status, tasks, user_id)
+        return cls(attributes, error_tys, params, status, tasks, user_id)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -616,6 +628,8 @@ class Job:
     def serialize_to(self, builder: Builder) -> int:
         from .generated.Job import (
             Start,
+            AddAttributes,
+            StartAttributesVector,
             AddErrorTys,
             StartErrorTysVector,
             AddParams,
@@ -626,6 +640,15 @@ class Job:
             AddUserId,
             End,
         )
+        attributes_offset = None
+        if self.attributes is not None:
+            attributes_offsets = list()
+            for value in self.attributes:
+                attributes_offsets.append(value.serialize_to(builder))
+            StartAttributesVector(builder, len(self.attributes))
+            for i in reversed(range(len(self.attributes))):
+                builder.PrependUOffsetTRelative(attributes_offsets[i])
+            attributes_offset = builder.EndVector()
         error_tys_offset = None
         if self.error_tys is not None:
             StartErrorTysVector(builder, len(self.error_tys))
@@ -649,6 +672,8 @@ class Job:
         user_id_offset = self.user_id.serialize_to(builder)
 
         Start(builder)
+        if attributes_offset is not None:
+            AddAttributes(builder, attributes_offset)
         if error_tys_offset is not None:
             AddErrorTys(builder, error_tys_offset)
         AddParams(builder, params_offset)
@@ -665,15 +690,27 @@ class Job:
 
     @classmethod
     def make_default(cls) -> Self:
+        attributes = []
         error_tys = []
         params = []
         status = Status(0)
         tasks = []
         user_id = ObjectId.make_default()
-        return cls(error_tys, params, status, tasks, user_id)
+        return cls(attributes, error_tys, params, status, tasks, user_id)
 
     def __eq__(self, other) -> bool:
         eq = True
+        self_attributes = self.attributes
+        other_attributes = other.attributes
+        if self_attributes is not None and other_attributes is not None:
+            if len(self_attributes) != len(other_attributes):
+                return False
+            for i in range(len(self_attributes)):
+                eq = eq and self_attributes[i] == other_attributes[i]
+        elif self_attributes is not None and other_attributes is None:
+            return False
+        elif self_attributes is None and other_attributes is not None:
+            return False
         self_error_tys = self.error_tys
         other_error_tys = other.error_tys
         if self_error_tys is not None and other_error_tys is not None:
@@ -821,6 +858,8 @@ class RunSpec:
      start_date / end_date to be used in a number of calculations)
     """
 
+    attributes: Optional["List[Attr]"]
+
     notify: "bool"
 
     param_indices: "List[ParamIndices]"
@@ -835,6 +874,14 @@ class RunSpec:
 
     @classmethod
     def from_fbs(cls, o: FbsRunSpec) -> Self:
+        attributes = list()
+        if not o.AttributesIsNone():
+            for i in range(o.AttributesLength()):
+                attributes_val = None
+                attributes_obj = o.Attributes(i)
+                if attributes_obj is not None:
+                    attributes_val = Attr.from_fbs(attributes_obj)
+                attributes.append(attributes_val)
         notify = o.Notify()
         param_indices = list()
         if not o.ParamIndicesIsNone():
@@ -859,7 +906,7 @@ class RunSpec:
             schematic = ObjectId.from_fbs(schematic_obj)
         else:
             raise ValueError("Schematic is required")
-        return cls(notify, param_indices, params, persist, priority, schematic)
+        return cls(attributes, notify, param_indices, params, persist, priority, schematic)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -870,6 +917,8 @@ class RunSpec:
     def serialize_to(self, builder: Builder) -> int:
         from .generated.RunSpec import (
             Start,
+            AddAttributes,
+            StartAttributesVector,
             AddNotify,
             AddParamIndices,
             StartParamIndicesVector,
@@ -880,6 +929,15 @@ class RunSpec:
             AddSchematic,
             End,
         )
+        attributes_offset = None
+        if self.attributes is not None:
+            attributes_offsets = list()
+            for value in self.attributes:
+                attributes_offsets.append(value.serialize_to(builder))
+            StartAttributesVector(builder, len(self.attributes))
+            for i in reversed(range(len(self.attributes))):
+                builder.PrependUOffsetTRelative(attributes_offsets[i])
+            attributes_offset = builder.EndVector()
         param_indices_offsets = list()
         for value in self.param_indices:
             param_indices_offsets.append(value.serialize_to(builder))
@@ -897,6 +955,8 @@ class RunSpec:
         schematic_offset = self.schematic.serialize_to(builder)
 
         Start(builder)
+        if attributes_offset is not None:
+            AddAttributes(builder, attributes_offset)
         AddNotify(builder, self.notify)
         AddParamIndices(builder, param_indices_offset)
         AddParams(builder, params_offset)
@@ -913,16 +973,28 @@ class RunSpec:
 
     @classmethod
     def make_default(cls) -> Self:
+        attributes = []
         notify = False
         param_indices = []
         params = []
         persist = False
         priority = TaskPriority(-256)
         schematic = ObjectId.make_default()
-        return cls(notify, param_indices, params, persist, priority, schematic)
+        return cls(attributes, notify, param_indices, params, persist, priority, schematic)
 
     def __eq__(self, other) -> bool:
         eq = True
+        self_attributes = self.attributes
+        other_attributes = other.attributes
+        if self_attributes is not None and other_attributes is not None:
+            if len(self_attributes) != len(other_attributes):
+                return False
+            for i in range(len(self_attributes)):
+                eq = eq and self_attributes[i] == other_attributes[i]
+        elif self_attributes is not None and other_attributes is None:
+            return False
+        elif self_attributes is None and other_attributes is not None:
+            return False
         eq = eq and self.notify == other.notify
         if len(self.param_indices) != len(other.param_indices):
             return False

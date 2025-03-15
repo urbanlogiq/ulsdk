@@ -16,6 +16,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
              "Non-compatible flatbuffers version included");
 
 #include "Schema_generated.h"
+#include "attr_generated.h"
 #include "data_generated.h"
 #include "id_generated.h"
 #include "value_generated.h"
@@ -1112,7 +1113,8 @@ struct Job FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_USER_ID = 6,
     VT_TASKS = 8,
     VT_PARAMS = 10,
-    VT_ERROR_TYS = 12
+    VT_ERROR_TYS = 12,
+    VT_ATTRIBUTES = 14
   };
   /// Is the job complete?
   Status status() const {
@@ -1133,6 +1135,9 @@ struct Job FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::Vector<TaskErrorTy> *error_tys() const {
     return GetPointer<const ::flatbuffers::Vector<TaskErrorTy> *>(VT_ERROR_TYS);
   }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<Attr>> *attributes() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Attr>> *>(VT_ATTRIBUTES);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int8_t>(verifier, VT_STATUS, 1) &&
@@ -1146,6 +1151,9 @@ struct Job FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyVectorOfTables(params()) &&
            VerifyOffset(verifier, VT_ERROR_TYS) &&
            verifier.VerifyVector(error_tys()) &&
+           VerifyOffset(verifier, VT_ATTRIBUTES) &&
+           verifier.VerifyVector(attributes()) &&
+           verifier.VerifyVectorOfTables(attributes()) &&
            verifier.EndTable();
   }
 };
@@ -1169,6 +1177,9 @@ struct JobBuilder {
   void add_error_tys(::flatbuffers::Offset<::flatbuffers::Vector<TaskErrorTy>> error_tys) {
     fbb_.AddOffset(Job::VT_ERROR_TYS, error_tys);
   }
+  void add_attributes(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Attr>>> attributes) {
+    fbb_.AddOffset(Job::VT_ATTRIBUTES, attributes);
+  }
   explicit JobBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1189,8 +1200,10 @@ inline ::flatbuffers::Offset<Job> CreateJob(
     ::flatbuffers::Offset<ObjectId> user_id = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Task>>> tasks = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<TaskParameter>>> params = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<TaskErrorTy>> error_tys = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<TaskErrorTy>> error_tys = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Attr>>> attributes = 0) {
   JobBuilder builder_(_fbb);
+  builder_.add_attributes(attributes);
   builder_.add_error_tys(error_tys);
   builder_.add_params(params);
   builder_.add_tasks(tasks);
@@ -1210,17 +1223,20 @@ inline ::flatbuffers::Offset<Job> CreateJobDirect(
     ::flatbuffers::Offset<ObjectId> user_id = 0,
     const std::vector<::flatbuffers::Offset<Task>> *tasks = nullptr,
     const std::vector<::flatbuffers::Offset<TaskParameter>> *params = nullptr,
-    const std::vector<TaskErrorTy> *error_tys = nullptr) {
+    const std::vector<TaskErrorTy> *error_tys = nullptr,
+    const std::vector<::flatbuffers::Offset<Attr>> *attributes = nullptr) {
   auto tasks__ = tasks ? _fbb.CreateVector<::flatbuffers::Offset<Task>>(*tasks) : 0;
   auto params__ = params ? _fbb.CreateVector<::flatbuffers::Offset<TaskParameter>>(*params) : 0;
   auto error_tys__ = error_tys ? _fbb.CreateVector<TaskErrorTy>(*error_tys) : 0;
+  auto attributes__ = attributes ? _fbb.CreateVector<::flatbuffers::Offset<Attr>>(*attributes) : 0;
   return CreateJob(
       _fbb,
       status,
       user_id,
       tasks__,
       params__,
-      error_tys__);
+      error_tys__,
+      attributes__);
 }
 
 /// A RunSpec is the data required in order to kickstart a schematic job.
@@ -1239,7 +1255,8 @@ struct RunSpec FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_PARAM_INDICES = 8,
     VT_PARAMS = 10,
     VT_PRIORITY = 12,
-    VT_NOTIFY = 14
+    VT_NOTIFY = 14,
+    VT_ATTRIBUTES = 16
   };
   bool persist() const {
     return GetField<uint8_t>(VT_PERSIST, 0) != 0;
@@ -1259,6 +1276,9 @@ struct RunSpec FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   bool notify() const {
     return GetField<uint8_t>(VT_NOTIFY, 1) != 0;
   }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<Attr>> *attributes() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Attr>> *>(VT_ATTRIBUTES);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_PERSIST, 1) &&
@@ -1272,6 +1292,9 @@ struct RunSpec FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyVectorOfTables(params()) &&
            VerifyField<int32_t>(verifier, VT_PRIORITY, 4) &&
            VerifyField<uint8_t>(verifier, VT_NOTIFY, 1) &&
+           VerifyOffset(verifier, VT_ATTRIBUTES) &&
+           verifier.VerifyVector(attributes()) &&
+           verifier.VerifyVectorOfTables(attributes()) &&
            verifier.EndTable();
   }
 };
@@ -1298,6 +1321,9 @@ struct RunSpecBuilder {
   void add_notify(bool notify) {
     fbb_.AddElement<uint8_t>(RunSpec::VT_NOTIFY, static_cast<uint8_t>(notify), 1);
   }
+  void add_attributes(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Attr>>> attributes) {
+    fbb_.AddOffset(RunSpec::VT_ATTRIBUTES, attributes);
+  }
   explicit RunSpecBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1319,8 +1345,10 @@ inline ::flatbuffers::Offset<RunSpec> CreateRunSpec(
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ParamIndices>>> param_indices = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<TaskParameter>>> params = 0,
     TaskPriority priority = TaskPriority::Medium,
-    bool notify = true) {
+    bool notify = true,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Attr>>> attributes = 0) {
   RunSpecBuilder builder_(_fbb);
+  builder_.add_attributes(attributes);
   builder_.add_priority(priority);
   builder_.add_params(params);
   builder_.add_param_indices(param_indices);
@@ -1342,9 +1370,11 @@ inline ::flatbuffers::Offset<RunSpec> CreateRunSpecDirect(
     const std::vector<::flatbuffers::Offset<ParamIndices>> *param_indices = nullptr,
     const std::vector<::flatbuffers::Offset<TaskParameter>> *params = nullptr,
     TaskPriority priority = TaskPriority::Medium,
-    bool notify = true) {
+    bool notify = true,
+    const std::vector<::flatbuffers::Offset<Attr>> *attributes = nullptr) {
   auto param_indices__ = param_indices ? _fbb.CreateVector<::flatbuffers::Offset<ParamIndices>>(*param_indices) : 0;
   auto params__ = params ? _fbb.CreateVector<::flatbuffers::Offset<TaskParameter>>(*params) : 0;
+  auto attributes__ = attributes ? _fbb.CreateVector<::flatbuffers::Offset<Attr>>(*attributes) : 0;
   return CreateRunSpec(
       _fbb,
       persist,
@@ -1352,7 +1382,8 @@ inline ::flatbuffers::Offset<RunSpec> CreateRunSpecDirect(
       param_indices__,
       params__,
       priority,
-      notify);
+      notify,
+      attributes__);
 }
 
 struct DeprecatedTaskParameter FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

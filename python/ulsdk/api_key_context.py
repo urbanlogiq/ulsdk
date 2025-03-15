@@ -208,7 +208,7 @@ class ApiKeyContext(RequestContext):
         headers["content-type"] = mimetype
         headers["content-length"] = str(len(data_as_bytes))
         headers = _generate_auth_header(
-            self._key, "PUT", path, params, headers, data_as_bytes
+            self._key, "POST", path, params, headers, data_as_bytes
         )
         kwargs["headers"] = headers
         kwargs["data"] = body

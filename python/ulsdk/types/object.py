@@ -46,6 +46,7 @@ from .Schema import (
     UnionMode,
     Utf8,
 )
+from .attr import Attr
 from .data import (
     AttributePair,
     DayOfWeek,
@@ -143,6 +144,7 @@ from .worklog import (
     WorkLog,
     WorklogParameter,
 )
+from .generated.Attr import Attr as FbsAttr
 from .generated.AttributePair import AttributePair as FbsAttributePair
 from .generated.B2cId import B2cId as FbsB2cId
 from .generated.Binary import Binary as FbsBinary

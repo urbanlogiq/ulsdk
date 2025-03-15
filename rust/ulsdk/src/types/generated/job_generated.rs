@@ -16,6 +16,7 @@
 // @generated
 
 use super::value_generated::*;
+use super::attr_generated::*;
 use super::data_generated::*;
 use super::id_generated::*;
 use super::Schema_generated::*;
@@ -2036,6 +2037,7 @@ impl<'a> Job<'a> {
   pub const VT_TASKS: flatbuffers::VOffsetT = 8;
   pub const VT_PARAMS: flatbuffers::VOffsetT = 10;
   pub const VT_ERROR_TYS: flatbuffers::VOffsetT = 12;
+  pub const VT_ATTRIBUTES: flatbuffers::VOffsetT = 14;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -2047,6 +2049,7 @@ impl<'a> Job<'a> {
     args: &'args JobArgs<'args>
   ) -> flatbuffers::WIPOffset<Job<'bldr>> {
     let mut builder = JobBuilder::new(_fbb);
+    if let Some(x) = args.attributes { builder.add_attributes(x); }
     if let Some(x) = args.error_tys { builder.add_error_tys(x); }
     if let Some(x) = args.params { builder.add_params(x); }
     if let Some(x) = args.tasks { builder.add_tasks(x); }
@@ -2095,6 +2098,13 @@ impl<'a> Job<'a> {
     // which contains a valid value in this slot
     unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, TaskErrorTy>>>(Job::VT_ERROR_TYS, None)}
   }
+  #[inline]
+  pub fn attributes(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Attr<'a>>>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Attr>>>>(Job::VT_ATTRIBUTES, None)}
+  }
 }
 
 impl flatbuffers::Verifiable for Job<'_> {
@@ -2109,6 +2119,7 @@ impl flatbuffers::Verifiable for Job<'_> {
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Task>>>>("tasks", Self::VT_TASKS, true)?
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<TaskParameter>>>>("params", Self::VT_PARAMS, true)?
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, TaskErrorTy>>>("error_tys", Self::VT_ERROR_TYS, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Attr>>>>("attributes", Self::VT_ATTRIBUTES, false)?
      .finish();
     Ok(())
   }
@@ -2119,6 +2130,7 @@ pub struct JobArgs<'a> {
     pub tasks: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Task<'a>>>>>,
     pub params: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<TaskParameter<'a>>>>>,
     pub error_tys: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, TaskErrorTy>>>,
+    pub attributes: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Attr<'a>>>>>,
 }
 impl<'a> Default for JobArgs<'a> {
   #[inline]
@@ -2129,6 +2141,7 @@ impl<'a> Default for JobArgs<'a> {
       tasks: None, // required field
       params: None, // required field
       error_tys: None,
+      attributes: None,
     }
   }
 }
@@ -2138,7 +2151,7 @@ impl Serialize for Job<'_> {
   where
     S: Serializer,
   {
-    let mut s = serializer.serialize_struct("Job", 5)?;
+    let mut s = serializer.serialize_struct("Job", 6)?;
       s.serialize_field("status", &self.status())?;
       s.serialize_field("user_id", &self.user_id())?;
       s.serialize_field("tasks", &self.tasks())?;
@@ -2147,6 +2160,11 @@ impl Serialize for Job<'_> {
         s.serialize_field("error_tys", &f)?;
       } else {
         s.skip_field("error_tys")?;
+      }
+      if let Some(f) = self.attributes() {
+        s.serialize_field("attributes", &f)?;
+      } else {
+        s.skip_field("attributes")?;
       }
     s.end()
   }
@@ -2178,6 +2196,10 @@ impl<'a: 'b, 'b> JobBuilder<'a, 'b> {
     self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(Job::VT_ERROR_TYS, error_tys);
   }
   #[inline]
+  pub fn add_attributes(&mut self, attributes: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<Attr<'b >>>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(Job::VT_ATTRIBUTES, attributes);
+  }
+  #[inline]
   pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> JobBuilder<'a, 'b> {
     let start = _fbb.start_table();
     JobBuilder {
@@ -2203,6 +2225,7 @@ impl core::fmt::Debug for Job<'_> {
       ds.field("tasks", &self.tasks());
       ds.field("params", &self.params());
       ds.field("error_tys", &self.error_tys());
+      ds.field("attributes", &self.attributes());
       ds.finish()
   }
 }
@@ -2235,6 +2258,7 @@ impl<'a> RunSpec<'a> {
   pub const VT_PARAMS: flatbuffers::VOffsetT = 10;
   pub const VT_PRIORITY: flatbuffers::VOffsetT = 12;
   pub const VT_NOTIFY: flatbuffers::VOffsetT = 14;
+  pub const VT_ATTRIBUTES: flatbuffers::VOffsetT = 16;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -2246,6 +2270,7 @@ impl<'a> RunSpec<'a> {
     args: &'args RunSpecArgs<'args>
   ) -> flatbuffers::WIPOffset<RunSpec<'bldr>> {
     let mut builder = RunSpecBuilder::new(_fbb);
+    if let Some(x) = args.attributes { builder.add_attributes(x); }
     builder.add_priority(args.priority);
     if let Some(x) = args.params { builder.add_params(x); }
     if let Some(x) = args.param_indices { builder.add_param_indices(x); }
@@ -2298,6 +2323,13 @@ impl<'a> RunSpec<'a> {
     // which contains a valid value in this slot
     unsafe { self._tab.get::<bool>(RunSpec::VT_NOTIFY, Some(true)).unwrap()}
   }
+  #[inline]
+  pub fn attributes(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Attr<'a>>>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Attr>>>>(RunSpec::VT_ATTRIBUTES, None)}
+  }
 }
 
 impl flatbuffers::Verifiable for RunSpec<'_> {
@@ -2313,6 +2345,7 @@ impl flatbuffers::Verifiable for RunSpec<'_> {
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<TaskParameter>>>>("params", Self::VT_PARAMS, true)?
      .visit_field::<TaskPriority>("priority", Self::VT_PRIORITY, false)?
      .visit_field::<bool>("notify", Self::VT_NOTIFY, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Attr>>>>("attributes", Self::VT_ATTRIBUTES, false)?
      .finish();
     Ok(())
   }
@@ -2324,6 +2357,7 @@ pub struct RunSpecArgs<'a> {
     pub params: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<TaskParameter<'a>>>>>,
     pub priority: TaskPriority,
     pub notify: bool,
+    pub attributes: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Attr<'a>>>>>,
 }
 impl<'a> Default for RunSpecArgs<'a> {
   #[inline]
@@ -2335,6 +2369,7 @@ impl<'a> Default for RunSpecArgs<'a> {
       params: None, // required field
       priority: TaskPriority::Medium,
       notify: true,
+      attributes: None,
     }
   }
 }
@@ -2344,13 +2379,18 @@ impl Serialize for RunSpec<'_> {
   where
     S: Serializer,
   {
-    let mut s = serializer.serialize_struct("RunSpec", 6)?;
+    let mut s = serializer.serialize_struct("RunSpec", 7)?;
       s.serialize_field("persist", &self.persist())?;
       s.serialize_field("schematic", &self.schematic())?;
       s.serialize_field("param_indices", &self.param_indices())?;
       s.serialize_field("params", &self.params())?;
       s.serialize_field("priority", &self.priority())?;
       s.serialize_field("notify", &self.notify())?;
+      if let Some(f) = self.attributes() {
+        s.serialize_field("attributes", &f)?;
+      } else {
+        s.skip_field("attributes")?;
+      }
     s.end()
   }
 }
@@ -2385,6 +2425,10 @@ impl<'a: 'b, 'b> RunSpecBuilder<'a, 'b> {
     self.fbb_.push_slot::<bool>(RunSpec::VT_NOTIFY, notify, true);
   }
   #[inline]
+  pub fn add_attributes(&mut self, attributes: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<Attr<'b >>>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(RunSpec::VT_ATTRIBUTES, attributes);
+  }
+  #[inline]
   pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> RunSpecBuilder<'a, 'b> {
     let start = _fbb.start_table();
     RunSpecBuilder {
@@ -2411,6 +2455,7 @@ impl core::fmt::Debug for RunSpec<'_> {
       ds.field("params", &self.params());
       ds.field("priority", &self.priority());
       ds.field("notify", &self.notify());
+      ds.field("attributes", &self.attributes());
       ds.finish()
   }
 }

@@ -52,6 +52,7 @@ use crate::types::Schema::{
     UnionMode,
     Utf8,
 };
+use crate::types::attr::Attr;
 use crate::types::crypto::{
     CryptHeader,
     Digest,
@@ -204,6 +205,9 @@ use crate::types::generated::Schema_generated::{
     Type as FbsType,
     UnionMode as FbsUnionMode,
 };
+use crate::types::generated::attr_generated::{
+    Attr as FbsAttr,
+};
 use crate::types::generated::crypto_generated::{
     CryptHeader as FbsCryptHeader,
     EncryptedObject as FbsEncryptedObject,
@@ -226,7 +230,6 @@ use crate::types::generated::data_generated::{
     TurnTy as FbsTurnTy,
 };
 use crate::types::generated::fs_generated::{
-    Attr as FbsAttr,
     Chunk as FbsChunk,
     Directory as FbsDirectory,
     DirectoryEntry as FbsDirectoryEntry,
@@ -911,84 +914,6 @@ impl ListEntry {
 }
 
 #[derive(Default, PartialEq, Debug, Clone)]
-pub struct Attr {
-    pub key: String,
-    pub v: Value,
-}
-
-impl Attr {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsAttr<'a>> {
-        use crate::types::generated::fs_generated::AttrBuilder as FbsAttrBuilder;
-
-        let key_offset = builder.create_string(&self.key);
-        let (v_offset, v_ty) = self.v.serialize_to(builder);
-
-        let mut bldr = FbsAttrBuilder::new(builder);
-        bldr.add_key(key_offset);
-        bldr.add_v(v_offset);
-        bldr.add_v_type(v_ty);
-        bldr.finish()
-    }
-}
-
-impl From<FbsAttr<'_>> for Attr {
-    fn from(fbs: FbsAttr<'_>) -> Self {
-        let key = fbs.key().to_owned();
-        let v = match fbs.v_type() {
-            FbsValue::VBool => Value::VBool(VBool::from(fbs.v_as_vbool().unwrap())),
-            FbsValue::VUnit => Value::VUnit(VUnit::from(fbs.v_as_vunit().unwrap())),
-            FbsValue::VChar => Value::VChar(VChar::from(fbs.v_as_vchar().unwrap())),
-            FbsValue::VNull => Value::VNull(VNull::from(fbs.v_as_vnull().unwrap())),
-            FbsValue::VI8 => Value::VI8(VI8::from(fbs.v_as_vi8().unwrap())),
-            FbsValue::VU8 => Value::VU8(VU8::from(fbs.v_as_vu8().unwrap())),
-            FbsValue::VI16 => Value::VI16(VI16::from(fbs.v_as_vi16().unwrap())),
-            FbsValue::VU16 => Value::VU16(VU16::from(fbs.v_as_vu16().unwrap())),
-            FbsValue::VI32 => Value::VI32(VI32::from(fbs.v_as_vi32().unwrap())),
-            FbsValue::VU32 => Value::VU32(VU32::from(fbs.v_as_vu32().unwrap())),
-            FbsValue::VF32 => Value::VF32(VF32::from(fbs.v_as_vf32().unwrap())),
-            FbsValue::VIsize => Value::VIsize(VIsize::from(fbs.v_as_visize().unwrap())),
-            FbsValue::VUsize => Value::VUsize(VUsize::from(fbs.v_as_vusize().unwrap())),
-            FbsValue::VI64 => Value::VI64(VI64::from(fbs.v_as_vi64().unwrap())),
-            FbsValue::VU64 => Value::VU64(VU64::from(fbs.v_as_vu64().unwrap())),
-            FbsValue::VF64 => Value::VF64(VF64::from(fbs.v_as_vf64().unwrap())),
-            FbsValue::VStr => Value::VStr(VStr::from(fbs.v_as_vstr().unwrap())),
-            FbsValue::VBytes => Value::VBytes(VBytes::from(fbs.v_as_vbytes().unwrap())),
-            FbsValue::VArray => Value::VArray(VArray::from(fbs.v_as_varray().unwrap())),
-            FbsValue::VTri2D => Value::VTri2D(VTri2D::from(fbs.v_as_vtri_2_d().unwrap())),
-            FbsValue::VFixedSizeBytes => Value::VFixedSizeBytes(VFixedSizeBytes::from(fbs.v_as_vfixed_size_bytes().unwrap())),
-            FbsValue::VTimestampMsUtc => Value::VTimestampMsUtc(VTimestampMsUtc::from(fbs.v_as_vtimestamp_ms_utc().unwrap())),
-            FbsValue::VTimestampMs => Value::VTimestampMs(VTimestampMs::from(fbs.v_as_vtimestamp_ms().unwrap())),
-            FbsValue::VTimestampNsUtc => Value::VTimestampNsUtc(VTimestampNsUtc::from(fbs.v_as_vtimestamp_ns_utc().unwrap())),
-            FbsValue::VTimestampNs => Value::VTimestampNs(VTimestampNs::from(fbs.v_as_vtimestamp_ns().unwrap())),
-            FbsValue::VPlaceholder => Value::VPlaceholder(VPlaceholder::from(fbs.v_as_vplaceholder().unwrap())),
-            _ => unreachable!(),
-        };
-
-        Self {
-            key,
-            v,
-        }
-    }
-}
-
-impl TryFrom<&[u8]> for Attr {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsAttr>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<Attr> for Vec<u8> {
-    fn from(obj: Attr) -> Self {
-        let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
-        bldr.finish_size_prefixed(offset, None);
-        bldr.finished_data().to_vec()
-    }
-}
-
-#[derive(Default, PartialEq, Debug, Clone)]
 pub struct Chunk {
     pub blob: GenericId,
     pub digest: Digest,
@@ -1447,14 +1372,6 @@ impl From<Slot> for Vec<u8> {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_attr() {
-        let t0 = Attr::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = Attr::try_from(buf.as_slice()).unwrap();
-        assert_eq!(t0, t1);
-    }
 
     #[test]
     fn test_chunk() {

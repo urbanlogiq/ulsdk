@@ -243,6 +243,17 @@ Edge::Edge(const ::Edge *root)
 
 ::flatbuffers::Offset<::Job>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Job &o) {
+    std::optional<::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::Attr>>>> attributes_offset = std::nullopt;
+    if (o.attributes_.has_value()) {
+        const auto &attributes__var = o.attributes_.value();
+        std::vector<::flatbuffers::Offset<::Attr>> attributes_offsets = std::vector<::flatbuffers::Offset<::Attr>>();
+        attributes_offsets.reserve(attributes__var.size());
+        for (const auto &i: attributes__var) {
+            attributes_offsets.push_back(serialize_to(builder, i));
+        }
+        const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::Attr>>> attributes_offset_val = builder.CreateVector(attributes_offsets);
+        attributes_offset = std::make_optional(attributes_offset_val);
+    }
     std::optional<decltype(builder.CreateVector(o.error_tys_.value()))> error_tys_offset = std::nullopt;
     if (o.error_tys_.has_value()) {
         const decltype(builder.CreateVector(o.error_tys_.value())) error_tys_offset_val = builder.CreateVector(o.error_tys_.value());
@@ -263,6 +274,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Job &o) {
     const ::flatbuffers::Offset<::ObjectId> user_id_offset = serialize_to(builder, o.user_id_);
 
     ::JobBuilder instance_builder = ::JobBuilder(builder);
+    if (attributes_offset.has_value()) {
+        instance_builder.add_attributes(attributes_offset.value());
+    }
     if (error_tys_offset.has_value()) {
         instance_builder.add_error_tys(error_tys_offset.value());
     }
@@ -282,7 +296,8 @@ std::vector<uint8_t> to_bytes(const Job &o) {
 }
 
 Job::Job()
-    : error_tys_(std::nullopt)
+    : attributes_(std::nullopt)
+    , error_tys_(std::nullopt)
     , params_()
     , status_(Status(0))
     , tasks_()
@@ -294,7 +309,8 @@ Job::Job(const std::vector<uint8_t> &bytes)
 }
 
 Job::Job(const ::Job *root) 
-    : error_tys_(std::nullopt)
+    : attributes_(std::nullopt)
+    , error_tys_(std::nullopt)
     , params_()
     , status_(Status(0))
     , tasks_()
@@ -303,6 +319,15 @@ Job::Job(const ::Job *root)
         throw std::runtime_error("cannot deserialize flatbuffer type");
     }
 
+    const auto &attributes_vector = root->attributes();
+    if (attributes_vector != nullptr) {
+        decltype(attributes_)::value_type attributes__target = decltype(attributes_)::value_type();
+        attributes__target.reserve(attributes_vector->size());
+        for (const auto &i: *attributes_vector) {
+            attributes__target.emplace_back(i);
+        }
+        attributes_ = std::make_optional(attributes__target);
+    }
     const auto &error_tys_vector = root->error_tys();
     if (error_tys_vector != nullptr) {
         decltype(error_tys_)::value_type error_tys__target = decltype(error_tys_)::value_type();
@@ -409,6 +434,17 @@ ParamIndices::ParamIndices(const ::ParamIndices *root)
 
 ::flatbuffers::Offset<::RunSpec>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const RunSpec &o) {
+    std::optional<::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::Attr>>>> attributes_offset = std::nullopt;
+    if (o.attributes_.has_value()) {
+        const auto &attributes__var = o.attributes_.value();
+        std::vector<::flatbuffers::Offset<::Attr>> attributes_offsets = std::vector<::flatbuffers::Offset<::Attr>>();
+        attributes_offsets.reserve(attributes__var.size());
+        for (const auto &i: attributes__var) {
+            attributes_offsets.push_back(serialize_to(builder, i));
+        }
+        const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::Attr>>> attributes_offset_val = builder.CreateVector(attributes_offsets);
+        attributes_offset = std::make_optional(attributes_offset_val);
+    }
     std::vector<::flatbuffers::Offset<::ParamIndices>> param_indices_offsets = std::vector<::flatbuffers::Offset<::ParamIndices>>();
     param_indices_offsets.reserve(o.param_indices_.size());
     for (const auto &i: o.param_indices_) {
@@ -424,6 +460,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const RunSpec &o) {
     const ::flatbuffers::Offset<::ObjectId> schematic_offset = serialize_to(builder, o.schematic_);
 
     ::RunSpecBuilder instance_builder = ::RunSpecBuilder(builder);
+    if (attributes_offset.has_value()) {
+        instance_builder.add_attributes(attributes_offset.value());
+    }
     instance_builder.add_notify(o.notify_);
     instance_builder.add_param_indices(param_indices_offset);
     instance_builder.add_params(params_offset);
@@ -442,7 +481,8 @@ std::vector<uint8_t> to_bytes(const RunSpec &o) {
 }
 
 RunSpec::RunSpec()
-    : notify_(true)
+    : attributes_(std::nullopt)
+    , notify_(true)
     , param_indices_()
     , params_()
     , persist_(false)
@@ -455,7 +495,8 @@ RunSpec::RunSpec(const std::vector<uint8_t> &bytes)
 }
 
 RunSpec::RunSpec(const ::RunSpec *root) 
-    : notify_(true)
+    : attributes_(std::nullopt)
+    , notify_(true)
     , param_indices_()
     , params_()
     , persist_(false)
@@ -465,6 +506,15 @@ RunSpec::RunSpec(const ::RunSpec *root)
         throw std::runtime_error("cannot deserialize flatbuffer type");
     }
 
+    const auto &attributes_vector = root->attributes();
+    if (attributes_vector != nullptr) {
+        decltype(attributes_)::value_type attributes__target = decltype(attributes_)::value_type();
+        attributes__target.reserve(attributes_vector->size());
+        for (const auto &i: *attributes_vector) {
+            attributes__target.emplace_back(i);
+        }
+        attributes_ = std::make_optional(attributes__target);
+    }
     notify_ = root->notify();
     const auto &param_indices_vector = root->param_indices();
     if (param_indices_vector != nullptr) {
