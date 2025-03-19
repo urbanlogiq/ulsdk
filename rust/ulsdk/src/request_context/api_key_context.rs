@@ -287,6 +287,7 @@ impl RequestContext for ApiKeyContext {
             let r = client
                 .put(&endpoint)
                 .headers(headers.clone())
+                .query(&query)
                 .body(body.clone())
                 .send()
                 .await?;
@@ -361,6 +362,7 @@ impl RequestContext for ApiKeyContext {
             let r = client
                 .post(&endpoint)
                 .headers(headers.clone())
+                .query(&query)
                 .body(body.clone())
                 .send()
                 .await?;
