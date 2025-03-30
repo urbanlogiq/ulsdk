@@ -7,6 +7,16 @@
 #include "test.h"
 
 bool
+test_append() {
+    ::ul::types::Append t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::Append deserialized = ::ul::types::Append(bytes);
+    return true;
+}
+
+TypeTest test_append_obj(test_append, "Append");
+
+bool
 test_change_op_entry() {
     ::ul::types::ChangeOpEntry t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);

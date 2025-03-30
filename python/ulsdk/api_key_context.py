@@ -146,9 +146,15 @@ class ApiKeyContext(RequestContext):
         self,
         path: str,
         params: Optional[Dict] = None,
-        headers: Dict[str, str] = dict(),
+        headers: Optional[Dict[str, str]] = None,
         **kwargs,
     ) -> bytes:
+        if params is None:
+            params = dict()
+
+        if headers is None:
+            headers = dict()
+
         endpoint = _get_endpoint(self._key.region, self._environment, path)
         headers = _generate_auth_header(self._key, "GET", path, params, headers, None)
         kwargs["headers"] = headers
@@ -164,9 +170,15 @@ class ApiKeyContext(RequestContext):
         body: Union[bytes, str, None] = None,
         mimetype: str = "application/octet-stream",
         params: Optional[Dict] = None,
-        headers: Dict[str, str] = dict(),
+        headers: Optional[Dict[str, str]] = None,
         **kwargs,
     ) -> bytes:
+        if params is None:
+            params = dict()
+
+        if headers is None:
+            headers = dict()
+
         endpoint = _get_endpoint(self._key.region, self._environment, path)
         if mimetype is None:
             mimetype = (
@@ -194,9 +206,15 @@ class ApiKeyContext(RequestContext):
         body: Union[bytes, str, None] = None,
         mimetype: str = "application/octet-stream",
         params: Optional[Dict] = None,
-        headers: Dict[str, str] = dict(),
+        headers: Optional[Dict[str, str]] = None,
         **kwargs,
     ) -> bytes:
+        if params is None:
+            params = dict()
+
+        if headers is None:
+            headers = dict()
+
         endpoint = _get_endpoint(self._key.region, self._environment, path)
         if mimetype is None:
             mimetype = (
@@ -277,9 +295,15 @@ class ApiKeyContext(RequestContext):
         self,
         path: str,
         params: Optional[Dict] = None,
-        headers: Dict[str, str] = dict(),
+        headers: Optional[Dict[str, str]] = None,
         **kwargs,
     ) -> bytes:
+        if params is None:
+            params = dict()
+
+        if headers is None:
+            headers = dict()
+
         endpoint = _get_endpoint(self._key.region, self._environment, path)
         headers = _generate_auth_header(
             self._key, "DELETE", path, params, headers, None

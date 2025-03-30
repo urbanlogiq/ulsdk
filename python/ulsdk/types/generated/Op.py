@@ -8,3 +8,4 @@ class Op(object):
     Set = 1
     RmRow = 2
     RestoreRow = 3
+    Append = 4

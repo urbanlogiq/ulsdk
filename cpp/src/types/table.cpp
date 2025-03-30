@@ -42,6 +42,10 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Op &o) {
         const std::shared_ptr<RestoreRow> &v = std::get<std::shared_ptr<RestoreRow>>(o);
         const auto offset = serialize_to(builder, *v);
         return std::make_pair(offset.Union(), ::Op::RestoreRow);
+    } else if (std::holds_alternative<std::shared_ptr<Append>>(o)) {
+        const std::shared_ptr<Append> &v = std::get<std::shared_ptr<Append>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::Op::Append);
     } else { 
         throw std::runtime_error("unreachable");
     }
@@ -312,6 +316,43 @@ RestoreRow::RestoreRow(const ::RestoreRow *root)
 
     if (root->row() != nullptr) {
         row_ = decltype(row_)(root->row());
+    }
+}
+
+::flatbuffers::Offset<::Append>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Append &o) {
+    const decltype(builder.CreateVector(o.content_)) content_offset = builder.CreateVector(o.content_);
+
+    ::AppendBuilder instance_builder = ::AppendBuilder(builder);
+    instance_builder.add_content(content_offset);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const Append &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+Append::Append()
+    : content_() {
+}
+
+Append::Append(const std::vector<uint8_t> &bytes)
+    : Append(::flatbuffers::GetSizePrefixedRoot<::Append>(bytes.data())) {
+}
+
+Append::Append(const ::Append *root) 
+    : content_() {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    const auto &content_vector = root->content();
+    if (content_vector != nullptr) {
+        std::copy(content_vector->begin(), content_vector->end(), std::back_inserter(content_));
     }
 }
 
@@ -740,6 +781,12 @@ OpEntry::OpEntry(const ::OpEntry *root)
             case ::Op::RestoreRow: {
                 const auto op__local = static_cast<const ::RestoreRow *>(root->op());
                 std::shared_ptr<RestoreRow> op__shared = std::make_shared<RestoreRow>(op__local);
+                op_ = op__shared;
+                break;
+            }
+            case ::Op::Append: {
+                const auto op__local = static_cast<const ::Append *>(root->op());
+                std::shared_ptr<Append> op__shared = std::make_shared<Append>(op__local);
                 op_ = op__shared;
                 break;
             }

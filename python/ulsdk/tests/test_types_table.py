@@ -4,6 +4,12 @@
 
 from ..types.table import *
 
+def test_append():
+    _t0 = Append.make_default()
+    _b = _t0.to_bytes()
+    _t1 = Append.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_change_op_entry():
     _t0 = ChangeOpEntry.make_default()
     _b = _t0.to_bytes()

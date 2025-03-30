@@ -50,7 +50,7 @@ class RequestContext(ABC):
         self,
         path: str,
         params: Optional[Dict] = None,
-        headers: Dict[str, str] = dict(),
+        headers: Optional[Dict[str, str]] = None,
         **kwargs,
     ) -> bytes:
         """Make a GET request to the given path with optional parameters and headers"""
@@ -62,7 +62,7 @@ class RequestContext(ABC):
         body: Union[bytes, str, None] = None,
         mimetype: str = "application/octet-stream",
         params: Optional[Dict] = None,
-        headers: Dict[str, str] = dict(),
+        headers: Optional[Dict[str, str]] = None,
         **kwargs,
     ) -> bytes:
         """Make a PUT request to the given path with optional parameters and headers"""
@@ -74,7 +74,7 @@ class RequestContext(ABC):
         body: Union[bytes, str, None] = None,
         mimetype: str = "application/octet-stream",
         params: Optional[Dict] = None,
-        headers: Dict[str, str] = dict(),
+        headers: Optional[Dict[str, str]] = None,
         **kwargs,
     ) -> bytes:
         """Make a POST request to the given path with optional parameters and headers"""
@@ -92,7 +92,7 @@ class RequestContext(ABC):
         self,
         path: str,
         params: Optional[Dict] = None,
-        headers: Dict[str, str] = dict(),
+        headers: Optional[Dict[str, str]] = None,
         **kwargs,
     ) -> bytes:
         """Make a DELETE request to the given path with optional parameters and headers"""

@@ -298,6 +298,7 @@ use crate::types::generated::query_generated::{
     TypeHint as FbsTypeHint,
 };
 use crate::types::generated::table_generated::{
+    Append as FbsAppend,
     ChangeOpEntry as FbsChangeOpEntry,
     ChangeSet as FbsChangeSet,
     Delete as FbsDelete,
@@ -678,12 +679,62 @@ impl From<RestoreRow> for Vec<u8> {
     }
 }
 
+/// Append rows to a table. The `content` field is Arrow IPC Stream formatted.
+#[derive(Default, PartialEq, Debug, Clone)]
+pub struct Append {
+    /// The row content to append in Arrow IPC Stream format.
+    pub content: Vec<u8>,
+}
+
+impl Append {
+    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsAppend<'a>> {
+        use crate::types::generated::table_generated::AppendBuilder as FbsAppendBuilder;
+
+        let content_offset = builder.create_vector(&self.content);
+
+        let mut bldr = FbsAppendBuilder::new(builder);
+        bldr.add_content(content_offset);
+        bldr.finish()
+    }
+}
+
+impl From<FbsAppend<'_>> for Append {
+    fn from(fbs: FbsAppend<'_>) -> Self {
+        let mut content = Vec::new();
+        for elem in fbs.content() {
+            content.push(elem.into());
+        }
+
+        Self {
+            content,
+        }
+    }
+}
+
+impl TryFrom<&[u8]> for Append {
+    type Error = flatbuffers::InvalidFlatbuffer;
+    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsAppend>(bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+impl From<Append> for Vec<u8> {
+    fn from(obj: Append) -> Self {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = obj.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+}
+
 /// Table Ops are used to modify the contents of a table.
 #[derive(Clone, Debug, PartialEq)]
 pub enum Op {
     Set(Set),
     RmRow(RmRow),
     RestoreRow(RestoreRow),
+    Append(Append),
 }
 
 impl Default for Op {
@@ -708,6 +759,11 @@ impl Op {
             Self::RestoreRow(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
                 let ty = FbsOp::RestoreRow;
+                (offset, ty)
+            }
+            Self::Append(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsOp::Append;
                 (offset, ty)
             }
         }
@@ -1143,6 +1199,7 @@ impl From<FbsOpEntry<'_>> for OpEntry {
             FbsOp::Set => Op::Set(Set::from(fbs.op_as_set().unwrap())),
             FbsOp::RmRow => Op::RmRow(RmRow::from(fbs.op_as_rm_row().unwrap())),
             FbsOp::RestoreRow => Op::RestoreRow(RestoreRow::from(fbs.op_as_restore_row().unwrap())),
+            FbsOp::Append => Op::Append(Append::from(fbs.op_as_append().unwrap())),
             _ => unreachable!(),
         };
 
@@ -1172,6 +1229,14 @@ impl From<OpEntry> for Vec<u8> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_append() {
+        let t0 = Append::default();
+        let buf: Vec<u8> = t0.clone().into();
+        let t1 = Append::try_from(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
 
     #[test]
     fn test_change_op_entry() {

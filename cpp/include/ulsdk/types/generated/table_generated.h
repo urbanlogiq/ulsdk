@@ -28,6 +28,9 @@ struct RmRowBuilder;
 struct RestoreRow;
 struct RestoreRowBuilder;
 
+struct Append;
+struct AppendBuilder;
+
 struct OpEntry;
 struct OpEntryBuilder;
 
@@ -61,33 +64,36 @@ enum class Op : uint8_t {
   Set = 1,
   RmRow = 2,
   RestoreRow = 3,
+  Append = 4,
   MIN = NONE,
-  MAX = RestoreRow
+  MAX = Append
 };
 
-inline const Op (&EnumValuesOp())[4] {
+inline const Op (&EnumValuesOp())[5] {
   static const Op values[] = {
     Op::NONE,
     Op::Set,
     Op::RmRow,
-    Op::RestoreRow
+    Op::RestoreRow,
+    Op::Append
   };
   return values;
 }
 
 inline const char * const *EnumNamesOp() {
-  static const char * const names[5] = {
+  static const char * const names[6] = {
     "NONE",
     "Set",
     "RmRow",
     "RestoreRow",
+    "Append",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameOp(Op e) {
-  if (::flatbuffers::IsOutRange(e, Op::NONE, Op::RestoreRow)) return "";
+  if (::flatbuffers::IsOutRange(e, Op::NONE, Op::Append)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesOp()[index];
 }
@@ -106,6 +112,10 @@ template<> struct OpTraits<RmRow> {
 
 template<> struct OpTraits<RestoreRow> {
   static const Op enum_value = Op::RestoreRow;
+};
+
+template<> struct OpTraits<Append> {
+  static const Op enum_value = Op::Append;
 };
 
 bool VerifyOp(::flatbuffers::Verifier &verifier, const void *obj, Op type);
@@ -408,6 +418,66 @@ struct RestoreRow::Traits {
   static auto constexpr Create = CreateRestoreRow;
 };
 
+/// Append rows to a table. The `content` field is Arrow IPC Stream formatted.
+struct Append FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef AppendBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_CONTENT = 4
+  };
+  /// The row content to append in Arrow IPC Stream format.
+  const ::flatbuffers::Vector<uint8_t> *content() const {
+    return GetPointer<const ::flatbuffers::Vector<uint8_t> *>(VT_CONTENT);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_CONTENT) &&
+           verifier.VerifyVector(content()) &&
+           verifier.EndTable();
+  }
+};
+
+struct AppendBuilder {
+  typedef Append Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_content(::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> content) {
+    fbb_.AddOffset(Append::VT_CONTENT, content);
+  }
+  explicit AppendBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<Append> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<Append>(end);
+    fbb_.Required(o, Append::VT_CONTENT);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<Append> CreateAppend(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> content = 0) {
+  AppendBuilder builder_(_fbb);
+  builder_.add_content(content);
+  return builder_.Finish();
+}
+
+struct Append::Traits {
+  using type = Append;
+  static auto constexpr Create = CreateAppend;
+};
+
+inline ::flatbuffers::Offset<Append> CreateAppendDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<uint8_t> *content = nullptr) {
+  auto content__ = content ? _fbb.CreateVector<uint8_t>(*content) : 0;
+  return CreateAppend(
+      _fbb,
+      content__);
+}
+
 struct OpEntry FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef OpEntryBuilder Builder;
   struct Traits;
@@ -431,6 +501,9 @@ struct OpEntry FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const RestoreRow *op_as_RestoreRow() const {
     return op_type() == Op::RestoreRow ? static_cast<const RestoreRow *>(op()) : nullptr;
   }
+  const Append *op_as_Append() const {
+    return op_type() == Op::Append ? static_cast<const Append *>(op()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_OP_TYPE, 1) &&
@@ -450,6 +523,10 @@ template<> inline const RmRow *OpEntry::op_as<RmRow>() const {
 
 template<> inline const RestoreRow *OpEntry::op_as<RestoreRow>() const {
   return op_as_RestoreRow();
+}
+
+template<> inline const Append *OpEntry::op_as<Append>() const {
+  return op_as_Append();
 }
 
 struct OpEntryBuilder {
@@ -1206,6 +1283,10 @@ inline bool VerifyOp(::flatbuffers::Verifier &verifier, const void *obj, Op type
     }
     case Op::RestoreRow: {
       auto ptr = reinterpret_cast<const RestoreRow *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case Op::Append: {
+      auto ptr = reinterpret_cast<const Append *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

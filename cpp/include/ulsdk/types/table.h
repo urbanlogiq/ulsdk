@@ -25,6 +25,7 @@
 namespace ul {
 namespace types {
 
+struct Append;
 struct ChangeOpEntry;
 struct ChangeSet;
 struct Delete;
@@ -50,7 +51,8 @@ typedef std::variant<
 typedef std::variant<
     std::shared_ptr<Set>,
     std::shared_ptr<RmRow>,
-    std::shared_ptr<RestoreRow>
+    std::shared_ptr<RestoreRow>,
+    std::shared_ptr<Append>
 > Op;
 
 typedef std::variant<
@@ -120,6 +122,17 @@ struct RestoreRow {
     RestoreRow();
     RestoreRow(const ::RestoreRow *root);
     RestoreRow(const std::vector<uint8_t> &bytes);
+};
+
+///
+/// Append rows to a table. The `content` field is Arrow IPC Stream formatted.
+///
+struct Append {
+    std::vector<uint8_t> content_;
+
+    Append();
+    Append(const ::Append *root);
+    Append(const std::vector<uint8_t> &bytes);
 };
 
 struct ChangeOpEntry {
@@ -212,6 +225,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const RmRow &);
 ::flatbuffers::Offset<::RestoreRow>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const RestoreRow &);
 
+::flatbuffers::Offset<::Append>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Append &);
+
 ::flatbuffers::Offset<::ChangeOpEntry>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ChangeOpEntry &);
 
@@ -248,6 +264,9 @@ to_bytes(const RmRow &o);
 
 std::vector<uint8_t>
 to_bytes(const RestoreRow &o);
+
+std::vector<uint8_t>
+to_bytes(const Append &o);
 
 std::vector<uint8_t>
 to_bytes(const ChangeOpEntry &o);

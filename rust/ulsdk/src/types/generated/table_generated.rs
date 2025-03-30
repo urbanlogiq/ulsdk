@@ -36,14 +36,15 @@ use self::flatbuffers::{EndianScalar, Follow};
 #[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
 pub const ENUM_MIN_OP: u8 = 0;
 #[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
-pub const ENUM_MAX_OP: u8 = 3;
+pub const ENUM_MAX_OP: u8 = 4;
 #[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_OP: [Op; 4] = [
+pub const ENUM_VALUES_OP: [Op; 5] = [
   Op::NONE,
   Op::Set,
   Op::RmRow,
   Op::RestoreRow,
+  Op::Append,
 ];
 
 /// Table Ops are used to modify the contents of a table.
@@ -56,14 +57,16 @@ impl Op {
   pub const Set: Self = Self(1);
   pub const RmRow: Self = Self(2);
   pub const RestoreRow: Self = Self(3);
+  pub const Append: Self = Self(4);
 
   pub const ENUM_MIN: u8 = 0;
-  pub const ENUM_MAX: u8 = 3;
+  pub const ENUM_MAX: u8 = 4;
   pub const ENUM_VALUES: &'static [Self] = &[
     Self::NONE,
     Self::Set,
     Self::RmRow,
     Self::RestoreRow,
+    Self::Append,
   ];
   /// Returns the variant's name or "" if unknown.
   pub fn variant_name(self) -> Option<&'static str> {
@@ -72,6 +75,7 @@ impl Op {
       Self::Set => Some("Set"),
       Self::RmRow => Some("RmRow"),
       Self::RestoreRow => Some("RestoreRow"),
+      Self::Append => Some("Append"),
       _ => None,
     }
   }
@@ -717,6 +721,117 @@ impl core::fmt::Debug for RestoreRow<'_> {
       ds.finish()
   }
 }
+pub enum AppendOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+/// Append rows to a table. The `content` field is Arrow IPC Stream formatted.
+pub struct Append<'a> {
+  pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for Append<'a> {
+  type Inner = Append<'a>;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    Self { _tab: flatbuffers::Table::new(buf, loc) }
+  }
+}
+
+impl<'a> Append<'a> {
+  pub const VT_CONTENT: flatbuffers::VOffsetT = 4;
+
+  #[inline]
+  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+    Append { _tab: table }
+  }
+  #[allow(unused_mut)]
+  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
+    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    args: &'args AppendArgs<'args>
+  ) -> flatbuffers::WIPOffset<Append<'bldr>> {
+    let mut builder = AppendBuilder::new(_fbb);
+    if let Some(x) = args.content { builder.add_content(x); }
+    builder.finish()
+  }
+
+
+  /// The row content to append in Arrow IPC Stream format.
+  #[inline]
+  pub fn content(&self) -> flatbuffers::Vector<'a, u8> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, u8>>>(Append::VT_CONTENT, None).unwrap()}
+  }
+}
+
+impl flatbuffers::Verifiable for Append<'_> {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.visit_table(pos)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, u8>>>("content", Self::VT_CONTENT, true)?
+     .finish();
+    Ok(())
+  }
+}
+pub struct AppendArgs<'a> {
+    pub content: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, u8>>>,
+}
+impl<'a> Default for AppendArgs<'a> {
+  #[inline]
+  fn default() -> Self {
+    AppendArgs {
+      content: None, // required field
+    }
+  }
+}
+
+impl Serialize for Append<'_> {
+  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+  where
+    S: Serializer,
+  {
+    let mut s = serializer.serialize_struct("Append", 1)?;
+      s.serialize_field("content", &self.content())?;
+    s.end()
+  }
+}
+
+pub struct AppendBuilder<'a: 'b, 'b> {
+  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b> AppendBuilder<'a, 'b> {
+  #[inline]
+  pub fn add_content(&mut self, content: flatbuffers::WIPOffset<flatbuffers::Vector<'b , u8>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(Append::VT_CONTENT, content);
+  }
+  #[inline]
+  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> AppendBuilder<'a, 'b> {
+    let start = _fbb.start_table();
+    AppendBuilder {
+      fbb_: _fbb,
+      start_: start,
+    }
+  }
+  #[inline]
+  pub fn finish(self) -> flatbuffers::WIPOffset<Append<'a>> {
+    let o = self.fbb_.end_table(self.start_);
+    self.fbb_.required(o, Append::VT_CONTENT,"content");
+    flatbuffers::WIPOffset::new(o.value())
+  }
+}
+
+impl core::fmt::Debug for Append<'_> {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    let mut ds = f.debug_struct("Append");
+      ds.field("content", &self.content());
+      ds.finish()
+  }
+}
 pub enum OpEntryOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -808,6 +923,20 @@ impl<'a> OpEntry<'a> {
     }
   }
 
+  #[inline]
+  #[allow(non_snake_case)]
+  pub fn op_as_append(&self) -> Option<Append<'a>> {
+    if self.op_type() == Op::Append {
+      let u = self.op();
+      // Safety:
+      // Created from a valid Table for this object
+      // Which contains a valid union in this slot
+      Some(unsafe { Append::init_from_table(u) })
+    } else {
+      None
+    }
+  }
+
 }
 
 impl flatbuffers::Verifiable for OpEntry<'_> {
@@ -822,6 +951,7 @@ impl flatbuffers::Verifiable for OpEntry<'_> {
           Op::Set => v.verify_union_variant::<flatbuffers::ForwardsUOffset<Set>>("Op::Set", pos),
           Op::RmRow => v.verify_union_variant::<flatbuffers::ForwardsUOffset<RmRow>>("Op::RmRow", pos),
           Op::RestoreRow => v.verify_union_variant::<flatbuffers::ForwardsUOffset<RestoreRow>>("Op::RestoreRow", pos),
+          Op::Append => v.verify_union_variant::<flatbuffers::ForwardsUOffset<Append>>("Op::Append", pos),
           _ => Ok(()),
         }
      })?
@@ -865,6 +995,11 @@ impl Serialize for OpEntry<'_> {
           Op::RestoreRow => {
             let f = self.op_as_restore_row()
               .expect("Invalid union table, expected `Op::RestoreRow`.");
+            s.serialize_field("op", &f)?;
+          }
+          Op::Append => {
+            let f = self.op_as_append()
+              .expect("Invalid union table, expected `Op::Append`.");
             s.serialize_field("op", &f)?;
           }
         _ => unimplemented!(),
@@ -923,6 +1058,13 @@ impl core::fmt::Debug for OpEntry<'_> {
         },
         Op::RestoreRow => {
           if let Some(x) = self.op_as_restore_row() {
+            ds.field("op", &x)
+          } else {
+            ds.field("op", &"InvalidFlatbuffer: Union discriminant does not match value.")
+          }
+        },
+        Op::Append => {
+          if let Some(x) = self.op_as_append() {
             ds.field("op", &x)
           } else {
             ds.field("op", &"InvalidFlatbuffer: Union discriminant does not match value.")

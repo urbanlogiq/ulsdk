@@ -164,6 +164,7 @@ from .value import (
     ValueTy,
 )
 from .generated.AllColumns import AllColumns as FbsAllColumns
+from .generated.Append import Append as FbsAppend
 from .generated.Arrow import Arrow as FbsArrow
 from .generated.Attr import Attr as FbsAttr
 from .generated.B2cId import B2cId as FbsB2cId
@@ -714,6 +715,64 @@ class RestoreRow:
         return eq
 
 @dataclass
+class Append:
+    """ Append rows to a table. The `content` field is Arrow IPC Stream formatted.
+    """
+
+    # The row content to append in Arrow IPC Stream format.
+    content: "bytes"
+
+    @classmethod
+    def from_fbs(cls, o: FbsAppend) -> Self:
+        if o.ContentIsNone():
+            content = b""
+        else:
+            content = bytes(o.ContentAsNumpy())
+        return cls(content)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsAppend.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.Append import (
+            Start,
+            AddContent,
+            StartContentVector,
+            End,
+        )
+        StartContentVector(builder, len(self.content))
+        for i in reversed(range(len(self.content))):
+            builder.PrependUint8(self.content[i])
+        content_offset = builder.EndVector()
+
+        Start(builder)
+        AddContent(builder, content_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        content = b""
+        return cls(content)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        if len(self.content) != len(other.content):
+            return False
+        for i in range(len(self.content)):
+            eq = eq and self.content[i] == other.content[i]
+
+        return eq
+
+@dataclass
 class Op:
     """ Table Ops are used to modify the contents of a table.
     """
@@ -722,6 +781,7 @@ class Op:
         "Set",
         "RmRow",
         "RestoreRow",
+        "Append",
     ]
 
     def serialize_to(self, builder: Builder) -> Tuple[int, int]:
@@ -733,6 +793,8 @@ class Op:
             return (offset, Op().RmRow)
         elif isinstance(self.value, RestoreRow):
             return (offset, Op().RestoreRow)
+        elif isinstance(self.value, Append):
+            return (offset, Op().Append)
         raise ValueError("Invalid union type")
 
     @classmethod
@@ -753,6 +815,10 @@ class Op:
             val = FbsRestoreRow();
             val.Init(source, pos)
             return cls(RestoreRow.from_fbs(val))
+        elif ty == Op_ty_instance.Append:
+            val = FbsAppend();
+            val.Init(source, pos)
+            return cls(Append.from_fbs(val))
         else:
             raise ValueError("Invalid union type")
 
