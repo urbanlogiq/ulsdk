@@ -72,4 +72,16 @@ public final class ContentId {
     public ContentId(String s) {
         this(java.util.UUID.fromString(s));
     }
+
+    public java.util.UUID toId() {
+        long lo = 0;
+        long hi = 0;
+        for (int i = 0; i < 8; i++) {
+            long bl = ((long)this._b[15 - i] & 0xFF) << (i * 8);
+            lo = lo | bl;
+            long bh = ((long)this._b[7 - i] & 0xFF) << (i * 8);
+            hi = hi | bh;
+        }
+        return new java.util.UUID(hi, lo);
+    }
 }

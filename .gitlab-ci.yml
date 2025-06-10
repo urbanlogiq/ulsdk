@@ -1,5 +1,5 @@
-test-ulsdk:
-    image: gitlab.y.urbanlogiq.com:4567/urbanlogiq/ul/code-build:latest-bullseye-13
+test-ulsdk-python:
+    image: gitlab.y.urbanlogiq.com:4567/urbanlogiq/ul/python:3.12-slim-bookworm
     rules:
         - if: $CI_COMMIT_BRANCH != "prod"
           changes:
@@ -9,6 +9,27 @@ test-ulsdk:
     variables:
         DEBIAN_FRONTEND: "noninteractive"
     script:
+        - apt-get update && apt-get install -y curl
+        - curl -sSL https://install.python-poetry.org | python3 - --version 1.7.0
+        - cd ulsdk
+        - /root/.local/bin/poetry install --no-root
+        - /root/.local/bin/poetry run pyright python/ulsdk/types/*.py
+        - /root/.local/bin/poetry run pyright python/ulsdk/api/*.py
+        - cd python
+        - /root/.local/bin/poetry run pytest --cov
+
+test-ulsdk-cpp:
+    image: gitlab.y.urbanlogiq.com:4567/urbanlogiq/ul/code-build:latest-bookworm-1
+    rules:
+        - if: $CI_COMMIT_BRANCH != "prod"
+          changes:
+            - "Cargo.lock"
+            - "ulsdk/**/*"
+    stage: test
+    variables:
+        DEBIAN_FRONTEND: "noninteractive"
+        JDK_JAVA_OPTIONS: --add-opens=java.base/java.nio=org.apache.arrow.memory.core,ALL-UNNAMED
+    script:
         - cd ulsdk
         - apt-get update && apt-get install -y libcurl4-openssl-dev libsodium-dev
         - apt install -y -V ca-certificates lsb-release wget
@@ -16,6 +37,11 @@ test-ulsdk:
         - apt install -y -V ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
         - apt update
         - apt install -y -V libarrow-dev
+        # build+test Java SDK
+        - apt install -y openjdk-17-jdk maven
+        - pushd java
+        - mvn package
+        - popd
         # build+test Rust SDK
         - cargo test
         # build+test C++ sdk
