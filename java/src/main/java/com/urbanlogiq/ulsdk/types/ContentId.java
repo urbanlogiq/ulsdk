@@ -47,4 +47,29 @@ public final class ContentId {
     public boolean equals(Object o) {
         return org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals(this, o, false, null, true);
     }
+
+    public ContentId(java.util.UUID uuid) {
+        long lo = uuid.getLeastSignificantBits();
+        long hi = uuid.getMostSignificantBits();
+        byte[] bytes = new byte[16];
+        int idx = 15;
+
+        for (int i = 0; i < 8; i++) {
+            byte b = (byte)(lo >> (i * 8));
+            bytes[idx] = b;
+            idx--;
+        }
+
+        for (int i = 0; i < 8; i++) {
+            byte b = (byte)(hi >> (i * 8));
+            bytes[idx] = b;
+            idx--;
+        }
+
+        this._b = bytes;
+    }
+
+    public ContentId(String s) {
+        this(java.util.UUID.fromString(s));
+    }
 }

@@ -47,4 +47,29 @@ public final class GenericId {
     public boolean equals(Object o) {
         return org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals(this, o, false, null, true);
     }
+
+    public GenericId(java.util.UUID uuid) {
+        long lo = uuid.getLeastSignificantBits();
+        long hi = uuid.getMostSignificantBits();
+        byte[] bytes = new byte[16];
+        int idx = 15;
+
+        for (int i = 0; i < 8; i++) {
+            byte b = (byte)(lo >> (i * 8));
+            bytes[idx] = b;
+            idx--;
+        }
+
+        for (int i = 0; i < 8; i++) {
+            byte b = (byte)(hi >> (i * 8));
+            bytes[idx] = b;
+            idx--;
+        }
+
+        this._b = bytes;
+    }
+
+    public GenericId(String s) {
+        this(java.util.UUID.fromString(s));
+    }
 }
