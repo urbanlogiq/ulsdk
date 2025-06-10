@@ -46,6 +46,14 @@ B2cId::B2cId(const ::B2cId *root)
     }
 }
 
+bool
+B2cId::operator==(const B2cId &rhs) const {
+    if (this->b_ != rhs.b_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::ColumnGroupId>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ColumnGroupId &o) {
     const decltype(builder.CreateVector(o.b_)) b_offset = builder.CreateVector(o.b_);
@@ -81,6 +89,14 @@ ColumnGroupId::ColumnGroupId(const ::ColumnGroupId *root)
     if (b_vector != nullptr) {
         std::copy(b_vector->begin(), b_vector->end(), std::back_inserter(b_));
     }
+}
+
+bool
+ColumnGroupId::operator==(const ColumnGroupId &rhs) const {
+    if (this->b_ != rhs.b_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::ContentId>
@@ -120,6 +136,14 @@ ContentId::ContentId(const ::ContentId *root)
     }
 }
 
+bool
+ContentId::operator==(const ContentId &rhs) const {
+    if (this->b_ != rhs.b_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::DataStateId>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DataStateId &o) {
     const decltype(builder.CreateVector(o.b_)) b_offset = builder.CreateVector(o.b_);
@@ -155,6 +179,14 @@ DataStateId::DataStateId(const ::DataStateId *root)
     if (b_vector != nullptr) {
         std::copy(b_vector->begin(), b_vector->end(), std::back_inserter(b_));
     }
+}
+
+bool
+DataStateId::operator==(const DataStateId &rhs) const {
+    if (this->b_ != rhs.b_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::GenericId>
@@ -194,6 +226,14 @@ GenericId::GenericId(const ::GenericId *root)
     }
 }
 
+bool
+GenericId::operator==(const GenericId &rhs) const {
+    if (this->b_ != rhs.b_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::GraphNodeId>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const GraphNodeId &o) {
     const decltype(builder.CreateVector(o.b_)) b_offset = builder.CreateVector(o.b_);
@@ -229,6 +269,14 @@ GraphNodeId::GraphNodeId(const ::GraphNodeId *root)
     if (b_vector != nullptr) {
         std::copy(b_vector->begin(), b_vector->end(), std::back_inserter(b_));
     }
+}
+
+bool
+GraphNodeId::operator==(const GraphNodeId &rhs) const {
+    if (this->b_ != rhs.b_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::ObjectId>
@@ -268,6 +316,14 @@ ObjectId::ObjectId(const ::ObjectId *root)
     }
 }
 
+bool
+ObjectId::operator==(const ObjectId &rhs) const {
+    if (this->b_ != rhs.b_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::StreamId>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const StreamId &o) {
     const decltype(builder.CreateVector(o.b_)) b_offset = builder.CreateVector(o.b_);
@@ -303,6 +359,14 @@ StreamId::StreamId(const ::StreamId *root)
     if (b_vector != nullptr) {
         std::copy(b_vector->begin(), b_vector->end(), std::back_inserter(b_));
     }
+}
+
+bool
+StreamId::operator==(const StreamId &rhs) const {
+    if (this->b_ != rhs.b_) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace types

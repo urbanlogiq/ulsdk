@@ -155,6 +155,38 @@ UseCase::UseCase(const ::UseCase *root)
     ty_ = root->ty();
 }
 
+bool
+UseCase::operator==(const UseCase &rhs) const {
+    if (this->abbreviation_ != rhs.abbreviation_) {
+        return false;
+    }
+    if (this->description_ != rhs.description_) {
+        return false;
+    }
+    if (this->extended_description_ != rhs.extended_description_) {
+        return false;
+    }
+    if (this->extended_title_ != rhs.extended_title_) {
+        return false;
+    }
+    if (this->inputs_ != rhs.inputs_) {
+        return false;
+    }
+    if (this->module_ != rhs.module_) {
+        return false;
+    }
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->subtitle_ != rhs.subtitle_) {
+        return false;
+    }
+    if (this->ty_ != rhs.ty_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::UseCaseInputPair>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UseCaseInputPair &o) {
     std::optional<std::pair<::flatbuffers::Offset<void>, ::UseCaseInput>> input_offset = std::nullopt;
@@ -229,6 +261,17 @@ UseCaseInputPair::UseCaseInputPair(const ::UseCaseInputPair *root)
         }
     }
         name_ = std::string(*root->name()->begin(), *root->name()->end());
+}
+
+bool
+UseCaseInputPair::operator==(const UseCaseInputPair &rhs) const {
+    if (this->input_ != rhs.input_) {
+        return false;
+    }
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace types

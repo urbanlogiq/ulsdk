@@ -28,6 +28,10 @@ struct AccessControlList {
     AccessControlList();
     AccessControlList(const ::AccessControlList *root);
     AccessControlList(const std::vector<uint8_t> &bytes);
+    bool operator==(const AccessControlList &rhs) const;
+    bool operator!=(const AccessControlList &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Role {
@@ -37,6 +41,10 @@ struct Role {
     Role();
     Role(const ::Role *root);
     Role(const std::vector<uint8_t> &bytes);
+    bool operator==(const Role &rhs) const;
+    bool operator!=(const Role &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ::flatbuffers::Offset<::AccessControlList>

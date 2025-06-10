@@ -10,122 +10,75 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
-use flatbuffers::{WIPOffset, UnionWIPOffset};
 use bitflags::bitflags;
 use core::ops::Deref;
+use flatbuffers::{UnionWIPOffset, WIPOffset};
 
 use crate::types::Schema::{
-    Binary,
-    Bool,
-    Buffer,
-    Date,
-    DateUnit,
-    Decimal,
-    DictionaryEncoding,
-    DictionaryKind,
-    Duration,
-    Endianness,
-    Feature,
-    Field,
-    FixedSizeBinary,
-    FixedSizeList,
-    FloatingPoint,
-    Int,
-    Interval,
-    IntervalUnit,
-    KeyValue,
-    LargeBinary,
-    LargeList,
-    LargeUtf8,
-    List,
-    Map,
-    MetadataVersion,
-    Null,
-    Precision,
-    Schema,
-    Struct_,
-    Time,
-    TimeUnit,
-    Timestamp,
-    Type,
-    Union,
-    UnionMode,
-    Utf8,
-};
-use crate::types::id::{
-    B2cId,
-    ColumnGroupId,
-    ContentId,
-    DataStateId,
-    GenericId,
-    GraphNodeId,
-    ObjectId,
-    ObjectNamespace,
-    StreamId,
+    Binary, BinaryView, Bool, Buffer, Date, DateUnit, Decimal, DictionaryEncoding, DictionaryKind,
+    Duration, Endianness, Feature, Field, FixedSizeBinary, FixedSizeList, FloatingPoint, Int,
+    Interval, IntervalUnit, KeyValue, LargeBinary, LargeList, LargeListView, LargeUtf8, List,
+    ListView, Map, MetadataVersion, Null, Precision, RunEndEncoded, Schema, Struct_, Time,
+    TimeUnit, Timestamp, Type, Union, UnionMode, Utf8, Utf8View,
 };
 use crate::types::generated::Schema_generated::{
-    Binary as FbsBinary,
-    Bool as FbsBool,
-    Buffer as FbsBuffer,
-    Date as FbsDate,
-    Decimal as FbsDecimal,
-    DictionaryEncoding as FbsDictionaryEncoding,
-    Duration as FbsDuration,
-    Field as FbsField,
-    FixedSizeBinary as FbsFixedSizeBinary,
-    FixedSizeList as FbsFixedSizeList,
-    FloatingPoint as FbsFloatingPoint,
-    Int as FbsInt,
-    Interval as FbsInterval,
-    KeyValue as FbsKeyValue,
-    LargeBinary as FbsLargeBinary,
-    LargeList as FbsLargeList,
-    LargeUtf8 as FbsLargeUtf8,
-    List as FbsList,
-    Map as FbsMap,
-    Null as FbsNull,
-    Schema as FbsSchema,
-    Struct_ as FbsStruct_,
-    Time as FbsTime,
-    Timestamp as FbsTimestamp,
-    Union as FbsUnion,
-    Utf8 as FbsUtf8,
-    DateUnit as FbsDateUnit,
-    DictionaryKind as FbsDictionaryKind,
-    Endianness as FbsEndianness,
-    Feature as FbsFeature,
-    IntervalUnit as FbsIntervalUnit,
-    MetadataVersion as FbsMetadataVersion,
-    Precision as FbsPrecision,
-    TimeUnit as FbsTimeUnit,
-    Type as FbsType,
-    UnionMode as FbsUnionMode,
+    Binary as FbsBinary, BinaryView as FbsBinaryView, Bool as FbsBool, Buffer as FbsBuffer,
+    Date as FbsDate, DateUnit as FbsDateUnit, Decimal as FbsDecimal,
+    DictionaryEncoding as FbsDictionaryEncoding, DictionaryKind as FbsDictionaryKind,
+    Duration as FbsDuration, Endianness as FbsEndianness, Feature as FbsFeature, Field as FbsField,
+    FixedSizeBinary as FbsFixedSizeBinary, FixedSizeList as FbsFixedSizeList,
+    FloatingPoint as FbsFloatingPoint, Int as FbsInt, Interval as FbsInterval,
+    IntervalUnit as FbsIntervalUnit, KeyValue as FbsKeyValue, LargeBinary as FbsLargeBinary,
+    LargeList as FbsLargeList, LargeListView as FbsLargeListView, LargeUtf8 as FbsLargeUtf8,
+    List as FbsList, ListView as FbsListView, Map as FbsMap, MetadataVersion as FbsMetadataVersion,
+    Null as FbsNull, Precision as FbsPrecision, RunEndEncoded as FbsRunEndEncoded,
+    Schema as FbsSchema, Struct_ as FbsStruct_, Time as FbsTime, TimeUnit as FbsTimeUnit,
+    Timestamp as FbsTimestamp, Type as FbsType, Union as FbsUnion, UnionMode as FbsUnionMode,
+    Utf8 as FbsUtf8, Utf8View as FbsUtf8View,
 };
 use crate::types::generated::data_generated::{
-    AttributePair as FbsAttributePair,
+    AttributePair as FbsAttributePair, BinaryYesNo as FbsBinaryYesNo, DayOfWeek as FbsDayOfWeek,
     DirectionAndRoadName as FbsDirectionAndRoadName,
-    DirectionAndRoadNames as FbsDirectionAndRoadNames,
-    NamedParameter as FbsNamedParameter,
-    Source as FbsSource,
-    DayOfWeek as FbsDayOfWeek,
-    DirectionTy as FbsDirectionTy,
-    NamedParameterFlags as FbsNamedParameterFlags,
-    RoadUserTy as FbsRoadUserTy,
-    StatisticTy as FbsStatisticTy,
-    TimeGranularity as FbsTimeGranularity,
-    TurnTy as FbsTurnTy,
+    DirectionAndRoadNames as FbsDirectionAndRoadNames, DirectionTy as FbsDirectionTy,
+    NamedParameter as FbsNamedParameter, NamedParameterFlags as FbsNamedParameterFlags,
+    RoadUserTy as FbsRoadUserTy, Source as FbsSource, StatisticTy as FbsStatisticTy,
+    TimeGranularity as FbsTimeGranularity, TurnTy as FbsTurnTy,
 };
 use crate::types::generated::id_generated::{
-    B2cId as FbsB2cId,
-    ColumnGroupId as FbsColumnGroupId,
-    ContentId as FbsContentId,
-    DataStateId as FbsDataStateId,
-    GenericId as FbsGenericId,
-    GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId,
-    StreamId as FbsStreamId,
-    ObjectNamespace as FbsObjectNamespace,
+    B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
+    DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
 };
+use crate::types::id::{
+    B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
+    ObjectNamespace, StreamId,
+};
+
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub enum BinaryYesNo {
+    #[default]
+    NO = 0,
+    YES = 1,
+}
+
+impl From<BinaryYesNo> for FbsBinaryYesNo {
+    fn from(val: BinaryYesNo) -> Self {
+        match val {
+            BinaryYesNo::NO => FbsBinaryYesNo::NO,
+            BinaryYesNo::YES => FbsBinaryYesNo::YES,
+        }
+    }
+}
+
+impl From<FbsBinaryYesNo> for BinaryYesNo {
+    fn from(fbs: FbsBinaryYesNo) -> Self {
+        match fbs.0 {
+            0 => Self::NO,
+            1 => Self::YES,
+            _ => panic!("Invalid value {} when constructing BinaryYesNo", fbs.0),
+        }
+    }
+}
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub enum DayOfWeek {
@@ -163,7 +116,7 @@ impl From<FbsDayOfWeek> for DayOfWeek {
             4 => Self::FRIDAY,
             5 => Self::SATURDAY,
             6 => Self::SUNDAY,
-            _ => panic!("Invalid value {} when constructing DayOfWeek", fbs.0)
+            _ => panic!("Invalid value {} when constructing DayOfWeek", fbs.0),
         }
     }
 }
@@ -246,7 +199,7 @@ impl From<FbsDirectionTy> for DirectionTy {
             18 => Self::NE,
             19 => Self::SW,
             20 => Self::SE,
-            _ => panic!("Invalid value {} when constructing DirectionTy", fbs.0)
+            _ => panic!("Invalid value {} when constructing DirectionTy", fbs.0),
         }
     }
 }
@@ -321,7 +274,9 @@ impl From<RoadUserTy> for FbsRoadUserTy {
             RoadUserTy::BUSES => FbsRoadUserTy::BUSES,
             RoadUserTy::CARS => FbsRoadUserTy::CARS,
             RoadUserTy::ARTICULATED_TRUCKS => FbsRoadUserTy::ARTICULATED_TRUCKS,
-            RoadUserTy::CARS_AND_LIGHT_GOODS_VEHICLES => FbsRoadUserTy::CARS_AND_LIGHT_GOODS_VEHICLES,
+            RoadUserTy::CARS_AND_LIGHT_GOODS_VEHICLES => {
+                FbsRoadUserTy::CARS_AND_LIGHT_GOODS_VEHICLES
+            }
             RoadUserTy::LIGHT_GOODS_VEHICLES => FbsRoadUserTy::LIGHT_GOODS_VEHICLES,
             RoadUserTy::SINGLE_UNIT_TRUCKS => FbsRoadUserTy::SINGLE_UNIT_TRUCKS,
             RoadUserTy::HEAVY_VEHICLES => FbsRoadUserTy::HEAVY_VEHICLES,
@@ -394,7 +349,7 @@ impl From<FbsRoadUserTy> for RoadUserTy {
             32 => Self::CROSSWALKS,
             33 => Self::TRAMS,
             34 => Self::TAXIS,
-            _ => panic!("Invalid value {} when constructing RoadUserTy", fbs.0)
+            _ => panic!("Invalid value {} when constructing RoadUserTy", fbs.0),
         }
     }
 }
@@ -440,7 +395,9 @@ impl From<StatisticTy> for FbsStatisticTy {
             StatisticTy::STAT_MIN => FbsStatisticTy::STAT_MIN,
             StatisticTy::MEAN_EXCEEDING => FbsStatisticTy::MEAN_EXCEEDING,
             StatisticTy::STANDARD_DEVIATION => FbsStatisticTy::STANDARD_DEVIATION,
-            StatisticTy::NUMBER_OF_VEHICLES_EXCEEDING => FbsStatisticTy::NUMBER_OF_VEHICLES_EXCEEDING,
+            StatisticTy::NUMBER_OF_VEHICLES_EXCEEDING => {
+                FbsStatisticTy::NUMBER_OF_VEHICLES_EXCEEDING
+            }
         }
     }
 }
@@ -465,7 +422,7 @@ impl From<FbsStatisticTy> for StatisticTy {
             107 => Self::MEAN_EXCEEDING,
             108 => Self::STANDARD_DEVIATION,
             109 => Self::NUMBER_OF_VEHICLES_EXCEEDING,
-            _ => panic!("Invalid value {} when constructing StatisticTy", fbs.0)
+            _ => panic!("Invalid value {} when constructing StatisticTy", fbs.0),
         }
     }
 }
@@ -491,7 +448,7 @@ impl From<FbsTimeGranularity> for TimeGranularity {
         match fbs.0 {
             0 => Self::NONE,
             1 => Self::Daily,
-            _ => panic!("Invalid value {} when constructing TimeGranularity", fbs.0)
+            _ => panic!("Invalid value {} when constructing TimeGranularity", fbs.0),
         }
     }
 }
@@ -550,7 +507,7 @@ impl From<FbsTurnTy> for TurnTy {
             10 => Self::HARD_LEFT,
             11 => Self::RIGHT_TURNING_ON_RED,
             12 => Self::BEAR_RIGHT_ON_RED,
-            _ => panic!("Invalid value {} when constructing TurnTy", fbs.0)
+            _ => panic!("Invalid value {} when constructing TurnTy", fbs.0),
         }
     }
 }
@@ -562,7 +519,10 @@ pub struct AttributePair {
 }
 
 impl AttributePair {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsAttributePair<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsAttributePair<'a>> {
         use crate::types::generated::data_generated::AttributePairBuilder as FbsAttributePairBuilder;
 
         let key_offset = self.key.as_ref().map(|s| builder.create_string(s));
@@ -583,10 +543,7 @@ impl From<FbsAttributePair<'_>> for AttributePair {
     fn from(fbs: FbsAttributePair<'_>) -> Self {
         let key = fbs.key().map(ToOwned::to_owned);
         let value = fbs.value().map(ToOwned::to_owned);
-        Self {
-            key,
-            value,
-        }
+        Self { key, value }
     }
 }
 
@@ -614,7 +571,10 @@ pub struct DirectionAndRoadName {
 }
 
 impl DirectionAndRoadName {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDirectionAndRoadName<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDirectionAndRoadName<'a>> {
         use crate::types::generated::data_generated::DirectionAndRoadNameBuilder as FbsDirectionAndRoadNameBuilder;
 
         let direction_offset = builder.create_string(&self.direction);
@@ -661,7 +621,10 @@ pub struct DirectionAndRoadNames {
 }
 
 impl DirectionAndRoadNames {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDirectionAndRoadNames<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDirectionAndRoadNames<'a>> {
         use crate::types::generated::data_generated::DirectionAndRoadNamesBuilder as FbsDirectionAndRoadNamesBuilder;
 
         let direction_and_road_names_offset = self.direction_and_road_names.as_ref().map(|v| {
@@ -670,7 +633,8 @@ impl DirectionAndRoadNames {
                 let offset = val.serialize_to(builder);
                 direction_and_road_names_offsets.push(offset);
             }
-            let direction_and_road_names_offset = builder.create_vector(&direction_and_road_names_offsets);
+            let direction_and_road_names_offset =
+                builder.create_vector(&direction_and_road_names_offsets);
             direction_and_road_names_offset
         });
 
@@ -727,7 +691,10 @@ pub struct NamedParameter {
 }
 
 impl NamedParameter {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsNamedParameter<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNamedParameter<'a>> {
         use crate::types::generated::data_generated::NamedParameterBuilder as FbsNamedParameterBuilder;
 
         let description_offset = self.description.as_ref().map(|s| builder.create_string(s));
@@ -791,11 +758,17 @@ pub struct Source {
 }
 
 impl Source {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsSource<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsSource<'a>> {
         use crate::types::generated::data_generated::SourceBuilder as FbsSourceBuilder;
 
         let metadata_offset = self.metadata.as_ref().map(|o| o.serialize_to(builder));
-        let metadata_revision_offset = self.metadata_revision.as_ref().map(|o| o.serialize_to(builder));
+        let metadata_revision_offset = self
+            .metadata_revision
+            .as_ref()
+            .map(|o| o.serialize_to(builder));
         let name_offset = builder.create_string(&self.name);
         let named_parameters_offset = self.named_parameters.as_ref().map(|v| {
             let mut named_parameters_offsets = Vec::with_capacity(v.len());
@@ -954,5 +927,4 @@ mod tests {
         let t1 = Source::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
-
 }

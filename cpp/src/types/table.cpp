@@ -127,6 +127,23 @@ Modify::Modify(const ::Modify *root)
     }
 }
 
+bool
+Modify::operator==(const Modify &rhs) const {
+    if (this->col_ != rhs.col_) {
+        return false;
+    }
+    if (this->previous_ != rhs.previous_) {
+        return false;
+    }
+    if (this->row_ != rhs.row_) {
+        return false;
+    }
+    if (this->value_ != rhs.value_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Delete>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Delete &o) {
     const ::flatbuffers::Offset<::GenericId> row_offset = serialize_to(builder, o.row_);
@@ -163,6 +180,14 @@ Delete::Delete(const ::Delete *root)
     }
 }
 
+bool
+Delete::operator==(const Delete &rhs) const {
+    if (this->row_ != rhs.row_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Restore>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Restore &o) {
     const ::flatbuffers::Offset<::GenericId> row_offset = serialize_to(builder, o.row_);
@@ -197,6 +222,14 @@ Restore::Restore(const ::Restore *root)
     if (root->row() != nullptr) {
         row_ = decltype(row_)(root->row());
     }
+}
+
+bool
+Restore::operator==(const Restore &rhs) const {
+    if (this->row_ != rhs.row_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Set>
@@ -247,6 +280,20 @@ Set::Set(const ::Set *root)
     }
 }
 
+bool
+Set::operator==(const Set &rhs) const {
+    if (this->col_ != rhs.col_) {
+        return false;
+    }
+    if (this->row_ != rhs.row_) {
+        return false;
+    }
+    if (this->value_ != rhs.value_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::RmRow>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const RmRow &o) {
     const ::flatbuffers::Offset<::GenericId> row_offset = serialize_to(builder, o.row_);
@@ -281,6 +328,14 @@ RmRow::RmRow(const ::RmRow *root)
     if (root->row() != nullptr) {
         row_ = decltype(row_)(root->row());
     }
+}
+
+bool
+RmRow::operator==(const RmRow &rhs) const {
+    if (this->row_ != rhs.row_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::RestoreRow>
@@ -319,6 +374,14 @@ RestoreRow::RestoreRow(const ::RestoreRow *root)
     }
 }
 
+bool
+RestoreRow::operator==(const RestoreRow &rhs) const {
+    if (this->row_ != rhs.row_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Append>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Append &o) {
     const decltype(builder.CreateVector(o.content_)) content_offset = builder.CreateVector(o.content_);
@@ -354,6 +417,14 @@ Append::Append(const ::Append *root)
     if (content_vector != nullptr) {
         std::copy(content_vector->begin(), content_vector->end(), std::back_inserter(content_));
     }
+}
+
+bool
+Append::operator==(const Append &rhs) const {
+    if (this->content_ != rhs.content_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::ChangeOpEntry>
@@ -412,6 +483,14 @@ ChangeOpEntry::ChangeOpEntry(const ::ChangeOpEntry *root)
             default: throw std::runtime_error("unknown union variant");
         }
     }
+}
+
+bool
+ChangeOpEntry::operator==(const ChangeOpEntry &rhs) const {
+    if (this->op_ != rhs.op_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::ChangeSet>
@@ -502,6 +581,26 @@ ChangeSet::ChangeSet(const ::ChangeSet *root)
     }
 }
 
+bool
+ChangeSet::operator==(const ChangeSet &rhs) const {
+    if (this->attributes_ != rhs.attributes_) {
+        return false;
+    }
+    if (this->ops_ != rhs.ops_) {
+        return false;
+    }
+    if (this->revision_ != rhs.revision_) {
+        return false;
+    }
+    if (this->when_ != rhs.when_) {
+        return false;
+    }
+    if (this->who_ != rhs.who_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::DiffStream>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DiffStream &o) {
     std::optional<::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::Attr>>>> attributes_offset = std::nullopt;
@@ -579,6 +678,20 @@ DiffStream::DiffStream(const ::DiffStream *root)
     }
 }
 
+bool
+DiffStream::operator==(const DiffStream &rhs) const {
+    if (this->attributes_ != rhs.attributes_) {
+        return false;
+    }
+    if (this->base_ != rhs.base_) {
+        return false;
+    }
+    if (this->seq_ != rhs.seq_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::History>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const History &o) {
     std::vector<::flatbuffers::Offset<::ChangeSet>> changes_offsets = std::vector<::flatbuffers::Offset<::ChangeSet>>();
@@ -635,6 +748,17 @@ History::History(const ::History *root)
     if (root->continuation_id() != nullptr) {
         continuation_id_ = decltype(continuation_id_)(root->continuation_id());
     }
+}
+
+bool
+History::operator==(const History &rhs) const {
+    if (this->changes_ != rhs.changes_) {
+        return false;
+    }
+    if (this->continuation_id_ != rhs.continuation_id_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::NewTable>
@@ -731,6 +855,26 @@ NewTable::NewTable(const ::NewTable *root)
     }
 }
 
+bool
+NewTable::operator==(const NewTable &rhs) const {
+    if (this->from_ != rhs.from_) {
+        return false;
+    }
+    if (this->migrate_ != rhs.migrate_) {
+        return false;
+    }
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->parent_ != rhs.parent_) {
+        return false;
+    }
+    if (this->target_ != rhs.target_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::OpEntry>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const OpEntry &o) {
     const std::pair<::flatbuffers::Offset<void>, ::Op> op_offset = serialize_to(builder, o.op_);
@@ -793,6 +937,14 @@ OpEntry::OpEntry(const ::OpEntry *root)
             default: throw std::runtime_error("unknown union variant");
         }
     }
+}
+
+bool
+OpEntry::operator==(const OpEntry &rhs) const {
+    if (this->op_ != rhs.op_) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace types

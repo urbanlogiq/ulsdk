@@ -27,6 +27,10 @@ struct Principal {
 
     Principal() = default;
     Principal(const struct json_value_s *root);
+    bool operator==(const Principal &rhs) const;
+    bool operator!=(const Principal &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
@@ -36,12 +40,16 @@ struct AdUser {
     std::string display_name_;
     std::string id_;
     std::string user_principal_name_;
-    std::vector<std::string> other_mails_;
+    std::optional<std::vector<std::string>> other_mails_;
     std::optional<std::string> department_;
     std::string created_date_time_;
 
     AdUser() = default;
     AdUser(const struct json_value_s *root);
+    bool operator==(const AdUser &rhs) const;
+    bool operator!=(const AdUser &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
@@ -53,6 +61,10 @@ struct DisplayNames {
 
     DisplayNames() = default;
     DisplayNames(const struct json_value_s *root);
+    bool operator==(const DisplayNames &rhs) const;
+    bool operator!=(const DisplayNames &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
@@ -68,6 +80,10 @@ struct DeviceDetail {
 
     DeviceDetail() = default;
     DeviceDetail(const struct json_value_s *root);
+    bool operator==(const DeviceDetail &rhs) const;
+    bool operator!=(const DeviceDetail &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
@@ -80,6 +96,10 @@ struct Coordinates {
 
     Coordinates() = default;
     Coordinates(const struct json_value_s *root);
+    bool operator==(const Coordinates &rhs) const;
+    bool operator!=(const Coordinates &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
@@ -93,6 +113,10 @@ struct Location {
 
     Location() = default;
     Location(const struct json_value_s *root);
+    bool operator==(const Location &rhs) const;
+    bool operator!=(const Location &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
@@ -109,16 +133,24 @@ struct AuditLogEntry {
 
     AuditLogEntry() = default;
     AuditLogEntry(const struct json_value_s *root);
+    bool operator==(const AuditLogEntry &rhs) const;
+    bool operator!=(const AuditLogEntry &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
 to_bytes(const AuditLogEntry &o);
 
 struct AuditLog {
-    std::vector<std::vector<AuditLogEntry>> value_;
+    std::vector<AuditLogEntry> value_;
 
     AuditLog() = default;
     AuditLog(const struct json_value_s *root);
+    bool operator==(const AuditLog &rhs) const;
+    bool operator!=(const AuditLog &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
@@ -128,13 +160,17 @@ struct AdUserWithAuditLog {
     std::string display_name_;
     std::string id_;
     std::string user_principal_name_;
-    std::vector<std::string> other_mails_;
+    std::optional<std::vector<std::string>> other_mails_;
     std::optional<std::string> department_;
     std::string created_date_time_;
     std::optional<AuditLog> audit_log_;
 
     AdUserWithAuditLog() = default;
     AdUserWithAuditLog(const struct json_value_s *root);
+    bool operator==(const AdUserWithAuditLog &rhs) const;
+    bool operator!=(const AdUserWithAuditLog &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
@@ -146,6 +182,10 @@ struct CreateUserRequest {
 
     CreateUserRequest() = default;
     CreateUserRequest(const struct json_value_s *root);
+    bool operator==(const CreateUserRequest &rhs) const;
+    bool operator!=(const CreateUserRequest &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
@@ -157,6 +197,10 @@ struct CreateUser {
 
     CreateUser() = default;
     CreateUser(const struct json_value_s *root);
+    bool operator==(const CreateUser &rhs) const;
+    bool operator!=(const CreateUser &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
@@ -168,6 +212,10 @@ struct UpdateCurrentUser {
 
     UpdateCurrentUser() = default;
     UpdateCurrentUser(const struct json_value_s *root);
+    bool operator==(const UpdateCurrentUser &rhs) const;
+    bool operator!=(const UpdateCurrentUser &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
@@ -179,6 +227,10 @@ struct UpdateUser {
 
     UpdateUser() = default;
     UpdateUser(const struct json_value_s *root);
+    bool operator==(const UpdateUser &rhs) const;
+    bool operator!=(const UpdateUser &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
@@ -191,6 +243,10 @@ struct AdGroup {
 
     AdGroup() = default;
     AdGroup(const struct json_value_s *root);
+    bool operator==(const AdGroup &rhs) const;
+    bool operator!=(const AdGroup &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
@@ -202,6 +258,10 @@ struct CreateGroup {
 
     CreateGroup() = default;
     CreateGroup(const struct json_value_s *root);
+    bool operator==(const CreateGroup &rhs) const;
+    bool operator!=(const CreateGroup &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
@@ -217,6 +277,10 @@ struct GroupMembership {
 
     GroupMembership() = default;
     GroupMembership(const struct json_value_s *root);
+    bool operator==(const GroupMembership &rhs) const;
+    bool operator!=(const GroupMembership &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>

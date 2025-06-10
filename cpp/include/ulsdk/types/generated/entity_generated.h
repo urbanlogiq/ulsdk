@@ -303,11 +303,18 @@ enum class EntityTy : int32_t {
   T_AIR_QUALITY_MONITORING_STATION = 263,
   T_AOI = 264,
   T_PERFORMANCE_MEASURE = 265,
+  T_EMERGENCY_RESPONSE_ZONE = 266,
+  T_RED_LIGHT_RUNNING_COUNTS = 267,
+  T_PEDESTRIAN_RED_LIGHT_RUNNING_COUNTS = 268,
+  T_INTERSECTION_DELAY_COUNTS = 269,
+  T_INTERSECTION_SAFETY_COUNTS = 270,
+  T_ROAD_SEGMENT_SAFETY_COUNTS = 271,
+  T_HEXAGON_BOUNDARY = 272,
   MIN = T_INVALID,
-  MAX = T_PERFORMANCE_MEASURE
+  MAX = T_HEXAGON_BOUNDARY
 };
 
-inline const EntityTy (&EnumValuesEntityTy())[266] {
+inline const EntityTy (&EnumValuesEntityTy())[273] {
   static const EntityTy values[] = {
     EntityTy::T_INVALID,
     EntityTy::T_TFC,
@@ -574,13 +581,20 @@ inline const EntityTy (&EnumValuesEntityTy())[266] {
     EntityTy::T_STATE_OWNED_ROAD,
     EntityTy::T_AIR_QUALITY_MONITORING_STATION,
     EntityTy::T_AOI,
-    EntityTy::T_PERFORMANCE_MEASURE
+    EntityTy::T_PERFORMANCE_MEASURE,
+    EntityTy::T_EMERGENCY_RESPONSE_ZONE,
+    EntityTy::T_RED_LIGHT_RUNNING_COUNTS,
+    EntityTy::T_PEDESTRIAN_RED_LIGHT_RUNNING_COUNTS,
+    EntityTy::T_INTERSECTION_DELAY_COUNTS,
+    EntityTy::T_INTERSECTION_SAFETY_COUNTS,
+    EntityTy::T_ROAD_SEGMENT_SAFETY_COUNTS,
+    EntityTy::T_HEXAGON_BOUNDARY
   };
   return values;
 }
 
 inline const char * const *EnumNamesEntityTy() {
-  static const char * const names[267] = {
+  static const char * const names[274] = {
     "T_INVALID",
     "T_TFC",
     "T_TFC_LOOP",
@@ -847,13 +861,20 @@ inline const char * const *EnumNamesEntityTy() {
     "T_AIR_QUALITY_MONITORING_STATION",
     "T_AOI",
     "T_PERFORMANCE_MEASURE",
+    "T_EMERGENCY_RESPONSE_ZONE",
+    "T_RED_LIGHT_RUNNING_COUNTS",
+    "T_PEDESTRIAN_RED_LIGHT_RUNNING_COUNTS",
+    "T_INTERSECTION_DELAY_COUNTS",
+    "T_INTERSECTION_SAFETY_COUNTS",
+    "T_ROAD_SEGMENT_SAFETY_COUNTS",
+    "T_HEXAGON_BOUNDARY",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameEntityTy(EntityTy e) {
-  if (::flatbuffers::IsOutRange(e, EntityTy::T_INVALID, EntityTy::T_PERFORMANCE_MEASURE)) return "";
+  if (::flatbuffers::IsOutRange(e, EntityTy::T_INVALID, EntityTy::T_HEXAGON_BOUNDARY)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesEntityTy()[index];
 }

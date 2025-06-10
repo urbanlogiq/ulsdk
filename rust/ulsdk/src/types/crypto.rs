@@ -10,16 +10,13 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
-use flatbuffers::{WIPOffset, UnionWIPOffset};
 use bitflags::bitflags;
 use core::ops::Deref;
+use flatbuffers::{UnionWIPOffset, WIPOffset};
 
 use crate::types::generated::crypto_generated::{
-    CryptHeader as FbsCryptHeader,
-    EncryptedObject as FbsEncryptedObject,
-    Sha256 as FbsSha256,
-    Signature as FbsSignature,
-    Digest as FbsDigest,
+    CryptHeader as FbsCryptHeader, Digest as FbsDigest, EncryptedObject as FbsEncryptedObject,
+    Sha256 as FbsSha256, Signature as FbsSignature,
 };
 
 #[derive(Default, PartialEq, Debug, Clone)]
@@ -28,7 +25,10 @@ pub struct Sha256 {
 }
 
 impl Sha256 {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsSha256<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsSha256<'a>> {
         use crate::types::generated::crypto_generated::Sha256Builder as FbsSha256Builder;
 
         let b_offset = builder.create_vector(&self.b);
@@ -46,9 +46,7 @@ impl From<FbsSha256<'_>> for Sha256 {
             b.push(elem.into());
         }
 
-        Self {
-            b,
-        }
+        Self { b }
     }
 }
 
@@ -81,7 +79,10 @@ impl Default for Digest {
 }
 
 impl Digest {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsDigest) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsDigest) {
         match self {
             Self::Sha256(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -101,7 +102,10 @@ pub struct CryptHeader {
 }
 
 impl CryptHeader {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsCryptHeader<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsCryptHeader<'a>> {
         use crate::types::generated::crypto_generated::CryptHeaderBuilder as FbsCryptHeaderBuilder;
 
         let kid_offset = builder.create_string(&self.kid);
@@ -156,7 +160,10 @@ pub struct EncryptedObject {
 }
 
 impl EncryptedObject {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsEncryptedObject<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsEncryptedObject<'a>> {
         use crate::types::generated::crypto_generated::EncryptedObjectBuilder as FbsEncryptedObjectBuilder;
 
         let header_offset = self.header.serialize_to(builder);
@@ -177,10 +184,7 @@ impl From<FbsEncryptedObject<'_>> for EncryptedObject {
             obj.push(elem.into());
         }
 
-        Self {
-            header,
-            obj,
-        }
+        Self { header, obj }
     }
 }
 
@@ -208,7 +212,10 @@ pub struct Signature {
 }
 
 impl Signature {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsSignature<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsSignature<'a>> {
         use crate::types::generated::crypto_generated::SignatureBuilder as FbsSignatureBuilder;
 
         let kid_offset = builder.create_string(&self.kid);
@@ -229,10 +236,7 @@ impl From<FbsSignature<'_>> for Signature {
             sig.push(elem.into());
         }
 
-        Self {
-            kid,
-            sig,
-        }
+        Self { kid, sig }
     }
 }
 
@@ -288,5 +292,4 @@ mod tests {
         let t1 = Signature::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
-
 }

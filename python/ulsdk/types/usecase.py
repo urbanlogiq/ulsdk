@@ -10,6 +10,7 @@ from flatbuffers.util import RemoveSizePrefix
 from typing import Union, List, Optional, Self, Tuple
 from .Schema import (
     Binary,
+    BinaryView,
     Bool,
     Buffer,
     Date,
@@ -30,12 +31,15 @@ from .Schema import (
     KeyValue,
     LargeBinary,
     LargeList,
+    LargeListView,
     LargeUtf8,
     List_,
+    ListView,
     Map,
     MetadataVersion,
     Null,
     Precision,
+    RunEndEncoded,
     Schema,
     Struct_,
     Time,
@@ -45,6 +49,7 @@ from .Schema import (
     Union_,
     UnionMode,
     Utf8,
+    Utf8View,
 )
 from .api import SortOrder
 from .entity import (
@@ -97,6 +102,7 @@ from .query import (
     DataCatalog,
     DeleteQueryElement,
     Distinct,
+    Drive,
     Expr,
     ExprUnion,
     Function,
@@ -167,6 +173,7 @@ from .generated.Arrow import Arrow as FbsArrow
 from .generated.B2cId import B2cId as FbsB2cId
 from .generated.Binary import Binary as FbsBinary
 from .generated.BinaryQueryElement import BinaryQueryElement as FbsBinaryQueryElement
+from .generated.BinaryView import BinaryView as FbsBinaryView
 from .generated.Bool import Bool as FbsBool
 from .generated.Buffer import Buffer as FbsBuffer
 from .generated.Case import Case as FbsCase
@@ -180,6 +187,7 @@ from .generated.Decimal import Decimal as FbsDecimal
 from .generated.DeleteQueryElement import DeleteQueryElement as FbsDeleteQueryElement
 from .generated.DictionaryEncoding import DictionaryEncoding as FbsDictionaryEncoding
 from .generated.Distinct import Distinct as FbsDistinct
+from .generated.Drive import Drive as FbsDrive
 from .generated.Duration import Duration as FbsDuration
 from .generated.EdgeList import EdgeList as FbsEdgeList
 from .generated.EdgeQuery import EdgeQuery as FbsEdgeQuery
@@ -202,9 +210,11 @@ from .generated.Join import Join as FbsJoin
 from .generated.KeyValue import KeyValue as FbsKeyValue
 from .generated.LargeBinary import LargeBinary as FbsLargeBinary
 from .generated.LargeList import LargeList as FbsLargeList
+from .generated.LargeListView import LargeListView as FbsLargeListView
 from .generated.LargeUtf8 import LargeUtf8 as FbsLargeUtf8
 from .generated.Line import Line as FbsLine
 from .generated.List import List as FbsList
+from .generated.ListView import ListView as FbsListView
 from .generated.Map import Map as FbsMap
 from .generated.MultiLine import MultiLine as FbsMultiLine
 from .generated.MultiPolygon import MultiPolygon as FbsMultiPolygon
@@ -227,6 +237,7 @@ from .generated.Query import Query as FbsQuery
 from .generated.QueryElement import QueryElement as FbsQueryElement
 from .generated.QueryPathElement import QueryPathElement as FbsQueryPathElement
 from .generated.QueryTableSource import QueryTableSource as FbsQueryTableSource
+from .generated.RunEndEncoded import RunEndEncoded as FbsRunEndEncoded
 from .generated.Schema import Schema as FbsSchema
 from .generated.SetExpr import SetExpr as FbsSetExpr
 from .generated.StreamId import StreamId as FbsStreamId
@@ -244,6 +255,7 @@ from .generated.UpdateQueryElement import UpdateQueryElement as FbsUpdateQueryEl
 from .generated.UseCase import UseCase as FbsUseCase
 from .generated.UseCaseInputPair import UseCaseInputPair as FbsUseCaseInputPair
 from .generated.Utf8 import Utf8 as FbsUtf8
+from .generated.Utf8View import Utf8View as FbsUtf8View
 from .generated.VArray import VArray as FbsVArray
 from .generated.VBool import VBool as FbsVBool
 from .generated.VBytes import VBytes as FbsVBytes

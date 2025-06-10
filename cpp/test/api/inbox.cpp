@@ -25,50 +25,71 @@
 namespace inbox {
 
 ul::Result<ul::Void>
-test_fetch(ul::RequestContext &ctx) {
-    ::ul::api::inbox::fetch(
+test_fetch(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const std::string p0 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+    const ::ul::types::Inbox expected = ::ul::types::Inbox();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::inbox::fetch(
         ctx,
-        std::string()
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::Inbox result_value = std::get<::ul::types::Inbox>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_fetch_obj(test_fetch, "inbox::fetch", &link_only_api_test_root);
+ApiTest test_fetch_obj(test_fetch, "inbox::fetch", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_clear_all_status(ul::RequestContext &ctx) {
-    ::ul::api::inbox::clear_all_status(
+test_clear_all_status(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const std::string p0 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+    return ul::api::inbox::clear_all_status(
         ctx,
-        std::string()
+        p0
     );
-    return ul::Void();
 }
 
-ApiTest test_clear_all_status_obj(test_clear_all_status, "inbox::clear_all_status", &link_only_api_test_root);
+ApiTest test_clear_all_status_obj(test_clear_all_status, "inbox::clear_all_status", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_set_status(ul::RequestContext &ctx) {
-    ::ul::api::inbox::set_status(
+test_set_status(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const std::string p0 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    int p2 = 42;
+    return ul::api::inbox::set_status(
         ctx,
-        std::string(),
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        0
+        p0,
+        p1,
+        p2
     );
-    return ul::Void();
 }
 
-ApiTest test_set_status_obj(test_set_status, "inbox::set_status", &link_only_api_test_root);
+ApiTest test_set_status_obj(test_set_status, "inbox::set_status", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_clear_status(ul::RequestContext &ctx) {
-    ::ul::api::inbox::clear_status(
+test_clear_status(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const std::string p0 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    return ul::api::inbox::clear_status(
         ctx,
-        std::string(),
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0,
+        p1
     );
-    return ul::Void();
 }
 
-ApiTest test_clear_status_obj(test_clear_status, "inbox::clear_status", &link_only_api_test_root);
+ApiTest test_clear_status_obj(test_clear_status, "inbox::clear_status", &idempotent_api_test_root);
 
 } // namespace inbox

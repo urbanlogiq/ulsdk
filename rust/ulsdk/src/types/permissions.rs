@@ -10,36 +10,21 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
-use flatbuffers::{WIPOffset, UnionWIPOffset};
 use bitflags::bitflags;
 use core::ops::Deref;
+use flatbuffers::{UnionWIPOffset, WIPOffset};
 
-use crate::types::id::{
-    B2cId,
-    ColumnGroupId,
-    ContentId,
-    DataStateId,
-    GenericId,
-    GraphNodeId,
-    ObjectId,
-    ObjectNamespace,
-    StreamId,
-};
 use crate::types::generated::id_generated::{
-    B2cId as FbsB2cId,
-    ColumnGroupId as FbsColumnGroupId,
-    ContentId as FbsContentId,
-    DataStateId as FbsDataStateId,
-    GenericId as FbsGenericId,
-    GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId,
-    StreamId as FbsStreamId,
-    ObjectNamespace as FbsObjectNamespace,
+    B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
+    DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
 };
 use crate::types::generated::permissions_generated::{
-    AccessControlList as FbsAccessControlList,
-    Role as FbsRole,
-    PermissionTy as FbsPermissionTy,
+    AccessControlList as FbsAccessControlList, PermissionTy as FbsPermissionTy, Role as FbsRole,
+};
+use crate::types::id::{
+    B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
+    ObjectNamespace, StreamId,
 };
 
 bitflags! {
@@ -87,7 +72,10 @@ pub struct AccessControlList {
 }
 
 impl AccessControlList {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsAccessControlList<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsAccessControlList<'a>> {
         use crate::types::generated::permissions_generated::AccessControlListBuilder as FbsAccessControlListBuilder;
 
         let extends_offset = self.extends.as_ref().map(|o| o.serialize_to(builder));
@@ -115,10 +103,7 @@ impl From<FbsAccessControlList<'_>> for AccessControlList {
             roles.push(elem.into());
         }
 
-        Self {
-            extends,
-            roles,
-        }
+        Self { extends, roles }
     }
 }
 
@@ -146,7 +131,10 @@ pub struct Role {
 }
 
 impl Role {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsRole<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsRole<'a>> {
         use crate::types::generated::permissions_generated::RoleBuilder as FbsRoleBuilder;
 
         let principal_offset = self.principal.serialize_to(builder);
@@ -205,5 +193,4 @@ mod tests {
         let t1 = Role::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
-
 }

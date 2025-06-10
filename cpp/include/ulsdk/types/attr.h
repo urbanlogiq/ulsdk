@@ -26,6 +26,10 @@ struct Attr {
     Attr();
     Attr(const ::Attr *root);
     Attr(const std::vector<uint8_t> &bytes);
+    bool operator==(const Attr &rhs) const;
+    bool operator!=(const Attr &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ::flatbuffers::Offset<::Attr>

@@ -32,6 +32,10 @@ struct B2cId {
     B2cId();
     B2cId(const ::B2cId *root);
     B2cId(const std::vector<uint8_t> &bytes);
+    bool operator==(const B2cId &rhs) const;
+    bool operator!=(const B2cId &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ColumnGroupId {
@@ -40,6 +44,10 @@ struct ColumnGroupId {
     ColumnGroupId();
     ColumnGroupId(const ::ColumnGroupId *root);
     ColumnGroupId(const std::vector<uint8_t> &bytes);
+    bool operator==(const ColumnGroupId &rhs) const;
+    bool operator!=(const ColumnGroupId &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ContentId {
@@ -48,6 +56,10 @@ struct ContentId {
     ContentId();
     ContentId(const ::ContentId *root);
     ContentId(const std::vector<uint8_t> &bytes);
+    bool operator==(const ContentId &rhs) const;
+    bool operator!=(const ContentId &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct DataStateId {
@@ -56,6 +68,10 @@ struct DataStateId {
     DataStateId();
     DataStateId(const ::DataStateId *root);
     DataStateId(const std::vector<uint8_t> &bytes);
+    bool operator==(const DataStateId &rhs) const;
+    bool operator!=(const DataStateId &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct GenericId {
@@ -64,6 +80,10 @@ struct GenericId {
     GenericId();
     GenericId(const ::GenericId *root);
     GenericId(const std::vector<uint8_t> &bytes);
+    bool operator==(const GenericId &rhs) const;
+    bool operator!=(const GenericId &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct GraphNodeId {
@@ -72,6 +92,10 @@ struct GraphNodeId {
     GraphNodeId();
     GraphNodeId(const ::GraphNodeId *root);
     GraphNodeId(const std::vector<uint8_t> &bytes);
+    bool operator==(const GraphNodeId &rhs) const;
+    bool operator!=(const GraphNodeId &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ObjectId {
@@ -80,6 +104,10 @@ struct ObjectId {
     ObjectId();
     ObjectId(const ::ObjectId *root);
     ObjectId(const std::vector<uint8_t> &bytes);
+    bool operator==(const ObjectId &rhs) const;
+    bool operator!=(const ObjectId &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct StreamId {
@@ -88,6 +116,10 @@ struct StreamId {
     StreamId();
     StreamId(const ::StreamId *root);
     StreamId(const std::vector<uint8_t> &bytes);
+    bool operator==(const StreamId &rhs) const;
+    bool operator!=(const StreamId &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ::flatbuffers::Offset<::B2cId>

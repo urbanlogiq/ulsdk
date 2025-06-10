@@ -48,6 +48,17 @@ Label::Label(const ::Label *root)
         value_ = std::string(*root->value()->begin(), *root->value()->end());
 }
 
+bool
+Label::operator==(const Label &rhs) const {
+    if (this->key_ != rhs.key_) {
+        return false;
+    }
+    if (this->value_ != rhs.value_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Log>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Log &o) {
     std::vector<::flatbuffers::Offset<::Label>> labels_offsets = std::vector<::flatbuffers::Offset<::Label>>();
@@ -111,6 +122,20 @@ Log::Log(const ::Log *root)
         }
     }
     timestamp_ = root->timestamp();
+}
+
+bool
+Log::operator==(const Log &rhs) const {
+    if (this->labels_ != rhs.labels_) {
+        return false;
+    }
+    if (this->pairs_ != rhs.pairs_) {
+        return false;
+    }
+    if (this->timestamp_ != rhs.timestamp_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Pair>
@@ -312,6 +337,17 @@ Pair::Pair(const ::Pair *root)
             default: throw std::runtime_error("unknown union variant");
         }
     }
+}
+
+bool
+Pair::operator==(const Pair &rhs) const {
+    if (this->key_ != rhs.key_) {
+        return false;
+    }
+    if (this->value_ != rhs.value_) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace types

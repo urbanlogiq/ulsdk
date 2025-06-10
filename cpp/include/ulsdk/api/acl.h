@@ -173,8 +173,9 @@ revoke(
 /**
  * Get the permissions the caller has on the object with the given ID.
  * @param id The ID of the object which will be queried for permissions.
+ * @return The 32-bit integer bitmap corresponding to the permissions the caller has on the object.
  */
-Result<Void>
+Result<std::vector<uint8_t>>
 get_permissions(
     ul::RequestContext &ctx,
     const Uuid &id

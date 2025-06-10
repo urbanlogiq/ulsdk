@@ -400,8 +400,38 @@ impl RequestContext for ApiKeyContext {
             .map(|b| b.to_vec())
     }
 
-    async fn upload(&self, _path: &str, _files: Vec<File>) -> Result<Vec<u8>, Error> {
-        todo!()
+    async fn upload(&self, path: &str, files: Vec<File>) -> Result<Vec<u8>, Error> {
+        let boundary = format!(
+            "UL1-multipart-{}",
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_millis()
+        );
+        let crlf = "\r\n";
+
+        let mut body = Vec::new();
+
+        for file in files {
+            body.extend(b"--");
+            body.extend(boundary.as_bytes());
+            body.extend(crlf.as_bytes());
+
+            let disposition_header = format!(
+                "Content-Disposition: form-data; name=\"{}\"; filename=\"{}\"\r\nContent-Type: {}\r\n\r\n",
+                file.name, file.name, file.mimetype
+            );
+            body.extend(disposition_header.as_bytes());
+            body.extend(&file.data)
+        }
+
+        body.extend(b"--");
+        body.extend(boundary.as_bytes());
+        body.extend(b"--");
+
+        let mimetype = format!("multipart/form-data; boundary=\"{}\"", boundary);
+
+        self.post(path, body.into(), &mimetype, None, None).await
     }
 
     async fn delete(
@@ -423,7 +453,7 @@ impl RequestContext for ApiKeyContext {
 
         let mut headers = headers.unwrap_or_default();
         let auth_header =
-            generate_auth_header(&self.key, "GET", path, &mut query, &mut headers, &[])?;
+            generate_auth_header(&self.key, "DELETE", path, &mut query, &mut headers, &[])?;
 
         headers.insert(
             HeaderName::from_static(HEADER_AUTHORIZATION),

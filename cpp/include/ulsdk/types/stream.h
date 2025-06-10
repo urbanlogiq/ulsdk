@@ -45,6 +45,10 @@ struct Stream {
     Stream();
     Stream(const ::Stream *root);
     Stream(const std::vector<uint8_t> &bytes);
+    bool operator==(const Stream &rhs) const;
+    bool operator!=(const Stream &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ::flatbuffers::Offset<::Stream>

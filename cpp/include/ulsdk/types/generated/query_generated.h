@@ -79,6 +79,9 @@ struct QueryTableSourceBuilder;
 struct Placeholder;
 struct PlaceholderBuilder;
 
+struct Drive;
+struct DriveBuilder;
+
 struct Vector;
 struct VectorBuilder;
 
@@ -353,11 +356,12 @@ enum class TableSourceUnion : uint8_t {
   QueryTableSource = 4,
   Vector = 5,
   Placeholder = 6,
+  Drive = 7,
   MIN = NONE,
-  MAX = Placeholder
+  MAX = Drive
 };
 
-inline const TableSourceUnion (&EnumValuesTableSourceUnion())[7] {
+inline const TableSourceUnion (&EnumValuesTableSourceUnion())[8] {
   static const TableSourceUnion values[] = {
     TableSourceUnion::NONE,
     TableSourceUnion::DataCatalog,
@@ -365,13 +369,14 @@ inline const TableSourceUnion (&EnumValuesTableSourceUnion())[7] {
     TableSourceUnion::GraphQuery,
     TableSourceUnion::QueryTableSource,
     TableSourceUnion::Vector,
-    TableSourceUnion::Placeholder
+    TableSourceUnion::Placeholder,
+    TableSourceUnion::Drive
   };
   return values;
 }
 
 inline const char * const *EnumNamesTableSourceUnion() {
-  static const char * const names[8] = {
+  static const char * const names[9] = {
     "NONE",
     "DataCatalog",
     "Arrow",
@@ -379,13 +384,14 @@ inline const char * const *EnumNamesTableSourceUnion() {
     "QueryTableSource",
     "Vector",
     "Placeholder",
+    "Drive",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameTableSourceUnion(TableSourceUnion e) {
-  if (::flatbuffers::IsOutRange(e, TableSourceUnion::NONE, TableSourceUnion::Placeholder)) return "";
+  if (::flatbuffers::IsOutRange(e, TableSourceUnion::NONE, TableSourceUnion::Drive)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesTableSourceUnion()[index];
 }
@@ -416,6 +422,10 @@ template<> struct TableSourceUnionTraits<Vector> {
 
 template<> struct TableSourceUnionTraits<Placeholder> {
   static const TableSourceUnion enum_value = TableSourceUnion::Placeholder;
+};
+
+template<> struct TableSourceUnionTraits<Drive> {
+  static const TableSourceUnion enum_value = TableSourceUnion::Drive;
 };
 
 bool VerifyTableSourceUnion(::flatbuffers::Verifier &verifier, const void *obj, TableSourceUnion type);
@@ -1828,6 +1838,76 @@ struct Placeholder::Traits {
   static auto constexpr Create = CreatePlaceholder;
 };
 
+struct Drive FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef DriveBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_ROOT = 4,
+    VT_PATH = 6
+  };
+  const ObjectId *root() const {
+    return GetPointer<const ObjectId *>(VT_ROOT);
+  }
+  const ::flatbuffers::String *path() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_PATH);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_ROOT) &&
+           verifier.VerifyTable(root()) &&
+           VerifyOffset(verifier, VT_PATH) &&
+           verifier.VerifyString(path()) &&
+           verifier.EndTable();
+  }
+};
+
+struct DriveBuilder {
+  typedef Drive Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_root(::flatbuffers::Offset<ObjectId> root) {
+    fbb_.AddOffset(Drive::VT_ROOT, root);
+  }
+  void add_path(::flatbuffers::Offset<::flatbuffers::String> path) {
+    fbb_.AddOffset(Drive::VT_PATH, path);
+  }
+  explicit DriveBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<Drive> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<Drive>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<Drive> CreateDrive(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<ObjectId> root = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> path = 0) {
+  DriveBuilder builder_(_fbb);
+  builder_.add_path(path);
+  builder_.add_root(root);
+  return builder_.Finish();
+}
+
+struct Drive::Traits {
+  using type = Drive;
+  static auto constexpr Create = CreateDrive;
+};
+
+inline ::flatbuffers::Offset<Drive> CreateDriveDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<ObjectId> root = 0,
+    const char *path = nullptr) {
+  auto path__ = path ? _fbb.CreateString(path) : 0;
+  return CreateDrive(
+      _fbb,
+      root,
+      path__);
+}
+
 struct Vector FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef VectorBuilder Builder;
   struct Traits;
@@ -1962,6 +2042,9 @@ struct TableSourceInstance FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Tabl
   const Placeholder *t_as_Placeholder() const {
     return t_type() == TableSourceUnion::Placeholder ? static_cast<const Placeholder *>(t()) : nullptr;
   }
+  const Drive *t_as_Drive() const {
+    return t_type() == TableSourceUnion::Drive ? static_cast<const Drive *>(t()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_T_TYPE, 1) &&
@@ -1993,6 +2076,10 @@ template<> inline const Vector *TableSourceInstance::t_as<Vector>() const {
 
 template<> inline const Placeholder *TableSourceInstance::t_as<Placeholder>() const {
   return t_as_Placeholder();
+}
+
+template<> inline const Drive *TableSourceInstance::t_as<Drive>() const {
+  return t_as_Drive();
 }
 
 struct TableSourceInstanceBuilder {
@@ -2068,6 +2155,9 @@ struct TableSource FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const Placeholder *t_as_Placeholder() const {
     return t_type() == TableSourceUnion::Placeholder ? static_cast<const Placeholder *>(t()) : nullptr;
   }
+  const Drive *t_as_Drive() const {
+    return t_type() == TableSourceUnion::Drive ? static_cast<const Drive *>(t()) : nullptr;
+  }
   const ::flatbuffers::Vector<::flatbuffers::Offset<Expr>> *fields() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Expr>> *>(VT_FIELDS);
   }
@@ -2122,6 +2212,10 @@ template<> inline const Vector *TableSource::t_as<Vector>() const {
 
 template<> inline const Placeholder *TableSource::t_as<Placeholder>() const {
   return t_as_Placeholder();
+}
+
+template<> inline const Drive *TableSource::t_as<Drive>() const {
+  return t_as_Drive();
 }
 
 struct TableSourceBuilder {
@@ -2686,6 +2780,9 @@ struct UpdateQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   const Placeholder *source_as_Placeholder() const {
     return source_type() == TableSourceUnion::Placeholder ? static_cast<const Placeholder *>(source()) : nullptr;
   }
+  const Drive *source_as_Drive() const {
+    return source_type() == TableSourceUnion::Drive ? static_cast<const Drive *>(source()) : nullptr;
+  }
   const ::flatbuffers::Vector<::flatbuffers::Offset<SetExpr>> *sets() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<SetExpr>> *>(VT_SETS);
   }
@@ -2728,6 +2825,10 @@ template<> inline const Vector *UpdateQueryElement::source_as<Vector>() const {
 
 template<> inline const Placeholder *UpdateQueryElement::source_as<Placeholder>() const {
   return source_as_Placeholder();
+}
+
+template<> inline const Drive *UpdateQueryElement::source_as<Drive>() const {
+  return source_as_Drive();
 }
 
 struct UpdateQueryElementBuilder {
@@ -2826,6 +2927,9 @@ struct DeleteQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   const Placeholder *source_as_Placeholder() const {
     return source_type() == TableSourceUnion::Placeholder ? static_cast<const Placeholder *>(source()) : nullptr;
   }
+  const Drive *source_as_Drive() const {
+    return source_type() == TableSourceUnion::Drive ? static_cast<const Drive *>(source()) : nullptr;
+  }
   const Function *filter() const {
     return GetPointer<const Function *>(VT_FILTER);
   }
@@ -2862,6 +2966,10 @@ template<> inline const Vector *DeleteQueryElement::source_as<Vector>() const {
 
 template<> inline const Placeholder *DeleteQueryElement::source_as<Placeholder>() const {
   return source_as_Placeholder();
+}
+
+template<> inline const Drive *DeleteQueryElement::source_as<Drive>() const {
+  return source_as_Drive();
 }
 
 struct DeleteQueryElementBuilder {
@@ -3209,6 +3317,10 @@ inline bool VerifyTableSourceUnion(::flatbuffers::Verifier &verifier, const void
     }
     case TableSourceUnion::Placeholder: {
       auto ptr = reinterpret_cast<const Placeholder *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case TableSourceUnion::Drive: {
+      auto ptr = reinterpret_cast<const Drive *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

@@ -1,6 +1,8 @@
 // Copyright (c), CommunityLogiq Software
 
 mod api_key_context;
+#[cfg(test)]
+mod test_context;
 
 use async_trait::async_trait;
 use bytes::Bytes;
@@ -11,6 +13,8 @@ use uuid::Uuid;
 
 use crate::error::Error;
 pub use crate::request_context::api_key_context::ApiKeyContext;
+#[cfg(test)]
+pub(crate) use crate::request_context::test_context::TestContext;
 use crate::{Environment, Region};
 
 const DELAYS: &[u64] = &[25, 50, 100, 200, 400];
@@ -24,7 +28,7 @@ pub struct File {
 }
 
 #[async_trait]
-pub trait RequestContext {
+pub trait RequestContext: Send + Sync {
     fn region(&self) -> Region;
     fn environment(&self) -> Environment;
     async fn get(

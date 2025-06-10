@@ -186,6 +186,38 @@ File::File(const ::File *root)
     }
 }
 
+bool
+File::operator==(const File &rhs) const {
+    if (this->account_ != rhs.account_) {
+        return false;
+    }
+    if (this->blob_ != rhs.blob_) {
+        return false;
+    }
+    if (this->chunks_ != rhs.chunks_) {
+        return false;
+    }
+    if (this->container_ != rhs.container_) {
+        return false;
+    }
+    if (this->digest_ != rhs.digest_) {
+        return false;
+    }
+    if (this->mime_ != rhs.mime_) {
+        return false;
+    }
+    if (this->size_ != rhs.size_) {
+        return false;
+    }
+    if (this->tier_ != rhs.tier_) {
+        return false;
+    }
+    if (this->virus_ != rhs.virus_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Directory>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Directory &o) {
     std::optional<::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::B2cId>>>> notifications_offset = std::nullopt;
@@ -256,6 +288,17 @@ Directory::Directory(const ::Directory *root)
     }
 }
 
+bool
+Directory::operator==(const Directory &rhs) const {
+    if (this->notifications_ != rhs.notifications_) {
+        return false;
+    }
+    if (this->slots_ != rhs.slots_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::ObjectRef>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ObjectRef &o) {
     const ::flatbuffers::Offset<::ObjectId> id_offset = serialize_to(builder, o.id_);
@@ -294,6 +337,17 @@ ObjectRef::ObjectRef(const ::ObjectRef *root)
         id_ = decltype(id_)(root->id());
     }
     ty_ = root->ty();
+}
+
+bool
+ObjectRef::operator==(const ObjectRef &rhs) const {
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->ty_ != rhs.ty_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::ListFile>
@@ -347,6 +401,20 @@ ListFile::ListFile(const ::ListFile *root)
     }
 }
 
+bool
+ListFile::operator==(const ListFile &rhs) const {
+    if (this->mime_ != rhs.mime_) {
+        return false;
+    }
+    if (this->size_ != rhs.size_) {
+        return false;
+    }
+    if (this->virus_ != rhs.virus_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::ListDirectory>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ListDirectory &) {
 
@@ -374,6 +442,12 @@ ListDirectory::ListDirectory(const ::ListDirectory *root)  {
         throw std::runtime_error("cannot deserialize flatbuffer type");
     }
 
+}
+
+bool
+ListDirectory::operator==(const ListDirectory &rhs) const {
+    (void)rhs;
+    return true;
 }
 
 ::flatbuffers::Offset<::ListObject>
@@ -420,6 +494,20 @@ ListObject::ListObject(const ::ListObject *root)
     ty_ = root->ty();
 }
 
+bool
+ListObject::operator==(const ListObject &rhs) const {
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->size_ != rhs.size_) {
+        return false;
+    }
+    if (this->ty_ != rhs.ty_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::TopLevelDirectory>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TopLevelDirectory &o) {
     const ::flatbuffers::Offset<::B2cId> b2c_entity_offset = serialize_to(builder, o.b2c_entity_);
@@ -454,6 +542,14 @@ TopLevelDirectory::TopLevelDirectory(const ::TopLevelDirectory *root)
     if (root->b2c_entity() != nullptr) {
         b2c_entity_ = decltype(b2c_entity_)(root->b2c_entity());
     }
+}
+
+bool
+TopLevelDirectory::operator==(const TopLevelDirectory &rhs) const {
+    if (this->b2c_entity_ != rhs.b2c_entity_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Chunk>
@@ -511,6 +607,20 @@ Chunk::Chunk(const ::Chunk *root)
         }
     }
     size_ = root->size();
+}
+
+bool
+Chunk::operator==(const Chunk &rhs) const {
+    if (this->blob_ != rhs.blob_) {
+        return false;
+    }
+    if (this->digest_ != rhs.digest_) {
+        return false;
+    }
+    if (this->size_ != rhs.size_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::DirectoryEntry>
@@ -578,6 +688,17 @@ DirectoryEntry::DirectoryEntry(const ::DirectoryEntry *root)
     }
 }
 
+bool
+DirectoryEntry::operator==(const DirectoryEntry &rhs) const {
+    if (this->entry_ != rhs.entry_) {
+        return false;
+    }
+    if (this->parent_ != rhs.parent_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::DirectoryList>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DirectoryList &o) {
     std::vector<::flatbuffers::Offset<::ListSlot>> slots_offsets = std::vector<::flatbuffers::Offset<::ListSlot>>();
@@ -621,6 +742,14 @@ DirectoryList::DirectoryList(const ::DirectoryList *root)
             slots_.emplace_back(i);
         }
     }
+}
+
+bool
+DirectoryList::operator==(const DirectoryList &rhs) const {
+    if (this->slots_ != rhs.slots_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::ListSlot>
@@ -749,6 +878,35 @@ ListSlot::ListSlot(const ::ListSlot *root)
     user_permissions_ = root->user_permissions();
 }
 
+bool
+ListSlot::operator==(const ListSlot &rhs) const {
+    if (this->attributes_ != rhs.attributes_) {
+        return false;
+    }
+    if (this->entry_ != rhs.entry_) {
+        return false;
+    }
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->last_modified_by_ != rhs.last_modified_by_) {
+        return false;
+    }
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->size_ != rhs.size_) {
+        return false;
+    }
+    if (this->time_ != rhs.time_) {
+        return false;
+    }
+    if (this->user_permissions_ != rhs.user_permissions_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::MoveRequest>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const MoveRequest &o) {
     std::optional<::flatbuffers::Offset<::flatbuffers::String>> dest_name_offset = std::nullopt;
@@ -815,6 +973,23 @@ MoveRequest::MoveRequest(const ::MoveRequest *root)
     overwrite_ = root->overwrite();
 }
 
+bool
+MoveRequest::operator==(const MoveRequest &rhs) const {
+    if (this->dest_name_ != rhs.dest_name_) {
+        return false;
+    }
+    if (this->dest_root_ != rhs.dest_root_) {
+        return false;
+    }
+    if (this->entry_ != rhs.entry_) {
+        return false;
+    }
+    if (this->overwrite_ != rhs.overwrite_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::NewLink>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NewLink &o) {
     const ::flatbuffers::Offset<::flatbuffers::String> name_offset = builder.CreateString(o.name_);
@@ -854,6 +1029,17 @@ NewLink::NewLink(const ::NewLink *root)
     if (root->obj() != nullptr) {
         obj_ = decltype(obj_)(root->obj());
     }
+}
+
+bool
+NewLink::operator==(const NewLink &rhs) const {
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->obj_ != rhs.obj_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Slot>
@@ -924,6 +1110,23 @@ Slot::Slot(const ::Slot *root)
     }
         name_ = std::string(*root->name()->begin(), *root->name()->end());
     ty_ = root->ty();
+}
+
+bool
+Slot::operator==(const Slot &rhs) const {
+    if (this->attributes_ != rhs.attributes_) {
+        return false;
+    }
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->ty_ != rhs.ty_) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace types

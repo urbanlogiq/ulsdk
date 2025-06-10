@@ -27,6 +27,10 @@ struct Key {
 
     Key() = default;
     Key(const struct json_value_s *root);
+    bool operator==(const Key &rhs) const;
+    bool operator!=(const Key &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
@@ -37,6 +41,10 @@ struct GetKeys {
 
     GetKeys() = default;
     GetKeys(const struct json_value_s *root);
+    bool operator==(const GetKeys &rhs) const;
+    bool operator!=(const GetKeys &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
@@ -48,6 +56,10 @@ struct CreateKey {
 
     CreateKey() = default;
     CreateKey(const struct json_value_s *root);
+    bool operator==(const CreateKey &rhs) const;
+    bool operator!=(const CreateKey &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
@@ -59,6 +71,10 @@ struct UpdateKey {
 
     UpdateKey() = default;
     UpdateKey(const struct json_value_s *root);
+    bool operator==(const UpdateKey &rhs) const;
+    bool operator!=(const UpdateKey &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>

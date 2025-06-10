@@ -25,37 +25,83 @@
 namespace schematic_evaluator {
 
 ul::Result<ul::Void>
-test_create_job(ul::RequestContext &ctx) {
-    ::ul::api::schematic_evaluator::create_job(
+test_create_job(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    ::ul::types::RunSpec body = ::ul::types::RunSpec();
+    const ::ul::types::ObjectId expected = ::ul::types::ObjectId();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::schematic_evaluator::create_job(
         ctx,
-        ::ul::types::RunSpec()
+        body
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::ObjectId result_value = std::get<::ul::types::ObjectId>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_create_job_obj(test_create_job, "schematic_evaluator::create_job", &link_only_api_test_root);
+ApiTest test_create_job_obj(test_create_job, "schematic_evaluator::create_job", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_job(ul::RequestContext &ctx) {
-    ::ul::api::schematic_evaluator::get_job(
+test_get_job(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    int q0 = 42;
+    const ::ul::types::Job expected = ::ul::types::Job();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::schematic_evaluator::get_job(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        std::nullopt
+        p0,
+        q0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::Job result_value = std::get<::ul::types::Job>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_job_obj(test_get_job, "schematic_evaluator::get_job", &link_only_api_test_root);
+ApiTest test_get_job_obj(test_get_job, "schematic_evaluator::get_job", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_task(ul::RequestContext &ctx) {
-    ::ul::api::schematic_evaluator::get_task(
+test_get_task(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::Task expected = ::ul::types::Task();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::schematic_evaluator::get_task(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::Task result_value = std::get<::ul::types::Task>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_task_obj(test_get_task, "schematic_evaluator::get_task", &link_only_api_test_root);
+ApiTest test_get_task_obj(test_get_task, "schematic_evaluator::get_task", &idempotent_api_test_root);
 
 } // namespace schematic_evaluator

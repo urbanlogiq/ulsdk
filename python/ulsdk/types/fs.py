@@ -10,6 +10,7 @@ from flatbuffers.util import RemoveSizePrefix
 from typing import Union, List, Optional, Self, Tuple
 from .Schema import (
     Binary,
+    BinaryView,
     Bool,
     Buffer,
     Date,
@@ -30,12 +31,15 @@ from .Schema import (
     KeyValue,
     LargeBinary,
     LargeList,
+    LargeListView,
     LargeUtf8,
     List_,
+    ListView,
     Map,
     MetadataVersion,
     Null,
     Precision,
+    RunEndEncoded,
     Schema,
     Struct_,
     Time,
@@ -45,6 +49,7 @@ from .Schema import (
     Union_,
     UnionMode,
     Utf8,
+    Utf8View,
 )
 from .attr import Attr
 from .crypto import (
@@ -56,6 +61,7 @@ from .crypto import (
 )
 from .data import (
     AttributePair,
+    BinaryYesNo,
     DayOfWeek,
     DirectionAndRoadName,
     DirectionAndRoadNames,
@@ -165,6 +171,7 @@ from .generated.Attr import Attr as FbsAttr
 from .generated.AttributePair import AttributePair as FbsAttributePair
 from .generated.B2cId import B2cId as FbsB2cId
 from .generated.Binary import Binary as FbsBinary
+from .generated.BinaryView import BinaryView as FbsBinaryView
 from .generated.Bool import Bool as FbsBool
 from .generated.Buffer import Buffer as FbsBuffer
 from .generated.ByteArray import ByteArray as FbsByteArray
@@ -201,6 +208,7 @@ from .generated.Job import Job as FbsJob
 from .generated.KeyValue import KeyValue as FbsKeyValue
 from .generated.LargeBinary import LargeBinary as FbsLargeBinary
 from .generated.LargeList import LargeList as FbsLargeList
+from .generated.LargeListView import LargeListView as FbsLargeListView
 from .generated.LargeUtf8 import LargeUtf8 as FbsLargeUtf8
 from .generated.Layout import Layout as FbsLayout
 from .generated.List import List as FbsList
@@ -208,6 +216,7 @@ from .generated.ListDirectory import ListDirectory as FbsListDirectory
 from .generated.ListFile import ListFile as FbsListFile
 from .generated.ListObject import ListObject as FbsListObject
 from .generated.ListSlot import ListSlot as FbsListSlot
+from .generated.ListView import ListView as FbsListView
 from .generated.Map import Map as FbsMap
 from .generated.MoveRequest import MoveRequest as FbsMoveRequest
 from .generated.NamedParameter import NamedParameter as FbsNamedParameter
@@ -224,6 +233,7 @@ from .generated.ObjectSummaryList import ObjectSummaryList as FbsObjectSummaryLi
 from .generated.ParamIndices import ParamIndices as FbsParamIndices
 from .generated.ParameterFlags import ParameterFlags as FbsParameterFlags
 from .generated.Point2D import Point2D as FbsPoint2D
+from .generated.RunEndEncoded import RunEndEncoded as FbsRunEndEncoded
 from .generated.RunSpec import RunSpec as FbsRunSpec
 from .generated.Schema import Schema as FbsSchema
 from .generated.Schematic import Schematic as FbsSchematic
@@ -246,6 +256,7 @@ from .generated.Tri2D import Tri2D as FbsTri2D
 from .generated.Union import Union as FbsUnion
 from .generated.UserSettings import UserSettings as FbsUserSettings
 from .generated.Utf8 import Utf8 as FbsUtf8
+from .generated.Utf8View import Utf8View as FbsUtf8View
 from .generated.VArray import VArray as FbsVArray
 from .generated.VBool import VBool as FbsVBool
 from .generated.VBytes import VBytes as FbsVBytes

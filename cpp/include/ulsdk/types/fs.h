@@ -70,6 +70,10 @@ struct File {
     File();
     File(const ::File *root);
     File(const std::vector<uint8_t> &bytes);
+    bool operator==(const File &rhs) const;
+    bool operator!=(const File &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -82,6 +86,10 @@ struct Directory {
     Directory();
     Directory(const ::Directory *root);
     Directory(const std::vector<uint8_t> &bytes);
+    bool operator==(const Directory &rhs) const;
+    bool operator!=(const Directory &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ObjectRef {
@@ -91,6 +99,10 @@ struct ObjectRef {
     ObjectRef();
     ObjectRef(const ::ObjectRef *root);
     ObjectRef(const std::vector<uint8_t> &bytes);
+    bool operator==(const ObjectRef &rhs) const;
+    bool operator!=(const ObjectRef &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ListFile {
@@ -101,6 +113,10 @@ struct ListFile {
     ListFile();
     ListFile(const ::ListFile *root);
     ListFile(const std::vector<uint8_t> &bytes);
+    bool operator==(const ListFile &rhs) const;
+    bool operator!=(const ListFile &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ListDirectory {
@@ -108,6 +124,10 @@ struct ListDirectory {
     ListDirectory();
     ListDirectory(const ::ListDirectory *root);
     ListDirectory(const std::vector<uint8_t> &bytes);
+    bool operator==(const ListDirectory &rhs) const;
+    bool operator!=(const ListDirectory &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ListObject {
@@ -118,6 +138,10 @@ struct ListObject {
     ListObject();
     ListObject(const ::ListObject *root);
     ListObject(const std::vector<uint8_t> &bytes);
+    bool operator==(const ListObject &rhs) const;
+    bool operator!=(const ListObject &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct TopLevelDirectory {
@@ -126,6 +150,10 @@ struct TopLevelDirectory {
     TopLevelDirectory();
     TopLevelDirectory(const ::TopLevelDirectory *root);
     TopLevelDirectory(const std::vector<uint8_t> &bytes);
+    bool operator==(const TopLevelDirectory &rhs) const;
+    bool operator!=(const TopLevelDirectory &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Chunk {
@@ -136,6 +164,10 @@ struct Chunk {
     Chunk();
     Chunk(const ::Chunk *root);
     Chunk(const std::vector<uint8_t> &bytes);
+    bool operator==(const Chunk &rhs) const;
+    bool operator!=(const Chunk &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct DirectoryEntry {
@@ -145,6 +177,10 @@ struct DirectoryEntry {
     DirectoryEntry();
     DirectoryEntry(const ::DirectoryEntry *root);
     DirectoryEntry(const std::vector<uint8_t> &bytes);
+    bool operator==(const DirectoryEntry &rhs) const;
+    bool operator!=(const DirectoryEntry &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct DirectoryList {
@@ -153,6 +189,10 @@ struct DirectoryList {
     DirectoryList();
     DirectoryList(const ::DirectoryList *root);
     DirectoryList(const std::vector<uint8_t> &bytes);
+    bool operator==(const DirectoryList &rhs) const;
+    bool operator!=(const DirectoryList &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ListSlot {
@@ -168,6 +208,10 @@ struct ListSlot {
     ListSlot();
     ListSlot(const ::ListSlot *root);
     ListSlot(const std::vector<uint8_t> &bytes);
+    bool operator==(const ListSlot &rhs) const;
+    bool operator!=(const ListSlot &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct MoveRequest {
@@ -179,6 +223,10 @@ struct MoveRequest {
     MoveRequest();
     MoveRequest(const ::MoveRequest *root);
     MoveRequest(const std::vector<uint8_t> &bytes);
+    bool operator==(const MoveRequest &rhs) const;
+    bool operator!=(const MoveRequest &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -191,6 +239,10 @@ struct NewLink {
     NewLink();
     NewLink(const ::NewLink *root);
     NewLink(const std::vector<uint8_t> &bytes);
+    bool operator==(const NewLink &rhs) const;
+    bool operator!=(const NewLink &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Slot {
@@ -202,6 +254,10 @@ struct Slot {
     Slot();
     Slot(const ::Slot *root);
     Slot(const std::vector<uint8_t> &bytes);
+    bool operator==(const Slot &rhs) const;
+    bool operator!=(const Slot &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::pair<::flatbuffers::Offset<void>, ::Entry>

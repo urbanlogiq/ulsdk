@@ -21,12 +21,16 @@ struct AdUser {
     std::string display_name_;
     std::string id_;
     std::string user_principal_name_;
-    std::vector<std::string> other_mails_;
+    std::optional<std::vector<std::string>> other_mails_;
     std::optional<std::string> department_;
     std::string created_date_time_;
 
     AdUser() = default;
     AdUser(const struct json_value_s *root);
+    bool operator==(const AdUser &rhs) const;
+    bool operator!=(const AdUser &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
@@ -39,6 +43,10 @@ struct AdGroup {
 
     AdGroup() = default;
     AdGroup(const struct json_value_s *root);
+    bool operator==(const AdGroup &rhs) const;
+    bool operator!=(const AdGroup &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>
@@ -47,7 +55,6 @@ to_bytes(const AdGroup &o);
 struct Bootstrap {
     AdUser user_;
     std::vector<AdGroup> groups_;
-    std::vector<AdGroup> v_2groups_;
     struct json_value_s * client_secrets_;
 
     ~Bootstrap() {
@@ -56,21 +63,23 @@ struct Bootstrap {
 
     Bootstrap(const Bootstrap &o)
         : user_(o.user_)
-        , groups_(o.groups_)
-        , v_2groups_(o.v_2groups_) {
+        , groups_(o.groups_) {
         client_secrets_ = json_extract_value(o.client_secrets_);
     }
 
     Bootstrap(Bootstrap &&o)
         : user_(std::move(o.user_))
-        , groups_(std::move(o.groups_))
-        , v_2groups_(std::move(o.v_2groups_)) {
+        , groups_(std::move(o.groups_)) {
         client_secrets_ = o.client_secrets_;
         o.client_secrets_ = nullptr;
     }
 
     Bootstrap() = default;
     Bootstrap(const struct json_value_s *root);
+    bool operator==(const Bootstrap &rhs) const;
+    bool operator!=(const Bootstrap &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::vector<uint8_t>

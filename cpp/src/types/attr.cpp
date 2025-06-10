@@ -210,5 +210,16 @@ Attr::Attr(const ::Attr *root)
     }
 }
 
+bool
+Attr::operator==(const Attr &rhs) const {
+    if (this->key_ != rhs.key_) {
+        return false;
+    }
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
+}
+
 } // namespace types
 } // namespace ul

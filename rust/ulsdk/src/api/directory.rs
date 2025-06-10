@@ -14,11 +14,11 @@ use crate::error::Error;
 use crate::request_context::{ParamMap, RequestContext};
 use crate::{read_arrow_ipc, write_arrow_ipc};
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct Principal {
-    #[serde(rename="principalType")]
+    #[serde(rename = "principalType")]
     principal_type: String,
-    #[serde(rename="displayName")]
+    #[serde(rename = "displayName")]
     display_name: String,
     id: String,
     email: Option<Vec<String>>,
@@ -26,152 +26,152 @@ pub struct Principal {
     department: Option<String>,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct AdUser {
-    #[serde(rename="displayName")]
+    #[serde(rename = "displayName")]
     display_name: String,
     id: String,
-    #[serde(rename="userPrincipalName")]
+    #[serde(rename = "userPrincipalName")]
     user_principal_name: String,
-    #[serde(rename="otherMails")]
-    other_mails: Vec<String>,
+    #[serde(rename = "otherMails")]
+    other_mails: Option<Vec<String>>,
     department: Option<String>,
-    #[serde(rename="createdDateTime")]
+    #[serde(rename = "createdDateTime")]
     created_date_time: String,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct DisplayNames {
-    #[serde(rename="displayName")]
+    #[serde(rename = "displayName")]
     display_name: String,
     id: String,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct DeviceDetail {
-    #[serde(rename="deviceId")]
+    #[serde(rename = "deviceId")]
     device_id: Option<String>,
-    #[serde(rename="operatingSystem")]
+    #[serde(rename = "operatingSystem")]
     operating_system: Option<String>,
     browser: Option<String>,
-    #[serde(rename="isCompliant")]
+    #[serde(rename = "isCompliant")]
     is_compliant: Option<bool>,
-    #[serde(rename="isManaged")]
+    #[serde(rename = "isManaged")]
     is_managed: Option<bool>,
-    #[serde(rename="trustType")]
+    #[serde(rename = "trustType")]
     trust_type: Option<String>,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct Coordinates {
     latitude: Option<f64>,
     longitude: Option<f64>,
     altitude: Option<f64>,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct Location {
     city: Option<String>,
     state: Option<String>,
-    #[serde(rename="countryOrRegion")]
+    #[serde(rename = "countryOrRegion")]
     country_or_region: Option<String>,
-    #[serde(rename="geoCoordinates")]
+    #[serde(rename = "geoCoordinates")]
     geo_coordinates: Option<Coordinates>,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct AuditLogEntry {
     id: Option<String>,
-    #[serde(rename="userPrincipalName")]
+    #[serde(rename = "userPrincipalName")]
     user_principal_name: Option<String>,
-    #[serde(rename="userId")]
+    #[serde(rename = "userId")]
     user_id: Option<String>,
-    #[serde(rename="createdDateTime")]
+    #[serde(rename = "createdDateTime")]
     created_date_time: Option<String>,
-    #[serde(rename="ipAddress")]
+    #[serde(rename = "ipAddress")]
     ip_address: Option<String>,
-    #[serde(rename="deviceDetail")]
+    #[serde(rename = "deviceDetail")]
     device_detail: Option<DeviceDetail>,
     location: Option<Location>,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct AuditLog {
-    value: Vec<Vec<AuditLogEntry>>,
+    value: Vec<AuditLogEntry>,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct AdUserWithAuditLog {
-    #[serde(rename="displayName")]
+    #[serde(rename = "displayName")]
     display_name: String,
     id: String,
-    #[serde(rename="userPrincipalName")]
+    #[serde(rename = "userPrincipalName")]
     user_principal_name: String,
-    #[serde(rename="otherMails")]
-    other_mails: Vec<String>,
+    #[serde(rename = "otherMails")]
+    other_mails: Option<Vec<String>>,
     department: Option<String>,
-    #[serde(rename="createdDateTime")]
+    #[serde(rename = "createdDateTime")]
     created_date_time: String,
-    #[serde(rename="auditLog")]
+    #[serde(rename = "auditLog")]
     audit_log: Option<AuditLog>,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct CreateUserRequest {
-    #[serde(rename="displayName")]
+    #[serde(rename = "displayName")]
     display_name: Option<String>,
-    #[serde(rename="userPrincipalName")]
+    #[serde(rename = "userPrincipalName")]
     user_principal_name: Option<String>,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct CreateUser {
     user: AdUser,
     password: String,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct UpdateCurrentUser {
-    #[serde(rename="displayName")]
+    #[serde(rename = "displayName")]
     display_name: Option<String>,
-    #[serde(rename="otherMails")]
+    #[serde(rename = "otherMails")]
     other_mails: Option<Vec<String>>,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct UpdateUser {
-    #[serde(rename="displayName")]
+    #[serde(rename = "displayName")]
     display_name: Option<String>,
-    #[serde(rename="otherMails")]
+    #[serde(rename = "otherMails")]
     other_mails: Option<Vec<String>>,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct AdGroup {
     id: String,
-    #[serde(rename="displayName")]
+    #[serde(rename = "displayName")]
     display_name: String,
     description: Option<String>,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct CreateGroup {
-    #[serde(rename="displayName")]
+    #[serde(rename = "displayName")]
     display_name: String,
     description: Option<String>,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct GroupMembership {
     id: String,
-    #[serde(rename="objectType")]
+    #[serde(rename = "objectType")]
     object_type: String,
-    #[serde(rename="displayName")]
+    #[serde(rename = "displayName")]
     display_name: String,
-    #[serde(rename="otherMails")]
+    #[serde(rename = "otherMails")]
     other_mails: Option<Vec<String>>,
     department: Option<String>,
-    #[serde(rename="createdDateTime")]
+    #[serde(rename = "createdDateTime")]
     created_date_time: Option<String>,
 }
 
@@ -184,12 +184,8 @@ pub struct GroupMembership {
 ///
 /// Returns
 /// * Details of the specified principal
-pub async fn get_principal(
-    ctx: &dyn RequestContext,
-    id: Uuid,
-) -> Result<Principal, Error> {
-    let path = "/v1/api/uldirectory/v1/principal/:id"
-        .replace(":id", &id.to_string());
+pub async fn get_principal(ctx: &dyn RequestContext, id: Uuid) -> Result<Principal, Error> {
+    let path = "/v1/api/uldirectory/v1/principal/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }
@@ -203,23 +199,19 @@ pub async fn get_principal(
 ///
 /// Returns
 /// * Details of all the specified principals
-pub async fn get_principals(
-    ctx: &dyn RequestContext,
-    ids: &str,
-) -> Result<Vec<Principal>, Error> {
-    let path = "/v1/api/uldirectory/v1/principal/:ids"
-        .replace(":ids", ids);
+pub async fn get_principals(ctx: &dyn RequestContext, ids: &str) -> Result<Vec<Principal>, Error> {
+    let path = "/v1/api/uldirectory/v1/principal/:ids".replace(":ids", ids);
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }
 
 /// Queries for principals. The query is performed as a substring match against the following fields:
-/// 
+///
 /// For users:
 /// - displayName
 /// - id
 /// - otherMails
-/// 
+///
 /// For groups:
 /// - displayName
 /// - id
@@ -236,8 +228,7 @@ pub async fn query_principals(
     ctx: &dyn RequestContext,
     query: &str,
 ) -> Result<Vec<Principal>, Error> {
-    let path = "/v1/api/uldirectory/v1/principals/:query"
-        .replace(":query", query);
+    let path = "/v1/api/uldirectory/v1/principals/:query".replace(":query", query);
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }
@@ -250,9 +241,7 @@ pub async fn query_principals(
 ///
 /// Returns
 /// * Details of all specified users.
-pub async fn get_users(
-    ctx: &dyn RequestContext,
-) -> Result<Vec<AdUser>, Error> {
+pub async fn get_users(ctx: &dyn RequestContext) -> Result<Vec<AdUser>, Error> {
     let path = "/v1/api/uldirectory/v1/users";
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
@@ -266,9 +255,7 @@ pub async fn get_users(
 ///
 /// Returns
 /// * The list of users including their IDs and their display names
-pub async fn get_users_display_names(
-    ctx: &dyn RequestContext,
-) -> Result<Vec<DisplayNames>, Error> {
+pub async fn get_users_display_names(ctx: &dyn RequestContext) -> Result<Vec<DisplayNames>, Error> {
     let path = "/v1/api/uldirectory/v1/users/display_names";
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
@@ -289,8 +276,11 @@ pub async fn get_current_user(
 ) -> Result<AdUserWithAuditLog, Error> {
     let path = "/v1/api/uldirectory/v1/user";
     let mut params = ParamMap::new();
-    if let Some(val) = audit_log { 
-        params.insert("audit_log".to_owned(), if val { "true" } else  { "false" }.to_owned());
+    if let Some(val) = audit_log {
+        params.insert(
+            "audit_log".to_owned(),
+            if val { "true" } else { "false" }.to_owned(),
+        );
     }
 
     let res = ctx.get(&path, Some(params), None).await?;
@@ -312,7 +302,9 @@ pub async fn create_user(
 ) -> Result<CreateUser, Error> {
     let path = "/v1/api/uldirectory/v1/user";
     let body = Bytes::from(serde_json::to_vec(&create_user_request)?);
-    let res = ctx.post(&path, body, "application/json", None, None).await?;
+    let res = ctx
+        .post(&path, body, "application/json", None, None)
+        .await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }
 
@@ -347,11 +339,13 @@ pub async fn get_user(
     id: Uuid,
     audit_log: Option<bool>,
 ) -> Result<AdUserWithAuditLog, Error> {
-    let path = "/v1/api/uldirectory/v1/user/:id"
-        .replace(":id", &id.to_string());
+    let path = "/v1/api/uldirectory/v1/user/:id".replace(":id", &id.to_string());
     let mut params = ParamMap::new();
-    if let Some(val) = audit_log { 
-        params.insert("audit_log".to_owned(), if val { "true" } else  { "false" }.to_owned());
+    if let Some(val) = audit_log {
+        params.insert(
+            "audit_log".to_owned(),
+            if val { "true" } else { "false" }.to_owned(),
+        );
     }
 
     let res = ctx.get(&path, Some(params), None).await?;
@@ -370,8 +364,7 @@ pub async fn update_user(
     id: Uuid,
     update_user_request: UpdateUser,
 ) -> Result<(), Error> {
-    let path = "/v1/api/uldirectory/v1/user/:id"
-        .replace(":id", &id.to_string());
+    let path = "/v1/api/uldirectory/v1/user/:id".replace(":id", &id.to_string());
     let body = Bytes::from(serde_json::to_vec(&update_user_request)?);
     ctx.put(&path, body, "application/json", None, None).await?;
     Ok(())
@@ -383,12 +376,8 @@ pub async fn update_user(
 ///
 /// * `ctx` - A request context object
 /// * `id` - The ID of the user to delete
-pub async fn delete_user(
-    ctx: &dyn RequestContext,
-    id: Uuid,
-) -> Result<(), Error> {
-    let path = "/v1/api/uldirectory/v1/user/:id"
-        .replace(":id", &id.to_string());
+pub async fn delete_user(ctx: &dyn RequestContext, id: Uuid) -> Result<(), Error> {
+    let path = "/v1/api/uldirectory/v1/user/:id".replace(":id", &id.to_string());
     ctx.delete(&path, None, None).await?;
     Ok(())
 }
@@ -401,9 +390,7 @@ pub async fn delete_user(
 ///
 /// Returns
 /// * A list of all the groups from the directory for which the current user is allowed to see.
-pub async fn get_groups(
-    ctx: &dyn RequestContext,
-) -> Result<Vec<AdGroup>, Error> {
+pub async fn get_groups(ctx: &dyn RequestContext) -> Result<Vec<AdGroup>, Error> {
     let path = "/v1/api/uldirectory/v1/group";
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
@@ -424,7 +411,9 @@ pub async fn create_group(
 ) -> Result<AdGroup, Error> {
     let path = "/v1/api/uldirectory/v1/group";
     let body = Bytes::from(serde_json::to_vec(&create_group_request)?);
-    let res = ctx.post(&path, body, "application/json", None, None).await?;
+    let res = ctx
+        .post(&path, body, "application/json", None, None)
+        .await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }
 
@@ -441,8 +430,7 @@ pub async fn get_group_members(
     ctx: &dyn RequestContext,
     id: Uuid,
 ) -> Result<Vec<GroupMembership>, Error> {
-    let path = "/v1/api/uldirectory/v1/group/:id/members"
-        .replace(":id", &id.to_string());
+    let path = "/v1/api/uldirectory/v1/group/:id/members".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }
@@ -453,12 +441,8 @@ pub async fn get_group_members(
 ///
 /// * `ctx` - A request context object
 /// * `id` - The ID of the group to delete
-pub async fn delete_group(
-    ctx: &dyn RequestContext,
-    id: Uuid,
-) -> Result<(), Error> {
-    let path = "/v1/api/uldirectory/v1/group/:id"
-        .replace(":id", &id.to_string());
+pub async fn delete_group(ctx: &dyn RequestContext, id: Uuid) -> Result<(), Error> {
+    let path = "/v1/api/uldirectory/v1/group/:id".replace(":id", &id.to_string());
     ctx.delete(&path, None, None).await?;
     Ok(())
 }
@@ -502,320 +486,399 @@ pub async fn remove_group_member(
     Ok(())
 }
 
-
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-    use crate::request_context::ApiKeyContext;
-    use crate::keys::Key;
-    use crate::{Region, Environment};
     use super::*;
+    use crate::keys::Key as SigningKey;
+    use crate::request_context::{ApiKeyContext, TestContext};
+    use crate::{Environment, Region};
+    use std::str::FromStr;
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_principal() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        get_principal(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = Principal::default();
+        let expected_bytes = serde_json::to_vec(&expected).unwrap();
+        ctx.set_response(expected_bytes);
+        let result = get_principal(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_principals() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = "";
-
-        get_principals(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+        let mut expected = Vec::with_capacity(5);
+        for i in 0..5 {
+            expected.push(Principal::default());
+        }
+        let expected_bytes = serde_json::to_vec(&expected).unwrap();
+        ctx.set_response(expected_bytes);
+        let result = get_principals(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_query_principals() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = "";
-
-        query_principals(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+        let mut expected = Vec::with_capacity(5);
+        for i in 0..5 {
+            expected.push(Principal::default());
+        }
+        let expected_bytes = serde_json::to_vec(&expected).unwrap();
+        ctx.set_response(expected_bytes);
+        let result = query_principals(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_users() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-
-        get_users(
-            &ctx,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let mut expected = Vec::with_capacity(5);
+        for i in 0..5 {
+            expected.push(AdUser::default());
+        }
+        let expected_bytes = serde_json::to_vec(&expected).unwrap();
+        ctx.set_response(expected_bytes);
+        let result = get_users(&ctx).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_users_display_names() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-
-        get_users_display_names(
-            &ctx,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let mut expected = Vec::with_capacity(5);
+        for i in 0..5 {
+            expected.push(DisplayNames::default());
+        }
+        let expected_bytes = serde_json::to_vec(&expected).unwrap();
+        ctx.set_response(expected_bytes);
+        let result = get_users_display_names(&ctx).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_current_user() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = None;
-
-        get_current_user(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let q0 = true;
+        let q0 = Some(q0);
+        let expected = AdUserWithAuditLog::default();
+        let expected_bytes = serde_json::to_vec(&expected).unwrap();
+        ctx.set_response(expected_bytes);
+        let result = get_current_user(&ctx, q0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_create_user() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = CreateUserRequest::default();
-
-        create_user(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let body = CreateUserRequest::default();
+        let expected = CreateUser::default();
+        let expected_bytes = serde_json::to_vec(&expected).unwrap();
+        ctx.set_response(expected_bytes);
+        let result = create_user(&ctx, body).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_update_current_user() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = UpdateCurrentUser::default();
-
-        update_current_user(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let body = UpdateCurrentUser::default();
+        update_current_user(&ctx, body).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_user() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = None;
-
-        get_user(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let q0 = true;
+        let q0 = Some(q0);
+        let expected = AdUserWithAuditLog::default();
+        let expected_bytes = serde_json::to_vec(&expected).unwrap();
+        ctx.set_response(expected_bytes);
+        let result = get_user(&ctx, p0, q0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_update_user() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = UpdateUser::default();
-
-        update_user(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let body = UpdateUser::default();
+        update_user(&ctx, p0, body).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_delete_user() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        delete_user(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        delete_user(&ctx, p0).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_groups() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-
-        get_groups(
-            &ctx,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let mut expected = Vec::with_capacity(5);
+        for i in 0..5 {
+            expected.push(AdGroup::default());
+        }
+        let expected_bytes = serde_json::to_vec(&expected).unwrap();
+        ctx.set_response(expected_bytes);
+        let result = get_groups(&ctx).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_create_group() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = CreateGroup::default();
-
-        create_group(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let body = CreateGroup::default();
+        let expected = AdGroup::default();
+        let expected_bytes = serde_json::to_vec(&expected).unwrap();
+        ctx.set_response(expected_bytes);
+        let result = create_group(&ctx, body).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_group_members() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        get_group_members(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let mut expected = Vec::with_capacity(5);
+        for i in 0..5 {
+            expected.push(GroupMembership::default());
+        }
+        let expected_bytes = serde_json::to_vec(&expected).unwrap();
+        ctx.set_response(expected_bytes);
+        let result = get_group_members(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_delete_group() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        delete_group(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        delete_group(&ctx, p0).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_add_group_member() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = Uuid::nil();
-
-        add_group_member(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        add_group_member(&ctx, p0, p1).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_remove_group_member() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = Uuid::nil();
-
-        remove_group_member(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        remove_group_member(&ctx, p0, p1).await.unwrap();
     }
 }

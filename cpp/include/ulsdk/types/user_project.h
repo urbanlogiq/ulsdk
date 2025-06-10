@@ -59,6 +59,10 @@ struct CategoryFilter {
     CategoryFilter();
     CategoryFilter(const ::CategoryFilter *root);
     CategoryFilter(const std::vector<uint8_t> &bytes);
+    bool operator==(const CategoryFilter &rhs) const;
+    bool operator!=(const CategoryFilter &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct RangeFilter {
@@ -70,6 +74,10 @@ struct RangeFilter {
     RangeFilter();
     RangeFilter(const ::RangeFilter *root);
     RangeFilter(const std::vector<uint8_t> &bytes);
+    bool operator==(const RangeFilter &rhs) const;
+    bool operator!=(const RangeFilter &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct RelationshipRangeFilter {
@@ -83,6 +91,10 @@ struct RelationshipRangeFilter {
     RelationshipRangeFilter();
     RelationshipRangeFilter(const ::RelationshipRangeFilter *root);
     RelationshipRangeFilter(const std::vector<uint8_t> &bytes);
+    bool operator==(const RelationshipRangeFilter &rhs) const;
+    bool operator!=(const RelationshipRangeFilter &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct DataStateGeometrySource {
@@ -91,6 +103,10 @@ struct DataStateGeometrySource {
     DataStateGeometrySource();
     DataStateGeometrySource(const ::DataStateGeometrySource *root);
     DataStateGeometrySource(const std::vector<uint8_t> &bytes);
+    bool operator==(const DataStateGeometrySource &rhs) const;
+    bool operator!=(const DataStateGeometrySource &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct RawGeometrySource {
@@ -99,6 +115,10 @@ struct RawGeometrySource {
     RawGeometrySource();
     RawGeometrySource(const ::RawGeometrySource *root);
     RawGeometrySource(const std::vector<uint8_t> &bytes);
+    bool operator==(const RawGeometrySource &rhs) const;
+    bool operator!=(const RawGeometrySource &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ColumnGroup {
@@ -111,6 +131,10 @@ struct ColumnGroup {
     ColumnGroup();
     ColumnGroup(const ::ColumnGroup *root);
     ColumnGroup(const std::vector<uint8_t> &bytes);
+    bool operator==(const ColumnGroup &rhs) const;
+    bool operator!=(const ColumnGroup &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct DeprecatedDataStateJoin {
@@ -122,6 +146,10 @@ struct DeprecatedDataStateJoin {
     DeprecatedDataStateJoin();
     DeprecatedDataStateJoin(const ::DeprecatedDataStateJoin *root);
     DeprecatedDataStateJoin(const std::vector<uint8_t> &bytes);
+    bool operator==(const DeprecatedDataStateJoin &rhs) const;
+    bool operator!=(const DeprecatedDataStateJoin &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct FieldFilter {
@@ -130,6 +158,10 @@ struct FieldFilter {
     FieldFilter();
     FieldFilter(const ::FieldFilter *root);
     FieldFilter(const std::vector<uint8_t> &bytes);
+    bool operator==(const FieldFilter &rhs) const;
+    bool operator!=(const FieldFilter &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct JoinStackEntry {
@@ -141,6 +173,10 @@ struct JoinStackEntry {
     JoinStackEntry();
     JoinStackEntry(const ::JoinStackEntry *root);
     JoinStackEntry(const std::vector<uint8_t> &bytes);
+    bool operator==(const JoinStackEntry &rhs) const;
+    bool operator!=(const JoinStackEntry &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct RawGeometrySourceGeom {
@@ -149,6 +185,10 @@ struct RawGeometrySourceGeom {
     RawGeometrySourceGeom();
     RawGeometrySourceGeom(const ::RawGeometrySourceGeom *root);
     RawGeometrySourceGeom(const std::vector<uint8_t> &bytes);
+    bool operator==(const RawGeometrySourceGeom &rhs) const;
+    bool operator!=(const RawGeometrySourceGeom &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct StackableDataStateJoin {
@@ -161,6 +201,10 @@ struct StackableDataStateJoin {
     StackableDataStateJoin();
     StackableDataStateJoin(const ::StackableDataStateJoin *root);
     StackableDataStateJoin(const std::vector<uint8_t> &bytes);
+    bool operator==(const StackableDataStateJoin &rhs) const;
+    bool operator!=(const StackableDataStateJoin &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct UserLayer {
@@ -173,6 +217,10 @@ struct UserLayer {
     UserLayer();
     UserLayer(const ::UserLayer *root);
     UserLayer(const std::vector<uint8_t> &bytes);
+    bool operator==(const UserLayer &rhs) const;
+    bool operator!=(const UserLayer &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct UserLayerDataState {
@@ -184,6 +232,10 @@ struct UserLayerDataState {
     UserLayerDataState();
     UserLayerDataState(const ::UserLayerDataState *root);
     UserLayerDataState(const std::vector<uint8_t> &bytes);
+    bool operator==(const UserLayerDataState &rhs) const;
+    bool operator!=(const UserLayerDataState &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct UserProject {
@@ -194,6 +246,10 @@ struct UserProject {
     UserProject();
     UserProject(const ::UserProject *root);
     UserProject(const std::vector<uint8_t> &bytes);
+    bool operator==(const UserProject &rhs) const;
+    bool operator!=(const UserProject &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::pair<::flatbuffers::Offset<void>, ::Filter>

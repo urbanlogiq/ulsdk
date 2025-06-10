@@ -87,6 +87,16 @@ test_distinct() {
 TypeTest test_distinct_obj(test_distinct, "Distinct");
 
 bool
+test_drive() {
+    ::ul::types::Drive t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::Drive deserialized = ::ul::types::Drive(bytes);
+    return true;
+}
+
+TypeTest test_drive_obj(test_drive, "Drive");
+
+bool
 test_expr() {
     ::ul::types::Expr t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);

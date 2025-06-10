@@ -50,6 +50,10 @@ struct EmbeddedTable {
     EmbeddedTable();
     EmbeddedTable(const ::EmbeddedTable *root);
     EmbeddedTable(const std::vector<uint8_t> &bytes);
+    bool operator==(const EmbeddedTable &rhs) const;
+    bool operator!=(const EmbeddedTable &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct DeprecatedRunSpec {
@@ -61,6 +65,10 @@ struct DeprecatedRunSpec {
     DeprecatedRunSpec();
     DeprecatedRunSpec(const ::DeprecatedRunSpec *root);
     DeprecatedRunSpec(const std::vector<uint8_t> &bytes);
+    bool operator==(const DeprecatedRunSpec &rhs) const;
+    bool operator!=(const DeprecatedRunSpec &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct DeprecatedTaskParameter {
@@ -72,6 +80,10 @@ struct DeprecatedTaskParameter {
     DeprecatedTaskParameter();
     DeprecatedTaskParameter(const ::DeprecatedTaskParameter *root);
     DeprecatedTaskParameter(const std::vector<uint8_t> &bytes);
+    bool operator==(const DeprecatedTaskParameter &rhs) const;
+    bool operator!=(const DeprecatedTaskParameter &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Edge {
@@ -81,6 +93,10 @@ struct Edge {
     Edge();
     Edge(const ::Edge *root);
     Edge(const std::vector<uint8_t> &bytes);
+    bool operator==(const Edge &rhs) const;
+    bool operator!=(const Edge &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Job {
@@ -94,6 +110,10 @@ struct Job {
     Job();
     Job(const ::Job *root);
     Job(const std::vector<uint8_t> &bytes);
+    bool operator==(const Job &rhs) const;
+    bool operator!=(const Job &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Node {
@@ -103,6 +123,10 @@ struct Node {
     Node();
     Node(const ::Node *root);
     Node(const std::vector<uint8_t> &bytes);
+    bool operator==(const Node &rhs) const;
+    bool operator!=(const Node &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ParamIndices {
@@ -111,6 +135,10 @@ struct ParamIndices {
     ParamIndices();
     ParamIndices(const ::ParamIndices *root);
     ParamIndices(const std::vector<uint8_t> &bytes);
+    bool operator==(const ParamIndices &rhs) const;
+    bool operator!=(const ParamIndices &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -134,6 +162,10 @@ struct RunSpec {
     RunSpec();
     RunSpec(const ::RunSpec *root);
     RunSpec(const std::vector<uint8_t> &bytes);
+    bool operator==(const RunSpec &rhs) const;
+    bool operator!=(const RunSpec &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Schematic {
@@ -145,6 +177,10 @@ struct Schematic {
     Schematic();
     Schematic(const ::Schematic *root);
     Schematic(const std::vector<uint8_t> &bytes);
+    bool operator==(const Schematic &rhs) const;
+    bool operator!=(const Schematic &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Task {
@@ -174,6 +210,10 @@ struct Task {
     Task();
     Task(const ::Task *root);
     Task(const std::vector<uint8_t> &bytes);
+    bool operator==(const Task &rhs) const;
+    bool operator!=(const Task &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct TaskList {
@@ -182,6 +222,10 @@ struct TaskList {
     TaskList();
     TaskList(const ::TaskList *root);
     TaskList(const std::vector<uint8_t> &bytes);
+    bool operator==(const TaskList &rhs) const;
+    bool operator!=(const TaskList &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct TaskParameter {
@@ -191,6 +235,10 @@ struct TaskParameter {
     TaskParameter();
     TaskParameter(const ::TaskParameter *root);
     TaskParameter(const std::vector<uint8_t> &bytes);
+    bool operator==(const TaskParameter &rhs) const;
+    bool operator!=(const TaskParameter &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::pair<::flatbuffers::Offset<void>, ::TaskParameterValue>

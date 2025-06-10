@@ -166,6 +166,47 @@ DataCatalogObject::DataCatalogObject(const ::DataCatalogObject *root)
     version_ = root->version();
 }
 
+bool
+DataCatalogObject::operator==(const DataCatalogObject &rhs) const {
+    if (this->attributes_ != rhs.attributes_) {
+        return false;
+    }
+    if (this->comment_ != rhs.comment_) {
+        return false;
+    }
+    if (this->default_mode_ != rhs.default_mode_) {
+        return false;
+    }
+    if (this->flags_ != rhs.flags_) {
+        return false;
+    }
+    if (this->obj_ != rhs.obj_) {
+        return false;
+    }
+    if (this->parents_ != rhs.parents_) {
+        return false;
+    }
+    if (this->signature_ != rhs.signature_) {
+        return false;
+    }
+    if (this->tags_ != rhs.tags_) {
+        return false;
+    }
+    if (this->time_ != rhs.time_) {
+        return false;
+    }
+    if (this->ty_ != rhs.ty_) {
+        return false;
+    }
+    if (this->user_ != rhs.user_) {
+        return false;
+    }
+    if (this->version_ != rhs.version_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::ObjectIdList>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ObjectIdList &o) {
     std::vector<::flatbuffers::Offset<::ObjectId>> ids_offsets = std::vector<::flatbuffers::Offset<::ObjectId>>();
@@ -209,6 +250,14 @@ ObjectIdList::ObjectIdList(const ::ObjectIdList *root)
             ids_.emplace_back(i);
         }
     }
+}
+
+bool
+ObjectIdList::operator==(const ObjectIdList &rhs) const {
+    if (this->ids_ != rhs.ids_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::ObjectIdPair>
@@ -263,6 +312,17 @@ ObjectIdPair::ObjectIdPair(const ::ObjectIdPair *root)
     }
 }
 
+bool
+ObjectIdPair::operator==(const ObjectIdPair &rhs) const {
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->object_ != rhs.object_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::ObjectIdPairList>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ObjectIdPairList &o) {
     std::vector<::flatbuffers::Offset<::ObjectIdPair>> pairs_offsets = std::vector<::flatbuffers::Offset<::ObjectIdPair>>();
@@ -306,6 +366,14 @@ ObjectIdPairList::ObjectIdPairList(const ::ObjectIdPairList *root)
             pairs_.emplace_back(i);
         }
     }
+}
+
+bool
+ObjectIdPairList::operator==(const ObjectIdPairList &rhs) const {
+    if (this->pairs_ != rhs.pairs_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::ObjectSummary>
@@ -376,6 +444,29 @@ ObjectSummary::ObjectSummary(const ::ObjectSummary *root)
     ty_ = root->ty();
 }
 
+bool
+ObjectSummary::operator==(const ObjectSummary &rhs) const {
+    if (this->acl_ != rhs.acl_) {
+        return false;
+    }
+    if (this->drive_size_ != rhs.drive_size_) {
+        return false;
+    }
+    if (this->head_revision_ != rhs.head_revision_) {
+        return false;
+    }
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->time_ != rhs.time_) {
+        return false;
+    }
+    if (this->ty_ != rhs.ty_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::ObjectSummaryList>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ObjectSummaryList &o) {
     std::vector<::flatbuffers::Offset<::ObjectSummary>> pairs_offsets = std::vector<::flatbuffers::Offset<::ObjectSummary>>();
@@ -419,6 +510,14 @@ ObjectSummaryList::ObjectSummaryList(const ::ObjectSummaryList *root)
             pairs_.emplace_back(i);
         }
     }
+}
+
+bool
+ObjectSummaryList::operator==(const ObjectSummaryList &rhs) const {
+    if (this->pairs_ != rhs.pairs_) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace types

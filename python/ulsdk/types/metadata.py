@@ -10,6 +10,7 @@ from flatbuffers.util import RemoveSizePrefix
 from typing import Union, List, Optional, Self, Tuple
 from .Schema import (
     Binary,
+    BinaryView,
     Bool,
     Buffer,
     Date,
@@ -30,12 +31,15 @@ from .Schema import (
     KeyValue,
     LargeBinary,
     LargeList,
+    LargeListView,
     LargeUtf8,
     List_,
+    ListView,
     Map,
     MetadataVersion,
     Null,
     Precision,
+    RunEndEncoded,
     Schema,
     Struct_,
     Time,
@@ -45,10 +49,12 @@ from .Schema import (
     Union_,
     UnionMode,
     Utf8,
+    Utf8View,
 )
 from .api import SortOrder
 from .data import (
     AttributePair,
+    BinaryYesNo,
     DayOfWeek,
     DirectionAndRoadName,
     DirectionAndRoadNames,
@@ -138,6 +144,7 @@ from .value import (
 from .generated.AttributePair import AttributePair as FbsAttributePair
 from .generated.B2cId import B2cId as FbsB2cId
 from .generated.Binary import Binary as FbsBinary
+from .generated.BinaryView import BinaryView as FbsBinaryView
 from .generated.Bool import Bool as FbsBool
 from .generated.Buffer import Buffer as FbsBuffer
 from .generated.CategoryRelationshipData import CategoryRelationshipData as FbsCategoryRelationshipData
@@ -185,9 +192,11 @@ from .generated.Interval import Interval as FbsInterval
 from .generated.KeyValue import KeyValue as FbsKeyValue
 from .generated.LargeBinary import LargeBinary as FbsLargeBinary
 from .generated.LargeList import LargeList as FbsLargeList
+from .generated.LargeListView import LargeListView as FbsLargeListView
 from .generated.LargeUtf8 import LargeUtf8 as FbsLargeUtf8
 from .generated.Line import Line as FbsLine
 from .generated.List import List as FbsList
+from .generated.ListView import ListView as FbsListView
 from .generated.Map import Map as FbsMap
 from .generated.Metadata import Metadata as FbsMetadata
 from .generated.MultiLine import MultiLine as FbsMultiLine
@@ -213,6 +222,7 @@ from .generated.Polygon import Polygon as FbsPolygon
 from .generated.Projection import Projection as FbsProjection
 from .generated.QueryPathElement import QueryPathElement as FbsQueryPathElement
 from .generated.RawGeom import RawGeom as FbsRawGeom
+from .generated.RunEndEncoded import RunEndEncoded as FbsRunEndEncoded
 from .generated.Schema import Schema as FbsSchema
 from .generated.Source import Source as FbsSource
 from .generated.StreamId import StreamId as FbsStreamId
@@ -229,6 +239,7 @@ from .generated.UlField import UlField as FbsUlField
 from .generated.UlFieldRelationship import UlFieldRelationship as FbsUlFieldRelationship
 from .generated.Union import Union as FbsUnion
 from .generated.Utf8 import Utf8 as FbsUtf8
+from .generated.Utf8View import Utf8View as FbsUtf8View
 from .generated.VArray import VArray as FbsVArray
 from .generated.VBool import VBool as FbsVBool
 from .generated.VBytes import VBytes as FbsVBytes

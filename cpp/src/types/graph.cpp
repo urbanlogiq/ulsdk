@@ -77,6 +77,20 @@ GeomOp::GeomOp(const ::GeomOp *root)
     predicate_ = root->predicate();
 }
 
+bool
+GeomOp::operator==(const GeomOp &rhs) const {
+    if (this->geoms_ != rhs.geoms_) {
+        return false;
+    }
+    if (this->op_ != rhs.op_) {
+        return false;
+    }
+    if (this->predicate_ != rhs.predicate_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::NodeQuery>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NodeQuery &o) {
     std::optional<::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>>> descriptions_offset = std::nullopt;
@@ -233,6 +247,29 @@ NodeQuery::NodeQuery(const ::NodeQuery *root)
     }
 }
 
+bool
+NodeQuery::operator==(const NodeQuery &rhs) const {
+    if (this->descriptions_ != rhs.descriptions_) {
+        return false;
+    }
+    if (this->entity_tys_ != rhs.entity_tys_) {
+        return false;
+    }
+    if (this->geom_op_ != rhs.geom_op_) {
+        return false;
+    }
+    if (this->node_ids_ != rhs.node_ids_) {
+        return false;
+    }
+    if (this->projections_ != rhs.projections_) {
+        return false;
+    }
+    if (this->stream_ids_ != rhs.stream_ids_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::EdgeQuery>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const EdgeQuery &o) {
 
@@ -264,6 +301,14 @@ EdgeQuery::EdgeQuery(const ::EdgeQuery *root)
     }
 
     edge_ty_ = root->edge_ty();
+}
+
+bool
+EdgeQuery::operator==(const EdgeQuery &rhs) const {
+    if (this->edge_ty_ != rhs.edge_ty_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::EdgeList>
@@ -309,6 +354,14 @@ EdgeList::EdgeList(const ::EdgeList *root)
             edges_.emplace_back(i);
         }
     }
+}
+
+bool
+EdgeList::operator==(const EdgeList &rhs) const {
+    if (this->edges_ != rhs.edges_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Geom>
@@ -379,6 +432,14 @@ Geom::Geom(const ::Geom *root)
             default: throw std::runtime_error("unknown union variant");
         }
     }
+}
+
+bool
+Geom::operator==(const Geom &rhs) const {
+    if (this->geom_ != rhs.geom_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::GraphQuery>
@@ -455,6 +516,20 @@ GraphQuery::GraphQuery(const ::GraphQuery *root)
     }
 }
 
+bool
+GraphQuery::operator==(const GraphQuery &rhs) const {
+    if (this->limit_ != rhs.limit_) {
+        return false;
+    }
+    if (this->order_by_ != rhs.order_by_) {
+        return false;
+    }
+    if (this->path_ != rhs.path_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::NodeIdPair>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NodeIdPair &o) {
     const ::flatbuffers::Offset<::GraphNodeId> node_id_offset = serialize_to(builder, o.node_id_);
@@ -504,6 +579,17 @@ NodeIdPair::NodeIdPair(const ::NodeIdPair *root)
     }
 }
 
+bool
+NodeIdPair::operator==(const NodeIdPair &rhs) const {
+    if (this->node_id_ != rhs.node_id_) {
+        return false;
+    }
+    if (this->stream_id_ != rhs.stream_id_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::NodeList>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NodeList &o) {
     std::vector<::flatbuffers::Offset<::GraphNode>> nodes_offsets = std::vector<::flatbuffers::Offset<::GraphNode>>();
@@ -549,6 +635,14 @@ NodeList::NodeList(const ::NodeList *root)
     }
 }
 
+bool
+NodeList::operator==(const NodeList &rhs) const {
+    if (this->nodes_ != rhs.nodes_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::OrderBy>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const OrderBy &o) {
     const ::flatbuffers::Offset<::flatbuffers::String> field_offset = builder.CreateString(o.field_);
@@ -591,6 +685,20 @@ OrderBy::OrderBy(const ::OrderBy *root)
     transform_ = root->transform();
 }
 
+bool
+OrderBy::operator==(const OrderBy &rhs) const {
+    if (this->field_ != rhs.field_) {
+        return false;
+    }
+    if (this->sort_ != rhs.sort_) {
+        return false;
+    }
+    if (this->transform_ != rhs.transform_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Projection>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Projection &o) {
     const ::flatbuffers::Offset<::flatbuffers::String> alias_offset = builder.CreateString(o.alias_);
@@ -627,6 +735,17 @@ Projection::Projection(const ::Projection *root)
 
         alias_ = std::string(*root->alias()->begin(), *root->alias()->end());
     predicate_ = root->predicate();
+}
+
+bool
+Projection::operator==(const Projection &rhs) const {
+    if (this->alias_ != rhs.alias_) {
+        return false;
+    }
+    if (this->predicate_ != rhs.predicate_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::QueryPathElement>
@@ -679,6 +798,14 @@ QueryPathElement::QueryPathElement(const ::QueryPathElement *root)
             default: throw std::runtime_error("unknown union variant");
         }
     }
+}
+
+bool
+QueryPathElement::operator==(const QueryPathElement &rhs) const {
+    if (this->element_ != rhs.element_) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace types

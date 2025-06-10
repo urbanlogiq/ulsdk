@@ -77,6 +77,14 @@ ByteArray::ByteArray(const ::ByteArray *root)
     }
 }
 
+bool
+ByteArray::operator==(const ByteArray &rhs) const {
+    if (this->b_ != rhs.b_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::ParameterFlags>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ParameterFlags &o) {
 
@@ -108,6 +116,14 @@ ParameterFlags::ParameterFlags(const ::ParameterFlags *root)
     }
 
     flags_ = root->flags();
+}
+
+bool
+ParameterFlags::operator==(const ParameterFlags &rhs) const {
+    if (this->flags_ != rhs.flags_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Layout>
@@ -153,6 +169,23 @@ Layout::Layout(const ::Layout *root)
     width_ = root->width();
     x_ = root->x();
     y_ = root->y();
+}
+
+bool
+Layout::operator==(const Layout &rhs) const {
+    if (this->height_ != rhs.height_) {
+        return false;
+    }
+    if (this->width_ != rhs.width_) {
+        return false;
+    }
+    if (this->x_ != rhs.x_) {
+        return false;
+    }
+    if (this->y_ != rhs.y_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::TileSettings>
@@ -265,6 +298,53 @@ TileSettings::TileSettings(const ::TileSettings *root)
     values_format_ = root->values_format();
 }
 
+bool
+TileSettings::operator==(const TileSettings &rhs) const {
+    if (this->aggregation_ != rhs.aggregation_) {
+        return false;
+    }
+    if (this->category_ != rhs.category_) {
+        return false;
+    }
+    if (this->chart_type_ != rhs.chart_type_) {
+        return false;
+    }
+    if (this->field_name_ != rhs.field_name_) {
+        return false;
+    }
+    if (this->group_others_ != rhs.group_others_) {
+        return false;
+    }
+    if (this->is_record_count_tile_ != rhs.is_record_count_tile_) {
+        return false;
+    }
+    if (this->is_relationship_field_ != rhs.is_relationship_field_) {
+        return false;
+    }
+    if (this->metadata_id_ != rhs.metadata_id_) {
+        return false;
+    }
+    if (this->output_stream_index_ != rhs.output_stream_index_) {
+        return false;
+    }
+    if (this->record_count_stream_id_ != rhs.record_count_stream_id_) {
+        return false;
+    }
+    if (this->selected_columns_ != rhs.selected_columns_) {
+        return false;
+    }
+    if (this->text_tile_font_size_ != rhs.text_tile_font_size_) {
+        return false;
+    }
+    if (this->title_ != rhs.title_) {
+        return false;
+    }
+    if (this->values_format_ != rhs.values_format_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::TileData>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TileData &o) {
     const ::flatbuffers::Offset<::Layout> layout_offset = serialize_to(builder, o.layout_);
@@ -306,6 +386,17 @@ TileData::TileData(const ::TileData *root)
     if (root->tile_settings() != nullptr) {
         tile_settings_ = decltype(tile_settings_)(root->tile_settings());
     }
+}
+
+bool
+TileData::operator==(const TileData &rhs) const {
+    if (this->layout_ != rhs.layout_) {
+        return false;
+    }
+    if (this->tile_settings_ != rhs.tile_settings_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::UserSettings>
@@ -355,6 +446,17 @@ UserSettings::UserSettings(const ::UserSettings *root)
             tile_data_.emplace_back(i);
         }
     }
+}
+
+bool
+UserSettings::operator==(const UserSettings &rhs) const {
+    if (this->is_template_ != rhs.is_template_) {
+        return false;
+    }
+    if (this->tile_data_ != rhs.tile_data_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::WorkLog>
@@ -502,6 +604,35 @@ WorkLog::WorkLog(const ::WorkLog *root)
     }
 }
 
+bool
+WorkLog::operator==(const WorkLog &rhs) const {
+    if (this->input_streams_ != rhs.input_streams_) {
+        return false;
+    }
+    if (this->job_id_ != rhs.job_id_) {
+        return false;
+    }
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->output_streams_ != rhs.output_streams_) {
+        return false;
+    }
+    if (this->params_ != rhs.params_) {
+        return false;
+    }
+    if (this->parent_ != rhs.parent_) {
+        return false;
+    }
+    if (this->schematic_ != rhs.schematic_) {
+        return false;
+    }
+    if (this->user_settings_ != rhs.user_settings_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::WorklogParameter>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const WorklogParameter &o) {
     const ::flatbuffers::Offset<::flatbuffers::String> key_offset = builder.CreateString(o.key_);
@@ -576,6 +707,17 @@ WorklogParameter::WorklogParameter(const ::WorklogParameter *root)
             default: throw std::runtime_error("unknown union variant");
         }
     }
+}
+
+bool
+WorklogParameter::operator==(const WorklogParameter &rhs) const {
+    if (this->key_ != rhs.key_) {
+        return false;
+    }
+    if (this->value_ != rhs.value_) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace types

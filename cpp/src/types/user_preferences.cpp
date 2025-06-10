@@ -98,5 +98,28 @@ UserPreferences::UserPreferences(const ::UserPreferences *root)
     zoom_ = root->zoom();
 }
 
+bool
+UserPreferences::operator==(const UserPreferences &rhs) const {
+    if (this->center_ != rhs.center_) {
+        return false;
+    }
+    if (this->default_area_report_template_ != rhs.default_area_report_template_) {
+        return false;
+    }
+    if (this->homepage_usecase_id_ != rhs.homepage_usecase_id_) {
+        return false;
+    }
+    if (this->timezone_ != rhs.timezone_) {
+        return false;
+    }
+    if (this->units_ != rhs.units_) {
+        return false;
+    }
+    if (this->zoom_ != rhs.zoom_) {
+        return false;
+    }
+    return true;
+}
+
 } // namespace types
 } // namespace ul

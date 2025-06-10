@@ -73,6 +73,14 @@ Point::Point(const ::Point *root)
     }
 }
 
+bool
+Point::operator==(const Point &rhs) const {
+    if (this->point_geo_ != rhs.point_geo_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Line>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Line &o) {
     std::vector<::flatbuffers::Offset<::Point>> line_geo_offsets = std::vector<::flatbuffers::Offset<::Point>>();
@@ -116,6 +124,14 @@ Line::Line(const ::Line *root)
             line_geo_.emplace_back(i);
         }
     }
+}
+
+bool
+Line::operator==(const Line &rhs) const {
+    if (this->line_geo_ != rhs.line_geo_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::MultiLine>
@@ -163,6 +179,14 @@ MultiLine::MultiLine(const ::MultiLine *root)
     }
 }
 
+bool
+MultiLine::operator==(const MultiLine &rhs) const {
+    if (this->multiline_geo_ != rhs.multiline_geo_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Polygon>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Polygon &o) {
     std::vector<::flatbuffers::Offset<::Line>> polygon_geo_offsets = std::vector<::flatbuffers::Offset<::Line>>();
@@ -206,6 +230,14 @@ Polygon::Polygon(const ::Polygon *root)
             polygon_geo_.emplace_back(i);
         }
     }
+}
+
+bool
+Polygon::operator==(const Polygon &rhs) const {
+    if (this->polygon_geo_ != rhs.polygon_geo_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::MultiPolygon>
@@ -253,6 +285,14 @@ MultiPolygon::MultiPolygon(const ::MultiPolygon *root)
     }
 }
 
+bool
+MultiPolygon::operator==(const MultiPolygon &rhs) const {
+    if (this->multipolygon_geo_ != rhs.multipolygon_geo_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::GraphEdge>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const GraphEdge &o) {
 
@@ -292,6 +332,20 @@ GraphEdge::GraphEdge(const ::GraphEdge *root)
     _from_ = root->_from();
     _kind_ = root->_kind();
     _to_ = root->_to();
+}
+
+bool
+GraphEdge::operator==(const GraphEdge &rhs) const {
+    if (this->_from_ != rhs._from_) {
+        return false;
+    }
+    if (this->_kind_ != rhs._kind_) {
+        return false;
+    }
+    if (this->_to_ != rhs._to_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::GraphNode>
@@ -433,6 +487,35 @@ GraphNode::GraphNode(const ::GraphNode *root)
         _stream_ = decltype(_stream_)(root->_stream());
     }
     _uid_ = root->_uid();
+}
+
+bool
+GraphNode::operator==(const GraphNode &rhs) const {
+    if (this->_description_ != rhs._description_) {
+        return false;
+    }
+    if (this->_entity_type_ != rhs._entity_type_) {
+        return false;
+    }
+    if (this->_geom_ != rhs._geom_) {
+        return false;
+    }
+    if (this->_location_ != rhs._location_) {
+        return false;
+    }
+    if (this->_node_id_ != rhs._node_id_) {
+        return false;
+    }
+    if (this->_node_type_ != rhs._node_type_) {
+        return false;
+    }
+    if (this->_stream_ != rhs._stream_) {
+        return false;
+    }
+    if (this->_uid_ != rhs._uid_) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace types

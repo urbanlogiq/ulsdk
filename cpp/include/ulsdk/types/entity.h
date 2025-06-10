@@ -42,6 +42,10 @@ struct Point {
     Point();
     Point(const ::Point *root);
     Point(const std::vector<uint8_t> &bytes);
+    bool operator==(const Point &rhs) const;
+    bool operator!=(const Point &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Line {
@@ -50,6 +54,10 @@ struct Line {
     Line();
     Line(const ::Line *root);
     Line(const std::vector<uint8_t> &bytes);
+    bool operator==(const Line &rhs) const;
+    bool operator!=(const Line &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct MultiLine {
@@ -58,6 +66,10 @@ struct MultiLine {
     MultiLine();
     MultiLine(const ::MultiLine *root);
     MultiLine(const std::vector<uint8_t> &bytes);
+    bool operator==(const MultiLine &rhs) const;
+    bool operator!=(const MultiLine &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -70,6 +82,10 @@ struct Polygon {
     Polygon();
     Polygon(const ::Polygon *root);
     Polygon(const std::vector<uint8_t> &bytes);
+    bool operator==(const Polygon &rhs) const;
+    bool operator!=(const Polygon &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct MultiPolygon {
@@ -78,6 +94,10 @@ struct MultiPolygon {
     MultiPolygon();
     MultiPolygon(const ::MultiPolygon *root);
     MultiPolygon(const std::vector<uint8_t> &bytes);
+    bool operator==(const MultiPolygon &rhs) const;
+    bool operator!=(const MultiPolygon &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct GraphEdge {
@@ -88,6 +108,10 @@ struct GraphEdge {
     GraphEdge();
     GraphEdge(const ::GraphEdge *root);
     GraphEdge(const std::vector<uint8_t> &bytes);
+    bool operator==(const GraphEdge &rhs) const;
+    bool operator!=(const GraphEdge &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct GraphNode {
@@ -103,6 +127,10 @@ struct GraphNode {
     GraphNode();
     GraphNode(const ::GraphNode *root);
     GraphNode(const std::vector<uint8_t> &bytes);
+    bool operator==(const GraphNode &rhs) const;
+    bool operator!=(const GraphNode &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::pair<::flatbuffers::Offset<void>, ::Geometry>

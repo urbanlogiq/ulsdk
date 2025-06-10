@@ -39,6 +39,10 @@ struct UserPreferences {
     UserPreferences();
     UserPreferences(const ::UserPreferences *root);
     UserPreferences(const std::vector<uint8_t> &bytes);
+    bool operator==(const UserPreferences &rhs) const;
+    bool operator!=(const UserPreferences &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ::flatbuffers::Offset<::UserPreferences>

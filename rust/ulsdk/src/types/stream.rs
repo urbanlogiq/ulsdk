@@ -10,113 +10,44 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
-use flatbuffers::{WIPOffset, UnionWIPOffset};
 use bitflags::bitflags;
 use core::ops::Deref;
+use flatbuffers::{UnionWIPOffset, WIPOffset};
 
 use crate::types::Schema::{
-    Binary,
-    Bool,
-    Buffer,
-    Date,
-    DateUnit,
-    Decimal,
-    DictionaryEncoding,
-    DictionaryKind,
-    Duration,
-    Endianness,
-    Feature,
-    Field,
-    FixedSizeBinary,
-    FixedSizeList,
-    FloatingPoint,
-    Int,
-    Interval,
-    IntervalUnit,
-    KeyValue,
-    LargeBinary,
-    LargeList,
-    LargeUtf8,
-    List,
-    Map,
-    MetadataVersion,
-    Null,
-    Precision,
-    Schema,
-    Struct_,
-    Time,
-    TimeUnit,
-    Timestamp,
-    Type,
-    Union,
-    UnionMode,
-    Utf8,
-};
-use crate::types::id::{
-    B2cId,
-    ColumnGroupId,
-    ContentId,
-    DataStateId,
-    GenericId,
-    GraphNodeId,
-    ObjectId,
-    ObjectNamespace,
-    StreamId,
+    Binary, BinaryView, Bool, Buffer, Date, DateUnit, Decimal, DictionaryEncoding, DictionaryKind,
+    Duration, Endianness, Feature, Field, FixedSizeBinary, FixedSizeList, FloatingPoint, Int,
+    Interval, IntervalUnit, KeyValue, LargeBinary, LargeList, LargeListView, LargeUtf8, List,
+    ListView, Map, MetadataVersion, Null, Precision, RunEndEncoded, Schema, Struct_, Time,
+    TimeUnit, Timestamp, Type, Union, UnionMode, Utf8, Utf8View,
 };
 use crate::types::generated::Schema_generated::{
-    Binary as FbsBinary,
-    Bool as FbsBool,
-    Buffer as FbsBuffer,
-    Date as FbsDate,
-    Decimal as FbsDecimal,
-    DictionaryEncoding as FbsDictionaryEncoding,
-    Duration as FbsDuration,
-    Field as FbsField,
-    FixedSizeBinary as FbsFixedSizeBinary,
-    FixedSizeList as FbsFixedSizeList,
-    FloatingPoint as FbsFloatingPoint,
-    Int as FbsInt,
-    Interval as FbsInterval,
-    KeyValue as FbsKeyValue,
-    LargeBinary as FbsLargeBinary,
-    LargeList as FbsLargeList,
-    LargeUtf8 as FbsLargeUtf8,
-    List as FbsList,
-    Map as FbsMap,
-    Null as FbsNull,
-    Schema as FbsSchema,
-    Struct_ as FbsStruct_,
-    Time as FbsTime,
-    Timestamp as FbsTimestamp,
-    Union as FbsUnion,
-    Utf8 as FbsUtf8,
-    DateUnit as FbsDateUnit,
-    DictionaryKind as FbsDictionaryKind,
-    Endianness as FbsEndianness,
-    Feature as FbsFeature,
-    IntervalUnit as FbsIntervalUnit,
-    MetadataVersion as FbsMetadataVersion,
-    Precision as FbsPrecision,
-    TimeUnit as FbsTimeUnit,
-    Type as FbsType,
-    UnionMode as FbsUnionMode,
+    Binary as FbsBinary, BinaryView as FbsBinaryView, Bool as FbsBool, Buffer as FbsBuffer,
+    Date as FbsDate, DateUnit as FbsDateUnit, Decimal as FbsDecimal,
+    DictionaryEncoding as FbsDictionaryEncoding, DictionaryKind as FbsDictionaryKind,
+    Duration as FbsDuration, Endianness as FbsEndianness, Feature as FbsFeature, Field as FbsField,
+    FixedSizeBinary as FbsFixedSizeBinary, FixedSizeList as FbsFixedSizeList,
+    FloatingPoint as FbsFloatingPoint, Int as FbsInt, Interval as FbsInterval,
+    IntervalUnit as FbsIntervalUnit, KeyValue as FbsKeyValue, LargeBinary as FbsLargeBinary,
+    LargeList as FbsLargeList, LargeListView as FbsLargeListView, LargeUtf8 as FbsLargeUtf8,
+    List as FbsList, ListView as FbsListView, Map as FbsMap, MetadataVersion as FbsMetadataVersion,
+    Null as FbsNull, Precision as FbsPrecision, RunEndEncoded as FbsRunEndEncoded,
+    Schema as FbsSchema, Struct_ as FbsStruct_, Time as FbsTime, TimeUnit as FbsTimeUnit,
+    Timestamp as FbsTimestamp, Type as FbsType, Union as FbsUnion, UnionMode as FbsUnionMode,
+    Utf8 as FbsUtf8, Utf8View as FbsUtf8View,
 };
 use crate::types::generated::id_generated::{
-    B2cId as FbsB2cId,
-    ColumnGroupId as FbsColumnGroupId,
-    ContentId as FbsContentId,
-    DataStateId as FbsDataStateId,
-    GenericId as FbsGenericId,
-    GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId,
-    StreamId as FbsStreamId,
-    ObjectNamespace as FbsObjectNamespace,
+    B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
+    DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
 };
 use crate::types::generated::stream_generated::{
-    Stream as FbsStream,
-    AxisType as FbsAxisType,
-    FormatFlags as FbsFormatFlags,
+    AxisType as FbsAxisType, FormatFlags as FbsFormatFlags, Stream as FbsStream,
     StreamFlags as FbsStreamFlags,
+};
+use crate::types::id::{
+    B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
+    ObjectNamespace, StreamId,
 };
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -137,7 +68,7 @@ impl From<FbsAxisType> for AxisType {
     fn from(fbs: FbsAxisType) -> Self {
         match fbs.0 {
             0 => Self::AXIS_TIMESTAMP,
-            _ => panic!("Invalid value {} when constructing AxisType", fbs.0)
+            _ => panic!("Invalid value {} when constructing AxisType", fbs.0),
         }
     }
 }
@@ -185,7 +116,7 @@ impl From<FbsStreamFlags> for StreamFlags {
 /// A Stream is an instance of a source. The main difference is the parameters
 /// field is not a ParameterDesc descriptor object but the actual, serialized
 /// parameter values.
-/// 
+///
 /// Code performing the operation on the source will be able to construct a
 /// stream object from this description and downstream code will be able to
 /// read from it.
@@ -202,11 +133,17 @@ pub struct Stream {
 }
 
 impl Stream {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsStream<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsStream<'a>> {
         use crate::types::generated::stream_generated::StreamBuilder as FbsStreamBuilder;
 
         let metadata_offset = self.metadata.as_ref().map(|o| o.serialize_to(builder));
-        let metadata_revision_offset = self.metadata_revision.as_ref().map(|o| o.serialize_to(builder));
+        let metadata_revision_offset = self
+            .metadata_revision
+            .as_ref()
+            .map(|o| o.serialize_to(builder));
         let options_offset = self.options.as_ref().map(|v| {
             let options_offset = builder.create_vector(&v);
             options_offset
@@ -331,5 +268,4 @@ mod tests {
         let t1 = Stream::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
-
 }

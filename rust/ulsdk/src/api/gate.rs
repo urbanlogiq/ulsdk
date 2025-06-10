@@ -14,35 +14,33 @@ use crate::error::Error;
 use crate::request_context::{ParamMap, RequestContext};
 use crate::{read_arrow_ipc, write_arrow_ipc};
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct AdUser {
-    #[serde(rename="displayName")]
+    #[serde(rename = "displayName")]
     display_name: String,
     id: String,
-    #[serde(rename="userPrincipalName")]
+    #[serde(rename = "userPrincipalName")]
     user_principal_name: String,
-    #[serde(rename="otherMails")]
-    other_mails: Vec<String>,
+    #[serde(rename = "otherMails")]
+    other_mails: Option<Vec<String>>,
     department: Option<String>,
-    #[serde(rename="createdDateTime")]
+    #[serde(rename = "createdDateTime")]
     created_date_time: String,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct AdGroup {
     id: String,
-    #[serde(rename="displayName")]
+    #[serde(rename = "displayName")]
     display_name: String,
     description: Option<String>,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct Bootstrap {
     user: AdUser,
     groups: Vec<AdGroup>,
-    #[serde(rename="v2groups")]
-    v_2groups: Vec<AdGroup>,
-    #[serde(rename="clientSecrets")]
+    #[serde(rename = "clientSecrets")]
     client_secrets: serde_json::Map<String, serde_json::Value>,
 }
 
@@ -54,22 +52,41 @@ pub struct Bootstrap {
 ///
 /// Returns
 /// * The current user details needed to start the UrbanLogiq web application.
-pub async fn bootstrap(
-    ctx: &dyn RequestContext,
-) -> Result<Bootstrap, Error> {
+pub async fn bootstrap(ctx: &dyn RequestContext) -> Result<Bootstrap, Error> {
     let path = "/v1/bootstrap/";
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }
 
-
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-    use crate::request_context::ApiKeyContext;
-    use crate::keys::Key;
-    use crate::{Region, Environment};
     use super::*;
+    use crate::keys::Key as SigningKey;
+    use crate::request_context::{ApiKeyContext, TestContext};
+    use crate::{Environment, Region};
+    use std::str::FromStr;
+
+    #[tokio::test]
+    async fn test_bootstrap() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let expected = Bootstrap::default();
+        let expected_bytes = serde_json::to_vec(&expected).unwrap();
+        ctx.set_response(expected_bytes);
+        let result = bootstrap(&ctx).await.unwrap();
+        assert_eq!(result, expected);
+    }
 
     #[tokio::test]
     async fn test_bootstrap_1() {
@@ -87,15 +104,25 @@ mod tests {
 
         for context in contexts {
             let (region, user, access_key, secret_key) = context;
-            let Some(user) = user else { continue; };
-            let Some(access_key) = access_key else { continue; };
-            let Some(secret_key) = secret_key else { continue; };
-            let key = Key::try_new(Uuid::from_str(&user).unwrap(), *region, access_key.as_str(), secret_key.as_str()).unwrap();
+            let Some(user) = user else {
+                continue;
+            };
+            let Some(access_key) = access_key else {
+                continue;
+            };
+            let Some(secret_key) = secret_key else {
+                continue;
+            };
+            let key = SigningKey::try_new(
+                Uuid::from_str(&user).unwrap(),
+                *region,
+                access_key.as_str(),
+                secret_key.as_str(),
+            )
+            .unwrap();
             let ctx = ApiKeyContext::new(key, Environment::Prod);
 
-            let res = bootstrap(
-                &ctx,
-            ).await;
+            let res = bootstrap(&ctx).await;
         }
     }
 }

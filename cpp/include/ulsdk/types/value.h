@@ -82,6 +82,10 @@ struct VBool {
     VBool();
     VBool(const ::VBool *root);
     VBool(const std::vector<uint8_t> &bytes);
+    bool operator==(const VBool &rhs) const;
+    bool operator!=(const VBool &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VUnit {
@@ -89,6 +93,10 @@ struct VUnit {
     VUnit();
     VUnit(const ::VUnit *root);
     VUnit(const std::vector<uint8_t> &bytes);
+    bool operator==(const VUnit &rhs) const;
+    bool operator!=(const VUnit &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VChar {
@@ -97,6 +105,10 @@ struct VChar {
     VChar();
     VChar(const ::VChar *root);
     VChar(const std::vector<uint8_t> &bytes);
+    bool operator==(const VChar &rhs) const;
+    bool operator!=(const VChar &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VNull {
@@ -104,6 +116,10 @@ struct VNull {
     VNull();
     VNull(const ::VNull *root);
     VNull(const std::vector<uint8_t> &bytes);
+    bool operator==(const VNull &rhs) const;
+    bool operator!=(const VNull &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VI8 {
@@ -112,6 +128,10 @@ struct VI8 {
     VI8();
     VI8(const ::VI8 *root);
     VI8(const std::vector<uint8_t> &bytes);
+    bool operator==(const VI8 &rhs) const;
+    bool operator!=(const VI8 &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VU8 {
@@ -120,6 +140,10 @@ struct VU8 {
     VU8();
     VU8(const ::VU8 *root);
     VU8(const std::vector<uint8_t> &bytes);
+    bool operator==(const VU8 &rhs) const;
+    bool operator!=(const VU8 &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VI16 {
@@ -128,6 +152,10 @@ struct VI16 {
     VI16();
     VI16(const ::VI16 *root);
     VI16(const std::vector<uint8_t> &bytes);
+    bool operator==(const VI16 &rhs) const;
+    bool operator!=(const VI16 &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VU16 {
@@ -136,6 +164,10 @@ struct VU16 {
     VU16();
     VU16(const ::VU16 *root);
     VU16(const std::vector<uint8_t> &bytes);
+    bool operator==(const VU16 &rhs) const;
+    bool operator!=(const VU16 &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VI32 {
@@ -144,6 +176,10 @@ struct VI32 {
     VI32();
     VI32(const ::VI32 *root);
     VI32(const std::vector<uint8_t> &bytes);
+    bool operator==(const VI32 &rhs) const;
+    bool operator!=(const VI32 &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VU32 {
@@ -152,6 +188,10 @@ struct VU32 {
     VU32();
     VU32(const ::VU32 *root);
     VU32(const std::vector<uint8_t> &bytes);
+    bool operator==(const VU32 &rhs) const;
+    bool operator!=(const VU32 &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VF32 {
@@ -160,6 +200,10 @@ struct VF32 {
     VF32();
     VF32(const ::VF32 *root);
     VF32(const std::vector<uint8_t> &bytes);
+    bool operator==(const VF32 &rhs) const;
+    bool operator!=(const VF32 &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VIsize {
@@ -168,6 +212,10 @@ struct VIsize {
     VIsize();
     VIsize(const ::VIsize *root);
     VIsize(const std::vector<uint8_t> &bytes);
+    bool operator==(const VIsize &rhs) const;
+    bool operator!=(const VIsize &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VUsize {
@@ -176,6 +224,10 @@ struct VUsize {
     VUsize();
     VUsize(const ::VUsize *root);
     VUsize(const std::vector<uint8_t> &bytes);
+    bool operator==(const VUsize &rhs) const;
+    bool operator!=(const VUsize &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VI64 {
@@ -184,6 +236,10 @@ struct VI64 {
     VI64();
     VI64(const ::VI64 *root);
     VI64(const std::vector<uint8_t> &bytes);
+    bool operator==(const VI64 &rhs) const;
+    bool operator!=(const VI64 &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VU64 {
@@ -192,6 +248,10 @@ struct VU64 {
     VU64();
     VU64(const ::VU64 *root);
     VU64(const std::vector<uint8_t> &bytes);
+    bool operator==(const VU64 &rhs) const;
+    bool operator!=(const VU64 &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VF64 {
@@ -200,6 +260,10 @@ struct VF64 {
     VF64();
     VF64(const ::VF64 *root);
     VF64(const std::vector<uint8_t> &bytes);
+    bool operator==(const VF64 &rhs) const;
+    bool operator!=(const VF64 &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VStr {
@@ -208,6 +272,10 @@ struct VStr {
     VStr();
     VStr(const ::VStr *root);
     VStr(const std::vector<uint8_t> &bytes);
+    bool operator==(const VStr &rhs) const;
+    bool operator!=(const VStr &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VBytes {
@@ -216,6 +284,10 @@ struct VBytes {
     VBytes();
     VBytes(const ::VBytes *root);
     VBytes(const std::vector<uint8_t> &bytes);
+    bool operator==(const VBytes &rhs) const;
+    bool operator!=(const VBytes &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VArray {
@@ -224,6 +296,10 @@ struct VArray {
     VArray();
     VArray(const ::VArray *root);
     VArray(const std::vector<uint8_t> &bytes);
+    bool operator==(const VArray &rhs) const;
+    bool operator!=(const VArray &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Point2D {
@@ -232,6 +308,10 @@ struct Point2D {
 
     Point2D();
     Point2D(const ::Point2D *root);
+    bool operator==(const Point2D &rhs) const;
+    bool operator!=(const Point2D &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Tri2D {
@@ -241,6 +321,10 @@ struct Tri2D {
 
     Tri2D();
     Tri2D(const ::Tri2D *root);
+    bool operator==(const Tri2D &rhs) const;
+    bool operator!=(const Tri2D &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VTri2D {
@@ -249,6 +333,10 @@ struct VTri2D {
     VTri2D();
     VTri2D(const ::VTri2D *root);
     VTri2D(const std::vector<uint8_t> &bytes);
+    bool operator==(const VTri2D &rhs) const;
+    bool operator!=(const VTri2D &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VFixedSizeBytes {
@@ -258,6 +346,10 @@ struct VFixedSizeBytes {
     VFixedSizeBytes();
     VFixedSizeBytes(const ::VFixedSizeBytes *root);
     VFixedSizeBytes(const std::vector<uint8_t> &bytes);
+    bool operator==(const VFixedSizeBytes &rhs) const;
+    bool operator!=(const VFixedSizeBytes &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VTimestampMsUtc {
@@ -266,6 +358,10 @@ struct VTimestampMsUtc {
     VTimestampMsUtc();
     VTimestampMsUtc(const ::VTimestampMsUtc *root);
     VTimestampMsUtc(const std::vector<uint8_t> &bytes);
+    bool operator==(const VTimestampMsUtc &rhs) const;
+    bool operator!=(const VTimestampMsUtc &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VTimestampMs {
@@ -274,6 +370,10 @@ struct VTimestampMs {
     VTimestampMs();
     VTimestampMs(const ::VTimestampMs *root);
     VTimestampMs(const std::vector<uint8_t> &bytes);
+    bool operator==(const VTimestampMs &rhs) const;
+    bool operator!=(const VTimestampMs &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VTimestampNsUtc {
@@ -282,6 +382,10 @@ struct VTimestampNsUtc {
     VTimestampNsUtc();
     VTimestampNsUtc(const ::VTimestampNsUtc *root);
     VTimestampNsUtc(const std::vector<uint8_t> &bytes);
+    bool operator==(const VTimestampNsUtc &rhs) const;
+    bool operator!=(const VTimestampNsUtc &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VTimestampNs {
@@ -290,6 +394,10 @@ struct VTimestampNs {
     VTimestampNs();
     VTimestampNs(const ::VTimestampNs *root);
     VTimestampNs(const std::vector<uint8_t> &bytes);
+    bool operator==(const VTimestampNs &rhs) const;
+    bool operator!=(const VTimestampNs &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct VPlaceholder {
@@ -299,6 +407,10 @@ struct VPlaceholder {
     VPlaceholder();
     VPlaceholder(const ::VPlaceholder *root);
     VPlaceholder(const std::vector<uint8_t> &bytes);
+    bool operator==(const VPlaceholder &rhs) const;
+    bool operator!=(const VPlaceholder &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ValueInstance {
@@ -308,6 +420,10 @@ struct ValueInstance {
     ValueInstance();
     ValueInstance(const ::ValueInstance *root);
     ValueInstance(const std::vector<uint8_t> &bytes);
+    bool operator==(const ValueInstance &rhs) const;
+    bool operator!=(const ValueInstance &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::pair<::flatbuffers::Offset<void>, ::Value>

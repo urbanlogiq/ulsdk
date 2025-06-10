@@ -63,5 +63,19 @@ Model::Model(const ::Model *root)
     }
 }
 
+bool
+Model::operator==(const Model &rhs) const {
+    if (this->location_ != rhs.location_) {
+        return false;
+    }
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->source_ != rhs.source_) {
+        return false;
+    }
+    return true;
+}
+
 } // namespace types
 } // namespace ul

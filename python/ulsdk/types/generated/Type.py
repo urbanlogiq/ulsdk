@@ -28,3 +28,8 @@ class Type(object):
     LargeBinary = 19
     LargeUtf8 = 20
     LargeList = 21
+    RunEndEncoded = 22
+    BinaryView = 23
+    Utf8View = 24
+    ListView = 25
+    LargeListView = 26

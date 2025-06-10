@@ -10,293 +10,107 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
-use flatbuffers::{WIPOffset, UnionWIPOffset};
 use bitflags::bitflags;
 use core::ops::Deref;
+use flatbuffers::{UnionWIPOffset, WIPOffset};
 
 use crate::types::Schema::{
-    Binary,
-    Bool,
-    Buffer,
-    Date,
-    DateUnit,
-    Decimal,
-    DictionaryEncoding,
-    DictionaryKind,
-    Duration,
-    Endianness,
-    Feature,
-    Field,
-    FixedSizeBinary,
-    FixedSizeList,
-    FloatingPoint,
-    Int,
-    Interval,
-    IntervalUnit,
-    KeyValue,
-    LargeBinary,
-    LargeList,
-    LargeUtf8,
-    List,
-    Map,
-    MetadataVersion,
-    Null,
-    Precision,
-    Schema,
-    Struct_,
-    Time,
-    TimeUnit,
-    Timestamp,
-    Type,
-    Union,
-    UnionMode,
-    Utf8,
+    Binary, BinaryView, Bool, Buffer, Date, DateUnit, Decimal, DictionaryEncoding, DictionaryKind,
+    Duration, Endianness, Feature, Field, FixedSizeBinary, FixedSizeList, FloatingPoint, Int,
+    Interval, IntervalUnit, KeyValue, LargeBinary, LargeList, LargeListView, LargeUtf8, List,
+    ListView, Map, MetadataVersion, Null, Precision, RunEndEncoded, Schema, Struct_, Time,
+    TimeUnit, Timestamp, Type, Union, UnionMode, Utf8, Utf8View,
 };
 use crate::types::attr::Attr;
 use crate::types::data::{
-    AttributePair,
-    DayOfWeek,
-    DirectionAndRoadName,
-    DirectionAndRoadNames,
-    DirectionTy,
-    NamedParameter,
-    NamedParameterFlags,
-    RoadUserTy,
-    Source,
-    StatisticTy,
-    TimeGranularity,
-    TurnTy,
-};
-use crate::types::id::{
-    B2cId,
-    ColumnGroupId,
-    ContentId,
-    DataStateId,
-    GenericId,
-    GraphNodeId,
-    ObjectId,
-    ObjectNamespace,
-    StreamId,
-};
-use crate::types::job::{
-    DeprecatedRunSpec,
-    DeprecatedTaskParameter,
-    Edge,
-    EmbeddedTable,
-    Job,
-    Node,
-    ParamIndices,
-    RunSpec,
-    Schematic,
-    Status,
-    Task,
-    TaskErrorTy,
-    TaskList,
-    TaskParameter,
-    TaskParameterValue,
-    TaskPriority,
-    TaskRunFlags,
-};
-use crate::types::stream::{
-    AxisType,
-    FormatFlags,
-    Stream,
-    StreamFlags,
-};
-use crate::types::value::{
-    Point2D,
-    Tri2D,
-    VArray,
-    VBool,
-    VBytes,
-    VChar,
-    VF32,
-    VF64,
-    VFixedSizeBytes,
-    VI16,
-    VI32,
-    VI64,
-    VI8,
-    VIsize,
-    VNull,
-    VPlaceholder,
-    VStr,
-    VTimestampMs,
-    VTimestampMsUtc,
-    VTimestampNs,
-    VTimestampNsUtc,
-    VTri2D,
-    VU16,
-    VU32,
-    VU64,
-    VU8,
-    VUnit,
-    VUsize,
-    Value,
-    ValueInstance,
-    ValueTy,
-};
-use crate::types::worklog::{
-    AggregationTy,
-    ByteArray,
-    ChartTypeTy,
-    Layout,
-    ParameterFlags,
-    ParameterValue,
-    TileData,
-    TileSettings,
-    UserSettings,
-    ValuesFormatTy,
-    WorkLog,
-    WorklogParameter,
+    AttributePair, BinaryYesNo, DayOfWeek, DirectionAndRoadName, DirectionAndRoadNames,
+    DirectionTy, NamedParameter, NamedParameterFlags, RoadUserTy, Source, StatisticTy,
+    TimeGranularity, TurnTy,
 };
 use crate::types::generated::Schema_generated::{
-    Binary as FbsBinary,
-    Bool as FbsBool,
-    Buffer as FbsBuffer,
-    Date as FbsDate,
-    Decimal as FbsDecimal,
-    DictionaryEncoding as FbsDictionaryEncoding,
-    Duration as FbsDuration,
-    Field as FbsField,
-    FixedSizeBinary as FbsFixedSizeBinary,
-    FixedSizeList as FbsFixedSizeList,
-    FloatingPoint as FbsFloatingPoint,
-    Int as FbsInt,
-    Interval as FbsInterval,
-    KeyValue as FbsKeyValue,
-    LargeBinary as FbsLargeBinary,
-    LargeList as FbsLargeList,
-    LargeUtf8 as FbsLargeUtf8,
-    List as FbsList,
-    Map as FbsMap,
-    Null as FbsNull,
-    Schema as FbsSchema,
-    Struct_ as FbsStruct_,
-    Time as FbsTime,
-    Timestamp as FbsTimestamp,
-    Union as FbsUnion,
-    Utf8 as FbsUtf8,
-    DateUnit as FbsDateUnit,
-    DictionaryKind as FbsDictionaryKind,
-    Endianness as FbsEndianness,
-    Feature as FbsFeature,
-    IntervalUnit as FbsIntervalUnit,
-    MetadataVersion as FbsMetadataVersion,
-    Precision as FbsPrecision,
-    TimeUnit as FbsTimeUnit,
-    Type as FbsType,
-    UnionMode as FbsUnionMode,
+    Binary as FbsBinary, BinaryView as FbsBinaryView, Bool as FbsBool, Buffer as FbsBuffer,
+    Date as FbsDate, DateUnit as FbsDateUnit, Decimal as FbsDecimal,
+    DictionaryEncoding as FbsDictionaryEncoding, DictionaryKind as FbsDictionaryKind,
+    Duration as FbsDuration, Endianness as FbsEndianness, Feature as FbsFeature, Field as FbsField,
+    FixedSizeBinary as FbsFixedSizeBinary, FixedSizeList as FbsFixedSizeList,
+    FloatingPoint as FbsFloatingPoint, Int as FbsInt, Interval as FbsInterval,
+    IntervalUnit as FbsIntervalUnit, KeyValue as FbsKeyValue, LargeBinary as FbsLargeBinary,
+    LargeList as FbsLargeList, LargeListView as FbsLargeListView, LargeUtf8 as FbsLargeUtf8,
+    List as FbsList, ListView as FbsListView, Map as FbsMap, MetadataVersion as FbsMetadataVersion,
+    Null as FbsNull, Precision as FbsPrecision, RunEndEncoded as FbsRunEndEncoded,
+    Schema as FbsSchema, Struct_ as FbsStruct_, Time as FbsTime, TimeUnit as FbsTimeUnit,
+    Timestamp as FbsTimestamp, Type as FbsType, Union as FbsUnion, UnionMode as FbsUnionMode,
+    Utf8 as FbsUtf8, Utf8View as FbsUtf8View,
 };
-use crate::types::generated::attr_generated::{
-    Attr as FbsAttr,
-};
+use crate::types::generated::attr_generated::Attr as FbsAttr;
 use crate::types::generated::data_generated::{
-    AttributePair as FbsAttributePair,
+    AttributePair as FbsAttributePair, BinaryYesNo as FbsBinaryYesNo, DayOfWeek as FbsDayOfWeek,
     DirectionAndRoadName as FbsDirectionAndRoadName,
-    DirectionAndRoadNames as FbsDirectionAndRoadNames,
-    NamedParameter as FbsNamedParameter,
-    Source as FbsSource,
-    DayOfWeek as FbsDayOfWeek,
-    DirectionTy as FbsDirectionTy,
-    NamedParameterFlags as FbsNamedParameterFlags,
-    RoadUserTy as FbsRoadUserTy,
-    StatisticTy as FbsStatisticTy,
-    TimeGranularity as FbsTimeGranularity,
-    TurnTy as FbsTurnTy,
+    DirectionAndRoadNames as FbsDirectionAndRoadNames, DirectionTy as FbsDirectionTy,
+    NamedParameter as FbsNamedParameter, NamedParameterFlags as FbsNamedParameterFlags,
+    RoadUserTy as FbsRoadUserTy, Source as FbsSource, StatisticTy as FbsStatisticTy,
+    TimeGranularity as FbsTimeGranularity, TurnTy as FbsTurnTy,
 };
 use crate::types::generated::id_generated::{
-    B2cId as FbsB2cId,
-    ColumnGroupId as FbsColumnGroupId,
-    ContentId as FbsContentId,
-    DataStateId as FbsDataStateId,
-    GenericId as FbsGenericId,
-    GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId,
-    StreamId as FbsStreamId,
-    ObjectNamespace as FbsObjectNamespace,
+    B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
+    DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
 };
 use crate::types::generated::job_generated::{
     DeprecatedRunSpec as FbsDeprecatedRunSpec,
-    DeprecatedTaskParameter as FbsDeprecatedTaskParameter,
-    Edge as FbsEdge,
-    EmbeddedTable as FbsEmbeddedTable,
-    Job as FbsJob,
-    Node as FbsNode,
-    ParamIndices as FbsParamIndices,
-    RunSpec as FbsRunSpec,
-    Schematic as FbsSchematic,
-    Task as FbsTask,
-    TaskList as FbsTaskList,
-    TaskParameter as FbsTaskParameter,
-    Status as FbsStatus,
-    TaskErrorTy as FbsTaskErrorTy,
-    TaskParameterValue as FbsTaskParameterValue,
-    TaskPriority as FbsTaskPriority,
-    TaskRunFlags as FbsTaskRunFlags,
+    DeprecatedTaskParameter as FbsDeprecatedTaskParameter, Edge as FbsEdge,
+    EmbeddedTable as FbsEmbeddedTable, Job as FbsJob, Node as FbsNode,
+    ParamIndices as FbsParamIndices, RunSpec as FbsRunSpec, Schematic as FbsSchematic,
+    Status as FbsStatus, Task as FbsTask, TaskErrorTy as FbsTaskErrorTy, TaskList as FbsTaskList,
+    TaskParameter as FbsTaskParameter, TaskParameterValue as FbsTaskParameterValue,
+    TaskPriority as FbsTaskPriority, TaskRunFlags as FbsTaskRunFlags,
 };
 use crate::types::generated::object_generated::{
-    DataCatalogObject as FbsDataCatalogObject,
-    ObjectIdList as FbsObjectIdList,
-    ObjectIdPair as FbsObjectIdPair,
-    ObjectIdPairList as FbsObjectIdPairList,
-    ObjectSummary as FbsObjectSummary,
-    ObjectSummaryList as FbsObjectSummaryList,
-    DataCatalogObjectFlags as FbsDataCatalogObjectFlags,
-    DataCatalogObjectTy as FbsDataCatalogObjectTy,
+    DataCatalogObject as FbsDataCatalogObject, DataCatalogObjectFlags as FbsDataCatalogObjectFlags,
+    DataCatalogObjectTy as FbsDataCatalogObjectTy, ObjectIdList as FbsObjectIdList,
+    ObjectIdPair as FbsObjectIdPair, ObjectIdPairList as FbsObjectIdPairList,
+    ObjectSummary as FbsObjectSummary, ObjectSummaryList as FbsObjectSummaryList,
 };
 use crate::types::generated::stream_generated::{
-    Stream as FbsStream,
-    AxisType as FbsAxisType,
-    FormatFlags as FbsFormatFlags,
+    AxisType as FbsAxisType, FormatFlags as FbsFormatFlags, Stream as FbsStream,
     StreamFlags as FbsStreamFlags,
 };
 use crate::types::generated::value_generated::{
-    Point2D as FbsPoint2D,
-    Tri2D as FbsTri2D,
-    VArray as FbsVArray,
-    VBool as FbsVBool,
-    VBytes as FbsVBytes,
-    VChar as FbsVChar,
-    VF32 as FbsVF32,
-    VF64 as FbsVF64,
-    VFixedSizeBytes as FbsVFixedSizeBytes,
-    VI16 as FbsVI16,
-    VI32 as FbsVI32,
-    VI64 as FbsVI64,
-    VI8 as FbsVI8,
-    VIsize as FbsVIsize,
-    VNull as FbsVNull,
-    VPlaceholder as FbsVPlaceholder,
-    VStr as FbsVStr,
-    VTimestampMs as FbsVTimestampMs,
-    VTimestampMsUtc as FbsVTimestampMsUtc,
-    VTimestampNs as FbsVTimestampNs,
-    VTimestampNsUtc as FbsVTimestampNsUtc,
-    VTri2D as FbsVTri2D,
-    VU16 as FbsVU16,
-    VU32 as FbsVU32,
-    VU64 as FbsVU64,
-    VU8 as FbsVU8,
-    VUnit as FbsVUnit,
-    VUsize as FbsVUsize,
-    ValueInstance as FbsValueInstance,
-    Value as FbsValue,
+    Point2D as FbsPoint2D, Tri2D as FbsTri2D, VArray as FbsVArray, VBool as FbsVBool,
+    VBytes as FbsVBytes, VChar as FbsVChar, VF32 as FbsVF32, VF64 as FbsVF64,
+    VFixedSizeBytes as FbsVFixedSizeBytes, VI8 as FbsVI8, VI16 as FbsVI16, VI32 as FbsVI32,
+    VI64 as FbsVI64, VIsize as FbsVIsize, VNull as FbsVNull, VPlaceholder as FbsVPlaceholder,
+    VStr as FbsVStr, VTimestampMs as FbsVTimestampMs, VTimestampMsUtc as FbsVTimestampMsUtc,
+    VTimestampNs as FbsVTimestampNs, VTimestampNsUtc as FbsVTimestampNsUtc, VTri2D as FbsVTri2D,
+    VU8 as FbsVU8, VU16 as FbsVU16, VU32 as FbsVU32, VU64 as FbsVU64, VUnit as FbsVUnit,
+    VUsize as FbsVUsize, Value as FbsValue, ValueInstance as FbsValueInstance,
     ValueTy as FbsValueTy,
 };
 use crate::types::generated::worklog_generated::{
-    ByteArray as FbsByteArray,
-    Layout as FbsLayout,
-    ParameterFlags as FbsParameterFlags,
-    TileData as FbsTileData,
-    TileSettings as FbsTileSettings,
-    UserSettings as FbsUserSettings,
-    WorkLog as FbsWorkLog,
+    AggregationTy as FbsAggregationTy, ByteArray as FbsByteArray, ChartTypeTy as FbsChartTypeTy,
+    Layout as FbsLayout, ParameterFlags as FbsParameterFlags, ParameterValue as FbsParameterValue,
+    TileData as FbsTileData, TileSettings as FbsTileSettings, UserSettings as FbsUserSettings,
+    ValuesFormatTy as FbsValuesFormatTy, WorkLog as FbsWorkLog,
     WorklogParameter as FbsWorklogParameter,
-    AggregationTy as FbsAggregationTy,
-    ChartTypeTy as FbsChartTypeTy,
-    ParameterValue as FbsParameterValue,
-    ValuesFormatTy as FbsValuesFormatTy,
+};
+use crate::types::id::{
+    B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
+    ObjectNamespace, StreamId,
+};
+use crate::types::job::{
+    DeprecatedRunSpec, DeprecatedTaskParameter, Edge, EmbeddedTable, Job, Node, ParamIndices,
+    RunSpec, Schematic, Status, Task, TaskErrorTy, TaskList, TaskParameter, TaskParameterValue,
+    TaskPriority, TaskRunFlags,
+};
+use crate::types::stream::{AxisType, FormatFlags, Stream, StreamFlags};
+use crate::types::value::{
+    Point2D, Tri2D, VArray, VBool, VBytes, VChar, VF32, VF64, VFixedSizeBytes, VI8, VI16, VI32,
+    VI64, VIsize, VNull, VPlaceholder, VStr, VTimestampMs, VTimestampMsUtc, VTimestampNs,
+    VTimestampNsUtc, VTri2D, VU8, VU16, VU32, VU64, VUnit, VUsize, Value, ValueInstance, ValueTy,
+};
+use crate::types::worklog::{
+    AggregationTy, ByteArray, ChartTypeTy, Layout, ParameterFlags, ParameterValue, TileData,
+    TileSettings, UserSettings, ValuesFormatTy, WorkLog, WorklogParameter,
 };
 
 bitflags! {
@@ -387,7 +201,10 @@ impl From<FbsDataCatalogObjectTy> for DataCatalogObjectTy {
             13 => Self::Model,
             14 => Self::Ingestion,
             15 => Self::View,
-            _ => panic!("Invalid value {} when constructing DataCatalogObjectTy", fbs.0)
+            _ => panic!(
+                "Invalid value {} when constructing DataCatalogObjectTy",
+                fbs.0
+            ),
         }
     }
 }
@@ -421,7 +238,10 @@ pub struct DataCatalogObject {
 }
 
 impl DataCatalogObject {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDataCatalogObject<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDataCatalogObject<'a>> {
         use crate::types::generated::object_generated::DataCatalogObjectBuilder as FbsDataCatalogObjectBuilder;
 
         let attributes_offset = self.attributes.as_ref().map(|v| {
@@ -573,7 +393,10 @@ pub struct ObjectIdList {
 }
 
 impl ObjectIdList {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsObjectIdList<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsObjectIdList<'a>> {
         use crate::types::generated::object_generated::ObjectIdListBuilder as FbsObjectIdListBuilder;
 
         let mut ids_offsets = Vec::with_capacity(self.ids.len());
@@ -596,9 +419,7 @@ impl From<FbsObjectIdList<'_>> for ObjectIdList {
             ids.push(elem.into());
         }
 
-        Self {
-            ids,
-        }
+        Self { ids }
     }
 }
 
@@ -626,7 +447,10 @@ pub struct ObjectIdPair {
 }
 
 impl ObjectIdPair {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsObjectIdPair<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsObjectIdPair<'a>> {
         use crate::types::generated::object_generated::ObjectIdPairBuilder as FbsObjectIdPairBuilder;
 
         let id_offset = self.id.serialize_to(builder);
@@ -658,10 +482,7 @@ impl From<FbsObjectIdPair<'_>> for ObjectIdPair {
             None
         };
 
-        Self {
-            id,
-            object,
-        }
+        Self { id, object }
     }
 }
 
@@ -688,7 +509,10 @@ pub struct ObjectIdPairList {
 }
 
 impl ObjectIdPairList {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsObjectIdPairList<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsObjectIdPairList<'a>> {
         use crate::types::generated::object_generated::ObjectIdPairListBuilder as FbsObjectIdPairListBuilder;
 
         let mut pairs_offsets = Vec::with_capacity(self.pairs.len());
@@ -711,9 +535,7 @@ impl From<FbsObjectIdPairList<'_>> for ObjectIdPairList {
             pairs.push(elem.into());
         }
 
-        Self {
-            pairs,
-        }
+        Self { pairs }
     }
 }
 
@@ -745,7 +567,10 @@ pub struct ObjectSummary {
 }
 
 impl ObjectSummary {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsObjectSummary<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsObjectSummary<'a>> {
         use crate::types::generated::object_generated::ObjectSummaryBuilder as FbsObjectSummaryBuilder;
 
         let acl_offset = self.acl.as_ref().map(|o| o.serialize_to(builder));
@@ -807,7 +632,10 @@ pub struct ObjectSummaryList {
 }
 
 impl ObjectSummaryList {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsObjectSummaryList<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsObjectSummaryList<'a>> {
         use crate::types::generated::object_generated::ObjectSummaryListBuilder as FbsObjectSummaryListBuilder;
 
         let mut pairs_offsets = Vec::with_capacity(self.pairs.len());
@@ -830,9 +658,7 @@ impl From<FbsObjectSummaryList<'_>> for ObjectSummaryList {
             pairs.push(elem.into());
         }
 
-        Self {
-            pairs,
-        }
+        Self { pairs }
     }
 }
 
@@ -904,5 +730,4 @@ mod tests {
         let t1 = ObjectSummaryList::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
-
 }

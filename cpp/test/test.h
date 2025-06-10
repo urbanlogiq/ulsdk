@@ -17,7 +17,6 @@ struct TypeTest;
 
 extern ApiTest *idempotent_api_test_root;
 extern ApiTest *mutating_api_test_root;
-extern ApiTest *link_only_api_test_root;
 extern ApiTest *regression_test_root;
 extern TypeTest *type_test_root;
 
@@ -150,3 +149,53 @@ struct MockContext : public ul::RequestContext {
         return std::vector<uint8_t>();
     }
 };
+
+struct TestContext: public ul::RequestContext {
+    ul::RequestContext &context_;
+    std::vector<uint8_t> response_;
+
+public:
+    TestContext() = delete;
+
+    TestContext(ul::RequestContext &context);
+    ~TestContext();
+
+    void set_response(std::vector<uint8_t> response);
+
+    ul::Region region() const override;
+    ul::Environment environment() const override;
+
+    ul::Result<std::vector<uint8_t>>
+    get(const std::string& path,
+        const std::map<std::string, std::string>& params,
+        const std::map<std::string, std::string>& headers) const override;
+
+    ul::Result<std::vector<uint8_t>>
+    put(const std::string& path,
+        const std::vector<uint8_t>& data,
+        const std::string& mimetype,
+        const std::map<std::string, std::string>& params,
+        const std::map<std::string, std::string>& headers) const override;
+
+    ul::Result<std::vector<uint8_t>> post(
+        const std::string& path,
+        const std::vector<uint8_t>& data,
+        const std::string& mimetype,
+        const std::map<std::string, std::string>& params,
+        const std::map<std::string, std::string>& headers
+    ) const override;
+
+    ul::Result<std::vector<uint8_t>> upload(
+        const std::string& path,
+        const std::vector<ul::File>& files
+    ) const override;
+
+    ul::Result<std::vector<uint8_t>>
+    del(const std::string& path,
+        const std::map<std::string, std::string>& params,
+        const std::map<std::string, std::string>& headers) const override;
+};
+
+std::vector<std::shared_ptr<::arrow::RecordBatch>>
+make_test_arrow_batches(std::vector<uint8_t> &serialized);
+

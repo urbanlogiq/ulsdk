@@ -10,78 +10,26 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
-use flatbuffers::{WIPOffset, UnionWIPOffset};
 use bitflags::bitflags;
 use core::ops::Deref;
+use flatbuffers::{UnionWIPOffset, WIPOffset};
 
-use crate::types::value::{
-    Point2D,
-    Tri2D,
-    VArray,
-    VBool,
-    VBytes,
-    VChar,
-    VF32,
-    VF64,
-    VFixedSizeBytes,
-    VI16,
-    VI32,
-    VI64,
-    VI8,
-    VIsize,
-    VNull,
-    VPlaceholder,
-    VStr,
-    VTimestampMs,
-    VTimestampMsUtc,
-    VTimestampNs,
-    VTimestampNsUtc,
-    VTri2D,
-    VU16,
-    VU32,
-    VU64,
-    VU8,
-    VUnit,
-    VUsize,
-    Value,
-    ValueInstance,
-    ValueTy,
-};
-use crate::types::generated::attr_generated::{
-    Attr as FbsAttr,
-};
+use crate::types::generated::attr_generated::Attr as FbsAttr;
 use crate::types::generated::value_generated::{
-    Point2D as FbsPoint2D,
-    Tri2D as FbsTri2D,
-    VArray as FbsVArray,
-    VBool as FbsVBool,
-    VBytes as FbsVBytes,
-    VChar as FbsVChar,
-    VF32 as FbsVF32,
-    VF64 as FbsVF64,
-    VFixedSizeBytes as FbsVFixedSizeBytes,
-    VI16 as FbsVI16,
-    VI32 as FbsVI32,
-    VI64 as FbsVI64,
-    VI8 as FbsVI8,
-    VIsize as FbsVIsize,
-    VNull as FbsVNull,
-    VPlaceholder as FbsVPlaceholder,
-    VStr as FbsVStr,
-    VTimestampMs as FbsVTimestampMs,
-    VTimestampMsUtc as FbsVTimestampMsUtc,
-    VTimestampNs as FbsVTimestampNs,
-    VTimestampNsUtc as FbsVTimestampNsUtc,
-    VTri2D as FbsVTri2D,
-    VU16 as FbsVU16,
-    VU32 as FbsVU32,
-    VU64 as FbsVU64,
-    VU8 as FbsVU8,
-    VUnit as FbsVUnit,
-    VUsize as FbsVUsize,
-    ValueInstance as FbsValueInstance,
-    Value as FbsValue,
+    Point2D as FbsPoint2D, Tri2D as FbsTri2D, VArray as FbsVArray, VBool as FbsVBool,
+    VBytes as FbsVBytes, VChar as FbsVChar, VF32 as FbsVF32, VF64 as FbsVF64,
+    VFixedSizeBytes as FbsVFixedSizeBytes, VI8 as FbsVI8, VI16 as FbsVI16, VI32 as FbsVI32,
+    VI64 as FbsVI64, VIsize as FbsVIsize, VNull as FbsVNull, VPlaceholder as FbsVPlaceholder,
+    VStr as FbsVStr, VTimestampMs as FbsVTimestampMs, VTimestampMsUtc as FbsVTimestampMsUtc,
+    VTimestampNs as FbsVTimestampNs, VTimestampNsUtc as FbsVTimestampNsUtc, VTri2D as FbsVTri2D,
+    VU8 as FbsVU8, VU16 as FbsVU16, VU32 as FbsVU32, VU64 as FbsVU64, VUnit as FbsVUnit,
+    VUsize as FbsVUsize, Value as FbsValue, ValueInstance as FbsValueInstance,
     ValueTy as FbsValueTy,
+};
+use crate::types::value::{
+    Point2D, Tri2D, VArray, VBool, VBytes, VChar, VF32, VF64, VFixedSizeBytes, VI8, VI16, VI32,
+    VI64, VIsize, VNull, VPlaceholder, VStr, VTimestampMs, VTimestampMsUtc, VTimestampNs,
+    VTimestampNsUtc, VTri2D, VU8, VU16, VU32, VU64, VUnit, VUsize, Value, ValueInstance, ValueTy,
 };
 
 #[derive(Default, PartialEq, Debug, Clone)]
@@ -91,7 +39,10 @@ pub struct Attr {
 }
 
 impl Attr {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsAttr<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsAttr<'a>> {
         use crate::types::generated::attr_generated::AttrBuilder as FbsAttrBuilder;
 
         let key_offset = builder.create_string(&self.key);
@@ -129,19 +80,28 @@ impl From<FbsAttr<'_>> for Attr {
             FbsValue::VBytes => Value::VBytes(VBytes::from(fbs.v_as_vbytes().unwrap())),
             FbsValue::VArray => Value::VArray(VArray::from(fbs.v_as_varray().unwrap())),
             FbsValue::VTri2D => Value::VTri2D(VTri2D::from(fbs.v_as_vtri_2_d().unwrap())),
-            FbsValue::VFixedSizeBytes => Value::VFixedSizeBytes(VFixedSizeBytes::from(fbs.v_as_vfixed_size_bytes().unwrap())),
-            FbsValue::VTimestampMsUtc => Value::VTimestampMsUtc(VTimestampMsUtc::from(fbs.v_as_vtimestamp_ms_utc().unwrap())),
-            FbsValue::VTimestampMs => Value::VTimestampMs(VTimestampMs::from(fbs.v_as_vtimestamp_ms().unwrap())),
-            FbsValue::VTimestampNsUtc => Value::VTimestampNsUtc(VTimestampNsUtc::from(fbs.v_as_vtimestamp_ns_utc().unwrap())),
-            FbsValue::VTimestampNs => Value::VTimestampNs(VTimestampNs::from(fbs.v_as_vtimestamp_ns().unwrap())),
-            FbsValue::VPlaceholder => Value::VPlaceholder(VPlaceholder::from(fbs.v_as_vplaceholder().unwrap())),
+            FbsValue::VFixedSizeBytes => {
+                Value::VFixedSizeBytes(VFixedSizeBytes::from(fbs.v_as_vfixed_size_bytes().unwrap()))
+            }
+            FbsValue::VTimestampMsUtc => {
+                Value::VTimestampMsUtc(VTimestampMsUtc::from(fbs.v_as_vtimestamp_ms_utc().unwrap()))
+            }
+            FbsValue::VTimestampMs => {
+                Value::VTimestampMs(VTimestampMs::from(fbs.v_as_vtimestamp_ms().unwrap()))
+            }
+            FbsValue::VTimestampNsUtc => {
+                Value::VTimestampNsUtc(VTimestampNsUtc::from(fbs.v_as_vtimestamp_ns_utc().unwrap()))
+            }
+            FbsValue::VTimestampNs => {
+                Value::VTimestampNs(VTimestampNs::from(fbs.v_as_vtimestamp_ns().unwrap()))
+            }
+            FbsValue::VPlaceholder => {
+                Value::VPlaceholder(VPlaceholder::from(fbs.v_as_vplaceholder().unwrap()))
+            }
             _ => unreachable!(),
         };
 
-        Self {
-            key,
-            v,
-        }
+        Self { key, v }
     }
 }
 
@@ -173,5 +133,4 @@ mod tests {
         let t1 = Attr::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
-
 }

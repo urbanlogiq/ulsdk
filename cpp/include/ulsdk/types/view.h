@@ -34,6 +34,10 @@ struct View {
     View();
     View(const ::View *root);
     View(const std::vector<uint8_t> &bytes);
+    bool operator==(const View &rhs) const;
+    bool operator!=(const View &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ::flatbuffers::Offset<::View>

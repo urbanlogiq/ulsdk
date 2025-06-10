@@ -10,343 +10,115 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
-use flatbuffers::{WIPOffset, UnionWIPOffset};
 use bitflags::bitflags;
 use core::ops::Deref;
+use flatbuffers::{UnionWIPOffset, WIPOffset};
 
 use crate::types::Schema::{
-    Binary,
-    Bool,
-    Buffer,
-    Date,
-    DateUnit,
-    Decimal,
-    DictionaryEncoding,
-    DictionaryKind,
-    Duration,
-    Endianness,
-    Feature,
-    Field,
-    FixedSizeBinary,
-    FixedSizeList,
-    FloatingPoint,
-    Int,
-    Interval,
-    IntervalUnit,
-    KeyValue,
-    LargeBinary,
-    LargeList,
-    LargeUtf8,
-    List,
-    Map,
-    MetadataVersion,
-    Null,
-    Precision,
-    Schema,
-    Struct_,
-    Time,
-    TimeUnit,
-    Timestamp,
-    Type,
-    Union,
-    UnionMode,
-    Utf8,
+    Binary, BinaryView, Bool, Buffer, Date, DateUnit, Decimal, DictionaryEncoding, DictionaryKind,
+    Duration, Endianness, Feature, Field, FixedSizeBinary, FixedSizeList, FloatingPoint, Int,
+    Interval, IntervalUnit, KeyValue, LargeBinary, LargeList, LargeListView, LargeUtf8, List,
+    ListView, Map, MetadataVersion, Null, Precision, RunEndEncoded, Schema, Struct_, Time,
+    TimeUnit, Timestamp, Type, Union, UnionMode, Utf8, Utf8View,
 };
 use crate::types::api::SortOrder;
 use crate::types::attr::Attr;
 use crate::types::entity::{
-    EdgeTy,
-    EntityTy,
-    Geometry,
-    GraphEdge,
-    GraphNode,
-    Line,
-    MultiLine,
-    MultiPolygon,
-    NodeTy,
-    Point,
+    EdgeTy, EntityTy, Geometry, GraphEdge, GraphNode, Line, MultiLine, MultiPolygon, NodeTy, Point,
     Polygon,
 };
 use crate::types::fun::Fn_;
-use crate::types::graph::{
-    EdgeList,
-    EdgeQuery,
-    Geom,
-    GeomOp,
-    GraphQuery,
-    NodeIdPair,
-    NodeList,
-    NodeQuery,
-    OrderBy,
-    Predicate,
-    Projection,
-    QueryPathElement,
-    QueryPathElementUnion,
-    ValueTransform,
-};
-use crate::types::id::{
-    B2cId,
-    ColumnGroupId,
-    ContentId,
-    DataStateId,
-    GenericId,
-    GraphNodeId,
-    ObjectId,
-    ObjectNamespace,
-    StreamId,
-};
-use crate::types::query::{
-    AllColumns,
-    Arrow,
-    BinaryQueryElement,
-    Case,
-    Column,
-    DataCatalog,
-    DeleteQueryElement,
-    Distinct,
-    Expr,
-    ExprUnion,
-    Function,
-    Join,
-    JoinTy,
-    MvdbPartition,
-    NullableUint,
-    OrderByExpr,
-    Partition,
-    Placeholder,
-    Query,
-    QueryElement,
-    QueryElementOp,
-    QueryElementUnion,
-    QueryTableSource,
-    SetExpr,
-    TableOrderBy,
-    TablePartition,
-    TableSource,
-    TableSourceInstance,
-    TableSourceUnion,
-    TypeHint,
-    UnaryQueryElement,
-    UnsetArgument,
-    UpdateQueryElement,
-    ValueIndex,
-    ValueName,
-    Vector,
-    When,
-    Window,
-    WorklogPartition,
-};
-use crate::types::value::{
-    Point2D,
-    Tri2D,
-    VArray,
-    VBool,
-    VBytes,
-    VChar,
-    VF32,
-    VF64,
-    VFixedSizeBytes,
-    VI16,
-    VI32,
-    VI64,
-    VI8,
-    VIsize,
-    VNull,
-    VPlaceholder,
-    VStr,
-    VTimestampMs,
-    VTimestampMsUtc,
-    VTimestampNs,
-    VTimestampNsUtc,
-    VTri2D,
-    VU16,
-    VU32,
-    VU64,
-    VU8,
-    VUnit,
-    VUsize,
-    Value,
-    ValueInstance,
-    ValueTy,
-};
 use crate::types::generated::Schema_generated::{
-    Binary as FbsBinary,
-    Bool as FbsBool,
-    Buffer as FbsBuffer,
-    Date as FbsDate,
-    Decimal as FbsDecimal,
-    DictionaryEncoding as FbsDictionaryEncoding,
-    Duration as FbsDuration,
-    Field as FbsField,
-    FixedSizeBinary as FbsFixedSizeBinary,
-    FixedSizeList as FbsFixedSizeList,
-    FloatingPoint as FbsFloatingPoint,
-    Int as FbsInt,
-    Interval as FbsInterval,
-    KeyValue as FbsKeyValue,
-    LargeBinary as FbsLargeBinary,
-    LargeList as FbsLargeList,
-    LargeUtf8 as FbsLargeUtf8,
-    List as FbsList,
-    Map as FbsMap,
-    Null as FbsNull,
-    Schema as FbsSchema,
-    Struct_ as FbsStruct_,
-    Time as FbsTime,
-    Timestamp as FbsTimestamp,
-    Union as FbsUnion,
-    Utf8 as FbsUtf8,
-    DateUnit as FbsDateUnit,
-    DictionaryKind as FbsDictionaryKind,
-    Endianness as FbsEndianness,
-    Feature as FbsFeature,
-    IntervalUnit as FbsIntervalUnit,
-    MetadataVersion as FbsMetadataVersion,
-    Precision as FbsPrecision,
-    TimeUnit as FbsTimeUnit,
-    Type as FbsType,
-    UnionMode as FbsUnionMode,
+    Binary as FbsBinary, BinaryView as FbsBinaryView, Bool as FbsBool, Buffer as FbsBuffer,
+    Date as FbsDate, DateUnit as FbsDateUnit, Decimal as FbsDecimal,
+    DictionaryEncoding as FbsDictionaryEncoding, DictionaryKind as FbsDictionaryKind,
+    Duration as FbsDuration, Endianness as FbsEndianness, Feature as FbsFeature, Field as FbsField,
+    FixedSizeBinary as FbsFixedSizeBinary, FixedSizeList as FbsFixedSizeList,
+    FloatingPoint as FbsFloatingPoint, Int as FbsInt, Interval as FbsInterval,
+    IntervalUnit as FbsIntervalUnit, KeyValue as FbsKeyValue, LargeBinary as FbsLargeBinary,
+    LargeList as FbsLargeList, LargeListView as FbsLargeListView, LargeUtf8 as FbsLargeUtf8,
+    List as FbsList, ListView as FbsListView, Map as FbsMap, MetadataVersion as FbsMetadataVersion,
+    Null as FbsNull, Precision as FbsPrecision, RunEndEncoded as FbsRunEndEncoded,
+    Schema as FbsSchema, Struct_ as FbsStruct_, Time as FbsTime, TimeUnit as FbsTimeUnit,
+    Timestamp as FbsTimestamp, Type as FbsType, Union as FbsUnion, UnionMode as FbsUnionMode,
+    Utf8 as FbsUtf8, Utf8View as FbsUtf8View,
 };
-use crate::types::generated::api_generated::{
-    SortOrder as FbsSortOrder,
-};
-use crate::types::generated::attr_generated::{
-    Attr as FbsAttr,
-};
+use crate::types::generated::api_generated::SortOrder as FbsSortOrder;
+use crate::types::generated::attr_generated::Attr as FbsAttr;
 use crate::types::generated::entity_generated::{
-    GraphEdge as FbsGraphEdge,
-    GraphNode as FbsGraphNode,
-    Line as FbsLine,
-    MultiLine as FbsMultiLine,
-    MultiPolygon as FbsMultiPolygon,
-    Point as FbsPoint,
-    Polygon as FbsPolygon,
-    EdgeTy as FbsEdgeTy,
-    EntityTy as FbsEntityTy,
-    Geometry as FbsGeometry,
-    NodeTy as FbsNodeTy,
+    EdgeTy as FbsEdgeTy, EntityTy as FbsEntityTy, Geometry as FbsGeometry,
+    GraphEdge as FbsGraphEdge, GraphNode as FbsGraphNode, Line as FbsLine,
+    MultiLine as FbsMultiLine, MultiPolygon as FbsMultiPolygon, NodeTy as FbsNodeTy,
+    Point as FbsPoint, Polygon as FbsPolygon,
 };
-use crate::types::generated::fun_generated::{
-    Fn as FbsFn,
-};
+use crate::types::generated::fun_generated::Fn as FbsFn;
 use crate::types::generated::graph_generated::{
-    EdgeList as FbsEdgeList,
-    EdgeQuery as FbsEdgeQuery,
-    Geom as FbsGeom,
-    GeomOp as FbsGeomOp,
-    GraphQuery as FbsGraphQuery,
-    NodeIdPair as FbsNodeIdPair,
-    NodeList as FbsNodeList,
-    NodeQuery as FbsNodeQuery,
-    OrderBy as FbsOrderBy,
-    Projection as FbsProjection,
-    QueryPathElement as FbsQueryPathElement,
-    Predicate as FbsPredicate,
-    QueryPathElementUnion as FbsQueryPathElementUnion,
-    ValueTransform as FbsValueTransform,
+    EdgeList as FbsEdgeList, EdgeQuery as FbsEdgeQuery, Geom as FbsGeom, GeomOp as FbsGeomOp,
+    GraphQuery as FbsGraphQuery, NodeIdPair as FbsNodeIdPair, NodeList as FbsNodeList,
+    NodeQuery as FbsNodeQuery, OrderBy as FbsOrderBy, Predicate as FbsPredicate,
+    Projection as FbsProjection, QueryPathElement as FbsQueryPathElement,
+    QueryPathElementUnion as FbsQueryPathElementUnion, ValueTransform as FbsValueTransform,
 };
 use crate::types::generated::id_generated::{
-    B2cId as FbsB2cId,
-    ColumnGroupId as FbsColumnGroupId,
-    ContentId as FbsContentId,
-    DataStateId as FbsDataStateId,
-    GenericId as FbsGenericId,
-    GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId,
-    StreamId as FbsStreamId,
-    ObjectNamespace as FbsObjectNamespace,
+    B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
+    DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
 };
 use crate::types::generated::query_generated::{
-    AllColumns as FbsAllColumns,
-    Arrow as FbsArrow,
-    BinaryQueryElement as FbsBinaryQueryElement,
-    Case as FbsCase,
-    Column as FbsColumn,
-    DataCatalog as FbsDataCatalog,
-    DeleteQueryElement as FbsDeleteQueryElement,
-    Distinct as FbsDistinct,
-    Expr as FbsExpr,
-    Function as FbsFunction,
-    Join as FbsJoin,
-    MvdbPartition as FbsMvdbPartition,
-    NullableUint as FbsNullableUint,
-    OrderByExpr as FbsOrderByExpr,
-    Partition as FbsPartition,
-    Placeholder as FbsPlaceholder,
-    Query as FbsQuery,
-    QueryElement as FbsQueryElement,
-    QueryTableSource as FbsQueryTableSource,
-    SetExpr as FbsSetExpr,
-    TableOrderBy as FbsTableOrderBy,
-    TableSource as FbsTableSource,
-    TableSourceInstance as FbsTableSourceInstance,
-    UnaryQueryElement as FbsUnaryQueryElement,
-    UnsetArgument as FbsUnsetArgument,
-    UpdateQueryElement as FbsUpdateQueryElement,
-    ValueIndex as FbsValueIndex,
-    ValueName as FbsValueName,
-    Vector as FbsVector,
-    When as FbsWhen,
-    Window as FbsWindow,
+    AllColumns as FbsAllColumns, Arrow as FbsArrow, BinaryQueryElement as FbsBinaryQueryElement,
+    Case as FbsCase, Column as FbsColumn, DataCatalog as FbsDataCatalog,
+    DeleteQueryElement as FbsDeleteQueryElement, Distinct as FbsDistinct, Drive as FbsDrive,
+    Expr as FbsExpr, ExprUnion as FbsExprUnion, Function as FbsFunction, Join as FbsJoin,
+    JoinTy as FbsJoinTy, MvdbPartition as FbsMvdbPartition, NullableUint as FbsNullableUint,
+    OrderByExpr as FbsOrderByExpr, Partition as FbsPartition, Placeholder as FbsPlaceholder,
+    Query as FbsQuery, QueryElement as FbsQueryElement, QueryElementOp as FbsQueryElementOp,
+    QueryElementUnion as FbsQueryElementUnion, QueryTableSource as FbsQueryTableSource,
+    SetExpr as FbsSetExpr, TableOrderBy as FbsTableOrderBy, TablePartition as FbsTablePartition,
+    TableSource as FbsTableSource, TableSourceInstance as FbsTableSourceInstance,
+    TableSourceUnion as FbsTableSourceUnion, TypeHint as FbsTypeHint,
+    UnaryQueryElement as FbsUnaryQueryElement, UnsetArgument as FbsUnsetArgument,
+    UpdateQueryElement as FbsUpdateQueryElement, ValueIndex as FbsValueIndex,
+    ValueName as FbsValueName, Vector as FbsVector, When as FbsWhen, Window as FbsWindow,
     WorklogPartition as FbsWorklogPartition,
-    ExprUnion as FbsExprUnion,
-    JoinTy as FbsJoinTy,
-    QueryElementOp as FbsQueryElementOp,
-    QueryElementUnion as FbsQueryElementUnion,
-    TablePartition as FbsTablePartition,
-    TableSourceUnion as FbsTableSourceUnion,
-    TypeHint as FbsTypeHint,
 };
 use crate::types::generated::table_generated::{
-    Append as FbsAppend,
-    ChangeOpEntry as FbsChangeOpEntry,
-    ChangeSet as FbsChangeSet,
-    Delete as FbsDelete,
-    DiffStream as FbsDiffStream,
-    History as FbsHistory,
-    Modify as FbsModify,
-    NewTable as FbsNewTable,
-    OpEntry as FbsOpEntry,
-    Restore as FbsRestore,
-    RestoreRow as FbsRestoreRow,
-    RmRow as FbsRmRow,
-    Set as FbsSet,
-    ChangeOp as FbsChangeOp,
-    Op as FbsOp,
-    TableFrom as FbsTableFrom,
+    Append as FbsAppend, ChangeOp as FbsChangeOp, ChangeOpEntry as FbsChangeOpEntry,
+    ChangeSet as FbsChangeSet, Delete as FbsDelete, DiffStream as FbsDiffStream,
+    History as FbsHistory, Modify as FbsModify, NewTable as FbsNewTable, Op as FbsOp,
+    OpEntry as FbsOpEntry, Restore as FbsRestore, RestoreRow as FbsRestoreRow, RmRow as FbsRmRow,
+    Set as FbsSet, TableFrom as FbsTableFrom,
 };
 use crate::types::generated::value_generated::{
-    Point2D as FbsPoint2D,
-    Tri2D as FbsTri2D,
-    VArray as FbsVArray,
-    VBool as FbsVBool,
-    VBytes as FbsVBytes,
-    VChar as FbsVChar,
-    VF32 as FbsVF32,
-    VF64 as FbsVF64,
-    VFixedSizeBytes as FbsVFixedSizeBytes,
-    VI16 as FbsVI16,
-    VI32 as FbsVI32,
-    VI64 as FbsVI64,
-    VI8 as FbsVI8,
-    VIsize as FbsVIsize,
-    VNull as FbsVNull,
-    VPlaceholder as FbsVPlaceholder,
-    VStr as FbsVStr,
-    VTimestampMs as FbsVTimestampMs,
-    VTimestampMsUtc as FbsVTimestampMsUtc,
-    VTimestampNs as FbsVTimestampNs,
-    VTimestampNsUtc as FbsVTimestampNsUtc,
-    VTri2D as FbsVTri2D,
-    VU16 as FbsVU16,
-    VU32 as FbsVU32,
-    VU64 as FbsVU64,
-    VU8 as FbsVU8,
-    VUnit as FbsVUnit,
-    VUsize as FbsVUsize,
-    ValueInstance as FbsValueInstance,
-    Value as FbsValue,
+    Point2D as FbsPoint2D, Tri2D as FbsTri2D, VArray as FbsVArray, VBool as FbsVBool,
+    VBytes as FbsVBytes, VChar as FbsVChar, VF32 as FbsVF32, VF64 as FbsVF64,
+    VFixedSizeBytes as FbsVFixedSizeBytes, VI8 as FbsVI8, VI16 as FbsVI16, VI32 as FbsVI32,
+    VI64 as FbsVI64, VIsize as FbsVIsize, VNull as FbsVNull, VPlaceholder as FbsVPlaceholder,
+    VStr as FbsVStr, VTimestampMs as FbsVTimestampMs, VTimestampMsUtc as FbsVTimestampMsUtc,
+    VTimestampNs as FbsVTimestampNs, VTimestampNsUtc as FbsVTimestampNsUtc, VTri2D as FbsVTri2D,
+    VU8 as FbsVU8, VU16 as FbsVU16, VU32 as FbsVU32, VU64 as FbsVU64, VUnit as FbsVUnit,
+    VUsize as FbsVUsize, Value as FbsValue, ValueInstance as FbsValueInstance,
     ValueTy as FbsValueTy,
+};
+use crate::types::graph::{
+    EdgeList, EdgeQuery, Geom, GeomOp, GraphQuery, NodeIdPair, NodeList, NodeQuery, OrderBy,
+    Predicate, Projection, QueryPathElement, QueryPathElementUnion, ValueTransform,
+};
+use crate::types::id::{
+    B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
+    ObjectNamespace, StreamId,
+};
+use crate::types::query::{
+    AllColumns, Arrow, BinaryQueryElement, Case, Column, DataCatalog, DeleteQueryElement, Distinct,
+    Drive, Expr, ExprUnion, Function, Join, JoinTy, MvdbPartition, NullableUint, OrderByExpr,
+    Partition, Placeholder, Query, QueryElement, QueryElementOp, QueryElementUnion,
+    QueryTableSource, SetExpr, TableOrderBy, TablePartition, TableSource, TableSourceInstance,
+    TableSourceUnion, TypeHint, UnaryQueryElement, UnsetArgument, UpdateQueryElement, ValueIndex,
+    ValueName, Vector, When, Window, WorklogPartition,
+};
+use crate::types::value::{
+    Point2D, Tri2D, VArray, VBool, VBytes, VChar, VF32, VF64, VFixedSizeBytes, VI8, VI16, VI32,
+    VI64, VIsize, VNull, VPlaceholder, VStr, VTimestampMs, VTimestampMsUtc, VTimestampNs,
+    VTimestampNsUtc, VTri2D, VU8, VU16, VU32, VU64, VUnit, VUsize, Value, ValueInstance, ValueTy,
 };
 
 #[derive(Default, PartialEq, Debug, Clone)]
@@ -358,7 +130,10 @@ pub struct Modify {
 }
 
 impl Modify {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsModify<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsModify<'a>> {
         use crate::types::generated::table_generated::ModifyBuilder as FbsModifyBuilder;
 
         let col_offset = builder.create_string(&self.col);
@@ -415,7 +190,10 @@ pub struct Delete {
 }
 
 impl Delete {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDelete<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDelete<'a>> {
         use crate::types::generated::table_generated::DeleteBuilder as FbsDeleteBuilder;
 
         let row_offset = self.row.serialize_to(builder);
@@ -429,9 +207,7 @@ impl Delete {
 impl From<FbsDelete<'_>> for Delete {
     fn from(fbs: FbsDelete<'_>) -> Self {
         let row = GenericId::from(fbs.row());
-        Self {
-            row,
-        }
+        Self { row }
     }
 }
 
@@ -458,7 +234,10 @@ pub struct Restore {
 }
 
 impl Restore {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsRestore<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsRestore<'a>> {
         use crate::types::generated::table_generated::RestoreBuilder as FbsRestoreBuilder;
 
         let row_offset = self.row.serialize_to(builder);
@@ -472,9 +251,7 @@ impl Restore {
 impl From<FbsRestore<'_>> for Restore {
     fn from(fbs: FbsRestore<'_>) -> Self {
         let row = GenericId::from(fbs.row());
-        Self {
-            row,
-        }
+        Self { row }
     }
 }
 
@@ -509,7 +286,10 @@ impl Default for ChangeOp {
 }
 
 impl ChangeOp {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsChangeOp) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsChangeOp) {
         match self {
             Self::Modify(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -542,7 +322,10 @@ pub struct Set {
 }
 
 impl Set {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsSet<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsSet<'a>> {
         use crate::types::generated::table_generated::SetBuilder as FbsSetBuilder;
 
         let col_offset = builder.create_string(&self.col);
@@ -562,11 +345,7 @@ impl From<FbsSet<'_>> for Set {
         let col = fbs.col().to_owned();
         let row = GenericId::from(fbs.row());
         let value = ValueInstance::from(fbs.value());
-        Self {
-            col,
-            row,
-            value,
-        }
+        Self { col, row, value }
     }
 }
 
@@ -595,7 +374,10 @@ pub struct RmRow {
 }
 
 impl RmRow {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsRmRow<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsRmRow<'a>> {
         use crate::types::generated::table_generated::RmRowBuilder as FbsRmRowBuilder;
 
         let row_offset = self.row.serialize_to(builder);
@@ -609,9 +391,7 @@ impl RmRow {
 impl From<FbsRmRow<'_>> for RmRow {
     fn from(fbs: FbsRmRow<'_>) -> Self {
         let row = GenericId::from(fbs.row());
-        Self {
-            row,
-        }
+        Self { row }
     }
 }
 
@@ -642,7 +422,10 @@ pub struct RestoreRow {
 }
 
 impl RestoreRow {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsRestoreRow<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsRestoreRow<'a>> {
         use crate::types::generated::table_generated::RestoreRowBuilder as FbsRestoreRowBuilder;
 
         let row_offset = self.row.serialize_to(builder);
@@ -656,9 +439,7 @@ impl RestoreRow {
 impl From<FbsRestoreRow<'_>> for RestoreRow {
     fn from(fbs: FbsRestoreRow<'_>) -> Self {
         let row = GenericId::from(fbs.row());
-        Self {
-            row,
-        }
+        Self { row }
     }
 }
 
@@ -687,7 +468,10 @@ pub struct Append {
 }
 
 impl Append {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsAppend<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsAppend<'a>> {
         use crate::types::generated::table_generated::AppendBuilder as FbsAppendBuilder;
 
         let content_offset = builder.create_vector(&self.content);
@@ -705,9 +489,7 @@ impl From<FbsAppend<'_>> for Append {
             content.push(elem.into());
         }
 
-        Self {
-            content,
-        }
+        Self { content }
     }
 }
 
@@ -744,7 +526,10 @@ impl Default for Op {
 }
 
 impl Op {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsOp) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsOp) {
         match self {
             Self::Set(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -783,7 +568,10 @@ impl Default for TableFrom {
 }
 
 impl TableFrom {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsTableFrom) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsTableFrom) {
         match self {
             Self::ObjectId(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -805,7 +593,10 @@ pub struct ChangeOpEntry {
 }
 
 impl ChangeOpEntry {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsChangeOpEntry<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsChangeOpEntry<'a>> {
         use crate::types::generated::table_generated::ChangeOpEntryBuilder as FbsChangeOpEntryBuilder;
 
         let (op_offset, op_ty) = self.op.serialize_to(builder);
@@ -826,9 +617,7 @@ impl From<FbsChangeOpEntry<'_>> for ChangeOpEntry {
             _ => unreachable!(),
         };
 
-        Self {
-            op,
-        }
+        Self { op }
     }
 }
 
@@ -859,7 +648,10 @@ pub struct ChangeSet {
 }
 
 impl ChangeSet {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsChangeSet<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsChangeSet<'a>> {
         use crate::types::generated::table_generated::ChangeSetBuilder as FbsChangeSetBuilder;
 
         let attributes_offset = self.attributes.as_ref().map(|v| {
@@ -954,7 +746,10 @@ pub struct DiffStream {
 }
 
 impl DiffStream {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDiffStream<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDiffStream<'a>> {
         use crate::types::generated::table_generated::DiffStreamBuilder as FbsDiffStreamBuilder;
 
         let attributes_offset = self.attributes.as_ref().map(|v| {
@@ -1035,7 +830,10 @@ pub struct History {
 }
 
 impl History {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsHistory<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsHistory<'a>> {
         use crate::types::generated::table_generated::HistoryBuilder as FbsHistoryBuilder;
 
         let mut changes_offsets = Vec::with_capacity(self.changes.len());
@@ -1044,7 +842,10 @@ impl History {
             changes_offsets.push(offset);
         }
         let changes_offset = builder.create_vector(&changes_offsets);
-        let continuation_id_offset = self.continuation_id.as_ref().map(|o| o.serialize_to(builder));
+        let continuation_id_offset = self
+            .continuation_id
+            .as_ref()
+            .map(|o| o.serialize_to(builder));
 
         let mut bldr = FbsHistoryBuilder::new(builder);
         bldr.add_changes(changes_offset);
@@ -1105,7 +906,10 @@ pub struct NewTable {
 }
 
 impl NewTable {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsNewTable<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNewTable<'a>> {
         use crate::types::generated::table_generated::NewTableBuilder as FbsNewTableBuilder;
 
         let from_offset = self.from.as_ref().map(|u| u.serialize_to(builder));
@@ -1134,8 +938,12 @@ impl From<FbsNewTable<'_>> for NewTable {
     fn from(fbs: FbsNewTable<'_>) -> Self {
         let from = if let Some(val) = fbs.from() {
             let from = match fbs.from_type() {
-                FbsTableFrom::ObjectId => TableFrom::ObjectId(ObjectId::from(fbs.from_as_object_id().unwrap())),
-                FbsTableFrom::Schema => TableFrom::Schema(Schema::from(fbs.from_as_schema().unwrap())),
+                FbsTableFrom::ObjectId => {
+                    TableFrom::ObjectId(ObjectId::from(fbs.from_as_object_id().unwrap()))
+                }
+                FbsTableFrom::Schema => {
+                    TableFrom::Schema(Schema::from(fbs.from_as_schema().unwrap()))
+                }
                 _ => unreachable!(),
             };
 
@@ -1181,7 +989,10 @@ pub struct OpEntry {
 }
 
 impl OpEntry {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsOpEntry<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsOpEntry<'a>> {
         use crate::types::generated::table_generated::OpEntryBuilder as FbsOpEntryBuilder;
 
         let (op_offset, op_ty) = self.op.serialize_to(builder);
@@ -1203,9 +1014,7 @@ impl From<FbsOpEntry<'_>> for OpEntry {
             _ => unreachable!(),
         };
 
-        Self {
-            op,
-        }
+        Self { op }
     }
 }
 
@@ -1333,5 +1142,4 @@ mod tests {
         let t1 = Set::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
-
 }

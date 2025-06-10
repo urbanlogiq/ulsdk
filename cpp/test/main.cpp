@@ -138,16 +138,6 @@ int main(int argc, char** argv) {
         }
     }
 
-    ApiTest* p = link_only_api_test_root;
-    std::cout << "Listing link-only tests" << std::endl;
-    while (p != nullptr) {
-        if (filter_test(filters, p->name)) {
-            std::cout << "  Running test " << p->name << " ... ok" << std::endl;
-        }
-
-        p = p->next;
-    }
-
     std::cout << "Running type tests" << std::endl;
     TypeTest* t = type_test_root;
     while (t != nullptr) {

@@ -130,6 +130,29 @@ Principal::Principal(const struct json_value_s *root)
     }
 }
 
+bool
+Principal::operator==(const Principal&rhs) const {
+    if (this->principal_type_ != rhs.principal_type_) {
+        return false;
+    }
+    if (this->display_name_ != rhs.display_name_) {
+        return false;
+    }
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->email_ != rhs.email_) {
+        return false;
+    }
+    if (this->description_ != rhs.description_) {
+        return false;
+    }
+    if (this->department_ != rhs.department_) {
+        return false;
+    }
+    return true;
+}
+
 std::vector<uint8_t>
 to_bytes(const Principal &o) {
     std::stringstream ss;
@@ -149,9 +172,15 @@ to_bytes(const Principal &o) {
     if (o.email_.has_value()) {
         ss << "\"email\":";
         const auto &email__value = o.email_.value();
+        ss << "[";
         for (const auto &i : email__value) {
             ss << "\"" << i << "\"";
+            ss << ",";
         }
+        if (!email__value.empty()) {
+            ss.seekp(-1, ss.cur);
+        }
+        ss << "]";
         ss << ",";
     }
 
@@ -180,7 +209,7 @@ AdUser::AdUser(const struct json_value_s *root)
     : display_name_(std::string())
     , id_(std::string())
     , user_principal_name_(std::string())
-    , other_mails_()
+    , other_mails_(std::nullopt)
     , department_(std::nullopt)
     , created_date_time_(std::string()) {
     if (root->type != json_type_object) {
@@ -221,26 +250,30 @@ AdUser::AdUser(const struct json_value_s *root)
         } else if (std::strcmp(e->name->string, "otherMails") == 0) {
             const struct json_value_s *ad_user_value = e->value;
 
-            if (ad_user_value->type != json_type_array) {
-                throw std::runtime_error("expected field to be of type array");
-            }
+            if (ad_user_value->type == json_type_null) {
+                other_mails_ = std::nullopt;
+            } else {
+                if (ad_user_value->type != json_type_array) {
+                    throw std::runtime_error("expected field to be of type array");
+                }
 
-            const struct json_array_s *other_mails__array = static_cast<const struct json_array_s *>(ad_user_value->payload);
-            const struct json_array_element_s *other_mails__element = other_mails__array->start;
-            std::vector<std::string> other_mails__vec = std::vector<std::string>();
-            while (other_mails__element != nullptr) {
-                const struct json_value_s *ad_user_value_0 = other_mails__element->value;
-                std::string other_mails__value;
-            if (ad_user_value_0->type != json_type_string) {
-                throw std::runtime_error("expected field to be of type string");
-            }
+                const struct json_array_s *other_mails__array = static_cast<const struct json_array_s *>(ad_user_value->payload);
+                const struct json_array_element_s *other_mails__element = other_mails__array->start;
+                std::vector<std::string> other_mails__vec = std::vector<std::string>();
+                while (other_mails__element != nullptr) {
+                    const struct json_value_s *ad_user_value_1 = other_mails__element->value;
+                    std::string other_mails__value;
+                    if (ad_user_value_1->type != json_type_string) {
+                        throw std::runtime_error("expected field to be of type string");
+                    }
 
-            const struct json_string_s *other_mails__value_str = static_cast<const struct json_string_s *>(ad_user_value_0->payload);
-            other_mails__value = std::string(other_mails__value_str->string);
-                other_mails__vec.push_back(other_mails__value);
-                other_mails__element = other_mails__element->next;
+                    const struct json_string_s *other_mails__value_str = static_cast<const struct json_string_s *>(ad_user_value_1->payload);
+                    other_mails__value = std::string(other_mails__value_str->string);
+                    other_mails__vec.push_back(other_mails__value);
+                    other_mails__element = other_mails__element->next;
+                }
+                other_mails_ = other_mails__vec;
             }
-            other_mails_ = other_mails__vec;
         } else if (std::strcmp(e->name->string, "department") == 0) {
             const struct json_value_s *ad_user_value = e->value;
 
@@ -269,6 +302,29 @@ AdUser::AdUser(const struct json_value_s *root)
     }
 }
 
+bool
+AdUser::operator==(const AdUser&rhs) const {
+    if (this->display_name_ != rhs.display_name_) {
+        return false;
+    }
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->user_principal_name_ != rhs.user_principal_name_) {
+        return false;
+    }
+    if (this->other_mails_ != rhs.other_mails_) {
+        return false;
+    }
+    if (this->department_ != rhs.department_) {
+        return false;
+    }
+    if (this->created_date_time_ != rhs.created_date_time_) {
+        return false;
+    }
+    return true;
+}
+
 std::vector<uint8_t>
 to_bytes(const AdUser &o) {
     std::stringstream ss;
@@ -285,11 +341,20 @@ to_bytes(const AdUser &o) {
     ss << "\"" << o.user_principal_name_ << "\"";
     ss << ",";
 
-    ss << "\"otherMails\":";
-    for (const auto &i : o.other_mails_) {
-        ss << "\"" << i << "\"";
+    if (o.other_mails_.has_value()) {
+        ss << "\"otherMails\":";
+        const auto &other_mails__value = o.other_mails_.value();
+        ss << "[";
+        for (const auto &i : other_mails__value) {
+            ss << "\"" << i << "\"";
+            ss << ",";
+        }
+        if (!other_mails__value.empty()) {
+            ss.seekp(-1, ss.cur);
+        }
+        ss << "]";
+        ss << ",";
     }
-    ss << ",";
 
     if (o.department_.has_value()) {
         ss << "\"department\":";
@@ -341,6 +406,17 @@ DisplayNames::DisplayNames(const struct json_value_s *root)
 
         e = e->next;
     }
+}
+
+bool
+DisplayNames::operator==(const DisplayNames&rhs) const {
+    if (this->display_name_ != rhs.display_name_) {
+        return false;
+    }
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    return true;
 }
 
 std::vector<uint8_t>
@@ -462,6 +538,29 @@ DeviceDetail::DeviceDetail(const struct json_value_s *root)
     }
 }
 
+bool
+DeviceDetail::operator==(const DeviceDetail&rhs) const {
+    if (this->device_id_ != rhs.device_id_) {
+        return false;
+    }
+    if (this->operating_system_ != rhs.operating_system_) {
+        return false;
+    }
+    if (this->browser_ != rhs.browser_) {
+        return false;
+    }
+    if (this->is_compliant_ != rhs.is_compliant_) {
+        return false;
+    }
+    if (this->is_managed_ != rhs.is_managed_) {
+        return false;
+    }
+    if (this->trust_type_ != rhs.trust_type_) {
+        return false;
+    }
+    return true;
+}
+
 std::vector<uint8_t>
 to_bytes(const DeviceDetail &o) {
     std::stringstream ss;
@@ -572,6 +671,20 @@ Coordinates::Coordinates(const struct json_value_s *root)
     }
 }
 
+bool
+Coordinates::operator==(const Coordinates&rhs) const {
+    if (this->latitude_ != rhs.latitude_) {
+        return false;
+    }
+    if (this->longitude_ != rhs.longitude_) {
+        return false;
+    }
+    if (this->altitude_ != rhs.altitude_) {
+        return false;
+    }
+    return true;
+}
+
 std::vector<uint8_t>
 to_bytes(const Coordinates &o) {
     std::stringstream ss;
@@ -672,6 +785,23 @@ Location::Location(const struct json_value_s *root)
 
         e = e->next;
     }
+}
+
+bool
+Location::operator==(const Location&rhs) const {
+    if (this->city_ != rhs.city_) {
+        return false;
+    }
+    if (this->state_ != rhs.state_) {
+        return false;
+    }
+    if (this->country_or_region_ != rhs.country_or_region_) {
+        return false;
+    }
+    if (this->geo_coordinates_ != rhs.geo_coordinates_) {
+        return false;
+    }
+    return true;
 }
 
 std::vector<uint8_t>
@@ -826,6 +956,32 @@ AuditLogEntry::AuditLogEntry(const struct json_value_s *root)
     }
 }
 
+bool
+AuditLogEntry::operator==(const AuditLogEntry&rhs) const {
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->user_principal_name_ != rhs.user_principal_name_) {
+        return false;
+    }
+    if (this->user_id_ != rhs.user_id_) {
+        return false;
+    }
+    if (this->created_date_time_ != rhs.created_date_time_) {
+        return false;
+    }
+    if (this->ip_address_ != rhs.ip_address_) {
+        return false;
+    }
+    if (this->device_detail_ != rhs.device_detail_) {
+        return false;
+    }
+    if (this->location_ != rhs.location_) {
+        return false;
+    }
+    return true;
+}
+
 std::vector<uint8_t>
 to_bytes(const AuditLogEntry &o) {
     std::stringstream ss;
@@ -909,29 +1065,15 @@ AuditLog::AuditLog(const struct json_value_s *root)
 
             const struct json_array_s *value__array = static_cast<const struct json_array_s *>(audit_log_value->payload);
             const struct json_array_element_s *value__element = value__array->start;
-            std::vector<std::vector<AuditLogEntry>> value__vec = std::vector<std::vector<AuditLogEntry>>();
+            std::vector<AuditLogEntry> value__vec = std::vector<AuditLogEntry>();
             while (value__element != nullptr) {
                 const struct json_value_s *audit_log_value_0 = value__element->value;
-                std::vector<AuditLogEntry> value__value;
-            if (audit_log_value_0->type != json_type_array) {
-                throw std::runtime_error("expected field to be of type array");
-            }
-
-            const struct json_array_s *value__value_array = static_cast<const struct json_array_s *>(audit_log_value_0->payload);
-            const struct json_array_element_s *value__value_element = value__value_array->start;
-            std::vector<AuditLogEntry> value__value_vec = std::vector<AuditLogEntry>();
-            while (value__value_element != nullptr) {
-                const struct json_value_s *audit_log_value_0_0 = value__value_element->value;
-                AuditLogEntry value__value_value;
-            if (audit_log_value_0_0->type != json_type_object) {
+                AuditLogEntry value__value;
+            if (audit_log_value_0->type != json_type_object) {
                 throw std::runtime_error("expected field to be of type object");
             }
 
-            value__value_value = AuditLogEntry(audit_log_value_0_0);
-                value__value_vec.push_back(value__value_value);
-                value__value_element = value__value_element->next;
-            }
-            value__value = value__value_vec;
+            value__value = AuditLogEntry(audit_log_value_0);
                 value__vec.push_back(value__value);
                 value__element = value__element->next;
             }
@@ -942,18 +1084,30 @@ AuditLog::AuditLog(const struct json_value_s *root)
     }
 }
 
+bool
+AuditLog::operator==(const AuditLog&rhs) const {
+    if (this->value_ != rhs.value_) {
+        return false;
+    }
+    return true;
+}
+
 std::vector<uint8_t>
 to_bytes(const AuditLog &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"value\":";
+    ss << "[";
     for (const auto &i : o.value_) {
-        for (const auto &i : i) {
-                const std::vector<uint8_t> i_serialized = to_bytes(i);
-                const std::string i_str = std::string(i_serialized.begin(), i_serialized.end());
-                ss << i_str;
-        }
+        const std::vector<uint8_t> i_serialized = to_bytes(i);
+        const std::string i_str = std::string(i_serialized.begin(), i_serialized.end());
+        ss << i_str;
+        ss << ",";
     }
+    if (!o.value_.empty()) {
+        ss.seekp(-1, ss.cur);
+    }
+    ss << "]";
     std::string str = ss.str();
     if (str.back() == ',') {
         str.pop_back();
@@ -966,7 +1120,7 @@ AdUserWithAuditLog::AdUserWithAuditLog(const struct json_value_s *root)
     : display_name_(std::string())
     , id_(std::string())
     , user_principal_name_(std::string())
-    , other_mails_()
+    , other_mails_(std::nullopt)
     , department_(std::nullopt)
     , created_date_time_(std::string())
     , audit_log_(std::nullopt) {
@@ -1008,26 +1162,30 @@ AdUserWithAuditLog::AdUserWithAuditLog(const struct json_value_s *root)
         } else if (std::strcmp(e->name->string, "otherMails") == 0) {
             const struct json_value_s *ad_user_with_audit_log_value = e->value;
 
-            if (ad_user_with_audit_log_value->type != json_type_array) {
-                throw std::runtime_error("expected field to be of type array");
-            }
+            if (ad_user_with_audit_log_value->type == json_type_null) {
+                other_mails_ = std::nullopt;
+            } else {
+                if (ad_user_with_audit_log_value->type != json_type_array) {
+                    throw std::runtime_error("expected field to be of type array");
+                }
 
-            const struct json_array_s *other_mails__array = static_cast<const struct json_array_s *>(ad_user_with_audit_log_value->payload);
-            const struct json_array_element_s *other_mails__element = other_mails__array->start;
-            std::vector<std::string> other_mails__vec = std::vector<std::string>();
-            while (other_mails__element != nullptr) {
-                const struct json_value_s *ad_user_with_audit_log_value_0 = other_mails__element->value;
-                std::string other_mails__value;
-            if (ad_user_with_audit_log_value_0->type != json_type_string) {
-                throw std::runtime_error("expected field to be of type string");
-            }
+                const struct json_array_s *other_mails__array = static_cast<const struct json_array_s *>(ad_user_with_audit_log_value->payload);
+                const struct json_array_element_s *other_mails__element = other_mails__array->start;
+                std::vector<std::string> other_mails__vec = std::vector<std::string>();
+                while (other_mails__element != nullptr) {
+                    const struct json_value_s *ad_user_with_audit_log_value_1 = other_mails__element->value;
+                    std::string other_mails__value;
+                    if (ad_user_with_audit_log_value_1->type != json_type_string) {
+                        throw std::runtime_error("expected field to be of type string");
+                    }
 
-            const struct json_string_s *other_mails__value_str = static_cast<const struct json_string_s *>(ad_user_with_audit_log_value_0->payload);
-            other_mails__value = std::string(other_mails__value_str->string);
-                other_mails__vec.push_back(other_mails__value);
-                other_mails__element = other_mails__element->next;
+                    const struct json_string_s *other_mails__value_str = static_cast<const struct json_string_s *>(ad_user_with_audit_log_value_1->payload);
+                    other_mails__value = std::string(other_mails__value_str->string);
+                    other_mails__vec.push_back(other_mails__value);
+                    other_mails__element = other_mails__element->next;
+                }
+                other_mails_ = other_mails__vec;
             }
-            other_mails_ = other_mails__vec;
         } else if (std::strcmp(e->name->string, "department") == 0) {
             const struct json_value_s *ad_user_with_audit_log_value = e->value;
 
@@ -1068,6 +1226,32 @@ AdUserWithAuditLog::AdUserWithAuditLog(const struct json_value_s *root)
     }
 }
 
+bool
+AdUserWithAuditLog::operator==(const AdUserWithAuditLog&rhs) const {
+    if (this->display_name_ != rhs.display_name_) {
+        return false;
+    }
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->user_principal_name_ != rhs.user_principal_name_) {
+        return false;
+    }
+    if (this->other_mails_ != rhs.other_mails_) {
+        return false;
+    }
+    if (this->department_ != rhs.department_) {
+        return false;
+    }
+    if (this->created_date_time_ != rhs.created_date_time_) {
+        return false;
+    }
+    if (this->audit_log_ != rhs.audit_log_) {
+        return false;
+    }
+    return true;
+}
+
 std::vector<uint8_t>
 to_bytes(const AdUserWithAuditLog &o) {
     std::stringstream ss;
@@ -1084,11 +1268,20 @@ to_bytes(const AdUserWithAuditLog &o) {
     ss << "\"" << o.user_principal_name_ << "\"";
     ss << ",";
 
-    ss << "\"otherMails\":";
-    for (const auto &i : o.other_mails_) {
-        ss << "\"" << i << "\"";
+    if (o.other_mails_.has_value()) {
+        ss << "\"otherMails\":";
+        const auto &other_mails__value = o.other_mails_.value();
+        ss << "[";
+        for (const auto &i : other_mails__value) {
+            ss << "\"" << i << "\"";
+            ss << ",";
+        }
+        if (!other_mails__value.empty()) {
+            ss.seekp(-1, ss.cur);
+        }
+        ss << "]";
+        ss << ",";
     }
-    ss << ",";
 
     if (o.department_.has_value()) {
         ss << "\"department\":";
@@ -1160,6 +1353,17 @@ CreateUserRequest::CreateUserRequest(const struct json_value_s *root)
     }
 }
 
+bool
+CreateUserRequest::operator==(const CreateUserRequest&rhs) const {
+    if (this->display_name_ != rhs.display_name_) {
+        return false;
+    }
+    if (this->user_principal_name_ != rhs.user_principal_name_) {
+        return false;
+    }
+    return true;
+}
+
 std::vector<uint8_t>
 to_bytes(const CreateUserRequest &o) {
     std::stringstream ss;
@@ -1217,6 +1421,17 @@ CreateUser::CreateUser(const struct json_value_s *root)
 
         e = e->next;
     }
+}
+
+bool
+CreateUser::operator==(const CreateUser&rhs) const {
+    if (this->user_ != rhs.user_) {
+        return false;
+    }
+    if (this->password_ != rhs.password_) {
+        return false;
+    }
+    return true;
 }
 
 std::vector<uint8_t>
@@ -1296,6 +1511,17 @@ UpdateCurrentUser::UpdateCurrentUser(const struct json_value_s *root)
     }
 }
 
+bool
+UpdateCurrentUser::operator==(const UpdateCurrentUser&rhs) const {
+    if (this->display_name_ != rhs.display_name_) {
+        return false;
+    }
+    if (this->other_mails_ != rhs.other_mails_) {
+        return false;
+    }
+    return true;
+}
+
 std::vector<uint8_t>
 to_bytes(const UpdateCurrentUser &o) {
     std::stringstream ss;
@@ -1310,9 +1536,15 @@ to_bytes(const UpdateCurrentUser &o) {
     if (o.other_mails_.has_value()) {
         ss << "\"otherMails\":";
         const auto &other_mails__value = o.other_mails_.value();
+        ss << "[";
         for (const auto &i : other_mails__value) {
             ss << "\"" << i << "\"";
+            ss << ",";
         }
+        if (!other_mails__value.empty()) {
+            ss.seekp(-1, ss.cur);
+        }
+        ss << "]";
     }
 
     std::string str = ss.str();
@@ -1380,6 +1612,17 @@ UpdateUser::UpdateUser(const struct json_value_s *root)
     }
 }
 
+bool
+UpdateUser::operator==(const UpdateUser&rhs) const {
+    if (this->display_name_ != rhs.display_name_) {
+        return false;
+    }
+    if (this->other_mails_ != rhs.other_mails_) {
+        return false;
+    }
+    return true;
+}
+
 std::vector<uint8_t>
 to_bytes(const UpdateUser &o) {
     std::stringstream ss;
@@ -1394,9 +1637,15 @@ to_bytes(const UpdateUser &o) {
     if (o.other_mails_.has_value()) {
         ss << "\"otherMails\":";
         const auto &other_mails__value = o.other_mails_.value();
+        ss << "[";
         for (const auto &i : other_mails__value) {
             ss << "\"" << i << "\"";
+            ss << ",";
         }
+        if (!other_mails__value.empty()) {
+            ss.seekp(-1, ss.cur);
+        }
+        ss << "]";
     }
 
     std::string str = ss.str();
@@ -1454,6 +1703,20 @@ AdGroup::AdGroup(const struct json_value_s *root)
 
         e = e->next;
     }
+}
+
+bool
+AdGroup::operator==(const AdGroup&rhs) const {
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->display_name_ != rhs.display_name_) {
+        return false;
+    }
+    if (this->description_ != rhs.description_) {
+        return false;
+    }
+    return true;
 }
 
 std::vector<uint8_t>
@@ -1519,6 +1782,17 @@ CreateGroup::CreateGroup(const struct json_value_s *root)
 
         e = e->next;
     }
+}
+
+bool
+CreateGroup::operator==(const CreateGroup&rhs) const {
+    if (this->display_name_ != rhs.display_name_) {
+        return false;
+    }
+    if (this->description_ != rhs.description_) {
+        return false;
+    }
+    return true;
 }
 
 std::vector<uint8_t>
@@ -1644,6 +1918,29 @@ GroupMembership::GroupMembership(const struct json_value_s *root)
     }
 }
 
+bool
+GroupMembership::operator==(const GroupMembership&rhs) const {
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->object_type_ != rhs.object_type_) {
+        return false;
+    }
+    if (this->display_name_ != rhs.display_name_) {
+        return false;
+    }
+    if (this->other_mails_ != rhs.other_mails_) {
+        return false;
+    }
+    if (this->department_ != rhs.department_) {
+        return false;
+    }
+    if (this->created_date_time_ != rhs.created_date_time_) {
+        return false;
+    }
+    return true;
+}
+
 std::vector<uint8_t>
 to_bytes(const GroupMembership &o) {
     std::stringstream ss;
@@ -1663,9 +1960,15 @@ to_bytes(const GroupMembership &o) {
     if (o.other_mails_.has_value()) {
         ss << "\"otherMails\":";
         const auto &other_mails__value = o.other_mails_.value();
+        ss << "[";
         for (const auto &i : other_mails__value) {
             ss << "\"" << i << "\"";
+            ss << ",";
         }
+        if (!other_mails__value.empty()) {
+            ss.seekp(-1, ss.cur);
+        }
+        ss << "]";
         ss << ",";
     }
 

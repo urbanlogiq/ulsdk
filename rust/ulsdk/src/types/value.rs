@@ -10,41 +10,19 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
-use flatbuffers::{WIPOffset, UnionWIPOffset};
 use bitflags::bitflags;
 use core::ops::Deref;
+use flatbuffers::{UnionWIPOffset, WIPOffset};
 
 use crate::types::generated::value_generated::{
-    Point2D as FbsPoint2D,
-    Tri2D as FbsTri2D,
-    VArray as FbsVArray,
-    VBool as FbsVBool,
-    VBytes as FbsVBytes,
-    VChar as FbsVChar,
-    VF32 as FbsVF32,
-    VF64 as FbsVF64,
-    VFixedSizeBytes as FbsVFixedSizeBytes,
-    VI16 as FbsVI16,
-    VI32 as FbsVI32,
-    VI64 as FbsVI64,
-    VI8 as FbsVI8,
-    VIsize as FbsVIsize,
-    VNull as FbsVNull,
-    VPlaceholder as FbsVPlaceholder,
-    VStr as FbsVStr,
-    VTimestampMs as FbsVTimestampMs,
-    VTimestampMsUtc as FbsVTimestampMsUtc,
-    VTimestampNs as FbsVTimestampNs,
-    VTimestampNsUtc as FbsVTimestampNsUtc,
-    VTri2D as FbsVTri2D,
-    VU16 as FbsVU16,
-    VU32 as FbsVU32,
-    VU64 as FbsVU64,
-    VU8 as FbsVU8,
-    VUnit as FbsVUnit,
-    VUsize as FbsVUsize,
-    ValueInstance as FbsValueInstance,
-    Value as FbsValue,
+    Point2D as FbsPoint2D, Tri2D as FbsTri2D, VArray as FbsVArray, VBool as FbsVBool,
+    VBytes as FbsVBytes, VChar as FbsVChar, VF32 as FbsVF32, VF64 as FbsVF64,
+    VFixedSizeBytes as FbsVFixedSizeBytes, VI8 as FbsVI8, VI16 as FbsVI16, VI32 as FbsVI32,
+    VI64 as FbsVI64, VIsize as FbsVIsize, VNull as FbsVNull, VPlaceholder as FbsVPlaceholder,
+    VStr as FbsVStr, VTimestampMs as FbsVTimestampMs, VTimestampMsUtc as FbsVTimestampMsUtc,
+    VTimestampNs as FbsVTimestampNs, VTimestampNsUtc as FbsVTimestampNsUtc, VTri2D as FbsVTri2D,
+    VU8 as FbsVU8, VU16 as FbsVU16, VU32 as FbsVU32, VU64 as FbsVU64, VUnit as FbsVUnit,
+    VUsize as FbsVUsize, Value as FbsValue, ValueInstance as FbsValueInstance,
     ValueTy as FbsValueTy,
 };
 
@@ -141,7 +119,7 @@ impl From<FbsValueTy> for ValueTy {
             23 => Self::TimestampNsUtc,
             24 => Self::TimestampNs,
             25 => Self::Placeholder,
-            _ => panic!("Invalid value {} when constructing ValueTy", fbs.0)
+            _ => panic!("Invalid value {} when constructing ValueTy", fbs.0),
         }
     }
 }
@@ -152,7 +130,10 @@ pub struct VBool {
 }
 
 impl VBool {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVBool<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVBool<'a>> {
         use crate::types::generated::value_generated::VBoolBuilder as FbsVBoolBuilder;
 
         let mut bldr = FbsVBoolBuilder::new(builder);
@@ -164,9 +145,7 @@ impl VBool {
 impl From<FbsVBool<'_>> for VBool {
     fn from(fbs: FbsVBool<'_>) -> Self {
         let v = fbs.v();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -188,11 +167,13 @@ impl From<VBool> for Vec<u8> {
 }
 
 #[derive(Default, PartialEq, Debug, Clone)]
-pub struct VUnit {
-}
+pub struct VUnit {}
 
 impl VUnit {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVUnit<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVUnit<'a>> {
         use crate::types::generated::value_generated::VUnitBuilder as FbsVUnitBuilder;
 
         let mut bldr = FbsVUnitBuilder::new(builder);
@@ -202,8 +183,7 @@ impl VUnit {
 
 impl From<FbsVUnit<'_>> for VUnit {
     fn from(fbs: FbsVUnit<'_>) -> Self {
-        Self {
-        }
+        Self {}
     }
 }
 
@@ -230,7 +210,10 @@ pub struct VChar {
 }
 
 impl VChar {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVChar<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVChar<'a>> {
         use crate::types::generated::value_generated::VCharBuilder as FbsVCharBuilder;
 
         let mut bldr = FbsVCharBuilder::new(builder);
@@ -242,9 +225,7 @@ impl VChar {
 impl From<FbsVChar<'_>> for VChar {
     fn from(fbs: FbsVChar<'_>) -> Self {
         let v = fbs.v();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -266,11 +247,13 @@ impl From<VChar> for Vec<u8> {
 }
 
 #[derive(Default, PartialEq, Debug, Clone)]
-pub struct VNull {
-}
+pub struct VNull {}
 
 impl VNull {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVNull<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVNull<'a>> {
         use crate::types::generated::value_generated::VNullBuilder as FbsVNullBuilder;
 
         let mut bldr = FbsVNullBuilder::new(builder);
@@ -280,8 +263,7 @@ impl VNull {
 
 impl From<FbsVNull<'_>> for VNull {
     fn from(fbs: FbsVNull<'_>) -> Self {
-        Self {
-        }
+        Self {}
     }
 }
 
@@ -308,7 +290,10 @@ pub struct VI8 {
 }
 
 impl VI8 {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVI8<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVI8<'a>> {
         use crate::types::generated::value_generated::VI8Builder as FbsVI8Builder;
 
         let mut bldr = FbsVI8Builder::new(builder);
@@ -320,9 +305,7 @@ impl VI8 {
 impl From<FbsVI8<'_>> for VI8 {
     fn from(fbs: FbsVI8<'_>) -> Self {
         let v = fbs.v();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -349,7 +332,10 @@ pub struct VU8 {
 }
 
 impl VU8 {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVU8<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVU8<'a>> {
         use crate::types::generated::value_generated::VU8Builder as FbsVU8Builder;
 
         let mut bldr = FbsVU8Builder::new(builder);
@@ -361,9 +347,7 @@ impl VU8 {
 impl From<FbsVU8<'_>> for VU8 {
     fn from(fbs: FbsVU8<'_>) -> Self {
         let v = fbs.v();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -390,7 +374,10 @@ pub struct VI16 {
 }
 
 impl VI16 {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVI16<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVI16<'a>> {
         use crate::types::generated::value_generated::VI16Builder as FbsVI16Builder;
 
         let mut bldr = FbsVI16Builder::new(builder);
@@ -402,9 +389,7 @@ impl VI16 {
 impl From<FbsVI16<'_>> for VI16 {
     fn from(fbs: FbsVI16<'_>) -> Self {
         let v = fbs.v();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -431,7 +416,10 @@ pub struct VU16 {
 }
 
 impl VU16 {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVU16<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVU16<'a>> {
         use crate::types::generated::value_generated::VU16Builder as FbsVU16Builder;
 
         let mut bldr = FbsVU16Builder::new(builder);
@@ -443,9 +431,7 @@ impl VU16 {
 impl From<FbsVU16<'_>> for VU16 {
     fn from(fbs: FbsVU16<'_>) -> Self {
         let v = fbs.v();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -472,7 +458,10 @@ pub struct VI32 {
 }
 
 impl VI32 {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVI32<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVI32<'a>> {
         use crate::types::generated::value_generated::VI32Builder as FbsVI32Builder;
 
         let mut bldr = FbsVI32Builder::new(builder);
@@ -484,9 +473,7 @@ impl VI32 {
 impl From<FbsVI32<'_>> for VI32 {
     fn from(fbs: FbsVI32<'_>) -> Self {
         let v = fbs.v();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -513,7 +500,10 @@ pub struct VU32 {
 }
 
 impl VU32 {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVU32<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVU32<'a>> {
         use crate::types::generated::value_generated::VU32Builder as FbsVU32Builder;
 
         let mut bldr = FbsVU32Builder::new(builder);
@@ -525,9 +515,7 @@ impl VU32 {
 impl From<FbsVU32<'_>> for VU32 {
     fn from(fbs: FbsVU32<'_>) -> Self {
         let v = fbs.v();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -554,7 +542,10 @@ pub struct VF32 {
 }
 
 impl VF32 {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVF32<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVF32<'a>> {
         use crate::types::generated::value_generated::VF32Builder as FbsVF32Builder;
 
         let mut bldr = FbsVF32Builder::new(builder);
@@ -566,9 +557,7 @@ impl VF32 {
 impl From<FbsVF32<'_>> for VF32 {
     fn from(fbs: FbsVF32<'_>) -> Self {
         let v = fbs.v();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -595,7 +584,10 @@ pub struct VIsize {
 }
 
 impl VIsize {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVIsize<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVIsize<'a>> {
         use crate::types::generated::value_generated::VIsizeBuilder as FbsVIsizeBuilder;
 
         let mut bldr = FbsVIsizeBuilder::new(builder);
@@ -607,9 +599,7 @@ impl VIsize {
 impl From<FbsVIsize<'_>> for VIsize {
     fn from(fbs: FbsVIsize<'_>) -> Self {
         let v = fbs.v();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -636,7 +626,10 @@ pub struct VUsize {
 }
 
 impl VUsize {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVUsize<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVUsize<'a>> {
         use crate::types::generated::value_generated::VUsizeBuilder as FbsVUsizeBuilder;
 
         let mut bldr = FbsVUsizeBuilder::new(builder);
@@ -648,9 +641,7 @@ impl VUsize {
 impl From<FbsVUsize<'_>> for VUsize {
     fn from(fbs: FbsVUsize<'_>) -> Self {
         let v = fbs.v();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -677,7 +668,10 @@ pub struct VI64 {
 }
 
 impl VI64 {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVI64<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVI64<'a>> {
         use crate::types::generated::value_generated::VI64Builder as FbsVI64Builder;
 
         let mut bldr = FbsVI64Builder::new(builder);
@@ -689,9 +683,7 @@ impl VI64 {
 impl From<FbsVI64<'_>> for VI64 {
     fn from(fbs: FbsVI64<'_>) -> Self {
         let v = fbs.v();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -718,7 +710,10 @@ pub struct VU64 {
 }
 
 impl VU64 {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVU64<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVU64<'a>> {
         use crate::types::generated::value_generated::VU64Builder as FbsVU64Builder;
 
         let mut bldr = FbsVU64Builder::new(builder);
@@ -730,9 +725,7 @@ impl VU64 {
 impl From<FbsVU64<'_>> for VU64 {
     fn from(fbs: FbsVU64<'_>) -> Self {
         let v = fbs.v();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -759,7 +752,10 @@ pub struct VF64 {
 }
 
 impl VF64 {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVF64<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVF64<'a>> {
         use crate::types::generated::value_generated::VF64Builder as FbsVF64Builder;
 
         let mut bldr = FbsVF64Builder::new(builder);
@@ -771,9 +767,7 @@ impl VF64 {
 impl From<FbsVF64<'_>> for VF64 {
     fn from(fbs: FbsVF64<'_>) -> Self {
         let v = fbs.v();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -800,7 +794,10 @@ pub struct VStr {
 }
 
 impl VStr {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVStr<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVStr<'a>> {
         use crate::types::generated::value_generated::VStrBuilder as FbsVStrBuilder;
 
         let v_offset = builder.create_string(&self.v);
@@ -814,9 +811,7 @@ impl VStr {
 impl From<FbsVStr<'_>> for VStr {
     fn from(fbs: FbsVStr<'_>) -> Self {
         let v = fbs.v().to_owned();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -843,7 +838,10 @@ pub struct VBytes {
 }
 
 impl VBytes {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVBytes<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVBytes<'a>> {
         use crate::types::generated::value_generated::VBytesBuilder as FbsVBytesBuilder;
 
         let v_offset = builder.create_vector(&self.v);
@@ -861,9 +859,7 @@ impl From<FbsVBytes<'_>> for VBytes {
             v.push(elem.into());
         }
 
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -890,7 +886,10 @@ pub struct VArray {
 }
 
 impl VArray {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVArray<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVArray<'a>> {
         use crate::types::generated::value_generated::VArrayBuilder as FbsVArrayBuilder;
 
         let mut v_offsets = Vec::with_capacity(self.v.len());
@@ -913,9 +912,7 @@ impl From<FbsVArray<'_>> for VArray {
             v.push(elem.into());
         }
 
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -993,7 +990,10 @@ pub struct VTri2D {
 }
 
 impl VTri2D {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVTri2D<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVTri2D<'a>> {
         use crate::types::generated::value_generated::VTri2DBuilder as FbsVTri2DBuilder;
 
         let v: FbsTri2D = self.v.clone().into();
@@ -1007,9 +1007,7 @@ impl VTri2D {
 impl From<FbsVTri2D<'_>> for VTri2D {
     fn from(fbs: FbsVTri2D<'_>) -> Self {
         let v = Tri2D::from(fbs.v());
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -1037,7 +1035,10 @@ pub struct VFixedSizeBytes {
 }
 
 impl VFixedSizeBytes {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVFixedSizeBytes<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVFixedSizeBytes<'a>> {
         use crate::types::generated::value_generated::VFixedSizeBytesBuilder as FbsVFixedSizeBytesBuilder;
 
         let v_offset = builder.create_vector(&self.v);
@@ -1057,10 +1058,7 @@ impl From<FbsVFixedSizeBytes<'_>> for VFixedSizeBytes {
             v.push(elem.into());
         }
 
-        Self {
-            sz,
-            v,
-        }
+        Self { sz, v }
     }
 }
 
@@ -1087,7 +1085,10 @@ pub struct VTimestampMsUtc {
 }
 
 impl VTimestampMsUtc {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVTimestampMsUtc<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVTimestampMsUtc<'a>> {
         use crate::types::generated::value_generated::VTimestampMsUtcBuilder as FbsVTimestampMsUtcBuilder;
 
         let mut bldr = FbsVTimestampMsUtcBuilder::new(builder);
@@ -1099,9 +1100,7 @@ impl VTimestampMsUtc {
 impl From<FbsVTimestampMsUtc<'_>> for VTimestampMsUtc {
     fn from(fbs: FbsVTimestampMsUtc<'_>) -> Self {
         let v = fbs.v();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -1128,7 +1127,10 @@ pub struct VTimestampMs {
 }
 
 impl VTimestampMs {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVTimestampMs<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVTimestampMs<'a>> {
         use crate::types::generated::value_generated::VTimestampMsBuilder as FbsVTimestampMsBuilder;
 
         let mut bldr = FbsVTimestampMsBuilder::new(builder);
@@ -1140,9 +1142,7 @@ impl VTimestampMs {
 impl From<FbsVTimestampMs<'_>> for VTimestampMs {
     fn from(fbs: FbsVTimestampMs<'_>) -> Self {
         let v = fbs.v();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -1169,7 +1169,10 @@ pub struct VTimestampNsUtc {
 }
 
 impl VTimestampNsUtc {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVTimestampNsUtc<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVTimestampNsUtc<'a>> {
         use crate::types::generated::value_generated::VTimestampNsUtcBuilder as FbsVTimestampNsUtcBuilder;
 
         let mut bldr = FbsVTimestampNsUtcBuilder::new(builder);
@@ -1181,9 +1184,7 @@ impl VTimestampNsUtc {
 impl From<FbsVTimestampNsUtc<'_>> for VTimestampNsUtc {
     fn from(fbs: FbsVTimestampNsUtc<'_>) -> Self {
         let v = fbs.v();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -1210,7 +1211,10 @@ pub struct VTimestampNs {
 }
 
 impl VTimestampNs {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVTimestampNs<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVTimestampNs<'a>> {
         use crate::types::generated::value_generated::VTimestampNsBuilder as FbsVTimestampNsBuilder;
 
         let mut bldr = FbsVTimestampNsBuilder::new(builder);
@@ -1222,9 +1226,7 @@ impl VTimestampNs {
 impl From<FbsVTimestampNs<'_>> for VTimestampNs {
     fn from(fbs: FbsVTimestampNs<'_>) -> Self {
         let v = fbs.v();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -1252,7 +1254,10 @@ pub struct VPlaceholder {
 }
 
 impl VPlaceholder {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVPlaceholder<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVPlaceholder<'a>> {
         use crate::types::generated::value_generated::VPlaceholderBuilder as FbsVPlaceholderBuilder;
 
         let name_offset = builder.create_string(&self.name);
@@ -1268,10 +1273,7 @@ impl From<FbsVPlaceholder<'_>> for VPlaceholder {
     fn from(fbs: FbsVPlaceholder<'_>) -> Self {
         let name = fbs.name().to_owned();
         let ty = ValueTy::from(fbs.ty());
-        Self {
-            name,
-            ty,
-        }
+        Self { name, ty }
     }
 }
 
@@ -1329,7 +1331,10 @@ impl Default for Value {
 }
 
 impl Value {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsValue) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsValue) {
         match self {
             Self::VBool(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -1472,7 +1477,10 @@ pub struct ValueInstance {
 }
 
 impl ValueInstance {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsValueInstance<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsValueInstance<'a>> {
         use crate::types::generated::value_generated::ValueInstanceBuilder as FbsValueInstanceBuilder;
 
         let name_offset = self.name.as_ref().map(|s| builder.create_string(s));
@@ -1512,19 +1520,28 @@ impl From<FbsValueInstance<'_>> for ValueInstance {
             FbsValue::VBytes => Value::VBytes(VBytes::from(fbs.v_as_vbytes().unwrap())),
             FbsValue::VArray => Value::VArray(VArray::from(fbs.v_as_varray().unwrap())),
             FbsValue::VTri2D => Value::VTri2D(VTri2D::from(fbs.v_as_vtri_2_d().unwrap())),
-            FbsValue::VFixedSizeBytes => Value::VFixedSizeBytes(VFixedSizeBytes::from(fbs.v_as_vfixed_size_bytes().unwrap())),
-            FbsValue::VTimestampMsUtc => Value::VTimestampMsUtc(VTimestampMsUtc::from(fbs.v_as_vtimestamp_ms_utc().unwrap())),
-            FbsValue::VTimestampMs => Value::VTimestampMs(VTimestampMs::from(fbs.v_as_vtimestamp_ms().unwrap())),
-            FbsValue::VTimestampNsUtc => Value::VTimestampNsUtc(VTimestampNsUtc::from(fbs.v_as_vtimestamp_ns_utc().unwrap())),
-            FbsValue::VTimestampNs => Value::VTimestampNs(VTimestampNs::from(fbs.v_as_vtimestamp_ns().unwrap())),
-            FbsValue::VPlaceholder => Value::VPlaceholder(VPlaceholder::from(fbs.v_as_vplaceholder().unwrap())),
+            FbsValue::VFixedSizeBytes => {
+                Value::VFixedSizeBytes(VFixedSizeBytes::from(fbs.v_as_vfixed_size_bytes().unwrap()))
+            }
+            FbsValue::VTimestampMsUtc => {
+                Value::VTimestampMsUtc(VTimestampMsUtc::from(fbs.v_as_vtimestamp_ms_utc().unwrap()))
+            }
+            FbsValue::VTimestampMs => {
+                Value::VTimestampMs(VTimestampMs::from(fbs.v_as_vtimestamp_ms().unwrap()))
+            }
+            FbsValue::VTimestampNsUtc => {
+                Value::VTimestampNsUtc(VTimestampNsUtc::from(fbs.v_as_vtimestamp_ns_utc().unwrap()))
+            }
+            FbsValue::VTimestampNs => {
+                Value::VTimestampNs(VTimestampNs::from(fbs.v_as_vtimestamp_ns().unwrap()))
+            }
+            FbsValue::VPlaceholder => {
+                Value::VPlaceholder(VPlaceholder::from(fbs.v_as_vplaceholder().unwrap()))
+            }
             _ => unreachable!(),
         };
 
-        Self {
-            name,
-            v,
-        }
+        Self { name, v }
     }
 }
 
@@ -1764,5 +1781,4 @@ mod tests {
         let t1 = ValueInstance::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
-
 }

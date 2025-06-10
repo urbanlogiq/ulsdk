@@ -47,6 +47,10 @@ struct ByteArray {
     ByteArray();
     ByteArray(const ::ByteArray *root);
     ByteArray(const std::vector<uint8_t> &bytes);
+    bool operator==(const ByteArray &rhs) const;
+    bool operator!=(const ByteArray &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ParameterFlags {
@@ -55,6 +59,10 @@ struct ParameterFlags {
     ParameterFlags();
     ParameterFlags(const ::ParameterFlags *root);
     ParameterFlags(const std::vector<uint8_t> &bytes);
+    bool operator==(const ParameterFlags &rhs) const;
+    bool operator!=(const ParameterFlags &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Layout {
@@ -66,6 +74,10 @@ struct Layout {
     Layout();
     Layout(const ::Layout *root);
     Layout(const std::vector<uint8_t> &bytes);
+    bool operator==(const Layout &rhs) const;
+    bool operator!=(const Layout &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct TileSettings {
@@ -87,6 +99,10 @@ struct TileSettings {
     TileSettings();
     TileSettings(const ::TileSettings *root);
     TileSettings(const std::vector<uint8_t> &bytes);
+    bool operator==(const TileSettings &rhs) const;
+    bool operator!=(const TileSettings &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct TileData {
@@ -96,6 +112,10 @@ struct TileData {
     TileData();
     TileData(const ::TileData *root);
     TileData(const std::vector<uint8_t> &bytes);
+    bool operator==(const TileData &rhs) const;
+    bool operator!=(const TileData &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct UserSettings {
@@ -105,6 +125,10 @@ struct UserSettings {
     UserSettings();
     UserSettings(const ::UserSettings *root);
     UserSettings(const std::vector<uint8_t> &bytes);
+    bool operator==(const UserSettings &rhs) const;
+    bool operator!=(const UserSettings &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct WorkLog {
@@ -120,6 +144,10 @@ struct WorkLog {
     WorkLog();
     WorkLog(const ::WorkLog *root);
     WorkLog(const std::vector<uint8_t> &bytes);
+    bool operator==(const WorkLog &rhs) const;
+    bool operator!=(const WorkLog &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct WorklogParameter {
@@ -129,6 +157,10 @@ struct WorklogParameter {
     WorklogParameter();
     WorklogParameter(const ::WorklogParameter *root);
     WorklogParameter(const std::vector<uint8_t> &bytes);
+    bool operator==(const WorklogParameter &rhs) const;
+    bool operator!=(const WorklogParameter &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::pair<::flatbuffers::Offset<void>, ::ParameterValue>

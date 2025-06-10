@@ -95,6 +95,26 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Type &o) {
         const std::shared_ptr<LargeList> &v = std::get<std::shared_ptr<LargeList>>(o);
         const auto offset = serialize_to(builder, *v);
         return std::make_pair(offset.Union(), ::Type::LargeList);
+    } else if (std::holds_alternative<std::shared_ptr<RunEndEncoded>>(o)) {
+        const std::shared_ptr<RunEndEncoded> &v = std::get<std::shared_ptr<RunEndEncoded>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::Type::RunEndEncoded);
+    } else if (std::holds_alternative<std::shared_ptr<BinaryView>>(o)) {
+        const std::shared_ptr<BinaryView> &v = std::get<std::shared_ptr<BinaryView>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::Type::BinaryView);
+    } else if (std::holds_alternative<std::shared_ptr<Utf8View>>(o)) {
+        const std::shared_ptr<Utf8View> &v = std::get<std::shared_ptr<Utf8View>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::Type::Utf8View);
+    } else if (std::holds_alternative<std::shared_ptr<ListView>>(o)) {
+        const std::shared_ptr<ListView> &v = std::get<std::shared_ptr<ListView>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::Type::ListView);
+    } else if (std::holds_alternative<std::shared_ptr<LargeListView>>(o)) {
+        const std::shared_ptr<LargeListView> &v = std::get<std::shared_ptr<LargeListView>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::Type::LargeListView);
     } else { 
         throw std::runtime_error("unreachable");
     }
@@ -127,6 +147,12 @@ Null::Null(const ::Null *root)  {
         throw std::runtime_error("cannot deserialize flatbuffer type");
     }
 
+}
+
+bool
+Null::operator==(const Null &rhs) const {
+    (void)rhs;
+    return true;
 }
 
 ::flatbuffers::Offset<::Int>
@@ -166,6 +192,17 @@ Int::Int(const ::Int *root)
     is_signed_ = root->is_signed();
 }
 
+bool
+Int::operator==(const Int &rhs) const {
+    if (this->bitWidth_ != rhs.bitWidth_) {
+        return false;
+    }
+    if (this->is_signed_ != rhs.is_signed_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::FloatingPoint>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const FloatingPoint &o) {
 
@@ -199,6 +236,14 @@ FloatingPoint::FloatingPoint(const ::FloatingPoint *root)
     precision_ = root->precision();
 }
 
+bool
+FloatingPoint::operator==(const FloatingPoint &rhs) const {
+    if (this->precision_ != rhs.precision_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Binary>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Binary &) {
 
@@ -226,6 +271,12 @@ Binary::Binary(const ::Binary *root)  {
         throw std::runtime_error("cannot deserialize flatbuffer type");
     }
 
+}
+
+bool
+Binary::operator==(const Binary &rhs) const {
+    (void)rhs;
+    return true;
 }
 
 ::flatbuffers::Offset<::Utf8>
@@ -257,6 +308,12 @@ Utf8::Utf8(const ::Utf8 *root)  {
 
 }
 
+bool
+Utf8::operator==(const Utf8 &rhs) const {
+    (void)rhs;
+    return true;
+}
+
 ::flatbuffers::Offset<::Bool>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Bool &) {
 
@@ -284,6 +341,12 @@ Bool::Bool(const ::Bool *root)  {
         throw std::runtime_error("cannot deserialize flatbuffer type");
     }
 
+}
+
+bool
+Bool::operator==(const Bool &rhs) const {
+    (void)rhs;
+    return true;
 }
 
 ::flatbuffers::Offset<::Decimal>
@@ -327,6 +390,20 @@ Decimal::Decimal(const ::Decimal *root)
     scale_ = root->scale();
 }
 
+bool
+Decimal::operator==(const Decimal &rhs) const {
+    if (this->bitWidth_ != rhs.bitWidth_) {
+        return false;
+    }
+    if (this->precision_ != rhs.precision_) {
+        return false;
+    }
+    if (this->scale_ != rhs.scale_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Date>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Date &o) {
 
@@ -358,6 +435,14 @@ Date::Date(const ::Date *root)
     }
 
     unit_ = root->unit();
+}
+
+bool
+Date::operator==(const Date &rhs) const {
+    if (this->unit_ != rhs.unit_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Time>
@@ -395,6 +480,17 @@ Time::Time(const ::Time *root)
 
     bitWidth_ = root->bitWidth();
     unit_ = root->unit();
+}
+
+bool
+Time::operator==(const Time &rhs) const {
+    if (this->bitWidth_ != rhs.bitWidth_) {
+        return false;
+    }
+    if (this->unit_ != rhs.unit_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Timestamp>
@@ -443,6 +539,17 @@ Timestamp::Timestamp(const ::Timestamp *root)
     unit_ = root->unit();
 }
 
+bool
+Timestamp::operator==(const Timestamp &rhs) const {
+    if (this->timezone_ != rhs.timezone_) {
+        return false;
+    }
+    if (this->unit_ != rhs.unit_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Interval>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Interval &o) {
 
@@ -476,6 +583,14 @@ Interval::Interval(const ::Interval *root)
     unit_ = root->unit();
 }
 
+bool
+Interval::operator==(const Interval &rhs) const {
+    if (this->unit_ != rhs.unit_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::List>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const List &) {
 
@@ -505,6 +620,12 @@ List::List(const ::List *root)  {
 
 }
 
+bool
+List::operator==(const List &rhs) const {
+    (void)rhs;
+    return true;
+}
+
 ::flatbuffers::Offset<::Struct_>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Struct_ &) {
 
@@ -532,6 +653,12 @@ Struct_::Struct_(const ::Struct_ *root)  {
         throw std::runtime_error("cannot deserialize flatbuffer type");
     }
 
+}
+
+bool
+Struct_::operator==(const Struct_ &rhs) const {
+    (void)rhs;
+    return true;
 }
 
 ::flatbuffers::Offset<::Union>
@@ -583,6 +710,17 @@ Union::Union(const ::Union *root)
     }
 }
 
+bool
+Union::operator==(const Union &rhs) const {
+    if (this->mode_ != rhs.mode_) {
+        return false;
+    }
+    if (this->typeIds_ != rhs.typeIds_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::FixedSizeBinary>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const FixedSizeBinary &o) {
 
@@ -614,6 +752,14 @@ FixedSizeBinary::FixedSizeBinary(const ::FixedSizeBinary *root)
     }
 
     byteWidth_ = root->byteWidth();
+}
+
+bool
+FixedSizeBinary::operator==(const FixedSizeBinary &rhs) const {
+    if (this->byteWidth_ != rhs.byteWidth_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::FixedSizeList>
@@ -649,6 +795,14 @@ FixedSizeList::FixedSizeList(const ::FixedSizeList *root)
     listSize_ = root->listSize();
 }
 
+bool
+FixedSizeList::operator==(const FixedSizeList &rhs) const {
+    if (this->listSize_ != rhs.listSize_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Map>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Map &o) {
 
@@ -680,6 +834,14 @@ Map::Map(const ::Map *root)
     }
 
     keysSorted_ = root->keysSorted();
+}
+
+bool
+Map::operator==(const Map &rhs) const {
+    if (this->keysSorted_ != rhs.keysSorted_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Duration>
@@ -715,6 +877,14 @@ Duration::Duration(const ::Duration *root)
     unit_ = root->unit();
 }
 
+bool
+Duration::operator==(const Duration &rhs) const {
+    if (this->unit_ != rhs.unit_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::LargeBinary>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const LargeBinary &) {
 
@@ -742,6 +912,12 @@ LargeBinary::LargeBinary(const ::LargeBinary *root)  {
         throw std::runtime_error("cannot deserialize flatbuffer type");
     }
 
+}
+
+bool
+LargeBinary::operator==(const LargeBinary &rhs) const {
+    (void)rhs;
+    return true;
 }
 
 ::flatbuffers::Offset<::LargeUtf8>
@@ -773,6 +949,12 @@ LargeUtf8::LargeUtf8(const ::LargeUtf8 *root)  {
 
 }
 
+bool
+LargeUtf8::operator==(const LargeUtf8 &rhs) const {
+    (void)rhs;
+    return true;
+}
+
 ::flatbuffers::Offset<::LargeList>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const LargeList &) {
 
@@ -802,6 +984,187 @@ LargeList::LargeList(const ::LargeList *root)  {
 
 }
 
+bool
+LargeList::operator==(const LargeList &rhs) const {
+    (void)rhs;
+    return true;
+}
+
+::flatbuffers::Offset<::RunEndEncoded>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const RunEndEncoded &) {
+
+    ::RunEndEncodedBuilder instance_builder = ::RunEndEncodedBuilder(builder);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const RunEndEncoded &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+RunEndEncoded::RunEndEncoded() {
+}
+
+RunEndEncoded::RunEndEncoded(const std::vector<uint8_t> &bytes)
+    : RunEndEncoded(::flatbuffers::GetSizePrefixedRoot<::RunEndEncoded>(bytes.data())) {
+}
+
+RunEndEncoded::RunEndEncoded(const ::RunEndEncoded *root)  {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+}
+
+bool
+RunEndEncoded::operator==(const RunEndEncoded &rhs) const {
+    (void)rhs;
+    return true;
+}
+
+::flatbuffers::Offset<::BinaryView>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const BinaryView &) {
+
+    ::BinaryViewBuilder instance_builder = ::BinaryViewBuilder(builder);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const BinaryView &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+BinaryView::BinaryView() {
+}
+
+BinaryView::BinaryView(const std::vector<uint8_t> &bytes)
+    : BinaryView(::flatbuffers::GetSizePrefixedRoot<::BinaryView>(bytes.data())) {
+}
+
+BinaryView::BinaryView(const ::BinaryView *root)  {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+}
+
+bool
+BinaryView::operator==(const BinaryView &rhs) const {
+    (void)rhs;
+    return true;
+}
+
+::flatbuffers::Offset<::Utf8View>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Utf8View &) {
+
+    ::Utf8ViewBuilder instance_builder = ::Utf8ViewBuilder(builder);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const Utf8View &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+Utf8View::Utf8View() {
+}
+
+Utf8View::Utf8View(const std::vector<uint8_t> &bytes)
+    : Utf8View(::flatbuffers::GetSizePrefixedRoot<::Utf8View>(bytes.data())) {
+}
+
+Utf8View::Utf8View(const ::Utf8View *root)  {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+}
+
+bool
+Utf8View::operator==(const Utf8View &rhs) const {
+    (void)rhs;
+    return true;
+}
+
+::flatbuffers::Offset<::ListView>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ListView &) {
+
+    ::ListViewBuilder instance_builder = ::ListViewBuilder(builder);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const ListView &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+ListView::ListView() {
+}
+
+ListView::ListView(const std::vector<uint8_t> &bytes)
+    : ListView(::flatbuffers::GetSizePrefixedRoot<::ListView>(bytes.data())) {
+}
+
+ListView::ListView(const ::ListView *root)  {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+}
+
+bool
+ListView::operator==(const ListView &rhs) const {
+    (void)rhs;
+    return true;
+}
+
+::flatbuffers::Offset<::LargeListView>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const LargeListView &) {
+
+    ::LargeListViewBuilder instance_builder = ::LargeListViewBuilder(builder);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const LargeListView &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+LargeListView::LargeListView() {
+}
+
+LargeListView::LargeListView(const std::vector<uint8_t> &bytes)
+    : LargeListView(::flatbuffers::GetSizePrefixedRoot<::LargeListView>(bytes.data())) {
+}
+
+LargeListView::LargeListView(const ::LargeListView *root)  {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+}
+
+bool
+LargeListView::operator==(const LargeListView &rhs) const {
+    (void)rhs;
+    return true;
+}
+
 Buffer::Buffer()
     : length_(0)
     , offset_(0) {
@@ -816,6 +1179,17 @@ Buffer::Buffer(const ::Buffer *root)
 
     length_ = root->length();
     offset_ = root->offset();
+}
+
+bool
+Buffer::operator==(const Buffer &rhs) const {
+    if (this->length_ != rhs.length_) {
+        return false;
+    }
+    if (this->offset_ != rhs.offset_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::DictionaryEncoding>
@@ -870,6 +1244,23 @@ DictionaryEncoding::DictionaryEncoding(const ::DictionaryEncoding *root)
         indexType_ = decltype(indexType_)(root->indexType());
     }
     isOrdered_ = root->isOrdered();
+}
+
+bool
+DictionaryEncoding::operator==(const DictionaryEncoding &rhs) const {
+    if (this->dictionaryKind_ != rhs.dictionaryKind_) {
+        return false;
+    }
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->indexType_ != rhs.indexType_) {
+        return false;
+    }
+    if (this->isOrdered_ != rhs.isOrdered_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Field>
@@ -1120,9 +1511,62 @@ Field::Field(const ::Field *root)
                 type_ = type__shared;
                 break;
             }
+            case ::Type::RunEndEncoded: {
+                const auto type__local = static_cast<const ::RunEndEncoded *>(root->type());
+                std::shared_ptr<RunEndEncoded> type__shared = std::make_shared<RunEndEncoded>(type__local);
+                type_ = type__shared;
+                break;
+            }
+            case ::Type::BinaryView: {
+                const auto type__local = static_cast<const ::BinaryView *>(root->type());
+                std::shared_ptr<BinaryView> type__shared = std::make_shared<BinaryView>(type__local);
+                type_ = type__shared;
+                break;
+            }
+            case ::Type::Utf8View: {
+                const auto type__local = static_cast<const ::Utf8View *>(root->type());
+                std::shared_ptr<Utf8View> type__shared = std::make_shared<Utf8View>(type__local);
+                type_ = type__shared;
+                break;
+            }
+            case ::Type::ListView: {
+                const auto type__local = static_cast<const ::ListView *>(root->type());
+                std::shared_ptr<ListView> type__shared = std::make_shared<ListView>(type__local);
+                type_ = type__shared;
+                break;
+            }
+            case ::Type::LargeListView: {
+                const auto type__local = static_cast<const ::LargeListView *>(root->type());
+                std::shared_ptr<LargeListView> type__shared = std::make_shared<LargeListView>(type__local);
+                type_ = type__shared;
+                break;
+            }
             default: throw std::runtime_error("unknown union variant");
         }
     }
+}
+
+bool
+Field::operator==(const Field &rhs) const {
+    if (this->children_ != rhs.children_) {
+        return false;
+    }
+    if (this->custom_metadata_ != rhs.custom_metadata_) {
+        return false;
+    }
+    if (this->dictionary_ != rhs.dictionary_) {
+        return false;
+    }
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->nullable_ != rhs.nullable_) {
+        return false;
+    }
+    if (this->type_ != rhs.type_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::KeyValue>
@@ -1178,6 +1622,17 @@ KeyValue::KeyValue(const ::KeyValue *root)
     if (root->value() != nullptr) {
         value_ = std::string(*root->value()->begin(), *root->value()->end());
     }
+}
+
+bool
+KeyValue::operator==(const KeyValue &rhs) const {
+    if (this->key_ != rhs.key_) {
+        return false;
+    }
+    if (this->value_ != rhs.value_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Schema>
@@ -1277,6 +1732,23 @@ Schema::Schema(const ::Schema *root)
         }
         fields_ = std::make_optional(fields__target);
     }
+}
+
+bool
+Schema::operator==(const Schema &rhs) const {
+    if (this->custom_metadata_ != rhs.custom_metadata_) {
+        return false;
+    }
+    if (this->endianness_ != rhs.endianness_) {
+        return false;
+    }
+    if (this->features_ != rhs.features_) {
+        return false;
+    }
+    if (this->fields_ != rhs.fields_) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace types

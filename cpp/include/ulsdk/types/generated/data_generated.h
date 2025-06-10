@@ -489,6 +489,36 @@ inline const char *EnumNameDayOfWeek(DayOfWeek e) {
   return EnumNamesDayOfWeek()[index];
 }
 
+enum class BinaryYesNo : uint8_t {
+  NO = 0,
+  YES = 1,
+  MIN = NO,
+  MAX = YES
+};
+
+inline const BinaryYesNo (&EnumValuesBinaryYesNo())[2] {
+  static const BinaryYesNo values[] = {
+    BinaryYesNo::NO,
+    BinaryYesNo::YES
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesBinaryYesNo() {
+  static const char * const names[3] = {
+    "NO",
+    "YES",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameBinaryYesNo(BinaryYesNo e) {
+  if (::flatbuffers::IsOutRange(e, BinaryYesNo::NO, BinaryYesNo::YES)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesBinaryYesNo()[index];
+}
+
 struct NamedParameter FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef NamedParameterBuilder Builder;
   struct Traits;

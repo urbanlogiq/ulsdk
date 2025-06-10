@@ -321,7 +321,7 @@ revoke(
     return Result<Void>();
 }
 
-Result<Void>
+Result<std::vector<uint8_t>>
 get_permissions(
     ul::RequestContext &ctx,
     const Uuid &id
@@ -334,11 +334,7 @@ get_permissions(
 
     std::map<std::string, std::string> headers;
     const Result<std::vector<uint8_t>> res = ctx.get(path, params, headers);
-    if (std::holds_alternative<Error>(res)) {
-        const auto error = std::get<Error>(res);
-        return Result<Void>(error);
-    }
-    return Result<Void>();
+    return res;
 }
 
 Result<Void>

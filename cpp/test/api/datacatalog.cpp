@@ -25,451 +25,944 @@
 namespace datacatalog {
 
 ul::Result<ul::Void>
-test_get_object_at_revision(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::get_object_at_revision(
+test_get_object_at_revision(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::DataCatalogObject expected = ::ul::types::DataCatalogObject();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::get_object_at_revision(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0,
+        p1
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::DataCatalogObject result_value = std::get<::ul::types::DataCatalogObject>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_object_at_revision_obj(test_get_object_at_revision, "datacatalog::get_object_at_revision", &link_only_api_test_root);
+ApiTest test_get_object_at_revision_obj(test_get_object_at_revision, "datacatalog::get_object_at_revision", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_acl(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::get_acl(
+test_get_acl(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId expected = ::ul::types::ObjectId();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::get_acl(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::ObjectId result_value = std::get<::ul::types::ObjectId>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_acl_obj(test_get_acl, "datacatalog::get_acl", &link_only_api_test_root);
+ApiTest test_get_acl_obj(test_get_acl, "datacatalog::get_acl", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_head_revision(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::get_head_revision(
+test_get_head_revision(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectSummary expected = ::ul::types::ObjectSummary();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::get_head_revision(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::ObjectSummary result_value = std::get<::ul::types::ObjectSummary>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_head_revision_obj(test_get_head_revision, "datacatalog::get_head_revision", &link_only_api_test_root);
+ApiTest test_get_head_revision_obj(test_get_head_revision, "datacatalog::get_head_revision", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_object(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::get_object(
+test_get_object(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::DataCatalogObject expected = ::ul::types::DataCatalogObject();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::get_object(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::DataCatalogObject result_value = std::get<::ul::types::DataCatalogObject>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_object_obj(test_get_object, "datacatalog::get_object", &link_only_api_test_root);
+ApiTest test_get_object_obj(test_get_object, "datacatalog::get_object", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_update_object(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::update_object(
+test_update_object(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    ::ul::types::DataCatalogObject body = ::ul::types::DataCatalogObject();
+    return ul::api::datacatalog::update_object(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ::ul::types::DataCatalogObject()
+        p0,
+        body
     );
-    return ul::Void();
 }
 
-ApiTest test_update_object_obj(test_update_object, "datacatalog::update_object", &link_only_api_test_root);
+ApiTest test_update_object_obj(test_update_object, "datacatalog::update_object", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_update_attributes(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::update_attributes(
+test_update_attributes(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    bool q0 = true;
+    const std::map<std::string, ul::JsonValue> body = std::map<std::string, ul::JsonValue>();
+    return ul::api::datacatalog::update_attributes(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        false,
-        std::map<std::string, ul::JsonValue>()
+        p0,
+        q0,
+        body
     );
-    return ul::Void();
 }
 
-ApiTest test_update_attributes_obj(test_update_attributes, "datacatalog::update_attributes", &link_only_api_test_root);
+ApiTest test_update_attributes_obj(test_update_attributes, "datacatalog::update_attributes", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_delete_attribute(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::delete_attribute(
+test_delete_attribute(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const std::string p1 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+    return ul::api::datacatalog::delete_attribute(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        std::string()
+        p0,
+        p1
     );
-    return ul::Void();
 }
 
-ApiTest test_delete_attribute_obj(test_delete_attribute, "datacatalog::delete_attribute", &link_only_api_test_root);
+ApiTest test_delete_attribute_obj(test_delete_attribute, "datacatalog::delete_attribute", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_object_summaries(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::get_object_summaries(
+test_get_object_summaries(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    ::ul::types::ObjectIdList body = ::ul::types::ObjectIdList();
+    const ::ul::types::ObjectSummaryList expected = ::ul::types::ObjectSummaryList();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::get_object_summaries(
         ctx,
-        ::ul::types::ObjectIdList()
+        body
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::ObjectSummaryList result_value = std::get<::ul::types::ObjectSummaryList>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_object_summaries_obj(test_get_object_summaries, "datacatalog::get_object_summaries", &link_only_api_test_root);
+ApiTest test_get_object_summaries_obj(test_get_object_summaries, "datacatalog::get_object_summaries", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_bulk_fetch_objects(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::bulk_fetch_objects(
+test_bulk_fetch_objects(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    ::ul::types::ObjectIdList body = ::ul::types::ObjectIdList();
+    const ::ul::types::ObjectIdPairList expected = ::ul::types::ObjectIdPairList();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::bulk_fetch_objects(
         ctx,
-        ::ul::types::ObjectIdList()
+        body
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::ObjectIdPairList result_value = std::get<::ul::types::ObjectIdPairList>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_bulk_fetch_objects_obj(test_bulk_fetch_objects, "datacatalog::bulk_fetch_objects", &link_only_api_test_root);
+ApiTest test_bulk_fetch_objects_obj(test_bulk_fetch_objects, "datacatalog::bulk_fetch_objects", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_create_object(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::create_object(
+test_create_object(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::types::ObjectSummaryList expected = ::ul::types::ObjectSummaryList();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::create_object(
         ctx
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::ObjectSummaryList result_value = std::get<::ul::types::ObjectSummaryList>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_create_object_obj(test_create_object, "datacatalog::create_object", &link_only_api_test_root);
+ApiTest test_create_object_obj(test_create_object, "datacatalog::create_object", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_query_aggregate_numeric(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::query_aggregate_numeric(
+test_query_aggregate_numeric(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const std::string q0 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+    ::ul::types::Query body = ::ul::types::Query();
+    std::vector<uint8_t> expected_bytes;
+    const auto expected = make_test_arrow_batches(expected_bytes);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::query_aggregate_numeric(
         ctx,
-        std::string(),
-        ::ul::types::Query()
+        q0,
+        body
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_query_aggregate_numeric_obj(test_query_aggregate_numeric, "datacatalog::query_aggregate_numeric", &link_only_api_test_root);
+ApiTest test_query_aggregate_numeric_obj(test_query_aggregate_numeric, "datacatalog::query_aggregate_numeric", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_query_aggregate_string(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::query_aggregate_string(
+test_query_aggregate_string(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const std::string q0 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+    ::ul::types::Query body = ::ul::types::Query();
+    std::vector<uint8_t> expected_bytes;
+    const auto expected = make_test_arrow_batches(expected_bytes);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::query_aggregate_string(
         ctx,
-        std::string(),
-        ::ul::types::Query()
+        q0,
+        body
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_query_aggregate_string_obj(test_query_aggregate_string, "datacatalog::query_aggregate_string", &link_only_api_test_root);
+ApiTest test_query_aggregate_string_obj(test_query_aggregate_string, "datacatalog::query_aggregate_string", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_query_aggregate_histo(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::query_aggregate_histo(
+test_query_aggregate_histo(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    int q0 = 42;
+    const std::string q1 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+    ::ul::types::Query body = ::ul::types::Query();
+    std::vector<uint8_t> expected_bytes;
+    const auto expected = make_test_arrow_batches(expected_bytes);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::query_aggregate_histo(
         ctx,
-        0,
-        std::string(),
-        ::ul::types::Query()
+        q0,
+        q1,
+        body
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_query_aggregate_histo_obj(test_query_aggregate_histo, "datacatalog::query_aggregate_histo", &link_only_api_test_root);
+ApiTest test_query_aggregate_histo_obj(test_query_aggregate_histo, "datacatalog::query_aggregate_histo", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_query_aggregate_relative_histo(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::query_aggregate_relative_histo(
+test_query_aggregate_relative_histo(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    int q0 = 42;
+    const std::string q1 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+    const std::string q2 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+    ::ul::types::Query body = ::ul::types::Query();
+    std::vector<uint8_t> expected_bytes;
+    const auto expected = make_test_arrow_batches(expected_bytes);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::query_aggregate_relative_histo(
         ctx,
-        0,
-        std::string(),
-        std::string(),
-        ::ul::types::Query()
+        q0,
+        q1,
+        q2,
+        body
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_query_aggregate_relative_histo_obj(test_query_aggregate_relative_histo, "datacatalog::query_aggregate_relative_histo", &link_only_api_test_root);
+ApiTest test_query_aggregate_relative_histo_obj(test_query_aggregate_relative_histo, "datacatalog::query_aggregate_relative_histo", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_stream_get_arrow(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::stream_get_arrow(
+test_stream_get_arrow(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    std::vector<uint8_t> expected_bytes;
+    const auto expected = make_test_arrow_batches(expected_bytes);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::stream_get_arrow(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_stream_get_arrow_obj(test_stream_get_arrow, "datacatalog::stream_get_arrow", &link_only_api_test_root);
+ApiTest test_stream_get_arrow_obj(test_stream_get_arrow, "datacatalog::stream_get_arrow", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_stream_get_parquet(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::stream_get_parquet(
+test_stream_get_parquet(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
+    const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
+    const std::vector<uint8_t> expected_bytes = std::vector(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::stream_get_parquet(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<uint8_t> result_value = std::get<std::vector<uint8_t>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_stream_get_parquet_obj(test_stream_get_parquet, "datacatalog::stream_get_parquet", &link_only_api_test_root);
+ApiTest test_stream_get_parquet_obj(test_stream_get_parquet, "datacatalog::stream_get_parquet", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_stream_get_csv(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::stream_get_csv(
+test_stream_get_csv(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
+    const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
+    const std::vector<uint8_t> expected_bytes = std::vector(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::stream_get_csv(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<uint8_t> result_value = std::get<std::vector<uint8_t>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_stream_get_csv_obj(test_stream_get_csv, "datacatalog::stream_get_csv", &link_only_api_test_root);
+ApiTest test_stream_get_csv_obj(test_stream_get_csv, "datacatalog::stream_get_csv", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_stream_get_xlsx(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::stream_get_xlsx(
+test_stream_get_xlsx(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
+    const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
+    const std::vector<uint8_t> expected_bytes = std::vector(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::stream_get_xlsx(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<uint8_t> result_value = std::get<std::vector<uint8_t>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_stream_get_xlsx_obj(test_stream_get_xlsx, "datacatalog::stream_get_xlsx", &link_only_api_test_root);
+ApiTest test_stream_get_xlsx_obj(test_stream_get_xlsx, "datacatalog::stream_get_xlsx", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_stream_get_json(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::stream_get_json(
+test_stream_get_json(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
+    const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
+    const std::vector<uint8_t> expected_bytes = std::vector(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::stream_get_json(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<uint8_t> result_value = std::get<std::vector<uint8_t>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_stream_get_json_obj(test_stream_get_json, "datacatalog::stream_get_json", &link_only_api_test_root);
+ApiTest test_stream_get_json_obj(test_stream_get_json, "datacatalog::stream_get_json", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_stream_get_text(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::stream_get_text(
+test_stream_get_text(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
+    const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
+    const std::vector<uint8_t> expected_bytes = std::vector(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::stream_get_text(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<uint8_t> result_value = std::get<std::vector<uint8_t>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_stream_get_text_obj(test_stream_get_text, "datacatalog::stream_get_text", &link_only_api_test_root);
+ApiTest test_stream_get_text_obj(test_stream_get_text, "datacatalog::stream_get_text", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_stream_get_html(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::stream_get_html(
+test_stream_get_html(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
+    const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
+    const std::vector<uint8_t> expected_bytes = std::vector(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::stream_get_html(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<uint8_t> result_value = std::get<std::vector<uint8_t>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_stream_get_html_obj(test_stream_get_html, "datacatalog::stream_get_html", &link_only_api_test_root);
+ApiTest test_stream_get_html_obj(test_stream_get_html, "datacatalog::stream_get_html", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_stream_put_arrow(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::stream_put_arrow(
+test_stream_put_arrow(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    std::vector<uint8_t> body_bytes;
+    const auto body = make_test_arrow_batches(body_bytes);
+    return ul::api::datacatalog::stream_put_arrow(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        std::vector<std::shared_ptr<arrow::RecordBatch>>()
+        p0,
+        body
     );
-    return ul::Void();
 }
 
-ApiTest test_stream_put_arrow_obj(test_stream_put_arrow, "datacatalog::stream_put_arrow", &link_only_api_test_root);
+ApiTest test_stream_put_arrow_obj(test_stream_put_arrow, "datacatalog::stream_put_arrow", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_stream_put_diffstream(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::stream_put_diffstream(
+test_stream_put_diffstream(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    ::ul::types::DiffStream body = ::ul::types::DiffStream();
+    return ul::api::datacatalog::stream_put_diffstream(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ::ul::types::DiffStream()
+        p0,
+        body
     );
-    return ul::Void();
 }
 
-ApiTest test_stream_put_diffstream_obj(test_stream_put_diffstream, "datacatalog::stream_put_diffstream", &link_only_api_test_root);
+ApiTest test_stream_put_diffstream_obj(test_stream_put_diffstream, "datacatalog::stream_put_diffstream", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_stream_put_json(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::stream_put_json(
+test_stream_put_json(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const std::vector<std::map<std::string, ul::JsonValue>> body;
+    return ul::api::datacatalog::stream_put_json(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        {}
+        p0,
+        body
     );
-    return ul::Void();
 }
 
-ApiTest test_stream_put_json_obj(test_stream_put_json, "datacatalog::stream_put_json", &link_only_api_test_root);
+ApiTest test_stream_put_json_obj(test_stream_put_json, "datacatalog::stream_put_json", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_generate_metadata(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::generate_metadata(
+test_generate_metadata(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::Metadata expected = ::ul::types::Metadata();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::generate_metadata(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::Metadata result_value = std::get<::ul::types::Metadata>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_generate_metadata_obj(test_generate_metadata, "datacatalog::generate_metadata", &link_only_api_test_root);
+ApiTest test_generate_metadata_obj(test_generate_metadata, "datacatalog::generate_metadata", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_update_metadata(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::update_metadata(
+test_update_metadata(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    ::ul::types::Metadata body = ::ul::types::Metadata();
+    return ul::api::datacatalog::update_metadata(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        std::nullopt
+        p0,
+        body
     );
-    return ul::Void();
 }
 
-ApiTest test_update_metadata_obj(test_update_metadata, "datacatalog::update_metadata", &link_only_api_test_root);
+ApiTest test_update_metadata_obj(test_update_metadata, "datacatalog::update_metadata", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_stream_compact(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::stream_compact(
+test_stream_compact(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    return ul::api::datacatalog::stream_compact(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
 }
 
-ApiTest test_stream_compact_obj(test_stream_compact, "datacatalog::stream_compact", &link_only_api_test_root);
+ApiTest test_stream_compact_obj(test_stream_compact, "datacatalog::stream_compact", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_table_row_history(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::table_row_history(
+test_table_row_history(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::History expected = ::ul::types::History();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::table_row_history(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0,
+        p1
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::History result_value = std::get<::ul::types::History>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_table_row_history_obj(test_table_row_history, "datacatalog::table_row_history", &link_only_api_test_root);
+ApiTest test_table_row_history_obj(test_table_row_history, "datacatalog::table_row_history", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_table_history(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::table_history(
+test_table_history(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::History expected = ::ul::types::History();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::table_history(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::History result_value = std::get<::ul::types::History>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_table_history_obj(test_table_history, "datacatalog::table_history", &link_only_api_test_root);
+ApiTest test_table_history_obj(test_table_history, "datacatalog::table_history", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_table_attachments_directory(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::get_table_attachments_directory(
+test_get_table_attachments_directory(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId expected = ::ul::types::ObjectId();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::get_table_attachments_directory(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0,
+        p1
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::ObjectId result_value = std::get<::ul::types::ObjectId>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_table_attachments_directory_obj(test_get_table_attachments_directory, "datacatalog::get_table_attachments_directory", &link_only_api_test_root);
+ApiTest test_get_table_attachments_directory_obj(test_get_table_attachments_directory, "datacatalog::get_table_attachments_directory", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_or_create_table_attachments_directory(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::get_or_create_table_attachments_directory(
+test_get_or_create_table_attachments_directory(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId expected = ::ul::types::ObjectId();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::get_or_create_table_attachments_directory(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0,
+        p1
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::ObjectId result_value = std::get<::ul::types::ObjectId>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_or_create_table_attachments_directory_obj(test_get_or_create_table_attachments_directory, "datacatalog::get_or_create_table_attachments_directory", &link_only_api_test_root);
+ApiTest test_get_or_create_table_attachments_directory_obj(test_get_or_create_table_attachments_directory, "datacatalog::get_or_create_table_attachments_directory", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_create_table(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::create_table(
+test_create_table(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    ::ul::types::NewTable body = ::ul::types::NewTable();
+    const ::ul::types::ObjectId expected = ::ul::types::ObjectId();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::create_table(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ::ul::types::NewTable()
+        p0,
+        body
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::ObjectId result_value = std::get<::ul::types::ObjectId>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_create_table_obj(test_create_table, "datacatalog::create_table", &link_only_api_test_root);
+ApiTest test_create_table_obj(test_create_table, "datacatalog::create_table", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_query_arrow(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::query_arrow(
+test_query_arrow(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    ::ul::types::Query body = ::ul::types::Query();
+    std::vector<uint8_t> expected_bytes;
+    const auto expected = make_test_arrow_batches(expected_bytes);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::query_arrow(
         ctx,
-        ::ul::types::Query()
+        body
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_query_arrow_obj(test_query_arrow, "datacatalog::query_arrow", &link_only_api_test_root);
+ApiTest test_query_arrow_obj(test_query_arrow, "datacatalog::query_arrow", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_query_parquet(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::query_parquet(
+test_query_parquet(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    ::ul::types::Query body = ::ul::types::Query();
+    const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
+    const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
+    const std::vector<uint8_t> expected_bytes = std::vector(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::query_parquet(
         ctx,
-        ::ul::types::Query()
+        body
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<uint8_t> result_value = std::get<std::vector<uint8_t>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_query_parquet_obj(test_query_parquet, "datacatalog::query_parquet", &link_only_api_test_root);
+ApiTest test_query_parquet_obj(test_query_parquet, "datacatalog::query_parquet", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_query_csv(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::query_csv(
+test_query_csv(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    ::ul::types::Query body = ::ul::types::Query();
+    const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
+    const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
+    const std::vector<uint8_t> expected_bytes = std::vector(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::query_csv(
         ctx,
-        ::ul::types::Query()
+        body
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<uint8_t> result_value = std::get<std::vector<uint8_t>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_query_csv_obj(test_query_csv, "datacatalog::query_csv", &link_only_api_test_root);
+ApiTest test_query_csv_obj(test_query_csv, "datacatalog::query_csv", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_query_xlsx(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::query_xlsx(
+test_query_xlsx(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    ::ul::types::Query body = ::ul::types::Query();
+    const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
+    const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
+    const std::vector<uint8_t> expected_bytes = std::vector(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::query_xlsx(
         ctx,
-        ::ul::types::Query()
+        body
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<uint8_t> result_value = std::get<std::vector<uint8_t>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_query_xlsx_obj(test_query_xlsx, "datacatalog::query_xlsx", &link_only_api_test_root);
+ApiTest test_query_xlsx_obj(test_query_xlsx, "datacatalog::query_xlsx", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_query_json(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::query_json(
+test_query_json(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    ::ul::types::Query body = ::ul::types::Query();
+    const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
+    const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
+    const std::vector<uint8_t> expected_bytes = std::vector(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::query_json(
         ctx,
-        ::ul::types::Query()
+        body
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<uint8_t> result_value = std::get<std::vector<uint8_t>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_query_json_obj(test_query_json, "datacatalog::query_json", &link_only_api_test_root);
+ApiTest test_query_json_obj(test_query_json, "datacatalog::query_json", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_query_text(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::query_text(
+test_query_text(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    ::ul::types::Query body = ::ul::types::Query();
+    const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
+    const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
+    const std::vector<uint8_t> expected_bytes = std::vector(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::query_text(
         ctx,
-        ::ul::types::Query()
+        body
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<uint8_t> result_value = std::get<std::vector<uint8_t>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_query_text_obj(test_query_text, "datacatalog::query_text", &link_only_api_test_root);
+ApiTest test_query_text_obj(test_query_text, "datacatalog::query_text", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_query_html(ul::RequestContext &ctx) {
-    ::ul::api::datacatalog::query_html(
+test_query_html(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    ::ul::types::Query body = ::ul::types::Query();
+    const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
+    const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
+    const std::vector<uint8_t> expected_bytes = std::vector(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::query_html(
         ctx,
-        ::ul::types::Query()
+        body
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<uint8_t> result_value = std::get<std::vector<uint8_t>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_query_html_obj(test_query_html, "datacatalog::query_html", &link_only_api_test_root);
+ApiTest test_query_html_obj(test_query_html, "datacatalog::query_html", &idempotent_api_test_root);
 
 } // namespace datacatalog

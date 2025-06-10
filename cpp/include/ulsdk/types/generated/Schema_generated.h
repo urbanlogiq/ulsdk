@@ -25,6 +25,12 @@ struct ListBuilder;
 struct LargeList;
 struct LargeListBuilder;
 
+struct ListView;
+struct ListViewBuilder;
+
+struct LargeListView;
+struct LargeListViewBuilder;
+
 struct FixedSizeList;
 struct FixedSizeListBuilder;
 
@@ -52,11 +58,20 @@ struct LargeUtf8Builder;
 struct LargeBinary;
 struct LargeBinaryBuilder;
 
+struct Utf8View;
+struct Utf8ViewBuilder;
+
+struct BinaryView;
+struct BinaryViewBuilder;
+
 struct FixedSizeBinary;
 struct FixedSizeBinaryBuilder;
 
 struct Bool;
 struct BoolBuilder;
+
+struct RunEndEncoded;
+struct RunEndEncodedBuilder;
 
 struct Decimal;
 struct DecimalBuilder;
@@ -93,8 +108,11 @@ struct SchemaBuilder;
 /// Logical types, vector layouts, and schemas
 /// Format Version History.
 /// Version 1.0 - Forward and backwards compatibility guaranteed.
-/// Version 1.1 - Add Decimal256 (No format release).
-/// Version 1.2 (Pending)- Add Interval MONTH_DAY_NANO
+/// Version 1.1 - Add Decimal256.
+/// Version 1.2 - Add Interval MONTH_DAY_NANO.
+/// Version 1.3 - Add Run-End Encoded.
+/// Version 1.4 - Add BinaryView, Utf8View, variadicBufferCounts, ListView, and
+/// LargeListView.
 enum class MetadataVersion : int16_t {
   /// 0.1.0 (October 2016).
   V1 = 0,
@@ -104,7 +122,7 @@ enum class MetadataVersion : int16_t {
   V3 = 2,
   /// >= 0.8.0 (December 2017). Non-backwards compatible with V3.
   V4 = 3,
-  /// >= 1.0.0 (July 2020. Backwards compatible with V4 (V5 readers can read V4
+  /// >= 1.0.0 (July 2020). Backwards compatible with V4 (V5 readers can read V4
   /// metadata and IPC messages). Implementations are recommended to provide a
   /// V4 compatibility mode with V5 format changes disabled.
   ///
@@ -389,11 +407,16 @@ enum class Type : uint8_t {
   LargeBinary = 19,
   LargeUtf8 = 20,
   LargeList = 21,
+  RunEndEncoded = 22,
+  BinaryView = 23,
+  Utf8View = 24,
+  ListView = 25,
+  LargeListView = 26,
   MIN = NONE,
-  MAX = LargeList
+  MAX = LargeListView
 };
 
-inline const Type (&EnumValuesType())[22] {
+inline const Type (&EnumValuesType())[27] {
   static const Type values[] = {
     Type::NONE,
     Type::Null,
@@ -416,13 +439,18 @@ inline const Type (&EnumValuesType())[22] {
     Type::Duration,
     Type::LargeBinary,
     Type::LargeUtf8,
-    Type::LargeList
+    Type::LargeList,
+    Type::RunEndEncoded,
+    Type::BinaryView,
+    Type::Utf8View,
+    Type::ListView,
+    Type::LargeListView
   };
   return values;
 }
 
 inline const char * const *EnumNamesType() {
-  static const char * const names[23] = {
+  static const char * const names[28] = {
     "NONE",
     "Null",
     "Int",
@@ -445,13 +473,18 @@ inline const char * const *EnumNamesType() {
     "LargeBinary",
     "LargeUtf8",
     "LargeList",
+    "RunEndEncoded",
+    "BinaryView",
+    "Utf8View",
+    "ListView",
+    "LargeListView",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameType(Type e) {
-  if (::flatbuffers::IsOutRange(e, Type::NONE, Type::LargeList)) return "";
+  if (::flatbuffers::IsOutRange(e, Type::NONE, Type::LargeListView)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesType()[index];
 }
@@ -542,6 +575,26 @@ template<> struct TypeTraits<LargeUtf8> {
 
 template<> struct TypeTraits<LargeList> {
   static const Type enum_value = Type::LargeList;
+};
+
+template<> struct TypeTraits<RunEndEncoded> {
+  static const Type enum_value = Type::RunEndEncoded;
+};
+
+template<> struct TypeTraits<BinaryView> {
+  static const Type enum_value = Type::BinaryView;
+};
+
+template<> struct TypeTraits<Utf8View> {
+  static const Type enum_value = Type::Utf8View;
+};
+
+template<> struct TypeTraits<ListView> {
+  static const Type enum_value = Type::ListView;
+};
+
+template<> struct TypeTraits<LargeListView> {
+  static const Type enum_value = Type::LargeListView;
 };
 
 bool VerifyType(::flatbuffers::Verifier &verifier, const void *obj, Type type);
@@ -792,6 +845,81 @@ inline ::flatbuffers::Offset<LargeList> CreateLargeList(
 struct LargeList::Traits {
   using type = LargeList;
   static auto constexpr Create = CreateLargeList;
+};
+
+/// Represents the same logical types that List can, but contains offsets and
+/// sizes allowing for writes in any order and sharing of child values among
+/// list values.
+struct ListView FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ListViewBuilder Builder;
+  struct Traits;
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct ListViewBuilder {
+  typedef ListView Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  explicit ListViewBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<ListView> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<ListView>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<ListView> CreateListView(
+    ::flatbuffers::FlatBufferBuilder &_fbb) {
+  ListViewBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
+struct ListView::Traits {
+  using type = ListView;
+  static auto constexpr Create = CreateListView;
+};
+
+/// Same as ListView, but with 64-bit offsets and sizes, allowing to represent
+/// extremely large data values.
+struct LargeListView FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef LargeListViewBuilder Builder;
+  struct Traits;
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct LargeListViewBuilder {
+  typedef LargeListView Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  explicit LargeListViewBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<LargeListView> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<LargeListView>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<LargeListView> CreateLargeListView(
+    ::flatbuffers::FlatBufferBuilder &_fbb) {
+  LargeListViewBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
+struct LargeListView::Traits {
+  using type = LargeListView;
+  static auto constexpr Create = CreateLargeListView;
 };
 
 struct FixedSizeList FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -1238,6 +1366,90 @@ struct LargeBinary::Traits {
   static auto constexpr Create = CreateLargeBinary;
 };
 
+/// Logically the same as Utf8, but the internal representation uses a view
+/// struct that contains the string length and either the string's entire data
+/// inline (for small strings) or an inlined prefix, an index of another buffer,
+/// and an offset pointing to a slice in that buffer (for non-small strings).
+///
+/// Since it uses a variable number of data buffers, each Field with this type
+/// must have a corresponding entry in `variadicBufferCounts`.
+struct Utf8View FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef Utf8ViewBuilder Builder;
+  struct Traits;
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct Utf8ViewBuilder {
+  typedef Utf8View Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  explicit Utf8ViewBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<Utf8View> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<Utf8View>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<Utf8View> CreateUtf8View(
+    ::flatbuffers::FlatBufferBuilder &_fbb) {
+  Utf8ViewBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
+struct Utf8View::Traits {
+  using type = Utf8View;
+  static auto constexpr Create = CreateUtf8View;
+};
+
+/// Logically the same as Binary, but the internal representation uses a view
+/// struct that contains the string length and either the string's entire data
+/// inline (for small strings) or an inlined prefix, an index of another buffer,
+/// and an offset pointing to a slice in that buffer (for non-small strings).
+///
+/// Since it uses a variable number of data buffers, each Field with this type
+/// must have a corresponding entry in `variadicBufferCounts`.
+struct BinaryView FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef BinaryViewBuilder Builder;
+  struct Traits;
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct BinaryViewBuilder {
+  typedef BinaryView Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  explicit BinaryViewBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<BinaryView> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<BinaryView>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<BinaryView> CreateBinaryView(
+    ::flatbuffers::FlatBufferBuilder &_fbb) {
+  BinaryViewBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
+struct BinaryView::Traits {
+  using type = BinaryView;
+  static auto constexpr Create = CreateBinaryView;
+};
+
 struct FixedSizeBinary FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef FixedSizeBinaryBuilder Builder;
   struct Traits;
@@ -1319,6 +1531,46 @@ inline ::flatbuffers::Offset<Bool> CreateBool(
 struct Bool::Traits {
   using type = Bool;
   static auto constexpr Create = CreateBool;
+};
+
+/// Contains two child arrays, run_ends and values.
+/// The run_ends child array must be a 16/32/64-bit integer array
+/// which encodes the indices at which the run with the value in
+/// each corresponding index in the values child array ends.
+/// Like list/struct types, the value array can be of any type.
+struct RunEndEncoded FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef RunEndEncodedBuilder Builder;
+  struct Traits;
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct RunEndEncodedBuilder {
+  typedef RunEndEncoded Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  explicit RunEndEncodedBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<RunEndEncoded> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<RunEndEncoded>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<RunEndEncoded> CreateRunEndEncoded(
+    ::flatbuffers::FlatBufferBuilder &_fbb) {
+  RunEndEncodedBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
+struct RunEndEncoded::Traits {
+  using type = RunEndEncoded;
+  static auto constexpr Create = CreateRunEndEncoded;
 };
 
 /// Exact decimal value represented as an integer value in two's
@@ -1619,7 +1871,7 @@ struct Time::Traits {
 /// no indication of how to map this information to a physical point in time.
 /// Naive date-times must be handled with care because of this missing
 /// information, and also because daylight saving time (DST) may make
-/// some values ambiguous or non-existent. A naive date-time may be
+/// some values ambiguous or nonexistent. A naive date-time may be
 /// stored as a struct with Date and Time fields. However, it may also be
 /// encoded into a Timestamp column with an empty timezone. The timestamp
 /// values should be computed "as if" the timezone of the date-time values
@@ -2056,6 +2308,21 @@ struct Field FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const LargeList *type_as_LargeList() const {
     return type_type() == Type::LargeList ? static_cast<const LargeList *>(type()) : nullptr;
   }
+  const RunEndEncoded *type_as_RunEndEncoded() const {
+    return type_type() == Type::RunEndEncoded ? static_cast<const RunEndEncoded *>(type()) : nullptr;
+  }
+  const BinaryView *type_as_BinaryView() const {
+    return type_type() == Type::BinaryView ? static_cast<const BinaryView *>(type()) : nullptr;
+  }
+  const Utf8View *type_as_Utf8View() const {
+    return type_type() == Type::Utf8View ? static_cast<const Utf8View *>(type()) : nullptr;
+  }
+  const ListView *type_as_ListView() const {
+    return type_type() == Type::ListView ? static_cast<const ListView *>(type()) : nullptr;
+  }
+  const LargeListView *type_as_LargeListView() const {
+    return type_type() == Type::LargeListView ? static_cast<const LargeListView *>(type()) : nullptr;
+  }
   /// Present only if the field is dictionary encoded.
   const DictionaryEncoding *dictionary() const {
     return GetPointer<const DictionaryEncoding *>(VT_DICTIONARY);
@@ -2171,6 +2438,26 @@ template<> inline const LargeUtf8 *Field::type_as<LargeUtf8>() const {
 
 template<> inline const LargeList *Field::type_as<LargeList>() const {
   return type_as_LargeList();
+}
+
+template<> inline const RunEndEncoded *Field::type_as<RunEndEncoded>() const {
+  return type_as_RunEndEncoded();
+}
+
+template<> inline const BinaryView *Field::type_as<BinaryView>() const {
+  return type_as_BinaryView();
+}
+
+template<> inline const Utf8View *Field::type_as<Utf8View>() const {
+  return type_as_Utf8View();
+}
+
+template<> inline const ListView *Field::type_as<ListView>() const {
+  return type_as_ListView();
+}
+
+template<> inline const LargeListView *Field::type_as<LargeListView>() const {
+  return type_as_LargeListView();
 }
 
 struct FieldBuilder {
@@ -2449,6 +2736,26 @@ inline bool VerifyType(::flatbuffers::Verifier &verifier, const void *obj, Type 
     }
     case Type::LargeList: {
       auto ptr = reinterpret_cast<const LargeList *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case Type::RunEndEncoded: {
+      auto ptr = reinterpret_cast<const RunEndEncoded *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case Type::BinaryView: {
+      auto ptr = reinterpret_cast<const BinaryView *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case Type::Utf8View: {
+      auto ptr = reinterpret_cast<const Utf8View *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case Type::ListView: {
+      auto ptr = reinterpret_cast<const ListView *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case Type::LargeListView: {
+      auto ptr = reinterpret_cast<const LargeListView *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

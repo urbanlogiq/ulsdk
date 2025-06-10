@@ -101,6 +101,10 @@ struct StringCategories {
     StringCategories();
     StringCategories(const ::StringCategories *root);
     StringCategories(const std::vector<uint8_t> &bytes);
+    bool operator==(const StringCategories &rhs) const;
+    bool operator!=(const StringCategories &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct NumericalFieldFormat {
@@ -112,6 +116,10 @@ struct NumericalFieldFormat {
     NumericalFieldFormat();
     NumericalFieldFormat(const ::NumericalFieldFormat *root);
     NumericalFieldFormat(const std::vector<uint8_t> &bytes);
+    bool operator==(const NumericalFieldFormat &rhs) const;
+    bool operator!=(const NumericalFieldFormat &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct IntRange {
@@ -125,6 +133,10 @@ struct IntRange {
     IntRange();
     IntRange(const ::IntRange *root);
     IntRange(const std::vector<uint8_t> &bytes);
+    bool operator==(const IntRange &rhs) const;
+    bool operator!=(const IntRange &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct FloatRange {
@@ -136,6 +148,10 @@ struct FloatRange {
     FloatRange();
     FloatRange(const ::FloatRange *root);
     FloatRange(const std::vector<uint8_t> &bytes);
+    bool operator==(const FloatRange &rhs) const;
+    bool operator!=(const FloatRange &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct DatetimeRange {
@@ -146,6 +162,10 @@ struct DatetimeRange {
     DatetimeRange();
     DatetimeRange(const ::DatetimeRange *root);
     DatetimeRange(const std::vector<uint8_t> &bytes);
+    bool operator==(const DatetimeRange &rhs) const;
+    bool operator!=(const DatetimeRange &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Dates {
@@ -157,6 +177,10 @@ struct Dates {
     Dates();
     Dates(const ::Dates *root);
     Dates(const std::vector<uint8_t> &bytes);
+    bool operator==(const Dates &rhs) const;
+    bool operator!=(const Dates &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct NestedStringCategories {
@@ -165,6 +189,10 @@ struct NestedStringCategories {
     NestedStringCategories();
     NestedStringCategories(const ::NestedStringCategories *root);
     NestedStringCategories(const std::vector<uint8_t> &bytes);
+    bool operator==(const NestedStringCategories &rhs) const;
+    bool operator!=(const NestedStringCategories &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct RawGeom {
@@ -173,6 +201,10 @@ struct RawGeom {
     RawGeom();
     RawGeom(const ::RawGeom *root);
     RawGeom(const std::vector<uint8_t> &bytes);
+    bool operator==(const RawGeom &rhs) const;
+    bool operator!=(const RawGeom &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct NoGeometry {
@@ -180,6 +212,10 @@ struct NoGeometry {
     NoGeometry();
     NoGeometry(const ::NoGeometry *root);
     NoGeometry(const std::vector<uint8_t> &bytes);
+    bool operator==(const NoGeometry &rhs) const;
+    bool operator!=(const NoGeometry &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct DatacatalogGeometry {
@@ -188,6 +224,10 @@ struct DatacatalogGeometry {
     DatacatalogGeometry();
     DatacatalogGeometry(const ::DatacatalogGeometry *root);
     DatacatalogGeometry(const std::vector<uint8_t> &bytes);
+    bool operator==(const DatacatalogGeometry &rhs) const;
+    bool operator!=(const DatacatalogGeometry &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -214,6 +254,10 @@ struct WorldGraphGeometry {
     WorldGraphGeometry();
     WorldGraphGeometry(const ::WorldGraphGeometry *root);
     WorldGraphGeometry(const std::vector<uint8_t> &bytes);
+    bool operator==(const WorldGraphGeometry &rhs) const;
+    bool operator!=(const WorldGraphGeometry &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct HierarchyRelationshipData {
@@ -222,6 +266,10 @@ struct HierarchyRelationshipData {
     HierarchyRelationshipData();
     HierarchyRelationshipData(const ::HierarchyRelationshipData *root);
     HierarchyRelationshipData(const std::vector<uint8_t> &bytes);
+    bool operator==(const HierarchyRelationshipData &rhs) const;
+    bool operator!=(const HierarchyRelationshipData &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct CategoryRelationshipData {
@@ -231,6 +279,10 @@ struct CategoryRelationshipData {
     CategoryRelationshipData();
     CategoryRelationshipData(const ::CategoryRelationshipData *root);
     CategoryRelationshipData(const std::vector<uint8_t> &bytes);
+    bool operator==(const CategoryRelationshipData &rhs) const;
+    bool operator!=(const CategoryRelationshipData &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct NestedCategoryRelationshipData {
@@ -239,6 +291,10 @@ struct NestedCategoryRelationshipData {
     NestedCategoryRelationshipData();
     NestedCategoryRelationshipData(const ::NestedCategoryRelationshipData *root);
     NestedCategoryRelationshipData(const std::vector<uint8_t> &bytes);
+    bool operator==(const NestedCategoryRelationshipData &rhs) const;
+    bool operator!=(const NestedCategoryRelationshipData &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct NestedHierarchyRelationshipData {
@@ -247,6 +303,10 @@ struct NestedHierarchyRelationshipData {
     NestedHierarchyRelationshipData();
     NestedHierarchyRelationshipData(const ::NestedHierarchyRelationshipData *root);
     NestedHierarchyRelationshipData(const std::vector<uint8_t> &bytes);
+    bool operator==(const NestedHierarchyRelationshipData &rhs) const;
+    bool operator!=(const NestedHierarchyRelationshipData &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ContactInfo {
@@ -259,6 +319,10 @@ struct ContactInfo {
     ContactInfo();
     ContactInfo(const ::ContactInfo *root);
     ContactInfo(const std::vector<uint8_t> &bytes);
+    bool operator==(const ContactInfo &rhs) const;
+    bool operator!=(const ContactInfo &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct DatasetSource {
@@ -269,6 +333,10 @@ struct DatasetSource {
     DatasetSource();
     DatasetSource(const ::DatasetSource *root);
     DatasetSource(const std::vector<uint8_t> &bytes);
+    bool operator==(const DatasetSource &rhs) const;
+    bool operator!=(const DatasetSource &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Document {
@@ -280,6 +348,10 @@ struct Document {
     Document();
     Document(const ::Document *root);
     Document(const std::vector<uint8_t> &bytes);
+    bool operator==(const Document &rhs) const;
+    bool operator!=(const Document &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Documents {
@@ -288,6 +360,10 @@ struct Documents {
     Documents();
     Documents(const ::Documents *root);
     Documents(const std::vector<uint8_t> &bytes);
+    bool operator==(const Documents &rhs) const;
+    bool operator!=(const Documents &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct FloatAggregate {
@@ -302,6 +378,10 @@ struct FloatAggregate {
     FloatAggregate();
     FloatAggregate(const ::FloatAggregate *root);
     FloatAggregate(const std::vector<uint8_t> &bytes);
+    bool operator==(const FloatAggregate &rhs) const;
+    bool operator!=(const FloatAggregate &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct FloatBucket {
@@ -310,6 +390,10 @@ struct FloatBucket {
 
     FloatBucket();
     FloatBucket(const ::FloatBucket *root);
+    bool operator==(const FloatBucket &rhs) const;
+    bool operator!=(const FloatBucket &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct GeometryData {
@@ -318,6 +402,10 @@ struct GeometryData {
     GeometryData();
     GeometryData(const ::GeometryData *root);
     GeometryData(const std::vector<uint8_t> &bytes);
+    bool operator==(const GeometryData &rhs) const;
+    bool operator!=(const GeometryData &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct HierarchicalRelationship {
@@ -327,6 +415,10 @@ struct HierarchicalRelationship {
     HierarchicalRelationship();
     HierarchicalRelationship(const ::HierarchicalRelationship *root);
     HierarchicalRelationship(const std::vector<uint8_t> &bytes);
+    bool operator==(const HierarchicalRelationship &rhs) const;
+    bool operator!=(const HierarchicalRelationship &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct IntAggregate {
@@ -341,6 +433,10 @@ struct IntAggregate {
     IntAggregate();
     IntAggregate(const ::IntAggregate *root);
     IntAggregate(const std::vector<uint8_t> &bytes);
+    bool operator==(const IntAggregate &rhs) const;
+    bool operator!=(const IntAggregate &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct IntBucket {
@@ -349,6 +445,10 @@ struct IntBucket {
 
     IntBucket();
     IntBucket(const ::IntBucket *root);
+    bool operator==(const IntBucket &rhs) const;
+    bool operator!=(const IntBucket &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct IntegerDisplayString {
@@ -358,6 +458,10 @@ struct IntegerDisplayString {
     IntegerDisplayString();
     IntegerDisplayString(const ::IntegerDisplayString *root);
     IntegerDisplayString(const std::vector<uint8_t> &bytes);
+    bool operator==(const IntegerDisplayString &rhs) const;
+    bool operator!=(const IntegerDisplayString &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Metadata {
@@ -378,6 +482,10 @@ struct Metadata {
     Metadata();
     Metadata(const ::Metadata *root);
     Metadata(const std::vector<uint8_t> &bytes);
+    bool operator==(const Metadata &rhs) const;
+    bool operator!=(const Metadata &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct NestedCategoryRelationshipNode {
@@ -387,6 +495,10 @@ struct NestedCategoryRelationshipNode {
     NestedCategoryRelationshipNode();
     NestedCategoryRelationshipNode(const ::NestedCategoryRelationshipNode *root);
     NestedCategoryRelationshipNode(const std::vector<uint8_t> &bytes);
+    bool operator==(const NestedCategoryRelationshipNode &rhs) const;
+    bool operator!=(const NestedCategoryRelationshipNode &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct NestedHierarchyRelationshipNode {
@@ -397,6 +509,10 @@ struct NestedHierarchyRelationshipNode {
     NestedHierarchyRelationshipNode();
     NestedHierarchyRelationshipNode(const ::NestedHierarchyRelationshipNode *root);
     NestedHierarchyRelationshipNode(const std::vector<uint8_t> &bytes);
+    bool operator==(const NestedHierarchyRelationshipNode &rhs) const;
+    bool operator!=(const NestedHierarchyRelationshipNode &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct NestedStringCategoryNode {
@@ -406,6 +522,10 @@ struct NestedStringCategoryNode {
     NestedStringCategoryNode();
     NestedStringCategoryNode(const ::NestedStringCategoryNode *root);
     NestedStringCategoryNode(const std::vector<uint8_t> &bytes);
+    bool operator==(const NestedStringCategoryNode &rhs) const;
+    bool operator!=(const NestedStringCategoryNode &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct StringAggregate {
@@ -415,6 +535,10 @@ struct StringAggregate {
     StringAggregate();
     StringAggregate(const ::StringAggregate *root);
     StringAggregate(const std::vector<uint8_t> &bytes);
+    bool operator==(const StringAggregate &rhs) const;
+    bool operator!=(const StringAggregate &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct TimeInterval {
@@ -424,6 +548,10 @@ struct TimeInterval {
     TimeInterval();
     TimeInterval(const ::TimeInterval *root);
     TimeInterval(const std::vector<uint8_t> &bytes);
+    bool operator==(const TimeInterval &rhs) const;
+    bool operator!=(const TimeInterval &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct UIntAggregate {
@@ -438,6 +566,10 @@ struct UIntAggregate {
     UIntAggregate();
     UIntAggregate(const ::UIntAggregate *root);
     UIntAggregate(const std::vector<uint8_t> &bytes);
+    bool operator==(const UIntAggregate &rhs) const;
+    bool operator!=(const UIntAggregate &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct UIntBucket {
@@ -446,6 +578,10 @@ struct UIntBucket {
 
     UIntBucket();
     UIntBucket(const ::UIntBucket *root);
+    bool operator==(const UIntBucket &rhs) const;
+    bool operator!=(const UIntBucket &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct UlField {
@@ -463,6 +599,10 @@ struct UlField {
     UlField();
     UlField(const ::UlField *root);
     UlField(const std::vector<uint8_t> &bytes);
+    bool operator==(const UlField &rhs) const;
+    bool operator!=(const UlField &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct UlFieldRelationship {
@@ -472,6 +612,10 @@ struct UlFieldRelationship {
     UlFieldRelationship();
     UlFieldRelationship(const ::UlFieldRelationship *root);
     UlFieldRelationship(const std::vector<uint8_t> &bytes);
+    bool operator==(const UlFieldRelationship &rhs) const;
+    bool operator!=(const UlFieldRelationship &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::pair<::flatbuffers::Offset<void>, ::ComponentData>

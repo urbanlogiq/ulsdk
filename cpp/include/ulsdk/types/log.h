@@ -29,6 +29,10 @@ struct Label {
     Label();
     Label(const ::Label *root);
     Label(const std::vector<uint8_t> &bytes);
+    bool operator==(const Label &rhs) const;
+    bool operator!=(const Label &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Log {
@@ -39,6 +43,10 @@ struct Log {
     Log();
     Log(const ::Log *root);
     Log(const std::vector<uint8_t> &bytes);
+    bool operator==(const Log &rhs) const;
+    bool operator!=(const Log &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Pair {
@@ -48,6 +56,10 @@ struct Pair {
     Pair();
     Pair(const ::Pair *root);
     Pair(const std::vector<uint8_t> &bytes);
+    bool operator==(const Pair &rhs) const;
+    bool operator!=(const Pair &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ::flatbuffers::Offset<::Label>

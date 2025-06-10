@@ -578,33 +578,31 @@ Result<std::vector<uint8_t>> ApiKeyContext::upload(
     // we can do with libcurl's multipart form data support.
     const unsigned long ts = time(nullptr);
     std::stringstream boundary_stream;
-    boundary_stream << "--UL1-multipart-" << ts;
+    boundary_stream << "UL1-multipart-" << ts;
     const std::string boundary = boundary_stream.str();
     const std::string crlf = "\r\n";
+    const std::string dash = "--";
 
     std::vector<uint8_t> body;
-    body.insert(body.end(), boundary.begin(), boundary.end());
-    body.insert(body.end(), crlf.begin(), crlf.end());
 
     for (const auto& file : files) {
-        if (!body.empty()) {
-            body.insert(body.end(), boundary.begin(), boundary.end());
-            body.insert(body.end(), crlf.begin(), crlf.end());
-        }
+        body.insert(body.end(), dash.begin(), dash.end());
+        body.insert(body.end(), boundary.begin(), boundary.end());
+        body.insert(body.end(), crlf.begin(), crlf.end());
 
         std::stringstream disposition_header;
         disposition_header << "Content-Disposition: form-data; name=\""
                            << file.name << "\"; filename=\"" << file.name
                            << "\"\r\n";
-        disposition_header << "Content-Type:" << file.mimetype << "\r\n\r\n";
+        disposition_header << "Content-Type: " << file.mimetype << "\r\n\r\n";
         const std::string header = disposition_header.str();
 
         body.insert(body.end(), header.begin(), header.end());
         body.insert(body.end(), file.data.begin(), file.data.end());
     }
+    body.insert(body.end(), dash.begin(), dash.end());
     body.insert(body.end(), boundary.begin(), boundary.end());
-    body.push_back((uint8_t)'-');
-    body.push_back((uint8_t)'-');
+    body.insert(body.end(), dash.begin(), dash.end());
 
     std::stringstream mime_type;
     mime_type << "multipart/form-data; boundary=\"" << boundary << "\"";

@@ -20,12 +20,12 @@ description = "A Python SDK for the UrbanLogiq API"
 authors = ["UrbanLogiq <customersuccess@urbanlogiq.com>"]
 
 [tool.poetry.dependencies]
-python = ">=3.12, <4"
+python = ">=3.10, <4"
 pynacl = "1.5.0"
 requests = "^2.32.0"
 pyarrow = "^17"
 pyarrow-stubs = "^10.0.1.9"
-flatbuffers = "^23.5.26"
+flatbuffers = "^22.12.6"
 
 [tool.poetry.group.dev.dependencies]
 pyright = "^1.1.377"

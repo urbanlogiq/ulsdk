@@ -17,6 +17,7 @@ namespace ul {
 namespace types {
 
 struct Binary;
+struct BinaryView;
 struct Bool;
 struct Buffer;
 struct Date;
@@ -32,16 +33,20 @@ struct Interval;
 struct KeyValue;
 struct LargeBinary;
 struct LargeList;
+struct LargeListView;
 struct LargeUtf8;
 struct List;
+struct ListView;
 struct Map;
 struct Null;
+struct RunEndEncoded;
 struct Schema;
 struct Struct_;
 struct Time;
 struct Timestamp;
 struct Union;
 struct Utf8;
+struct Utf8View;
 
 using ::DateUnit;
 using ::DictionaryKind;
@@ -77,7 +82,12 @@ typedef std::variant<
     std::shared_ptr<Duration>,
     std::shared_ptr<LargeBinary>,
     std::shared_ptr<LargeUtf8>,
-    std::shared_ptr<LargeList>
+    std::shared_ptr<LargeList>,
+    std::shared_ptr<RunEndEncoded>,
+    std::shared_ptr<BinaryView>,
+    std::shared_ptr<Utf8View>,
+    std::shared_ptr<ListView>,
+    std::shared_ptr<LargeListView>
 > Type;
 
 using ::UnionMode;
@@ -89,6 +99,10 @@ struct Null {
     Null();
     Null(const ::Null *root);
     Null(const std::vector<uint8_t> &bytes);
+    bool operator==(const Null &rhs) const;
+    bool operator!=(const Null &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Int {
@@ -98,6 +112,10 @@ struct Int {
     Int();
     Int(const ::Int *root);
     Int(const std::vector<uint8_t> &bytes);
+    bool operator==(const Int &rhs) const;
+    bool operator!=(const Int &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct FloatingPoint {
@@ -106,6 +124,10 @@ struct FloatingPoint {
     FloatingPoint();
     FloatingPoint(const ::FloatingPoint *root);
     FloatingPoint(const std::vector<uint8_t> &bytes);
+    bool operator==(const FloatingPoint &rhs) const;
+    bool operator!=(const FloatingPoint &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -116,6 +138,10 @@ struct Binary {
     Binary();
     Binary(const ::Binary *root);
     Binary(const std::vector<uint8_t> &bytes);
+    bool operator==(const Binary &rhs) const;
+    bool operator!=(const Binary &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -126,6 +152,10 @@ struct Utf8 {
     Utf8();
     Utf8(const ::Utf8 *root);
     Utf8(const std::vector<uint8_t> &bytes);
+    bool operator==(const Utf8 &rhs) const;
+    bool operator!=(const Utf8 &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Bool {
@@ -133,6 +163,10 @@ struct Bool {
     Bool();
     Bool(const ::Bool *root);
     Bool(const std::vector<uint8_t> &bytes);
+    bool operator==(const Bool &rhs) const;
+    bool operator!=(const Bool &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -149,6 +183,10 @@ struct Decimal {
     Decimal();
     Decimal(const ::Decimal *root);
     Decimal(const std::vector<uint8_t> &bytes);
+    bool operator==(const Decimal &rhs) const;
+    bool operator!=(const Decimal &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -165,6 +203,10 @@ struct Date {
     Date();
     Date(const ::Date *root);
     Date(const std::vector<uint8_t> &bytes);
+    bool operator==(const Date &rhs) const;
+    bool operator!=(const Date &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -190,6 +232,10 @@ struct Time {
     Time();
     Time(const ::Time *root);
     Time(const std::vector<uint8_t> &bytes);
+    bool operator==(const Time &rhs) const;
+    bool operator!=(const Time &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -292,7 +338,7 @@ struct Time {
 /// no indication of how to map this information to a physical point in time.
 /// Naive date-times must be handled with care because of this missing
 /// information, and also because daylight saving time (DST) may make
-/// some values ambiguous or non-existent. A naive date-time may be
+/// some values ambiguous or nonexistent. A naive date-time may be
 /// stored as a struct with Date and Time fields. However, it may also be
 /// encoded into a Timestamp column with an empty timezone. The timestamp
 /// values should be computed "as if" the timezone of the date-time values
@@ -306,6 +352,10 @@ struct Timestamp {
     Timestamp();
     Timestamp(const ::Timestamp *root);
     Timestamp(const std::vector<uint8_t> &bytes);
+    bool operator==(const Timestamp &rhs) const;
+    bool operator!=(const Timestamp &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Interval {
@@ -314,6 +364,10 @@ struct Interval {
     Interval();
     Interval(const ::Interval *root);
     Interval(const std::vector<uint8_t> &bytes);
+    bool operator==(const Interval &rhs) const;
+    bool operator!=(const Interval &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct List {
@@ -321,6 +375,10 @@ struct List {
     List();
     List(const ::List *root);
     List(const std::vector<uint8_t> &bytes);
+    bool operator==(const List &rhs) const;
+    bool operator!=(const List &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -333,6 +391,10 @@ struct Struct_ {
     Struct_();
     Struct_(const ::Struct_ *root);
     Struct_(const std::vector<uint8_t> &bytes);
+    bool operator==(const Struct_ &rhs) const;
+    bool operator!=(const Struct_ &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -348,6 +410,10 @@ struct Union {
     Union();
     Union(const ::Union *root);
     Union(const std::vector<uint8_t> &bytes);
+    bool operator==(const Union &rhs) const;
+    bool operator!=(const Union &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct FixedSizeBinary {
@@ -356,6 +422,10 @@ struct FixedSizeBinary {
     FixedSizeBinary();
     FixedSizeBinary(const ::FixedSizeBinary *root);
     FixedSizeBinary(const std::vector<uint8_t> &bytes);
+    bool operator==(const FixedSizeBinary &rhs) const;
+    bool operator!=(const FixedSizeBinary &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct FixedSizeList {
@@ -364,6 +434,10 @@ struct FixedSizeList {
     FixedSizeList();
     FixedSizeList(const ::FixedSizeList *root);
     FixedSizeList(const std::vector<uint8_t> &bytes);
+    bool operator==(const FixedSizeList &rhs) const;
+    bool operator!=(const FixedSizeList &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -399,6 +473,10 @@ struct Map {
     Map();
     Map(const ::Map *root);
     Map(const std::vector<uint8_t> &bytes);
+    bool operator==(const Map &rhs) const;
+    bool operator!=(const Map &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Duration {
@@ -407,6 +485,10 @@ struct Duration {
     Duration();
     Duration(const ::Duration *root);
     Duration(const std::vector<uint8_t> &bytes);
+    bool operator==(const Duration &rhs) const;
+    bool operator!=(const Duration &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -418,6 +500,10 @@ struct LargeBinary {
     LargeBinary();
     LargeBinary(const ::LargeBinary *root);
     LargeBinary(const std::vector<uint8_t> &bytes);
+    bool operator==(const LargeBinary &rhs) const;
+    bool operator!=(const LargeBinary &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -429,6 +515,10 @@ struct LargeUtf8 {
     LargeUtf8();
     LargeUtf8(const ::LargeUtf8 *root);
     LargeUtf8(const std::vector<uint8_t> &bytes);
+    bool operator==(const LargeUtf8 &rhs) const;
+    bool operator!=(const LargeUtf8 &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -440,6 +530,99 @@ struct LargeList {
     LargeList();
     LargeList(const ::LargeList *root);
     LargeList(const std::vector<uint8_t> &bytes);
+    bool operator==(const LargeList &rhs) const;
+    bool operator!=(const LargeList &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+///
+/// Contains two child arrays, run_ends and values.
+/// The run_ends child array must be a 16/32/64-bit integer array
+/// which encodes the indices at which the run with the value in
+/// each corresponding index in the values child array ends.
+/// Like list/struct types, the value array can be of any type.
+///
+struct RunEndEncoded {
+
+    RunEndEncoded();
+    RunEndEncoded(const ::RunEndEncoded *root);
+    RunEndEncoded(const std::vector<uint8_t> &bytes);
+    bool operator==(const RunEndEncoded &rhs) const;
+    bool operator!=(const RunEndEncoded &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+///
+/// Logically the same as Binary, but the internal representation uses a view
+/// struct that contains the string length and either the string's entire data
+/// inline (for small strings) or an inlined prefix, an index of another buffer,
+/// and an offset pointing to a slice in that buffer (for non-small strings).
+///
+/// Since it uses a variable number of data buffers, each Field with this type
+/// must have a corresponding entry in `variadicBufferCounts`.
+///
+struct BinaryView {
+
+    BinaryView();
+    BinaryView(const ::BinaryView *root);
+    BinaryView(const std::vector<uint8_t> &bytes);
+    bool operator==(const BinaryView &rhs) const;
+    bool operator!=(const BinaryView &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+///
+/// Logically the same as Utf8, but the internal representation uses a view
+/// struct that contains the string length and either the string's entire data
+/// inline (for small strings) or an inlined prefix, an index of another buffer,
+/// and an offset pointing to a slice in that buffer (for non-small strings).
+///
+/// Since it uses a variable number of data buffers, each Field with this type
+/// must have a corresponding entry in `variadicBufferCounts`.
+///
+struct Utf8View {
+
+    Utf8View();
+    Utf8View(const ::Utf8View *root);
+    Utf8View(const std::vector<uint8_t> &bytes);
+    bool operator==(const Utf8View &rhs) const;
+    bool operator!=(const Utf8View &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+///
+/// Represents the same logical types that List can, but contains offsets and
+/// sizes allowing for writes in any order and sharing of child values among
+/// list values.
+///
+struct ListView {
+
+    ListView();
+    ListView(const ::ListView *root);
+    ListView(const std::vector<uint8_t> &bytes);
+    bool operator==(const ListView &rhs) const;
+    bool operator!=(const ListView &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+///
+/// Same as ListView, but with 64-bit offsets and sizes, allowing to represent
+/// extremely large data values.
+///
+struct LargeListView {
+
+    LargeListView();
+    LargeListView(const ::LargeListView *root);
+    LargeListView(const std::vector<uint8_t> &bytes);
+    bool operator==(const LargeListView &rhs) const;
+    bool operator!=(const LargeListView &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -452,6 +635,10 @@ struct Buffer {
 
     Buffer();
     Buffer(const ::Buffer *root);
+    bool operator==(const Buffer &rhs) const;
+    bool operator!=(const Buffer &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct DictionaryEncoding {
@@ -463,6 +650,10 @@ struct DictionaryEncoding {
     DictionaryEncoding();
     DictionaryEncoding(const ::DictionaryEncoding *root);
     DictionaryEncoding(const std::vector<uint8_t> &bytes);
+    bool operator==(const DictionaryEncoding &rhs) const;
+    bool operator!=(const DictionaryEncoding &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -481,6 +672,10 @@ struct Field {
     Field();
     Field(const ::Field *root);
     Field(const std::vector<uint8_t> &bytes);
+    bool operator==(const Field &rhs) const;
+    bool operator!=(const Field &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -495,6 +690,10 @@ struct KeyValue {
     KeyValue();
     KeyValue(const ::KeyValue *root);
     KeyValue(const std::vector<uint8_t> &bytes);
+    bool operator==(const KeyValue &rhs) const;
+    bool operator!=(const KeyValue &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -510,6 +709,10 @@ struct Schema {
     Schema();
     Schema(const ::Schema *root);
     Schema(const std::vector<uint8_t> &bytes);
+    bool operator==(const Schema &rhs) const;
+    bool operator!=(const Schema &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::pair<::flatbuffers::Offset<void>, ::Type>
@@ -576,6 +779,21 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const LargeUtf8 &);
 
 ::flatbuffers::Offset<::LargeList>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const LargeList &);
+
+::flatbuffers::Offset<::RunEndEncoded>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const RunEndEncoded &);
+
+::flatbuffers::Offset<::BinaryView>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const BinaryView &);
+
+::flatbuffers::Offset<::Utf8View>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Utf8View &);
+
+::flatbuffers::Offset<::ListView>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ListView &);
+
+::flatbuffers::Offset<::LargeListView>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const LargeListView &);
 
 ::flatbuffers::Offset<::DictionaryEncoding>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DictionaryEncoding &);
@@ -652,6 +870,21 @@ to_bytes(const LargeUtf8 &o);
 
 std::vector<uint8_t>
 to_bytes(const LargeList &o);
+
+std::vector<uint8_t>
+to_bytes(const RunEndEncoded &o);
+
+std::vector<uint8_t>
+to_bytes(const BinaryView &o);
+
+std::vector<uint8_t>
+to_bytes(const Utf8View &o);
+
+std::vector<uint8_t>
+to_bytes(const ListView &o);
+
+std::vector<uint8_t>
+to_bytes(const LargeListView &o);
 
 std::vector<uint8_t>
 to_bytes(const DictionaryEncoding &o);

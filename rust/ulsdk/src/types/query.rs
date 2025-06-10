@@ -10,204 +10,76 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
-use flatbuffers::{WIPOffset, UnionWIPOffset};
 use bitflags::bitflags;
 use core::ops::Deref;
+use flatbuffers::{UnionWIPOffset, WIPOffset};
 
 use crate::types::api::SortOrder;
 use crate::types::entity::{
-    EdgeTy,
-    EntityTy,
-    Geometry,
-    GraphEdge,
-    GraphNode,
-    Line,
-    MultiLine,
-    MultiPolygon,
-    NodeTy,
-    Point,
+    EdgeTy, EntityTy, Geometry, GraphEdge, GraphNode, Line, MultiLine, MultiPolygon, NodeTy, Point,
     Polygon,
 };
 use crate::types::fun::Fn_;
-use crate::types::graph::{
-    EdgeList,
-    EdgeQuery,
-    Geom,
-    GeomOp,
-    GraphQuery,
-    NodeIdPair,
-    NodeList,
-    NodeQuery,
-    OrderBy,
-    Predicate,
-    Projection,
-    QueryPathElement,
-    QueryPathElementUnion,
-    ValueTransform,
-};
-use crate::types::id::{
-    B2cId,
-    ColumnGroupId,
-    ContentId,
-    DataStateId,
-    GenericId,
-    GraphNodeId,
-    ObjectId,
-    ObjectNamespace,
-    StreamId,
-};
-use crate::types::value::{
-    Point2D,
-    Tri2D,
-    VArray,
-    VBool,
-    VBytes,
-    VChar,
-    VF32,
-    VF64,
-    VFixedSizeBytes,
-    VI16,
-    VI32,
-    VI64,
-    VI8,
-    VIsize,
-    VNull,
-    VPlaceholder,
-    VStr,
-    VTimestampMs,
-    VTimestampMsUtc,
-    VTimestampNs,
-    VTimestampNsUtc,
-    VTri2D,
-    VU16,
-    VU32,
-    VU64,
-    VU8,
-    VUnit,
-    VUsize,
-    Value,
-    ValueInstance,
-    ValueTy,
-};
-use crate::types::generated::api_generated::{
-    SortOrder as FbsSortOrder,
-};
+use crate::types::generated::api_generated::SortOrder as FbsSortOrder;
 use crate::types::generated::entity_generated::{
-    GraphEdge as FbsGraphEdge,
-    GraphNode as FbsGraphNode,
-    Line as FbsLine,
-    MultiLine as FbsMultiLine,
-    MultiPolygon as FbsMultiPolygon,
-    Point as FbsPoint,
-    Polygon as FbsPolygon,
-    EdgeTy as FbsEdgeTy,
-    EntityTy as FbsEntityTy,
-    Geometry as FbsGeometry,
-    NodeTy as FbsNodeTy,
+    EdgeTy as FbsEdgeTy, EntityTy as FbsEntityTy, Geometry as FbsGeometry,
+    GraphEdge as FbsGraphEdge, GraphNode as FbsGraphNode, Line as FbsLine,
+    MultiLine as FbsMultiLine, MultiPolygon as FbsMultiPolygon, NodeTy as FbsNodeTy,
+    Point as FbsPoint, Polygon as FbsPolygon,
 };
-use crate::types::generated::fun_generated::{
-    Fn as FbsFn,
-};
+use crate::types::generated::fun_generated::Fn as FbsFn;
 use crate::types::generated::graph_generated::{
-    EdgeList as FbsEdgeList,
-    EdgeQuery as FbsEdgeQuery,
-    Geom as FbsGeom,
-    GeomOp as FbsGeomOp,
-    GraphQuery as FbsGraphQuery,
-    NodeIdPair as FbsNodeIdPair,
-    NodeList as FbsNodeList,
-    NodeQuery as FbsNodeQuery,
-    OrderBy as FbsOrderBy,
-    Projection as FbsProjection,
-    QueryPathElement as FbsQueryPathElement,
-    Predicate as FbsPredicate,
-    QueryPathElementUnion as FbsQueryPathElementUnion,
-    ValueTransform as FbsValueTransform,
+    EdgeList as FbsEdgeList, EdgeQuery as FbsEdgeQuery, Geom as FbsGeom, GeomOp as FbsGeomOp,
+    GraphQuery as FbsGraphQuery, NodeIdPair as FbsNodeIdPair, NodeList as FbsNodeList,
+    NodeQuery as FbsNodeQuery, OrderBy as FbsOrderBy, Predicate as FbsPredicate,
+    Projection as FbsProjection, QueryPathElement as FbsQueryPathElement,
+    QueryPathElementUnion as FbsQueryPathElementUnion, ValueTransform as FbsValueTransform,
 };
 use crate::types::generated::id_generated::{
-    B2cId as FbsB2cId,
-    ColumnGroupId as FbsColumnGroupId,
-    ContentId as FbsContentId,
-    DataStateId as FbsDataStateId,
-    GenericId as FbsGenericId,
-    GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId,
-    StreamId as FbsStreamId,
-    ObjectNamespace as FbsObjectNamespace,
+    B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
+    DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
 };
 use crate::types::generated::query_generated::{
-    AllColumns as FbsAllColumns,
-    Arrow as FbsArrow,
-    BinaryQueryElement as FbsBinaryQueryElement,
-    Case as FbsCase,
-    Column as FbsColumn,
-    DataCatalog as FbsDataCatalog,
-    DeleteQueryElement as FbsDeleteQueryElement,
-    Distinct as FbsDistinct,
-    Expr as FbsExpr,
-    Function as FbsFunction,
-    Join as FbsJoin,
-    MvdbPartition as FbsMvdbPartition,
-    NullableUint as FbsNullableUint,
-    OrderByExpr as FbsOrderByExpr,
-    Partition as FbsPartition,
-    Placeholder as FbsPlaceholder,
-    Query as FbsQuery,
-    QueryElement as FbsQueryElement,
-    QueryTableSource as FbsQueryTableSource,
-    SetExpr as FbsSetExpr,
-    TableOrderBy as FbsTableOrderBy,
-    TableSource as FbsTableSource,
-    TableSourceInstance as FbsTableSourceInstance,
-    UnaryQueryElement as FbsUnaryQueryElement,
-    UnsetArgument as FbsUnsetArgument,
-    UpdateQueryElement as FbsUpdateQueryElement,
-    ValueIndex as FbsValueIndex,
-    ValueName as FbsValueName,
-    Vector as FbsVector,
-    When as FbsWhen,
-    Window as FbsWindow,
+    AllColumns as FbsAllColumns, Arrow as FbsArrow, BinaryQueryElement as FbsBinaryQueryElement,
+    Case as FbsCase, Column as FbsColumn, DataCatalog as FbsDataCatalog,
+    DeleteQueryElement as FbsDeleteQueryElement, Distinct as FbsDistinct, Drive as FbsDrive,
+    Expr as FbsExpr, ExprUnion as FbsExprUnion, Function as FbsFunction, Join as FbsJoin,
+    JoinTy as FbsJoinTy, MvdbPartition as FbsMvdbPartition, NullableUint as FbsNullableUint,
+    OrderByExpr as FbsOrderByExpr, Partition as FbsPartition, Placeholder as FbsPlaceholder,
+    Query as FbsQuery, QueryElement as FbsQueryElement, QueryElementOp as FbsQueryElementOp,
+    QueryElementUnion as FbsQueryElementUnion, QueryTableSource as FbsQueryTableSource,
+    SetExpr as FbsSetExpr, TableOrderBy as FbsTableOrderBy, TablePartition as FbsTablePartition,
+    TableSource as FbsTableSource, TableSourceInstance as FbsTableSourceInstance,
+    TableSourceUnion as FbsTableSourceUnion, TypeHint as FbsTypeHint,
+    UnaryQueryElement as FbsUnaryQueryElement, UnsetArgument as FbsUnsetArgument,
+    UpdateQueryElement as FbsUpdateQueryElement, ValueIndex as FbsValueIndex,
+    ValueName as FbsValueName, Vector as FbsVector, When as FbsWhen, Window as FbsWindow,
     WorklogPartition as FbsWorklogPartition,
-    ExprUnion as FbsExprUnion,
-    JoinTy as FbsJoinTy,
-    QueryElementOp as FbsQueryElementOp,
-    QueryElementUnion as FbsQueryElementUnion,
-    TablePartition as FbsTablePartition,
-    TableSourceUnion as FbsTableSourceUnion,
-    TypeHint as FbsTypeHint,
 };
 use crate::types::generated::value_generated::{
-    Point2D as FbsPoint2D,
-    Tri2D as FbsTri2D,
-    VArray as FbsVArray,
-    VBool as FbsVBool,
-    VBytes as FbsVBytes,
-    VChar as FbsVChar,
-    VF32 as FbsVF32,
-    VF64 as FbsVF64,
-    VFixedSizeBytes as FbsVFixedSizeBytes,
-    VI16 as FbsVI16,
-    VI32 as FbsVI32,
-    VI64 as FbsVI64,
-    VI8 as FbsVI8,
-    VIsize as FbsVIsize,
-    VNull as FbsVNull,
-    VPlaceholder as FbsVPlaceholder,
-    VStr as FbsVStr,
-    VTimestampMs as FbsVTimestampMs,
-    VTimestampMsUtc as FbsVTimestampMsUtc,
-    VTimestampNs as FbsVTimestampNs,
-    VTimestampNsUtc as FbsVTimestampNsUtc,
-    VTri2D as FbsVTri2D,
-    VU16 as FbsVU16,
-    VU32 as FbsVU32,
-    VU64 as FbsVU64,
-    VU8 as FbsVU8,
-    VUnit as FbsVUnit,
-    VUsize as FbsVUsize,
-    ValueInstance as FbsValueInstance,
-    Value as FbsValue,
+    Point2D as FbsPoint2D, Tri2D as FbsTri2D, VArray as FbsVArray, VBool as FbsVBool,
+    VBytes as FbsVBytes, VChar as FbsVChar, VF32 as FbsVF32, VF64 as FbsVF64,
+    VFixedSizeBytes as FbsVFixedSizeBytes, VI8 as FbsVI8, VI16 as FbsVI16, VI32 as FbsVI32,
+    VI64 as FbsVI64, VIsize as FbsVIsize, VNull as FbsVNull, VPlaceholder as FbsVPlaceholder,
+    VStr as FbsVStr, VTimestampMs as FbsVTimestampMs, VTimestampMsUtc as FbsVTimestampMsUtc,
+    VTimestampNs as FbsVTimestampNs, VTimestampNsUtc as FbsVTimestampNsUtc, VTri2D as FbsVTri2D,
+    VU8 as FbsVU8, VU16 as FbsVU16, VU32 as FbsVU32, VU64 as FbsVU64, VUnit as FbsVUnit,
+    VUsize as FbsVUsize, Value as FbsValue, ValueInstance as FbsValueInstance,
     ValueTy as FbsValueTy,
+};
+use crate::types::graph::{
+    EdgeList, EdgeQuery, Geom, GeomOp, GraphQuery, NodeIdPair, NodeList, NodeQuery, OrderBy,
+    Predicate, Projection, QueryPathElement, QueryPathElementUnion, ValueTransform,
+};
+use crate::types::id::{
+    B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
+    ObjectNamespace, StreamId,
+};
+use crate::types::value::{
+    Point2D, Tri2D, VArray, VBool, VBytes, VChar, VF32, VF64, VFixedSizeBytes, VI8, VI16, VI32,
+    VI64, VIsize, VNull, VPlaceholder, VStr, VTimestampMs, VTimestampMsUtc, VTimestampNs,
+    VTimestampNsUtc, VTri2D, VU8, VU16, VU32, VU64, VUnit, VUsize, Value, ValueInstance, ValueTy,
 };
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -240,7 +112,7 @@ impl From<FbsJoinTy> for JoinTy {
             2 => Self::RightOuter,
             3 => Self::Full,
             4 => Self::Cross,
-            _ => panic!("Invalid value {} when constructing JoinTy", fbs.0)
+            _ => panic!("Invalid value {} when constructing JoinTy", fbs.0),
         }
     }
 }
@@ -269,7 +141,7 @@ impl From<FbsQueryElementOp> for QueryElementOp {
             0 => Self::Union,
             1 => Self::Intersect,
             2 => Self::Except,
-            _ => panic!("Invalid value {} when constructing QueryElementOp", fbs.0)
+            _ => panic!("Invalid value {} when constructing QueryElementOp", fbs.0),
         }
     }
 }
@@ -304,7 +176,7 @@ impl From<FbsTypeHint> for TypeHint {
             2 => Self::TimestampNanos,
             3 => Self::Base64,
             4 => Self::Uuid,
-            _ => panic!("Invalid value {} when constructing TypeHint", fbs.0)
+            _ => panic!("Invalid value {} when constructing TypeHint", fbs.0),
         }
     }
 }
@@ -315,7 +187,10 @@ pub struct ValueIndex {
 }
 
 impl ValueIndex {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsValueIndex<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsValueIndex<'a>> {
         use crate::types::generated::query_generated::ValueIndexBuilder as FbsValueIndexBuilder;
 
         let mut bldr = FbsValueIndexBuilder::new(builder);
@@ -327,9 +202,7 @@ impl ValueIndex {
 impl From<FbsValueIndex<'_>> for ValueIndex {
     fn from(fbs: FbsValueIndex<'_>) -> Self {
         let idx = fbs.idx();
-        Self {
-            idx,
-        }
+        Self { idx }
     }
 }
 
@@ -356,7 +229,10 @@ pub struct NullableUint {
 }
 
 impl NullableUint {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsNullableUint<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNullableUint<'a>> {
         use crate::types::generated::query_generated::NullableUintBuilder as FbsNullableUintBuilder;
 
         let mut bldr = FbsNullableUintBuilder::new(builder);
@@ -368,9 +244,7 @@ impl NullableUint {
 impl From<FbsNullableUint<'_>> for NullableUint {
     fn from(fbs: FbsNullableUint<'_>) -> Self {
         let v = fbs.v();
-        Self {
-            v,
-        }
+        Self { v }
     }
 }
 
@@ -399,7 +273,10 @@ pub struct Column {
 }
 
 impl Column {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsColumn<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsColumn<'a>> {
         use crate::types::generated::query_generated::ColumnBuilder as FbsColumnBuilder;
 
         let name_offset = builder.create_string(&self.name);
@@ -452,7 +329,10 @@ pub struct Function {
 }
 
 impl Function {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsFunction<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsFunction<'a>> {
         use crate::types::generated::query_generated::FunctionBuilder as FbsFunctionBuilder;
 
         let mut parameters_offsets = Vec::with_capacity(self.parameters.len());
@@ -477,10 +357,7 @@ impl From<FbsFunction<'_>> for Function {
             parameters.push(elem.into());
         }
 
-        Self {
-            fn_,
-            parameters,
-        }
+        Self { fn_, parameters }
     }
 }
 
@@ -507,7 +384,10 @@ pub struct AllColumns {
 }
 
 impl AllColumns {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsAllColumns<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsAllColumns<'a>> {
         use crate::types::generated::query_generated::AllColumnsBuilder as FbsAllColumnsBuilder;
 
         let source_offset = self.source.as_ref().map(|o| o.serialize_to(builder));
@@ -523,9 +403,7 @@ impl AllColumns {
 impl From<FbsAllColumns<'_>> for AllColumns {
     fn from(fbs: FbsAllColumns<'_>) -> Self {
         let source = fbs.source().map(NullableUint::from);
-        Self {
-            source,
-        }
+        Self { source }
     }
 }
 
@@ -552,7 +430,10 @@ pub struct Expr {
 }
 
 impl Expr {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsExpr<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsExpr<'a>> {
         use crate::types::generated::query_generated::ExprBuilder as FbsExprBuilder;
 
         let (exprs_offset, exprs_ty) = self.exprs.serialize_to(builder);
@@ -567,16 +448,30 @@ impl Expr {
 impl From<FbsExpr<'_>> for Expr {
     fn from(fbs: FbsExpr<'_>) -> Self {
         let exprs = match fbs.exprs_type() {
-            FbsExprUnion::ValueIndex => ExprUnion::ValueIndex(ValueIndex::from(fbs.exprs_as_value_index().unwrap())),
+            FbsExprUnion::ValueIndex => {
+                ExprUnion::ValueIndex(ValueIndex::from(fbs.exprs_as_value_index().unwrap()))
+            }
             FbsExprUnion::Column => ExprUnion::Column(Column::from(fbs.exprs_as_column().unwrap())),
-            FbsExprUnion::Function => ExprUnion::Function(Function::from(fbs.exprs_as_function().unwrap())),
-            FbsExprUnion::AllColumns => ExprUnion::AllColumns(AllColumns::from(fbs.exprs_as_all_columns().unwrap())),
+            FbsExprUnion::Function => {
+                ExprUnion::Function(Function::from(fbs.exprs_as_function().unwrap()))
+            }
+            FbsExprUnion::AllColumns => {
+                ExprUnion::AllColumns(AllColumns::from(fbs.exprs_as_all_columns().unwrap()))
+            }
             FbsExprUnion::Case => ExprUnion::Case(Case::from(fbs.exprs_as_case().unwrap())),
-            FbsExprUnion::OrderByExpr => ExprUnion::OrderByExpr(OrderByExpr::from(fbs.exprs_as_order_by_expr().unwrap())),
-            FbsExprUnion::Partition => ExprUnion::Partition(Partition::from(fbs.exprs_as_partition().unwrap())),
-            FbsExprUnion::UnsetArgument => ExprUnion::UnsetArgument(UnsetArgument::from(fbs.exprs_as_unset_argument().unwrap())),
+            FbsExprUnion::OrderByExpr => {
+                ExprUnion::OrderByExpr(OrderByExpr::from(fbs.exprs_as_order_by_expr().unwrap()))
+            }
+            FbsExprUnion::Partition => {
+                ExprUnion::Partition(Partition::from(fbs.exprs_as_partition().unwrap()))
+            }
+            FbsExprUnion::UnsetArgument => ExprUnion::UnsetArgument(UnsetArgument::from(
+                fbs.exprs_as_unset_argument().unwrap(),
+            )),
             FbsExprUnion::Window => ExprUnion::Window(Window::from(fbs.exprs_as_window().unwrap())),
-            FbsExprUnion::ValueName => ExprUnion::ValueName(ValueName::from(fbs.exprs_as_value_name().unwrap())),
+            FbsExprUnion::ValueName => {
+                ExprUnion::ValueName(ValueName::from(fbs.exprs_as_value_name().unwrap()))
+            }
             _ => unreachable!(),
         };
 
@@ -610,7 +505,10 @@ pub struct Case {
 }
 
 impl Case {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsCase<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsCase<'a>> {
         use crate::types::generated::query_generated::CaseBuilder as FbsCaseBuilder;
 
         let else__offset = self.else_.as_ref().map(|o| o.serialize_to(builder));
@@ -638,10 +536,7 @@ impl From<FbsCase<'_>> for Case {
             when.push(elem.into());
         }
 
-        Self {
-            else_,
-            when,
-        }
+        Self { else_, when }
     }
 }
 
@@ -668,7 +563,10 @@ pub struct OrderByExpr {
 }
 
 impl OrderByExpr {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsOrderByExpr<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsOrderByExpr<'a>> {
         use crate::types::generated::query_generated::OrderByExprBuilder as FbsOrderByExprBuilder;
 
         let mut order_by_offsets = Vec::with_capacity(self.order_by.len());
@@ -691,9 +589,7 @@ impl From<FbsOrderByExpr<'_>> for OrderByExpr {
             order_by.push(elem.into());
         }
 
-        Self {
-            order_by,
-        }
+        Self { order_by }
     }
 }
 
@@ -720,7 +616,10 @@ pub struct Partition {
 }
 
 impl Partition {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsPartition<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsPartition<'a>> {
         use crate::types::generated::query_generated::PartitionBuilder as FbsPartitionBuilder;
 
         let expr_offset = self.expr.serialize_to(builder);
@@ -734,9 +633,7 @@ impl Partition {
 impl From<FbsPartition<'_>> for Partition {
     fn from(fbs: FbsPartition<'_>) -> Self {
         let expr = Expr::from(fbs.expr());
-        Self {
-            expr,
-        }
+        Self { expr }
     }
 }
 
@@ -758,11 +655,13 @@ impl From<Partition> for Vec<u8> {
 }
 
 #[derive(Default, PartialEq, Debug, Clone)]
-pub struct UnsetArgument {
-}
+pub struct UnsetArgument {}
 
 impl UnsetArgument {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsUnsetArgument<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsUnsetArgument<'a>> {
         use crate::types::generated::query_generated::UnsetArgumentBuilder as FbsUnsetArgumentBuilder;
 
         let mut bldr = FbsUnsetArgumentBuilder::new(builder);
@@ -772,8 +671,7 @@ impl UnsetArgument {
 
 impl From<FbsUnsetArgument<'_>> for UnsetArgument {
     fn from(fbs: FbsUnsetArgument<'_>) -> Self {
-        Self {
-        }
+        Self {}
     }
 }
 
@@ -802,7 +700,10 @@ pub struct Window {
 }
 
 impl Window {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsWindow<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsWindow<'a>> {
         use crate::types::generated::query_generated::WindowBuilder as FbsWindowBuilder;
 
         let fun_offset = self.fun.serialize_to(builder);
@@ -893,7 +794,10 @@ pub struct ValueName {
 }
 
 impl ValueName {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsValueName<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsValueName<'a>> {
         use crate::types::generated::query_generated::ValueNameBuilder as FbsValueNameBuilder;
 
         let name_offset = builder.create_string(&self.name);
@@ -907,9 +811,7 @@ impl ValueName {
 impl From<FbsValueName<'_>> for ValueName {
     fn from(fbs: FbsValueName<'_>) -> Self {
         let name = fbs.name().to_owned();
-        Self {
-            name,
-        }
+        Self { name }
     }
 }
 
@@ -951,7 +853,10 @@ impl Default for ExprUnion {
 }
 
 impl ExprUnion {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsExprUnion) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsExprUnion) {
         match self {
             Self::ValueIndex(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -1023,7 +928,10 @@ pub struct Distinct {
 }
 
 impl Distinct {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDistinct<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDistinct<'a>> {
         use crate::types::generated::query_generated::DistinctBuilder as FbsDistinctBuilder;
 
         let on_offset = self.on.as_ref().map(|v| {
@@ -1057,9 +965,7 @@ impl From<FbsDistinct<'_>> for Distinct {
             None
         };
 
-        Self {
-            on,
-        }
+        Self { on }
     }
 }
 
@@ -1093,7 +999,10 @@ pub struct UnaryQueryElement {
 }
 
 impl UnaryQueryElement {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsUnaryQueryElement<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsUnaryQueryElement<'a>> {
         use crate::types::generated::query_generated::UnaryQueryElementBuilder as FbsUnaryQueryElementBuilder;
 
         let distinct_offset = self.distinct.as_ref().map(|o| o.serialize_to(builder));
@@ -1256,7 +1165,10 @@ pub struct QueryElement {
 }
 
 impl QueryElement {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsQueryElement<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsQueryElement<'a>> {
         use crate::types::generated::query_generated::QueryElementBuilder as FbsQueryElementBuilder;
 
         let q_offset = self.q.as_ref().map(|u| u.serialize_to(builder));
@@ -1274,10 +1186,18 @@ impl From<FbsQueryElement<'_>> for QueryElement {
     fn from(fbs: FbsQueryElement<'_>) -> Self {
         let q = if let Some(val) = fbs.q() {
             let q = match fbs.q_type() {
-                FbsQueryElementUnion::UnaryQueryElement => QueryElementUnion::UnaryQueryElement(UnaryQueryElement::from(fbs.q_as_unary_query_element().unwrap())),
-                FbsQueryElementUnion::BinaryQueryElement => QueryElementUnion::BinaryQueryElement(BinaryQueryElement::from(fbs.q_as_binary_query_element().unwrap())),
-                FbsQueryElementUnion::UpdateQueryElement => QueryElementUnion::UpdateQueryElement(UpdateQueryElement::from(fbs.q_as_update_query_element().unwrap())),
-                FbsQueryElementUnion::DeleteQueryElement => QueryElementUnion::DeleteQueryElement(DeleteQueryElement::from(fbs.q_as_delete_query_element().unwrap())),
+                FbsQueryElementUnion::UnaryQueryElement => QueryElementUnion::UnaryQueryElement(
+                    UnaryQueryElement::from(fbs.q_as_unary_query_element().unwrap()),
+                ),
+                FbsQueryElementUnion::BinaryQueryElement => QueryElementUnion::BinaryQueryElement(
+                    BinaryQueryElement::from(fbs.q_as_binary_query_element().unwrap()),
+                ),
+                FbsQueryElementUnion::UpdateQueryElement => QueryElementUnion::UpdateQueryElement(
+                    UpdateQueryElement::from(fbs.q_as_update_query_element().unwrap()),
+                ),
+                FbsQueryElementUnion::DeleteQueryElement => QueryElementUnion::DeleteQueryElement(
+                    DeleteQueryElement::from(fbs.q_as_delete_query_element().unwrap()),
+                ),
                 _ => unreachable!(),
             };
 
@@ -1286,9 +1206,7 @@ impl From<FbsQueryElement<'_>> for QueryElement {
             None
         };
 
-        Self {
-            q: q.map(Box::new),
-        }
+        Self { q: q.map(Box::new) }
     }
 }
 
@@ -1317,7 +1235,10 @@ pub struct BinaryQueryElement {
 }
 
 impl BinaryQueryElement {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsBinaryQueryElement<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsBinaryQueryElement<'a>> {
         use crate::types::generated::query_generated::BinaryQueryElementBuilder as FbsBinaryQueryElementBuilder;
 
         let lhs_offset = self.lhs.serialize_to(builder);
@@ -1336,11 +1257,7 @@ impl From<FbsBinaryQueryElement<'_>> for BinaryQueryElement {
         let lhs = QueryElement::from(fbs.lhs());
         let op = QueryElementOp::from(fbs.op());
         let rhs = QueryElement::from(fbs.rhs());
-        Self {
-            lhs,
-            op,
-            rhs,
-        }
+        Self { lhs, op, rhs }
     }
 }
 
@@ -1369,7 +1286,10 @@ pub struct MvdbPartition {
 }
 
 impl MvdbPartition {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsMvdbPartition<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsMvdbPartition<'a>> {
         use crate::types::generated::query_generated::MvdbPartitionBuilder as FbsMvdbPartitionBuilder;
 
         let partition_offset = builder.create_string(&self.partition);
@@ -1383,9 +1303,7 @@ impl MvdbPartition {
 impl From<FbsMvdbPartition<'_>> for MvdbPartition {
     fn from(fbs: FbsMvdbPartition<'_>) -> Self {
         let partition = fbs.partition().to_owned();
-        Self {
-            partition,
-        }
+        Self { partition }
     }
 }
 
@@ -1412,7 +1330,10 @@ pub struct WorklogPartition {
 }
 
 impl WorklogPartition {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsWorklogPartition<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsWorklogPartition<'a>> {
         use crate::types::generated::query_generated::WorklogPartitionBuilder as FbsWorklogPartitionBuilder;
 
         let mut bldr = FbsWorklogPartitionBuilder::new(builder);
@@ -1424,9 +1345,7 @@ impl WorklogPartition {
 impl From<FbsWorklogPartition<'_>> for WorklogPartition {
     fn from(fbs: FbsWorklogPartition<'_>) -> Self {
         let idx = fbs.idx();
-        Self {
-            idx,
-        }
+        Self { idx }
     }
 }
 
@@ -1460,7 +1379,10 @@ impl Default for TablePartition {
 }
 
 impl TablePartition {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsTablePartition) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsTablePartition) {
         match self {
             Self::MvdbPartition(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -1485,7 +1407,10 @@ pub struct DataCatalog {
 }
 
 impl DataCatalog {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDataCatalog<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDataCatalog<'a>> {
         use crate::types::generated::query_generated::DataCatalogBuilder as FbsDataCatalogBuilder;
 
         let id_offset = self.id.serialize_to(builder);
@@ -1510,8 +1435,12 @@ impl From<FbsDataCatalog<'_>> for DataCatalog {
         let id = ObjectId::from(fbs.id());
         let partition = if let Some(val) = fbs.partition() {
             let partition = match fbs.partition_type() {
-                FbsTablePartition::MvdbPartition => TablePartition::MvdbPartition(MvdbPartition::from(fbs.partition_as_mvdb_partition().unwrap())),
-                FbsTablePartition::WorklogPartition => TablePartition::WorklogPartition(WorklogPartition::from(fbs.partition_as_worklog_partition().unwrap())),
+                FbsTablePartition::MvdbPartition => TablePartition::MvdbPartition(
+                    MvdbPartition::from(fbs.partition_as_mvdb_partition().unwrap()),
+                ),
+                FbsTablePartition::WorklogPartition => TablePartition::WorklogPartition(
+                    WorklogPartition::from(fbs.partition_as_worklog_partition().unwrap()),
+                ),
                 _ => unreachable!(),
             };
 
@@ -1552,7 +1481,10 @@ pub struct Arrow {
 }
 
 impl Arrow {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsArrow<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsArrow<'a>> {
         use crate::types::generated::query_generated::ArrowBuilder as FbsArrowBuilder;
 
         let value_offset = builder.create_vector(&self.value);
@@ -1570,9 +1502,7 @@ impl From<FbsArrow<'_>> for Arrow {
             value.push(elem.into());
         }
 
-        Self {
-            value,
-        }
+        Self { value }
     }
 }
 
@@ -1602,7 +1532,10 @@ pub struct Query {
 }
 
 impl Query {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsQuery<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsQuery<'a>> {
         use crate::types::generated::query_generated::QueryBuilder as FbsQueryBuilder;
 
         let bound_sources_offset = self.bound_sources.as_ref().map(|v| {
@@ -1696,7 +1629,10 @@ pub struct QueryTableSource {
 }
 
 impl QueryTableSource {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsQueryTableSource<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsQueryTableSource<'a>> {
         use crate::types::generated::query_generated::QueryTableSourceBuilder as FbsQueryTableSourceBuilder;
 
         let q_offset = self.q.serialize_to(builder);
@@ -1710,9 +1646,7 @@ impl QueryTableSource {
 impl From<FbsQueryTableSource<'_>> for QueryTableSource {
     fn from(fbs: FbsQueryTableSource<'_>) -> Self {
         let q = Query::from(fbs.q());
-        Self {
-            q,
-        }
+        Self { q }
     }
 }
 
@@ -1745,7 +1679,10 @@ pub struct Vector {
 }
 
 impl Vector {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsVector<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsVector<'a>> {
         use crate::types::generated::query_generated::VectorBuilder as FbsVectorBuilder;
 
         let mut ids_offsets = Vec::with_capacity(self.ids.len());
@@ -1810,7 +1747,10 @@ pub struct Placeholder {
 }
 
 impl Placeholder {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsPlaceholder<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsPlaceholder<'a>> {
         use crate::types::generated::query_generated::PlaceholderBuilder as FbsPlaceholderBuilder;
 
         let mut bldr = FbsPlaceholderBuilder::new(builder);
@@ -1822,9 +1762,7 @@ impl Placeholder {
 impl From<FbsPlaceholder<'_>> for Placeholder {
     fn from(fbs: FbsPlaceholder<'_>) -> Self {
         let idx = fbs.idx();
-        Self {
-            idx,
-        }
+        Self { idx }
     }
 }
 
@@ -1845,6 +1783,58 @@ impl From<Placeholder> for Vec<u8> {
     }
 }
 
+#[derive(Default, PartialEq, Debug, Clone)]
+pub struct Drive {
+    pub path: Option<String>,
+    pub root: Option<ObjectId>,
+}
+
+impl Drive {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDrive<'a>> {
+        use crate::types::generated::query_generated::DriveBuilder as FbsDriveBuilder;
+
+        let path_offset = self.path.as_ref().map(|s| builder.create_string(s));
+        let root_offset = self.root.as_ref().map(|o| o.serialize_to(builder));
+
+        let mut bldr = FbsDriveBuilder::new(builder);
+        if let Some(offset) = path_offset {
+            bldr.add_path(offset);
+        }
+        if let Some(offset) = root_offset {
+            bldr.add_root(offset);
+        }
+        bldr.finish()
+    }
+}
+
+impl From<FbsDrive<'_>> for Drive {
+    fn from(fbs: FbsDrive<'_>) -> Self {
+        let path = fbs.path().map(ToOwned::to_owned);
+        let root = fbs.root().map(ObjectId::from);
+        Self { path, root }
+    }
+}
+
+impl TryFrom<&[u8]> for Drive {
+    type Error = flatbuffers::InvalidFlatbuffer;
+    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsDrive>(bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+impl From<Drive> for Vec<u8> {
+    fn from(obj: Drive) -> Self {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = obj.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum TableSourceUnion {
     DataCatalog(DataCatalog),
@@ -1853,6 +1843,7 @@ pub enum TableSourceUnion {
     QueryTableSource(QueryTableSource),
     Vector(Vector),
     Placeholder(Placeholder),
+    Drive(Drive),
 }
 
 impl Default for TableSourceUnion {
@@ -1862,7 +1853,10 @@ impl Default for TableSourceUnion {
 }
 
 impl TableSourceUnion {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsTableSourceUnion) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsTableSourceUnion) {
         match self {
             Self::DataCatalog(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -1894,6 +1888,11 @@ impl TableSourceUnion {
                 let ty = FbsTableSourceUnion::Placeholder;
                 (offset, ty)
             }
+            Self::Drive(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsTableSourceUnion::Drive;
+                (offset, ty)
+            }
         }
     }
 }
@@ -1906,7 +1905,10 @@ pub struct UpdateQueryElement {
 }
 
 impl UpdateQueryElement {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsUpdateQueryElement<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsUpdateQueryElement<'a>> {
         use crate::types::generated::query_generated::UpdateQueryElementBuilder as FbsUpdateQueryElementBuilder;
 
         let filter_offset = self.filter.as_ref().map(|o| o.serialize_to(builder));
@@ -1938,12 +1940,27 @@ impl From<FbsUpdateQueryElement<'_>> for UpdateQueryElement {
         }
 
         let source = match fbs.source_type() {
-            FbsTableSourceUnion::DataCatalog => TableSourceUnion::DataCatalog(DataCatalog::from(fbs.source_as_data_catalog().unwrap())),
-            FbsTableSourceUnion::Arrow => TableSourceUnion::Arrow(Arrow::from(fbs.source_as_arrow().unwrap())),
-            FbsTableSourceUnion::GraphQuery => TableSourceUnion::GraphQuery(GraphQuery::from(fbs.source_as_graph_query().unwrap())),
-            FbsTableSourceUnion::QueryTableSource => TableSourceUnion::QueryTableSource(QueryTableSource::from(fbs.source_as_query_table_source().unwrap())),
-            FbsTableSourceUnion::Vector => TableSourceUnion::Vector(Vector::from(fbs.source_as_vector().unwrap())),
-            FbsTableSourceUnion::Placeholder => TableSourceUnion::Placeholder(Placeholder::from(fbs.source_as_placeholder().unwrap())),
+            FbsTableSourceUnion::DataCatalog => TableSourceUnion::DataCatalog(DataCatalog::from(
+                fbs.source_as_data_catalog().unwrap(),
+            )),
+            FbsTableSourceUnion::Arrow => {
+                TableSourceUnion::Arrow(Arrow::from(fbs.source_as_arrow().unwrap()))
+            }
+            FbsTableSourceUnion::GraphQuery => {
+                TableSourceUnion::GraphQuery(GraphQuery::from(fbs.source_as_graph_query().unwrap()))
+            }
+            FbsTableSourceUnion::QueryTableSource => TableSourceUnion::QueryTableSource(
+                QueryTableSource::from(fbs.source_as_query_table_source().unwrap()),
+            ),
+            FbsTableSourceUnion::Vector => {
+                TableSourceUnion::Vector(Vector::from(fbs.source_as_vector().unwrap()))
+            }
+            FbsTableSourceUnion::Placeholder => TableSourceUnion::Placeholder(Placeholder::from(
+                fbs.source_as_placeholder().unwrap(),
+            )),
+            FbsTableSourceUnion::Drive => {
+                TableSourceUnion::Drive(Drive::from(fbs.source_as_drive().unwrap()))
+            }
             _ => unreachable!(),
         };
 
@@ -1979,7 +1996,10 @@ pub struct DeleteQueryElement {
 }
 
 impl DeleteQueryElement {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDeleteQueryElement<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDeleteQueryElement<'a>> {
         use crate::types::generated::query_generated::DeleteQueryElementBuilder as FbsDeleteQueryElementBuilder;
 
         let filter_offset = self.filter.as_ref().map(|o| o.serialize_to(builder));
@@ -1999,19 +2019,31 @@ impl From<FbsDeleteQueryElement<'_>> for DeleteQueryElement {
     fn from(fbs: FbsDeleteQueryElement<'_>) -> Self {
         let filter = fbs.filter().map(Function::from);
         let source = match fbs.source_type() {
-            FbsTableSourceUnion::DataCatalog => TableSourceUnion::DataCatalog(DataCatalog::from(fbs.source_as_data_catalog().unwrap())),
-            FbsTableSourceUnion::Arrow => TableSourceUnion::Arrow(Arrow::from(fbs.source_as_arrow().unwrap())),
-            FbsTableSourceUnion::GraphQuery => TableSourceUnion::GraphQuery(GraphQuery::from(fbs.source_as_graph_query().unwrap())),
-            FbsTableSourceUnion::QueryTableSource => TableSourceUnion::QueryTableSource(QueryTableSource::from(fbs.source_as_query_table_source().unwrap())),
-            FbsTableSourceUnion::Vector => TableSourceUnion::Vector(Vector::from(fbs.source_as_vector().unwrap())),
-            FbsTableSourceUnion::Placeholder => TableSourceUnion::Placeholder(Placeholder::from(fbs.source_as_placeholder().unwrap())),
+            FbsTableSourceUnion::DataCatalog => TableSourceUnion::DataCatalog(DataCatalog::from(
+                fbs.source_as_data_catalog().unwrap(),
+            )),
+            FbsTableSourceUnion::Arrow => {
+                TableSourceUnion::Arrow(Arrow::from(fbs.source_as_arrow().unwrap()))
+            }
+            FbsTableSourceUnion::GraphQuery => {
+                TableSourceUnion::GraphQuery(GraphQuery::from(fbs.source_as_graph_query().unwrap()))
+            }
+            FbsTableSourceUnion::QueryTableSource => TableSourceUnion::QueryTableSource(
+                QueryTableSource::from(fbs.source_as_query_table_source().unwrap()),
+            ),
+            FbsTableSourceUnion::Vector => {
+                TableSourceUnion::Vector(Vector::from(fbs.source_as_vector().unwrap()))
+            }
+            FbsTableSourceUnion::Placeholder => TableSourceUnion::Placeholder(Placeholder::from(
+                fbs.source_as_placeholder().unwrap(),
+            )),
+            FbsTableSourceUnion::Drive => {
+                TableSourceUnion::Drive(Drive::from(fbs.source_as_drive().unwrap()))
+            }
             _ => unreachable!(),
         };
 
-        Self {
-            filter,
-            source,
-        }
+        Self { filter, source }
     }
 }
 
@@ -2047,7 +2079,10 @@ impl Default for QueryElementUnion {
 }
 
 impl QueryElementUnion {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsQueryElementUnion) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsQueryElementUnion) {
         match self {
             Self::UnaryQueryElement(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -2083,7 +2118,10 @@ pub struct Join {
 }
 
 impl Join {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsJoin<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsJoin<'a>> {
         use crate::types::generated::query_generated::JoinBuilder as FbsJoinBuilder;
 
         let dest_col_offset = self.dest_col.as_ref().map(|s| builder.create_string(s));
@@ -2150,7 +2188,10 @@ pub struct SetExpr {
 }
 
 impl SetExpr {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsSetExpr<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsSetExpr<'a>> {
         use crate::types::generated::query_generated::SetExprBuilder as FbsSetExprBuilder;
 
         let col_offset = builder.create_string(&self.col);
@@ -2167,10 +2208,7 @@ impl From<FbsSetExpr<'_>> for SetExpr {
     fn from(fbs: FbsSetExpr<'_>) -> Self {
         let col = fbs.col().to_owned();
         let expr = Expr::from(fbs.expr());
-        Self {
-            col,
-            expr,
-        }
+        Self { col, expr }
     }
 }
 
@@ -2199,14 +2237,17 @@ pub struct TableOrderBy {
     /// indicate whether the source should be used. In some cases, such as when
     /// you want to order by an column produced by aggregating on the result of
     /// a join, the column isn't associated with any table source.
-    /// 
+    ///
     /// In that case, set `use_source` to false and the verbatim string provided
     /// in the `field` field of the `OrderBy` structure will be used for the order-by.
     pub use_source: bool,
 }
 
 impl TableOrderBy {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsTableOrderBy<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsTableOrderBy<'a>> {
         use crate::types::generated::query_generated::TableOrderByBuilder as FbsTableOrderByBuilder;
 
         let order_by_offset = self.order_by.serialize_to(builder);
@@ -2259,7 +2300,10 @@ pub struct TableSource {
 }
 
 impl TableSource {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsTableSource<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsTableSource<'a>> {
         use crate::types::generated::query_generated::TableSourceBuilder as FbsTableSourceBuilder;
 
         let fields_offset = self.fields.as_ref().map(|v| {
@@ -2348,12 +2392,27 @@ impl From<FbsTableSource<'_>> for TableSource {
         };
 
         let t = match fbs.t_type() {
-            FbsTableSourceUnion::DataCatalog => TableSourceUnion::DataCatalog(DataCatalog::from(fbs.t_as_data_catalog().unwrap())),
-            FbsTableSourceUnion::Arrow => TableSourceUnion::Arrow(Arrow::from(fbs.t_as_arrow().unwrap())),
-            FbsTableSourceUnion::GraphQuery => TableSourceUnion::GraphQuery(GraphQuery::from(fbs.t_as_graph_query().unwrap())),
-            FbsTableSourceUnion::QueryTableSource => TableSourceUnion::QueryTableSource(QueryTableSource::from(fbs.t_as_query_table_source().unwrap())),
-            FbsTableSourceUnion::Vector => TableSourceUnion::Vector(Vector::from(fbs.t_as_vector().unwrap())),
-            FbsTableSourceUnion::Placeholder => TableSourceUnion::Placeholder(Placeholder::from(fbs.t_as_placeholder().unwrap())),
+            FbsTableSourceUnion::DataCatalog => {
+                TableSourceUnion::DataCatalog(DataCatalog::from(fbs.t_as_data_catalog().unwrap()))
+            }
+            FbsTableSourceUnion::Arrow => {
+                TableSourceUnion::Arrow(Arrow::from(fbs.t_as_arrow().unwrap()))
+            }
+            FbsTableSourceUnion::GraphQuery => {
+                TableSourceUnion::GraphQuery(GraphQuery::from(fbs.t_as_graph_query().unwrap()))
+            }
+            FbsTableSourceUnion::QueryTableSource => TableSourceUnion::QueryTableSource(
+                QueryTableSource::from(fbs.t_as_query_table_source().unwrap()),
+            ),
+            FbsTableSourceUnion::Vector => {
+                TableSourceUnion::Vector(Vector::from(fbs.t_as_vector().unwrap()))
+            }
+            FbsTableSourceUnion::Placeholder => {
+                TableSourceUnion::Placeholder(Placeholder::from(fbs.t_as_placeholder().unwrap()))
+            }
+            FbsTableSourceUnion::Drive => {
+                TableSourceUnion::Drive(Drive::from(fbs.t_as_drive().unwrap()))
+            }
             _ => unreachable!(),
         };
 
@@ -2390,7 +2449,10 @@ pub struct TableSourceInstance {
 }
 
 impl TableSourceInstance {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsTableSourceInstance<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsTableSourceInstance<'a>> {
         use crate::types::generated::query_generated::TableSourceInstanceBuilder as FbsTableSourceInstanceBuilder;
 
         let (t_offset, t_ty) = self.t.serialize_to(builder);
@@ -2405,18 +2467,31 @@ impl TableSourceInstance {
 impl From<FbsTableSourceInstance<'_>> for TableSourceInstance {
     fn from(fbs: FbsTableSourceInstance<'_>) -> Self {
         let t = match fbs.t_type() {
-            FbsTableSourceUnion::DataCatalog => TableSourceUnion::DataCatalog(DataCatalog::from(fbs.t_as_data_catalog().unwrap())),
-            FbsTableSourceUnion::Arrow => TableSourceUnion::Arrow(Arrow::from(fbs.t_as_arrow().unwrap())),
-            FbsTableSourceUnion::GraphQuery => TableSourceUnion::GraphQuery(GraphQuery::from(fbs.t_as_graph_query().unwrap())),
-            FbsTableSourceUnion::QueryTableSource => TableSourceUnion::QueryTableSource(QueryTableSource::from(fbs.t_as_query_table_source().unwrap())),
-            FbsTableSourceUnion::Vector => TableSourceUnion::Vector(Vector::from(fbs.t_as_vector().unwrap())),
-            FbsTableSourceUnion::Placeholder => TableSourceUnion::Placeholder(Placeholder::from(fbs.t_as_placeholder().unwrap())),
+            FbsTableSourceUnion::DataCatalog => {
+                TableSourceUnion::DataCatalog(DataCatalog::from(fbs.t_as_data_catalog().unwrap()))
+            }
+            FbsTableSourceUnion::Arrow => {
+                TableSourceUnion::Arrow(Arrow::from(fbs.t_as_arrow().unwrap()))
+            }
+            FbsTableSourceUnion::GraphQuery => {
+                TableSourceUnion::GraphQuery(GraphQuery::from(fbs.t_as_graph_query().unwrap()))
+            }
+            FbsTableSourceUnion::QueryTableSource => TableSourceUnion::QueryTableSource(
+                QueryTableSource::from(fbs.t_as_query_table_source().unwrap()),
+            ),
+            FbsTableSourceUnion::Vector => {
+                TableSourceUnion::Vector(Vector::from(fbs.t_as_vector().unwrap()))
+            }
+            FbsTableSourceUnion::Placeholder => {
+                TableSourceUnion::Placeholder(Placeholder::from(fbs.t_as_placeholder().unwrap()))
+            }
+            FbsTableSourceUnion::Drive => {
+                TableSourceUnion::Drive(Drive::from(fbs.t_as_drive().unwrap()))
+            }
             _ => unreachable!(),
         };
 
-        Self {
-            t,
-        }
+        Self { t }
     }
 }
 
@@ -2444,7 +2519,10 @@ pub struct When {
 }
 
 impl When {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsWhen<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsWhen<'a>> {
         use crate::types::generated::query_generated::WhenBuilder as FbsWhenBuilder;
 
         let cond_offset = self.cond.serialize_to(builder);
@@ -2461,10 +2539,7 @@ impl From<FbsWhen<'_>> for When {
     fn from(fbs: FbsWhen<'_>) -> Self {
         let cond = Expr::from(fbs.cond());
         let value = Expr::from(fbs.value());
-        Self {
-            cond,
-            value,
-        }
+        Self { cond, value }
     }
 }
 
@@ -2550,6 +2625,14 @@ mod tests {
         let t0 = Distinct::default();
         let buf: Vec<u8> = t0.clone().into();
         let t1 = Distinct::try_from(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_drive() {
+        let t0 = Drive::default();
+        let buf: Vec<u8> = t0.clone().into();
+        let t1 = Drive::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
@@ -2744,5 +2827,4 @@ mod tests {
         let t1 = WorklogPartition::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
-
 }

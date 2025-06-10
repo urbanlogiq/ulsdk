@@ -10,316 +10,122 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
-use flatbuffers::{WIPOffset, UnionWIPOffset};
 use bitflags::bitflags;
 use core::ops::Deref;
+use flatbuffers::{UnionWIPOffset, WIPOffset};
 
 use crate::types::Schema::{
-    Binary,
-    Bool,
-    Buffer,
-    Date,
-    DateUnit,
-    Decimal,
-    DictionaryEncoding,
-    DictionaryKind,
-    Duration,
-    Endianness,
-    Feature,
-    Field,
-    FixedSizeBinary,
-    FixedSizeList,
-    FloatingPoint,
-    Int,
-    Interval,
-    IntervalUnit,
-    KeyValue,
-    LargeBinary,
-    LargeList,
-    LargeUtf8,
-    List,
-    Map,
-    MetadataVersion,
-    Null,
-    Precision,
-    Schema,
-    Struct_,
-    Time,
-    TimeUnit,
-    Timestamp,
-    Type,
-    Union,
-    UnionMode,
-    Utf8,
+    Binary, BinaryView, Bool, Buffer, Date, DateUnit, Decimal, DictionaryEncoding, DictionaryKind,
+    Duration, Endianness, Feature, Field, FixedSizeBinary, FixedSizeList, FloatingPoint, Int,
+    Interval, IntervalUnit, KeyValue, LargeBinary, LargeList, LargeListView, LargeUtf8, List,
+    ListView, Map, MetadataVersion, Null, Precision, RunEndEncoded, Schema, Struct_, Time,
+    TimeUnit, Timestamp, Type, Union, UnionMode, Utf8, Utf8View,
 };
 use crate::types::api::SortOrder;
 use crate::types::data::{
-    AttributePair,
-    DayOfWeek,
-    DirectionAndRoadName,
-    DirectionAndRoadNames,
-    DirectionTy,
-    NamedParameter,
-    NamedParameterFlags,
-    RoadUserTy,
-    Source,
-    StatisticTy,
-    TimeGranularity,
-    TurnTy,
+    AttributePair, BinaryYesNo, DayOfWeek, DirectionAndRoadName, DirectionAndRoadNames,
+    DirectionTy, NamedParameter, NamedParameterFlags, RoadUserTy, Source, StatisticTy,
+    TimeGranularity, TurnTy,
 };
 use crate::types::entity::{
-    EdgeTy,
-    EntityTy,
-    Geometry,
-    GraphEdge,
-    GraphNode,
-    Line,
-    MultiLine,
-    MultiPolygon,
-    NodeTy,
-    Point,
+    EdgeTy, EntityTy, Geometry, GraphEdge, GraphNode, Line, MultiLine, MultiPolygon, NodeTy, Point,
     Polygon,
 };
 use crate::types::fun::Fn_;
-use crate::types::graph::{
-    EdgeList,
-    EdgeQuery,
-    Geom,
-    GeomOp,
-    GraphQuery,
-    NodeIdPair,
-    NodeList,
-    NodeQuery,
-    OrderBy,
-    Predicate,
-    Projection,
-    QueryPathElement,
-    QueryPathElementUnion,
-    ValueTransform,
-};
-use crate::types::id::{
-    B2cId,
-    ColumnGroupId,
-    ContentId,
-    DataStateId,
-    GenericId,
-    GraphNodeId,
-    ObjectId,
-    ObjectNamespace,
-    StreamId,
-};
-use crate::types::value::{
-    Point2D,
-    Tri2D,
-    VArray,
-    VBool,
-    VBytes,
-    VChar,
-    VF32,
-    VF64,
-    VFixedSizeBytes,
-    VI16,
-    VI32,
-    VI64,
-    VI8,
-    VIsize,
-    VNull,
-    VPlaceholder,
-    VStr,
-    VTimestampMs,
-    VTimestampMsUtc,
-    VTimestampNs,
-    VTimestampNsUtc,
-    VTri2D,
-    VU16,
-    VU32,
-    VU64,
-    VU8,
-    VUnit,
-    VUsize,
-    Value,
-    ValueInstance,
-    ValueTy,
-};
 use crate::types::generated::Schema_generated::{
-    Binary as FbsBinary,
-    Bool as FbsBool,
-    Buffer as FbsBuffer,
-    Date as FbsDate,
-    Decimal as FbsDecimal,
-    DictionaryEncoding as FbsDictionaryEncoding,
-    Duration as FbsDuration,
-    Field as FbsField,
-    FixedSizeBinary as FbsFixedSizeBinary,
-    FixedSizeList as FbsFixedSizeList,
-    FloatingPoint as FbsFloatingPoint,
-    Int as FbsInt,
-    Interval as FbsInterval,
-    KeyValue as FbsKeyValue,
-    LargeBinary as FbsLargeBinary,
-    LargeList as FbsLargeList,
-    LargeUtf8 as FbsLargeUtf8,
-    List as FbsList,
-    Map as FbsMap,
-    Null as FbsNull,
-    Schema as FbsSchema,
-    Struct_ as FbsStruct_,
-    Time as FbsTime,
-    Timestamp as FbsTimestamp,
-    Union as FbsUnion,
-    Utf8 as FbsUtf8,
-    DateUnit as FbsDateUnit,
-    DictionaryKind as FbsDictionaryKind,
-    Endianness as FbsEndianness,
-    Feature as FbsFeature,
-    IntervalUnit as FbsIntervalUnit,
-    MetadataVersion as FbsMetadataVersion,
-    Precision as FbsPrecision,
-    TimeUnit as FbsTimeUnit,
-    Type as FbsType,
-    UnionMode as FbsUnionMode,
+    Binary as FbsBinary, BinaryView as FbsBinaryView, Bool as FbsBool, Buffer as FbsBuffer,
+    Date as FbsDate, DateUnit as FbsDateUnit, Decimal as FbsDecimal,
+    DictionaryEncoding as FbsDictionaryEncoding, DictionaryKind as FbsDictionaryKind,
+    Duration as FbsDuration, Endianness as FbsEndianness, Feature as FbsFeature, Field as FbsField,
+    FixedSizeBinary as FbsFixedSizeBinary, FixedSizeList as FbsFixedSizeList,
+    FloatingPoint as FbsFloatingPoint, Int as FbsInt, Interval as FbsInterval,
+    IntervalUnit as FbsIntervalUnit, KeyValue as FbsKeyValue, LargeBinary as FbsLargeBinary,
+    LargeList as FbsLargeList, LargeListView as FbsLargeListView, LargeUtf8 as FbsLargeUtf8,
+    List as FbsList, ListView as FbsListView, Map as FbsMap, MetadataVersion as FbsMetadataVersion,
+    Null as FbsNull, Precision as FbsPrecision, RunEndEncoded as FbsRunEndEncoded,
+    Schema as FbsSchema, Struct_ as FbsStruct_, Time as FbsTime, TimeUnit as FbsTimeUnit,
+    Timestamp as FbsTimestamp, Type as FbsType, Union as FbsUnion, UnionMode as FbsUnionMode,
+    Utf8 as FbsUtf8, Utf8View as FbsUtf8View,
 };
-use crate::types::generated::api_generated::{
-    SortOrder as FbsSortOrder,
-};
+use crate::types::generated::api_generated::SortOrder as FbsSortOrder;
 use crate::types::generated::data_generated::{
-    AttributePair as FbsAttributePair,
+    AttributePair as FbsAttributePair, BinaryYesNo as FbsBinaryYesNo, DayOfWeek as FbsDayOfWeek,
     DirectionAndRoadName as FbsDirectionAndRoadName,
-    DirectionAndRoadNames as FbsDirectionAndRoadNames,
-    NamedParameter as FbsNamedParameter,
-    Source as FbsSource,
-    DayOfWeek as FbsDayOfWeek,
-    DirectionTy as FbsDirectionTy,
-    NamedParameterFlags as FbsNamedParameterFlags,
-    RoadUserTy as FbsRoadUserTy,
-    StatisticTy as FbsStatisticTy,
-    TimeGranularity as FbsTimeGranularity,
-    TurnTy as FbsTurnTy,
+    DirectionAndRoadNames as FbsDirectionAndRoadNames, DirectionTy as FbsDirectionTy,
+    NamedParameter as FbsNamedParameter, NamedParameterFlags as FbsNamedParameterFlags,
+    RoadUserTy as FbsRoadUserTy, Source as FbsSource, StatisticTy as FbsStatisticTy,
+    TimeGranularity as FbsTimeGranularity, TurnTy as FbsTurnTy,
 };
 use crate::types::generated::entity_generated::{
-    GraphEdge as FbsGraphEdge,
-    GraphNode as FbsGraphNode,
-    Line as FbsLine,
-    MultiLine as FbsMultiLine,
-    MultiPolygon as FbsMultiPolygon,
-    Point as FbsPoint,
-    Polygon as FbsPolygon,
-    EdgeTy as FbsEdgeTy,
-    EntityTy as FbsEntityTy,
-    Geometry as FbsGeometry,
-    NodeTy as FbsNodeTy,
+    EdgeTy as FbsEdgeTy, EntityTy as FbsEntityTy, Geometry as FbsGeometry,
+    GraphEdge as FbsGraphEdge, GraphNode as FbsGraphNode, Line as FbsLine,
+    MultiLine as FbsMultiLine, MultiPolygon as FbsMultiPolygon, NodeTy as FbsNodeTy,
+    Point as FbsPoint, Polygon as FbsPolygon,
 };
-use crate::types::generated::fun_generated::{
-    Fn as FbsFn,
-};
+use crate::types::generated::fun_generated::Fn as FbsFn;
 use crate::types::generated::graph_generated::{
-    EdgeList as FbsEdgeList,
-    EdgeQuery as FbsEdgeQuery,
-    Geom as FbsGeom,
-    GeomOp as FbsGeomOp,
-    GraphQuery as FbsGraphQuery,
-    NodeIdPair as FbsNodeIdPair,
-    NodeList as FbsNodeList,
-    NodeQuery as FbsNodeQuery,
-    OrderBy as FbsOrderBy,
-    Projection as FbsProjection,
-    QueryPathElement as FbsQueryPathElement,
-    Predicate as FbsPredicate,
-    QueryPathElementUnion as FbsQueryPathElementUnion,
-    ValueTransform as FbsValueTransform,
+    EdgeList as FbsEdgeList, EdgeQuery as FbsEdgeQuery, Geom as FbsGeom, GeomOp as FbsGeomOp,
+    GraphQuery as FbsGraphQuery, NodeIdPair as FbsNodeIdPair, NodeList as FbsNodeList,
+    NodeQuery as FbsNodeQuery, OrderBy as FbsOrderBy, Predicate as FbsPredicate,
+    Projection as FbsProjection, QueryPathElement as FbsQueryPathElement,
+    QueryPathElementUnion as FbsQueryPathElementUnion, ValueTransform as FbsValueTransform,
 };
 use crate::types::generated::id_generated::{
-    B2cId as FbsB2cId,
-    ColumnGroupId as FbsColumnGroupId,
-    ContentId as FbsContentId,
-    DataStateId as FbsDataStateId,
-    GenericId as FbsGenericId,
-    GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId,
-    StreamId as FbsStreamId,
-    ObjectNamespace as FbsObjectNamespace,
+    B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
+    DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
 };
 use crate::types::generated::metadata_generated::{
-    CategoryRelationshipData as FbsCategoryRelationshipData,
-    ContactInfo as FbsContactInfo,
-    DatacatalogGeometry as FbsDatacatalogGeometry,
-    DatasetSource as FbsDatasetSource,
-    Dates as FbsDates,
-    DatetimeRange as FbsDatetimeRange,
-    Document as FbsDocument,
-    Documents as FbsDocuments,
-    FloatAggregate as FbsFloatAggregate,
-    FloatBucket as FbsFloatBucket,
-    FloatRange as FbsFloatRange,
-    GeometryData as FbsGeometryData,
+    AggregationFunction as FbsAggregationFunction,
+    CategoryRelationshipData as FbsCategoryRelationshipData, ComponentData as FbsComponentData,
+    ContactInfo as FbsContactInfo, DatacatalogGeometry as FbsDatacatalogGeometry,
+    DatasetCategory as FbsDatasetCategory, DatasetSource as FbsDatasetSource, Dates as FbsDates,
+    DatetimeRange as FbsDatetimeRange, Document as FbsDocument, Documents as FbsDocuments,
+    FieldFlags as FbsFieldFlags, FieldUnit as FbsFieldUnit, FloatAggregate as FbsFloatAggregate,
+    FloatBucket as FbsFloatBucket, FloatRange as FbsFloatRange, GeometryData as FbsGeometryData,
+    GeometryDataUnion as FbsGeometryDataUnion, GeometrySource as FbsGeometrySource,
     HierarchicalRelationship as FbsHierarchicalRelationship,
-    HierarchyRelationshipData as FbsHierarchyRelationshipData,
-    IntAggregate as FbsIntAggregate,
-    IntBucket as FbsIntBucket,
-    IntRange as FbsIntRange,
-    IntegerDisplayString as FbsIntegerDisplayString,
-    Metadata as FbsMetadata,
+    HierarchyRelationshipData as FbsHierarchyRelationshipData, IntAggregate as FbsIntAggregate,
+    IntBucket as FbsIntBucket, IntRange as FbsIntRange,
+    IntegerDisplayString as FbsIntegerDisplayString, Metadata as FbsMetadata,
     NestedCategoryRelationshipData as FbsNestedCategoryRelationshipData,
     NestedCategoryRelationshipNode as FbsNestedCategoryRelationshipNode,
     NestedHierarchyRelationshipData as FbsNestedHierarchyRelationshipData,
     NestedHierarchyRelationshipNode as FbsNestedHierarchyRelationshipNode,
     NestedStringCategories as FbsNestedStringCategories,
-    NestedStringCategoryNode as FbsNestedStringCategoryNode,
-    NoGeometry as FbsNoGeometry,
+    NestedStringCategoryNode as FbsNestedStringCategoryNode, NoGeometry as FbsNoGeometry,
     NumericalFieldFormat as FbsNumericalFieldFormat,
-    RawGeom as FbsRawGeom,
-    StringAggregate as FbsStringAggregate,
-    StringCategories as FbsStringCategories,
-    TimeInterval as FbsTimeInterval,
-    UIntAggregate as FbsUIntAggregate,
-    UIntBucket as FbsUIntBucket,
-    UlField as FbsUlField,
+    NumericalFieldValueType as FbsNumericalFieldValueType, RawGeom as FbsRawGeom,
+    StringAggregate as FbsStringAggregate, StringCategories as FbsStringCategories,
+    TimeInterval as FbsTimeInterval, UIntAggregate as FbsUIntAggregate,
+    UIntBucket as FbsUIntBucket, UlField as FbsUlField,
     UlFieldRelationship as FbsUlFieldRelationship,
-    WorldGraphGeometry as FbsWorldGraphGeometry,
-    AggregationFunction as FbsAggregationFunction,
-    ComponentData as FbsComponentData,
-    DatasetCategory as FbsDatasetCategory,
-    FieldFlags as FbsFieldFlags,
-    FieldUnit as FbsFieldUnit,
-    GeometryDataUnion as FbsGeometryDataUnion,
-    GeometrySource as FbsGeometrySource,
-    NumericalFieldValueType as FbsNumericalFieldValueType,
-    UlFieldRelationshipData as FbsUlFieldRelationshipData,
-    UlFieldType as FbsUlFieldType,
-    UpdateCadence as FbsUpdateCadence,
+    UlFieldRelationshipData as FbsUlFieldRelationshipData, UlFieldType as FbsUlFieldType,
+    UpdateCadence as FbsUpdateCadence, WorldGraphGeometry as FbsWorldGraphGeometry,
 };
 use crate::types::generated::value_generated::{
-    Point2D as FbsPoint2D,
-    Tri2D as FbsTri2D,
-    VArray as FbsVArray,
-    VBool as FbsVBool,
-    VBytes as FbsVBytes,
-    VChar as FbsVChar,
-    VF32 as FbsVF32,
-    VF64 as FbsVF64,
-    VFixedSizeBytes as FbsVFixedSizeBytes,
-    VI16 as FbsVI16,
-    VI32 as FbsVI32,
-    VI64 as FbsVI64,
-    VI8 as FbsVI8,
-    VIsize as FbsVIsize,
-    VNull as FbsVNull,
-    VPlaceholder as FbsVPlaceholder,
-    VStr as FbsVStr,
-    VTimestampMs as FbsVTimestampMs,
-    VTimestampMsUtc as FbsVTimestampMsUtc,
-    VTimestampNs as FbsVTimestampNs,
-    VTimestampNsUtc as FbsVTimestampNsUtc,
-    VTri2D as FbsVTri2D,
-    VU16 as FbsVU16,
-    VU32 as FbsVU32,
-    VU64 as FbsVU64,
-    VU8 as FbsVU8,
-    VUnit as FbsVUnit,
-    VUsize as FbsVUsize,
-    ValueInstance as FbsValueInstance,
-    Value as FbsValue,
+    Point2D as FbsPoint2D, Tri2D as FbsTri2D, VArray as FbsVArray, VBool as FbsVBool,
+    VBytes as FbsVBytes, VChar as FbsVChar, VF32 as FbsVF32, VF64 as FbsVF64,
+    VFixedSizeBytes as FbsVFixedSizeBytes, VI8 as FbsVI8, VI16 as FbsVI16, VI32 as FbsVI32,
+    VI64 as FbsVI64, VIsize as FbsVIsize, VNull as FbsVNull, VPlaceholder as FbsVPlaceholder,
+    VStr as FbsVStr, VTimestampMs as FbsVTimestampMs, VTimestampMsUtc as FbsVTimestampMsUtc,
+    VTimestampNs as FbsVTimestampNs, VTimestampNsUtc as FbsVTimestampNsUtc, VTri2D as FbsVTri2D,
+    VU8 as FbsVU8, VU16 as FbsVU16, VU32 as FbsVU32, VU64 as FbsVU64, VUnit as FbsVUnit,
+    VUsize as FbsVUsize, Value as FbsValue, ValueInstance as FbsValueInstance,
     ValueTy as FbsValueTy,
+};
+use crate::types::graph::{
+    EdgeList, EdgeQuery, Geom, GeomOp, GraphQuery, NodeIdPair, NodeList, NodeQuery, OrderBy,
+    Predicate, Projection, QueryPathElement, QueryPathElementUnion, ValueTransform,
+};
+use crate::types::id::{
+    B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
+    ObjectNamespace, StreamId,
+};
+use crate::types::value::{
+    Point2D, Tri2D, VArray, VBool, VBytes, VChar, VF32, VF64, VFixedSizeBytes, VI8, VI16, VI32,
+    VI64, VIsize, VNull, VPlaceholder, VStr, VTimestampMs, VTimestampMsUtc, VTimestampNs,
+    VTimestampNsUtc, VTri2D, VU8, VU16, VU32, VU64, VUnit, VUsize, Value, ValueInstance, ValueTy,
 };
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -355,7 +161,10 @@ impl From<FbsAggregationFunction> for AggregationFunction {
             3 => Self::Min,
             4 => Self::Max,
             5 => Self::Latest,
-            _ => panic!("Invalid value {} when constructing AggregationFunction", fbs.0)
+            _ => panic!(
+                "Invalid value {} when constructing AggregationFunction",
+                fbs.0
+            ),
         }
     }
 }
@@ -408,7 +217,7 @@ impl From<FbsDatasetCategory> for DatasetCategory {
             8 => Self::DC_BOUNDARY,
             9 => Self::DC_HEALTH,
             4294967295 => Self::DC_HIDDEN,
-            _ => panic!("Invalid value {} when constructing DatasetCategory", fbs.0)
+            _ => panic!("Invalid value {} when constructing DatasetCategory", fbs.0),
         }
     }
 }
@@ -507,7 +316,7 @@ impl From<FbsFieldUnit> for FieldUnit {
             11 => Self::U_ACRES,
             12 => Self::U_SQUARE_FEET,
             13 => Self::U_MILES,
-            _ => panic!("Invalid value {} when constructing FieldUnit", fbs.0)
+            _ => panic!("Invalid value {} when constructing FieldUnit", fbs.0),
         }
     }
 }
@@ -536,7 +345,10 @@ impl From<FbsNumericalFieldValueType> for NumericalFieldValueType {
             0 => Self::None_,
             1 => Self::Percent,
             2 => Self::Ratio,
-            _ => panic!("Invalid value {} when constructing NumericalFieldValueType", fbs.0)
+            _ => panic!(
+                "Invalid value {} when constructing NumericalFieldValueType",
+                fbs.0
+            ),
         }
     }
 }
@@ -631,7 +443,7 @@ impl From<FbsUlFieldType> for UlFieldType {
             22 => Self::FT_BINARY,
             23 => Self::FT_TIME,
             24 => Self::FT_GEOMETRY_OR_NODE,
-            _ => panic!("Invalid value {} when constructing UlFieldType", fbs.0)
+            _ => panic!("Invalid value {} when constructing UlFieldType", fbs.0),
         }
     }
 }
@@ -674,7 +486,7 @@ impl From<FbsUpdateCadence> for UpdateCadence {
             4 => Self::UC_BI_WEEKLY,
             5 => Self::UC_MONTHLY,
             6 => Self::UC_YEARLY,
-            _ => panic!("Invalid value {} when constructing UpdateCadence", fbs.0)
+            _ => panic!("Invalid value {} when constructing UpdateCadence", fbs.0),
         }
     }
 }
@@ -685,7 +497,10 @@ pub struct StringCategories {
 }
 
 impl StringCategories {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsStringCategories<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsStringCategories<'a>> {
         use crate::types::generated::metadata_generated::StringCategoriesBuilder as FbsStringCategoriesBuilder;
 
         let categories_offset = self.categories.as_ref().map(|v| {
@@ -719,9 +534,7 @@ impl From<FbsStringCategories<'_>> for StringCategories {
             None
         };
 
-        Self {
-            categories,
-        }
+        Self { categories }
     }
 }
 
@@ -751,7 +564,10 @@ pub struct NumericalFieldFormat {
 }
 
 impl NumericalFieldFormat {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsNumericalFieldFormat<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNumericalFieldFormat<'a>> {
         use crate::types::generated::metadata_generated::NumericalFieldFormatBuilder as FbsNumericalFieldFormatBuilder;
 
         let mut bldr = FbsNumericalFieldFormatBuilder::new(builder);
@@ -806,7 +622,10 @@ pub struct IntRange {
 }
 
 impl IntRange {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsIntRange<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsIntRange<'a>> {
         use crate::types::generated::metadata_generated::IntRangeBuilder as FbsIntRangeBuilder;
 
         let display_strings_offset = self.display_strings.as_ref().map(|v| {
@@ -893,7 +712,10 @@ pub struct FloatRange {
 }
 
 impl FloatRange {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsFloatRange<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsFloatRange<'a>> {
         use crate::types::generated::metadata_generated::FloatRangeBuilder as FbsFloatRangeBuilder;
 
         let field_format_offset = self.field_format.as_ref().map(|o| o.serialize_to(builder));
@@ -949,7 +771,10 @@ pub struct DatetimeRange {
 }
 
 impl DatetimeRange {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDatetimeRange<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDatetimeRange<'a>> {
         use crate::types::generated::metadata_generated::DatetimeRangeBuilder as FbsDatetimeRangeBuilder;
 
         let intervals_offset = self.intervals.as_ref().map(|v| {
@@ -1021,7 +846,10 @@ pub struct Dates {
 }
 
 impl Dates {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDates<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDates<'a>> {
         use crate::types::generated::metadata_generated::DatesBuilder as FbsDatesBuilder;
 
         let unique_value_counts_offset = self.unique_value_counts.as_ref().map(|v| {
@@ -1104,7 +932,10 @@ pub struct NestedStringCategories {
 }
 
 impl NestedStringCategories {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsNestedStringCategories<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNestedStringCategories<'a>> {
         use crate::types::generated::metadata_generated::NestedStringCategoriesBuilder as FbsNestedStringCategoriesBuilder;
 
         let mut nesting_tree_offsets = Vec::with_capacity(self.nesting_tree.len());
@@ -1127,9 +958,7 @@ impl From<FbsNestedStringCategories<'_>> for NestedStringCategories {
             nesting_tree.push(elem.into());
         }
 
-        Self {
-            nesting_tree,
-        }
+        Self { nesting_tree }
     }
 }
 
@@ -1167,7 +996,10 @@ impl Default for ComponentData {
 }
 
 impl ComponentData {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsComponentData) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsComponentData) {
         match self {
             Self::StringCategories(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -1209,7 +1041,10 @@ pub struct RawGeom {
 }
 
 impl RawGeom {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsRawGeom<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsRawGeom<'a>> {
         use crate::types::generated::metadata_generated::RawGeomBuilder as FbsRawGeomBuilder;
 
         let geom_offset = builder.create_vector(&self.geom);
@@ -1227,9 +1062,7 @@ impl From<FbsRawGeom<'_>> for RawGeom {
             geom.push(elem.into());
         }
 
-        Self {
-            geom,
-        }
+        Self { geom }
     }
 }
 
@@ -1263,7 +1096,10 @@ impl Default for GeometryDataUnion {
 }
 
 impl GeometryDataUnion {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsGeometryDataUnion) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsGeometryDataUnion) {
         match self {
             Self::RawGeom(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -1280,11 +1116,13 @@ impl GeometryDataUnion {
 }
 
 #[derive(Default, PartialEq, Debug, Clone)]
-pub struct NoGeometry {
-}
+pub struct NoGeometry {}
 
 impl NoGeometry {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsNoGeometry<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNoGeometry<'a>> {
         use crate::types::generated::metadata_generated::NoGeometryBuilder as FbsNoGeometryBuilder;
 
         let mut bldr = FbsNoGeometryBuilder::new(builder);
@@ -1294,8 +1132,7 @@ impl NoGeometry {
 
 impl From<FbsNoGeometry<'_>> for NoGeometry {
     fn from(fbs: FbsNoGeometry<'_>) -> Self {
-        Self {
-        }
+        Self {}
     }
 }
 
@@ -1322,7 +1159,10 @@ pub struct DatacatalogGeometry {
 }
 
 impl DatacatalogGeometry {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDatacatalogGeometry<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDatacatalogGeometry<'a>> {
         use crate::types::generated::metadata_generated::DatacatalogGeometryBuilder as FbsDatacatalogGeometryBuilder;
 
         let column_offset = builder.create_string(&self.column);
@@ -1336,9 +1176,7 @@ impl DatacatalogGeometry {
 impl From<FbsDatacatalogGeometry<'_>> for DatacatalogGeometry {
     fn from(fbs: FbsDatacatalogGeometry<'_>) -> Self {
         let column = fbs.column().to_owned();
-        Self {
-            column,
-        }
+        Self { column }
     }
 }
 
@@ -1361,17 +1199,17 @@ impl From<DatacatalogGeometry> for Vec<u8> {
 
 /// For most streams with GeometrySourceType==WorldGraphGeometry, edge_path will
 /// be empty and start_stream_id will be unset.
-/// 
+///
 /// If edge_path is empty and start_stream_id is unset we just query for nodes
 /// whose stream predicate matches this stream's streamId in order to fetch the stream's geometry.
-/// 
+///
 /// If edge_path is non-empty and start_stream_id is set: Start at nodes with
 /// streamId=start_stream_id and follow the edge_path. Retrieve geometry from
 /// the last node on that path.
-/// 
+///
 /// If edge_path is non-empty and start_stream_id is unset: Start at nodes with
 /// streamId=id of this stream and follow the edge_path to retrieve the geeometry.
-/// 
+///
 /// If edge_path is empty and start_stream_id is set: Just query for nodes with
 /// streamId == start_stream_id.
 #[derive(Default, PartialEq, Debug, Clone)]
@@ -1383,11 +1221,14 @@ pub struct WorldGraphGeometry {
 }
 
 impl WorldGraphGeometry {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsWorldGraphGeometry<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsWorldGraphGeometry<'a>> {
         use crate::types::generated::metadata_generated::WorldGraphGeometryBuilder as FbsWorldGraphGeometryBuilder;
 
-        let edge_path_offset = builder.create_vector_from_iter(self.edge_path.iter().map(|v| {
-            match v {
+        let edge_path_offset =
+            builder.create_vector_from_iter(self.edge_path.iter().map(|v| match v {
                 EdgeTy::E_INVALID => FbsEdgeTy::E_INVALID,
                 EdgeTy::E_POSTAL_CODE => FbsEdgeTy::E_POSTAL_CODE,
                 EdgeTy::E_INTERSECTS => FbsEdgeTy::E_INTERSECTS,
@@ -1403,9 +1244,11 @@ impl WorldGraphGeometry {
                 EdgeTy::E_CRASHBOARD_AGGREGATE_BY => FbsEdgeTy::E_CRASHBOARD_AGGREGATE_BY,
                 EdgeTy::E_OPPOSING_ROAD_SEGMENT => FbsEdgeTy::E_OPPOSING_ROAD_SEGMENT,
                 EdgeTy::E_ASSOCIATED_CAMERA => FbsEdgeTy::E_ASSOCIATED_CAMERA,
-            }
-        }));
-        let start_stream_id_offset = self.start_stream_id.as_ref().map(|o| o.serialize_to(builder));
+            }));
+        let start_stream_id_offset = self
+            .start_stream_id
+            .as_ref()
+            .map(|o| o.serialize_to(builder));
 
         let mut bldr = FbsWorldGraphGeometryBuilder::new(builder);
         bldr.add_edge_path(edge_path_offset);
@@ -1462,7 +1305,10 @@ impl Default for GeometrySource {
 }
 
 impl GeometrySource {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsGeometrySource) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsGeometrySource) {
         match self {
             Self::NoGeometry(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -1489,7 +1335,10 @@ pub struct HierarchyRelationshipData {
 }
 
 impl HierarchyRelationshipData {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsHierarchyRelationshipData<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsHierarchyRelationshipData<'a>> {
         use crate::types::generated::metadata_generated::HierarchyRelationshipDataBuilder as FbsHierarchyRelationshipDataBuilder;
 
         let hierarchy_offset = self.hierarchy.as_ref().map(|v| {
@@ -1523,9 +1372,7 @@ impl From<FbsHierarchyRelationshipData<'_>> for HierarchyRelationshipData {
             None
         };
 
-        Self {
-            hierarchy,
-        }
+        Self { hierarchy }
     }
 }
 
@@ -1553,7 +1400,10 @@ pub struct CategoryRelationshipData {
 }
 
 impl CategoryRelationshipData {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsCategoryRelationshipData<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsCategoryRelationshipData<'a>> {
         use crate::types::generated::metadata_generated::CategoryRelationshipDataBuilder as FbsCategoryRelationshipDataBuilder;
 
         let associated_fields_offset = self.associated_fields.as_ref().map(|v| {
@@ -1630,7 +1480,10 @@ pub struct NestedCategoryRelationshipData {
 }
 
 impl NestedCategoryRelationshipData {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsNestedCategoryRelationshipData<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNestedCategoryRelationshipData<'a>> {
         use crate::types::generated::metadata_generated::NestedCategoryRelationshipDataBuilder as FbsNestedCategoryRelationshipDataBuilder;
 
         let categories_offset = self.categories.as_ref().map(|v| {
@@ -1664,9 +1517,7 @@ impl From<FbsNestedCategoryRelationshipData<'_>> for NestedCategoryRelationshipD
             None
         };
 
-        Self {
-            categories,
-        }
+        Self { categories }
     }
 }
 
@@ -1693,7 +1544,10 @@ pub struct NestedHierarchyRelationshipData {
 }
 
 impl NestedHierarchyRelationshipData {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsNestedHierarchyRelationshipData<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNestedHierarchyRelationshipData<'a>> {
         use crate::types::generated::metadata_generated::NestedHierarchyRelationshipDataBuilder as FbsNestedHierarchyRelationshipDataBuilder;
 
         let nodes_offset = self.nodes.as_ref().map(|v| {
@@ -1727,9 +1581,7 @@ impl From<FbsNestedHierarchyRelationshipData<'_>> for NestedHierarchyRelationshi
             None
         };
 
-        Self {
-            nodes,
-        }
+        Self { nodes }
     }
 }
 
@@ -1765,7 +1617,10 @@ impl Default for UlFieldRelationshipData {
 }
 
 impl UlFieldRelationshipData {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsUlFieldRelationshipData) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsUlFieldRelationshipData) {
         match self {
             Self::HierarchyRelationshipData(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -1801,7 +1656,10 @@ pub struct ContactInfo {
 }
 
 impl ContactInfo {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsContactInfo<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsContactInfo<'a>> {
         use crate::types::generated::metadata_generated::ContactInfoBuilder as FbsContactInfoBuilder;
 
         let address_offset = self.address.as_ref().map(|s| builder.create_string(s));
@@ -1877,7 +1735,10 @@ pub struct DatasetSource {
 }
 
 impl DatasetSource {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDatasetSource<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDatasetSource<'a>> {
         use crate::types::generated::metadata_generated::DatasetSourceBuilder as FbsDatasetSourceBuilder;
 
         let date_offset = self.date.as_ref().map(|s| builder.create_string(s));
@@ -1903,11 +1764,7 @@ impl From<FbsDatasetSource<'_>> for DatasetSource {
         let date = fbs.date().map(ToOwned::to_owned);
         let source = fbs.source().map(ToOwned::to_owned);
         let url = fbs.url().map(ToOwned::to_owned);
-        Self {
-            date,
-            source,
-            url,
-        }
+        Self { date, source, url }
     }
 }
 
@@ -1937,7 +1794,10 @@ pub struct Document {
 }
 
 impl Document {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDocument<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDocument<'a>> {
         use crate::types::generated::metadata_generated::DocumentBuilder as FbsDocumentBuilder;
 
         let display_name_offset = self.display_name.as_ref().map(|s| builder.create_string(s));
@@ -2000,7 +1860,10 @@ pub struct Documents {
 }
 
 impl Documents {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDocuments<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDocuments<'a>> {
         use crate::types::generated::metadata_generated::DocumentsBuilder as FbsDocumentsBuilder;
 
         let documents_offset = self.documents.as_ref().map(|v| {
@@ -2034,9 +1897,7 @@ impl From<FbsDocuments<'_>> for Documents {
             None
         };
 
-        Self {
-            documents,
-        }
+        Self { documents }
     }
 }
 
@@ -2069,11 +1930,15 @@ pub struct FloatAggregate {
 }
 
 impl FloatAggregate {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsFloatAggregate<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsFloatAggregate<'a>> {
         use crate::types::generated::metadata_generated::FloatAggregateBuilder as FbsFloatAggregateBuilder;
 
         let histo_offset = self.histo.as_ref().map(|v| {
-            let histo_offset = builder.create_vector_from_iter(v.iter().cloned().map(Into::<FbsFloatBucket>::into));
+            let histo_offset = builder
+                .create_vector_from_iter(v.iter().cloned().map(Into::<FbsFloatBucket>::into));
             histo_offset
         });
 
@@ -2169,7 +2034,10 @@ pub struct GeometryData {
 }
 
 impl GeometryData {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsGeometryData<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsGeometryData<'a>> {
         use crate::types::generated::metadata_generated::GeometryDataBuilder as FbsGeometryDataBuilder;
 
         let (data_offset, data_ty) = self.data.serialize_to(builder);
@@ -2184,14 +2052,16 @@ impl GeometryData {
 impl From<FbsGeometryData<'_>> for GeometryData {
     fn from(fbs: FbsGeometryData<'_>) -> Self {
         let data = match fbs.data_type() {
-            FbsGeometryDataUnion::RawGeom => GeometryDataUnion::RawGeom(RawGeom::from(fbs.data_as_raw_geom().unwrap())),
-            FbsGeometryDataUnion::NodeIdPair => GeometryDataUnion::NodeIdPair(NodeIdPair::from(fbs.data_as_node_id_pair().unwrap())),
+            FbsGeometryDataUnion::RawGeom => {
+                GeometryDataUnion::RawGeom(RawGeom::from(fbs.data_as_raw_geom().unwrap()))
+            }
+            FbsGeometryDataUnion::NodeIdPair => {
+                GeometryDataUnion::NodeIdPair(NodeIdPair::from(fbs.data_as_node_id_pair().unwrap()))
+            }
             _ => unreachable!(),
         };
 
-        Self {
-            data,
-        }
+        Self { data }
     }
 }
 
@@ -2219,7 +2089,10 @@ pub struct HierarchicalRelationship {
 }
 
 impl HierarchicalRelationship {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsHierarchicalRelationship<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsHierarchicalRelationship<'a>> {
         use crate::types::generated::metadata_generated::HierarchicalRelationshipBuilder as FbsHierarchicalRelationshipBuilder;
 
         let children_offset = self.children.as_ref().map(|v| {
@@ -2250,10 +2123,7 @@ impl From<FbsHierarchicalRelationship<'_>> for HierarchicalRelationship {
         };
 
         let parent = fbs.parent();
-        Self {
-            children,
-            parent,
-        }
+        Self { children, parent }
     }
 }
 
@@ -2286,11 +2156,15 @@ pub struct IntAggregate {
 }
 
 impl IntAggregate {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsIntAggregate<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsIntAggregate<'a>> {
         use crate::types::generated::metadata_generated::IntAggregateBuilder as FbsIntAggregateBuilder;
 
         let histo_offset = self.histo.as_ref().map(|v| {
-            let histo_offset = builder.create_vector_from_iter(v.iter().cloned().map(Into::<FbsUIntBucket>::into));
+            let histo_offset =
+                builder.create_vector_from_iter(v.iter().cloned().map(Into::<FbsUIntBucket>::into));
             histo_offset
         });
 
@@ -2387,7 +2261,10 @@ pub struct IntegerDisplayString {
 }
 
 impl IntegerDisplayString {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsIntegerDisplayString<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsIntegerDisplayString<'a>> {
         use crate::types::generated::metadata_generated::IntegerDisplayStringBuilder as FbsIntegerDisplayStringBuilder;
 
         let display_name_offset = builder.create_string(&self.display_name);
@@ -2458,7 +2335,10 @@ pub struct Metadata {
 }
 
 impl Metadata {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsMetadata<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsMetadata<'a>> {
         use crate::types::generated::metadata_generated::MetadataBuilder as FbsMetadataBuilder;
 
         let description_offset = self.description.as_ref().map(|s| builder.create_string(s));
@@ -2481,7 +2361,10 @@ impl Metadata {
             let fields_offset = builder.create_vector(&fields_offsets);
             fields_offset
         });
-        let geometry_source_offset = self.geometry_source.as_ref().map(|u| u.serialize_to(builder));
+        let geometry_source_offset = self
+            .geometry_source
+            .as_ref()
+            .map(|u| u.serialize_to(builder));
         let source_offset = self.source.as_ref().map(|o| o.serialize_to(builder));
         let summary_offset = self.summary.as_ref().map(|v| {
             let summary_offset = builder.create_vector(&v);
@@ -2553,9 +2436,19 @@ impl From<FbsMetadata<'_>> for Metadata {
 
         let geometry_source = if let Some(val) = fbs.geometry_source() {
             let geometry_source = match fbs.geometry_source_type() {
-                FbsGeometrySource::NoGeometry => GeometrySource::NoGeometry(NoGeometry::from(fbs.geometry_source_as_no_geometry().unwrap())),
-                FbsGeometrySource::DatacatalogGeometry => GeometrySource::DatacatalogGeometry(DatacatalogGeometry::from(fbs.geometry_source_as_datacatalog_geometry().unwrap())),
-                FbsGeometrySource::WorldGraphGeometry => GeometrySource::WorldGraphGeometry(WorldGraphGeometry::from(fbs.geometry_source_as_world_graph_geometry().unwrap())),
+                FbsGeometrySource::NoGeometry => GeometrySource::NoGeometry(NoGeometry::from(
+                    fbs.geometry_source_as_no_geometry().unwrap(),
+                )),
+                FbsGeometrySource::DatacatalogGeometry => {
+                    GeometrySource::DatacatalogGeometry(DatacatalogGeometry::from(
+                        fbs.geometry_source_as_datacatalog_geometry().unwrap(),
+                    ))
+                }
+                FbsGeometrySource::WorldGraphGeometry => {
+                    GeometrySource::WorldGraphGeometry(WorldGraphGeometry::from(
+                        fbs.geometry_source_as_world_graph_geometry().unwrap(),
+                    ))
+                }
                 _ => unreachable!(),
             };
 
@@ -2620,7 +2513,10 @@ pub struct NestedCategoryRelationshipNode {
 }
 
 impl NestedCategoryRelationshipNode {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsNestedCategoryRelationshipNode<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNestedCategoryRelationshipNode<'a>> {
         use crate::types::generated::metadata_generated::NestedCategoryRelationshipNodeBuilder as FbsNestedCategoryRelationshipNodeBuilder;
 
         let child_columns_offset = self.child_columns.as_ref().map(|v| {
@@ -2683,7 +2579,10 @@ pub struct NestedHierarchyRelationshipNode {
 }
 
 impl NestedHierarchyRelationshipNode {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsNestedHierarchyRelationshipNode<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNestedHierarchyRelationshipNode<'a>> {
         use crate::types::generated::metadata_generated::NestedHierarchyRelationshipNodeBuilder as FbsNestedHierarchyRelationshipNodeBuilder;
 
         let child_columns_offset = self.child_columns.as_ref().map(|v| {
@@ -2767,7 +2666,10 @@ pub struct NestedStringCategoryNode {
 }
 
 impl NestedStringCategoryNode {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsNestedStringCategoryNode<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNestedStringCategoryNode<'a>> {
         use crate::types::generated::metadata_generated::NestedStringCategoryNodeBuilder as FbsNestedStringCategoryNodeBuilder;
 
         let mut child_values_offsets = Vec::with_capacity(self.child_values.len());
@@ -2826,7 +2728,10 @@ pub struct StringAggregate {
 }
 
 impl StringAggregate {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsStringAggregate<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsStringAggregate<'a>> {
         use crate::types::generated::metadata_generated::StringAggregateBuilder as FbsStringAggregateBuilder;
 
         let str_offset = self.str.as_ref().map(|s| builder.create_string(s));
@@ -2844,10 +2749,7 @@ impl From<FbsStringAggregate<'_>> for StringAggregate {
     fn from(fbs: FbsStringAggregate<'_>) -> Self {
         let count = fbs.count();
         let str = fbs.str().map(ToOwned::to_owned);
-        Self {
-            count,
-            str,
-        }
+        Self { count, str }
     }
 }
 
@@ -2875,7 +2777,10 @@ pub struct TimeInterval {
 }
 
 impl TimeInterval {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsTimeInterval<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsTimeInterval<'a>> {
         use crate::types::generated::metadata_generated::TimeIntervalBuilder as FbsTimeIntervalBuilder;
 
         let mut bldr = FbsTimeIntervalBuilder::new(builder);
@@ -2889,10 +2794,7 @@ impl From<FbsTimeInterval<'_>> for TimeInterval {
     fn from(fbs: FbsTimeInterval<'_>) -> Self {
         let max = fbs.max();
         let min = fbs.min();
-        Self {
-            max,
-            min,
-        }
+        Self { max, min }
     }
 }
 
@@ -2925,11 +2827,15 @@ pub struct UIntAggregate {
 }
 
 impl UIntAggregate {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsUIntAggregate<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsUIntAggregate<'a>> {
         use crate::types::generated::metadata_generated::UIntAggregateBuilder as FbsUIntAggregateBuilder;
 
         let histo_offset = self.histo.as_ref().map(|v| {
-            let histo_offset = builder.create_vector_from_iter(v.iter().cloned().map(Into::<FbsUIntBucket>::into));
+            let histo_offset =
+                builder.create_vector_from_iter(v.iter().cloned().map(Into::<FbsUIntBucket>::into));
             histo_offset
         });
 
@@ -3034,11 +2940,20 @@ pub struct UlField {
 }
 
 impl UlField {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsUlField<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsUlField<'a>> {
         use crate::types::generated::metadata_generated::UlFieldBuilder as FbsUlFieldBuilder;
 
-        let breakdown_display_name_offset = self.breakdown_display_name.as_ref().map(|s| builder.create_string(s));
-        let component_data_offset = self.component_data.as_ref().map(|u| u.serialize_to(builder));
+        let breakdown_display_name_offset = self
+            .breakdown_display_name
+            .as_ref()
+            .map(|s| builder.create_string(s));
+        let component_data_offset = self
+            .component_data
+            .as_ref()
+            .map(|u| u.serialize_to(builder));
         let default_offset = self.default.as_ref().map(|o| o.serialize_to(builder));
         let description_offset = self.description.as_ref().map(|s| builder.create_string(s));
         let display_name_offset = self.display_name.as_ref().map(|s| builder.create_string(s));
@@ -3081,12 +2996,26 @@ impl From<FbsUlField<'_>> for UlField {
         let breakdown_display_name = fbs.breakdown_display_name().map(ToOwned::to_owned);
         let component_data = if let Some(val) = fbs.component_data() {
             let component_data = match fbs.component_data_type() {
-                FbsComponentData::StringCategories => ComponentData::StringCategories(StringCategories::from(fbs.component_data_as_string_categories().unwrap())),
-                FbsComponentData::IntRange => ComponentData::IntRange(IntRange::from(fbs.component_data_as_int_range().unwrap())),
-                FbsComponentData::FloatRange => ComponentData::FloatRange(FloatRange::from(fbs.component_data_as_float_range().unwrap())),
-                FbsComponentData::DatetimeRange => ComponentData::DatetimeRange(DatetimeRange::from(fbs.component_data_as_datetime_range().unwrap())),
-                FbsComponentData::Dates => ComponentData::Dates(Dates::from(fbs.component_data_as_dates().unwrap())),
-                FbsComponentData::NestedStringCategories => ComponentData::NestedStringCategories(NestedStringCategories::from(fbs.component_data_as_nested_string_categories().unwrap())),
+                FbsComponentData::StringCategories => ComponentData::StringCategories(
+                    StringCategories::from(fbs.component_data_as_string_categories().unwrap()),
+                ),
+                FbsComponentData::IntRange => ComponentData::IntRange(IntRange::from(
+                    fbs.component_data_as_int_range().unwrap(),
+                )),
+                FbsComponentData::FloatRange => ComponentData::FloatRange(FloatRange::from(
+                    fbs.component_data_as_float_range().unwrap(),
+                )),
+                FbsComponentData::DatetimeRange => ComponentData::DatetimeRange(
+                    DatetimeRange::from(fbs.component_data_as_datetime_range().unwrap()),
+                ),
+                FbsComponentData::Dates => {
+                    ComponentData::Dates(Dates::from(fbs.component_data_as_dates().unwrap()))
+                }
+                FbsComponentData::NestedStringCategories => {
+                    ComponentData::NestedStringCategories(NestedStringCategories::from(
+                        fbs.component_data_as_nested_string_categories().unwrap(),
+                    ))
+                }
                 _ => unreachable!(),
             };
 
@@ -3105,25 +3034,64 @@ impl From<FbsUlField<'_>> for UlField {
             let storage_type = match fbs.storage_type_type() {
                 FbsType::Null => Type::Null(Null::from(fbs.storage_type_as_null().unwrap())),
                 FbsType::Int => Type::Int(Int::from(fbs.storage_type_as_int().unwrap())),
-                FbsType::FloatingPoint => Type::FloatingPoint(FloatingPoint::from(fbs.storage_type_as_floating_point().unwrap())),
-                FbsType::Binary => Type::Binary(Binary::from(fbs.storage_type_as_binary().unwrap())),
+                FbsType::FloatingPoint => Type::FloatingPoint(FloatingPoint::from(
+                    fbs.storage_type_as_floating_point().unwrap(),
+                )),
+                FbsType::Binary => {
+                    Type::Binary(Binary::from(fbs.storage_type_as_binary().unwrap()))
+                }
                 FbsType::Utf8 => Type::Utf8(Utf8::from(fbs.storage_type_as_utf_8().unwrap())),
                 FbsType::Bool => Type::Bool(Bool::from(fbs.storage_type_as_bool().unwrap())),
-                FbsType::Decimal => Type::Decimal(Decimal::from(fbs.storage_type_as_decimal().unwrap())),
+                FbsType::Decimal => {
+                    Type::Decimal(Decimal::from(fbs.storage_type_as_decimal().unwrap()))
+                }
                 FbsType::Date => Type::Date(Date::from(fbs.storage_type_as_date().unwrap())),
                 FbsType::Time => Type::Time(Time::from(fbs.storage_type_as_time().unwrap())),
-                FbsType::Timestamp => Type::Timestamp(Timestamp::from(fbs.storage_type_as_timestamp().unwrap())),
-                FbsType::Interval => Type::Interval(Interval::from(fbs.storage_type_as_interval().unwrap())),
+                FbsType::Timestamp => {
+                    Type::Timestamp(Timestamp::from(fbs.storage_type_as_timestamp().unwrap()))
+                }
+                FbsType::Interval => {
+                    Type::Interval(Interval::from(fbs.storage_type_as_interval().unwrap()))
+                }
                 FbsType::List => Type::List(List::from(fbs.storage_type_as_list().unwrap())),
-                FbsType::Struct_ => Type::Struct_(Struct_::from(fbs.storage_type_as_struct_().unwrap())),
+                FbsType::Struct_ => {
+                    Type::Struct_(Struct_::from(fbs.storage_type_as_struct_().unwrap()))
+                }
                 FbsType::Union => Type::Union(Union::from(fbs.storage_type_as_union().unwrap())),
-                FbsType::FixedSizeBinary => Type::FixedSizeBinary(FixedSizeBinary::from(fbs.storage_type_as_fixed_size_binary().unwrap())),
-                FbsType::FixedSizeList => Type::FixedSizeList(FixedSizeList::from(fbs.storage_type_as_fixed_size_list().unwrap())),
+                FbsType::FixedSizeBinary => Type::FixedSizeBinary(FixedSizeBinary::from(
+                    fbs.storage_type_as_fixed_size_binary().unwrap(),
+                )),
+                FbsType::FixedSizeList => Type::FixedSizeList(FixedSizeList::from(
+                    fbs.storage_type_as_fixed_size_list().unwrap(),
+                )),
                 FbsType::Map => Type::Map(Map::from(fbs.storage_type_as_map().unwrap())),
-                FbsType::Duration => Type::Duration(Duration::from(fbs.storage_type_as_duration().unwrap())),
-                FbsType::LargeBinary => Type::LargeBinary(LargeBinary::from(fbs.storage_type_as_large_binary().unwrap())),
-                FbsType::LargeUtf8 => Type::LargeUtf8(LargeUtf8::from(fbs.storage_type_as_large_utf_8().unwrap())),
-                FbsType::LargeList => Type::LargeList(LargeList::from(fbs.storage_type_as_large_list().unwrap())),
+                FbsType::Duration => {
+                    Type::Duration(Duration::from(fbs.storage_type_as_duration().unwrap()))
+                }
+                FbsType::LargeBinary => Type::LargeBinary(LargeBinary::from(
+                    fbs.storage_type_as_large_binary().unwrap(),
+                )),
+                FbsType::LargeUtf8 => {
+                    Type::LargeUtf8(LargeUtf8::from(fbs.storage_type_as_large_utf_8().unwrap()))
+                }
+                FbsType::LargeList => {
+                    Type::LargeList(LargeList::from(fbs.storage_type_as_large_list().unwrap()))
+                }
+                FbsType::RunEndEncoded => Type::RunEndEncoded(RunEndEncoded::from(
+                    fbs.storage_type_as_run_end_encoded().unwrap(),
+                )),
+                FbsType::BinaryView => {
+                    Type::BinaryView(BinaryView::from(fbs.storage_type_as_binary_view().unwrap()))
+                }
+                FbsType::Utf8View => {
+                    Type::Utf8View(Utf8View::from(fbs.storage_type_as_utf_8_view().unwrap()))
+                }
+                FbsType::ListView => {
+                    Type::ListView(ListView::from(fbs.storage_type_as_list_view().unwrap()))
+                }
+                FbsType::LargeListView => Type::LargeListView(LargeListView::from(
+                    fbs.storage_type_as_large_list_view().unwrap(),
+                )),
                 _ => unreachable!(),
             };
 
@@ -3172,11 +3140,20 @@ pub struct UlFieldRelationship {
 }
 
 impl UlFieldRelationship {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsUlFieldRelationship<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsUlFieldRelationship<'a>> {
         use crate::types::generated::metadata_generated::UlFieldRelationshipBuilder as FbsUlFieldRelationshipBuilder;
 
-        let relationship_data_offset = self.relationship_data.as_ref().map(|u| u.serialize_to(builder));
-        let relationship_display_name_offset = self.relationship_display_name.as_ref().map(|s| builder.create_string(s));
+        let relationship_data_offset = self
+            .relationship_data
+            .as_ref()
+            .map(|u| u.serialize_to(builder));
+        let relationship_display_name_offset = self
+            .relationship_display_name
+            .as_ref()
+            .map(|s| builder.create_string(s));
 
         let mut bldr = FbsUlFieldRelationshipBuilder::new(builder);
         if let Some((offset, ty)) = relationship_data_offset {
@@ -3194,10 +3171,38 @@ impl From<FbsUlFieldRelationship<'_>> for UlFieldRelationship {
     fn from(fbs: FbsUlFieldRelationship<'_>) -> Self {
         let relationship_data = if let Some(val) = fbs.relationship_data() {
             let relationship_data = match fbs.relationship_data_type() {
-                FbsUlFieldRelationshipData::HierarchyRelationshipData => UlFieldRelationshipData::HierarchyRelationshipData(HierarchyRelationshipData::from(fbs.relationship_data_as_hierarchy_relationship_data().unwrap())),
-                FbsUlFieldRelationshipData::CategoryRelationshipData => UlFieldRelationshipData::CategoryRelationshipData(CategoryRelationshipData::from(fbs.relationship_data_as_category_relationship_data().unwrap())),
-                FbsUlFieldRelationshipData::NestedCategoryRelationshipData => UlFieldRelationshipData::NestedCategoryRelationshipData(NestedCategoryRelationshipData::from(fbs.relationship_data_as_nested_category_relationship_data().unwrap())),
-                FbsUlFieldRelationshipData::NestedHierarchyRelationshipData => UlFieldRelationshipData::NestedHierarchyRelationshipData(NestedHierarchyRelationshipData::from(fbs.relationship_data_as_nested_hierarchy_relationship_data().unwrap())),
+                FbsUlFieldRelationshipData::HierarchyRelationshipData => {
+                    UlFieldRelationshipData::HierarchyRelationshipData(
+                        HierarchyRelationshipData::from(
+                            fbs.relationship_data_as_hierarchy_relationship_data()
+                                .unwrap(),
+                        ),
+                    )
+                }
+                FbsUlFieldRelationshipData::CategoryRelationshipData => {
+                    UlFieldRelationshipData::CategoryRelationshipData(
+                        CategoryRelationshipData::from(
+                            fbs.relationship_data_as_category_relationship_data()
+                                .unwrap(),
+                        ),
+                    )
+                }
+                FbsUlFieldRelationshipData::NestedCategoryRelationshipData => {
+                    UlFieldRelationshipData::NestedCategoryRelationshipData(
+                        NestedCategoryRelationshipData::from(
+                            fbs.relationship_data_as_nested_category_relationship_data()
+                                .unwrap(),
+                        ),
+                    )
+                }
+                FbsUlFieldRelationshipData::NestedHierarchyRelationshipData => {
+                    UlFieldRelationshipData::NestedHierarchyRelationshipData(
+                        NestedHierarchyRelationshipData::from(
+                            fbs.relationship_data_as_nested_hierarchy_relationship_data()
+                                .unwrap(),
+                        ),
+                    )
+                }
                 _ => unreachable!(),
             };
 
@@ -3498,5 +3503,4 @@ mod tests {
         let t1 = WorldGraphGeometry::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
-
 }

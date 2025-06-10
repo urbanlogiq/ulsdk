@@ -27,6 +27,10 @@ struct Model {
     Model();
     Model(const ::Model *root);
     Model(const std::vector<uint8_t> &bytes);
+    bool operator==(const Model &rhs) const;
+    bool operator!=(const Model &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ::flatbuffers::Offset<::Model>

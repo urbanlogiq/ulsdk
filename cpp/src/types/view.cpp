@@ -45,5 +45,13 @@ View::View(const ::View *root)
     }
 }
 
+bool
+View::operator==(const View &rhs) const {
+    if (this->query_ != rhs.query_) {
+        return false;
+    }
+    return true;
+}
+
 } // namespace types
 } // namespace ul

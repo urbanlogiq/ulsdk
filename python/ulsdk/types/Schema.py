@@ -9,6 +9,7 @@ from flatbuffers.builder import Builder
 from flatbuffers.util import RemoveSizePrefix
 from typing import Union, List, Optional, Self, Tuple
 from .generated.Binary import Binary as FbsBinary
+from .generated.BinaryView import BinaryView as FbsBinaryView
 from .generated.Bool import Bool as FbsBool
 from .generated.Buffer import Buffer as FbsBuffer
 from .generated.Date import Date as FbsDate
@@ -24,16 +25,20 @@ from .generated.Interval import Interval as FbsInterval
 from .generated.KeyValue import KeyValue as FbsKeyValue
 from .generated.LargeBinary import LargeBinary as FbsLargeBinary
 from .generated.LargeList import LargeList as FbsLargeList
+from .generated.LargeListView import LargeListView as FbsLargeListView
 from .generated.LargeUtf8 import LargeUtf8 as FbsLargeUtf8
 from .generated.List import List as FbsList
+from .generated.ListView import ListView as FbsListView
 from .generated.Map import Map as FbsMap
 from .generated.Null import Null as FbsNull
+from .generated.RunEndEncoded import RunEndEncoded as FbsRunEndEncoded
 from .generated.Schema import Schema as FbsSchema
 from .generated.Struct_ import Struct_ as FbsStruct_
 from .generated.Time import Time as FbsTime
 from .generated.Timestamp import Timestamp as FbsTimestamp
 from .generated.Union import Union as FbsUnion
 from .generated.Utf8 import Utf8 as FbsUtf8
+from .generated.Utf8View import Utf8View as FbsUtf8View
 from .generated.Type import Type as FbsType
 
 class DateUnit(Enum):
@@ -611,7 +616,7 @@ class Timestamp:
      no indication of how to map this information to a physical point in time.
      Naive date-times must be handled with care because of this missing
      information, and also because daylight saving time (DST) may make
-     some values ambiguous or non-existent. A naive date-time may be
+     some values ambiguous or nonexistent. A naive date-time may be
      stored as a struct with Date and Time fields. However, it may also be
      encoded into a Timestamp column with an empty timezone. The timestamp
      values should be computed "as if" the timezone of the date-time values
@@ -1204,6 +1209,220 @@ class LargeList:
         return eq
 
 @dataclass
+class RunEndEncoded:
+    """ Contains two child arrays, run_ends and values.
+     The run_ends child array must be a 16/32/64-bit integer array
+     which encodes the indices at which the run with the value in
+     each corresponding index in the values child array ends.
+     Like list/struct types, the value array can be of any type.
+    """
+
+    @classmethod
+    def from_fbs(cls, o: FbsRunEndEncoded) -> Self:
+        return cls()
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsRunEndEncoded.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.RunEndEncoded import (
+            Start,
+            End,
+        )
+
+        Start(builder)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        return cls()
+
+    def __eq__(self, other) -> bool:
+        eq = True
+
+        return eq
+
+@dataclass
+class BinaryView:
+    """ Logically the same as Binary, but the internal representation uses a view
+     struct that contains the string length and either the string's entire data
+     inline (for small strings) or an inlined prefix, an index of another buffer,
+     and an offset pointing to a slice in that buffer (for non-small strings).
+
+     Since it uses a variable number of data buffers, each Field with this type
+     must have a corresponding entry in `variadicBufferCounts`.
+    """
+
+    @classmethod
+    def from_fbs(cls, o: FbsBinaryView) -> Self:
+        return cls()
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsBinaryView.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.BinaryView import (
+            Start,
+            End,
+        )
+
+        Start(builder)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        return cls()
+
+    def __eq__(self, other) -> bool:
+        eq = True
+
+        return eq
+
+@dataclass
+class Utf8View:
+    """ Logically the same as Utf8, but the internal representation uses a view
+     struct that contains the string length and either the string's entire data
+     inline (for small strings) or an inlined prefix, an index of another buffer,
+     and an offset pointing to a slice in that buffer (for non-small strings).
+
+     Since it uses a variable number of data buffers, each Field with this type
+     must have a corresponding entry in `variadicBufferCounts`.
+    """
+
+    @classmethod
+    def from_fbs(cls, o: FbsUtf8View) -> Self:
+        return cls()
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsUtf8View.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.Utf8View import (
+            Start,
+            End,
+        )
+
+        Start(builder)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        return cls()
+
+    def __eq__(self, other) -> bool:
+        eq = True
+
+        return eq
+
+@dataclass
+class ListView:
+    """ Represents the same logical types that List can, but contains offsets and
+     sizes allowing for writes in any order and sharing of child values among
+     list values.
+    """
+
+    @classmethod
+    def from_fbs(cls, o: FbsListView) -> Self:
+        return cls()
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsListView.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.ListView import (
+            Start,
+            End,
+        )
+
+        Start(builder)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        return cls()
+
+    def __eq__(self, other) -> bool:
+        eq = True
+
+        return eq
+
+@dataclass
+class LargeListView:
+    """ Same as ListView, but with 64-bit offsets and sizes, allowing to represent
+     extremely large data values.
+    """
+
+    @classmethod
+    def from_fbs(cls, o: FbsLargeListView) -> Self:
+        return cls()
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsLargeListView.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.LargeListView import (
+            Start,
+            End,
+        )
+
+        Start(builder)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        return cls()
+
+    def __eq__(self, other) -> bool:
+        eq = True
+
+        return eq
+
+@dataclass
 class Type:
     """ ----------------------------------------------------------------------
      Top-level Type value, enabling extensible type-specific metadata. We can
@@ -1232,6 +1451,11 @@ class Type:
         "LargeBinary",
         "LargeUtf8",
         "LargeList",
+        "RunEndEncoded",
+        "BinaryView",
+        "Utf8View",
+        "ListView",
+        "LargeListView",
     ]
 
     def serialize_to(self, builder: Builder) -> Tuple[int, int]:
@@ -1279,6 +1503,16 @@ class Type:
             return (offset, Type().LargeUtf8)
         elif isinstance(self.value, LargeList):
             return (offset, Type().LargeList)
+        elif isinstance(self.value, RunEndEncoded):
+            return (offset, Type().RunEndEncoded)
+        elif isinstance(self.value, BinaryView):
+            return (offset, Type().BinaryView)
+        elif isinstance(self.value, Utf8View):
+            return (offset, Type().Utf8View)
+        elif isinstance(self.value, ListView):
+            return (offset, Type().ListView)
+        elif isinstance(self.value, LargeListView):
+            return (offset, Type().LargeListView)
         raise ValueError("Invalid union type")
 
     @classmethod
@@ -1371,6 +1605,26 @@ class Type:
             val = FbsLargeList();
             val.Init(source, pos)
             return cls(LargeList.from_fbs(val))
+        elif ty == Type_ty_instance.RunEndEncoded:
+            val = FbsRunEndEncoded();
+            val.Init(source, pos)
+            return cls(RunEndEncoded.from_fbs(val))
+        elif ty == Type_ty_instance.BinaryView:
+            val = FbsBinaryView();
+            val.Init(source, pos)
+            return cls(BinaryView.from_fbs(val))
+        elif ty == Type_ty_instance.Utf8View:
+            val = FbsUtf8View();
+            val.Init(source, pos)
+            return cls(Utf8View.from_fbs(val))
+        elif ty == Type_ty_instance.ListView:
+            val = FbsListView();
+            val.Init(source, pos)
+            return cls(ListView.from_fbs(val))
+        elif ty == Type_ty_instance.LargeListView:
+            val = FbsLargeListView();
+            val.Init(source, pos)
+            return cls(LargeListView.from_fbs(val))
         else:
             raise ValueError("Invalid union type")
 

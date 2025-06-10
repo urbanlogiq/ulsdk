@@ -10,47 +10,24 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
-use flatbuffers::{WIPOffset, UnionWIPOffset};
 use bitflags::bitflags;
 use core::ops::Deref;
+use flatbuffers::{UnionWIPOffset, WIPOffset};
 
 use crate::types::generated::Schema_generated::{
-    Binary as FbsBinary,
-    Bool as FbsBool,
-    Buffer as FbsBuffer,
-    Date as FbsDate,
-    Decimal as FbsDecimal,
-    DictionaryEncoding as FbsDictionaryEncoding,
-    Duration as FbsDuration,
-    Field as FbsField,
-    FixedSizeBinary as FbsFixedSizeBinary,
-    FixedSizeList as FbsFixedSizeList,
-    FloatingPoint as FbsFloatingPoint,
-    Int as FbsInt,
-    Interval as FbsInterval,
-    KeyValue as FbsKeyValue,
-    LargeBinary as FbsLargeBinary,
-    LargeList as FbsLargeList,
-    LargeUtf8 as FbsLargeUtf8,
-    List as FbsList,
-    Map as FbsMap,
-    Null as FbsNull,
-    Schema as FbsSchema,
-    Struct_ as FbsStruct_,
-    Time as FbsTime,
-    Timestamp as FbsTimestamp,
-    Union as FbsUnion,
-    Utf8 as FbsUtf8,
-    DateUnit as FbsDateUnit,
-    DictionaryKind as FbsDictionaryKind,
-    Endianness as FbsEndianness,
-    Feature as FbsFeature,
-    IntervalUnit as FbsIntervalUnit,
-    MetadataVersion as FbsMetadataVersion,
-    Precision as FbsPrecision,
-    TimeUnit as FbsTimeUnit,
-    Type as FbsType,
-    UnionMode as FbsUnionMode,
+    Binary as FbsBinary, BinaryView as FbsBinaryView, Bool as FbsBool, Buffer as FbsBuffer,
+    Date as FbsDate, DateUnit as FbsDateUnit, Decimal as FbsDecimal,
+    DictionaryEncoding as FbsDictionaryEncoding, DictionaryKind as FbsDictionaryKind,
+    Duration as FbsDuration, Endianness as FbsEndianness, Feature as FbsFeature, Field as FbsField,
+    FixedSizeBinary as FbsFixedSizeBinary, FixedSizeList as FbsFixedSizeList,
+    FloatingPoint as FbsFloatingPoint, Int as FbsInt, Interval as FbsInterval,
+    IntervalUnit as FbsIntervalUnit, KeyValue as FbsKeyValue, LargeBinary as FbsLargeBinary,
+    LargeList as FbsLargeList, LargeListView as FbsLargeListView, LargeUtf8 as FbsLargeUtf8,
+    List as FbsList, ListView as FbsListView, Map as FbsMap, MetadataVersion as FbsMetadataVersion,
+    Null as FbsNull, Precision as FbsPrecision, RunEndEncoded as FbsRunEndEncoded,
+    Schema as FbsSchema, Struct_ as FbsStruct_, Time as FbsTime, TimeUnit as FbsTimeUnit,
+    Timestamp as FbsTimestamp, Type as FbsType, Union as FbsUnion, UnionMode as FbsUnionMode,
+    Utf8 as FbsUtf8, Utf8View as FbsUtf8View,
 };
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -74,7 +51,7 @@ impl From<FbsDateUnit> for DateUnit {
         match fbs.0 {
             0 => Self::DAY,
             1 => Self::MILLISECOND,
-            _ => panic!("Invalid value {} when constructing DateUnit", fbs.0)
+            _ => panic!("Invalid value {} when constructing DateUnit", fbs.0),
         }
     }
 }
@@ -102,7 +79,7 @@ impl From<FbsDictionaryKind> for DictionaryKind {
     fn from(fbs: FbsDictionaryKind) -> Self {
         match fbs.0 {
             0 => Self::DenseArray,
-            _ => panic!("Invalid value {} when constructing DictionaryKind", fbs.0)
+            _ => panic!("Invalid value {} when constructing DictionaryKind", fbs.0),
         }
     }
 }
@@ -130,7 +107,7 @@ impl From<FbsEndianness> for Endianness {
         match fbs.0 {
             0 => Self::Little,
             1 => Self::Big,
-            _ => panic!("Invalid value {} when constructing Endianness", fbs.0)
+            _ => panic!("Invalid value {} when constructing Endianness", fbs.0),
         }
     }
 }
@@ -148,7 +125,7 @@ impl From<FbsEndianness> for Endianness {
 /// values here are intented to represent higher level
 /// features, additional details maybe negotiated
 /// with key-value pairs specific to the protocol.
-/// 
+///
 /// Enums added to this list should be assigned power-of-two values
 /// to facilitate exchanging and comparing bitmaps for supported
 /// features.
@@ -182,7 +159,7 @@ impl From<FbsFeature> for Feature {
             0 => Self::UNUSED,
             1 => Self::DICTIONARY_REPLACEMENT,
             2 => Self::COMPRESSED_BODY,
-            _ => panic!("Invalid value {} when constructing Feature", fbs.0)
+            _ => panic!("Invalid value {} when constructing Feature", fbs.0),
         }
     }
 }
@@ -211,7 +188,7 @@ impl From<FbsIntervalUnit> for IntervalUnit {
             0 => Self::YEAR_MONTH,
             1 => Self::DAY_TIME,
             2 => Self::MONTH_DAY_NANO,
-            _ => panic!("Invalid value {} when constructing IntervalUnit", fbs.0)
+            _ => panic!("Invalid value {} when constructing IntervalUnit", fbs.0),
         }
     }
 }
@@ -219,8 +196,11 @@ impl From<FbsIntervalUnit> for IntervalUnit {
 /// Logical types, vector layouts, and schemas
 /// Format Version History.
 /// Version 1.0 - Forward and backwards compatibility guaranteed.
-/// Version 1.1 - Add Decimal256 (No format release).
-/// Version 1.2 (Pending)- Add Interval MONTH_DAY_NANO
+/// Version 1.1 - Add Decimal256.
+/// Version 1.2 - Add Interval MONTH_DAY_NANO.
+/// Version 1.3 - Add Run-End Encoded.
+/// Version 1.4 - Add BinaryView, Utf8View, variadicBufferCounts, ListView, and
+/// LargeListView.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub enum MetadataVersion {
     /// 0.1.0 (October 2016).
@@ -232,10 +212,10 @@ pub enum MetadataVersion {
     V3 = 2,
     /// >= 0.8.0 (December 2017). Non-backwards compatible with V3.
     V4 = 3,
-    /// >= 1.0.0 (July 2020. Backwards compatible with V4 (V5 readers can read V4
+    /// >= 1.0.0 (July 2020). Backwards compatible with V4 (V5 readers can read V4
     /// metadata and IPC messages). Implementations are recommended to provide a
     /// V4 compatibility mode with V5 format changes disabled.
-    /// 
+    ///
     /// Incompatible changes between V4 and V5:
     /// - Union buffer layout has changed. In V5, Unions don't have a validity
     /// bitmap buffer.
@@ -262,7 +242,7 @@ impl From<FbsMetadataVersion> for MetadataVersion {
             2 => Self::V3,
             3 => Self::V4,
             4 => Self::V5,
-            _ => panic!("Invalid value {} when constructing MetadataVersion", fbs.0)
+            _ => panic!("Invalid value {} when constructing MetadataVersion", fbs.0),
         }
     }
 }
@@ -291,7 +271,7 @@ impl From<FbsPrecision> for Precision {
             0 => Self::HALF,
             1 => Self::SINGLE,
             2 => Self::DOUBLE,
-            _ => panic!("Invalid value {} when constructing Precision", fbs.0)
+            _ => panic!("Invalid value {} when constructing Precision", fbs.0),
         }
     }
 }
@@ -323,7 +303,7 @@ impl From<FbsTimeUnit> for TimeUnit {
             1 => Self::MILLISECOND,
             2 => Self::MICROSECOND,
             3 => Self::NANOSECOND,
-            _ => panic!("Invalid value {} when constructing TimeUnit", fbs.0)
+            _ => panic!("Invalid value {} when constructing TimeUnit", fbs.0),
         }
     }
 }
@@ -349,18 +329,20 @@ impl From<FbsUnionMode> for UnionMode {
         match fbs.0 {
             0 => Self::Sparse,
             1 => Self::Dense,
-            _ => panic!("Invalid value {} when constructing UnionMode", fbs.0)
+            _ => panic!("Invalid value {} when constructing UnionMode", fbs.0),
         }
     }
 }
 
 /// These are stored in the flatbuffer in the Type union below
 #[derive(Default, PartialEq, Debug, Clone)]
-pub struct Null {
-}
+pub struct Null {}
 
 impl Null {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsNull<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNull<'a>> {
         use crate::types::generated::Schema_generated::NullBuilder as FbsNullBuilder;
 
         let mut bldr = FbsNullBuilder::new(builder);
@@ -370,8 +352,7 @@ impl Null {
 
 impl From<FbsNull<'_>> for Null {
     fn from(fbs: FbsNull<'_>) -> Self {
-        Self {
-        }
+        Self {}
     }
 }
 
@@ -399,7 +380,10 @@ pub struct Int {
 }
 
 impl Int {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsInt<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsInt<'a>> {
         use crate::types::generated::Schema_generated::IntBuilder as FbsIntBuilder;
 
         let mut bldr = FbsIntBuilder::new(builder);
@@ -443,7 +427,10 @@ pub struct FloatingPoint {
 }
 
 impl FloatingPoint {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsFloatingPoint<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsFloatingPoint<'a>> {
         use crate::types::generated::Schema_generated::FloatingPointBuilder as FbsFloatingPointBuilder;
 
         let mut bldr = FbsFloatingPointBuilder::new(builder);
@@ -455,9 +442,7 @@ impl FloatingPoint {
 impl From<FbsFloatingPoint<'_>> for FloatingPoint {
     fn from(fbs: FbsFloatingPoint<'_>) -> Self {
         let precision = Precision::from(fbs.precision());
-        Self {
-            precision,
-        }
+        Self { precision }
     }
 }
 
@@ -480,11 +465,13 @@ impl From<FloatingPoint> for Vec<u8> {
 
 /// Opaque binary data
 #[derive(Default, PartialEq, Debug, Clone)]
-pub struct Binary {
-}
+pub struct Binary {}
 
 impl Binary {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsBinary<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsBinary<'a>> {
         use crate::types::generated::Schema_generated::BinaryBuilder as FbsBinaryBuilder;
 
         let mut bldr = FbsBinaryBuilder::new(builder);
@@ -494,8 +481,7 @@ impl Binary {
 
 impl From<FbsBinary<'_>> for Binary {
     fn from(fbs: FbsBinary<'_>) -> Self {
-        Self {
-        }
+        Self {}
     }
 }
 
@@ -518,11 +504,13 @@ impl From<Binary> for Vec<u8> {
 
 /// Unicode with UTF-8 encoding
 #[derive(Default, PartialEq, Debug, Clone)]
-pub struct Utf8 {
-}
+pub struct Utf8 {}
 
 impl Utf8 {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsUtf8<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsUtf8<'a>> {
         use crate::types::generated::Schema_generated::Utf8Builder as FbsUtf8Builder;
 
         let mut bldr = FbsUtf8Builder::new(builder);
@@ -532,8 +520,7 @@ impl Utf8 {
 
 impl From<FbsUtf8<'_>> for Utf8 {
     fn from(fbs: FbsUtf8<'_>) -> Self {
-        Self {
-        }
+        Self {}
     }
 }
 
@@ -555,11 +542,13 @@ impl From<Utf8> for Vec<u8> {
 }
 
 #[derive(Default, PartialEq, Debug, Clone)]
-pub struct Bool {
-}
+pub struct Bool {}
 
 impl Bool {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsBool<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsBool<'a>> {
         use crate::types::generated::Schema_generated::BoolBuilder as FbsBoolBuilder;
 
         let mut bldr = FbsBoolBuilder::new(builder);
@@ -569,8 +558,7 @@ impl Bool {
 
 impl From<FbsBool<'_>> for Bool {
     fn from(fbs: FbsBool<'_>) -> Self {
-        Self {
-        }
+        Self {}
     }
 }
 
@@ -607,7 +595,10 @@ pub struct Decimal {
 }
 
 impl Decimal {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDecimal<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDecimal<'a>> {
         use crate::types::generated::Schema_generated::DecimalBuilder as FbsDecimalBuilder;
 
         let mut bldr = FbsDecimalBuilder::new(builder);
@@ -650,7 +641,7 @@ impl From<Decimal> for Vec<u8> {
 
 /// Date is either a 32-bit or 64-bit signed integer type representing an
 /// elapsed time since UNIX epoch (1970-01-01), stored in either of two units:
-/// 
+///
 /// * Milliseconds (64 bits) indicating UNIX time elapsed since the epoch (no
 /// leap seconds), where the values are evenly divisible by 86400000
 /// * Days (32 bits) since the UNIX epoch
@@ -660,7 +651,10 @@ pub struct Date {
 }
 
 impl Date {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDate<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDate<'a>> {
         use crate::types::generated::Schema_generated::DateBuilder as FbsDateBuilder;
 
         let mut bldr = FbsDateBuilder::new(builder);
@@ -672,9 +666,7 @@ impl Date {
 impl From<FbsDate<'_>> for Date {
     fn from(fbs: FbsDate<'_>) -> Self {
         let unit = DateUnit::from(fbs.unit());
-        Self {
-            unit,
-        }
+        Self { unit }
     }
 }
 
@@ -698,11 +690,11 @@ impl From<Date> for Vec<u8> {
 /// Time is either a 32-bit or 64-bit signed integer type representing an
 /// elapsed time since midnight, stored in either of four units: seconds,
 /// milliseconds, microseconds or nanoseconds.
-/// 
+///
 /// The integer `bitWidth` depends on the `unit` and must be one of the following:
 /// * SECOND and MILLISECOND: 32 bits
 /// * MICROSECOND and NANOSECOND: 64 bits
-/// 
+///
 /// The allowed values are between 0 (inclusive) and 86400 (=24*60*60) seconds
 /// (exclusive), adjusted for the time unit (for example, up to 86400000
 /// exclusive for the MILLISECOND unit).
@@ -716,7 +708,10 @@ pub struct Time {
 }
 
 impl Time {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsTime<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsTime<'a>> {
         use crate::types::generated::Schema_generated::TimeBuilder as FbsTimeBuilder;
 
         let mut bldr = FbsTimeBuilder::new(builder);
@@ -730,10 +725,7 @@ impl From<FbsTime<'_>> for Time {
     fn from(fbs: FbsTime<'_>) -> Self {
         let bitWidth = fbs.bitWidth();
         let unit = TimeUnit::from(fbs.unit());
-        Self {
-            bitWidth,
-            unit,
-        }
+        Self { bitWidth, unit }
     }
 }
 
@@ -757,58 +749,58 @@ impl From<Time> for Vec<u8> {
 /// Timestamp is a 64-bit signed integer representing an elapsed time since a
 /// fixed epoch, stored in either of four units: seconds, milliseconds,
 /// microseconds or nanoseconds, and is optionally annotated with a timezone.
-/// 
+///
 /// Timestamp values do not include any leap seconds (in other words, all
 /// days are considered 86400 seconds long).
-/// 
+///
 /// Timestamps with a non-empty timezone
 /// ------------------------------------
-/// 
+///
 /// If a Timestamp column has a non-empty timezone value, its epoch is
 /// 1970-01-01 00:00:00 (January 1st 1970, midnight) in the *UTC* timezone
 /// (the Unix epoch), regardless of the Timestamp's own timezone.
-/// 
+///
 /// Therefore, timestamp values with a non-empty timezone correspond to
 /// physical points in time together with some additional information about
 /// how the data was obtained and/or how to display it (the timezone).
-/// 
+///
 /// For example, the timestamp value 0 with the timezone string "Europe/Paris"
 /// corresponds to "January 1st 1970, 00h00" in the UTC timezone, but the
 /// application may prefer to display it as "January 1st 1970, 01h00" in
 /// the Europe/Paris timezone (which is the same physical point in time).
-/// 
+///
 /// One consequence is that timestamp values with a non-empty timezone
 /// can be compared and ordered directly, since they all share the same
 /// well-known point of reference (the Unix epoch).
-/// 
+///
 /// Timestamps with an unset / empty timezone
 /// -----------------------------------------
-/// 
+///
 /// If a Timestamp column has no timezone value, its epoch is
 /// 1970-01-01 00:00:00 (January 1st 1970, midnight) in an *unknown* timezone.
-/// 
+///
 /// Therefore, timestamp values without a timezone cannot be meaningfully
 /// interpreted as physical points in time, but only as calendar / clock
 /// indications ("wall clock time") in an unspecified timezone.
-/// 
+///
 /// For example, the timestamp value 0 with an empty timezone string
 /// corresponds to "January 1st 1970, 00h00" in an unknown timezone: there
 /// is not enough information to interpret it as a well-defined physical
 /// point in time.
-/// 
+///
 /// One consequence is that timestamp values without a timezone cannot
 /// be reliably compared or ordered, since they may have different points of
 /// reference.  In particular, it is *not* possible to interpret an unset
 /// or empty timezone as the same as "UTC".
-/// 
+///
 /// Conversion between timezones
 /// ----------------------------
-/// 
+///
 /// If a Timestamp column has a non-empty timezone, changing the timezone
 /// to a different non-empty value is a metadata-only operation:
 /// the timestamp values need not change as their point of reference remains
 /// the same (the Unix epoch).
-/// 
+///
 /// However, if a Timestamp column has no timezone value, changing it to a
 /// non-empty value requires to think about the desired semantics.
 /// One possibility is to assume that the original timestamp values are
@@ -817,43 +809,43 @@ impl From<Time> for Vec<u8> {
 /// empty to "Europe/Paris" would require converting the timestamp values
 /// from "Europe/Paris" to "UTC", which seems counter-intuitive but is
 /// nevertheless correct).
-/// 
+///
 /// Guidelines for encoding data from external libraries
 /// ----------------------------------------------------
-/// 
+///
 /// Date & time libraries often have multiple different data types for temporal
 /// data. In order to ease interoperability between different implementations the
 /// Arrow project has some recommendations for encoding these types into a Timestamp
 /// column.
-/// 
+///
 /// An "instant" represents a physical point in time that has no relevant timezone
 /// (for example, astronomical data). To encode an instant, use a Timestamp with
 /// the timezone string set to "UTC", and make sure the Timestamp values
 /// are relative to the UTC epoch (January 1st 1970, midnight).
-/// 
+///
 /// A "zoned date-time" represents a physical point in time annotated with an
 /// informative timezone (for example, the timezone in which the data was
 /// recorded).  To encode a zoned date-time, use a Timestamp with the timezone
 /// string set to the name of the timezone, and make sure the Timestamp values
 /// are relative to the UTC epoch (January 1st 1970, midnight).
-/// 
+///
 /// (There is some ambiguity between an instant and a zoned date-time with the
 /// UTC timezone.  Both of these are stored the same in Arrow.  Typically,
 /// this distinction does not matter.  If it does, then an application should
 /// use custom metadata or an extension type to distinguish between the two cases.)
-/// 
+///
 /// An "offset date-time" represents a physical point in time combined with an
 /// explicit offset from UTC.  To encode an offset date-time, use a Timestamp
 /// with the timezone string set to the numeric timezone offset string
 /// (e.g. "+03:00"), and make sure the Timestamp values are relative to
 /// the UTC epoch (January 1st 1970, midnight).
-/// 
+///
 /// A "naive date-time" (also called "local date-time" in some libraries)
 /// represents a wall clock time combined with a calendar date, but with
 /// no indication of how to map this information to a physical point in time.
 /// Naive date-times must be handled with care because of this missing
 /// information, and also because daylight saving time (DST) may make
-/// some values ambiguous or non-existent. A naive date-time may be
+/// some values ambiguous or nonexistent. A naive date-time may be
 /// stored as a struct with Date and Time fields. However, it may also be
 /// encoded into a Timestamp column with an empty timezone. The timestamp
 /// values should be computed "as if" the timezone of the date-time values
@@ -863,12 +855,12 @@ impl From<Time> for Vec<u8> {
 pub struct Timestamp {
     /// The timezone is an optional string indicating the name of a timezone,
     /// one of:
-    /// 
+    ///
     /// * As used in the Olson timezone database (the "tz database" or
     /// "tzdata"), such as "America/New_York".
     /// * An absolute timezone offset of the form "+XX:XX" or "-XX:XX",
     /// such as "+07:30".
-    /// 
+    ///
     /// Whether a timezone string is present indicates different semantics about
     /// the data (see above).
     pub timezone: Option<String>,
@@ -876,7 +868,10 @@ pub struct Timestamp {
 }
 
 impl Timestamp {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsTimestamp<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsTimestamp<'a>> {
         use crate::types::generated::Schema_generated::TimestampBuilder as FbsTimestampBuilder;
 
         let timezone_offset = self.timezone.as_ref().map(|s| builder.create_string(s));
@@ -894,10 +889,7 @@ impl From<FbsTimestamp<'_>> for Timestamp {
     fn from(fbs: FbsTimestamp<'_>) -> Self {
         let timezone = fbs.timezone().map(ToOwned::to_owned);
         let unit = TimeUnit::from(fbs.unit());
-        Self {
-            timezone,
-            unit,
-        }
+        Self { timezone, unit }
     }
 }
 
@@ -924,7 +916,10 @@ pub struct Interval {
 }
 
 impl Interval {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsInterval<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsInterval<'a>> {
         use crate::types::generated::Schema_generated::IntervalBuilder as FbsIntervalBuilder;
 
         let mut bldr = FbsIntervalBuilder::new(builder);
@@ -936,9 +931,7 @@ impl Interval {
 impl From<FbsInterval<'_>> for Interval {
     fn from(fbs: FbsInterval<'_>) -> Self {
         let unit = IntervalUnit::from(fbs.unit());
-        Self {
-            unit,
-        }
+        Self { unit }
     }
 }
 
@@ -960,11 +953,13 @@ impl From<Interval> for Vec<u8> {
 }
 
 #[derive(Default, PartialEq, Debug, Clone)]
-pub struct List {
-}
+pub struct List {}
 
 impl List {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsList<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsList<'a>> {
         use crate::types::generated::Schema_generated::ListBuilder as FbsListBuilder;
 
         let mut bldr = FbsListBuilder::new(builder);
@@ -974,8 +969,7 @@ impl List {
 
 impl From<FbsList<'_>> for List {
     fn from(fbs: FbsList<'_>) -> Self {
-        Self {
-        }
+        Self {}
     }
 }
 
@@ -1000,11 +994,13 @@ impl From<List> for Vec<u8> {
 /// (according to the physical memory layout). We used Struct_ here as
 /// Struct is a reserved word in Flatbuffers
 #[derive(Default, PartialEq, Debug, Clone)]
-pub struct Struct_ {
-}
+pub struct Struct_ {}
 
 impl Struct_ {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsStruct_<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsStruct_<'a>> {
         use crate::types::generated::Schema_generated::Struct_Builder as FbsStruct_Builder;
 
         let mut bldr = FbsStruct_Builder::new(builder);
@@ -1014,8 +1010,7 @@ impl Struct_ {
 
 impl From<FbsStruct_<'_>> for Struct_ {
     fn from(fbs: FbsStruct_<'_>) -> Self {
-        Self {
-        }
+        Self {}
     }
 }
 
@@ -1047,7 +1042,10 @@ pub struct Union {
 }
 
 impl Union {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsUnion<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsUnion<'a>> {
         use crate::types::generated::Schema_generated::UnionBuilder as FbsUnionBuilder;
 
         let typeIds_offset = self.typeIds.as_ref().map(|v| {
@@ -1078,10 +1076,7 @@ impl From<FbsUnion<'_>> for Union {
             None
         };
 
-        Self {
-            mode,
-            typeIds,
-        }
+        Self { mode, typeIds }
     }
 }
 
@@ -1109,7 +1104,10 @@ pub struct FixedSizeBinary {
 }
 
 impl FixedSizeBinary {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsFixedSizeBinary<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsFixedSizeBinary<'a>> {
         use crate::types::generated::Schema_generated::FixedSizeBinaryBuilder as FbsFixedSizeBinaryBuilder;
 
         let mut bldr = FbsFixedSizeBinaryBuilder::new(builder);
@@ -1121,9 +1119,7 @@ impl FixedSizeBinary {
 impl From<FbsFixedSizeBinary<'_>> for FixedSizeBinary {
     fn from(fbs: FbsFixedSizeBinary<'_>) -> Self {
         let byteWidth = fbs.byteWidth();
-        Self {
-            byteWidth,
-        }
+        Self { byteWidth }
     }
 }
 
@@ -1151,7 +1147,10 @@ pub struct FixedSizeList {
 }
 
 impl FixedSizeList {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsFixedSizeList<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsFixedSizeList<'a>> {
         use crate::types::generated::Schema_generated::FixedSizeListBuilder as FbsFixedSizeListBuilder;
 
         let mut bldr = FbsFixedSizeListBuilder::new(builder);
@@ -1163,9 +1162,7 @@ impl FixedSizeList {
 impl From<FbsFixedSizeList<'_>> for FixedSizeList {
     fn from(fbs: FbsFixedSizeList<'_>) -> Self {
         let listSize = fbs.listSize();
-        Self {
-            listSize,
-        }
+        Self { listSize }
     }
 }
 
@@ -1187,19 +1184,19 @@ impl From<FixedSizeList> for Vec<u8> {
 }
 
 /// A Map is a logical nested type that is represented as
-/// 
+///
 /// List<entries: Struct<key: K, value: V>>
-/// 
+///
 /// In this layout, the keys and values are each respectively contiguous. We do
 /// not constrain the key and value types, so the application is responsible
 /// for ensuring that the keys are hashable and unique. Whether the keys are sorted
 /// may be set in the metadata for this field.
-/// 
+///
 /// In a field with Map type, the field has a child Struct field, which then
 /// has two children: key type and the second the value type. The names of the
 /// child fields may be respectively "entries", "key", and "value", but this is
 /// not enforced.
-/// 
+///
 /// Map
 /// ```text
 /// - child[0] entries: Struct
@@ -1207,7 +1204,7 @@ impl From<FixedSizeList> for Vec<u8> {
 /// - child[1] value: V
 /// ```
 /// Neither the "entries" field nor the "key" field may be nullable.
-/// 
+///
 /// The metadata is structured so that Arrow systems without special handling
 /// for Map can make Map an alias for List. The "layout" attribute for the Map
 /// field must have the same contents as a List.
@@ -1218,7 +1215,10 @@ pub struct Map {
 }
 
 impl Map {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsMap<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsMap<'a>> {
         use crate::types::generated::Schema_generated::MapBuilder as FbsMapBuilder;
 
         let mut bldr = FbsMapBuilder::new(builder);
@@ -1230,9 +1230,7 @@ impl Map {
 impl From<FbsMap<'_>> for Map {
     fn from(fbs: FbsMap<'_>) -> Self {
         let keysSorted = fbs.keysSorted();
-        Self {
-            keysSorted,
-        }
+        Self { keysSorted }
     }
 }
 
@@ -1259,7 +1257,10 @@ pub struct Duration {
 }
 
 impl Duration {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDuration<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDuration<'a>> {
         use crate::types::generated::Schema_generated::DurationBuilder as FbsDurationBuilder;
 
         let mut bldr = FbsDurationBuilder::new(builder);
@@ -1271,9 +1272,7 @@ impl Duration {
 impl From<FbsDuration<'_>> for Duration {
     fn from(fbs: FbsDuration<'_>) -> Self {
         let unit = TimeUnit::from(fbs.unit());
-        Self {
-            unit,
-        }
+        Self { unit }
     }
 }
 
@@ -1297,11 +1296,13 @@ impl From<Duration> for Vec<u8> {
 /// Same as Binary, but with 64-bit offsets, allowing to represent
 /// extremely large data values.
 #[derive(Default, PartialEq, Debug, Clone)]
-pub struct LargeBinary {
-}
+pub struct LargeBinary {}
 
 impl LargeBinary {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsLargeBinary<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsLargeBinary<'a>> {
         use crate::types::generated::Schema_generated::LargeBinaryBuilder as FbsLargeBinaryBuilder;
 
         let mut bldr = FbsLargeBinaryBuilder::new(builder);
@@ -1311,8 +1312,7 @@ impl LargeBinary {
 
 impl From<FbsLargeBinary<'_>> for LargeBinary {
     fn from(fbs: FbsLargeBinary<'_>) -> Self {
-        Self {
-        }
+        Self {}
     }
 }
 
@@ -1336,11 +1336,13 @@ impl From<LargeBinary> for Vec<u8> {
 /// Same as Utf8, but with 64-bit offsets, allowing to represent
 /// extremely large data values.
 #[derive(Default, PartialEq, Debug, Clone)]
-pub struct LargeUtf8 {
-}
+pub struct LargeUtf8 {}
 
 impl LargeUtf8 {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsLargeUtf8<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsLargeUtf8<'a>> {
         use crate::types::generated::Schema_generated::LargeUtf8Builder as FbsLargeUtf8Builder;
 
         let mut bldr = FbsLargeUtf8Builder::new(builder);
@@ -1350,8 +1352,7 @@ impl LargeUtf8 {
 
 impl From<FbsLargeUtf8<'_>> for LargeUtf8 {
     fn from(fbs: FbsLargeUtf8<'_>) -> Self {
-        Self {
-        }
+        Self {}
     }
 }
 
@@ -1375,11 +1376,13 @@ impl From<LargeUtf8> for Vec<u8> {
 /// Same as List, but with 64-bit offsets, allowing to represent
 /// extremely large data values.
 #[derive(Default, PartialEq, Debug, Clone)]
-pub struct LargeList {
-}
+pub struct LargeList {}
 
 impl LargeList {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsLargeList<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsLargeList<'a>> {
         use crate::types::generated::Schema_generated::LargeListBuilder as FbsLargeListBuilder;
 
         let mut bldr = FbsLargeListBuilder::new(builder);
@@ -1389,8 +1392,7 @@ impl LargeList {
 
 impl From<FbsLargeList<'_>> for LargeList {
     fn from(fbs: FbsLargeList<'_>) -> Self {
-        Self {
-        }
+        Self {}
     }
 }
 
@@ -1404,6 +1406,220 @@ impl TryFrom<&[u8]> for LargeList {
 
 impl From<LargeList> for Vec<u8> {
     fn from(obj: LargeList) -> Self {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = obj.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+}
+
+/// Contains two child arrays, run_ends and values.
+/// The run_ends child array must be a 16/32/64-bit integer array
+/// which encodes the indices at which the run with the value in
+/// each corresponding index in the values child array ends.
+/// Like list/struct types, the value array can be of any type.
+#[derive(Default, PartialEq, Debug, Clone)]
+pub struct RunEndEncoded {}
+
+impl RunEndEncoded {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsRunEndEncoded<'a>> {
+        use crate::types::generated::Schema_generated::RunEndEncodedBuilder as FbsRunEndEncodedBuilder;
+
+        let mut bldr = FbsRunEndEncodedBuilder::new(builder);
+        bldr.finish()
+    }
+}
+
+impl From<FbsRunEndEncoded<'_>> for RunEndEncoded {
+    fn from(fbs: FbsRunEndEncoded<'_>) -> Self {
+        Self {}
+    }
+}
+
+impl TryFrom<&[u8]> for RunEndEncoded {
+    type Error = flatbuffers::InvalidFlatbuffer;
+    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsRunEndEncoded>(bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+impl From<RunEndEncoded> for Vec<u8> {
+    fn from(obj: RunEndEncoded) -> Self {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = obj.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+}
+
+/// Logically the same as Binary, but the internal representation uses a view
+/// struct that contains the string length and either the string's entire data
+/// inline (for small strings) or an inlined prefix, an index of another buffer,
+/// and an offset pointing to a slice in that buffer (for non-small strings).
+///
+/// Since it uses a variable number of data buffers, each Field with this type
+/// must have a corresponding entry in `variadicBufferCounts`.
+#[derive(Default, PartialEq, Debug, Clone)]
+pub struct BinaryView {}
+
+impl BinaryView {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsBinaryView<'a>> {
+        use crate::types::generated::Schema_generated::BinaryViewBuilder as FbsBinaryViewBuilder;
+
+        let mut bldr = FbsBinaryViewBuilder::new(builder);
+        bldr.finish()
+    }
+}
+
+impl From<FbsBinaryView<'_>> for BinaryView {
+    fn from(fbs: FbsBinaryView<'_>) -> Self {
+        Self {}
+    }
+}
+
+impl TryFrom<&[u8]> for BinaryView {
+    type Error = flatbuffers::InvalidFlatbuffer;
+    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsBinaryView>(bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+impl From<BinaryView> for Vec<u8> {
+    fn from(obj: BinaryView) -> Self {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = obj.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+}
+
+/// Logically the same as Utf8, but the internal representation uses a view
+/// struct that contains the string length and either the string's entire data
+/// inline (for small strings) or an inlined prefix, an index of another buffer,
+/// and an offset pointing to a slice in that buffer (for non-small strings).
+///
+/// Since it uses a variable number of data buffers, each Field with this type
+/// must have a corresponding entry in `variadicBufferCounts`.
+#[derive(Default, PartialEq, Debug, Clone)]
+pub struct Utf8View {}
+
+impl Utf8View {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsUtf8View<'a>> {
+        use crate::types::generated::Schema_generated::Utf8ViewBuilder as FbsUtf8ViewBuilder;
+
+        let mut bldr = FbsUtf8ViewBuilder::new(builder);
+        bldr.finish()
+    }
+}
+
+impl From<FbsUtf8View<'_>> for Utf8View {
+    fn from(fbs: FbsUtf8View<'_>) -> Self {
+        Self {}
+    }
+}
+
+impl TryFrom<&[u8]> for Utf8View {
+    type Error = flatbuffers::InvalidFlatbuffer;
+    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsUtf8View>(bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+impl From<Utf8View> for Vec<u8> {
+    fn from(obj: Utf8View) -> Self {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = obj.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+}
+
+/// Represents the same logical types that List can, but contains offsets and
+/// sizes allowing for writes in any order and sharing of child values among
+/// list values.
+#[derive(Default, PartialEq, Debug, Clone)]
+pub struct ListView {}
+
+impl ListView {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsListView<'a>> {
+        use crate::types::generated::Schema_generated::ListViewBuilder as FbsListViewBuilder;
+
+        let mut bldr = FbsListViewBuilder::new(builder);
+        bldr.finish()
+    }
+}
+
+impl From<FbsListView<'_>> for ListView {
+    fn from(fbs: FbsListView<'_>) -> Self {
+        Self {}
+    }
+}
+
+impl TryFrom<&[u8]> for ListView {
+    type Error = flatbuffers::InvalidFlatbuffer;
+    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsListView>(bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+impl From<ListView> for Vec<u8> {
+    fn from(obj: ListView) -> Self {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = obj.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+}
+
+/// Same as ListView, but with 64-bit offsets and sizes, allowing to represent
+/// extremely large data values.
+#[derive(Default, PartialEq, Debug, Clone)]
+pub struct LargeListView {}
+
+impl LargeListView {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsLargeListView<'a>> {
+        use crate::types::generated::Schema_generated::LargeListViewBuilder as FbsLargeListViewBuilder;
+
+        let mut bldr = FbsLargeListViewBuilder::new(builder);
+        bldr.finish()
+    }
+}
+
+impl From<FbsLargeListView<'_>> for LargeListView {
+    fn from(fbs: FbsLargeListView<'_>) -> Self {
+        Self {}
+    }
+}
+
+impl TryFrom<&[u8]> for LargeListView {
+    type Error = flatbuffers::InvalidFlatbuffer;
+    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsLargeListView>(bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+impl From<LargeListView> for Vec<u8> {
+    fn from(obj: LargeListView) -> Self {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = obj.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
@@ -1437,6 +1653,11 @@ pub enum Type {
     LargeBinary(LargeBinary),
     LargeUtf8(LargeUtf8),
     LargeList(LargeList),
+    RunEndEncoded(RunEndEncoded),
+    BinaryView(BinaryView),
+    Utf8View(Utf8View),
+    ListView(ListView),
+    LargeListView(LargeListView),
 }
 
 impl Default for Type {
@@ -1446,7 +1667,10 @@ impl Default for Type {
 }
 
 impl Type {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsType) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsType) {
         match self {
             Self::Null(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -1553,6 +1777,31 @@ impl Type {
                 let ty = FbsType::LargeList;
                 (offset, ty)
             }
+            Self::RunEndEncoded(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsType::RunEndEncoded;
+                (offset, ty)
+            }
+            Self::BinaryView(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsType::BinaryView;
+                (offset, ty)
+            }
+            Self::Utf8View(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsType::Utf8View;
+                (offset, ty)
+            }
+            Self::ListView(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsType::ListView;
+                (offset, ty)
+            }
+            Self::LargeListView(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsType::LargeListView;
+                (offset, ty)
+            }
         }
     }
 }
@@ -1611,7 +1860,10 @@ pub struct DictionaryEncoding {
 }
 
 impl DictionaryEncoding {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDictionaryEncoding<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDictionaryEncoding<'a>> {
         use crate::types::generated::Schema_generated::DictionaryEncodingBuilder as FbsDictionaryEncodingBuilder;
 
         let indexType_offset = self.indexType.as_ref().map(|o| o.serialize_to(builder));
@@ -1680,7 +1932,10 @@ pub struct Field {
 }
 
 impl Field {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsField<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsField<'a>> {
         use crate::types::generated::Schema_generated::FieldBuilder as FbsFieldBuilder;
 
         let children_offset = self.children.as_ref().map(|v| {
@@ -1758,25 +2013,58 @@ impl From<FbsField<'_>> for Field {
             let type_ = match fbs.type_type() {
                 FbsType::Null => Type::Null(Null::from(fbs.type__as_null().unwrap())),
                 FbsType::Int => Type::Int(Int::from(fbs.type__as_int().unwrap())),
-                FbsType::FloatingPoint => Type::FloatingPoint(FloatingPoint::from(fbs.type__as_floating_point().unwrap())),
+                FbsType::FloatingPoint => {
+                    Type::FloatingPoint(FloatingPoint::from(fbs.type__as_floating_point().unwrap()))
+                }
                 FbsType::Binary => Type::Binary(Binary::from(fbs.type__as_binary().unwrap())),
                 FbsType::Utf8 => Type::Utf8(Utf8::from(fbs.type__as_utf_8().unwrap())),
                 FbsType::Bool => Type::Bool(Bool::from(fbs.type__as_bool().unwrap())),
                 FbsType::Decimal => Type::Decimal(Decimal::from(fbs.type__as_decimal().unwrap())),
                 FbsType::Date => Type::Date(Date::from(fbs.type__as_date().unwrap())),
                 FbsType::Time => Type::Time(Time::from(fbs.type__as_time().unwrap())),
-                FbsType::Timestamp => Type::Timestamp(Timestamp::from(fbs.type__as_timestamp().unwrap())),
-                FbsType::Interval => Type::Interval(Interval::from(fbs.type__as_interval().unwrap())),
+                FbsType::Timestamp => {
+                    Type::Timestamp(Timestamp::from(fbs.type__as_timestamp().unwrap()))
+                }
+                FbsType::Interval => {
+                    Type::Interval(Interval::from(fbs.type__as_interval().unwrap()))
+                }
                 FbsType::List => Type::List(List::from(fbs.type__as_list().unwrap())),
                 FbsType::Struct_ => Type::Struct_(Struct_::from(fbs.type__as_struct_().unwrap())),
                 FbsType::Union => Type::Union(Union::from(fbs.type__as_union().unwrap())),
-                FbsType::FixedSizeBinary => Type::FixedSizeBinary(FixedSizeBinary::from(fbs.type__as_fixed_size_binary().unwrap())),
-                FbsType::FixedSizeList => Type::FixedSizeList(FixedSizeList::from(fbs.type__as_fixed_size_list().unwrap())),
+                FbsType::FixedSizeBinary => Type::FixedSizeBinary(FixedSizeBinary::from(
+                    fbs.type__as_fixed_size_binary().unwrap(),
+                )),
+                FbsType::FixedSizeList => Type::FixedSizeList(FixedSizeList::from(
+                    fbs.type__as_fixed_size_list().unwrap(),
+                )),
                 FbsType::Map => Type::Map(Map::from(fbs.type__as_map().unwrap())),
-                FbsType::Duration => Type::Duration(Duration::from(fbs.type__as_duration().unwrap())),
-                FbsType::LargeBinary => Type::LargeBinary(LargeBinary::from(fbs.type__as_large_binary().unwrap())),
-                FbsType::LargeUtf8 => Type::LargeUtf8(LargeUtf8::from(fbs.type__as_large_utf_8().unwrap())),
-                FbsType::LargeList => Type::LargeList(LargeList::from(fbs.type__as_large_list().unwrap())),
+                FbsType::Duration => {
+                    Type::Duration(Duration::from(fbs.type__as_duration().unwrap()))
+                }
+                FbsType::LargeBinary => {
+                    Type::LargeBinary(LargeBinary::from(fbs.type__as_large_binary().unwrap()))
+                }
+                FbsType::LargeUtf8 => {
+                    Type::LargeUtf8(LargeUtf8::from(fbs.type__as_large_utf_8().unwrap()))
+                }
+                FbsType::LargeList => {
+                    Type::LargeList(LargeList::from(fbs.type__as_large_list().unwrap()))
+                }
+                FbsType::RunEndEncoded => Type::RunEndEncoded(RunEndEncoded::from(
+                    fbs.type__as_run_end_encoded().unwrap(),
+                )),
+                FbsType::BinaryView => {
+                    Type::BinaryView(BinaryView::from(fbs.type__as_binary_view().unwrap()))
+                }
+                FbsType::Utf8View => {
+                    Type::Utf8View(Utf8View::from(fbs.type__as_utf_8_view().unwrap()))
+                }
+                FbsType::ListView => {
+                    Type::ListView(ListView::from(fbs.type__as_list_view().unwrap()))
+                }
+                FbsType::LargeListView => Type::LargeListView(LargeListView::from(
+                    fbs.type__as_large_list_view().unwrap(),
+                )),
                 _ => unreachable!(),
             };
 
@@ -1823,7 +2111,10 @@ pub struct KeyValue {
 }
 
 impl KeyValue {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsKeyValue<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsKeyValue<'a>> {
         use crate::types::generated::Schema_generated::KeyValueBuilder as FbsKeyValueBuilder;
 
         let key_offset = self.key.as_ref().map(|s| builder.create_string(s));
@@ -1844,10 +2135,7 @@ impl From<FbsKeyValue<'_>> for KeyValue {
     fn from(fbs: FbsKeyValue<'_>) -> Self {
         let key = fbs.key().map(ToOwned::to_owned);
         let value = fbs.value().map(ToOwned::to_owned);
-        Self {
-            key,
-            value,
-        }
+        Self { key, value }
     }
 }
 
@@ -1883,7 +2171,10 @@ pub struct Schema {
 }
 
 impl Schema {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsSchema<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsSchema<'a>> {
         use crate::types::generated::Schema_generated::SchemaBuilder as FbsSchemaBuilder;
 
         let custom_metadata_offset = self.custom_metadata.as_ref().map(|v| {
@@ -1896,12 +2187,10 @@ impl Schema {
             custom_metadata_offset
         });
         let features_offset = self.features.as_ref().map(|v| {
-            let features_offset = builder.create_vector_from_iter(v.iter().map(|v| {
-                match v {
-                    Feature::UNUSED => FbsFeature::UNUSED,
-                    Feature::DICTIONARY_REPLACEMENT => FbsFeature::DICTIONARY_REPLACEMENT,
-                    Feature::COMPRESSED_BODY => FbsFeature::COMPRESSED_BODY,
-                }
+            let features_offset = builder.create_vector_from_iter(v.iter().map(|v| match v {
+                Feature::UNUSED => FbsFeature::UNUSED,
+                Feature::DICTIONARY_REPLACEMENT => FbsFeature::DICTIONARY_REPLACEMENT,
+                Feature::COMPRESSED_BODY => FbsFeature::COMPRESSED_BODY,
             }));
             features_offset
         });
@@ -2001,6 +2290,14 @@ mod tests {
         let t0 = Binary::default();
         let buf: Vec<u8> = t0.clone().into();
         let t1 = Binary::try_from(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_binary_view() {
+        let t0 = BinaryView::default();
+        let buf: Vec<u8> = t0.clone().into();
+        let t1 = BinaryView::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
@@ -2117,6 +2414,14 @@ mod tests {
     }
 
     #[test]
+    fn test_large_list_view() {
+        let t0 = LargeListView::default();
+        let buf: Vec<u8> = t0.clone().into();
+        let t1 = LargeListView::try_from(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
     fn test_large_utf_8() {
         let t0 = LargeUtf8::default();
         let buf: Vec<u8> = t0.clone().into();
@@ -2133,6 +2438,14 @@ mod tests {
     }
 
     #[test]
+    fn test_list_view() {
+        let t0 = ListView::default();
+        let buf: Vec<u8> = t0.clone().into();
+        let t1 = ListView::try_from(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
     fn test_map() {
         let t0 = Map::default();
         let buf: Vec<u8> = t0.clone().into();
@@ -2145,6 +2458,14 @@ mod tests {
         let t0 = Null::default();
         let buf: Vec<u8> = t0.clone().into();
         let t1 = Null::try_from(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_run_end_encoded() {
+        let t0 = RunEndEncoded::default();
+        let buf: Vec<u8> = t0.clone().into();
+        let t1 = RunEndEncoded::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
@@ -2196,4 +2517,11 @@ mod tests {
         assert_eq!(t0, t1);
     }
 
+    #[test]
+    fn test_utf_8_view() {
+        let t0 = Utf8View::default();
+        let buf: Vec<u8> = t0.clone().into();
+        let t1 = Utf8View::try_from(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
 }

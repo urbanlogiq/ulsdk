@@ -120,6 +120,10 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TableSourceUnion &
         const std::shared_ptr<Placeholder> &v = std::get<std::shared_ptr<Placeholder>>(o);
         const auto offset = serialize_to(builder, *v);
         return std::make_pair(offset.Union(), ::TableSourceUnion::Placeholder);
+    } else if (std::holds_alternative<std::shared_ptr<Drive>>(o)) {
+        const std::shared_ptr<Drive> &v = std::get<std::shared_ptr<Drive>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::TableSourceUnion::Drive);
     } else { 
         throw std::runtime_error("unreachable");
     }
@@ -158,6 +162,14 @@ ValueIndex::ValueIndex(const ::ValueIndex *root)
     idx_ = root->idx();
 }
 
+bool
+ValueIndex::operator==(const ValueIndex &rhs) const {
+    if (this->idx_ != rhs.idx_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::NullableUint>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NullableUint &o) {
 
@@ -189,6 +201,14 @@ NullableUint::NullableUint(const ::NullableUint *root)
     }
 
     v_ = root->v();
+}
+
+bool
+NullableUint::operator==(const NullableUint &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Column>
@@ -242,6 +262,20 @@ Column::Column(const ::Column *root)
     type_hint_ = root->type_hint();
 }
 
+bool
+Column::operator==(const Column &rhs) const {
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->source_ != rhs.source_) {
+        return false;
+    }
+    if (this->type_hint_ != rhs.type_hint_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Function>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Function &o) {
     std::vector<::flatbuffers::Offset<::Expr>> parameters_offsets = std::vector<::flatbuffers::Offset<::Expr>>();
@@ -291,6 +325,17 @@ Function::Function(const ::Function *root)
     }
 }
 
+bool
+Function::operator==(const Function &rhs) const {
+    if (this->fn_ != rhs.fn_) {
+        return false;
+    }
+    if (this->parameters_ != rhs.parameters_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::AllColumns>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const AllColumns &o) {
     std::optional<::flatbuffers::Offset<::NullableUint>> source_offset = std::nullopt;
@@ -331,6 +376,14 @@ AllColumns::AllColumns(const ::AllColumns *root)
     if (root->source() != nullptr) {
         source_ = decltype(source_)(root->source());
     }
+}
+
+bool
+AllColumns::operator==(const AllColumns &rhs) const {
+    if (this->source_ != rhs.source_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Expr>
@@ -433,6 +486,14 @@ Expr::Expr(const ::Expr *root)
     }
 }
 
+bool
+Expr::operator==(const Expr &rhs) const {
+    if (this->exprs_ != rhs.exprs_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Case>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Case &o) {
     std::optional<::flatbuffers::Offset<::Expr>> else__offset = std::nullopt;
@@ -491,6 +552,17 @@ Case::Case(const ::Case *root)
     }
 }
 
+bool
+Case::operator==(const Case &rhs) const {
+    if (this->else_ != rhs.else_) {
+        return false;
+    }
+    if (this->when_ != rhs.when_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::OrderByExpr>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const OrderByExpr &o) {
     std::vector<::flatbuffers::Offset<::OrderBy>> order_by_offsets = std::vector<::flatbuffers::Offset<::OrderBy>>();
@@ -536,6 +608,14 @@ OrderByExpr::OrderByExpr(const ::OrderByExpr *root)
     }
 }
 
+bool
+OrderByExpr::operator==(const OrderByExpr &rhs) const {
+    if (this->order_by_ != rhs.order_by_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Partition>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Partition &o) {
     const ::flatbuffers::Offset<::Expr> expr_offset = serialize_to(builder, o.expr_);
@@ -572,6 +652,14 @@ Partition::Partition(const ::Partition *root)
     }
 }
 
+bool
+Partition::operator==(const Partition &rhs) const {
+    if (this->expr_ != rhs.expr_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::UnsetArgument>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UnsetArgument &) {
 
@@ -599,6 +687,12 @@ UnsetArgument::UnsetArgument(const ::UnsetArgument *root)  {
         throw std::runtime_error("cannot deserialize flatbuffer type");
     }
 
+}
+
+bool
+UnsetArgument::operator==(const UnsetArgument &rhs) const {
+    (void)rhs;
+    return true;
 }
 
 ::flatbuffers::Offset<::Window>
@@ -687,6 +781,20 @@ Window::Window(const ::Window *root)
     }
 }
 
+bool
+Window::operator==(const Window &rhs) const {
+    if (this->fun_ != rhs.fun_) {
+        return false;
+    }
+    if (this->order_by_ != rhs.order_by_) {
+        return false;
+    }
+    if (this->partition_ != rhs.partition_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::ValueName>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ValueName &o) {
     const ::flatbuffers::Offset<::flatbuffers::String> name_offset = builder.CreateString(o.name_);
@@ -719,6 +827,14 @@ ValueName::ValueName(const ::ValueName *root)
     }
 
         name_ = std::string(*root->name()->begin(), *root->name()->end());
+}
+
+bool
+ValueName::operator==(const ValueName &rhs) const {
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Distinct>
@@ -773,6 +889,14 @@ Distinct::Distinct(const ::Distinct *root)
         }
         on_ = std::make_optional(on__target);
     }
+}
+
+bool
+Distinct::operator==(const Distinct &rhs) const {
+    if (this->on_ != rhs.on_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::UnaryQueryElement>
@@ -950,6 +1074,35 @@ UnaryQueryElement::UnaryQueryElement(const ::UnaryQueryElement *root)
     }
 }
 
+bool
+UnaryQueryElement::operator==(const UnaryQueryElement &rhs) const {
+    if (this->distinct_ != rhs.distinct_) {
+        return false;
+    }
+    if (this->fields_ != rhs.fields_) {
+        return false;
+    }
+    if (this->filter_ != rhs.filter_) {
+        return false;
+    }
+    if (this->group_by_ != rhs.group_by_) {
+        return false;
+    }
+    if (this->joins_ != rhs.joins_) {
+        return false;
+    }
+    if (this->limit_ != rhs.limit_) {
+        return false;
+    }
+    if (this->order_by_ != rhs.order_by_) {
+        return false;
+    }
+    if (this->sources_ != rhs.sources_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::QueryElement>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const QueryElement &o) {
     std::optional<std::pair<::flatbuffers::Offset<void>, ::QueryElementUnion>> q_offset = std::nullopt;
@@ -1021,6 +1174,14 @@ QueryElement::QueryElement(const ::QueryElement *root)
     }
 }
 
+bool
+QueryElement::operator==(const QueryElement &rhs) const {
+    if (this->q_ != rhs.q_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::BinaryQueryElement>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const BinaryQueryElement &o) {
     const ::flatbuffers::Offset<::QueryElement> lhs_offset = serialize_to(builder, o.lhs_);
@@ -1068,6 +1229,20 @@ BinaryQueryElement::BinaryQueryElement(const ::BinaryQueryElement *root)
     }
 }
 
+bool
+BinaryQueryElement::operator==(const BinaryQueryElement &rhs) const {
+    if (this->lhs_ != rhs.lhs_) {
+        return false;
+    }
+    if (this->op_ != rhs.op_) {
+        return false;
+    }
+    if (this->rhs_ != rhs.rhs_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::MvdbPartition>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const MvdbPartition &o) {
     const ::flatbuffers::Offset<::flatbuffers::String> partition_offset = builder.CreateString(o.partition_);
@@ -1102,6 +1277,14 @@ MvdbPartition::MvdbPartition(const ::MvdbPartition *root)
         partition_ = std::string(*root->partition()->begin(), *root->partition()->end());
 }
 
+bool
+MvdbPartition::operator==(const MvdbPartition &rhs) const {
+    if (this->partition_ != rhs.partition_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::WorklogPartition>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const WorklogPartition &o) {
 
@@ -1133,6 +1316,14 @@ WorklogPartition::WorklogPartition(const ::WorklogPartition *root)
     }
 
     idx_ = root->idx();
+}
+
+bool
+WorklogPartition::operator==(const WorklogPartition &rhs) const {
+    if (this->idx_ != rhs.idx_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::DataCatalog>
@@ -1214,6 +1405,20 @@ DataCatalog::DataCatalog(const ::DataCatalog *root)
     }
 }
 
+bool
+DataCatalog::operator==(const DataCatalog &rhs) const {
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->partition_ != rhs.partition_) {
+        return false;
+    }
+    if (this->revision_ != rhs.revision_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Arrow>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Arrow &o) {
     const decltype(builder.CreateVector(o.value_)) value_offset = builder.CreateVector(o.value_);
@@ -1249,6 +1454,14 @@ Arrow::Arrow(const ::Arrow *root)
     if (value_vector != nullptr) {
         std::copy(value_vector->begin(), value_vector->end(), std::back_inserter(value_));
     }
+}
+
+bool
+Arrow::operator==(const Arrow &rhs) const {
+    if (this->value_ != rhs.value_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Query>
@@ -1341,6 +1554,23 @@ Query::Query(const ::Query *root)
     }
 }
 
+bool
+Query::operator==(const Query &rhs) const {
+    if (this->bound_sources_ != rhs.bound_sources_) {
+        return false;
+    }
+    if (this->limit_ != rhs.limit_) {
+        return false;
+    }
+    if (this->query_ != rhs.query_) {
+        return false;
+    }
+    if (this->values_ != rhs.values_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::QueryTableSource>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const QueryTableSource &o) {
     const ::flatbuffers::Offset<::Query> q_offset = serialize_to(builder, o.q_);
@@ -1375,6 +1605,14 @@ QueryTableSource::QueryTableSource(const ::QueryTableSource *root)
     if (root->q() != nullptr) {
         q_ = decltype(q_)(root->q());
     }
+}
+
+bool
+QueryTableSource::operator==(const QueryTableSource &rhs) const {
+    if (this->q_ != rhs.q_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Vector>
@@ -1444,6 +1682,23 @@ Vector::Vector(const ::Vector *root)
         query_ = std::string(*root->query()->begin(), *root->query()->end());
 }
 
+bool
+Vector::operator==(const Vector &rhs) const {
+    if (this->ids_ != rhs.ids_) {
+        return false;
+    }
+    if (this->limit_ != rhs.limit_) {
+        return false;
+    }
+    if (this->max_distance_ != rhs.max_distance_) {
+        return false;
+    }
+    if (this->query_ != rhs.query_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Placeholder>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Placeholder &o) {
 
@@ -1475,6 +1730,80 @@ Placeholder::Placeholder(const ::Placeholder *root)
     }
 
     idx_ = root->idx();
+}
+
+bool
+Placeholder::operator==(const Placeholder &rhs) const {
+    if (this->idx_ != rhs.idx_) {
+        return false;
+    }
+    return true;
+}
+
+::flatbuffers::Offset<::Drive>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Drive &o) {
+    std::optional<::flatbuffers::Offset<::flatbuffers::String>> path_offset = std::nullopt;
+    if (o.path_.has_value()) {
+        const ::flatbuffers::Offset<::flatbuffers::String> path_offset_val = builder.CreateString(o.path_.value());
+        path_offset = std::make_optional(path_offset_val);
+    }
+    std::optional<::flatbuffers::Offset<::ObjectId>> root_offset = std::nullopt;
+    if (o.root_.has_value()) {
+        const ::flatbuffers::Offset<::ObjectId> root_offset_val = serialize_to(builder, o.root_.value());
+        root_offset = std::make_optional(root_offset_val);
+    }
+
+    ::DriveBuilder instance_builder = ::DriveBuilder(builder);
+    if (path_offset.has_value()) {
+        instance_builder.add_path(path_offset.value());
+    }
+    if (root_offset.has_value()) {
+        instance_builder.add_root(root_offset.value());
+    }
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const Drive &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+Drive::Drive()
+    : path_(std::nullopt)
+    , root_(std::nullopt) {
+}
+
+Drive::Drive(const std::vector<uint8_t> &bytes)
+    : Drive(::flatbuffers::GetSizePrefixedRoot<::Drive>(bytes.data())) {
+}
+
+Drive::Drive(const ::Drive *root) 
+    : path_(std::nullopt)
+    , root_(std::nullopt) {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    if (root->path() != nullptr) {
+        path_ = std::string(*root->path()->begin(), *root->path()->end());
+    }
+    if (root->root() != nullptr) {
+        root_ = decltype(root_)(root->root());
+    }
+}
+
+bool
+Drive::operator==(const Drive &rhs) const {
+    if (this->path_ != rhs.path_) {
+        return false;
+    }
+    if (this->root_ != rhs.root_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::UpdateQueryElement>
@@ -1577,9 +1906,29 @@ UpdateQueryElement::UpdateQueryElement(const ::UpdateQueryElement *root)
                 source_ = source__shared;
                 break;
             }
+            case ::TableSourceUnion::Drive: {
+                const auto source__local = static_cast<const ::Drive *>(root->source());
+                std::shared_ptr<Drive> source__shared = std::make_shared<Drive>(source__local);
+                source_ = source__shared;
+                break;
+            }
             default: throw std::runtime_error("unknown union variant");
         }
     }
+}
+
+bool
+UpdateQueryElement::operator==(const UpdateQueryElement &rhs) const {
+    if (this->filter_ != rhs.filter_) {
+        return false;
+    }
+    if (this->sets_ != rhs.sets_) {
+        return false;
+    }
+    if (this->source_ != rhs.source_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::DeleteQueryElement>
@@ -1666,9 +2015,26 @@ DeleteQueryElement::DeleteQueryElement(const ::DeleteQueryElement *root)
                 source_ = source__shared;
                 break;
             }
+            case ::TableSourceUnion::Drive: {
+                const auto source__local = static_cast<const ::Drive *>(root->source());
+                std::shared_ptr<Drive> source__shared = std::make_shared<Drive>(source__local);
+                source_ = source__shared;
+                break;
+            }
             default: throw std::runtime_error("unknown union variant");
         }
     }
+}
+
+bool
+DeleteQueryElement::operator==(const DeleteQueryElement &rhs) const {
+    if (this->filter_ != rhs.filter_) {
+        return false;
+    }
+    if (this->source_ != rhs.source_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Join>
@@ -1738,6 +2104,26 @@ Join::Join(const ::Join *root)
     ty_ = root->ty();
 }
 
+bool
+Join::operator==(const Join &rhs) const {
+    if (this->dest_col_ != rhs.dest_col_) {
+        return false;
+    }
+    if (this->dest_idx_ != rhs.dest_idx_) {
+        return false;
+    }
+    if (this->src_col_ != rhs.src_col_) {
+        return false;
+    }
+    if (this->src_idx_ != rhs.src_idx_) {
+        return false;
+    }
+    if (this->ty_ != rhs.ty_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::SetExpr>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const SetExpr &o) {
     const ::flatbuffers::Offset<::flatbuffers::String> col_offset = builder.CreateString(o.col_);
@@ -1777,6 +2163,17 @@ SetExpr::SetExpr(const ::SetExpr *root)
     if (root->expr() != nullptr) {
         expr_ = decltype(expr_)(root->expr());
     }
+}
+
+bool
+SetExpr::operator==(const SetExpr &rhs) const {
+    if (this->col_ != rhs.col_) {
+        return false;
+    }
+    if (this->expr_ != rhs.expr_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::TableOrderBy>
@@ -1821,6 +2218,20 @@ TableOrderBy::TableOrderBy(const ::TableOrderBy *root)
     }
     source_ = root->source();
     use_source_ = root->use_source();
+}
+
+bool
+TableOrderBy::operator==(const TableOrderBy &rhs) const {
+    if (this->order_by_ != rhs.order_by_) {
+        return false;
+    }
+    if (this->source_ != rhs.source_) {
+        return false;
+    }
+    if (this->use_source_ != rhs.use_source_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::TableSource>
@@ -1982,9 +2393,35 @@ TableSource::TableSource(const ::TableSource *root)
                 t_ = t__shared;
                 break;
             }
+            case ::TableSourceUnion::Drive: {
+                const auto t__local = static_cast<const ::Drive *>(root->t());
+                std::shared_ptr<Drive> t__shared = std::make_shared<Drive>(t__local);
+                t_ = t__shared;
+                break;
+            }
             default: throw std::runtime_error("unknown union variant");
         }
     }
+}
+
+bool
+TableSource::operator==(const TableSource &rhs) const {
+    if (this->fields_ != rhs.fields_) {
+        return false;
+    }
+    if (this->filter_ != rhs.filter_) {
+        return false;
+    }
+    if (this->group_by_ != rhs.group_by_) {
+        return false;
+    }
+    if (this->order_by_ != rhs.order_by_) {
+        return false;
+    }
+    if (this->t_ != rhs.t_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::TableSourceInstance>
@@ -2058,9 +2495,23 @@ TableSourceInstance::TableSourceInstance(const ::TableSourceInstance *root)
                 t_ = t__shared;
                 break;
             }
+            case ::TableSourceUnion::Drive: {
+                const auto t__local = static_cast<const ::Drive *>(root->t());
+                std::shared_ptr<Drive> t__shared = std::make_shared<Drive>(t__local);
+                t_ = t__shared;
+                break;
+            }
             default: throw std::runtime_error("unknown union variant");
         }
     }
+}
+
+bool
+TableSourceInstance::operator==(const TableSourceInstance &rhs) const {
+    if (this->t_ != rhs.t_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::When>
@@ -2104,6 +2555,17 @@ When::When(const ::When *root)
     if (root->value() != nullptr) {
         value_ = decltype(value_)(root->value());
     }
+}
+
+bool
+When::operator==(const When &rhs) const {
+    if (this->cond_ != rhs.cond_) {
+        return false;
+    }
+    if (this->value_ != rhs.value_) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace types

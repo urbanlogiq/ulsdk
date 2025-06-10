@@ -95,6 +95,7 @@ from .generated.DataCatalog import DataCatalog as FbsDataCatalog
 from .generated.DataStateId import DataStateId as FbsDataStateId
 from .generated.DeleteQueryElement import DeleteQueryElement as FbsDeleteQueryElement
 from .generated.Distinct import Distinct as FbsDistinct
+from .generated.Drive import Drive as FbsDrive
 from .generated.EdgeList import EdgeList as FbsEdgeList
 from .generated.EdgeQuery import EdgeQuery as FbsEdgeQuery
 from .generated.Expr import Expr as FbsExpr
@@ -2022,6 +2023,70 @@ class Placeholder:
         return eq
 
 @dataclass
+class Drive:
+    path: Optional["str"]
+
+    root: Optional["ObjectId"]
+
+    @classmethod
+    def from_fbs(cls, o: FbsDrive) -> Self:
+        path = None
+        path_str = o.Path()
+        if path_str is not None:
+            path = path_str.decode('utf-8')
+        root = None
+        root_obj = o.Root()
+        if root_obj is not None:
+            root = ObjectId.from_fbs(root_obj)
+        return cls(path, root)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsDrive.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.Drive import (
+            Start,
+            AddPath,
+            AddRoot,
+            End,
+        )
+        path_offset = None
+        if self.path is not None:
+            path_offset = builder.CreateString(self.path)
+        root_offset = None
+        if self.root is not None:
+            root_offset = self.root.serialize_to(builder)
+
+        Start(builder)
+        if path_offset is not None:
+            AddPath(builder, path_offset)
+        if root_offset is not None:
+            AddRoot(builder, root_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        path = ""
+        root = ObjectId.make_default()
+        return cls(path, root)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.path == other.path
+        eq = eq and self.root == other.root
+
+        return eq
+
+@dataclass
 class TableSourceUnion:
     value: Union[
         "DataCatalog",
@@ -2030,6 +2095,7 @@ class TableSourceUnion:
         "QueryTableSource",
         "Vector",
         "Placeholder",
+        "Drive",
     ]
 
     def serialize_to(self, builder: Builder) -> Tuple[int, int]:
@@ -2047,6 +2113,8 @@ class TableSourceUnion:
             return (offset, TableSourceUnion().Vector)
         elif isinstance(self.value, Placeholder):
             return (offset, TableSourceUnion().Placeholder)
+        elif isinstance(self.value, Drive):
+            return (offset, TableSourceUnion().Drive)
         raise ValueError("Invalid union type")
 
     @classmethod
@@ -2079,6 +2147,10 @@ class TableSourceUnion:
             val = FbsPlaceholder();
             val.Init(source, pos)
             return cls(Placeholder.from_fbs(val))
+        elif ty == TableSourceUnion_ty_instance.Drive:
+            val = FbsDrive();
+            val.Init(source, pos)
+            return cls(Drive.from_fbs(val))
         else:
             raise ValueError("Invalid union type")
 

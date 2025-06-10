@@ -17,6 +17,16 @@ test_binary() {
 TypeTest test_binary_obj(test_binary, "Binary");
 
 bool
+test_binary_view() {
+    ::ul::types::BinaryView t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::BinaryView deserialized = ::ul::types::BinaryView(bytes);
+    return true;
+}
+
+TypeTest test_binary_view_obj(test_binary_view, "BinaryView");
+
+bool
 test_bool() {
     ::ul::types::Bool t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
@@ -157,6 +167,16 @@ test_large_list() {
 TypeTest test_large_list_obj(test_large_list, "LargeList");
 
 bool
+test_large_list_view() {
+    ::ul::types::LargeListView t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::LargeListView deserialized = ::ul::types::LargeListView(bytes);
+    return true;
+}
+
+TypeTest test_large_list_view_obj(test_large_list_view, "LargeListView");
+
+bool
 test_large_utf_8() {
     ::ul::types::LargeUtf8 t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
@@ -177,6 +197,16 @@ test_list() {
 TypeTest test_list_obj(test_list, "List");
 
 bool
+test_list_view() {
+    ::ul::types::ListView t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::ListView deserialized = ::ul::types::ListView(bytes);
+    return true;
+}
+
+TypeTest test_list_view_obj(test_list_view, "ListView");
+
+bool
 test_map() {
     ::ul::types::Map t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
@@ -195,6 +225,16 @@ test_null() {
 }
 
 TypeTest test_null_obj(test_null, "Null");
+
+bool
+test_run_end_encoded() {
+    ::ul::types::RunEndEncoded t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::RunEndEncoded deserialized = ::ul::types::RunEndEncoded(bytes);
+    return true;
+}
+
+TypeTest test_run_end_encoded_obj(test_run_end_encoded, "RunEndEncoded");
 
 bool
 test_schema() {
@@ -255,3 +295,13 @@ test_utf_8() {
 }
 
 TypeTest test_utf_8_obj(test_utf_8, "Utf8");
+
+bool
+test_utf_8_view() {
+    ::ul::types::Utf8View t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::Utf8View deserialized = ::ul::types::Utf8View(bytes);
+    return true;
+}
+
+TypeTest test_utf_8_view_obj(test_utf_8_view, "Utf8View");

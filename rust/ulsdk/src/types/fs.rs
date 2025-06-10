@@ -10,337 +10,124 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
-use flatbuffers::{WIPOffset, UnionWIPOffset};
 use bitflags::bitflags;
 use core::ops::Deref;
+use flatbuffers::{UnionWIPOffset, WIPOffset};
 
 use crate::types::Schema::{
-    Binary,
-    Bool,
-    Buffer,
-    Date,
-    DateUnit,
-    Decimal,
-    DictionaryEncoding,
-    DictionaryKind,
-    Duration,
-    Endianness,
-    Feature,
-    Field,
-    FixedSizeBinary,
-    FixedSizeList,
-    FloatingPoint,
-    Int,
-    Interval,
-    IntervalUnit,
-    KeyValue,
-    LargeBinary,
-    LargeList,
-    LargeUtf8,
-    List,
-    Map,
-    MetadataVersion,
-    Null,
-    Precision,
-    Schema,
-    Struct_,
-    Time,
-    TimeUnit,
-    Timestamp,
-    Type,
-    Union,
-    UnionMode,
-    Utf8,
+    Binary, BinaryView, Bool, Buffer, Date, DateUnit, Decimal, DictionaryEncoding, DictionaryKind,
+    Duration, Endianness, Feature, Field, FixedSizeBinary, FixedSizeList, FloatingPoint, Int,
+    Interval, IntervalUnit, KeyValue, LargeBinary, LargeList, LargeListView, LargeUtf8, List,
+    ListView, Map, MetadataVersion, Null, Precision, RunEndEncoded, Schema, Struct_, Time,
+    TimeUnit, Timestamp, Type, Union, UnionMode, Utf8, Utf8View,
 };
 use crate::types::attr::Attr;
-use crate::types::crypto::{
-    CryptHeader,
-    Digest,
-    EncryptedObject,
-    Sha256,
-    Signature,
-};
+use crate::types::crypto::{CryptHeader, Digest, EncryptedObject, Sha256, Signature};
 use crate::types::data::{
-    AttributePair,
-    DayOfWeek,
-    DirectionAndRoadName,
-    DirectionAndRoadNames,
-    DirectionTy,
-    NamedParameter,
-    NamedParameterFlags,
-    RoadUserTy,
-    Source,
-    StatisticTy,
-    TimeGranularity,
-    TurnTy,
-};
-use crate::types::id::{
-    B2cId,
-    ColumnGroupId,
-    ContentId,
-    DataStateId,
-    GenericId,
-    GraphNodeId,
-    ObjectId,
-    ObjectNamespace,
-    StreamId,
-};
-use crate::types::job::{
-    DeprecatedRunSpec,
-    DeprecatedTaskParameter,
-    Edge,
-    EmbeddedTable,
-    Job,
-    Node,
-    ParamIndices,
-    RunSpec,
-    Schematic,
-    Status,
-    Task,
-    TaskErrorTy,
-    TaskList,
-    TaskParameter,
-    TaskParameterValue,
-    TaskPriority,
-    TaskRunFlags,
-};
-use crate::types::object::{
-    DataCatalogObject,
-    DataCatalogObjectFlags,
-    DataCatalogObjectTy,
-    ObjectIdList,
-    ObjectIdPair,
-    ObjectIdPairList,
-    ObjectSummary,
-    ObjectSummaryList,
-};
-use crate::types::stream::{
-    AxisType,
-    FormatFlags,
-    Stream,
-    StreamFlags,
-};
-use crate::types::value::{
-    Point2D,
-    Tri2D,
-    VArray,
-    VBool,
-    VBytes,
-    VChar,
-    VF32,
-    VF64,
-    VFixedSizeBytes,
-    VI16,
-    VI32,
-    VI64,
-    VI8,
-    VIsize,
-    VNull,
-    VPlaceholder,
-    VStr,
-    VTimestampMs,
-    VTimestampMsUtc,
-    VTimestampNs,
-    VTimestampNsUtc,
-    VTri2D,
-    VU16,
-    VU32,
-    VU64,
-    VU8,
-    VUnit,
-    VUsize,
-    Value,
-    ValueInstance,
-    ValueTy,
-};
-use crate::types::worklog::{
-    AggregationTy,
-    ByteArray,
-    ChartTypeTy,
-    Layout,
-    ParameterFlags,
-    ParameterValue,
-    TileData,
-    TileSettings,
-    UserSettings,
-    ValuesFormatTy,
-    WorkLog,
-    WorklogParameter,
+    AttributePair, BinaryYesNo, DayOfWeek, DirectionAndRoadName, DirectionAndRoadNames,
+    DirectionTy, NamedParameter, NamedParameterFlags, RoadUserTy, Source, StatisticTy,
+    TimeGranularity, TurnTy,
 };
 use crate::types::generated::Schema_generated::{
-    Binary as FbsBinary,
-    Bool as FbsBool,
-    Buffer as FbsBuffer,
-    Date as FbsDate,
-    Decimal as FbsDecimal,
-    DictionaryEncoding as FbsDictionaryEncoding,
-    Duration as FbsDuration,
-    Field as FbsField,
-    FixedSizeBinary as FbsFixedSizeBinary,
-    FixedSizeList as FbsFixedSizeList,
-    FloatingPoint as FbsFloatingPoint,
-    Int as FbsInt,
-    Interval as FbsInterval,
-    KeyValue as FbsKeyValue,
-    LargeBinary as FbsLargeBinary,
-    LargeList as FbsLargeList,
-    LargeUtf8 as FbsLargeUtf8,
-    List as FbsList,
-    Map as FbsMap,
-    Null as FbsNull,
-    Schema as FbsSchema,
-    Struct_ as FbsStruct_,
-    Time as FbsTime,
-    Timestamp as FbsTimestamp,
-    Union as FbsUnion,
-    Utf8 as FbsUtf8,
-    DateUnit as FbsDateUnit,
-    DictionaryKind as FbsDictionaryKind,
-    Endianness as FbsEndianness,
-    Feature as FbsFeature,
-    IntervalUnit as FbsIntervalUnit,
-    MetadataVersion as FbsMetadataVersion,
-    Precision as FbsPrecision,
-    TimeUnit as FbsTimeUnit,
-    Type as FbsType,
-    UnionMode as FbsUnionMode,
+    Binary as FbsBinary, BinaryView as FbsBinaryView, Bool as FbsBool, Buffer as FbsBuffer,
+    Date as FbsDate, DateUnit as FbsDateUnit, Decimal as FbsDecimal,
+    DictionaryEncoding as FbsDictionaryEncoding, DictionaryKind as FbsDictionaryKind,
+    Duration as FbsDuration, Endianness as FbsEndianness, Feature as FbsFeature, Field as FbsField,
+    FixedSizeBinary as FbsFixedSizeBinary, FixedSizeList as FbsFixedSizeList,
+    FloatingPoint as FbsFloatingPoint, Int as FbsInt, Interval as FbsInterval,
+    IntervalUnit as FbsIntervalUnit, KeyValue as FbsKeyValue, LargeBinary as FbsLargeBinary,
+    LargeList as FbsLargeList, LargeListView as FbsLargeListView, LargeUtf8 as FbsLargeUtf8,
+    List as FbsList, ListView as FbsListView, Map as FbsMap, MetadataVersion as FbsMetadataVersion,
+    Null as FbsNull, Precision as FbsPrecision, RunEndEncoded as FbsRunEndEncoded,
+    Schema as FbsSchema, Struct_ as FbsStruct_, Time as FbsTime, TimeUnit as FbsTimeUnit,
+    Timestamp as FbsTimestamp, Type as FbsType, Union as FbsUnion, UnionMode as FbsUnionMode,
+    Utf8 as FbsUtf8, Utf8View as FbsUtf8View,
 };
-use crate::types::generated::attr_generated::{
-    Attr as FbsAttr,
-};
+use crate::types::generated::attr_generated::Attr as FbsAttr;
 use crate::types::generated::crypto_generated::{
-    CryptHeader as FbsCryptHeader,
-    EncryptedObject as FbsEncryptedObject,
-    Sha256 as FbsSha256,
-    Signature as FbsSignature,
-    Digest as FbsDigest,
+    CryptHeader as FbsCryptHeader, Digest as FbsDigest, EncryptedObject as FbsEncryptedObject,
+    Sha256 as FbsSha256, Signature as FbsSignature,
 };
 use crate::types::generated::data_generated::{
-    AttributePair as FbsAttributePair,
+    AttributePair as FbsAttributePair, BinaryYesNo as FbsBinaryYesNo, DayOfWeek as FbsDayOfWeek,
     DirectionAndRoadName as FbsDirectionAndRoadName,
-    DirectionAndRoadNames as FbsDirectionAndRoadNames,
-    NamedParameter as FbsNamedParameter,
-    Source as FbsSource,
-    DayOfWeek as FbsDayOfWeek,
-    DirectionTy as FbsDirectionTy,
-    NamedParameterFlags as FbsNamedParameterFlags,
-    RoadUserTy as FbsRoadUserTy,
-    StatisticTy as FbsStatisticTy,
-    TimeGranularity as FbsTimeGranularity,
-    TurnTy as FbsTurnTy,
+    DirectionAndRoadNames as FbsDirectionAndRoadNames, DirectionTy as FbsDirectionTy,
+    NamedParameter as FbsNamedParameter, NamedParameterFlags as FbsNamedParameterFlags,
+    RoadUserTy as FbsRoadUserTy, Source as FbsSource, StatisticTy as FbsStatisticTy,
+    TimeGranularity as FbsTimeGranularity, TurnTy as FbsTurnTy,
 };
 use crate::types::generated::fs_generated::{
-    Chunk as FbsChunk,
-    Directory as FbsDirectory,
-    DirectoryEntry as FbsDirectoryEntry,
-    DirectoryList as FbsDirectoryList,
-    File as FbsFile,
-    ListDirectory as FbsListDirectory,
-    ListFile as FbsListFile,
-    ListObject as FbsListObject,
-    ListSlot as FbsListSlot,
-    MoveRequest as FbsMoveRequest,
-    NewLink as FbsNewLink,
-    ObjectRef as FbsObjectRef,
-    Slot as FbsSlot,
-    TopLevelDirectory as FbsTopLevelDirectory,
-    Entry as FbsEntry,
-    EntryTy as FbsEntryTy,
-    ListEntry as FbsListEntry,
-    StorageTier as FbsStorageTier,
+    Chunk as FbsChunk, Directory as FbsDirectory, DirectoryEntry as FbsDirectoryEntry,
+    DirectoryList as FbsDirectoryList, Entry as FbsEntry, EntryTy as FbsEntryTy, File as FbsFile,
+    ListDirectory as FbsListDirectory, ListEntry as FbsListEntry, ListFile as FbsListFile,
+    ListObject as FbsListObject, ListSlot as FbsListSlot, MoveRequest as FbsMoveRequest,
+    NewLink as FbsNewLink, ObjectRef as FbsObjectRef, Slot as FbsSlot,
+    StorageTier as FbsStorageTier, TopLevelDirectory as FbsTopLevelDirectory,
 };
 use crate::types::generated::id_generated::{
-    B2cId as FbsB2cId,
-    ColumnGroupId as FbsColumnGroupId,
-    ContentId as FbsContentId,
-    DataStateId as FbsDataStateId,
-    GenericId as FbsGenericId,
-    GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId,
-    StreamId as FbsStreamId,
-    ObjectNamespace as FbsObjectNamespace,
+    B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
+    DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
 };
 use crate::types::generated::job_generated::{
     DeprecatedRunSpec as FbsDeprecatedRunSpec,
-    DeprecatedTaskParameter as FbsDeprecatedTaskParameter,
-    Edge as FbsEdge,
-    EmbeddedTable as FbsEmbeddedTable,
-    Job as FbsJob,
-    Node as FbsNode,
-    ParamIndices as FbsParamIndices,
-    RunSpec as FbsRunSpec,
-    Schematic as FbsSchematic,
-    Task as FbsTask,
-    TaskList as FbsTaskList,
-    TaskParameter as FbsTaskParameter,
-    Status as FbsStatus,
-    TaskErrorTy as FbsTaskErrorTy,
-    TaskParameterValue as FbsTaskParameterValue,
-    TaskPriority as FbsTaskPriority,
-    TaskRunFlags as FbsTaskRunFlags,
+    DeprecatedTaskParameter as FbsDeprecatedTaskParameter, Edge as FbsEdge,
+    EmbeddedTable as FbsEmbeddedTable, Job as FbsJob, Node as FbsNode,
+    ParamIndices as FbsParamIndices, RunSpec as FbsRunSpec, Schematic as FbsSchematic,
+    Status as FbsStatus, Task as FbsTask, TaskErrorTy as FbsTaskErrorTy, TaskList as FbsTaskList,
+    TaskParameter as FbsTaskParameter, TaskParameterValue as FbsTaskParameterValue,
+    TaskPriority as FbsTaskPriority, TaskRunFlags as FbsTaskRunFlags,
 };
 use crate::types::generated::object_generated::{
-    DataCatalogObject as FbsDataCatalogObject,
-    ObjectIdList as FbsObjectIdList,
-    ObjectIdPair as FbsObjectIdPair,
-    ObjectIdPairList as FbsObjectIdPairList,
-    ObjectSummary as FbsObjectSummary,
-    ObjectSummaryList as FbsObjectSummaryList,
-    DataCatalogObjectFlags as FbsDataCatalogObjectFlags,
-    DataCatalogObjectTy as FbsDataCatalogObjectTy,
+    DataCatalogObject as FbsDataCatalogObject, DataCatalogObjectFlags as FbsDataCatalogObjectFlags,
+    DataCatalogObjectTy as FbsDataCatalogObjectTy, ObjectIdList as FbsObjectIdList,
+    ObjectIdPair as FbsObjectIdPair, ObjectIdPairList as FbsObjectIdPairList,
+    ObjectSummary as FbsObjectSummary, ObjectSummaryList as FbsObjectSummaryList,
 };
 use crate::types::generated::stream_generated::{
-    Stream as FbsStream,
-    AxisType as FbsAxisType,
-    FormatFlags as FbsFormatFlags,
+    AxisType as FbsAxisType, FormatFlags as FbsFormatFlags, Stream as FbsStream,
     StreamFlags as FbsStreamFlags,
 };
 use crate::types::generated::value_generated::{
-    Point2D as FbsPoint2D,
-    Tri2D as FbsTri2D,
-    VArray as FbsVArray,
-    VBool as FbsVBool,
-    VBytes as FbsVBytes,
-    VChar as FbsVChar,
-    VF32 as FbsVF32,
-    VF64 as FbsVF64,
-    VFixedSizeBytes as FbsVFixedSizeBytes,
-    VI16 as FbsVI16,
-    VI32 as FbsVI32,
-    VI64 as FbsVI64,
-    VI8 as FbsVI8,
-    VIsize as FbsVIsize,
-    VNull as FbsVNull,
-    VPlaceholder as FbsVPlaceholder,
-    VStr as FbsVStr,
-    VTimestampMs as FbsVTimestampMs,
-    VTimestampMsUtc as FbsVTimestampMsUtc,
-    VTimestampNs as FbsVTimestampNs,
-    VTimestampNsUtc as FbsVTimestampNsUtc,
-    VTri2D as FbsVTri2D,
-    VU16 as FbsVU16,
-    VU32 as FbsVU32,
-    VU64 as FbsVU64,
-    VU8 as FbsVU8,
-    VUnit as FbsVUnit,
-    VUsize as FbsVUsize,
-    ValueInstance as FbsValueInstance,
-    Value as FbsValue,
+    Point2D as FbsPoint2D, Tri2D as FbsTri2D, VArray as FbsVArray, VBool as FbsVBool,
+    VBytes as FbsVBytes, VChar as FbsVChar, VF32 as FbsVF32, VF64 as FbsVF64,
+    VFixedSizeBytes as FbsVFixedSizeBytes, VI8 as FbsVI8, VI16 as FbsVI16, VI32 as FbsVI32,
+    VI64 as FbsVI64, VIsize as FbsVIsize, VNull as FbsVNull, VPlaceholder as FbsVPlaceholder,
+    VStr as FbsVStr, VTimestampMs as FbsVTimestampMs, VTimestampMsUtc as FbsVTimestampMsUtc,
+    VTimestampNs as FbsVTimestampNs, VTimestampNsUtc as FbsVTimestampNsUtc, VTri2D as FbsVTri2D,
+    VU8 as FbsVU8, VU16 as FbsVU16, VU32 as FbsVU32, VU64 as FbsVU64, VUnit as FbsVUnit,
+    VUsize as FbsVUsize, Value as FbsValue, ValueInstance as FbsValueInstance,
     ValueTy as FbsValueTy,
 };
 use crate::types::generated::worklog_generated::{
-    ByteArray as FbsByteArray,
-    Layout as FbsLayout,
-    ParameterFlags as FbsParameterFlags,
-    TileData as FbsTileData,
-    TileSettings as FbsTileSettings,
-    UserSettings as FbsUserSettings,
-    WorkLog as FbsWorkLog,
+    AggregationTy as FbsAggregationTy, ByteArray as FbsByteArray, ChartTypeTy as FbsChartTypeTy,
+    Layout as FbsLayout, ParameterFlags as FbsParameterFlags, ParameterValue as FbsParameterValue,
+    TileData as FbsTileData, TileSettings as FbsTileSettings, UserSettings as FbsUserSettings,
+    ValuesFormatTy as FbsValuesFormatTy, WorkLog as FbsWorkLog,
     WorklogParameter as FbsWorklogParameter,
-    AggregationTy as FbsAggregationTy,
-    ChartTypeTy as FbsChartTypeTy,
-    ParameterValue as FbsParameterValue,
-    ValuesFormatTy as FbsValuesFormatTy,
+};
+use crate::types::id::{
+    B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
+    ObjectNamespace, StreamId,
+};
+use crate::types::job::{
+    DeprecatedRunSpec, DeprecatedTaskParameter, Edge, EmbeddedTable, Job, Node, ParamIndices,
+    RunSpec, Schematic, Status, Task, TaskErrorTy, TaskList, TaskParameter, TaskParameterValue,
+    TaskPriority, TaskRunFlags,
+};
+use crate::types::object::{
+    DataCatalogObject, DataCatalogObjectFlags, DataCatalogObjectTy, ObjectIdList, ObjectIdPair,
+    ObjectIdPairList, ObjectSummary, ObjectSummaryList,
+};
+use crate::types::stream::{AxisType, FormatFlags, Stream, StreamFlags};
+use crate::types::value::{
+    Point2D, Tri2D, VArray, VBool, VBytes, VChar, VF32, VF64, VFixedSizeBytes, VI8, VI16, VI32,
+    VI64, VIsize, VNull, VPlaceholder, VStr, VTimestampMs, VTimestampMsUtc, VTimestampNs,
+    VTimestampNsUtc, VTri2D, VU8, VU16, VU32, VU64, VUnit, VUsize, Value, ValueInstance, ValueTy,
+};
+use crate::types::worklog::{
+    AggregationTy, ByteArray, ChartTypeTy, Layout, ParameterFlags, ParameterValue, TileData,
+    TileSettings, UserSettings, ValuesFormatTy, WorkLog, WorklogParameter,
 };
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -370,7 +157,7 @@ impl From<FbsEntryTy> for EntryTy {
             1 => Self::Directory,
             2 => Self::Object,
             3 => Self::TopLevelDirectory,
-            _ => panic!("Invalid value {} when constructing EntryTy", fbs.0)
+            _ => panic!("Invalid value {} when constructing EntryTy", fbs.0),
         }
     }
 }
@@ -402,7 +189,7 @@ impl From<FbsStorageTier> for StorageTier {
             -1 => Self::Cool,
             0 => Self::Hot,
             1 => Self::Blazing,
-            _ => panic!("Invalid value {} when constructing StorageTier", fbs.0)
+            _ => panic!("Invalid value {} when constructing StorageTier", fbs.0),
         }
     }
 }
@@ -421,7 +208,10 @@ pub struct File {
 }
 
 impl File {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsFile<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsFile<'a>> {
         use crate::types::generated::fs_generated::FileBuilder as FbsFileBuilder;
 
         let account_offset = builder.create_string(&self.account);
@@ -535,7 +325,10 @@ pub struct Directory {
 }
 
 impl Directory {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDirectory<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDirectory<'a>> {
         use crate::types::generated::fs_generated::DirectoryBuilder as FbsDirectoryBuilder;
 
         let notifications_offset = self.notifications.as_ref().map(|v| {
@@ -612,7 +405,10 @@ pub struct ObjectRef {
 }
 
 impl ObjectRef {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsObjectRef<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsObjectRef<'a>> {
         use crate::types::generated::fs_generated::ObjectRefBuilder as FbsObjectRefBuilder;
 
         let id_offset = self.id.serialize_to(builder);
@@ -628,10 +424,7 @@ impl From<FbsObjectRef<'_>> for ObjectRef {
     fn from(fbs: FbsObjectRef<'_>) -> Self {
         let id = ObjectId::from(fbs.id());
         let ty = DataCatalogObjectTy::from(fbs.ty());
-        Self {
-            id,
-            ty,
-        }
+        Self { id, ty }
     }
 }
 
@@ -666,7 +459,10 @@ impl Default for Entry {
 }
 
 impl Entry {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsEntry) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsEntry) {
         match self {
             Self::File(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -695,7 +491,10 @@ pub struct ListFile {
 }
 
 impl ListFile {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsListFile<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsListFile<'a>> {
         use crate::types::generated::fs_generated::ListFileBuilder as FbsListFileBuilder;
 
         let mime_offset = builder.create_string(&self.mime);
@@ -716,11 +515,7 @@ impl From<FbsListFile<'_>> for ListFile {
         let mime = fbs.mime().to_owned();
         let size_ = fbs.size_();
         let virus = fbs.virus().map(ToOwned::to_owned);
-        Self {
-            mime,
-            size_,
-            virus,
-        }
+        Self { mime, size_, virus }
     }
 }
 
@@ -742,11 +537,13 @@ impl From<ListFile> for Vec<u8> {
 }
 
 #[derive(Default, PartialEq, Debug, Clone)]
-pub struct ListDirectory {
-}
+pub struct ListDirectory {}
 
 impl ListDirectory {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsListDirectory<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsListDirectory<'a>> {
         use crate::types::generated::fs_generated::ListDirectoryBuilder as FbsListDirectoryBuilder;
 
         let mut bldr = FbsListDirectoryBuilder::new(builder);
@@ -756,8 +553,7 @@ impl ListDirectory {
 
 impl From<FbsListDirectory<'_>> for ListDirectory {
     fn from(fbs: FbsListDirectory<'_>) -> Self {
-        Self {
-        }
+        Self {}
     }
 }
 
@@ -786,7 +582,10 @@ pub struct ListObject {
 }
 
 impl ListObject {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsListObject<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsListObject<'a>> {
         use crate::types::generated::fs_generated::ListObjectBuilder as FbsListObjectBuilder;
 
         let id_offset = self.id.serialize_to(builder);
@@ -804,11 +603,7 @@ impl From<FbsListObject<'_>> for ListObject {
         let id = ObjectId::from(fbs.id());
         let size_ = fbs.size_();
         let ty = DataCatalogObjectTy::from(fbs.ty());
-        Self {
-            id,
-            size_,
-            ty,
-        }
+        Self { id, size_, ty }
     }
 }
 
@@ -835,7 +630,10 @@ pub struct TopLevelDirectory {
 }
 
 impl TopLevelDirectory {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsTopLevelDirectory<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsTopLevelDirectory<'a>> {
         use crate::types::generated::fs_generated::TopLevelDirectoryBuilder as FbsTopLevelDirectoryBuilder;
 
         let b2c_entity_offset = self.b2c_entity.serialize_to(builder);
@@ -849,9 +647,7 @@ impl TopLevelDirectory {
 impl From<FbsTopLevelDirectory<'_>> for TopLevelDirectory {
     fn from(fbs: FbsTopLevelDirectory<'_>) -> Self {
         let b2c_entity = B2cId::from(fbs.b2c_entity());
-        Self {
-            b2c_entity,
-        }
+        Self { b2c_entity }
     }
 }
 
@@ -887,7 +683,10 @@ impl Default for ListEntry {
 }
 
 impl ListEntry {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsListEntry) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsListEntry) {
         match self {
             Self::ListFile(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -921,7 +720,10 @@ pub struct Chunk {
 }
 
 impl Chunk {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsChunk<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsChunk<'a>> {
         use crate::types::generated::fs_generated::ChunkBuilder as FbsChunkBuilder;
 
         let blob_offset = self.blob.serialize_to(builder);
@@ -977,7 +779,10 @@ pub struct DirectoryEntry {
 }
 
 impl DirectoryEntry {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDirectoryEntry<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDirectoryEntry<'a>> {
         use crate::types::generated::fs_generated::DirectoryEntryBuilder as FbsDirectoryEntryBuilder;
 
         let (entry_offset, entry_ty) = self.entry.serialize_to(builder);
@@ -995,16 +800,17 @@ impl From<FbsDirectoryEntry<'_>> for DirectoryEntry {
     fn from(fbs: FbsDirectoryEntry<'_>) -> Self {
         let entry = match fbs.entry_type() {
             FbsEntry::File => Entry::File(File::from(fbs.entry_as_file().unwrap())),
-            FbsEntry::Directory => Entry::Directory(Directory::from(fbs.entry_as_directory().unwrap())),
-            FbsEntry::ObjectRef => Entry::ObjectRef(ObjectRef::from(fbs.entry_as_object_ref().unwrap())),
+            FbsEntry::Directory => {
+                Entry::Directory(Directory::from(fbs.entry_as_directory().unwrap()))
+            }
+            FbsEntry::ObjectRef => {
+                Entry::ObjectRef(ObjectRef::from(fbs.entry_as_object_ref().unwrap()))
+            }
             _ => unreachable!(),
         };
 
         let parent = ObjectId::from(fbs.parent());
-        Self {
-            entry,
-            parent,
-        }
+        Self { entry, parent }
     }
 }
 
@@ -1031,7 +837,10 @@ pub struct DirectoryList {
 }
 
 impl DirectoryList {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDirectoryList<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDirectoryList<'a>> {
         use crate::types::generated::fs_generated::DirectoryListBuilder as FbsDirectoryListBuilder;
 
         let mut slots_offsets = Vec::with_capacity(self.slots.len());
@@ -1054,9 +863,7 @@ impl From<FbsDirectoryList<'_>> for DirectoryList {
             slots.push(elem.into());
         }
 
-        Self {
-            slots,
-        }
+        Self { slots }
     }
 }
 
@@ -1090,7 +897,10 @@ pub struct ListSlot {
 }
 
 impl ListSlot {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsListSlot<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsListSlot<'a>> {
         use crate::types::generated::fs_generated::ListSlotBuilder as FbsListSlotBuilder;
 
         let attributes_offset = self.attributes.as_ref().map(|v| {
@@ -1104,7 +914,10 @@ impl ListSlot {
         });
         let (entry_offset, entry_ty) = self.entry.serialize_to(builder);
         let id_offset = self.id.serialize_to(builder);
-        let last_modified_by_offset = self.last_modified_by.as_ref().map(|o| o.serialize_to(builder));
+        let last_modified_by_offset = self
+            .last_modified_by
+            .as_ref()
+            .map(|o| o.serialize_to(builder));
         let name_offset = builder.create_string(&self.name);
 
         let mut bldr = FbsListSlotBuilder::new(builder);
@@ -1139,10 +952,18 @@ impl From<FbsListSlot<'_>> for ListSlot {
         };
 
         let entry = match fbs.entry_type() {
-            FbsListEntry::ListFile => ListEntry::ListFile(ListFile::from(fbs.entry_as_list_file().unwrap())),
-            FbsListEntry::ListDirectory => ListEntry::ListDirectory(ListDirectory::from(fbs.entry_as_list_directory().unwrap())),
-            FbsListEntry::ListObject => ListEntry::ListObject(ListObject::from(fbs.entry_as_list_object().unwrap())),
-            FbsListEntry::TopLevelDirectory => ListEntry::TopLevelDirectory(TopLevelDirectory::from(fbs.entry_as_top_level_directory().unwrap())),
+            FbsListEntry::ListFile => {
+                ListEntry::ListFile(ListFile::from(fbs.entry_as_list_file().unwrap()))
+            }
+            FbsListEntry::ListDirectory => ListEntry::ListDirectory(ListDirectory::from(
+                fbs.entry_as_list_directory().unwrap(),
+            )),
+            FbsListEntry::ListObject => {
+                ListEntry::ListObject(ListObject::from(fbs.entry_as_list_object().unwrap()))
+            }
+            FbsListEntry::TopLevelDirectory => ListEntry::TopLevelDirectory(
+                TopLevelDirectory::from(fbs.entry_as_top_level_directory().unwrap()),
+            ),
             _ => unreachable!(),
         };
 
@@ -1191,7 +1012,10 @@ pub struct MoveRequest {
 }
 
 impl MoveRequest {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsMoveRequest<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsMoveRequest<'a>> {
         use crate::types::generated::fs_generated::MoveRequestBuilder as FbsMoveRequestBuilder;
 
         let dest_name_offset = self.dest_name.as_ref().map(|s| builder.create_string(s));
@@ -1251,7 +1075,10 @@ pub struct NewLink {
 }
 
 impl NewLink {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsNewLink<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNewLink<'a>> {
         use crate::types::generated::fs_generated::NewLinkBuilder as FbsNewLinkBuilder;
 
         let name_offset = builder.create_string(&self.name);
@@ -1268,10 +1095,7 @@ impl From<FbsNewLink<'_>> for NewLink {
     fn from(fbs: FbsNewLink<'_>) -> Self {
         let name = fbs.name().to_owned();
         let obj = ObjectId::from(fbs.obj());
-        Self {
-            name,
-            obj,
-        }
+        Self { name, obj }
     }
 }
 
@@ -1301,7 +1125,10 @@ pub struct Slot {
 }
 
 impl Slot {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsSlot<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsSlot<'a>> {
         use crate::types::generated::fs_generated::SlotBuilder as FbsSlotBuilder;
 
         let attributes_offset = self.attributes.as_ref().map(|v| {
@@ -1484,5 +1311,4 @@ mod tests {
         let t1 = TopLevelDirectory::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
-
 }

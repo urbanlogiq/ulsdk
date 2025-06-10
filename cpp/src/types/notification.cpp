@@ -102,6 +102,26 @@ Share::Share(const ::Share *root)
     old_perms_ = root->old_perms();
 }
 
+bool
+Share::operator==(const Share &rhs) const {
+    if (this->dest_ != rhs.dest_) {
+        return false;
+    }
+    if (this->msg_ != rhs.msg_) {
+        return false;
+    }
+    if (this->new_perms_ != rhs.new_perms_) {
+        return false;
+    }
+    if (this->object_ != rhs.object_) {
+        return false;
+    }
+    if (this->old_perms_ != rhs.old_perms_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::JobComplete>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const JobComplete &o) {
     const ::flatbuffers::Offset<::ObjectId> job_offset = serialize_to(builder, o.job_);
@@ -136,6 +156,14 @@ JobComplete::JobComplete(const ::JobComplete *root)
     if (root->job() != nullptr) {
         job_ = decltype(job_)(root->job());
     }
+}
+
+bool
+JobComplete::operator==(const JobComplete &rhs) const {
+    if (this->job_ != rhs.job_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::AccessRequest>
@@ -199,6 +227,26 @@ AccessRequest::AccessRequest(const ::AccessRequest *root)
     status_ = root->status();
 }
 
+bool
+AccessRequest::operator==(const AccessRequest &rhs) const {
+    if (this->msg_ != rhs.msg_) {
+        return false;
+    }
+    if (this->object_ != rhs.object_) {
+        return false;
+    }
+    if (this->perms_ != rhs.perms_) {
+        return false;
+    }
+    if (this->requested_ownership_ != rhs.requested_ownership_) {
+        return false;
+    }
+    if (this->status_ != rhs.status_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::DriveChange>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DriveChange &o) {
     const ::flatbuffers::Offset<::ObjectId> object_offset = serialize_to(builder, o.object_);
@@ -246,6 +294,20 @@ DriveChange::DriveChange(const ::DriveChange *root)
     }
 }
 
+bool
+DriveChange::operator==(const DriveChange &rhs) const {
+    if (this->action_ != rhs.action_) {
+        return false;
+    }
+    if (this->object_ != rhs.object_) {
+        return false;
+    }
+    if (this->root_ != rhs.root_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Inbox>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Inbox &o) {
     std::vector<::flatbuffers::Offset<::InboxItem>> items_offsets = std::vector<::flatbuffers::Offset<::InboxItem>>();
@@ -291,6 +353,14 @@ Inbox::Inbox(const ::Inbox *root)
     }
 }
 
+bool
+Inbox::operator==(const Inbox &rhs) const {
+    if (this->items_ != rhs.items_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::InboxItem>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const InboxItem &o) {
     const ::flatbuffers::Offset<::ObjectId> notification_offset = serialize_to(builder, o.notification_);
@@ -333,6 +403,20 @@ InboxItem::InboxItem(const ::InboxItem *root)
     }
     status_ = root->status();
     time_ = root->time();
+}
+
+bool
+InboxItem::operator==(const InboxItem &rhs) const {
+    if (this->notification_ != rhs.notification_) {
+        return false;
+    }
+    if (this->status_ != rhs.status_) {
+        return false;
+    }
+    if (this->time_ != rhs.time_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Notification>
@@ -419,6 +503,17 @@ Notification::Notification(const ::Notification *root)
     }
 }
 
+bool
+Notification::operator==(const Notification &rhs) const {
+    if (this->notification_ != rhs.notification_) {
+        return false;
+    }
+    if (this->sender_ != rhs.sender_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Response>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Response &o) {
     std::optional<::flatbuffers::Offset<::flatbuffers::String>> msg_offset = std::nullopt;
@@ -459,6 +554,14 @@ Response::Response(const ::Response *root)
     if (root->msg() != nullptr) {
         msg_ = std::string(*root->msg()->begin(), *root->msg()->end());
     }
+}
+
+bool
+Response::operator==(const Response &rhs) const {
+    if (this->msg_ != rhs.msg_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::ShareDetails>
@@ -505,6 +608,17 @@ ShareDetails::ShareDetails(const ::ShareDetails *root)
         msg_ = std::string(*root->msg()->begin(), *root->msg()->end());
     }
     notify_ = root->notify();
+}
+
+bool
+ShareDetails::operator==(const ShareDetails &rhs) const {
+    if (this->msg_ != rhs.msg_) {
+        return false;
+    }
+    if (this->notify_ != rhs.notify_) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace types

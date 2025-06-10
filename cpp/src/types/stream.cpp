@@ -137,5 +137,34 @@ Stream::Stream(const ::Stream *root)
         url_ = std::string(*root->url()->begin(), *root->url()->end());
 }
 
+bool
+Stream::operator==(const Stream &rhs) const {
+    if (this->flags_ != rhs.flags_) {
+        return false;
+    }
+    if (this->metadata_ != rhs.metadata_) {
+        return false;
+    }
+    if (this->metadata_revision_ != rhs.metadata_revision_) {
+        return false;
+    }
+    if (this->options_ != rhs.options_) {
+        return false;
+    }
+    if (this->parameters_ != rhs.parameters_) {
+        return false;
+    }
+    if (this->schema_ != rhs.schema_) {
+        return false;
+    }
+    if (this->substreams_ != rhs.substreams_) {
+        return false;
+    }
+    if (this->url_ != rhs.url_) {
+        return false;
+    }
+    return true;
+}
+
 } // namespace types
 } // namespace ul

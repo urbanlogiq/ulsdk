@@ -67,6 +67,17 @@ AccessControlList::AccessControlList(const ::AccessControlList *root)
     }
 }
 
+bool
+AccessControlList::operator==(const AccessControlList &rhs) const {
+    if (this->extends_ != rhs.extends_) {
+        return false;
+    }
+    if (this->roles_ != rhs.roles_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Role>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Role &o) {
     const ::flatbuffers::Offset<::B2cId> principal_offset = serialize_to(builder, o.principal_);
@@ -105,6 +116,17 @@ Role::Role(const ::Role *root)
     if (root->principal() != nullptr) {
         principal_ = decltype(principal_)(root->principal());
     }
+}
+
+bool
+Role::operator==(const Role &rhs) const {
+    if (this->permission_ != rhs.permission_) {
+        return false;
+    }
+    if (this->principal_ != rhs.principal_) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace types

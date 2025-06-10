@@ -31,6 +31,10 @@ struct Sha256 {
     Sha256();
     Sha256(const ::Sha256 *root);
     Sha256(const std::vector<uint8_t> &bytes);
+    bool operator==(const Sha256 &rhs) const;
+    bool operator!=(const Sha256 &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct CryptHeader {
@@ -41,6 +45,10 @@ struct CryptHeader {
     CryptHeader();
     CryptHeader(const ::CryptHeader *root);
     CryptHeader(const std::vector<uint8_t> &bytes);
+    bool operator==(const CryptHeader &rhs) const;
+    bool operator!=(const CryptHeader &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct EncryptedObject {
@@ -50,6 +58,10 @@ struct EncryptedObject {
     EncryptedObject();
     EncryptedObject(const ::EncryptedObject *root);
     EncryptedObject(const std::vector<uint8_t> &bytes);
+    bool operator==(const EncryptedObject &rhs) const;
+    bool operator!=(const EncryptedObject &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Signature {
@@ -59,6 +71,10 @@ struct Signature {
     Signature();
     Signature(const ::Signature *root);
     Signature(const std::vector<uint8_t> &bytes);
+    bool operator==(const Signature &rhs) const;
+    bool operator!=(const Signature &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::pair<::flatbuffers::Offset<void>, ::Digest>

@@ -100,3 +100,35 @@ pub fn read_arrow_ipc(bytes: &[u8]) -> Result<Vec<RecordBatch>, Error> {
 
     Ok(batches)
 }
+
+#[cfg(test)]
+fn make_test_batches() -> (Vec<RecordBatch>, Vec<u8>) {
+    use arrow::array::{ArrayRef, Int32Array, StringArray};
+    use arrow::datatypes::{DataType, Field, Schema, SchemaRef};
+    use arrow::ipc::writer::StreamWriter;
+    use std::sync::Arc;
+
+    let mut str_vector = Vec::with_capacity(20);
+    let mut int_vector = Vec::with_capacity(20);
+    for i in 0..20 {
+        str_vector.push(format!("test{}", i));
+        int_vector.push(i as i32);
+    }
+    let str_array: ArrayRef = Arc::new(StringArray::from(str_vector));
+    let int_array: ArrayRef = Arc::new(Int32Array::from(int_vector));
+    let schema: SchemaRef = Arc::new(Schema::new(vec![
+        Field::new("v", DataType::Utf8, false),
+        Field::new("i", DataType::Int32, false),
+    ]));
+    let batch = RecordBatch::try_new(schema.clone(), vec![str_array, int_array]).unwrap();
+
+    let mut buffer = Vec::new();
+
+    {
+        let mut writer = StreamWriter::try_new(&mut buffer, &schema).unwrap();
+        writer.write(&batch).unwrap();
+        writer.finish().unwrap();
+    }
+
+    (vec![batch], buffer)
+}

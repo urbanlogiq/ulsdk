@@ -26,13 +26,12 @@ use crate::types::job::{Job, RunSpec, Task};
 ///
 /// Returns
 /// * The ID of the newly created job
-pub async fn create_job(
-    ctx: &dyn RequestContext,
-    job: RunSpec,
-) -> Result<ObjectId, Error> {
+pub async fn create_job(ctx: &dyn RequestContext, job: RunSpec) -> Result<ObjectId, Error> {
     let path = "/v1/api/ulv2/schematicevaluator/jobs";
     let body = Bytes::from(Vec::<u8>::from(job));
-    let res = ctx.post(&path, body, "application/octet-stream", None, None).await?;
+    let res = ctx
+        .post(&path, body, "application/octet-stream", None, None)
+        .await?;
     res.as_slice().try_into().map_err(Error::from)
 }
 
@@ -51,10 +50,9 @@ pub async fn get_job(
     id: Uuid,
     timeout: Option<i64>,
 ) -> Result<Job, Error> {
-    let path = "/v1/api/ulv2/schematicevaluator/jobs/:id"
-        .replace(":id", &id.to_string());
+    let path = "/v1/api/ulv2/schematicevaluator/jobs/:id".replace(":id", &id.to_string());
     let mut params = ParamMap::new();
-    if let Some(val) = timeout { 
+    if let Some(val) = timeout {
         params.insert("timeout".to_owned(), val.to_string());
     }
 
@@ -71,78 +69,88 @@ pub async fn get_job(
 ///
 /// Returns
 /// * The details of the task
-pub async fn get_task(
-    ctx: &dyn RequestContext,
-    id: Uuid,
-) -> Result<Task, Error> {
-    let path = "/v1/api/ulv2/schematicevaluator/tasks/:id"
-        .replace(":id", &id.to_string());
+pub async fn get_task(ctx: &dyn RequestContext, id: Uuid) -> Result<Task, Error> {
+    let path = "/v1/api/ulv2/schematicevaluator/tasks/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     res.as_slice().try_into().map_err(Error::from)
 }
 
-
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-    use crate::request_context::ApiKeyContext;
-    use crate::keys::Key;
-    use crate::{Region, Environment};
     use super::*;
+    use crate::keys::Key as SigningKey;
+    use crate::request_context::{ApiKeyContext, TestContext};
+    use crate::{Environment, Region};
+    use std::str::FromStr;
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_create_job() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = RunSpec::default();
-
-        create_job(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let body = crate::types::RunSpec::default();
+        let expected = ObjectId::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = create_job(&ctx, body).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_job() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = None;
-
-        get_job(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let q0 = 42;
+        let q0 = Some(q0);
+        let expected = Job::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = get_job(&ctx, p0, q0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_task() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        get_task(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = Task::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = get_task(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 }

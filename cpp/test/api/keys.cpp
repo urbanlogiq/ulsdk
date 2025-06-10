@@ -25,8 +25,32 @@
 namespace keys {
 
 ul::Result<ul::Void>
+test_get_keys(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::api::keys::GetKeys expected = ::ul::api::keys::GetKeys();
+    const std::vector<uint8_t> expected_bytes = ::ul::api::keys::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::keys::get_keys(
+        ctx
+    );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::api::keys::GetKeys result_value = std::get<::ul::api::keys::GetKeys>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
+}
+
+ApiTest test_get_keys_obj(test_get_keys, "keys::get_keys", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
 test_get_keys_1(ul::RequestContext &ctx) {
-    const auto result = ::ul::api::keys::get_keys(
+    auto result = ::ul::api::keys::get_keys(
         ctx
     );
 
@@ -41,47 +65,79 @@ test_get_keys_1(ul::RequestContext &ctx) {
 ApiTest test_get_keys_1_obj(test_get_keys_1, "keys::get_keys (1)", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_create_key(ul::RequestContext &ctx) {
-    ::ul::api::keys::create_key(
+test_create_key(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::api::keys::CreateKey expected = ::ul::api::keys::CreateKey();
+    const std::vector<uint8_t> expected_bytes = ::ul::api::keys::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::keys::create_key(
         ctx
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::api::keys::CreateKey result_value = std::get<::ul::api::keys::CreateKey>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_create_key_obj(test_create_key, "keys::create_key", &link_only_api_test_root);
+ApiTest test_create_key_obj(test_create_key, "keys::create_key", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_update_key(ul::RequestContext &ctx) {
-    ::ul::api::keys::update_key(
+test_update_key(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::api::keys::UpdateKey body = ::ul::api::keys::UpdateKey();
+    return ul::api::keys::update_key(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ::ul::api::keys::UpdateKey()
+        p0,
+        body
     );
-    return ul::Void();
 }
 
-ApiTest test_update_key_obj(test_update_key, "keys::update_key", &link_only_api_test_root);
+ApiTest test_update_key_obj(test_update_key, "keys::update_key", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_key(ul::RequestContext &ctx) {
-    ::ul::api::keys::get_key(
+test_get_key(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::api::keys::Key expected = ::ul::api::keys::Key();
+    const std::vector<uint8_t> expected_bytes = ::ul::api::keys::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::keys::get_key(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::api::keys::Key result_value = std::get<::ul::api::keys::Key>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_key_obj(test_get_key, "keys::get_key", &link_only_api_test_root);
+ApiTest test_get_key_obj(test_get_key, "keys::get_key", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_delete_key(ul::RequestContext &ctx) {
-    ::ul::api::keys::delete_key(
+test_delete_key(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    return ul::api::keys::delete_key(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
 }
 
-ApiTest test_delete_key_obj(test_delete_key, "keys::delete_key", &link_only_api_test_root);
+ApiTest test_delete_key_obj(test_delete_key, "keys::delete_key", &idempotent_api_test_root);
 
 } // namespace keys

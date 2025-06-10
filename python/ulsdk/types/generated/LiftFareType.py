@@ -27,3 +27,4 @@ class LiftFareType(object):
     CASH_HC_1 = 21
     TRANSFER = 22
     CASH_FARE_FOR_COMPANION = 23
+    NEXT_MICROTRANSIT_FARE = 24

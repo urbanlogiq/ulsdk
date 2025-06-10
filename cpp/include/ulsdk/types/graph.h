@@ -47,6 +47,10 @@ struct GeomOp {
     GeomOp();
     GeomOp(const ::GeomOp *root);
     GeomOp(const std::vector<uint8_t> &bytes);
+    bool operator==(const GeomOp &rhs) const;
+    bool operator!=(const GeomOp &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct NodeQuery {
@@ -60,6 +64,10 @@ struct NodeQuery {
     NodeQuery();
     NodeQuery(const ::NodeQuery *root);
     NodeQuery(const std::vector<uint8_t> &bytes);
+    bool operator==(const NodeQuery &rhs) const;
+    bool operator!=(const NodeQuery &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct EdgeQuery {
@@ -68,6 +76,10 @@ struct EdgeQuery {
     EdgeQuery();
     EdgeQuery(const ::EdgeQuery *root);
     EdgeQuery(const std::vector<uint8_t> &bytes);
+    bool operator==(const EdgeQuery &rhs) const;
+    bool operator!=(const EdgeQuery &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct EdgeList {
@@ -76,6 +88,10 @@ struct EdgeList {
     EdgeList();
     EdgeList(const ::EdgeList *root);
     EdgeList(const std::vector<uint8_t> &bytes);
+    bool operator==(const EdgeList &rhs) const;
+    bool operator!=(const EdgeList &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Geom {
@@ -84,6 +100,10 @@ struct Geom {
     Geom();
     Geom(const ::Geom *root);
     Geom(const std::vector<uint8_t> &bytes);
+    bool operator==(const Geom &rhs) const;
+    bool operator!=(const Geom &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -97,6 +117,10 @@ struct GraphQuery {
     GraphQuery();
     GraphQuery(const ::GraphQuery *root);
     GraphQuery(const std::vector<uint8_t> &bytes);
+    bool operator==(const GraphQuery &rhs) const;
+    bool operator!=(const GraphQuery &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct NodeIdPair {
@@ -106,6 +130,10 @@ struct NodeIdPair {
     NodeIdPair();
     NodeIdPair(const ::NodeIdPair *root);
     NodeIdPair(const std::vector<uint8_t> &bytes);
+    bool operator==(const NodeIdPair &rhs) const;
+    bool operator!=(const NodeIdPair &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct NodeList {
@@ -114,6 +142,10 @@ struct NodeList {
     NodeList();
     NodeList(const ::NodeList *root);
     NodeList(const std::vector<uint8_t> &bytes);
+    bool operator==(const NodeList &rhs) const;
+    bool operator!=(const NodeList &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct OrderBy {
@@ -124,6 +156,10 @@ struct OrderBy {
     OrderBy();
     OrderBy(const ::OrderBy *root);
     OrderBy(const std::vector<uint8_t> &bytes);
+    bool operator==(const OrderBy &rhs) const;
+    bool operator!=(const OrderBy &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Projection {
@@ -133,6 +169,10 @@ struct Projection {
     Projection();
     Projection(const ::Projection *root);
     Projection(const std::vector<uint8_t> &bytes);
+    bool operator==(const Projection &rhs) const;
+    bool operator!=(const Projection &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct QueryPathElement {
@@ -141,6 +181,10 @@ struct QueryPathElement {
     QueryPathElement();
     QueryPathElement(const ::QueryPathElement *root);
     QueryPathElement(const std::vector<uint8_t> &bytes);
+    bool operator==(const QueryPathElement &rhs) const;
+    bool operator!=(const QueryPathElement &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::pair<::flatbuffers::Offset<void>, ::QueryPathElementUnion>

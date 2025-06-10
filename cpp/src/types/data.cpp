@@ -64,6 +64,17 @@ AttributePair::AttributePair(const ::AttributePair *root)
     }
 }
 
+bool
+AttributePair::operator==(const AttributePair &rhs) const {
+    if (this->key_ != rhs.key_) {
+        return false;
+    }
+    if (this->value_ != rhs.value_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::DirectionAndRoadName>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DirectionAndRoadName &o) {
     const ::flatbuffers::Offset<::flatbuffers::String> direction_offset = builder.CreateString(o.direction_);
@@ -101,6 +112,17 @@ DirectionAndRoadName::DirectionAndRoadName(const ::DirectionAndRoadName *root)
 
         direction_ = std::string(*root->direction()->begin(), *root->direction()->end());
         road_name_ = std::string(*root->road_name()->begin(), *root->road_name()->end());
+}
+
+bool
+DirectionAndRoadName::operator==(const DirectionAndRoadName &rhs) const {
+    if (this->direction_ != rhs.direction_) {
+        return false;
+    }
+    if (this->road_name_ != rhs.road_name_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::DirectionAndRoadNames>
@@ -155,6 +177,14 @@ DirectionAndRoadNames::DirectionAndRoadNames(const ::DirectionAndRoadNames *root
         }
         direction_and_road_names_ = std::make_optional(direction_and_road_names__target);
     }
+}
+
+bool
+DirectionAndRoadNames::operator==(const DirectionAndRoadNames &rhs) const {
+    if (this->direction_and_road_names_ != rhs.direction_and_road_names_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::NamedParameter>
@@ -219,6 +249,23 @@ NamedParameter::NamedParameter(const ::NamedParameter *root)
     if (root->schema() != nullptr) {
         schema_ = decltype(schema_)(root->schema());
     }
+}
+
+bool
+NamedParameter::operator==(const NamedParameter &rhs) const {
+    if (this->description_ != rhs.description_) {
+        return false;
+    }
+    if (this->flags_ != rhs.flags_) {
+        return false;
+    }
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->schema_ != rhs.schema_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Source>
@@ -350,6 +397,32 @@ Source::Source(const ::Source *root)
         schemas_ = std::make_optional(schemas__target);
     }
         url_ = std::string(*root->url()->begin(), *root->url()->end());
+}
+
+bool
+Source::operator==(const Source &rhs) const {
+    if (this->metadata_ != rhs.metadata_) {
+        return false;
+    }
+    if (this->metadata_revision_ != rhs.metadata_revision_) {
+        return false;
+    }
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->named_parameters_ != rhs.named_parameters_) {
+        return false;
+    }
+    if (this->options_ != rhs.options_) {
+        return false;
+    }
+    if (this->schemas_ != rhs.schemas_) {
+        return false;
+    }
+    if (this->url_ != rhs.url_) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace types

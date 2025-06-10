@@ -10,6 +10,7 @@ from flatbuffers.util import RemoveSizePrefix
 from typing import Union, List, Optional, Self, Tuple
 from .Schema import (
     Binary,
+    BinaryView,
     Bool,
     Buffer,
     Date,
@@ -30,12 +31,15 @@ from .Schema import (
     KeyValue,
     LargeBinary,
     LargeList,
+    LargeListView,
     LargeUtf8,
     List_,
+    ListView,
     Map,
     MetadataVersion,
     Null,
     Precision,
+    RunEndEncoded,
     Schema,
     Struct_,
     Time,
@@ -45,6 +49,7 @@ from .Schema import (
     Union_,
     UnionMode,
     Utf8,
+    Utf8View,
 )
 from .id import (
     B2cId,
@@ -59,6 +64,7 @@ from .id import (
 )
 from .generated.B2cId import B2cId as FbsB2cId
 from .generated.Binary import Binary as FbsBinary
+from .generated.BinaryView import BinaryView as FbsBinaryView
 from .generated.Bool import Bool as FbsBool
 from .generated.Buffer import Buffer as FbsBuffer
 from .generated.ColumnGroupId import ColumnGroupId as FbsColumnGroupId
@@ -79,11 +85,14 @@ from .generated.Interval import Interval as FbsInterval
 from .generated.KeyValue import KeyValue as FbsKeyValue
 from .generated.LargeBinary import LargeBinary as FbsLargeBinary
 from .generated.LargeList import LargeList as FbsLargeList
+from .generated.LargeListView import LargeListView as FbsLargeListView
 from .generated.LargeUtf8 import LargeUtf8 as FbsLargeUtf8
 from .generated.List import List as FbsList
+from .generated.ListView import ListView as FbsListView
 from .generated.Map import Map as FbsMap
 from .generated.Null import Null as FbsNull
 from .generated.ObjectId import ObjectId as FbsObjectId
+from .generated.RunEndEncoded import RunEndEncoded as FbsRunEndEncoded
 from .generated.Schema import Schema as FbsSchema
 from .generated.Stream import Stream as FbsStream
 from .generated.StreamId import StreamId as FbsStreamId
@@ -92,6 +101,7 @@ from .generated.Time import Time as FbsTime
 from .generated.Timestamp import Timestamp as FbsTimestamp
 from .generated.Union import Union as FbsUnion
 from .generated.Utf8 import Utf8 as FbsUtf8
+from .generated.Utf8View import Utf8View as FbsUtf8View
 from .generated.Type import Type as FbsType
 
 class AxisType(Enum):

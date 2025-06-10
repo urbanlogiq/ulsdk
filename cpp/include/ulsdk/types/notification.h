@@ -48,6 +48,10 @@ struct Share {
     Share();
     Share(const ::Share *root);
     Share(const std::vector<uint8_t> &bytes);
+    bool operator==(const Share &rhs) const;
+    bool operator!=(const Share &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct JobComplete {
@@ -56,6 +60,10 @@ struct JobComplete {
     JobComplete();
     JobComplete(const ::JobComplete *root);
     JobComplete(const std::vector<uint8_t> &bytes);
+    bool operator==(const JobComplete &rhs) const;
+    bool operator!=(const JobComplete &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct AccessRequest {
@@ -68,6 +76,10 @@ struct AccessRequest {
     AccessRequest();
     AccessRequest(const ::AccessRequest *root);
     AccessRequest(const std::vector<uint8_t> &bytes);
+    bool operator==(const AccessRequest &rhs) const;
+    bool operator!=(const AccessRequest &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct DriveChange {
@@ -78,6 +90,10 @@ struct DriveChange {
     DriveChange();
     DriveChange(const ::DriveChange *root);
     DriveChange(const std::vector<uint8_t> &bytes);
+    bool operator==(const DriveChange &rhs) const;
+    bool operator!=(const DriveChange &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Inbox {
@@ -86,6 +102,10 @@ struct Inbox {
     Inbox();
     Inbox(const ::Inbox *root);
     Inbox(const std::vector<uint8_t> &bytes);
+    bool operator==(const Inbox &rhs) const;
+    bool operator!=(const Inbox &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct InboxItem {
@@ -96,6 +116,10 @@ struct InboxItem {
     InboxItem();
     InboxItem(const ::InboxItem *root);
     InboxItem(const std::vector<uint8_t> &bytes);
+    bool operator==(const InboxItem &rhs) const;
+    bool operator!=(const InboxItem &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Notification {
@@ -105,6 +129,10 @@ struct Notification {
     Notification();
     Notification(const ::Notification *root);
     Notification(const std::vector<uint8_t> &bytes);
+    bool operator==(const Notification &rhs) const;
+    bool operator!=(const Notification &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Response {
@@ -113,6 +141,10 @@ struct Response {
     Response();
     Response(const ::Response *root);
     Response(const std::vector<uint8_t> &bytes);
+    bool operator==(const Response &rhs) const;
+    bool operator!=(const Response &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ShareDetails {
@@ -122,6 +154,10 @@ struct ShareDetails {
     ShareDetails();
     ShareDetails(const ::ShareDetails *root);
     ShareDetails(const std::vector<uint8_t> &bytes);
+    bool operator==(const ShareDetails &rhs) const;
+    bool operator!=(const ShareDetails &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::pair<::flatbuffers::Offset<void>, ::NotificationUnion>

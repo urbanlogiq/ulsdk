@@ -120,6 +120,29 @@ Key::Key(const struct json_value_s *root)
     }
 }
 
+bool
+Key::operator==(const Key&rhs) const {
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->pubkey_ != rhs.pubkey_) {
+        return false;
+    }
+    if (this->created_ != rhs.created_) {
+        return false;
+    }
+    if (this->last_ != rhs.last_) {
+        return false;
+    }
+    if (this->expiry_ != rhs.expiry_) {
+        return false;
+    }
+    if (this->comment_ != rhs.comment_) {
+        return false;
+    }
+    return true;
+}
+
 std::vector<uint8_t>
 to_bytes(const Key &o) {
     std::stringstream ss;
@@ -205,16 +228,30 @@ GetKeys::GetKeys(const struct json_value_s *root)
     }
 }
 
+bool
+GetKeys::operator==(const GetKeys&rhs) const {
+    if (this->keys_ != rhs.keys_) {
+        return false;
+    }
+    return true;
+}
+
 std::vector<uint8_t>
 to_bytes(const GetKeys &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"keys\":";
+    ss << "[";
     for (const auto &i : o.keys_) {
         const std::vector<uint8_t> i_serialized = to_bytes(i);
         const std::string i_str = std::string(i_serialized.begin(), i_serialized.end());
         ss << i_str;
+        ss << ",";
     }
+    if (!o.keys_.empty()) {
+        ss.seekp(-1, ss.cur);
+    }
+    ss << "]";
     std::string str = ss.str();
     if (str.back() == ',') {
         str.pop_back();
@@ -256,6 +293,17 @@ CreateKey::CreateKey(const struct json_value_s *root)
 
         e = e->next;
     }
+}
+
+bool
+CreateKey::operator==(const CreateKey&rhs) const {
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->secret_key_ != rhs.secret_key_) {
+        return false;
+    }
+    return true;
 }
 
 std::vector<uint8_t>
@@ -317,6 +365,17 @@ UpdateKey::UpdateKey(const struct json_value_s *root)
 
         e = e->next;
     }
+}
+
+bool
+UpdateKey::operator==(const UpdateKey&rhs) const {
+    if (this->comment_ != rhs.comment_) {
+        return false;
+    }
+    if (this->expiry_ != rhs.expiry_) {
+        return false;
+    }
+    return true;
 }
 
 std::vector<uint8_t>

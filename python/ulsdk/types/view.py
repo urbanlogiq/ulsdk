@@ -59,6 +59,7 @@ from .query import (
     DataCatalog,
     DeleteQueryElement,
     Distinct,
+    Drive,
     Expr,
     ExprUnion,
     Function,
@@ -136,6 +137,7 @@ from .generated.DataCatalog import DataCatalog as FbsDataCatalog
 from .generated.DataStateId import DataStateId as FbsDataStateId
 from .generated.DeleteQueryElement import DeleteQueryElement as FbsDeleteQueryElement
 from .generated.Distinct import Distinct as FbsDistinct
+from .generated.Drive import Drive as FbsDrive
 from .generated.EdgeList import EdgeList as FbsEdgeList
 from .generated.EdgeQuery import EdgeQuery as FbsEdgeQuery
 from .generated.Expr import Expr as FbsExpr

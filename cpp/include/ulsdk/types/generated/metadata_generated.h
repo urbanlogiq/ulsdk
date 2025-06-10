@@ -2610,6 +2610,21 @@ struct UlField FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const LargeList *storage_type_as_LargeList() const {
     return storage_type_type() == Type::LargeList ? static_cast<const LargeList *>(storage_type()) : nullptr;
   }
+  const RunEndEncoded *storage_type_as_RunEndEncoded() const {
+    return storage_type_type() == Type::RunEndEncoded ? static_cast<const RunEndEncoded *>(storage_type()) : nullptr;
+  }
+  const BinaryView *storage_type_as_BinaryView() const {
+    return storage_type_type() == Type::BinaryView ? static_cast<const BinaryView *>(storage_type()) : nullptr;
+  }
+  const Utf8View *storage_type_as_Utf8View() const {
+    return storage_type_type() == Type::Utf8View ? static_cast<const Utf8View *>(storage_type()) : nullptr;
+  }
+  const ListView *storage_type_as_ListView() const {
+    return storage_type_type() == Type::ListView ? static_cast<const ListView *>(storage_type()) : nullptr;
+  }
+  const LargeListView *storage_type_as_LargeListView() const {
+    return storage_type_type() == Type::LargeListView ? static_cast<const LargeListView *>(storage_type()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_FIELD_NAME) &&
@@ -2741,6 +2756,26 @@ template<> inline const LargeUtf8 *UlField::storage_type_as<LargeUtf8>() const {
 
 template<> inline const LargeList *UlField::storage_type_as<LargeList>() const {
   return storage_type_as_LargeList();
+}
+
+template<> inline const RunEndEncoded *UlField::storage_type_as<RunEndEncoded>() const {
+  return storage_type_as_RunEndEncoded();
+}
+
+template<> inline const BinaryView *UlField::storage_type_as<BinaryView>() const {
+  return storage_type_as_BinaryView();
+}
+
+template<> inline const Utf8View *UlField::storage_type_as<Utf8View>() const {
+  return storage_type_as_Utf8View();
+}
+
+template<> inline const ListView *UlField::storage_type_as<ListView>() const {
+  return storage_type_as_ListView();
+}
+
+template<> inline const LargeListView *UlField::storage_type_as<LargeListView>() const {
+  return storage_type_as_LargeListView();
 }
 
 struct UlFieldBuilder {

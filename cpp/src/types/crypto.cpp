@@ -57,6 +57,14 @@ Sha256::Sha256(const ::Sha256 *root)
     }
 }
 
+bool
+Sha256::operator==(const Sha256 &rhs) const {
+    if (this->b_ != rhs.b_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::CryptHeader>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const CryptHeader &o) {
     const ::flatbuffers::Offset<::flatbuffers::String> kid_offset = builder.CreateString(o.kid_);
@@ -103,6 +111,20 @@ CryptHeader::CryptHeader(const ::CryptHeader *root)
     plaintext_len_ = root->plaintext_len();
 }
 
+bool
+CryptHeader::operator==(const CryptHeader &rhs) const {
+    if (this->kid_ != rhs.kid_) {
+        return false;
+    }
+    if (this->nonce_ != rhs.nonce_) {
+        return false;
+    }
+    if (this->plaintext_len_ != rhs.plaintext_len_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::EncryptedObject>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const EncryptedObject &o) {
     const ::flatbuffers::Offset<::CryptHeader> header_offset = serialize_to(builder, o.header_);
@@ -147,6 +169,17 @@ EncryptedObject::EncryptedObject(const ::EncryptedObject *root)
     }
 }
 
+bool
+EncryptedObject::operator==(const EncryptedObject &rhs) const {
+    if (this->header_ != rhs.header_) {
+        return false;
+    }
+    if (this->obj_ != rhs.obj_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Signature>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Signature &o) {
     const ::flatbuffers::Offset<::flatbuffers::String> kid_offset = builder.CreateString(o.kid_);
@@ -187,6 +220,17 @@ Signature::Signature(const ::Signature *root)
     if (sig_vector != nullptr) {
         std::copy(sig_vector->begin(), sig_vector->end(), std::back_inserter(sig_));
     }
+}
+
+bool
+Signature::operator==(const Signature &rhs) const {
+    if (this->kid_ != rhs.kid_) {
+        return false;
+    }
+    if (this->sig_ != rhs.sig_) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace types

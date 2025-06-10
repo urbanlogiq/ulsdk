@@ -149,6 +149,14 @@ StringCategories::StringCategories(const ::StringCategories *root)
     }
 }
 
+bool
+StringCategories::operator==(const StringCategories &rhs) const {
+    if (this->categories_ != rhs.categories_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::NumericalFieldFormat>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NumericalFieldFormat &o) {
 
@@ -192,6 +200,23 @@ NumericalFieldFormat::NumericalFieldFormat(const ::NumericalFieldFormat *root)
     offset_ = root->offset();
     scale_ = root->scale();
     value_type_ = root->value_type();
+}
+
+bool
+NumericalFieldFormat::operator==(const NumericalFieldFormat &rhs) const {
+    if (this->decimal_places_ != rhs.decimal_places_) {
+        return false;
+    }
+    if (this->offset_ != rhs.offset_) {
+        return false;
+    }
+    if (this->scale_ != rhs.scale_) {
+        return false;
+    }
+    if (this->value_type_ != rhs.value_type_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::IntRange>
@@ -286,6 +311,29 @@ IntRange::IntRange(const ::IntRange *root)
     min_ = root->min();
 }
 
+bool
+IntRange::operator==(const IntRange &rhs) const {
+    if (this->aggregation_protocol_ != rhs.aggregation_protocol_) {
+        return false;
+    }
+    if (this->display_strings_ != rhs.display_strings_) {
+        return false;
+    }
+    if (this->enum_name_ != rhs.enum_name_) {
+        return false;
+    }
+    if (this->field_format_ != rhs.field_format_) {
+        return false;
+    }
+    if (this->max_ != rhs.max_) {
+        return false;
+    }
+    if (this->min_ != rhs.min_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::FloatRange>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const FloatRange &o) {
     std::optional<::flatbuffers::Offset<::NumericalFieldFormat>> field_format_offset = std::nullopt;
@@ -338,6 +386,23 @@ FloatRange::FloatRange(const ::FloatRange *root)
     }
     max_ = root->max();
     min_ = root->min();
+}
+
+bool
+FloatRange::operator==(const FloatRange &rhs) const {
+    if (this->aggregation_protocol_ != rhs.aggregation_protocol_) {
+        return false;
+    }
+    if (this->field_format_ != rhs.field_format_) {
+        return false;
+    }
+    if (this->max_ != rhs.max_) {
+        return false;
+    }
+    if (this->min_ != rhs.min_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::DatetimeRange>
@@ -400,6 +465,20 @@ DatetimeRange::DatetimeRange(const ::DatetimeRange *root)
     }
     max_ = root->max();
     min_ = root->min();
+}
+
+bool
+DatetimeRange::operator==(const DatetimeRange &rhs) const {
+    if (this->intervals_ != rhs.intervals_) {
+        return false;
+    }
+    if (this->max_ != rhs.max_) {
+        return false;
+    }
+    if (this->min_ != rhs.min_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Dates>
@@ -471,6 +550,23 @@ Dates::Dates(const ::Dates *root)
     }
 }
 
+bool
+Dates::operator==(const Dates &rhs) const {
+    if (this->max_ != rhs.max_) {
+        return false;
+    }
+    if (this->min_ != rhs.min_) {
+        return false;
+    }
+    if (this->unique_value_counts_ != rhs.unique_value_counts_) {
+        return false;
+    }
+    if (this->unique_values_ != rhs.unique_values_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::NestedStringCategories>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NestedStringCategories &o) {
     std::vector<::flatbuffers::Offset<::NestedStringCategoryNode>> nesting_tree_offsets = std::vector<::flatbuffers::Offset<::NestedStringCategoryNode>>();
@@ -516,6 +612,14 @@ NestedStringCategories::NestedStringCategories(const ::NestedStringCategories *r
     }
 }
 
+bool
+NestedStringCategories::operator==(const NestedStringCategories &rhs) const {
+    if (this->nesting_tree_ != rhs.nesting_tree_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::RawGeom>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const RawGeom &o) {
     const decltype(builder.CreateVector(o.geom_)) geom_offset = builder.CreateVector(o.geom_);
@@ -553,6 +657,14 @@ RawGeom::RawGeom(const ::RawGeom *root)
     }
 }
 
+bool
+RawGeom::operator==(const RawGeom &rhs) const {
+    if (this->geom_ != rhs.geom_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::NoGeometry>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NoGeometry &) {
 
@@ -580,6 +692,12 @@ NoGeometry::NoGeometry(const ::NoGeometry *root)  {
         throw std::runtime_error("cannot deserialize flatbuffer type");
     }
 
+}
+
+bool
+NoGeometry::operator==(const NoGeometry &rhs) const {
+    (void)rhs;
+    return true;
 }
 
 ::flatbuffers::Offset<::DatacatalogGeometry>
@@ -614,6 +732,14 @@ DatacatalogGeometry::DatacatalogGeometry(const ::DatacatalogGeometry *root)
     }
 
         column_ = std::string(*root->column()->begin(), *root->column()->end());
+}
+
+bool
+DatacatalogGeometry::operator==(const DatacatalogGeometry &rhs) const {
+    if (this->column_ != rhs.column_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::WorldGraphGeometry>
@@ -664,6 +790,17 @@ WorldGraphGeometry::WorldGraphGeometry(const ::WorldGraphGeometry *root)
     if (root->start_stream_id() != nullptr) {
         start_stream_id_ = decltype(start_stream_id_)(root->start_stream_id());
     }
+}
+
+bool
+WorldGraphGeometry::operator==(const WorldGraphGeometry &rhs) const {
+    if (this->edge_path_ != rhs.edge_path_) {
+        return false;
+    }
+    if (this->start_stream_id_ != rhs.start_stream_id_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::HierarchyRelationshipData>
@@ -718,6 +855,14 @@ HierarchyRelationshipData::HierarchyRelationshipData(const ::HierarchyRelationsh
         }
         hierarchy_ = std::make_optional(hierarchy__target);
     }
+}
+
+bool
+HierarchyRelationshipData::operator==(const HierarchyRelationshipData &rhs) const {
+    if (this->hierarchy_ != rhs.hierarchy_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::CategoryRelationshipData>
@@ -781,6 +926,17 @@ CategoryRelationshipData::CategoryRelationshipData(const ::CategoryRelationshipD
     }
 }
 
+bool
+CategoryRelationshipData::operator==(const CategoryRelationshipData &rhs) const {
+    if (this->associated_fields_ != rhs.associated_fields_) {
+        return false;
+    }
+    if (this->categories_ != rhs.categories_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::NestedCategoryRelationshipData>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NestedCategoryRelationshipData &o) {
     std::optional<::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::NestedCategoryRelationshipNode>>>> categories_offset = std::nullopt;
@@ -835,6 +991,14 @@ NestedCategoryRelationshipData::NestedCategoryRelationshipData(const ::NestedCat
     }
 }
 
+bool
+NestedCategoryRelationshipData::operator==(const NestedCategoryRelationshipData &rhs) const {
+    if (this->categories_ != rhs.categories_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::NestedHierarchyRelationshipData>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NestedHierarchyRelationshipData &o) {
     std::optional<::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::NestedHierarchyRelationshipNode>>>> nodes_offset = std::nullopt;
@@ -887,6 +1051,14 @@ NestedHierarchyRelationshipData::NestedHierarchyRelationshipData(const ::NestedH
         }
         nodes_ = std::make_optional(nodes__target);
     }
+}
+
+bool
+NestedHierarchyRelationshipData::operator==(const NestedHierarchyRelationshipData &rhs) const {
+    if (this->nodes_ != rhs.nodes_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::ContactInfo>
@@ -983,6 +1155,26 @@ ContactInfo::ContactInfo(const ::ContactInfo *root)
     }
 }
 
+bool
+ContactInfo::operator==(const ContactInfo &rhs) const {
+    if (this->address_ != rhs.address_) {
+        return false;
+    }
+    if (this->email_ != rhs.email_) {
+        return false;
+    }
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->phone_ != rhs.phone_) {
+        return false;
+    }
+    if (this->url_ != rhs.url_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::DatasetSource>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DatasetSource &o) {
     std::optional<::flatbuffers::Offset<::flatbuffers::String>> date_offset = std::nullopt;
@@ -1049,6 +1241,20 @@ DatasetSource::DatasetSource(const ::DatasetSource *root)
     if (root->url() != nullptr) {
         url_ = std::string(*root->url()->begin(), *root->url()->end());
     }
+}
+
+bool
+DatasetSource::operator==(const DatasetSource &rhs) const {
+    if (this->date_ != rhs.date_) {
+        return false;
+    }
+    if (this->source_ != rhs.source_) {
+        return false;
+    }
+    if (this->url_ != rhs.url_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Document>
@@ -1132,6 +1338,23 @@ Document::Document(const ::Document *root)
     }
 }
 
+bool
+Document::operator==(const Document &rhs) const {
+    if (this->display_name_ != rhs.display_name_) {
+        return false;
+    }
+    if (this->filename_ != rhs.filename_) {
+        return false;
+    }
+    if (this->mime_type_ != rhs.mime_type_) {
+        return false;
+    }
+    if (this->url_ != rhs.url_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Documents>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Documents &o) {
     std::optional<::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::Document>>>> documents_offset = std::nullopt;
@@ -1184,6 +1407,14 @@ Documents::Documents(const ::Documents *root)
         }
         documents_ = std::make_optional(documents__target);
     }
+}
+
+bool
+Documents::operator==(const Documents &rhs) const {
+    if (this->documents_ != rhs.documents_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::FloatAggregate>
@@ -1264,6 +1495,32 @@ FloatAggregate::FloatAggregate(const ::FloatAggregate *root)
     variance_ = root->variance();
 }
 
+bool
+FloatAggregate::operator==(const FloatAggregate &rhs) const {
+    if (this->count_ != rhs.count_) {
+        return false;
+    }
+    if (this->histo_ != rhs.histo_) {
+        return false;
+    }
+    if (this->max_ != rhs.max_) {
+        return false;
+    }
+    if (this->mean_ != rhs.mean_) {
+        return false;
+    }
+    if (this->min_ != rhs.min_) {
+        return false;
+    }
+    if (this->sum_ != rhs.sum_) {
+        return false;
+    }
+    if (this->variance_ != rhs.variance_) {
+        return false;
+    }
+    return true;
+}
+
 FloatBucket::FloatBucket()
     : count_(0)
     , max_(0) {
@@ -1278,6 +1535,17 @@ FloatBucket::FloatBucket(const ::FloatBucket *root)
 
     count_ = root->count();
     max_ = root->max();
+}
+
+bool
+FloatBucket::operator==(const FloatBucket &rhs) const {
+    if (this->count_ != rhs.count_) {
+        return false;
+    }
+    if (this->max_ != rhs.max_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::GeometryData>
@@ -1332,6 +1600,14 @@ GeometryData::GeometryData(const ::GeometryData *root)
     }
 }
 
+bool
+GeometryData::operator==(const GeometryData &rhs) const {
+    if (this->data_ != rhs.data_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::HierarchicalRelationship>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const HierarchicalRelationship &o) {
     std::optional<decltype(builder.CreateVector(o.children_.value()))> children_offset = std::nullopt;
@@ -1379,6 +1655,17 @@ HierarchicalRelationship::HierarchicalRelationship(const ::HierarchicalRelations
         children_ = std::make_optional(children__target);
     }
     parent_ = root->parent();
+}
+
+bool
+HierarchicalRelationship::operator==(const HierarchicalRelationship &rhs) const {
+    if (this->children_ != rhs.children_) {
+        return false;
+    }
+    if (this->parent_ != rhs.parent_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::IntAggregate>
@@ -1459,6 +1746,32 @@ IntAggregate::IntAggregate(const ::IntAggregate *root)
     variance_ = root->variance();
 }
 
+bool
+IntAggregate::operator==(const IntAggregate &rhs) const {
+    if (this->count_ != rhs.count_) {
+        return false;
+    }
+    if (this->histo_ != rhs.histo_) {
+        return false;
+    }
+    if (this->max_ != rhs.max_) {
+        return false;
+    }
+    if (this->mean_ != rhs.mean_) {
+        return false;
+    }
+    if (this->min_ != rhs.min_) {
+        return false;
+    }
+    if (this->sum_ != rhs.sum_) {
+        return false;
+    }
+    if (this->variance_ != rhs.variance_) {
+        return false;
+    }
+    return true;
+}
+
 IntBucket::IntBucket()
     : count_(0)
     , max_(0) {
@@ -1473,6 +1786,17 @@ IntBucket::IntBucket(const ::IntBucket *root)
 
     count_ = root->count();
     max_ = root->max();
+}
+
+bool
+IntBucket::operator==(const IntBucket &rhs) const {
+    if (this->count_ != rhs.count_) {
+        return false;
+    }
+    if (this->max_ != rhs.max_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::IntegerDisplayString>
@@ -1511,6 +1835,17 @@ IntegerDisplayString::IntegerDisplayString(const ::IntegerDisplayString *root)
 
         display_name_ = std::string(*root->display_name()->begin(), *root->display_name()->end());
     value_ = root->value();
+}
+
+bool
+IntegerDisplayString::operator==(const IntegerDisplayString &rhs) const {
+    if (this->display_name_ != rhs.display_name_) {
+        return false;
+    }
+    if (this->value_ != rhs.value_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Metadata>
@@ -1707,6 +2042,50 @@ Metadata::Metadata(const ::Metadata *root)
     update_cadence_ = root->update_cadence();
 }
 
+bool
+Metadata::operator==(const Metadata &rhs) const {
+    if (this->area_selection_ != rhs.area_selection_) {
+        return false;
+    }
+    if (this->dataset_category_ != rhs.dataset_category_) {
+        return false;
+    }
+    if (this->description_ != rhs.description_) {
+        return false;
+    }
+    if (this->display_name_ != rhs.display_name_) {
+        return false;
+    }
+    if (this->do_not_filter_geometry_by_viewport_ != rhs.do_not_filter_geometry_by_viewport_) {
+        return false;
+    }
+    if (this->entity_ty_ != rhs.entity_ty_) {
+        return false;
+    }
+    if (this->field_relationships_ != rhs.field_relationships_) {
+        return false;
+    }
+    if (this->fields_ != rhs.fields_) {
+        return false;
+    }
+    if (this->geometry_source_ != rhs.geometry_source_) {
+        return false;
+    }
+    if (this->location_description_field_ != rhs.location_description_field_) {
+        return false;
+    }
+    if (this->source_ != rhs.source_) {
+        return false;
+    }
+    if (this->summary_ != rhs.summary_) {
+        return false;
+    }
+    if (this->update_cadence_ != rhs.update_cadence_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::NestedCategoryRelationshipNode>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NestedCategoryRelationshipNode &o) {
     std::optional<decltype(builder.CreateVector(o.child_columns_.value()))> child_columns_offset = std::nullopt;
@@ -1754,6 +2133,17 @@ NestedCategoryRelationshipNode::NestedCategoryRelationshipNode(const ::NestedCat
         child_columns_ = std::make_optional(child_columns__target);
     }
     column_ = root->column();
+}
+
+bool
+NestedCategoryRelationshipNode::operator==(const NestedCategoryRelationshipNode &rhs) const {
+    if (this->child_columns_ != rhs.child_columns_) {
+        return false;
+    }
+    if (this->column_ != rhs.column_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::NestedHierarchyRelationshipNode>
@@ -1830,6 +2220,20 @@ NestedHierarchyRelationshipNode::NestedHierarchyRelationshipNode(const ::NestedH
     }
 }
 
+bool
+NestedHierarchyRelationshipNode::operator==(const NestedHierarchyRelationshipNode &rhs) const {
+    if (this->child_columns_ != rhs.child_columns_) {
+        return false;
+    }
+    if (this->child_nodes_ != rhs.child_nodes_) {
+        return false;
+    }
+    if (this->label_ != rhs.label_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::NestedStringCategoryNode>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NestedStringCategoryNode &o) {
     std::vector<::flatbuffers::Offset<::flatbuffers::String>> child_values_offsets = std::vector<::flatbuffers::Offset<::flatbuffers::String>>();
@@ -1887,6 +2291,17 @@ NestedStringCategoryNode::NestedStringCategoryNode(const ::NestedStringCategoryN
     }
 }
 
+bool
+NestedStringCategoryNode::operator==(const NestedStringCategoryNode &rhs) const {
+    if (this->child_values_ != rhs.child_values_) {
+        return false;
+    }
+    if (this->value_ != rhs.value_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::StringAggregate>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const StringAggregate &o) {
     std::optional<::flatbuffers::Offset<::flatbuffers::String>> str_offset = std::nullopt;
@@ -1933,6 +2348,17 @@ StringAggregate::StringAggregate(const ::StringAggregate *root)
     }
 }
 
+bool
+StringAggregate::operator==(const StringAggregate &rhs) const {
+    if (this->count_ != rhs.count_) {
+        return false;
+    }
+    if (this->str_ != rhs.str_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::TimeInterval>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TimeInterval &o) {
 
@@ -1968,6 +2394,17 @@ TimeInterval::TimeInterval(const ::TimeInterval *root)
 
     max_ = root->max();
     min_ = root->min();
+}
+
+bool
+TimeInterval::operator==(const TimeInterval &rhs) const {
+    if (this->max_ != rhs.max_) {
+        return false;
+    }
+    if (this->min_ != rhs.min_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::UIntAggregate>
@@ -2048,6 +2485,32 @@ UIntAggregate::UIntAggregate(const ::UIntAggregate *root)
     variance_ = root->variance();
 }
 
+bool
+UIntAggregate::operator==(const UIntAggregate &rhs) const {
+    if (this->count_ != rhs.count_) {
+        return false;
+    }
+    if (this->histo_ != rhs.histo_) {
+        return false;
+    }
+    if (this->max_ != rhs.max_) {
+        return false;
+    }
+    if (this->mean_ != rhs.mean_) {
+        return false;
+    }
+    if (this->min_ != rhs.min_) {
+        return false;
+    }
+    if (this->sum_ != rhs.sum_) {
+        return false;
+    }
+    if (this->variance_ != rhs.variance_) {
+        return false;
+    }
+    return true;
+}
+
 UIntBucket::UIntBucket()
     : count_(0)
     , max_(0) {
@@ -2062,6 +2525,17 @@ UIntBucket::UIntBucket(const ::UIntBucket *root)
 
     count_ = root->count();
     max_ = root->max();
+}
+
+bool
+UIntBucket::operator==(const UIntBucket &rhs) const {
+    if (this->count_ != rhs.count_) {
+        return false;
+    }
+    if (this->max_ != rhs.max_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::UlField>
@@ -2362,10 +2836,75 @@ UlField::UlField(const ::UlField *root)
                 storage_type_ = storage_type__shared;
                 break;
             }
+            case ::Type::RunEndEncoded: {
+                const auto storage_type__local = static_cast<const ::RunEndEncoded *>(root->storage_type());
+                std::shared_ptr<RunEndEncoded> storage_type__shared = std::make_shared<RunEndEncoded>(storage_type__local);
+                storage_type_ = storage_type__shared;
+                break;
+            }
+            case ::Type::BinaryView: {
+                const auto storage_type__local = static_cast<const ::BinaryView *>(root->storage_type());
+                std::shared_ptr<BinaryView> storage_type__shared = std::make_shared<BinaryView>(storage_type__local);
+                storage_type_ = storage_type__shared;
+                break;
+            }
+            case ::Type::Utf8View: {
+                const auto storage_type__local = static_cast<const ::Utf8View *>(root->storage_type());
+                std::shared_ptr<Utf8View> storage_type__shared = std::make_shared<Utf8View>(storage_type__local);
+                storage_type_ = storage_type__shared;
+                break;
+            }
+            case ::Type::ListView: {
+                const auto storage_type__local = static_cast<const ::ListView *>(root->storage_type());
+                std::shared_ptr<ListView> storage_type__shared = std::make_shared<ListView>(storage_type__local);
+                storage_type_ = storage_type__shared;
+                break;
+            }
+            case ::Type::LargeListView: {
+                const auto storage_type__local = static_cast<const ::LargeListView *>(root->storage_type());
+                std::shared_ptr<LargeListView> storage_type__shared = std::make_shared<LargeListView>(storage_type__local);
+                storage_type_ = storage_type__shared;
+                break;
+            }
             default: throw std::runtime_error("unknown union variant");
         }
     }
     unit_ = root->unit();
+}
+
+bool
+UlField::operator==(const UlField &rhs) const {
+    if (this->breakdown_display_name_ != rhs.breakdown_display_name_) {
+        return false;
+    }
+    if (this->component_data_ != rhs.component_data_) {
+        return false;
+    }
+    if (this->default_ != rhs.default_) {
+        return false;
+    }
+    if (this->description_ != rhs.description_) {
+        return false;
+    }
+    if (this->display_name_ != rhs.display_name_) {
+        return false;
+    }
+    if (this->field_name_ != rhs.field_name_) {
+        return false;
+    }
+    if (this->field_type_ != rhs.field_type_) {
+        return false;
+    }
+    if (this->flags_ != rhs.flags_) {
+        return false;
+    }
+    if (this->storage_type_ != rhs.storage_type_) {
+        return false;
+    }
+    if (this->unit_ != rhs.unit_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::UlFieldRelationship>
@@ -2450,6 +2989,17 @@ UlFieldRelationship::UlFieldRelationship(const ::UlFieldRelationship *root)
     if (root->relationship_display_name() != nullptr) {
         relationship_display_name_ = std::string(*root->relationship_display_name()->begin(), *root->relationship_display_name()->end());
     }
+}
+
+bool
+UlFieldRelationship::operator==(const UlFieldRelationship &rhs) const {
+    if (this->relationship_data_ != rhs.relationship_data_) {
+        return false;
+    }
+    if (this->relationship_display_name_ != rhs.relationship_display_name_) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace types

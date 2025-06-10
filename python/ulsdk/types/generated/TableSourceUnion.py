@@ -10,3 +10,4 @@ class TableSourceUnion(object):
     QueryTableSource = 4
     Vector = 5
     Placeholder = 6
+    Drive = 7

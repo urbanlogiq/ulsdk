@@ -23,7 +23,7 @@ use crate::types::object::ObjectSummary;
 /// - `me` for the current user's drive
 /// - `union` for the union of the current user's drive and all shared drives
 /// - the UUID of any drive directory
-/// 
+///
 /// Paths may include wildcards like `*`.
 ///                 
 ///
@@ -35,11 +35,7 @@ use crate::types::object::ObjectSummary;
 ///
 /// Returns
 /// * The directory listing
-pub async fn ls(
-    ctx: &dyn RequestContext,
-    root: &str,
-    tail: &str,
-) -> Result<DirectoryList, Error> {
+pub async fn ls(ctx: &dyn RequestContext, root: &str, tail: &str) -> Result<DirectoryList, Error> {
     let path = "/v1/api/ulv2/drive/:root/*tail"
         .replace(":root", root)
         .replace("*tail", tail);
@@ -77,7 +73,9 @@ pub async fn create_entry(
     params.insert("chunks".to_owned(), chunks.to_string());
 
     let body = Bytes::new();
-    let res = ctx.post(&path, body, "text/plain", Some(params), None).await?;
+    let res = ctx
+        .post(&path, body, "text/plain", Some(params), None)
+        .await?;
     res.as_slice().try_into().map_err(Error::from)
 }
 
@@ -89,9 +87,7 @@ pub async fn create_entry(
 ///
 /// Returns
 /// * A listing of all the directory roots.
-pub async fn get_roots(
-    ctx: &dyn RequestContext,
-) -> Result<DirectoryList, Error> {
+pub async fn get_roots(ctx: &dyn RequestContext) -> Result<DirectoryList, Error> {
     let path = "/v1/api/ulv2/drive/*";
     let res = ctx.get(&path, None, None).await?;
     res.as_slice().try_into().map_err(Error::from)
@@ -114,10 +110,12 @@ pub async fn post_file(
     force: bool,
     files: Vec<File>,
 ) -> Result<DirectoryList, Error> {
-    let path = "/v1/api/ulv2/drive/:root"
-        .replace(":root", &root.to_string());
+    let path = "/v1/api/ulv2/drive/:root".replace(":root", &root.to_string());
     let mut params = ParamMap::new();
-    params.insert("force".to_owned(), if force { "true" } else  { "false" }.to_owned());
+    params.insert(
+        "force".to_owned(),
+        if force { "true" } else { "false" }.to_owned(),
+    );
 
     let res = ctx.upload(&path, files).await?;
     res.as_slice().try_into().map_err(Error::from)
@@ -132,12 +130,8 @@ pub async fn post_file(
 ///
 /// Returns
 /// * An updated list of directory entries
-pub async fn unlink(
-    ctx: &dyn RequestContext,
-    entry: Uuid,
-) -> Result<DirectoryList, Error> {
-    let path = "/v1/api/ulv2/drive/:entry"
-        .replace(":entry", &entry.to_string());
+pub async fn unlink(ctx: &dyn RequestContext, entry: Uuid) -> Result<DirectoryList, Error> {
+    let path = "/v1/api/ulv2/drive/:entry".replace(":entry", &entry.to_string());
     let res = ctx.delete(&path, None, None).await?;
     res.as_slice().try_into().map_err(Error::from)
 }
@@ -148,13 +142,11 @@ pub async fn unlink(
 ///
 /// * `ctx` - A request context object
 /// * `move_request` - Details of the move operation.
-pub async fn move_(
-    ctx: &dyn RequestContext,
-    move_request: MoveRequest,
-) -> Result<(), Error> {
+pub async fn move_(ctx: &dyn RequestContext, move_request: MoveRequest) -> Result<(), Error> {
     let path = "/v1/api/ulv2/drive/move";
     let body = Bytes::from(Vec::<u8>::from(move_request));
-    ctx.post(&path, body, "application/octet-stream", None, None).await?;
+    ctx.post(&path, body, "application/octet-stream", None, None)
+        .await?;
     Ok(())
 }
 
@@ -164,13 +156,11 @@ pub async fn move_(
 ///
 /// * `ctx` - A request context object
 /// * `copy_request` - Details of the copy operation.
-pub async fn copy(
-    ctx: &dyn RequestContext,
-    copy_request: MoveRequest,
-) -> Result<(), Error> {
+pub async fn copy(ctx: &dyn RequestContext, copy_request: MoveRequest) -> Result<(), Error> {
     let path = "/v1/api/ulv2/drive/copy";
     let body = Bytes::from(Vec::<u8>::from(copy_request));
-    ctx.post(&path, body, "application/octet-stream", None, None).await?;
+    ctx.post(&path, body, "application/octet-stream", None, None)
+        .await?;
     Ok(())
 }
 
@@ -183,12 +173,8 @@ pub async fn copy(
 ///
 /// Returns
 /// * The contents of the file referenced by the specified ID
-pub async fn get_file(
-    ctx: &dyn RequestContext,
-    id: Uuid,
-) -> Result<Vec<u8>, Error> {
-    let path = "/v1/api/ulv2/drive/file/:id"
-        .replace(":id", &id.to_string());
+pub async fn get_file(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u8>, Error> {
+    let path = "/v1/api/ulv2/drive/file/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     Ok(res)
 }
@@ -216,7 +202,8 @@ pub async fn put_file_chunk(
     params.insert("hash".to_owned(), hash.to_owned());
 
     let body = Bytes::from(chunk);
-    ctx.put(&path, body, "application/octet-stream", Some(params), None).await?;
+    ctx.put(&path, body, "application/octet-stream", Some(params), None)
+        .await?;
     Ok(())
 }
 
@@ -229,220 +216,244 @@ pub async fn put_file_chunk(
 ///
 /// Returns
 /// * Drive directory root ID
-pub async fn get_root_id(
-    ctx: &dyn RequestContext,
-    b2cid: Uuid,
-) -> Result<ObjectId, Error> {
-    let path = "/v1/api/ulv2/drive/root/:b2cid"
-        .replace(":b2cid", &b2cid.to_string());
+pub async fn get_root_id(ctx: &dyn RequestContext, b2cid: Uuid) -> Result<ObjectId, Error> {
+    let path = "/v1/api/ulv2/drive/root/:b2cid".replace(":b2cid", &b2cid.to_string());
     let res = ctx.get(&path, None, None).await?;
     res.as_slice().try_into().map_err(Error::from)
 }
 
-
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-    use crate::request_context::ApiKeyContext;
-    use crate::keys::Key;
-    use crate::{Region, Environment};
     use super::*;
+    use crate::keys::Key as SigningKey;
+    use crate::request_context::{ApiKeyContext, TestContext};
+    use crate::{Environment, Region};
+    use std::str::FromStr;
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_ls() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = "";
-        let p1 = "";
-
-        ls(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+        let p1 = "tail".into();
+        let expected = DirectoryList::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = ls(&ctx, p0, p1).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_create_entry() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = "";
-        let p2 = "";
-        let p3 = "";
-        let p4 = 0;
-
-        create_entry(
-            &ctx,
-            p0,
-            p1,
-            p2,
-            p3,
-            p4,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = "tail".into();
+        let q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+        let q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+        let q2 = 42;
+        let expected = ObjectSummary::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = create_entry(&ctx, p0, p1, q0, q1, q2).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_roots() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-
-        get_roots(
-            &ctx,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let expected = DirectoryList::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = get_roots(&ctx).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_post_file() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = false;
-        let p2 = vec![File { name: "test.txt".to_owned(), mimetype: "text/plain".to_owned() , data: Bytes::new() }];
-
-        post_file(
-            &ctx,
-            p0,
-            p1,
-            p2,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let q0 = true;
+        let body = Vec::new();
+        let expected = DirectoryList::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = post_file(&ctx, p0, q0, body).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_unlink() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        unlink(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = DirectoryList::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = unlink(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_move() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = MoveRequest::default();
-
-        move_(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let body = crate::types::MoveRequest::default();
+        move_(&ctx, body).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_copy() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = MoveRequest::default();
-
-        copy(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let body = crate::types::MoveRequest::default();
+        copy(&ctx, body).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_file() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        get_file(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        let expected_bytes = expected.clone();
+        ctx.set_response(expected_bytes);
+        let result = get_file(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_put_file_chunk() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = 0;
-        let p2 = "";
-        let p3 = Vec::new();
-
-        put_file_chunk(
-            &ctx,
-            p0,
-            p1,
-            p2,
-            p3,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = 42;
+        let q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+        let body = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".to_vec();
+        put_file_chunk(&ctx, p0, p1, q0, body).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_root_id() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        get_root_id(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = ObjectId::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = get_root_id(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 }

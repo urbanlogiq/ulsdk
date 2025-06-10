@@ -25,12 +25,8 @@ use crate::types::notification::Inbox;
 ///
 /// Returns
 /// * The contents of the inbox folder
-pub async fn fetch(
-    ctx: &dyn RequestContext,
-    folder: &str,
-) -> Result<Inbox, Error> {
-    let path = "/v1/api/ulv2/inbox/:folder"
-        .replace(":folder", folder);
+pub async fn fetch(ctx: &dyn RequestContext, folder: &str) -> Result<Inbox, Error> {
+    let path = "/v1/api/ulv2/inbox/:folder".replace(":folder", folder);
     let res = ctx.get(&path, None, None).await?;
     res.as_slice().try_into().map_err(Error::from)
 }
@@ -41,12 +37,8 @@ pub async fn fetch(
 ///
 /// * `ctx` - A request context object
 /// * `folder` - The name of the folder to clear
-pub async fn clear_all_status(
-    ctx: &dyn RequestContext,
-    folder: &str,
-) -> Result<(), Error> {
-    let path = "/v1/api/ulv2/inbox/:folder"
-        .replace(":folder", folder);
+pub async fn clear_all_status(ctx: &dyn RequestContext, folder: &str) -> Result<(), Error> {
+    let path = "/v1/api/ulv2/inbox/:folder".replace(":folder", folder);
     ctx.delete(&path, None, None).await?;
     Ok(())
 }
@@ -81,11 +73,7 @@ pub async fn set_status(
 /// * `ctx` - A request context object
 /// * `folder` - The name of the folder to clear the status in
 /// * `id` - The ID of the notification to clear the status for
-pub async fn clear_status(
-    ctx: &dyn RequestContext,
-    folder: &str,
-    id: Uuid,
-) -> Result<(), Error> {
+pub async fn clear_status(ctx: &dyn RequestContext, folder: &str, id: Uuid) -> Result<(), Error> {
     let path = "/v1/api/ulv2/inbox/:folder/:id"
         .replace(":folder", folder)
         .replace(":id", &id.to_string());
@@ -93,90 +81,94 @@ pub async fn clear_status(
     Ok(())
 }
 
-
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-    use crate::request_context::ApiKeyContext;
-    use crate::keys::Key;
-    use crate::{Region, Environment};
     use super::*;
+    use crate::keys::Key as SigningKey;
+    use crate::request_context::{ApiKeyContext, TestContext};
+    use crate::{Environment, Region};
+    use std::str::FromStr;
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_fetch() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = "";
-
-        fetch(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+        let expected = Inbox::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = fetch(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_clear_all_status() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = "";
-
-        clear_all_status(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+        clear_all_status(&ctx, p0).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_set_status() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = "";
-        let p1 = Uuid::nil();
-        let p2 = 0;
-
-        set_status(
-            &ctx,
-            p0,
-            p1,
-            p2,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p2 = 42;
+        set_status(&ctx, p0, p1, p2).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_clear_status() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = "";
-        let p1 = Uuid::nil();
-
-        clear_status(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        clear_status(&ctx, p0, p1).await.unwrap();
     }
 }

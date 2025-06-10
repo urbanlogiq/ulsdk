@@ -69,6 +69,10 @@ struct Modify {
     Modify();
     Modify(const ::Modify *root);
     Modify(const std::vector<uint8_t> &bytes);
+    bool operator==(const Modify &rhs) const;
+    bool operator!=(const Modify &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Delete {
@@ -77,6 +81,10 @@ struct Delete {
     Delete();
     Delete(const ::Delete *root);
     Delete(const std::vector<uint8_t> &bytes);
+    bool operator==(const Delete &rhs) const;
+    bool operator!=(const Delete &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Restore {
@@ -85,6 +93,10 @@ struct Restore {
     Restore();
     Restore(const ::Restore *root);
     Restore(const std::vector<uint8_t> &bytes);
+    bool operator==(const Restore &rhs) const;
+    bool operator!=(const Restore &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -98,6 +110,10 @@ struct Set {
     Set();
     Set(const ::Set *root);
     Set(const std::vector<uint8_t> &bytes);
+    bool operator==(const Set &rhs) const;
+    bool operator!=(const Set &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -109,6 +125,10 @@ struct RmRow {
     RmRow();
     RmRow(const ::RmRow *root);
     RmRow(const std::vector<uint8_t> &bytes);
+    bool operator==(const RmRow &rhs) const;
+    bool operator!=(const RmRow &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -122,6 +142,10 @@ struct RestoreRow {
     RestoreRow();
     RestoreRow(const ::RestoreRow *root);
     RestoreRow(const std::vector<uint8_t> &bytes);
+    bool operator==(const RestoreRow &rhs) const;
+    bool operator!=(const RestoreRow &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -133,6 +157,10 @@ struct Append {
     Append();
     Append(const ::Append *root);
     Append(const std::vector<uint8_t> &bytes);
+    bool operator==(const Append &rhs) const;
+    bool operator!=(const Append &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ChangeOpEntry {
@@ -141,6 +169,10 @@ struct ChangeOpEntry {
     ChangeOpEntry();
     ChangeOpEntry(const ::ChangeOpEntry *root);
     ChangeOpEntry(const std::vector<uint8_t> &bytes);
+    bool operator==(const ChangeOpEntry &rhs) const;
+    bool operator!=(const ChangeOpEntry &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ChangeSet {
@@ -153,6 +185,10 @@ struct ChangeSet {
     ChangeSet();
     ChangeSet(const ::ChangeSet *root);
     ChangeSet(const std::vector<uint8_t> &bytes);
+    bool operator==(const ChangeSet &rhs) const;
+    bool operator!=(const ChangeSet &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -167,6 +203,10 @@ struct DiffStream {
     DiffStream();
     DiffStream(const ::DiffStream *root);
     DiffStream(const std::vector<uint8_t> &bytes);
+    bool operator==(const DiffStream &rhs) const;
+    bool operator!=(const DiffStream &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct History {
@@ -176,6 +216,10 @@ struct History {
     History();
     History(const ::History *root);
     History(const std::vector<uint8_t> &bytes);
+    bool operator==(const History &rhs) const;
+    bool operator!=(const History &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -191,6 +235,10 @@ struct NewTable {
     NewTable();
     NewTable(const ::NewTable *root);
     NewTable(const std::vector<uint8_t> &bytes);
+    bool operator==(const NewTable &rhs) const;
+    bool operator!=(const NewTable &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct OpEntry {
@@ -199,6 +247,10 @@ struct OpEntry {
     OpEntry();
     OpEntry(const ::OpEntry *root);
     OpEntry(const std::vector<uint8_t> &bytes);
+    bool operator==(const OpEntry &rhs) const;
+    bool operator!=(const OpEntry &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::pair<::flatbuffers::Offset<void>, ::ChangeOp>

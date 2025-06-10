@@ -79,4 +79,70 @@ inline const char *EnumNameMeasureType(MeasureType e) {
   return EnumNamesMeasureType()[index];
 }
 
+enum class Category : uint8_t {
+  INVALID = 0,
+  BUS = 1,
+  RAIL = 2,
+  DEMAND_RESPONSE = 3,
+  ARTICULATED_BUS = 4,
+  CUTAWAY = 5,
+  VAN = 6,
+  HEAVY_RAIL_PASSENGER_CAR = 7,
+  AUTOMOBILES = 8,
+  TRUCKS_AND_OTHER_RUBBER_TIRE_VEHICLES = 9,
+  STEEL_WHEEL_VEHICLES = 10,
+  PASSENGER_PARKING_FACILITIES = 11,
+  ADMINISTRATIVE_MAINTENANCE_FACILITIES = 12,
+  HANDI_VAN = 13,
+  MIN = INVALID,
+  MAX = HANDI_VAN
+};
+
+inline const Category (&EnumValuesCategory())[14] {
+  static const Category values[] = {
+    Category::INVALID,
+    Category::BUS,
+    Category::RAIL,
+    Category::DEMAND_RESPONSE,
+    Category::ARTICULATED_BUS,
+    Category::CUTAWAY,
+    Category::VAN,
+    Category::HEAVY_RAIL_PASSENGER_CAR,
+    Category::AUTOMOBILES,
+    Category::TRUCKS_AND_OTHER_RUBBER_TIRE_VEHICLES,
+    Category::STEEL_WHEEL_VEHICLES,
+    Category::PASSENGER_PARKING_FACILITIES,
+    Category::ADMINISTRATIVE_MAINTENANCE_FACILITIES,
+    Category::HANDI_VAN
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesCategory() {
+  static const char * const names[15] = {
+    "INVALID",
+    "BUS",
+    "RAIL",
+    "DEMAND_RESPONSE",
+    "ARTICULATED_BUS",
+    "CUTAWAY",
+    "VAN",
+    "HEAVY_RAIL_PASSENGER_CAR",
+    "AUTOMOBILES",
+    "TRUCKS_AND_OTHER_RUBBER_TIRE_VEHICLES",
+    "STEEL_WHEEL_VEHICLES",
+    "PASSENGER_PARKING_FACILITIES",
+    "ADMINISTRATIVE_MAINTENANCE_FACILITIES",
+    "HANDI_VAN",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameCategory(Category e) {
+  if (::flatbuffers::IsOutRange(e, Category::INVALID, Category::HANDI_VAN)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesCategory()[index];
+}
+
 #endif  // FLATBUFFERS_GENERATED_OAHUMPO_H_

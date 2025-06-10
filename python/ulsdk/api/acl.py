@@ -303,12 +303,15 @@ def revoke(
 def get_permissions(
     ctx: RequestContext,
     id_: UUID,
-) -> None:
+) -> bytes:
     """Get the permissions the caller has on the object with the given ID.
 
     Arguments:
     ctx: RequestContext -- A request context object
     id_: UUID -- The ID of the object which will be queried for permissions.
+
+    Returns:
+    The 32-bit integer bitmap corresponding to the permissions the caller has on the object.
     """
 
     path = "/v1/api/ulv2/datacatalog/acl/perms/:id"
@@ -316,8 +319,8 @@ def get_permissions(
 
     params = dict()
     headers = dict()
-    ctx.get(path, params=params, headers=headers)
-    return
+    res = ctx.get(path, params=params, headers=headers)
+    return res
 
 def set(
     ctx: RequestContext,

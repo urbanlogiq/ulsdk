@@ -50,6 +50,10 @@ struct DataCatalogObject {
     DataCatalogObject();
     DataCatalogObject(const ::DataCatalogObject *root);
     DataCatalogObject(const std::vector<uint8_t> &bytes);
+    bool operator==(const DataCatalogObject &rhs) const;
+    bool operator!=(const DataCatalogObject &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ObjectIdList {
@@ -58,6 +62,10 @@ struct ObjectIdList {
     ObjectIdList();
     ObjectIdList(const ::ObjectIdList *root);
     ObjectIdList(const std::vector<uint8_t> &bytes);
+    bool operator==(const ObjectIdList &rhs) const;
+    bool operator!=(const ObjectIdList &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ObjectIdPair {
@@ -67,6 +75,10 @@ struct ObjectIdPair {
     ObjectIdPair();
     ObjectIdPair(const ::ObjectIdPair *root);
     ObjectIdPair(const std::vector<uint8_t> &bytes);
+    bool operator==(const ObjectIdPair &rhs) const;
+    bool operator!=(const ObjectIdPair &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ObjectIdPairList {
@@ -75,6 +87,10 @@ struct ObjectIdPairList {
     ObjectIdPairList();
     ObjectIdPairList(const ::ObjectIdPairList *root);
     ObjectIdPairList(const std::vector<uint8_t> &bytes);
+    bool operator==(const ObjectIdPairList &rhs) const;
+    bool operator!=(const ObjectIdPairList &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ObjectSummary {
@@ -88,6 +104,10 @@ struct ObjectSummary {
     ObjectSummary();
     ObjectSummary(const ::ObjectSummary *root);
     ObjectSummary(const std::vector<uint8_t> &bytes);
+    bool operator==(const ObjectSummary &rhs) const;
+    bool operator!=(const ObjectSummary &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ObjectSummaryList {
@@ -96,6 +116,10 @@ struct ObjectSummaryList {
     ObjectSummaryList();
     ObjectSummaryList(const ::ObjectSummaryList *root);
     ObjectSummaryList(const std::vector<uint8_t> &bytes);
+    bool operator==(const ObjectSummaryList &rhs) const;
+    bool operator!=(const ObjectSummaryList &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ::flatbuffers::Offset<::DataCatalogObject>

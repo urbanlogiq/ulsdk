@@ -52,6 +52,12 @@ def test_distinct():
     _t1 = Distinct.from_bytes(_b)
     assert _t0 == _t1
 
+def test_drive():
+    _t0 = Drive.make_default()
+    _b = _t0.to_bytes()
+    _t1 = Drive.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_expr():
     _t0 = Expr.make_default()
     _b = _t0.to_bytes()

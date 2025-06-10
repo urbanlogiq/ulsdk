@@ -50,6 +50,10 @@ struct UseCase {
     UseCase();
     UseCase(const ::UseCase *root);
     UseCase(const std::vector<uint8_t> &bytes);
+    bool operator==(const UseCase &rhs) const;
+    bool operator!=(const UseCase &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct UseCaseInputPair {
@@ -59,6 +63,10 @@ struct UseCaseInputPair {
     UseCaseInputPair();
     UseCaseInputPair(const ::UseCaseInputPair *root);
     UseCaseInputPair(const std::vector<uint8_t> &bytes);
+    bool operator==(const UseCaseInputPair &rhs) const;
+    bool operator!=(const UseCaseInputPair &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::pair<::flatbuffers::Offset<void>, ::UseCaseInput>

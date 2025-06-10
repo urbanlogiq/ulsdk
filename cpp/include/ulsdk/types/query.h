@@ -30,6 +30,7 @@ struct Column;
 struct DataCatalog;
 struct DeleteQueryElement;
 struct Distinct;
+struct Drive;
 struct Expr;
 struct Function;
 struct Join;
@@ -88,7 +89,8 @@ typedef std::variant<
     std::shared_ptr<GraphQuery>,
     std::shared_ptr<QueryTableSource>,
     std::shared_ptr<Vector>,
-    std::shared_ptr<Placeholder>
+    std::shared_ptr<Placeholder>,
+    std::shared_ptr<Drive>
 > TableSourceUnion;
 
 using ::TypeHint;
@@ -98,6 +100,10 @@ struct ValueIndex {
     ValueIndex();
     ValueIndex(const ::ValueIndex *root);
     ValueIndex(const std::vector<uint8_t> &bytes);
+    bool operator==(const ValueIndex &rhs) const;
+    bool operator!=(const ValueIndex &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct NullableUint {
@@ -106,6 +112,10 @@ struct NullableUint {
     NullableUint();
     NullableUint(const ::NullableUint *root);
     NullableUint(const std::vector<uint8_t> &bytes);
+    bool operator==(const NullableUint &rhs) const;
+    bool operator!=(const NullableUint &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Column {
@@ -116,6 +126,10 @@ struct Column {
     Column();
     Column(const ::Column *root);
     Column(const std::vector<uint8_t> &bytes);
+    bool operator==(const Column &rhs) const;
+    bool operator!=(const Column &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Function {
@@ -125,6 +139,10 @@ struct Function {
     Function();
     Function(const ::Function *root);
     Function(const std::vector<uint8_t> &bytes);
+    bool operator==(const Function &rhs) const;
+    bool operator!=(const Function &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct AllColumns {
@@ -133,6 +151,10 @@ struct AllColumns {
     AllColumns();
     AllColumns(const ::AllColumns *root);
     AllColumns(const std::vector<uint8_t> &bytes);
+    bool operator==(const AllColumns &rhs) const;
+    bool operator!=(const AllColumns &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Expr {
@@ -141,6 +163,10 @@ struct Expr {
     Expr();
     Expr(const ::Expr *root);
     Expr(const std::vector<uint8_t> &bytes);
+    bool operator==(const Expr &rhs) const;
+    bool operator!=(const Expr &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Case {
@@ -150,6 +176,10 @@ struct Case {
     Case();
     Case(const ::Case *root);
     Case(const std::vector<uint8_t> &bytes);
+    bool operator==(const Case &rhs) const;
+    bool operator!=(const Case &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct OrderByExpr {
@@ -158,6 +188,10 @@ struct OrderByExpr {
     OrderByExpr();
     OrderByExpr(const ::OrderByExpr *root);
     OrderByExpr(const std::vector<uint8_t> &bytes);
+    bool operator==(const OrderByExpr &rhs) const;
+    bool operator!=(const OrderByExpr &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Partition {
@@ -166,6 +200,10 @@ struct Partition {
     Partition();
     Partition(const ::Partition *root);
     Partition(const std::vector<uint8_t> &bytes);
+    bool operator==(const Partition &rhs) const;
+    bool operator!=(const Partition &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct UnsetArgument {
@@ -173,6 +211,10 @@ struct UnsetArgument {
     UnsetArgument();
     UnsetArgument(const ::UnsetArgument *root);
     UnsetArgument(const std::vector<uint8_t> &bytes);
+    bool operator==(const UnsetArgument &rhs) const;
+    bool operator!=(const UnsetArgument &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Window {
@@ -183,6 +225,10 @@ struct Window {
     Window();
     Window(const ::Window *root);
     Window(const std::vector<uint8_t> &bytes);
+    bool operator==(const Window &rhs) const;
+    bool operator!=(const Window &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct ValueName {
@@ -191,6 +237,10 @@ struct ValueName {
     ValueName();
     ValueName(const ::ValueName *root);
     ValueName(const std::vector<uint8_t> &bytes);
+    bool operator==(const ValueName &rhs) const;
+    bool operator!=(const ValueName &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -207,6 +257,10 @@ struct Distinct {
     Distinct();
     Distinct(const ::Distinct *root);
     Distinct(const std::vector<uint8_t> &bytes);
+    bool operator==(const Distinct &rhs) const;
+    bool operator!=(const Distinct &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct UnaryQueryElement {
@@ -222,6 +276,10 @@ struct UnaryQueryElement {
     UnaryQueryElement();
     UnaryQueryElement(const ::UnaryQueryElement *root);
     UnaryQueryElement(const std::vector<uint8_t> &bytes);
+    bool operator==(const UnaryQueryElement &rhs) const;
+    bool operator!=(const UnaryQueryElement &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct QueryElement {
@@ -230,6 +288,10 @@ struct QueryElement {
     QueryElement();
     QueryElement(const ::QueryElement *root);
     QueryElement(const std::vector<uint8_t> &bytes);
+    bool operator==(const QueryElement &rhs) const;
+    bool operator!=(const QueryElement &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct BinaryQueryElement {
@@ -240,6 +302,10 @@ struct BinaryQueryElement {
     BinaryQueryElement();
     BinaryQueryElement(const ::BinaryQueryElement *root);
     BinaryQueryElement(const std::vector<uint8_t> &bytes);
+    bool operator==(const BinaryQueryElement &rhs) const;
+    bool operator!=(const BinaryQueryElement &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -252,6 +318,10 @@ struct MvdbPartition {
     MvdbPartition();
     MvdbPartition(const ::MvdbPartition *root);
     MvdbPartition(const std::vector<uint8_t> &bytes);
+    bool operator==(const MvdbPartition &rhs) const;
+    bool operator!=(const MvdbPartition &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct WorklogPartition {
@@ -260,6 +330,10 @@ struct WorklogPartition {
     WorklogPartition();
     WorklogPartition(const ::WorklogPartition *root);
     WorklogPartition(const std::vector<uint8_t> &bytes);
+    bool operator==(const WorklogPartition &rhs) const;
+    bool operator!=(const WorklogPartition &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct DataCatalog {
@@ -270,6 +344,10 @@ struct DataCatalog {
     DataCatalog();
     DataCatalog(const ::DataCatalog *root);
     DataCatalog(const std::vector<uint8_t> &bytes);
+    bool operator==(const DataCatalog &rhs) const;
+    bool operator!=(const DataCatalog &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Arrow {
@@ -278,6 +356,10 @@ struct Arrow {
     Arrow();
     Arrow(const ::Arrow *root);
     Arrow(const std::vector<uint8_t> &bytes);
+    bool operator==(const Arrow &rhs) const;
+    bool operator!=(const Arrow &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Query {
@@ -289,6 +371,10 @@ struct Query {
     Query();
     Query(const ::Query *root);
     Query(const std::vector<uint8_t> &bytes);
+    bool operator==(const Query &rhs) const;
+    bool operator!=(const Query &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct QueryTableSource {
@@ -297,6 +383,10 @@ struct QueryTableSource {
     QueryTableSource();
     QueryTableSource(const ::QueryTableSource *root);
     QueryTableSource(const std::vector<uint8_t> &bytes);
+    bool operator==(const QueryTableSource &rhs) const;
+    bool operator!=(const QueryTableSource &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Vector {
@@ -308,6 +398,10 @@ struct Vector {
     Vector();
     Vector(const ::Vector *root);
     Vector(const std::vector<uint8_t> &bytes);
+    bool operator==(const Vector &rhs) const;
+    bool operator!=(const Vector &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Placeholder {
@@ -316,6 +410,23 @@ struct Placeholder {
     Placeholder();
     Placeholder(const ::Placeholder *root);
     Placeholder(const std::vector<uint8_t> &bytes);
+    bool operator==(const Placeholder &rhs) const;
+    bool operator!=(const Placeholder &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+struct Drive {
+    std::optional<std::string> path_;
+    std::optional<ObjectId> root_;
+
+    Drive();
+    Drive(const ::Drive *root);
+    Drive(const std::vector<uint8_t> &bytes);
+    bool operator==(const Drive &rhs) const;
+    bool operator!=(const Drive &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct UpdateQueryElement {
@@ -326,6 +437,10 @@ struct UpdateQueryElement {
     UpdateQueryElement();
     UpdateQueryElement(const ::UpdateQueryElement *root);
     UpdateQueryElement(const std::vector<uint8_t> &bytes);
+    bool operator==(const UpdateQueryElement &rhs) const;
+    bool operator!=(const UpdateQueryElement &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct DeleteQueryElement {
@@ -335,6 +450,10 @@ struct DeleteQueryElement {
     DeleteQueryElement();
     DeleteQueryElement(const ::DeleteQueryElement *root);
     DeleteQueryElement(const std::vector<uint8_t> &bytes);
+    bool operator==(const DeleteQueryElement &rhs) const;
+    bool operator!=(const DeleteQueryElement &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Join {
@@ -347,6 +466,10 @@ struct Join {
     Join();
     Join(const ::Join *root);
     Join(const std::vector<uint8_t> &bytes);
+    bool operator==(const Join &rhs) const;
+    bool operator!=(const Join &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ///
@@ -359,6 +482,10 @@ struct SetExpr {
     SetExpr();
     SetExpr(const ::SetExpr *root);
     SetExpr(const std::vector<uint8_t> &bytes);
+    bool operator==(const SetExpr &rhs) const;
+    bool operator!=(const SetExpr &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct TableOrderBy {
@@ -369,6 +496,10 @@ struct TableOrderBy {
     TableOrderBy();
     TableOrderBy(const ::TableOrderBy *root);
     TableOrderBy(const std::vector<uint8_t> &bytes);
+    bool operator==(const TableOrderBy &rhs) const;
+    bool operator!=(const TableOrderBy &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct TableSource {
@@ -381,6 +512,10 @@ struct TableSource {
     TableSource();
     TableSource(const ::TableSource *root);
     TableSource(const std::vector<uint8_t> &bytes);
+    bool operator==(const TableSource &rhs) const;
+    bool operator!=(const TableSource &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct TableSourceInstance {
@@ -389,6 +524,10 @@ struct TableSourceInstance {
     TableSourceInstance();
     TableSourceInstance(const ::TableSourceInstance *root);
     TableSourceInstance(const std::vector<uint8_t> &bytes);
+    bool operator==(const TableSourceInstance &rhs) const;
+    bool operator!=(const TableSourceInstance &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct When {
@@ -398,6 +537,10 @@ struct When {
     When();
     When(const ::When *root);
     When(const std::vector<uint8_t> &bytes);
+    bool operator==(const When &rhs) const;
+    bool operator!=(const When &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 std::pair<::flatbuffers::Offset<void>, ::ExprUnion>
@@ -479,6 +622,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Vector &);
 
 ::flatbuffers::Offset<::Placeholder>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Placeholder &);
+
+::flatbuffers::Offset<::Drive>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Drive &);
 
 ::flatbuffers::Offset<::UpdateQueryElement>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UpdateQueryElement &);
@@ -576,6 +722,9 @@ to_bytes(const Vector &o);
 
 std::vector<uint8_t>
 to_bytes(const Placeholder &o);
+
+std::vector<uint8_t>
+to_bytes(const Drive &o);
 
 std::vector<uint8_t>
 to_bytes(const UpdateQueryElement &o);

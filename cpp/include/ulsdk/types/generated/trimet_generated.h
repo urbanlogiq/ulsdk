@@ -317,11 +317,12 @@ enum class LiftFareType : uint8_t {
   CASH_HC_1 = 21,
   TRANSFER = 22,
   CASH_FARE_FOR_COMPANION = 23,
+  NEXT_MICROTRANSIT_FARE = 24,
   MIN = UNKNOWN,
-  MAX = CASH_FARE_FOR_COMPANION
+  MAX = NEXT_MICROTRANSIT_FARE
 };
 
-inline const LiftFareType (&EnumValuesLiftFareType())[24] {
+inline const LiftFareType (&EnumValuesLiftFareType())[25] {
   static const LiftFareType values[] = {
     LiftFareType::UNKNOWN,
     LiftFareType::HOP_PASS,
@@ -346,13 +347,14 @@ inline const LiftFareType (&EnumValuesLiftFareType())[24] {
     LiftFareType::LIFT_TICKET,
     LiftFareType::CASH_HC_1,
     LiftFareType::TRANSFER,
-    LiftFareType::CASH_FARE_FOR_COMPANION
+    LiftFareType::CASH_FARE_FOR_COMPANION,
+    LiftFareType::NEXT_MICROTRANSIT_FARE
   };
   return values;
 }
 
 inline const char * const *EnumNamesLiftFareType() {
-  static const char * const names[25] = {
+  static const char * const names[26] = {
     "UNKNOWN",
     "HOP_PASS",
     "NO_PAY",
@@ -377,13 +379,14 @@ inline const char * const *EnumNamesLiftFareType() {
     "CASH_HC_1",
     "TRANSFER",
     "CASH_FARE_FOR_COMPANION",
+    "NEXT_MICROTRANSIT_FARE",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameLiftFareType(LiftFareType e) {
-  if (::flatbuffers::IsOutRange(e, LiftFareType::UNKNOWN, LiftFareType::CASH_FARE_FOR_COMPANION)) return "";
+  if (::flatbuffers::IsOutRange(e, LiftFareType::UNKNOWN, LiftFareType::NEXT_MICROTRANSIT_FARE)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesLiftFareType()[index];
 }

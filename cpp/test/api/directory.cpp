@@ -25,191 +25,423 @@
 namespace directory {
 
 ul::Result<ul::Void>
-test_get_principal(ul::RequestContext &ctx) {
-    ::ul::api::directory::get_principal(
+test_get_principal(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::api::directory::Principal expected = ::ul::api::directory::Principal();
+    const std::vector<uint8_t> expected_bytes = ::ul::api::directory::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::directory::get_principal(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::api::directory::Principal result_value = std::get<::ul::api::directory::Principal>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_principal_obj(test_get_principal, "directory::get_principal", &link_only_api_test_root);
+ApiTest test_get_principal_obj(test_get_principal, "directory::get_principal", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_principals(ul::RequestContext &ctx) {
-    ::ul::api::directory::get_principals(
+test_get_principals(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const std::string p0 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+    std::vector<::ul::api::directory::Principal> expected;
+    std::vector<uint8_t> expected_bytes;
+    expected_bytes.push_back((uint8_t)'[');
+    for (int i = 0; i < 5; ++i) {
+        ::ul::api::directory::Principal value = ::ul::api::directory::Principal();
+        const std::vector<uint8_t> bytes = to_bytes(value);
+        expected_bytes.insert(expected_bytes.end(), bytes.begin(), bytes.end());
+        expected_bytes.push_back((uint8_t)',');
+        expected.push_back(value);
+    }
+    expected_bytes.pop_back();
+    expected_bytes.push_back((uint8_t)']');
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::directory::get_principals(
         ctx,
-        std::string()
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<::ul::api::directory::Principal> result_value = std::get<std::vector<::ul::api::directory::Principal>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_principals_obj(test_get_principals, "directory::get_principals", &link_only_api_test_root);
+ApiTest test_get_principals_obj(test_get_principals, "directory::get_principals", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_query_principals(ul::RequestContext &ctx) {
-    ::ul::api::directory::query_principals(
+test_query_principals(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const std::string p0 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+    std::vector<::ul::api::directory::Principal> expected;
+    std::vector<uint8_t> expected_bytes;
+    expected_bytes.push_back((uint8_t)'[');
+    for (int i = 0; i < 5; ++i) {
+        ::ul::api::directory::Principal value = ::ul::api::directory::Principal();
+        const std::vector<uint8_t> bytes = to_bytes(value);
+        expected_bytes.insert(expected_bytes.end(), bytes.begin(), bytes.end());
+        expected_bytes.push_back((uint8_t)',');
+        expected.push_back(value);
+    }
+    expected_bytes.pop_back();
+    expected_bytes.push_back((uint8_t)']');
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::directory::query_principals(
         ctx,
-        std::string()
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<::ul::api::directory::Principal> result_value = std::get<std::vector<::ul::api::directory::Principal>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_query_principals_obj(test_query_principals, "directory::query_principals", &link_only_api_test_root);
+ApiTest test_query_principals_obj(test_query_principals, "directory::query_principals", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_users(ul::RequestContext &ctx) {
-    ::ul::api::directory::get_users(
+test_get_users(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    std::vector<::ul::api::directory::AdUser> expected;
+    std::vector<uint8_t> expected_bytes;
+    expected_bytes.push_back((uint8_t)'[');
+    for (int i = 0; i < 5; ++i) {
+        ::ul::api::directory::AdUser value = ::ul::api::directory::AdUser();
+        const std::vector<uint8_t> bytes = to_bytes(value);
+        expected_bytes.insert(expected_bytes.end(), bytes.begin(), bytes.end());
+        expected_bytes.push_back((uint8_t)',');
+        expected.push_back(value);
+    }
+    expected_bytes.pop_back();
+    expected_bytes.push_back((uint8_t)']');
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::directory::get_users(
         ctx
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<::ul::api::directory::AdUser> result_value = std::get<std::vector<::ul::api::directory::AdUser>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_users_obj(test_get_users, "directory::get_users", &link_only_api_test_root);
+ApiTest test_get_users_obj(test_get_users, "directory::get_users", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_users_display_names(ul::RequestContext &ctx) {
-    ::ul::api::directory::get_users_display_names(
+test_get_users_display_names(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    std::vector<::ul::api::directory::DisplayNames> expected;
+    std::vector<uint8_t> expected_bytes;
+    expected_bytes.push_back((uint8_t)'[');
+    for (int i = 0; i < 5; ++i) {
+        ::ul::api::directory::DisplayNames value = ::ul::api::directory::DisplayNames();
+        const std::vector<uint8_t> bytes = to_bytes(value);
+        expected_bytes.insert(expected_bytes.end(), bytes.begin(), bytes.end());
+        expected_bytes.push_back((uint8_t)',');
+        expected.push_back(value);
+    }
+    expected_bytes.pop_back();
+    expected_bytes.push_back((uint8_t)']');
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::directory::get_users_display_names(
         ctx
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<::ul::api::directory::DisplayNames> result_value = std::get<std::vector<::ul::api::directory::DisplayNames>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_users_display_names_obj(test_get_users_display_names, "directory::get_users_display_names", &link_only_api_test_root);
+ApiTest test_get_users_display_names_obj(test_get_users_display_names, "directory::get_users_display_names", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_current_user(ul::RequestContext &ctx) {
-    ::ul::api::directory::get_current_user(
+test_get_current_user(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    bool q0 = true;
+    const ::ul::api::directory::AdUserWithAuditLog expected = ::ul::api::directory::AdUserWithAuditLog();
+    const std::vector<uint8_t> expected_bytes = ::ul::api::directory::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::directory::get_current_user(
         ctx,
-        std::nullopt
+        q0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::api::directory::AdUserWithAuditLog result_value = std::get<::ul::api::directory::AdUserWithAuditLog>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_current_user_obj(test_get_current_user, "directory::get_current_user", &link_only_api_test_root);
+ApiTest test_get_current_user_obj(test_get_current_user, "directory::get_current_user", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_create_user(ul::RequestContext &ctx) {
-    ::ul::api::directory::create_user(
+test_create_user(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::api::directory::CreateUserRequest body = ::ul::api::directory::CreateUserRequest();
+    const ::ul::api::directory::CreateUser expected = ::ul::api::directory::CreateUser();
+    const std::vector<uint8_t> expected_bytes = ::ul::api::directory::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::directory::create_user(
         ctx,
-        ::ul::api::directory::CreateUserRequest()
+        body
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::api::directory::CreateUser result_value = std::get<::ul::api::directory::CreateUser>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_create_user_obj(test_create_user, "directory::create_user", &link_only_api_test_root);
+ApiTest test_create_user_obj(test_create_user, "directory::create_user", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_update_current_user(ul::RequestContext &ctx) {
-    ::ul::api::directory::update_current_user(
+test_update_current_user(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::api::directory::UpdateCurrentUser body = ::ul::api::directory::UpdateCurrentUser();
+    return ul::api::directory::update_current_user(
         ctx,
-        ::ul::api::directory::UpdateCurrentUser()
+        body
     );
-    return ul::Void();
 }
 
-ApiTest test_update_current_user_obj(test_update_current_user, "directory::update_current_user", &link_only_api_test_root);
+ApiTest test_update_current_user_obj(test_update_current_user, "directory::update_current_user", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_user(ul::RequestContext &ctx) {
-    ::ul::api::directory::get_user(
+test_get_user(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    bool q0 = true;
+    const ::ul::api::directory::AdUserWithAuditLog expected = ::ul::api::directory::AdUserWithAuditLog();
+    const std::vector<uint8_t> expected_bytes = ::ul::api::directory::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::directory::get_user(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        std::nullopt
+        p0,
+        q0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::api::directory::AdUserWithAuditLog result_value = std::get<::ul::api::directory::AdUserWithAuditLog>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_user_obj(test_get_user, "directory::get_user", &link_only_api_test_root);
+ApiTest test_get_user_obj(test_get_user, "directory::get_user", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_update_user(ul::RequestContext &ctx) {
-    ::ul::api::directory::update_user(
+test_update_user(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::api::directory::UpdateUser body = ::ul::api::directory::UpdateUser();
+    return ul::api::directory::update_user(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ::ul::api::directory::UpdateUser()
+        p0,
+        body
     );
-    return ul::Void();
 }
 
-ApiTest test_update_user_obj(test_update_user, "directory::update_user", &link_only_api_test_root);
+ApiTest test_update_user_obj(test_update_user, "directory::update_user", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_delete_user(ul::RequestContext &ctx) {
-    ::ul::api::directory::delete_user(
+test_delete_user(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    return ul::api::directory::delete_user(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
 }
 
-ApiTest test_delete_user_obj(test_delete_user, "directory::delete_user", &link_only_api_test_root);
+ApiTest test_delete_user_obj(test_delete_user, "directory::delete_user", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_groups(ul::RequestContext &ctx) {
-    ::ul::api::directory::get_groups(
+test_get_groups(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    std::vector<::ul::api::directory::AdGroup> expected;
+    std::vector<uint8_t> expected_bytes;
+    expected_bytes.push_back((uint8_t)'[');
+    for (int i = 0; i < 5; ++i) {
+        ::ul::api::directory::AdGroup value = ::ul::api::directory::AdGroup();
+        const std::vector<uint8_t> bytes = to_bytes(value);
+        expected_bytes.insert(expected_bytes.end(), bytes.begin(), bytes.end());
+        expected_bytes.push_back((uint8_t)',');
+        expected.push_back(value);
+    }
+    expected_bytes.pop_back();
+    expected_bytes.push_back((uint8_t)']');
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::directory::get_groups(
         ctx
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<::ul::api::directory::AdGroup> result_value = std::get<std::vector<::ul::api::directory::AdGroup>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_groups_obj(test_get_groups, "directory::get_groups", &link_only_api_test_root);
+ApiTest test_get_groups_obj(test_get_groups, "directory::get_groups", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_create_group(ul::RequestContext &ctx) {
-    ::ul::api::directory::create_group(
+test_create_group(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::api::directory::CreateGroup body = ::ul::api::directory::CreateGroup();
+    const ::ul::api::directory::AdGroup expected = ::ul::api::directory::AdGroup();
+    const std::vector<uint8_t> expected_bytes = ::ul::api::directory::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::directory::create_group(
         ctx,
-        ::ul::api::directory::CreateGroup()
+        body
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::api::directory::AdGroup result_value = std::get<::ul::api::directory::AdGroup>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_create_group_obj(test_create_group, "directory::create_group", &link_only_api_test_root);
+ApiTest test_create_group_obj(test_create_group, "directory::create_group", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_group_members(ul::RequestContext &ctx) {
-    ::ul::api::directory::get_group_members(
+test_get_group_members(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    std::vector<::ul::api::directory::GroupMembership> expected;
+    std::vector<uint8_t> expected_bytes;
+    expected_bytes.push_back((uint8_t)'[');
+    for (int i = 0; i < 5; ++i) {
+        ::ul::api::directory::GroupMembership value = ::ul::api::directory::GroupMembership();
+        const std::vector<uint8_t> bytes = to_bytes(value);
+        expected_bytes.insert(expected_bytes.end(), bytes.begin(), bytes.end());
+        expected_bytes.push_back((uint8_t)',');
+        expected.push_back(value);
+    }
+    expected_bytes.pop_back();
+    expected_bytes.push_back((uint8_t)']');
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::directory::get_group_members(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<::ul::api::directory::GroupMembership> result_value = std::get<std::vector<::ul::api::directory::GroupMembership>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_group_members_obj(test_get_group_members, "directory::get_group_members", &link_only_api_test_root);
+ApiTest test_get_group_members_obj(test_get_group_members, "directory::get_group_members", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_delete_group(ul::RequestContext &ctx) {
-    ::ul::api::directory::delete_group(
+test_delete_group(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    return ul::api::directory::delete_group(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
 }
 
-ApiTest test_delete_group_obj(test_delete_group, "directory::delete_group", &link_only_api_test_root);
+ApiTest test_delete_group_obj(test_delete_group, "directory::delete_group", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_add_group_member(ul::RequestContext &ctx) {
-    ::ul::api::directory::add_group_member(
+test_add_group_member(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    return ul::api::directory::add_group_member(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0,
+        p1
     );
-    return ul::Void();
 }
 
-ApiTest test_add_group_member_obj(test_add_group_member, "directory::add_group_member", &link_only_api_test_root);
+ApiTest test_add_group_member_obj(test_add_group_member, "directory::add_group_member", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_remove_group_member(ul::RequestContext &ctx) {
-    ::ul::api::directory::remove_group_member(
+test_remove_group_member(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    return ul::api::directory::remove_group_member(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0,
+        p1
     );
-    return ul::Void();
 }
 
-ApiTest test_remove_group_member_obj(test_remove_group_member, "directory::remove_group_member", &link_only_api_test_root);
+ApiTest test_remove_group_member_obj(test_remove_group_member, "directory::remove_group_member", &idempotent_api_test_root);
 
 } // namespace directory

@@ -14,12 +14,11 @@ use crate::error::Error;
 use crate::request_context::{ParamMap, RequestContext};
 use crate::{read_arrow_ipc, write_arrow_ipc};
 
-
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-    use crate::request_context::ApiKeyContext;
-    use crate::keys::Key;
-    use crate::{Region, Environment};
     use super::*;
+    use crate::keys::Key as SigningKey;
+    use crate::request_context::{ApiKeyContext, TestContext};
+    use crate::{Environment, Region};
+    use std::str::FromStr;
 }

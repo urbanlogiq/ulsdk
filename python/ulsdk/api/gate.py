@@ -15,7 +15,7 @@ class AdUser:
     display_name: "str"
     id_: "str"
     user_principal_name: "str"
-    other_mails: "List[str]"
+    other_mails: "Optional[List[str]]"
     department: "Optional[str]"
     created_date_time: "str"
 
@@ -24,11 +24,13 @@ class AdUser:
         o["displayName"] = self.display_name
         o["id"] = self.id_
         o["userPrincipalName"] = self.user_principal_name
-        other_mails_list = []
-        for item in self.other_mails:
-            other_mails_var = item
-            other_mails_list.append(other_mails_var)
-        o["otherMails"] = other_mails_list
+        o["otherMails"] = None
+        if self.other_mails is not None:
+            other_mails_list = []
+            for item in self.other_mails:
+                other_mails_var = item
+                other_mails_list.append(other_mails_var)
+            o["otherMails"] = other_mails_list
         o["department"] = None
         if self.department is not None:
             o["department"] = self.department
@@ -58,14 +60,17 @@ class AdUser:
                 assert type(user_principal_name_var) is str
                 user_principal_name = user_principal_name_var
             elif key == "otherMails":
-                other_mails_var = o[key]
-                assert type(other_mails_var) is list
-                other_mails = []
-                for item in other_mails_var:
-                    other_mails_item_var = item
-                    assert type(other_mails_item_var) is str
-                    other_mails_item = other_mails_item_var
-                    other_mails.append(other_mails_item)
+                if o[key] is not None:
+                    other_mails_var = o[key]
+                    assert type(other_mails_var) is list
+                    other_mails = []
+                    for item in other_mails_var:
+                        other_mails_item_var = item
+                        assert type(other_mails_item_var) is str
+                        other_mails_item = other_mails_item_var
+                        other_mails.append(other_mails_item)
+                else:
+                    other_mails = None
             elif key == "department":
                 if o[key] is not None:
                     department_var = o[key]
@@ -81,7 +86,6 @@ class AdUser:
         assert display_name is not None
         assert id_ is not None
         assert user_principal_name is not None
-        assert other_mails is not None
         assert created_date_time is not None
 
         return cls(display_name, id_, user_principal_name, other_mails, department, created_date_time)
@@ -91,7 +95,7 @@ class AdUser:
         displayName = ""
         id = ""
         userPrincipalName = ""
-        otherMails = []
+        otherMails = None
         department = None
         createdDateTime = ""
 
@@ -152,7 +156,6 @@ class AdGroup:
 class Bootstrap:
     user: "AdUser"
     groups: "List[AdGroup]"
-    v_2groups: "List[AdGroup]"
     client_secrets: "Dict[str, Any]"
 
     def to_dict(self) -> Dict[str, Any]:
@@ -163,11 +166,6 @@ class Bootstrap:
             groups_var = item.to_dict()
             groups_list.append(groups_var)
         o["groups"] = groups_list
-        v_2groups_list = []
-        for item in self.v_2groups:
-            v_2groups_var = item.to_dict()
-            v_2groups_list.append(v_2groups_var)
-        o["v2groups"] = v_2groups_list
         o["clientSecrets"] = self.client_secrets
         return o
 
@@ -175,7 +173,6 @@ class Bootstrap:
     def from_dict(cls, o: Dict[str, Any]) -> Self:
         user = None
         groups = None
-        v_2groups = None
         client_secrets = None
 
         for key in o:
@@ -192,15 +189,6 @@ class Bootstrap:
                     assert type(groups_item_var) is dict
                     groups_item = AdGroup.from_dict(groups_item_var)
                     groups.append(groups_item)
-            elif key == "v2groups":
-                v_2groups_var = o[key]
-                assert type(v_2groups_var) is list
-                v_2groups = []
-                for item in v_2groups_var:
-                    v_2groups_item_var = item
-                    assert type(v_2groups_item_var) is dict
-                    v_2groups_item = AdGroup.from_dict(v_2groups_item_var)
-                    v_2groups.append(v_2groups_item)
             elif key == "clientSecrets":
                 client_secrets_var = o[key]
                 assert type(client_secrets_var) is dict
@@ -208,19 +196,17 @@ class Bootstrap:
 
         assert user is not None
         assert groups is not None
-        assert v_2groups is not None
         assert client_secrets is not None
 
-        return cls(user, groups, v_2groups, client_secrets)
+        return cls(user, groups, client_secrets)
 
     @classmethod
     def make_default(cls) -> Self:
         user = AdUser.make_default()
         groups = []
-        v2groups = []
         clientSecrets = dict()
 
-        return cls(user, groups, v2groups, clientSecrets)
+        return cls(user, groups, clientSecrets)
 
 def bootstrap(
     ctx: RequestContext,

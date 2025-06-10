@@ -24,6 +24,7 @@ struct DirectionAndRoadNames;
 struct NamedParameter;
 struct Source;
 
+using ::BinaryYesNo;
 using ::DayOfWeek;
 using ::DirectionTy;
 using ::NamedParameterFlags;
@@ -38,6 +39,10 @@ struct AttributePair {
     AttributePair();
     AttributePair(const ::AttributePair *root);
     AttributePair(const std::vector<uint8_t> &bytes);
+    bool operator==(const AttributePair &rhs) const;
+    bool operator!=(const AttributePair &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct DirectionAndRoadName {
@@ -47,6 +52,10 @@ struct DirectionAndRoadName {
     DirectionAndRoadName();
     DirectionAndRoadName(const ::DirectionAndRoadName *root);
     DirectionAndRoadName(const std::vector<uint8_t> &bytes);
+    bool operator==(const DirectionAndRoadName &rhs) const;
+    bool operator!=(const DirectionAndRoadName &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct DirectionAndRoadNames {
@@ -55,6 +64,10 @@ struct DirectionAndRoadNames {
     DirectionAndRoadNames();
     DirectionAndRoadNames(const ::DirectionAndRoadNames *root);
     DirectionAndRoadNames(const std::vector<uint8_t> &bytes);
+    bool operator==(const DirectionAndRoadNames &rhs) const;
+    bool operator!=(const DirectionAndRoadNames &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct NamedParameter {
@@ -66,6 +79,10 @@ struct NamedParameter {
     NamedParameter();
     NamedParameter(const ::NamedParameter *root);
     NamedParameter(const std::vector<uint8_t> &bytes);
+    bool operator==(const NamedParameter &rhs) const;
+    bool operator!=(const NamedParameter &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 struct Source {
@@ -80,6 +97,10 @@ struct Source {
     Source();
     Source(const ::Source *root);
     Source(const std::vector<uint8_t> &bytes);
+    bool operator==(const Source &rhs) const;
+    bool operator!=(const Source &rhs) const {
+        return !(*this == rhs);
+    }
 };
 
 ::flatbuffers::Offset<::AttributePair>

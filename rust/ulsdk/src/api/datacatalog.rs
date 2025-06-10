@@ -17,11 +17,7 @@ use crate::{read_arrow_ipc, write_arrow_ipc};
 use crate::types::id::ObjectId;
 use crate::types::metadata::Metadata;
 use crate::types::object::{
-    DataCatalogObject,
-    ObjectIdList,
-    ObjectIdPairList,
-    ObjectSummary,
-    ObjectSummaryList,
+    DataCatalogObject, ObjectIdList, ObjectIdPairList, ObjectSummary, ObjectSummaryList,
 };
 use crate::types::query::Query;
 use crate::types::table::{DiffStream, History, NewTable};
@@ -57,12 +53,8 @@ pub async fn get_object_at_revision(
 ///
 /// Returns
 /// * The ID of the object's ACL
-pub async fn get_acl(
-    ctx: &dyn RequestContext,
-    id: Uuid,
-) -> Result<ObjectId, Error> {
-    let path = "/v1/api/ulv2/datacatalog/object/acl/:id"
-        .replace(":id", &id.to_string());
+pub async fn get_acl(ctx: &dyn RequestContext, id: Uuid) -> Result<ObjectId, Error> {
+    let path = "/v1/api/ulv2/datacatalog/object/acl/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     res.as_slice().try_into().map_err(Error::from)
 }
@@ -76,12 +68,8 @@ pub async fn get_acl(
 ///
 /// Returns
 /// * The summary for the head revision of the object
-pub async fn get_head_revision(
-    ctx: &dyn RequestContext,
-    id: Uuid,
-) -> Result<ObjectSummary, Error> {
-    let path = "/v1/api/ulv2/datacatalog/object/head/:id"
-        .replace(":id", &id.to_string());
+pub async fn get_head_revision(ctx: &dyn RequestContext, id: Uuid) -> Result<ObjectSummary, Error> {
+    let path = "/v1/api/ulv2/datacatalog/object/head/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     res.as_slice().try_into().map_err(Error::from)
 }
@@ -95,12 +83,8 @@ pub async fn get_head_revision(
 ///
 /// Returns
 /// * Object content
-pub async fn get_object(
-    ctx: &dyn RequestContext,
-    id: Uuid,
-) -> Result<DataCatalogObject, Error> {
-    let path = "/v1/api/ulv2/datacatalog/object/:id"
-        .replace(":id", &id.to_string());
+pub async fn get_object(ctx: &dyn RequestContext, id: Uuid) -> Result<DataCatalogObject, Error> {
+    let path = "/v1/api/ulv2/datacatalog/object/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     res.as_slice().try_into().map_err(Error::from)
 }
@@ -117,10 +101,10 @@ pub async fn update_object(
     id: Uuid,
     object: DataCatalogObject,
 ) -> Result<(), Error> {
-    let path = "/v1/api/ulv2/datacatalog/object/:id"
-        .replace(":id", &id.to_string());
+    let path = "/v1/api/ulv2/datacatalog/object/:id".replace(":id", &id.to_string());
     let body = Bytes::from(Vec::<u8>::from(object));
-    ctx.post(&path, body, "application/octet-stream", None, None).await?;
+    ctx.post(&path, body, "application/octet-stream", None, None)
+        .await?;
     Ok(())
 }
 
@@ -138,13 +122,16 @@ pub async fn update_attributes(
     overwrite: bool,
     attributes: serde_json::Map<String, serde_json::Value>,
 ) -> Result<(), Error> {
-    let path = "/v1/api/ulv2/datacatalog/object/:id/attributes"
-        .replace(":id", &id.to_string());
+    let path = "/v1/api/ulv2/datacatalog/object/:id/attributes".replace(":id", &id.to_string());
     let mut params = ParamMap::new();
-    params.insert("overwrite".to_owned(), if overwrite { "true" } else  { "false" }.to_owned());
+    params.insert(
+        "overwrite".to_owned(),
+        if overwrite { "true" } else { "false" }.to_owned(),
+    );
 
     let body = Bytes::from(serde_json::to_vec(&attributes)?);
-    ctx.post(&path, body, "application/json", Some(params), None).await?;
+    ctx.post(&path, body, "application/json", Some(params), None)
+        .await?;
     Ok(())
 }
 
@@ -155,11 +142,7 @@ pub async fn update_attributes(
 /// * `ctx` - A request context object
 /// * `id` - The ID of the object whose attribute will be deleted
 /// * `key` - The key of the attribute to delete
-pub async fn delete_attribute(
-    ctx: &dyn RequestContext,
-    id: Uuid,
-    key: &str,
-) -> Result<(), Error> {
+pub async fn delete_attribute(ctx: &dyn RequestContext, id: Uuid, key: &str) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/object/:id/attributes/:key"
         .replace(":id", &id.to_string())
         .replace(":key", key);
@@ -182,7 +165,9 @@ pub async fn get_object_summaries(
 ) -> Result<ObjectSummaryList, Error> {
     let path = "/v1/api/ulv2/datacatalog/object_summaries";
     let body = Bytes::from(Vec::<u8>::from(object_ids));
-    let res = ctx.post(&path, body, "application/octet-stream", None, None).await?;
+    let res = ctx
+        .post(&path, body, "application/octet-stream", None, None)
+        .await?;
     res.as_slice().try_into().map_err(Error::from)
 }
 
@@ -201,7 +186,9 @@ pub async fn bulk_fetch_objects(
 ) -> Result<ObjectIdPairList, Error> {
     let path = "/v1/api/ulv2/datacatalog/object_list";
     let body = Bytes::from(Vec::<u8>::from(object_ids));
-    let res = ctx.post(&path, body, "application/octet-stream", None, None).await?;
+    let res = ctx
+        .post(&path, body, "application/octet-stream", None, None)
+        .await?;
     res.as_slice().try_into().map_err(Error::from)
 }
 
@@ -213,9 +200,7 @@ pub async fn bulk_fetch_objects(
 ///
 /// Returns
 /// * The object summary of the newly created object
-pub async fn create_object(
-    ctx: &dyn RequestContext,
-) -> Result<ObjectSummaryList, Error> {
+pub async fn create_object(ctx: &dyn RequestContext) -> Result<ObjectSummaryList, Error> {
     let path = "/v1/api/ulv2/datacatalog/objects";
     let body = Bytes::new();
     let res = ctx.post(&path, body, "text/plain", None, None).await?;
@@ -242,7 +227,9 @@ pub async fn query_aggregate_numeric(
     params.insert("columns".to_owned(), columns.to_owned());
 
     let body = Bytes::from(Vec::<u8>::from(query));
-    let res = ctx.post(&path, body, "application/octet-stream", Some(params), None).await?;
+    let res = ctx
+        .post(&path, body, "application/octet-stream", Some(params), None)
+        .await?;
     read_arrow_ipc(&res)
 }
 
@@ -266,7 +253,9 @@ pub async fn query_aggregate_string(
     params.insert("columns".to_owned(), columns.to_owned());
 
     let body = Bytes::from(Vec::<u8>::from(query));
-    let res = ctx.post(&path, body, "application/octet-stream", Some(params), None).await?;
+    let res = ctx
+        .post(&path, body, "application/octet-stream", Some(params), None)
+        .await?;
     read_arrow_ipc(&res)
 }
 
@@ -293,7 +282,9 @@ pub async fn query_aggregate_histo(
     params.insert("columns".to_owned(), columns.to_owned());
 
     let body = Bytes::from(Vec::<u8>::from(query));
-    let res = ctx.post(&path, body, "application/octet-stream", Some(params), None).await?;
+    let res = ctx
+        .post(&path, body, "application/octet-stream", Some(params), None)
+        .await?;
     read_arrow_ipc(&res)
 }
 
@@ -320,10 +311,15 @@ pub async fn query_aggregate_relative_histo(
     let mut params = ParamMap::new();
     params.insert("buckets".to_owned(), buckets.to_string());
     params.insert("numerator_columns".to_owned(), numerator_columns.to_owned());
-    params.insert("denominator_columns".to_owned(), denominator_columns.to_owned());
+    params.insert(
+        "denominator_columns".to_owned(),
+        denominator_columns.to_owned(),
+    );
 
     let body = Bytes::from(Vec::<u8>::from(query));
-    let res = ctx.post(&path, body, "application/octet-stream", Some(params), None).await?;
+    let res = ctx
+        .post(&path, body, "application/octet-stream", Some(params), None)
+        .await?;
     read_arrow_ipc(&res)
 }
 
@@ -340,10 +336,12 @@ pub async fn stream_get_arrow(
     ctx: &dyn RequestContext,
     id: Uuid,
 ) -> Result<Vec<arrow::record_batch::RecordBatch>, Error> {
-    let path = "/v1/api/ulv2/datacatalog/stream/:id"
-        .replace(":id", &id.to_string());
+    let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
-    headers.insert(HeaderName::from_static("accept"), HeaderValue::from_static("application/vnd.apache.arrow.stream"));
+    headers.insert(
+        HeaderName::from_static("accept"),
+        HeaderValue::from_static("application/vnd.apache.arrow.stream"),
+    );
 
     let res = ctx.get(&path, None, Some(headers)).await?;
     read_arrow_ipc(&res)
@@ -358,14 +356,13 @@ pub async fn stream_get_arrow(
 ///
 /// Returns
 /// * Stream data as requested
-pub async fn stream_get_parquet(
-    ctx: &dyn RequestContext,
-    id: Uuid,
-) -> Result<Vec<u8>, Error> {
-    let path = "/v1/api/ulv2/datacatalog/stream/:id"
-        .replace(":id", &id.to_string());
+pub async fn stream_get_parquet(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u8>, Error> {
+    let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
-    headers.insert(HeaderName::from_static("accept"), HeaderValue::from_static("application/vnd.apache.parquet"));
+    headers.insert(
+        HeaderName::from_static("accept"),
+        HeaderValue::from_static("application/vnd.apache.parquet"),
+    );
 
     let res = ctx.get(&path, None, Some(headers)).await?;
     Ok(res)
@@ -380,14 +377,13 @@ pub async fn stream_get_parquet(
 ///
 /// Returns
 /// * Stream data as requested
-pub async fn stream_get_csv(
-    ctx: &dyn RequestContext,
-    id: Uuid,
-) -> Result<Vec<u8>, Error> {
-    let path = "/v1/api/ulv2/datacatalog/stream/:id"
-        .replace(":id", &id.to_string());
+pub async fn stream_get_csv(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u8>, Error> {
+    let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
-    headers.insert(HeaderName::from_static("accept"), HeaderValue::from_static("text/csv"));
+    headers.insert(
+        HeaderName::from_static("accept"),
+        HeaderValue::from_static("text/csv"),
+    );
 
     let res = ctx.get(&path, None, Some(headers)).await?;
     Ok(res)
@@ -402,14 +398,15 @@ pub async fn stream_get_csv(
 ///
 /// Returns
 /// * Stream data as requested
-pub async fn stream_get_xlsx(
-    ctx: &dyn RequestContext,
-    id: Uuid,
-) -> Result<Vec<u8>, Error> {
-    let path = "/v1/api/ulv2/datacatalog/stream/:id"
-        .replace(":id", &id.to_string());
+pub async fn stream_get_xlsx(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u8>, Error> {
+    let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
-    headers.insert(HeaderName::from_static("accept"), HeaderValue::from_static("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+    headers.insert(
+        HeaderName::from_static("accept"),
+        HeaderValue::from_static(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ),
+    );
 
     let res = ctx.get(&path, None, Some(headers)).await?;
     Ok(res)
@@ -424,14 +421,13 @@ pub async fn stream_get_xlsx(
 ///
 /// Returns
 /// * Stream data as requested
-pub async fn stream_get_json(
-    ctx: &dyn RequestContext,
-    id: Uuid,
-) -> Result<Vec<u8>, Error> {
-    let path = "/v1/api/ulv2/datacatalog/stream/:id"
-        .replace(":id", &id.to_string());
+pub async fn stream_get_json(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u8>, Error> {
+    let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
-    headers.insert(HeaderName::from_static("accept"), HeaderValue::from_static("application/json"));
+    headers.insert(
+        HeaderName::from_static("accept"),
+        HeaderValue::from_static("application/json"),
+    );
 
     let res = ctx.get(&path, None, Some(headers)).await?;
     Ok(res)
@@ -446,14 +442,13 @@ pub async fn stream_get_json(
 ///
 /// Returns
 /// * Stream data as requested
-pub async fn stream_get_text(
-    ctx: &dyn RequestContext,
-    id: Uuid,
-) -> Result<Vec<u8>, Error> {
-    let path = "/v1/api/ulv2/datacatalog/stream/:id"
-        .replace(":id", &id.to_string());
+pub async fn stream_get_text(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u8>, Error> {
+    let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
-    headers.insert(HeaderName::from_static("accept"), HeaderValue::from_static("text/plain"));
+    headers.insert(
+        HeaderName::from_static("accept"),
+        HeaderValue::from_static("text/plain"),
+    );
 
     let res = ctx.get(&path, None, Some(headers)).await?;
     Ok(res)
@@ -468,14 +463,13 @@ pub async fn stream_get_text(
 ///
 /// Returns
 /// * Stream data as requested
-pub async fn stream_get_html(
-    ctx: &dyn RequestContext,
-    id: Uuid,
-) -> Result<Vec<u8>, Error> {
-    let path = "/v1/api/ulv2/datacatalog/stream/:id"
-        .replace(":id", &id.to_string());
+pub async fn stream_get_html(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u8>, Error> {
+    let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
-    headers.insert(HeaderName::from_static("accept"), HeaderValue::from_static("text/html"));
+    headers.insert(
+        HeaderName::from_static("accept"),
+        HeaderValue::from_static("text/html"),
+    );
 
     let res = ctx.get(&path, None, Some(headers)).await?;
     Ok(res)
@@ -493,10 +487,16 @@ pub async fn stream_put_arrow(
     id: Uuid,
     data: Vec<arrow::record_batch::RecordBatch>,
 ) -> Result<(), Error> {
-    let path = "/v1/api/ulv2/datacatalog/stream/:id"
-        .replace(":id", &id.to_string());
+    let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let body = Bytes::from(write_arrow_ipc(&data)?);
-    ctx.put(&path, body, "application/vnd.apache.arrow.stream", None, None).await?;
+    ctx.put(
+        &path,
+        body,
+        "application/vnd.apache.arrow.stream",
+        None,
+        None,
+    )
+    .await?;
     Ok(())
 }
 
@@ -512,10 +512,10 @@ pub async fn stream_put_diffstream(
     id: Uuid,
     data: DiffStream,
 ) -> Result<(), Error> {
-    let path = "/v1/api/ulv2/datacatalog/stream/:id"
-        .replace(":id", &id.to_string());
+    let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let body = Bytes::from(Vec::<u8>::from(data));
-    ctx.put(&path, body, "application/octet-stream", None, None).await?;
+    ctx.put(&path, body, "application/octet-stream", None, None)
+        .await?;
     Ok(())
 }
 
@@ -531,8 +531,7 @@ pub async fn stream_put_json(
     id: Uuid,
     data: Vec<serde_json::Map<String, serde_json::Value>>,
 ) -> Result<(), Error> {
-    let path = "/v1/api/ulv2/datacatalog/stream/:id"
-        .replace(":id", &id.to_string());
+    let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let body = Bytes::from(serde_json::to_vec(&data)?);
     ctx.put(&path, body, "application/json", None, None).await?;
     Ok(())
@@ -547,12 +546,9 @@ pub async fn stream_put_json(
 ///
 /// Returns
 /// * The metadata as generated from the stream data
-pub async fn generate_metadata(
-    ctx: &dyn RequestContext,
-    id: Uuid,
-) -> Result<Metadata, Error> {
-    let path = "/v1/api/ulv2/datacatalog/stream/:id/generated/metadata"
-        .replace(":id", &id.to_string());
+pub async fn generate_metadata(ctx: &dyn RequestContext, id: Uuid) -> Result<Metadata, Error> {
+    let path =
+        "/v1/api/ulv2/datacatalog/stream/:id/generated/metadata".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     res.as_slice().try_into().map_err(Error::from)
 }
@@ -561,7 +557,7 @@ pub async fn generate_metadata(
 /// - the existing metadata
 /// - the provided metadata
 /// - the generated metadata
-/// 
+///
 /// Also, update the stream object to point to the updated metadata and to have an updated schema.
 ///
 /// # Arguments
@@ -574,15 +570,15 @@ pub async fn update_metadata(
     id: Uuid,
     metadata: Option<Metadata>,
 ) -> Result<(), Error> {
-    let path = "/v1/api/ulv2/datacatalog/stream/:id/metadata"
-        .replace(":id", &id.to_string());
+    let path = "/v1/api/ulv2/datacatalog/stream/:id/metadata".replace(":id", &id.to_string());
     let body = if let Some(metadata) = metadata {
         let body = Bytes::from(Vec::<u8>::from(metadata));
         body
     } else {
         Bytes::new()
     };
-    ctx.post(&path, body, "application/octet-stream", None, None).await?;
+    ctx.post(&path, body, "application/octet-stream", None, None)
+        .await?;
     Ok(())
 }
 
@@ -592,12 +588,8 @@ pub async fn update_metadata(
 ///
 /// * `ctx` - A request context object
 /// * `id` - The ID of the stream to compact
-pub async fn stream_compact(
-    ctx: &dyn RequestContext,
-    id: Uuid,
-) -> Result<(), Error> {
-    let path = "/v1/api/ulv2/datacatalog/stream/:id/compact"
-        .replace(":id", &id.to_string());
+pub async fn stream_compact(ctx: &dyn RequestContext, id: Uuid) -> Result<(), Error> {
+    let path = "/v1/api/ulv2/datacatalog/stream/:id/compact".replace(":id", &id.to_string());
     let body = Bytes::new();
     ctx.post(&path, body, "text/plain", None, None).await?;
     Ok(())
@@ -634,12 +626,8 @@ pub async fn table_row_history(
 ///
 /// Returns
 /// * The history of the table
-pub async fn table_history(
-    ctx: &dyn RequestContext,
-    id: Uuid,
-) -> Result<History, Error> {
-    let path = "/v1/api/ulv2/datacatalog/table/:id/history"
-        .replace(":id", &id.to_string());
+pub async fn table_history(ctx: &dyn RequestContext, id: Uuid) -> Result<History, Error> {
+    let path = "/v1/api/ulv2/datacatalog/table/:id/history".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     res.as_slice().try_into().map_err(Error::from)
 }
@@ -704,10 +692,11 @@ pub async fn create_table(
     id: Uuid,
     new_table: NewTable,
 ) -> Result<ObjectId, Error> {
-    let path = "/v1/api/ulv2/datacatalog/table/:id"
-        .replace(":id", &id.to_string());
+    let path = "/v1/api/ulv2/datacatalog/table/:id".replace(":id", &id.to_string());
     let body = Bytes::from(Vec::<u8>::from(new_table));
-    let res = ctx.post(&path, body, "application/octet-stream", None, None).await?;
+    let res = ctx
+        .post(&path, body, "application/octet-stream", None, None)
+        .await?;
     res.as_slice().try_into().map_err(Error::from)
 }
 
@@ -726,10 +715,15 @@ pub async fn query_arrow(
 ) -> Result<Vec<arrow::record_batch::RecordBatch>, Error> {
     let path = "/v1/api/ulv2/datacatalog/query";
     let mut headers = HeaderMap::new();
-    headers.insert(HeaderName::from_static("accept"), HeaderValue::from_static("application/vnd.apache.arrow.stream"));
+    headers.insert(
+        HeaderName::from_static("accept"),
+        HeaderValue::from_static("application/vnd.apache.arrow.stream"),
+    );
 
     let body = Bytes::from(Vec::<u8>::from(query));
-    let res = ctx.post(&path, body, "application/octet-stream", None, Some(headers)).await?;
+    let res = ctx
+        .post(&path, body, "application/octet-stream", None, Some(headers))
+        .await?;
     read_arrow_ipc(&res)
 }
 
@@ -742,16 +736,18 @@ pub async fn query_arrow(
 ///
 /// Returns
 /// * The result of the query
-pub async fn query_parquet(
-    ctx: &dyn RequestContext,
-    query: Query,
-) -> Result<Vec<u8>, Error> {
+pub async fn query_parquet(ctx: &dyn RequestContext, query: Query) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/datacatalog/query";
     let mut headers = HeaderMap::new();
-    headers.insert(HeaderName::from_static("accept"), HeaderValue::from_static("application/vnd.apache.parquet"));
+    headers.insert(
+        HeaderName::from_static("accept"),
+        HeaderValue::from_static("application/vnd.apache.parquet"),
+    );
 
     let body = Bytes::from(Vec::<u8>::from(query));
-    let res = ctx.post(&path, body, "application/octet-stream", None, Some(headers)).await?;
+    let res = ctx
+        .post(&path, body, "application/octet-stream", None, Some(headers))
+        .await?;
     Ok(res)
 }
 
@@ -764,16 +760,18 @@ pub async fn query_parquet(
 ///
 /// Returns
 /// * The result of the query
-pub async fn query_csv(
-    ctx: &dyn RequestContext,
-    query: Query,
-) -> Result<Vec<u8>, Error> {
+pub async fn query_csv(ctx: &dyn RequestContext, query: Query) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/datacatalog/query";
     let mut headers = HeaderMap::new();
-    headers.insert(HeaderName::from_static("accept"), HeaderValue::from_static("text/csv"));
+    headers.insert(
+        HeaderName::from_static("accept"),
+        HeaderValue::from_static("text/csv"),
+    );
 
     let body = Bytes::from(Vec::<u8>::from(query));
-    let res = ctx.post(&path, body, "application/octet-stream", None, Some(headers)).await?;
+    let res = ctx
+        .post(&path, body, "application/octet-stream", None, Some(headers))
+        .await?;
     Ok(res)
 }
 
@@ -786,16 +784,20 @@ pub async fn query_csv(
 ///
 /// Returns
 /// * The result of the query
-pub async fn query_xlsx(
-    ctx: &dyn RequestContext,
-    query: Query,
-) -> Result<Vec<u8>, Error> {
+pub async fn query_xlsx(ctx: &dyn RequestContext, query: Query) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/datacatalog/query";
     let mut headers = HeaderMap::new();
-    headers.insert(HeaderName::from_static("accept"), HeaderValue::from_static("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+    headers.insert(
+        HeaderName::from_static("accept"),
+        HeaderValue::from_static(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ),
+    );
 
     let body = Bytes::from(Vec::<u8>::from(query));
-    let res = ctx.post(&path, body, "application/octet-stream", None, Some(headers)).await?;
+    let res = ctx
+        .post(&path, body, "application/octet-stream", None, Some(headers))
+        .await?;
     Ok(res)
 }
 
@@ -808,16 +810,18 @@ pub async fn query_xlsx(
 ///
 /// Returns
 /// * The result of the query
-pub async fn query_json(
-    ctx: &dyn RequestContext,
-    query: Query,
-) -> Result<Vec<u8>, Error> {
+pub async fn query_json(ctx: &dyn RequestContext, query: Query) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/datacatalog/query";
     let mut headers = HeaderMap::new();
-    headers.insert(HeaderName::from_static("accept"), HeaderValue::from_static("application/json"));
+    headers.insert(
+        HeaderName::from_static("accept"),
+        HeaderValue::from_static("application/json"),
+    );
 
     let body = Bytes::from(Vec::<u8>::from(query));
-    let res = ctx.post(&path, body, "application/octet-stream", None, Some(headers)).await?;
+    let res = ctx
+        .post(&path, body, "application/octet-stream", None, Some(headers))
+        .await?;
     Ok(res)
 }
 
@@ -830,16 +834,18 @@ pub async fn query_json(
 ///
 /// Returns
 /// * The result of the query
-pub async fn query_text(
-    ctx: &dyn RequestContext,
-    query: Query,
-) -> Result<Vec<u8>, Error> {
+pub async fn query_text(ctx: &dyn RequestContext, query: Query) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/datacatalog/query";
     let mut headers = HeaderMap::new();
-    headers.insert(HeaderName::from_static("accept"), HeaderValue::from_static("text/plain"));
+    headers.insert(
+        HeaderName::from_static("accept"),
+        HeaderValue::from_static("text/plain"),
+    );
 
     let body = Bytes::from(Vec::<u8>::from(query));
-    let res = ctx.post(&path, body, "application/octet-stream", None, Some(headers)).await?;
+    let res = ctx
+        .post(&path, body, "application/octet-stream", None, Some(headers))
+        .await?;
     Ok(res)
 }
 
@@ -852,765 +858,903 @@ pub async fn query_text(
 ///
 /// Returns
 /// * The result of the query
-pub async fn query_html(
-    ctx: &dyn RequestContext,
-    query: Query,
-) -> Result<Vec<u8>, Error> {
+pub async fn query_html(ctx: &dyn RequestContext, query: Query) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/datacatalog/query";
     let mut headers = HeaderMap::new();
-    headers.insert(HeaderName::from_static("accept"), HeaderValue::from_static("text/html"));
+    headers.insert(
+        HeaderName::from_static("accept"),
+        HeaderValue::from_static("text/html"),
+    );
 
     let body = Bytes::from(Vec::<u8>::from(query));
-    let res = ctx.post(&path, body, "application/octet-stream", None, Some(headers)).await?;
+    let res = ctx
+        .post(&path, body, "application/octet-stream", None, Some(headers))
+        .await?;
     Ok(res)
 }
 
-
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-    use crate::request_context::ApiKeyContext;
-    use crate::keys::Key;
-    use crate::{Region, Environment};
     use super::*;
+    use crate::keys::Key as SigningKey;
+    use crate::request_context::{ApiKeyContext, TestContext};
+    use crate::{Environment, Region};
+    use std::str::FromStr;
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_object_at_revision() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = Uuid::nil();
-
-        get_object_at_revision(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = DataCatalogObject::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = get_object_at_revision(&ctx, p0, p1).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_acl() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        get_acl(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = ObjectId::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = get_acl(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_head_revision() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        get_head_revision(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = ObjectSummary::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = get_head_revision(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_object() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        get_object(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = DataCatalogObject::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = get_object(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_update_object() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = DataCatalogObject::default();
-
-        update_object(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let body = crate::types::DataCatalogObject::default();
+        update_object(&ctx, p0, body).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_update_attributes() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = false;
-        let p2 = serde_json::Map::new();
-
-        update_attributes(
-            &ctx,
-            p0,
-            p1,
-            p2,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let q0 = true;
+        let body = serde_json::Map::<String, serde_json::Value>::default();
+        update_attributes(&ctx, p0, q0, body).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_delete_attribute() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = "";
-
-        delete_attribute(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+        delete_attribute(&ctx, p0, p1).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_object_summaries() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = ObjectIdList::default();
-
-        get_object_summaries(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let body = crate::types::ObjectIdList::default();
+        let expected = ObjectSummaryList::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = get_object_summaries(&ctx, body).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_bulk_fetch_objects() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = ObjectIdList::default();
-
-        bulk_fetch_objects(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let body = crate::types::ObjectIdList::default();
+        let expected = ObjectIdPairList::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = bulk_fetch_objects(&ctx, body).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_create_object() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-
-        create_object(
-            &ctx,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let expected = ObjectSummaryList::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = create_object(&ctx).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_query_aggregate_numeric() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = "";
-        let p1 = Query::default();
-
-        query_aggregate_numeric(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+        let body = crate::types::Query::default();
+        let (expected, expected_bytes) = crate::make_test_batches();
+        ctx.set_response(expected_bytes);
+        let result = query_aggregate_numeric(&ctx, q0, body).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_query_aggregate_string() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = "";
-        let p1 = Query::default();
-
-        query_aggregate_string(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+        let body = crate::types::Query::default();
+        let (expected, expected_bytes) = crate::make_test_batches();
+        ctx.set_response(expected_bytes);
+        let result = query_aggregate_string(&ctx, q0, body).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_query_aggregate_histo() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = 0;
-        let p1 = "";
-        let p2 = Query::default();
-
-        query_aggregate_histo(
-            &ctx,
-            p0,
-            p1,
-            p2,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let q0 = 42;
+        let q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+        let body = crate::types::Query::default();
+        let (expected, expected_bytes) = crate::make_test_batches();
+        ctx.set_response(expected_bytes);
+        let result = query_aggregate_histo(&ctx, q0, q1, body).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_query_aggregate_relative_histo() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = 0;
-        let p1 = "";
-        let p2 = "";
-        let p3 = Query::default();
-
-        query_aggregate_relative_histo(
-            &ctx,
-            p0,
-            p1,
-            p2,
-            p3,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let q0 = 42;
+        let q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+        let q2 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+        let body = crate::types::Query::default();
+        let (expected, expected_bytes) = crate::make_test_batches();
+        ctx.set_response(expected_bytes);
+        let result = query_aggregate_relative_histo(&ctx, q0, q1, q2, body)
+            .await
+            .unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_stream_get_arrow() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        stream_get_arrow(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let (expected, expected_bytes) = crate::make_test_batches();
+        ctx.set_response(expected_bytes);
+        let result = stream_get_arrow(&ctx, p0).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_stream_get_parquet() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        stream_get_parquet(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        let expected_bytes = expected.clone();
+        ctx.set_response(expected_bytes);
+        let result = stream_get_parquet(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_stream_get_csv() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        stream_get_csv(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        let expected_bytes = expected.clone();
+        ctx.set_response(expected_bytes);
+        let result = stream_get_csv(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_stream_get_xlsx() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        stream_get_xlsx(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        let expected_bytes = expected.clone();
+        ctx.set_response(expected_bytes);
+        let result = stream_get_xlsx(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_stream_get_json() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        stream_get_json(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        let expected_bytes = expected.clone();
+        ctx.set_response(expected_bytes);
+        let result = stream_get_json(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_stream_get_text() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        stream_get_text(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        let expected_bytes = expected.clone();
+        ctx.set_response(expected_bytes);
+        let result = stream_get_text(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_stream_get_html() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        stream_get_html(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        let expected_bytes = expected.clone();
+        ctx.set_response(expected_bytes);
+        let result = stream_get_html(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_stream_put_arrow() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = Vec::new();
-
-        stream_put_arrow(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let (body, body_bytes) = crate::make_test_batches();
+        stream_put_arrow(&ctx, p0, body).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_stream_put_diffstream() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = DiffStream::default();
-
-        stream_put_diffstream(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let body = crate::types::DiffStream::default();
+        stream_put_diffstream(&ctx, p0, body).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_stream_put_json() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = vec![];
-
-        stream_put_json(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let body = Vec::new();
+        stream_put_json(&ctx, p0, body).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_generate_metadata() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        generate_metadata(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = Metadata::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = generate_metadata(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_update_metadata() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = None;
-
-        update_metadata(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let body = crate::types::Metadata::default();
+        let body = Some(body);
+        update_metadata(&ctx, p0, body).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_stream_compact() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        stream_compact(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        stream_compact(&ctx, p0).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_table_row_history() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = Uuid::nil();
-
-        table_row_history(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = History::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = table_row_history(&ctx, p0, p1).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_table_history() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-
-        table_history(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = History::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = table_history(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_table_attachments_directory() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = Uuid::nil();
-
-        get_table_attachments_directory(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = ObjectId::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = get_table_attachments_directory(&ctx, p0, p1).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_get_or_create_table_attachments_directory() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = Uuid::nil();
-
-        get_or_create_table_attachments_directory(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let expected = ObjectId::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = get_or_create_table_attachments_directory(&ctx, p0, p1)
+            .await
+            .unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_create_table() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Uuid::nil();
-        let p1 = NewTable::default();
-
-        create_table(
-            &ctx,
-            p0,
-            p1,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let body = crate::types::NewTable::default();
+        let expected = ObjectId::default();
+        let expected_bytes: Vec<u8> = expected.clone().into();
+        ctx.set_response(expected_bytes);
+        let result = create_table(&ctx, p0, body).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_query_arrow() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Query::default();
-
-        query_arrow(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let body = crate::types::Query::default();
+        let (expected, expected_bytes) = crate::make_test_batches();
+        ctx.set_response(expected_bytes);
+        let result = query_arrow(&ctx, body).await.unwrap();
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_query_parquet() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Query::default();
-
-        query_parquet(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let body = crate::types::Query::default();
+        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        let expected_bytes = expected.clone();
+        ctx.set_response(expected_bytes);
+        let result = query_parquet(&ctx, body).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_query_csv() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Query::default();
-
-        query_csv(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let body = crate::types::Query::default();
+        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        let expected_bytes = expected.clone();
+        ctx.set_response(expected_bytes);
+        let result = query_csv(&ctx, body).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_query_xlsx() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Query::default();
-
-        query_xlsx(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let body = crate::types::Query::default();
+        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        let expected_bytes = expected.clone();
+        ctx.set_response(expected_bytes);
+        let result = query_xlsx(&ctx, body).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_query_json() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Query::default();
-
-        query_json(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let body = crate::types::Query::default();
+        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        let expected_bytes = expected.clone();
+        ctx.set_response(expected_bytes);
+        let result = query_json(&ctx, body).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_query_text() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Query::default();
-
-        query_text(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let body = crate::types::Query::default();
+        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        let expected_bytes = expected.clone();
+        ctx.set_response(expected_bytes);
+        let result = query_text(&ctx, body).await.unwrap();
+        assert_eq!(result, expected);
     }
 
-    #[ignore = "link-only test"]
     #[tokio::test]
     async fn test_query_html() {
-        let user = std::env::var("CA_USER").unwrap();
-        let access_key = std::env::var("CA_ACCESS_KEY").unwrap();
-        let secret_key = std::env::var("CA_SECRET_KEY").unwrap();
-
-        let key = Key::try_new(Uuid::from_str(&user).unwrap(), Region::CA, access_key.as_str(), secret_key.as_str()).unwrap();
-        let ctx = ApiKeyContext::new(key, Environment::Prod);
-
-        let p0 = Query::default();
-
-        query_html(
-            &ctx,
-            p0,
-        ).await;
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let body = crate::types::Query::default();
+        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        let expected_bytes = expected.clone();
+        ctx.set_response(expected_bytes);
+        let result = query_html(&ctx, body).await.unwrap();
+        assert_eq!(result, expected);
     }
 }

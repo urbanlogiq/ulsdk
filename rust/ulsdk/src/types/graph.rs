@@ -10,81 +10,39 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
-use flatbuffers::{WIPOffset, UnionWIPOffset};
 use bitflags::bitflags;
 use core::ops::Deref;
+use flatbuffers::{UnionWIPOffset, WIPOffset};
 
 use crate::types::api::SortOrder;
 use crate::types::entity::{
-    EdgeTy,
-    EntityTy,
-    Geometry,
-    GraphEdge,
-    GraphNode,
-    Line,
-    MultiLine,
-    MultiPolygon,
-    NodeTy,
-    Point,
+    EdgeTy, EntityTy, Geometry, GraphEdge, GraphNode, Line, MultiLine, MultiPolygon, NodeTy, Point,
     Polygon,
 };
 use crate::types::fun::Fn_;
-use crate::types::id::{
-    B2cId,
-    ColumnGroupId,
-    ContentId,
-    DataStateId,
-    GenericId,
-    GraphNodeId,
-    ObjectId,
-    ObjectNamespace,
-    StreamId,
-};
-use crate::types::generated::api_generated::{
-    SortOrder as FbsSortOrder,
-};
+use crate::types::generated::api_generated::SortOrder as FbsSortOrder;
 use crate::types::generated::entity_generated::{
-    GraphEdge as FbsGraphEdge,
-    GraphNode as FbsGraphNode,
-    Line as FbsLine,
-    MultiLine as FbsMultiLine,
-    MultiPolygon as FbsMultiPolygon,
-    Point as FbsPoint,
-    Polygon as FbsPolygon,
-    EdgeTy as FbsEdgeTy,
-    EntityTy as FbsEntityTy,
-    Geometry as FbsGeometry,
-    NodeTy as FbsNodeTy,
+    EdgeTy as FbsEdgeTy, EntityTy as FbsEntityTy, Geometry as FbsGeometry,
+    GraphEdge as FbsGraphEdge, GraphNode as FbsGraphNode, Line as FbsLine,
+    MultiLine as FbsMultiLine, MultiPolygon as FbsMultiPolygon, NodeTy as FbsNodeTy,
+    Point as FbsPoint, Polygon as FbsPolygon,
 };
-use crate::types::generated::fun_generated::{
-    Fn as FbsFn,
-};
+use crate::types::generated::fun_generated::Fn as FbsFn;
 use crate::types::generated::graph_generated::{
-    EdgeList as FbsEdgeList,
-    EdgeQuery as FbsEdgeQuery,
-    Geom as FbsGeom,
-    GeomOp as FbsGeomOp,
-    GraphQuery as FbsGraphQuery,
-    NodeIdPair as FbsNodeIdPair,
-    NodeList as FbsNodeList,
-    NodeQuery as FbsNodeQuery,
-    OrderBy as FbsOrderBy,
-    Projection as FbsProjection,
-    QueryPathElement as FbsQueryPathElement,
-    Predicate as FbsPredicate,
-    QueryPathElementUnion as FbsQueryPathElementUnion,
-    ValueTransform as FbsValueTransform,
+    EdgeList as FbsEdgeList, EdgeQuery as FbsEdgeQuery, Geom as FbsGeom, GeomOp as FbsGeomOp,
+    GraphQuery as FbsGraphQuery, NodeIdPair as FbsNodeIdPair, NodeList as FbsNodeList,
+    NodeQuery as FbsNodeQuery, OrderBy as FbsOrderBy, Predicate as FbsPredicate,
+    Projection as FbsProjection, QueryPathElement as FbsQueryPathElement,
+    QueryPathElementUnion as FbsQueryPathElementUnion, ValueTransform as FbsValueTransform,
 };
 use crate::types::generated::id_generated::{
-    B2cId as FbsB2cId,
-    ColumnGroupId as FbsColumnGroupId,
-    ContentId as FbsContentId,
-    DataStateId as FbsDataStateId,
-    GenericId as FbsGenericId,
-    GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId,
-    StreamId as FbsStreamId,
-    ObjectNamespace as FbsObjectNamespace,
+    B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
+    DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
+};
+use crate::types::id::{
+    B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
+    ObjectNamespace, StreamId,
 };
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -129,7 +87,7 @@ impl From<FbsPredicate> for Predicate {
             6 => Self::description,
             7 => Self::location,
             8 => Self::geom,
-            _ => panic!("Invalid value {} when constructing Predicate", fbs.0)
+            _ => panic!("Invalid value {} when constructing Predicate", fbs.0),
         }
     }
 }
@@ -155,7 +113,7 @@ impl From<FbsValueTransform> for ValueTransform {
         match fbs.0 {
             0 => Self::NONE,
             1 => Self::UuidToBase64,
-            _ => panic!("Invalid value {} when constructing ValueTransform", fbs.0)
+            _ => panic!("Invalid value {} when constructing ValueTransform", fbs.0),
         }
     }
 }
@@ -168,7 +126,10 @@ pub struct GeomOp {
 }
 
 impl GeomOp {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsGeomOp<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsGeomOp<'a>> {
         use crate::types::generated::graph_generated::GeomOpBuilder as FbsGeomOpBuilder;
 
         let mut geoms_offsets = Vec::with_capacity(self.geoms.len());
@@ -233,7 +194,10 @@ pub struct NodeQuery {
 }
 
 impl NodeQuery {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsNodeQuery<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNodeQuery<'a>> {
         use crate::types::generated::graph_generated::NodeQueryBuilder as FbsNodeQueryBuilder;
 
         let descriptions_offset = self.descriptions.as_ref().map(|v| {
@@ -246,275 +210,316 @@ impl NodeQuery {
             descriptions_offset
         });
         let entity_tys_offset = self.entity_tys.as_ref().map(|v| {
-            let entity_tys_offset = builder.create_vector_from_iter(v.iter().map(|v| {
-                match v {
-                    EntityTy::T_INVALID => FbsEntityTy::T_INVALID,
-                    EntityTy::T_TFC => FbsEntityTy::T_TFC,
-                    EntityTy::T_TFC_LOOP => FbsEntityTy::T_TFC_LOOP,
-                    EntityTy::T_TFC_CRASH => FbsEntityTy::T_TFC_CRASH,
-                    EntityTy::T_TFC_TMC_REPORT => FbsEntityTy::T_TFC_TMC_REPORT,
-                    EntityTy::T_ROAD_SEGMENT => FbsEntityTy::T_ROAD_SEGMENT,
-                    EntityTy::T_INTERSECTION => FbsEntityTy::T_INTERSECTION,
-                    EntityTy::T_SIDEWAlK => FbsEntityTy::T_SIDEWAlK,
-                    EntityTy::T_BIKEWAY => FbsEntityTy::T_BIKEWAY,
-                    EntityTy::T_TRANSIT_LINE => FbsEntityTy::T_TRANSIT_LINE,
-                    EntityTy::T_BIA => FbsEntityTy::T_BIA,
-                    EntityTy::T_NEIGHBOURHOOD => FbsEntityTy::T_NEIGHBOURHOOD,
-                    EntityTy::T_NIA => FbsEntityTy::T_NIA,
-                    EntityTy::T_WARD => FbsEntityTy::T_WARD,
-                    EntityTy::T_DISTRICT => FbsEntityTy::T_DISTRICT,
-                    EntityTy::T_CONSTITUENCY => FbsEntityTy::T_CONSTITUENCY,
-                    EntityTy::T_POSTAL_CODE_GEO => FbsEntityTy::T_POSTAL_CODE_GEO,
-                    EntityTy::T_BUSINESS => FbsEntityTy::T_BUSINESS,
-                    EntityTy::T_LAND_PARCEL => FbsEntityTy::T_LAND_PARCEL,
-                    EntityTy::T_ADDRESS => FbsEntityTy::T_ADDRESS,
-                    EntityTy::T_POSTAL_CODE_DEMOGRAPHICS => FbsEntityTy::T_POSTAL_CODE_DEMOGRAPHICS,
-                    EntityTy::T_ZONE => FbsEntityTy::T_ZONE,
-                    EntityTy::T_PARK => FbsEntityTy::T_PARK,
-                    EntityTy::T_PARKING_LOT => FbsEntityTy::T_PARKING_LOT,
-                    EntityTy::T_PARKING_TICKET => FbsEntityTy::T_PARKING_TICKET,
-                    EntityTy::T_PLACE_OF_INTEREST => FbsEntityTy::T_PLACE_OF_INTEREST,
-                    EntityTy::T_DAYCARE_CENTRE => FbsEntityTy::T_DAYCARE_CENTRE,
-                    EntityTy::T_MEDICAL_CENTRE => FbsEntityTy::T_MEDICAL_CENTRE,
-                    EntityTy::T_COMMERCIAL_LAND => FbsEntityTy::T_COMMERCIAL_LAND,
-                    EntityTy::T_DEVELOPMENT_APPLICATION => FbsEntityTy::T_DEVELOPMENT_APPLICATION,
-                    EntityTy::T_AVAILABLE_COMMERCIAL_SPACE => FbsEntityTy::T_AVAILABLE_COMMERCIAL_SPACE,
-                    EntityTy::T_BUILDING_FOOTPRINT => FbsEntityTy::T_BUILDING_FOOTPRINT,
-                    EntityTy::T_DEVELOPED_EMPLOYMENT_LAND => FbsEntityTy::T_DEVELOPED_EMPLOYMENT_LAND,
-                    EntityTy::T_VACANT_EMPLOYMENT_LAND => FbsEntityTy::T_VACANT_EMPLOYMENT_LAND,
-                    EntityTy::T_STREET => FbsEntityTy::T_STREET,
-                    EntityTy::T_BIKESHARE_STATION => FbsEntityTy::T_BIKESHARE_STATION,
-                    EntityTy::T_SUBWAY_LINE => FbsEntityTy::T_SUBWAY_LINE,
-                    EntityTy::T_ON_STREET_PARKING => FbsEntityTy::T_ON_STREET_PARKING,
-                    EntityTy::T_PEDESTRIAN_ROUTE => FbsEntityTy::T_PEDESTRIAN_ROUTE,
-                    EntityTy::T_HERITAGE_DISTRICT => FbsEntityTy::T_HERITAGE_DISTRICT,
-                    EntityTy::T_BUS_ROUTE => FbsEntityTy::T_BUS_ROUTE,
-                    EntityTy::T_BUS_STOP => FbsEntityTy::T_BUS_STOP,
-                    EntityTy::T_POLITICAL_BOUNDARY => FbsEntityTy::T_POLITICAL_BOUNDARY,
-                    EntityTy::T_CRIME => FbsEntityTy::T_CRIME,
-                    EntityTy::T_EVENT => FbsEntityTy::T_EVENT,
-                    EntityTy::T_TFC_SEGMENT_VOLUMES => FbsEntityTy::T_TFC_SEGMENT_VOLUMES,
-                    EntityTy::T_TFC_TMC_COUNTS => FbsEntityTy::T_TFC_TMC_COUNTS,
-                    EntityTy::T_TFC_AADT => FbsEntityTy::T_TFC_AADT,
-                    EntityTy::T_CONNECTIVITY_CORRIDORS => FbsEntityTy::T_CONNECTIVITY_CORRIDORS,
-                    EntityTy::T_MEDIANS => FbsEntityTy::T_MEDIANS,
-                    EntityTy::T_EVACUATION_ROUTES => FbsEntityTy::T_EVACUATION_ROUTES,
-                    EntityTy::T_TRAFFIC_METRICS => FbsEntityTy::T_TRAFFIC_METRICS,
-                    EntityTy::T_COUNTERMEASURES_DEVICES => FbsEntityTy::T_COUNTERMEASURES_DEVICES,
-                    EntityTy::T_TRAFFIC_INCIDENTS => FbsEntityTy::T_TRAFFIC_INCIDENTS,
-                    EntityTy::T_BLOCKGROUP_DEMOGRAPHIC => FbsEntityTy::T_BLOCKGROUP_DEMOGRAPHIC,
-                    EntityTy::T_PARKING_METER => FbsEntityTy::T_PARKING_METER,
-                    EntityTy::T_PROPERTY_VALUE_ASSESSMENT => FbsEntityTy::T_PROPERTY_VALUE_ASSESSMENT,
-                    EntityTy::T_GOLF_COURSE => FbsEntityTy::T_GOLF_COURSE,
-                    EntityTy::T_BUILDING_PERMIT => FbsEntityTy::T_BUILDING_PERMIT,
-                    EntityTy::T_REALM => FbsEntityTy::T_REALM,
-                    EntityTy::T_ROAD_SEGMENT_COUNT_LOCATION => FbsEntityTy::T_ROAD_SEGMENT_COUNT_LOCATION,
-                    EntityTy::T_INTERSECTION_COUNT_LOCATION => FbsEntityTy::T_INTERSECTION_COUNT_LOCATION,
-                    EntityTy::T_TRIPS_ORIGIN_DESTINATION_PASSTHROUGH_BIA => FbsEntityTy::T_TRIPS_ORIGIN_DESTINATION_PASSTHROUGH_BIA,
-                    EntityTy::T_WORKLOGS => FbsEntityTy::T_WORKLOGS,
-                    EntityTy::T_FORECAST => FbsEntityTy::T_FORECAST,
-                    EntityTy::T_BRIDGES => FbsEntityTy::T_BRIDGES,
-                    EntityTy::T_OPEN_MARKETS => FbsEntityTy::T_OPEN_MARKETS,
-                    EntityTy::T_BIKE_FACILITIES => FbsEntityTy::T_BIKE_FACILITIES,
-                    EntityTy::T_DOG_LICENCES => FbsEntityTy::T_DOG_LICENCES,
-                    EntityTy::T_PEDESTRIAN_COUNT_LOCATION => FbsEntityTy::T_PEDESTRIAN_COUNT_LOCATION,
-                    EntityTy::T_DISADVANTAGED_AREA => FbsEntityTy::T_DISADVANTAGED_AREA,
-                    EntityTy::T_TRANSPORTATION_ANALYSIS_ZONE => FbsEntityTy::T_TRANSPORTATION_ANALYSIS_ZONE,
-                    EntityTy::T_ELECTION_DISTRICT => FbsEntityTy::T_ELECTION_DISTRICT,
-                    EntityTy::T_DISSEMINATION_AREA => FbsEntityTy::T_DISSEMINATION_AREA,
-                    EntityTy::T_RETAIL_AREA => FbsEntityTy::T_RETAIL_AREA,
-                    EntityTy::T_GROWTH_CENTER => FbsEntityTy::T_GROWTH_CENTER,
-                    EntityTy::T_SEARCH_ATTRIBUTES => FbsEntityTy::T_SEARCH_ATTRIBUTES,
-                    EntityTy::T_PROPERTY => FbsEntityTy::T_PROPERTY,
-                    EntityTy::T_DESIGNATED_AREA => FbsEntityTy::T_DESIGNATED_AREA,
-                    EntityTy::T_PROVINCIAL_FOREST => FbsEntityTy::T_PROVINCIAL_FOREST,
-                    EntityTy::T_TIMBER_SUPPLY_AREA => FbsEntityTy::T_TIMBER_SUPPLY_AREA,
-                    EntityTy::T_COMMUNICATION_SITE => FbsEntityTy::T_COMMUNICATION_SITE,
-                    EntityTy::T_CUT_BLOCK => FbsEntityTy::T_CUT_BLOCK,
-                    EntityTy::T_PERMIT => FbsEntityTy::T_PERMIT,
-                    EntityTy::T_LICENCE => FbsEntityTy::T_LICENCE,
-                    EntityTy::T_MAP_NOTATION => FbsEntityTy::T_MAP_NOTATION,
-                    EntityTy::T_REAL_PROPERTY_PROJECT => FbsEntityTy::T_REAL_PROPERTY_PROJECT,
-                    EntityTy::T_RECREATION_SITE => FbsEntityTy::T_RECREATION_SITE,
-                    EntityTy::T_RECREATION_LINE => FbsEntityTy::T_RECREATION_LINE,
-                    EntityTy::T_RECREATION_POLYGON => FbsEntityTy::T_RECREATION_POLYGON,
-                    EntityTy::T_SPECIAL_ACCESS_ROAD => FbsEntityTy::T_SPECIAL_ACCESS_ROAD,
-                    EntityTy::T_GROWTH_YIELD_SAMPLE => FbsEntityTy::T_GROWTH_YIELD_SAMPLE,
-                    EntityTy::T_OLD_GROWTH_MANAGEMENT_AREA => FbsEntityTy::T_OLD_GROWTH_MANAGEMENT_AREA,
-                    EntityTy::T_TREATY_AREA => FbsEntityTy::T_TREATY_AREA,
-                    EntityTy::T_TREATY_LAND => FbsEntityTy::T_TREATY_LAND,
-                    EntityTy::T_RELATED_TREATY_LAND => FbsEntityTy::T_RELATED_TREATY_LAND,
-                    EntityTy::T_ALC_ALR => FbsEntityTy::T_ALC_ALR,
-                    EntityTy::T_CONSERVATION_LAND => FbsEntityTy::T_CONSERVATION_LAND,
-                    EntityTy::T_MINFILE_MINERAL_OCCURRENCE_DATABASE => FbsEntityTy::T_MINFILE_MINERAL_OCCURRENCE_DATABASE,
-                    EntityTy::T_CROWN_GRANTED_MINERAL_CLAIM => FbsEntityTy::T_CROWN_GRANTED_MINERAL_CLAIM,
-                    EntityTy::T_MINERAL_RESERVES_SITES_BUSINESS_VIEW => FbsEntityTy::T_MINERAL_RESERVES_SITES_BUSINESS_VIEW,
-                    EntityTy::T_PETROLEUM_TITLE => FbsEntityTy::T_PETROLEUM_TITLE,
-                    EntityTy::T_CONSERVANCY_AREA => FbsEntityTy::T_CONSERVANCY_AREA,
-                    EntityTy::T_WILDLIFE_MANAGEMENT_AREA => FbsEntityTy::T_WILDLIFE_MANAGEMENT_AREA,
-                    EntityTy::T_RESERVOIR_PERMIT => FbsEntityTy::T_RESERVOIR_PERMIT,
-                    EntityTy::T_WATER_LICENSED_WORK => FbsEntityTy::T_WATER_LICENSED_WORK,
-                    EntityTy::T_WATER_RIGHTS_APPLICATION => FbsEntityTy::T_WATER_RIGHTS_APPLICATION,
-                    EntityTy::T_WATER_RIGHTS_LICENCE => FbsEntityTy::T_WATER_RIGHTS_LICENCE,
-                    EntityTy::T_GUIDE_OUTFITTER_AREA => FbsEntityTy::T_GUIDE_OUTFITTER_AREA,
-                    EntityTy::T_UNGULATE_WINTER_RANGE => FbsEntityTy::T_UNGULATE_WINTER_RANGE,
-                    EntityTy::T_WILDLIFE_HABITAT_AREAS => FbsEntityTy::T_WILDLIFE_HABITAT_AREAS,
-                    EntityTy::T_ROAD_SEGMENT_EXACT_COUNT_LOCATION => FbsEntityTy::T_ROAD_SEGMENT_EXACT_COUNT_LOCATION,
-                    EntityTy::T_EASEMENT => FbsEntityTy::T_EASEMENT,
-                    EntityTy::T_STREET_LIGHT => FbsEntityTy::T_STREET_LIGHT,
-                    EntityTy::T_TRAIL => FbsEntityTy::T_TRAIL,
-                    EntityTy::T_ROAD_SEGMENT_TRAVEL_TIME_LOCATION => FbsEntityTy::T_ROAD_SEGMENT_TRAVEL_TIME_LOCATION,
-                    EntityTy::T_CONSTRUCTION_PROJECT => FbsEntityTy::T_CONSTRUCTION_PROJECT,
-                    EntityTy::T_FACILITY => FbsEntityTy::T_FACILITY,
-                    EntityTy::T_SUBDIVISION_APPLICATION => FbsEntityTy::T_SUBDIVISION_APPLICATION,
-                    EntityTy::T_GARBAGE_ROUTE => FbsEntityTy::T_GARBAGE_ROUTE,
-                    EntityTy::T_PUBLIC_ART => FbsEntityTy::T_PUBLIC_ART,
-                    EntityTy::T_CENSUS_TRACTS_DEMOGRAPHIC => FbsEntityTy::T_CENSUS_TRACTS_DEMOGRAPHIC,
-                    EntityTy::T_COMMUNITY_OF_CONCERN => FbsEntityTy::T_COMMUNITY_OF_CONCERN,
-                    EntityTy::T_LIBRARY => FbsEntityTy::T_LIBRARY,
-                    EntityTy::T_SCHOOL => FbsEntityTy::T_SCHOOL,
-                    EntityTy::T_STREET_TREE => FbsEntityTy::T_STREET_TREE,
-                    EntityTy::T_ELECTRIC_VEHICLE_CHARGING_STATION => FbsEntityTy::T_ELECTRIC_VEHICLE_CHARGING_STATION,
-                    EntityTy::T_VISION_ZERO_SAFETY_CORRIDOR => FbsEntityTy::T_VISION_ZERO_SAFETY_CORRIDOR,
-                    EntityTy::T_TRAFFIC_VOLUME_MODEL => FbsEntityTy::T_TRAFFIC_VOLUME_MODEL,
-                    EntityTy::T_PLANNING_PROJECT => FbsEntityTy::T_PLANNING_PROJECT,
-                    EntityTy::T_PHARMACY => FbsEntityTy::T_PHARMACY,
-                    EntityTy::T_CENSUS_BLOCK => FbsEntityTy::T_CENSUS_BLOCK,
-                    EntityTy::T_ZIP_CODE => FbsEntityTy::T_ZIP_CODE,
-                    EntityTy::T_FIRE_ASSESSMENT => FbsEntityTy::T_FIRE_ASSESSMENT,
-                    EntityTy::T_TRANSPORTATION_PAVEMENT => FbsEntityTy::T_TRANSPORTATION_PAVEMENT,
-                    EntityTy::T_VEHICLE => FbsEntityTy::T_VEHICLE,
-                    EntityTy::T_TRIBAL_LAND => FbsEntityTy::T_TRIBAL_LAND,
-                    EntityTy::T_FIRE_STATION => FbsEntityTy::T_FIRE_STATION,
-                    EntityTy::T_WILDFIRE => FbsEntityTy::T_WILDFIRE,
-                    EntityTy::T_ACTIVE_TRANSPORTATION_LOCATION => FbsEntityTy::T_ACTIVE_TRANSPORTATION_LOCATION,
-                    EntityTy::T_TIME_DENSITY => FbsEntityTy::T_TIME_DENSITY,
-                    EntityTy::T_YOUTH_DISABILITY_SUPPORT_SERVICES => FbsEntityTy::T_YOUTH_DISABILITY_SUPPORT_SERVICES,
-                    EntityTy::T_HOME_FIRE_RISK => FbsEntityTy::T_HOME_FIRE_RISK,
-                    EntityTy::T_COUNT_LOCATION => FbsEntityTy::T_COUNT_LOCATION,
-                    EntityTy::T_RAILROAD => FbsEntityTy::T_RAILROAD,
-                    EntityTy::T_COMMUNITY_CENTER => FbsEntityTy::T_COMMUNITY_CENTER,
-                    EntityTy::T_MEAL_SITE => FbsEntityTy::T_MEAL_SITE,
-                    EntityTy::T_FOOD_BANK_AND_PARTNER => FbsEntityTy::T_FOOD_BANK_AND_PARTNER,
-                    EntityTy::T_HOUSING_UNIT => FbsEntityTy::T_HOUSING_UNIT,
-                    EntityTy::T_BIKE_RACK => FbsEntityTy::T_BIKE_RACK,
-                    EntityTy::T_IMPROVEMENT_AREA => FbsEntityTy::T_IMPROVEMENT_AREA,
-                    EntityTy::T_ZONING_DISTRICT => FbsEntityTy::T_ZONING_DISTRICT,
-                    EntityTy::T_RIGHT_OF_WAY => FbsEntityTy::T_RIGHT_OF_WAY,
-                    EntityTy::T_FREEWAY => FbsEntityTy::T_FREEWAY,
-                    EntityTy::T_BIKE_SUPPORT => FbsEntityTy::T_BIKE_SUPPORT,
-                    EntityTy::T_BIKE_CROSSING => FbsEntityTy::T_BIKE_CROSSING,
-                    EntityTy::T_CYCLING_JUNCTION => FbsEntityTy::T_CYCLING_JUNCTION,
-                    EntityTy::T_LANEWAYS => FbsEntityTy::T_LANEWAYS,
-                    EntityTy::T_CROSSWALK => FbsEntityTy::T_CROSSWALK,
-                    EntityTy::T_ISSUE => FbsEntityTy::T_ISSUE,
-                    EntityTy::T_MONUMENT => FbsEntityTy::T_MONUMENT,
-                    EntityTy::T_WATER_PARCEL => FbsEntityTy::T_WATER_PARCEL,
-                    EntityTy::T_CONTOUR => FbsEntityTy::T_CONTOUR,
-                    EntityTy::T_CAPITAL_PROJECT => FbsEntityTy::T_CAPITAL_PROJECT,
-                    EntityTy::T_SIGN => FbsEntityTy::T_SIGN,
-                    EntityTy::T_SIGN_POLE => FbsEntityTy::T_SIGN_POLE,
-                    EntityTy::T_REQUEST => FbsEntityTy::T_REQUEST,
-                    EntityTy::T_EMERGENCY_RESPONSE_ROAD => FbsEntityTy::T_EMERGENCY_RESPONSE_ROAD,
-                    EntityTy::T_RAILWAY_CROSSING => FbsEntityTy::T_RAILWAY_CROSSING,
-                    EntityTy::T_MOBILITY_HUB => FbsEntityTy::T_MOBILITY_HUB,
-                    EntityTy::T_CORRIDOR => FbsEntityTy::T_CORRIDOR,
-                    EntityTy::T_CRASH => FbsEntityTy::T_CRASH,
-                    EntityTy::T_RAIL_LINE => FbsEntityTy::T_RAIL_LINE,
-                    EntityTy::T_RAIL_STOP => FbsEntityTy::T_RAIL_STOP,
-                    EntityTy::T_ROUTE => FbsEntityTy::T_ROUTE,
-                    EntityTy::T_ROUTE_STOP => FbsEntityTy::T_ROUTE_STOP,
-                    EntityTy::T_TRANSIT_STOP => FbsEntityTy::T_TRANSIT_STOP,
-                    EntityTy::T_TRANSIT_CENTER => FbsEntityTy::T_TRANSIT_CENTER,
-                    EntityTy::T_EXPLORE_MODE_INTERSECTION => FbsEntityTy::T_EXPLORE_MODE_INTERSECTION,
-                    EntityTy::T_ETS_SEGMENT => FbsEntityTy::T_ETS_SEGMENT,
-                    EntityTy::T_FSA => FbsEntityTy::T_FSA,
-                    EntityTy::T_NEIGHBORHOOD_BUSINESS_ASSOCIATION => FbsEntityTy::T_NEIGHBORHOOD_BUSINESS_ASSOCIATION,
-                    EntityTy::T_COUNCIL_DISTRICT => FbsEntityTy::T_COUNCIL_DISTRICT,
-                    EntityTy::T_PROJECT_CRASHBOARD => FbsEntityTy::T_PROJECT_CRASHBOARD,
-                    EntityTy::T_ELEVATION_LINE => FbsEntityTy::T_ELEVATION_LINE,
-                    EntityTy::T_AREA => FbsEntityTy::T_AREA,
-                    EntityTy::T_TAX_LOT => FbsEntityTy::T_TAX_LOT,
-                    EntityTy::T_FLOOD => FbsEntityTy::T_FLOOD,
-                    EntityTy::T_COUNTY => FbsEntityTy::T_COUNTY,
-                    EntityTy::T_CITY => FbsEntityTy::T_CITY,
-                    EntityTy::T_ELEMENTARY_SCHOOL_DISTRICT => FbsEntityTy::T_ELEMENTARY_SCHOOL_DISTRICT,
-                    EntityTy::T_HIGH_SCHOOL_DISTRICT => FbsEntityTy::T_HIGH_SCHOOL_DISTRICT,
-                    EntityTy::T_MIDDLE_SCHOOL_DISTRICT => FbsEntityTy::T_MIDDLE_SCHOOL_DISTRICT,
-                    EntityTy::T_POLICY_AREA => FbsEntityTy::T_POLICY_AREA,
-                    EntityTy::T_2020_CENSUS_BLOCK => FbsEntityTy::T_2020_CENSUS_BLOCK,
-                    EntityTy::T_2010_CENSUS_BLOCK => FbsEntityTy::T_2010_CENSUS_BLOCK,
-                    EntityTy::T_2020_CENSUS_TRACT => FbsEntityTy::T_2020_CENSUS_TRACT,
-                    EntityTy::T_NON_CTP_ROADS => FbsEntityTy::T_NON_CTP_ROADS,
-                    EntityTy::T_COMMERCIAL_VACANCY => FbsEntityTy::T_COMMERCIAL_VACANCY,
-                    EntityTy::T_TESTING_SITE => FbsEntityTy::T_TESTING_SITE,
-                    EntityTy::T_CLINIC => FbsEntityTy::T_CLINIC,
-                    EntityTy::T_STREET_LITTER => FbsEntityTy::T_STREET_LITTER,
-                    EntityTy::T_CHILDCARE_CENTER => FbsEntityTy::T_CHILDCARE_CENTER,
-                    EntityTy::T_CAMERA => FbsEntityTy::T_CAMERA,
-                    EntityTy::T_ALLEY => FbsEntityTy::T_ALLEY,
-                    EntityTy::T_PAVEMENT => FbsEntityTy::T_PAVEMENT,
-                    EntityTy::T_PAVEMENT_STRIP => FbsEntityTy::T_PAVEMENT_STRIP,
-                    EntityTy::T_POLE => FbsEntityTy::T_POLE,
-                    EntityTy::T_DASHBOARD_BUSINESS => FbsEntityTy::T_DASHBOARD_BUSINESS,
-                    EntityTy::T_SIGNAL => FbsEntityTy::T_SIGNAL,
-                    EntityTy::T_MAST_ARM => FbsEntityTy::T_MAST_ARM,
-                    EntityTy::T_CAMERA_EXPLORE => FbsEntityTy::T_CAMERA_EXPLORE,
-                    EntityTy::T_DASHBOARD_PROPERTY => FbsEntityTy::T_DASHBOARD_PROPERTY,
-                    EntityTy::T_POLICE_REPORTED_CRASH => FbsEntityTy::T_POLICE_REPORTED_CRASH,
-                    EntityTy::T_PARKING_SPACE => FbsEntityTy::T_PARKING_SPACE,
-                    EntityTy::T_FIRE_RISK_SCORE => FbsEntityTy::T_FIRE_RISK_SCORE,
-                    EntityTy::T_FIRE_RISK_CAUSE => FbsEntityTy::T_FIRE_RISK_CAUSE,
-                    EntityTy::T_FIRE_DEPARTMENT => FbsEntityTy::T_FIRE_DEPARTMENT,
-                    EntityTy::T_PLANNED_SIDEWALK => FbsEntityTy::T_PLANNED_SIDEWALK,
-                    EntityTy::T_PROPOSED_PEDESTRIAN_PROJECT => FbsEntityTy::T_PROPOSED_PEDESTRIAN_PROJECT,
-                    EntityTy::T_PROPOSED_BIKE_PROJECT => FbsEntityTy::T_PROPOSED_BIKE_PROJECT,
-                    EntityTy::T_ADMINISTRATIVE_AREA => FbsEntityTy::T_ADMINISTRATIVE_AREA,
-                    EntityTy::T_CURB_RAMP => FbsEntityTy::T_CURB_RAMP,
-                    EntityTy::T_PARKING_PERMIT_AREA => FbsEntityTy::T_PARKING_PERMIT_AREA,
-                    EntityTy::T_PARCEL => FbsEntityTy::T_PARCEL,
-                    EntityTy::T_BOUNDARY => FbsEntityTy::T_BOUNDARY,
-                    EntityTy::T_RAILWAY => FbsEntityTy::T_RAILWAY,
-                    EntityTy::T_SOIL => FbsEntityTy::T_SOIL,
-                    EntityTy::T_UTILITY_CABINET => FbsEntityTy::T_UTILITY_CABINET,
-                    EntityTy::T_SIGNAL_CABINET => FbsEntityTy::T_SIGNAL_CABINET,
-                    EntityTy::T_PEDESTRIAN_BUTTON => FbsEntityTy::T_PEDESTRIAN_BUTTON,
-                    EntityTy::T_TRAFFIC_CALMING => FbsEntityTy::T_TRAFFIC_CALMING,
-                    EntityTy::T_CURB => FbsEntityTy::T_CURB,
-                    EntityTy::T_TRUCK_ROUTE => FbsEntityTy::T_TRUCK_ROUTE,
-                    EntityTy::T_GREENWAY => FbsEntityTy::T_GREENWAY,
-                    EntityTy::T_ROAD_EDGE => FbsEntityTy::T_ROAD_EDGE,
-                    EntityTy::T_RESTAURANT => FbsEntityTy::T_RESTAURANT,
-                    EntityTy::T_BARRIER => FbsEntityTy::T_BARRIER,
-                    EntityTy::T_PAVEMENT_MARKING => FbsEntityTy::T_PAVEMENT_MARKING,
-                    EntityTy::T_PLANNING_AREA => FbsEntityTy::T_PLANNING_AREA,
-                    EntityTy::T_ORDER => FbsEntityTy::T_ORDER,
-                    EntityTy::T_FIRE_HYDRANT => FbsEntityTy::T_FIRE_HYDRANT,
-                    EntityTy::T_CANNABIS_AND_LIQUOR_STORES => FbsEntityTy::T_CANNABIS_AND_LIQUOR_STORES,
-                    EntityTy::T_CENSUS_SUBDIVISION => FbsEntityTy::T_CENSUS_SUBDIVISION,
-                    EntityTy::T_SPEED_HUMP => FbsEntityTy::T_SPEED_HUMP,
-                    EntityTy::T_CRASH_CUSHION => FbsEntityTy::T_CRASH_CUSHION,
-                    EntityTy::T_DEFAULT_AREA_FILTER => FbsEntityTy::T_DEFAULT_AREA_FILTER,
-                    EntityTy::T_PLAYGROUND => FbsEntityTy::T_PLAYGROUND,
-                    EntityTy::T_PICNIC_SHELTER => FbsEntityTy::T_PICNIC_SHELTER,
-                    EntityTy::T_TENNIS_COURT => FbsEntityTy::T_TENNIS_COURT,
-                    EntityTy::T_SPORTS_FIELD => FbsEntityTy::T_SPORTS_FIELD,
-                    EntityTy::T_WASHROOM => FbsEntityTy::T_WASHROOM,
-                    EntityTy::T_BASEBALL_DIAMOND => FbsEntityTy::T_BASEBALL_DIAMOND,
-                    EntityTy::T_ITS_DEVICE => FbsEntityTy::T_ITS_DEVICE,
-                    EntityTy::T_SHORTLINE => FbsEntityTy::T_SHORTLINE,
-                    EntityTy::T_TRANSIT_RELATED => FbsEntityTy::T_TRANSIT_RELATED,
-                    EntityTy::T_FREIGHT_ANALYSIS_DASHBOARD => FbsEntityTy::T_FREIGHT_ANALYSIS_DASHBOARD,
-                    EntityTy::T_ACCESS_POINT => FbsEntityTy::T_ACCESS_POINT,
-                    EntityTy::T_CENSUS_DIVISION => FbsEntityTy::T_CENSUS_DIVISION,
-                    EntityTy::T_STATE_PROVINCE => FbsEntityTy::T_STATE_PROVINCE,
-                    EntityTy::T_FEDERAL => FbsEntityTy::T_FEDERAL,
-                    EntityTy::T_CANNABIS_AND_LIQUOR_STORES_TRANSFER => FbsEntityTy::T_CANNABIS_AND_LIQUOR_STORES_TRANSFER,
-                    EntityTy::T_STATE_OWNED_ROAD => FbsEntityTy::T_STATE_OWNED_ROAD,
-                    EntityTy::T_AIR_QUALITY_MONITORING_STATION => FbsEntityTy::T_AIR_QUALITY_MONITORING_STATION,
-                    EntityTy::T_AOI => FbsEntityTy::T_AOI,
-                    EntityTy::T_PERFORMANCE_MEASURE => FbsEntityTy::T_PERFORMANCE_MEASURE,
+            let entity_tys_offset = builder.create_vector_from_iter(v.iter().map(|v| match v {
+                EntityTy::T_INVALID => FbsEntityTy::T_INVALID,
+                EntityTy::T_TFC => FbsEntityTy::T_TFC,
+                EntityTy::T_TFC_LOOP => FbsEntityTy::T_TFC_LOOP,
+                EntityTy::T_TFC_CRASH => FbsEntityTy::T_TFC_CRASH,
+                EntityTy::T_TFC_TMC_REPORT => FbsEntityTy::T_TFC_TMC_REPORT,
+                EntityTy::T_ROAD_SEGMENT => FbsEntityTy::T_ROAD_SEGMENT,
+                EntityTy::T_INTERSECTION => FbsEntityTy::T_INTERSECTION,
+                EntityTy::T_SIDEWAlK => FbsEntityTy::T_SIDEWAlK,
+                EntityTy::T_BIKEWAY => FbsEntityTy::T_BIKEWAY,
+                EntityTy::T_TRANSIT_LINE => FbsEntityTy::T_TRANSIT_LINE,
+                EntityTy::T_BIA => FbsEntityTy::T_BIA,
+                EntityTy::T_NEIGHBOURHOOD => FbsEntityTy::T_NEIGHBOURHOOD,
+                EntityTy::T_NIA => FbsEntityTy::T_NIA,
+                EntityTy::T_WARD => FbsEntityTy::T_WARD,
+                EntityTy::T_DISTRICT => FbsEntityTy::T_DISTRICT,
+                EntityTy::T_CONSTITUENCY => FbsEntityTy::T_CONSTITUENCY,
+                EntityTy::T_POSTAL_CODE_GEO => FbsEntityTy::T_POSTAL_CODE_GEO,
+                EntityTy::T_BUSINESS => FbsEntityTy::T_BUSINESS,
+                EntityTy::T_LAND_PARCEL => FbsEntityTy::T_LAND_PARCEL,
+                EntityTy::T_ADDRESS => FbsEntityTy::T_ADDRESS,
+                EntityTy::T_POSTAL_CODE_DEMOGRAPHICS => FbsEntityTy::T_POSTAL_CODE_DEMOGRAPHICS,
+                EntityTy::T_ZONE => FbsEntityTy::T_ZONE,
+                EntityTy::T_PARK => FbsEntityTy::T_PARK,
+                EntityTy::T_PARKING_LOT => FbsEntityTy::T_PARKING_LOT,
+                EntityTy::T_PARKING_TICKET => FbsEntityTy::T_PARKING_TICKET,
+                EntityTy::T_PLACE_OF_INTEREST => FbsEntityTy::T_PLACE_OF_INTEREST,
+                EntityTy::T_DAYCARE_CENTRE => FbsEntityTy::T_DAYCARE_CENTRE,
+                EntityTy::T_MEDICAL_CENTRE => FbsEntityTy::T_MEDICAL_CENTRE,
+                EntityTy::T_COMMERCIAL_LAND => FbsEntityTy::T_COMMERCIAL_LAND,
+                EntityTy::T_DEVELOPMENT_APPLICATION => FbsEntityTy::T_DEVELOPMENT_APPLICATION,
+                EntityTy::T_AVAILABLE_COMMERCIAL_SPACE => FbsEntityTy::T_AVAILABLE_COMMERCIAL_SPACE,
+                EntityTy::T_BUILDING_FOOTPRINT => FbsEntityTy::T_BUILDING_FOOTPRINT,
+                EntityTy::T_DEVELOPED_EMPLOYMENT_LAND => FbsEntityTy::T_DEVELOPED_EMPLOYMENT_LAND,
+                EntityTy::T_VACANT_EMPLOYMENT_LAND => FbsEntityTy::T_VACANT_EMPLOYMENT_LAND,
+                EntityTy::T_STREET => FbsEntityTy::T_STREET,
+                EntityTy::T_BIKESHARE_STATION => FbsEntityTy::T_BIKESHARE_STATION,
+                EntityTy::T_SUBWAY_LINE => FbsEntityTy::T_SUBWAY_LINE,
+                EntityTy::T_ON_STREET_PARKING => FbsEntityTy::T_ON_STREET_PARKING,
+                EntityTy::T_PEDESTRIAN_ROUTE => FbsEntityTy::T_PEDESTRIAN_ROUTE,
+                EntityTy::T_HERITAGE_DISTRICT => FbsEntityTy::T_HERITAGE_DISTRICT,
+                EntityTy::T_BUS_ROUTE => FbsEntityTy::T_BUS_ROUTE,
+                EntityTy::T_BUS_STOP => FbsEntityTy::T_BUS_STOP,
+                EntityTy::T_POLITICAL_BOUNDARY => FbsEntityTy::T_POLITICAL_BOUNDARY,
+                EntityTy::T_CRIME => FbsEntityTy::T_CRIME,
+                EntityTy::T_EVENT => FbsEntityTy::T_EVENT,
+                EntityTy::T_TFC_SEGMENT_VOLUMES => FbsEntityTy::T_TFC_SEGMENT_VOLUMES,
+                EntityTy::T_TFC_TMC_COUNTS => FbsEntityTy::T_TFC_TMC_COUNTS,
+                EntityTy::T_TFC_AADT => FbsEntityTy::T_TFC_AADT,
+                EntityTy::T_CONNECTIVITY_CORRIDORS => FbsEntityTy::T_CONNECTIVITY_CORRIDORS,
+                EntityTy::T_MEDIANS => FbsEntityTy::T_MEDIANS,
+                EntityTy::T_EVACUATION_ROUTES => FbsEntityTy::T_EVACUATION_ROUTES,
+                EntityTy::T_TRAFFIC_METRICS => FbsEntityTy::T_TRAFFIC_METRICS,
+                EntityTy::T_COUNTERMEASURES_DEVICES => FbsEntityTy::T_COUNTERMEASURES_DEVICES,
+                EntityTy::T_TRAFFIC_INCIDENTS => FbsEntityTy::T_TRAFFIC_INCIDENTS,
+                EntityTy::T_BLOCKGROUP_DEMOGRAPHIC => FbsEntityTy::T_BLOCKGROUP_DEMOGRAPHIC,
+                EntityTy::T_PARKING_METER => FbsEntityTy::T_PARKING_METER,
+                EntityTy::T_PROPERTY_VALUE_ASSESSMENT => FbsEntityTy::T_PROPERTY_VALUE_ASSESSMENT,
+                EntityTy::T_GOLF_COURSE => FbsEntityTy::T_GOLF_COURSE,
+                EntityTy::T_BUILDING_PERMIT => FbsEntityTy::T_BUILDING_PERMIT,
+                EntityTy::T_REALM => FbsEntityTy::T_REALM,
+                EntityTy::T_ROAD_SEGMENT_COUNT_LOCATION => {
+                    FbsEntityTy::T_ROAD_SEGMENT_COUNT_LOCATION
                 }
+                EntityTy::T_INTERSECTION_COUNT_LOCATION => {
+                    FbsEntityTy::T_INTERSECTION_COUNT_LOCATION
+                }
+                EntityTy::T_TRIPS_ORIGIN_DESTINATION_PASSTHROUGH_BIA => {
+                    FbsEntityTy::T_TRIPS_ORIGIN_DESTINATION_PASSTHROUGH_BIA
+                }
+                EntityTy::T_WORKLOGS => FbsEntityTy::T_WORKLOGS,
+                EntityTy::T_FORECAST => FbsEntityTy::T_FORECAST,
+                EntityTy::T_BRIDGES => FbsEntityTy::T_BRIDGES,
+                EntityTy::T_OPEN_MARKETS => FbsEntityTy::T_OPEN_MARKETS,
+                EntityTy::T_BIKE_FACILITIES => FbsEntityTy::T_BIKE_FACILITIES,
+                EntityTy::T_DOG_LICENCES => FbsEntityTy::T_DOG_LICENCES,
+                EntityTy::T_PEDESTRIAN_COUNT_LOCATION => FbsEntityTy::T_PEDESTRIAN_COUNT_LOCATION,
+                EntityTy::T_DISADVANTAGED_AREA => FbsEntityTy::T_DISADVANTAGED_AREA,
+                EntityTy::T_TRANSPORTATION_ANALYSIS_ZONE => {
+                    FbsEntityTy::T_TRANSPORTATION_ANALYSIS_ZONE
+                }
+                EntityTy::T_ELECTION_DISTRICT => FbsEntityTy::T_ELECTION_DISTRICT,
+                EntityTy::T_DISSEMINATION_AREA => FbsEntityTy::T_DISSEMINATION_AREA,
+                EntityTy::T_RETAIL_AREA => FbsEntityTy::T_RETAIL_AREA,
+                EntityTy::T_GROWTH_CENTER => FbsEntityTy::T_GROWTH_CENTER,
+                EntityTy::T_SEARCH_ATTRIBUTES => FbsEntityTy::T_SEARCH_ATTRIBUTES,
+                EntityTy::T_PROPERTY => FbsEntityTy::T_PROPERTY,
+                EntityTy::T_DESIGNATED_AREA => FbsEntityTy::T_DESIGNATED_AREA,
+                EntityTy::T_PROVINCIAL_FOREST => FbsEntityTy::T_PROVINCIAL_FOREST,
+                EntityTy::T_TIMBER_SUPPLY_AREA => FbsEntityTy::T_TIMBER_SUPPLY_AREA,
+                EntityTy::T_COMMUNICATION_SITE => FbsEntityTy::T_COMMUNICATION_SITE,
+                EntityTy::T_CUT_BLOCK => FbsEntityTy::T_CUT_BLOCK,
+                EntityTy::T_PERMIT => FbsEntityTy::T_PERMIT,
+                EntityTy::T_LICENCE => FbsEntityTy::T_LICENCE,
+                EntityTy::T_MAP_NOTATION => FbsEntityTy::T_MAP_NOTATION,
+                EntityTy::T_REAL_PROPERTY_PROJECT => FbsEntityTy::T_REAL_PROPERTY_PROJECT,
+                EntityTy::T_RECREATION_SITE => FbsEntityTy::T_RECREATION_SITE,
+                EntityTy::T_RECREATION_LINE => FbsEntityTy::T_RECREATION_LINE,
+                EntityTy::T_RECREATION_POLYGON => FbsEntityTy::T_RECREATION_POLYGON,
+                EntityTy::T_SPECIAL_ACCESS_ROAD => FbsEntityTy::T_SPECIAL_ACCESS_ROAD,
+                EntityTy::T_GROWTH_YIELD_SAMPLE => FbsEntityTy::T_GROWTH_YIELD_SAMPLE,
+                EntityTy::T_OLD_GROWTH_MANAGEMENT_AREA => FbsEntityTy::T_OLD_GROWTH_MANAGEMENT_AREA,
+                EntityTy::T_TREATY_AREA => FbsEntityTy::T_TREATY_AREA,
+                EntityTy::T_TREATY_LAND => FbsEntityTy::T_TREATY_LAND,
+                EntityTy::T_RELATED_TREATY_LAND => FbsEntityTy::T_RELATED_TREATY_LAND,
+                EntityTy::T_ALC_ALR => FbsEntityTy::T_ALC_ALR,
+                EntityTy::T_CONSERVATION_LAND => FbsEntityTy::T_CONSERVATION_LAND,
+                EntityTy::T_MINFILE_MINERAL_OCCURRENCE_DATABASE => {
+                    FbsEntityTy::T_MINFILE_MINERAL_OCCURRENCE_DATABASE
+                }
+                EntityTy::T_CROWN_GRANTED_MINERAL_CLAIM => {
+                    FbsEntityTy::T_CROWN_GRANTED_MINERAL_CLAIM
+                }
+                EntityTy::T_MINERAL_RESERVES_SITES_BUSINESS_VIEW => {
+                    FbsEntityTy::T_MINERAL_RESERVES_SITES_BUSINESS_VIEW
+                }
+                EntityTy::T_PETROLEUM_TITLE => FbsEntityTy::T_PETROLEUM_TITLE,
+                EntityTy::T_CONSERVANCY_AREA => FbsEntityTy::T_CONSERVANCY_AREA,
+                EntityTy::T_WILDLIFE_MANAGEMENT_AREA => FbsEntityTy::T_WILDLIFE_MANAGEMENT_AREA,
+                EntityTy::T_RESERVOIR_PERMIT => FbsEntityTy::T_RESERVOIR_PERMIT,
+                EntityTy::T_WATER_LICENSED_WORK => FbsEntityTy::T_WATER_LICENSED_WORK,
+                EntityTy::T_WATER_RIGHTS_APPLICATION => FbsEntityTy::T_WATER_RIGHTS_APPLICATION,
+                EntityTy::T_WATER_RIGHTS_LICENCE => FbsEntityTy::T_WATER_RIGHTS_LICENCE,
+                EntityTy::T_GUIDE_OUTFITTER_AREA => FbsEntityTy::T_GUIDE_OUTFITTER_AREA,
+                EntityTy::T_UNGULATE_WINTER_RANGE => FbsEntityTy::T_UNGULATE_WINTER_RANGE,
+                EntityTy::T_WILDLIFE_HABITAT_AREAS => FbsEntityTy::T_WILDLIFE_HABITAT_AREAS,
+                EntityTy::T_ROAD_SEGMENT_EXACT_COUNT_LOCATION => {
+                    FbsEntityTy::T_ROAD_SEGMENT_EXACT_COUNT_LOCATION
+                }
+                EntityTy::T_EASEMENT => FbsEntityTy::T_EASEMENT,
+                EntityTy::T_STREET_LIGHT => FbsEntityTy::T_STREET_LIGHT,
+                EntityTy::T_TRAIL => FbsEntityTy::T_TRAIL,
+                EntityTy::T_ROAD_SEGMENT_TRAVEL_TIME_LOCATION => {
+                    FbsEntityTy::T_ROAD_SEGMENT_TRAVEL_TIME_LOCATION
+                }
+                EntityTy::T_CONSTRUCTION_PROJECT => FbsEntityTy::T_CONSTRUCTION_PROJECT,
+                EntityTy::T_FACILITY => FbsEntityTy::T_FACILITY,
+                EntityTy::T_SUBDIVISION_APPLICATION => FbsEntityTy::T_SUBDIVISION_APPLICATION,
+                EntityTy::T_GARBAGE_ROUTE => FbsEntityTy::T_GARBAGE_ROUTE,
+                EntityTy::T_PUBLIC_ART => FbsEntityTy::T_PUBLIC_ART,
+                EntityTy::T_CENSUS_TRACTS_DEMOGRAPHIC => FbsEntityTy::T_CENSUS_TRACTS_DEMOGRAPHIC,
+                EntityTy::T_COMMUNITY_OF_CONCERN => FbsEntityTy::T_COMMUNITY_OF_CONCERN,
+                EntityTy::T_LIBRARY => FbsEntityTy::T_LIBRARY,
+                EntityTy::T_SCHOOL => FbsEntityTy::T_SCHOOL,
+                EntityTy::T_STREET_TREE => FbsEntityTy::T_STREET_TREE,
+                EntityTy::T_ELECTRIC_VEHICLE_CHARGING_STATION => {
+                    FbsEntityTy::T_ELECTRIC_VEHICLE_CHARGING_STATION
+                }
+                EntityTy::T_VISION_ZERO_SAFETY_CORRIDOR => {
+                    FbsEntityTy::T_VISION_ZERO_SAFETY_CORRIDOR
+                }
+                EntityTy::T_TRAFFIC_VOLUME_MODEL => FbsEntityTy::T_TRAFFIC_VOLUME_MODEL,
+                EntityTy::T_PLANNING_PROJECT => FbsEntityTy::T_PLANNING_PROJECT,
+                EntityTy::T_PHARMACY => FbsEntityTy::T_PHARMACY,
+                EntityTy::T_CENSUS_BLOCK => FbsEntityTy::T_CENSUS_BLOCK,
+                EntityTy::T_ZIP_CODE => FbsEntityTy::T_ZIP_CODE,
+                EntityTy::T_FIRE_ASSESSMENT => FbsEntityTy::T_FIRE_ASSESSMENT,
+                EntityTy::T_TRANSPORTATION_PAVEMENT => FbsEntityTy::T_TRANSPORTATION_PAVEMENT,
+                EntityTy::T_VEHICLE => FbsEntityTy::T_VEHICLE,
+                EntityTy::T_TRIBAL_LAND => FbsEntityTy::T_TRIBAL_LAND,
+                EntityTy::T_FIRE_STATION => FbsEntityTy::T_FIRE_STATION,
+                EntityTy::T_WILDFIRE => FbsEntityTy::T_WILDFIRE,
+                EntityTy::T_ACTIVE_TRANSPORTATION_LOCATION => {
+                    FbsEntityTy::T_ACTIVE_TRANSPORTATION_LOCATION
+                }
+                EntityTy::T_TIME_DENSITY => FbsEntityTy::T_TIME_DENSITY,
+                EntityTy::T_YOUTH_DISABILITY_SUPPORT_SERVICES => {
+                    FbsEntityTy::T_YOUTH_DISABILITY_SUPPORT_SERVICES
+                }
+                EntityTy::T_HOME_FIRE_RISK => FbsEntityTy::T_HOME_FIRE_RISK,
+                EntityTy::T_COUNT_LOCATION => FbsEntityTy::T_COUNT_LOCATION,
+                EntityTy::T_RAILROAD => FbsEntityTy::T_RAILROAD,
+                EntityTy::T_COMMUNITY_CENTER => FbsEntityTy::T_COMMUNITY_CENTER,
+                EntityTy::T_MEAL_SITE => FbsEntityTy::T_MEAL_SITE,
+                EntityTy::T_FOOD_BANK_AND_PARTNER => FbsEntityTy::T_FOOD_BANK_AND_PARTNER,
+                EntityTy::T_HOUSING_UNIT => FbsEntityTy::T_HOUSING_UNIT,
+                EntityTy::T_BIKE_RACK => FbsEntityTy::T_BIKE_RACK,
+                EntityTy::T_IMPROVEMENT_AREA => FbsEntityTy::T_IMPROVEMENT_AREA,
+                EntityTy::T_ZONING_DISTRICT => FbsEntityTy::T_ZONING_DISTRICT,
+                EntityTy::T_RIGHT_OF_WAY => FbsEntityTy::T_RIGHT_OF_WAY,
+                EntityTy::T_FREEWAY => FbsEntityTy::T_FREEWAY,
+                EntityTy::T_BIKE_SUPPORT => FbsEntityTy::T_BIKE_SUPPORT,
+                EntityTy::T_BIKE_CROSSING => FbsEntityTy::T_BIKE_CROSSING,
+                EntityTy::T_CYCLING_JUNCTION => FbsEntityTy::T_CYCLING_JUNCTION,
+                EntityTy::T_LANEWAYS => FbsEntityTy::T_LANEWAYS,
+                EntityTy::T_CROSSWALK => FbsEntityTy::T_CROSSWALK,
+                EntityTy::T_ISSUE => FbsEntityTy::T_ISSUE,
+                EntityTy::T_MONUMENT => FbsEntityTy::T_MONUMENT,
+                EntityTy::T_WATER_PARCEL => FbsEntityTy::T_WATER_PARCEL,
+                EntityTy::T_CONTOUR => FbsEntityTy::T_CONTOUR,
+                EntityTy::T_CAPITAL_PROJECT => FbsEntityTy::T_CAPITAL_PROJECT,
+                EntityTy::T_SIGN => FbsEntityTy::T_SIGN,
+                EntityTy::T_SIGN_POLE => FbsEntityTy::T_SIGN_POLE,
+                EntityTy::T_REQUEST => FbsEntityTy::T_REQUEST,
+                EntityTy::T_EMERGENCY_RESPONSE_ROAD => FbsEntityTy::T_EMERGENCY_RESPONSE_ROAD,
+                EntityTy::T_RAILWAY_CROSSING => FbsEntityTy::T_RAILWAY_CROSSING,
+                EntityTy::T_MOBILITY_HUB => FbsEntityTy::T_MOBILITY_HUB,
+                EntityTy::T_CORRIDOR => FbsEntityTy::T_CORRIDOR,
+                EntityTy::T_CRASH => FbsEntityTy::T_CRASH,
+                EntityTy::T_RAIL_LINE => FbsEntityTy::T_RAIL_LINE,
+                EntityTy::T_RAIL_STOP => FbsEntityTy::T_RAIL_STOP,
+                EntityTy::T_ROUTE => FbsEntityTy::T_ROUTE,
+                EntityTy::T_ROUTE_STOP => FbsEntityTy::T_ROUTE_STOP,
+                EntityTy::T_TRANSIT_STOP => FbsEntityTy::T_TRANSIT_STOP,
+                EntityTy::T_TRANSIT_CENTER => FbsEntityTy::T_TRANSIT_CENTER,
+                EntityTy::T_EXPLORE_MODE_INTERSECTION => FbsEntityTy::T_EXPLORE_MODE_INTERSECTION,
+                EntityTy::T_ETS_SEGMENT => FbsEntityTy::T_ETS_SEGMENT,
+                EntityTy::T_FSA => FbsEntityTy::T_FSA,
+                EntityTy::T_NEIGHBORHOOD_BUSINESS_ASSOCIATION => {
+                    FbsEntityTy::T_NEIGHBORHOOD_BUSINESS_ASSOCIATION
+                }
+                EntityTy::T_COUNCIL_DISTRICT => FbsEntityTy::T_COUNCIL_DISTRICT,
+                EntityTy::T_PROJECT_CRASHBOARD => FbsEntityTy::T_PROJECT_CRASHBOARD,
+                EntityTy::T_ELEVATION_LINE => FbsEntityTy::T_ELEVATION_LINE,
+                EntityTy::T_AREA => FbsEntityTy::T_AREA,
+                EntityTy::T_TAX_LOT => FbsEntityTy::T_TAX_LOT,
+                EntityTy::T_FLOOD => FbsEntityTy::T_FLOOD,
+                EntityTy::T_COUNTY => FbsEntityTy::T_COUNTY,
+                EntityTy::T_CITY => FbsEntityTy::T_CITY,
+                EntityTy::T_ELEMENTARY_SCHOOL_DISTRICT => FbsEntityTy::T_ELEMENTARY_SCHOOL_DISTRICT,
+                EntityTy::T_HIGH_SCHOOL_DISTRICT => FbsEntityTy::T_HIGH_SCHOOL_DISTRICT,
+                EntityTy::T_MIDDLE_SCHOOL_DISTRICT => FbsEntityTy::T_MIDDLE_SCHOOL_DISTRICT,
+                EntityTy::T_POLICY_AREA => FbsEntityTy::T_POLICY_AREA,
+                EntityTy::T_2020_CENSUS_BLOCK => FbsEntityTy::T_2020_CENSUS_BLOCK,
+                EntityTy::T_2010_CENSUS_BLOCK => FbsEntityTy::T_2010_CENSUS_BLOCK,
+                EntityTy::T_2020_CENSUS_TRACT => FbsEntityTy::T_2020_CENSUS_TRACT,
+                EntityTy::T_NON_CTP_ROADS => FbsEntityTy::T_NON_CTP_ROADS,
+                EntityTy::T_COMMERCIAL_VACANCY => FbsEntityTy::T_COMMERCIAL_VACANCY,
+                EntityTy::T_TESTING_SITE => FbsEntityTy::T_TESTING_SITE,
+                EntityTy::T_CLINIC => FbsEntityTy::T_CLINIC,
+                EntityTy::T_STREET_LITTER => FbsEntityTy::T_STREET_LITTER,
+                EntityTy::T_CHILDCARE_CENTER => FbsEntityTy::T_CHILDCARE_CENTER,
+                EntityTy::T_CAMERA => FbsEntityTy::T_CAMERA,
+                EntityTy::T_ALLEY => FbsEntityTy::T_ALLEY,
+                EntityTy::T_PAVEMENT => FbsEntityTy::T_PAVEMENT,
+                EntityTy::T_PAVEMENT_STRIP => FbsEntityTy::T_PAVEMENT_STRIP,
+                EntityTy::T_POLE => FbsEntityTy::T_POLE,
+                EntityTy::T_DASHBOARD_BUSINESS => FbsEntityTy::T_DASHBOARD_BUSINESS,
+                EntityTy::T_SIGNAL => FbsEntityTy::T_SIGNAL,
+                EntityTy::T_MAST_ARM => FbsEntityTy::T_MAST_ARM,
+                EntityTy::T_CAMERA_EXPLORE => FbsEntityTy::T_CAMERA_EXPLORE,
+                EntityTy::T_DASHBOARD_PROPERTY => FbsEntityTy::T_DASHBOARD_PROPERTY,
+                EntityTy::T_POLICE_REPORTED_CRASH => FbsEntityTy::T_POLICE_REPORTED_CRASH,
+                EntityTy::T_PARKING_SPACE => FbsEntityTy::T_PARKING_SPACE,
+                EntityTy::T_FIRE_RISK_SCORE => FbsEntityTy::T_FIRE_RISK_SCORE,
+                EntityTy::T_FIRE_RISK_CAUSE => FbsEntityTy::T_FIRE_RISK_CAUSE,
+                EntityTy::T_FIRE_DEPARTMENT => FbsEntityTy::T_FIRE_DEPARTMENT,
+                EntityTy::T_PLANNED_SIDEWALK => FbsEntityTy::T_PLANNED_SIDEWALK,
+                EntityTy::T_PROPOSED_PEDESTRIAN_PROJECT => {
+                    FbsEntityTy::T_PROPOSED_PEDESTRIAN_PROJECT
+                }
+                EntityTy::T_PROPOSED_BIKE_PROJECT => FbsEntityTy::T_PROPOSED_BIKE_PROJECT,
+                EntityTy::T_ADMINISTRATIVE_AREA => FbsEntityTy::T_ADMINISTRATIVE_AREA,
+                EntityTy::T_CURB_RAMP => FbsEntityTy::T_CURB_RAMP,
+                EntityTy::T_PARKING_PERMIT_AREA => FbsEntityTy::T_PARKING_PERMIT_AREA,
+                EntityTy::T_PARCEL => FbsEntityTy::T_PARCEL,
+                EntityTy::T_BOUNDARY => FbsEntityTy::T_BOUNDARY,
+                EntityTy::T_RAILWAY => FbsEntityTy::T_RAILWAY,
+                EntityTy::T_SOIL => FbsEntityTy::T_SOIL,
+                EntityTy::T_UTILITY_CABINET => FbsEntityTy::T_UTILITY_CABINET,
+                EntityTy::T_SIGNAL_CABINET => FbsEntityTy::T_SIGNAL_CABINET,
+                EntityTy::T_PEDESTRIAN_BUTTON => FbsEntityTy::T_PEDESTRIAN_BUTTON,
+                EntityTy::T_TRAFFIC_CALMING => FbsEntityTy::T_TRAFFIC_CALMING,
+                EntityTy::T_CURB => FbsEntityTy::T_CURB,
+                EntityTy::T_TRUCK_ROUTE => FbsEntityTy::T_TRUCK_ROUTE,
+                EntityTy::T_GREENWAY => FbsEntityTy::T_GREENWAY,
+                EntityTy::T_ROAD_EDGE => FbsEntityTy::T_ROAD_EDGE,
+                EntityTy::T_RESTAURANT => FbsEntityTy::T_RESTAURANT,
+                EntityTy::T_BARRIER => FbsEntityTy::T_BARRIER,
+                EntityTy::T_PAVEMENT_MARKING => FbsEntityTy::T_PAVEMENT_MARKING,
+                EntityTy::T_PLANNING_AREA => FbsEntityTy::T_PLANNING_AREA,
+                EntityTy::T_ORDER => FbsEntityTy::T_ORDER,
+                EntityTy::T_FIRE_HYDRANT => FbsEntityTy::T_FIRE_HYDRANT,
+                EntityTy::T_CANNABIS_AND_LIQUOR_STORES => FbsEntityTy::T_CANNABIS_AND_LIQUOR_STORES,
+                EntityTy::T_CENSUS_SUBDIVISION => FbsEntityTy::T_CENSUS_SUBDIVISION,
+                EntityTy::T_SPEED_HUMP => FbsEntityTy::T_SPEED_HUMP,
+                EntityTy::T_CRASH_CUSHION => FbsEntityTy::T_CRASH_CUSHION,
+                EntityTy::T_DEFAULT_AREA_FILTER => FbsEntityTy::T_DEFAULT_AREA_FILTER,
+                EntityTy::T_PLAYGROUND => FbsEntityTy::T_PLAYGROUND,
+                EntityTy::T_PICNIC_SHELTER => FbsEntityTy::T_PICNIC_SHELTER,
+                EntityTy::T_TENNIS_COURT => FbsEntityTy::T_TENNIS_COURT,
+                EntityTy::T_SPORTS_FIELD => FbsEntityTy::T_SPORTS_FIELD,
+                EntityTy::T_WASHROOM => FbsEntityTy::T_WASHROOM,
+                EntityTy::T_BASEBALL_DIAMOND => FbsEntityTy::T_BASEBALL_DIAMOND,
+                EntityTy::T_ITS_DEVICE => FbsEntityTy::T_ITS_DEVICE,
+                EntityTy::T_SHORTLINE => FbsEntityTy::T_SHORTLINE,
+                EntityTy::T_TRANSIT_RELATED => FbsEntityTy::T_TRANSIT_RELATED,
+                EntityTy::T_FREIGHT_ANALYSIS_DASHBOARD => FbsEntityTy::T_FREIGHT_ANALYSIS_DASHBOARD,
+                EntityTy::T_ACCESS_POINT => FbsEntityTy::T_ACCESS_POINT,
+                EntityTy::T_CENSUS_DIVISION => FbsEntityTy::T_CENSUS_DIVISION,
+                EntityTy::T_STATE_PROVINCE => FbsEntityTy::T_STATE_PROVINCE,
+                EntityTy::T_FEDERAL => FbsEntityTy::T_FEDERAL,
+                EntityTy::T_CANNABIS_AND_LIQUOR_STORES_TRANSFER => {
+                    FbsEntityTy::T_CANNABIS_AND_LIQUOR_STORES_TRANSFER
+                }
+                EntityTy::T_STATE_OWNED_ROAD => FbsEntityTy::T_STATE_OWNED_ROAD,
+                EntityTy::T_AIR_QUALITY_MONITORING_STATION => {
+                    FbsEntityTy::T_AIR_QUALITY_MONITORING_STATION
+                }
+                EntityTy::T_AOI => FbsEntityTy::T_AOI,
+                EntityTy::T_PERFORMANCE_MEASURE => FbsEntityTy::T_PERFORMANCE_MEASURE,
+                EntityTy::T_EMERGENCY_RESPONSE_ZONE => FbsEntityTy::T_EMERGENCY_RESPONSE_ZONE,
+                EntityTy::T_RED_LIGHT_RUNNING_COUNTS => FbsEntityTy::T_RED_LIGHT_RUNNING_COUNTS,
+                EntityTy::T_PEDESTRIAN_RED_LIGHT_RUNNING_COUNTS => {
+                    FbsEntityTy::T_PEDESTRIAN_RED_LIGHT_RUNNING_COUNTS
+                }
+                EntityTy::T_INTERSECTION_DELAY_COUNTS => FbsEntityTy::T_INTERSECTION_DELAY_COUNTS,
+                EntityTy::T_INTERSECTION_SAFETY_COUNTS => FbsEntityTy::T_INTERSECTION_SAFETY_COUNTS,
+                EntityTy::T_ROAD_SEGMENT_SAFETY_COUNTS => FbsEntityTy::T_ROAD_SEGMENT_SAFETY_COUNTS,
+                EntityTy::T_HEXAGON_BOUNDARY => FbsEntityTy::T_HEXAGON_BOUNDARY,
             }));
             entity_tys_offset
         });
@@ -662,7 +667,10 @@ pub struct EdgeQuery {
 }
 
 impl EdgeQuery {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsEdgeQuery<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsEdgeQuery<'a>> {
         use crate::types::generated::graph_generated::EdgeQueryBuilder as FbsEdgeQueryBuilder;
 
         let mut bldr = FbsEdgeQueryBuilder::new(builder);
@@ -674,9 +682,7 @@ impl EdgeQuery {
 impl From<FbsEdgeQuery<'_>> for EdgeQuery {
     fn from(fbs: FbsEdgeQuery<'_>) -> Self {
         let edge_ty = EdgeTy::from(fbs.edge_ty());
-        Self {
-            edge_ty,
-        }
+        Self { edge_ty }
     }
 }
 
@@ -710,7 +716,10 @@ impl Default for QueryPathElementUnion {
 }
 
 impl QueryPathElementUnion {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsQueryPathElementUnion) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsQueryPathElementUnion) {
         match self {
             Self::NodeQuery(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -732,7 +741,10 @@ pub struct EdgeList {
 }
 
 impl EdgeList {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsEdgeList<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsEdgeList<'a>> {
         use crate::types::generated::graph_generated::EdgeListBuilder as FbsEdgeListBuilder;
 
         let mut edges_offsets = Vec::with_capacity(self.edges.len());
@@ -755,9 +767,7 @@ impl From<FbsEdgeList<'_>> for EdgeList {
             edges.push(elem.into());
         }
 
-        Self {
-            edges,
-        }
+        Self { edges }
     }
 }
 
@@ -784,7 +794,10 @@ pub struct Geom {
 }
 
 impl Geom {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsGeom<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsGeom<'a>> {
         use crate::types::generated::graph_generated::GeomBuilder as FbsGeomBuilder;
 
         let (geom_offset, geom_ty) = self.geom.serialize_to(builder);
@@ -801,15 +814,19 @@ impl From<FbsGeom<'_>> for Geom {
         let geom = match fbs.geom_type() {
             FbsGeometry::Point => Geometry::Point(Point::from(fbs.geom_as_point().unwrap())),
             FbsGeometry::Line => Geometry::Line(Line::from(fbs.geom_as_line().unwrap())),
-            FbsGeometry::MultiLine => Geometry::MultiLine(MultiLine::from(fbs.geom_as_multi_line().unwrap())),
-            FbsGeometry::Polygon => Geometry::Polygon(Polygon::from(fbs.geom_as_polygon().unwrap())),
-            FbsGeometry::MultiPolygon => Geometry::MultiPolygon(MultiPolygon::from(fbs.geom_as_multi_polygon().unwrap())),
+            FbsGeometry::MultiLine => {
+                Geometry::MultiLine(MultiLine::from(fbs.geom_as_multi_line().unwrap()))
+            }
+            FbsGeometry::Polygon => {
+                Geometry::Polygon(Polygon::from(fbs.geom_as_polygon().unwrap()))
+            }
+            FbsGeometry::MultiPolygon => {
+                Geometry::MultiPolygon(MultiPolygon::from(fbs.geom_as_multi_polygon().unwrap()))
+            }
             _ => unreachable!(),
         };
 
-        Self {
-            geom,
-        }
+        Self { geom }
     }
 }
 
@@ -839,7 +856,10 @@ pub struct GraphQuery {
 }
 
 impl GraphQuery {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsGraphQuery<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsGraphQuery<'a>> {
         use crate::types::generated::graph_generated::GraphQueryBuilder as FbsGraphQueryBuilder;
 
         let order_by_offset = self.order_by.as_ref().map(|v| {
@@ -919,7 +939,10 @@ pub struct NodeIdPair {
 }
 
 impl NodeIdPair {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsNodeIdPair<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNodeIdPair<'a>> {
         use crate::types::generated::graph_generated::NodeIdPairBuilder as FbsNodeIdPairBuilder;
 
         let node_id_offset = self.node_id.serialize_to(builder);
@@ -938,10 +961,7 @@ impl From<FbsNodeIdPair<'_>> for NodeIdPair {
     fn from(fbs: FbsNodeIdPair<'_>) -> Self {
         let node_id = GraphNodeId::from(fbs.node_id());
         let stream_id = fbs.stream_id().map(ObjectId::from);
-        Self {
-            node_id,
-            stream_id,
-        }
+        Self { node_id, stream_id }
     }
 }
 
@@ -968,7 +988,10 @@ pub struct NodeList {
 }
 
 impl NodeList {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsNodeList<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNodeList<'a>> {
         use crate::types::generated::graph_generated::NodeListBuilder as FbsNodeListBuilder;
 
         let mut nodes_offsets = Vec::with_capacity(self.nodes.len());
@@ -991,9 +1014,7 @@ impl From<FbsNodeList<'_>> for NodeList {
             nodes.push(elem.into());
         }
 
-        Self {
-            nodes,
-        }
+        Self { nodes }
     }
 }
 
@@ -1022,7 +1043,10 @@ pub struct OrderBy {
 }
 
 impl OrderBy {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsOrderBy<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsOrderBy<'a>> {
         use crate::types::generated::graph_generated::OrderByBuilder as FbsOrderByBuilder;
 
         let field_offset = builder.create_string(&self.field);
@@ -1072,7 +1096,10 @@ pub struct Projection {
 }
 
 impl Projection {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsProjection<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsProjection<'a>> {
         use crate::types::generated::graph_generated::ProjectionBuilder as FbsProjectionBuilder;
 
         let alias_offset = builder.create_string(&self.alias);
@@ -1088,10 +1115,7 @@ impl From<FbsProjection<'_>> for Projection {
     fn from(fbs: FbsProjection<'_>) -> Self {
         let alias = fbs.alias().to_owned();
         let predicate = Predicate::from(fbs.predicate());
-        Self {
-            alias,
-            predicate,
-        }
+        Self { alias, predicate }
     }
 }
 
@@ -1118,7 +1142,10 @@ pub struct QueryPathElement {
 }
 
 impl QueryPathElement {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsQueryPathElement<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsQueryPathElement<'a>> {
         use crate::types::generated::graph_generated::QueryPathElementBuilder as FbsQueryPathElementBuilder;
 
         let (element_offset, element_ty) = self.element.serialize_to(builder);
@@ -1133,14 +1160,16 @@ impl QueryPathElement {
 impl From<FbsQueryPathElement<'_>> for QueryPathElement {
     fn from(fbs: FbsQueryPathElement<'_>) -> Self {
         let element = match fbs.element_type() {
-            FbsQueryPathElementUnion::NodeQuery => QueryPathElementUnion::NodeQuery(NodeQuery::from(fbs.element_as_node_query().unwrap())),
-            FbsQueryPathElementUnion::EdgeQuery => QueryPathElementUnion::EdgeQuery(EdgeQuery::from(fbs.element_as_edge_query().unwrap())),
+            FbsQueryPathElementUnion::NodeQuery => QueryPathElementUnion::NodeQuery(
+                NodeQuery::from(fbs.element_as_node_query().unwrap()),
+            ),
+            FbsQueryPathElementUnion::EdgeQuery => QueryPathElementUnion::EdgeQuery(
+                EdgeQuery::from(fbs.element_as_edge_query().unwrap()),
+            ),
             _ => unreachable!(),
         };
 
-        Self {
-            element,
-        }
+        Self { element }
     }
 }
 
@@ -1252,5 +1281,4 @@ mod tests {
         let t1 = QueryPathElement::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
-
 }

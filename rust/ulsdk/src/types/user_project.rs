@@ -10,81 +10,43 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
-use flatbuffers::{WIPOffset, UnionWIPOffset};
 use bitflags::bitflags;
 use core::ops::Deref;
+use flatbuffers::{UnionWIPOffset, WIPOffset};
 
 use crate::types::entity::{
-    EdgeTy,
-    EntityTy,
-    Geometry,
-    GraphEdge,
-    GraphNode,
-    Line,
-    MultiLine,
-    MultiPolygon,
-    NodeTy,
-    Point,
+    EdgeTy, EntityTy, Geometry, GraphEdge, GraphNode, Line, MultiLine, MultiPolygon, NodeTy, Point,
     Polygon,
 };
-use crate::types::id::{
-    B2cId,
-    ColumnGroupId,
-    ContentId,
-    DataStateId,
-    GenericId,
-    GraphNodeId,
-    ObjectId,
-    ObjectNamespace,
-    StreamId,
-};
 use crate::types::generated::entity_generated::{
-    GraphEdge as FbsGraphEdge,
-    GraphNode as FbsGraphNode,
-    Line as FbsLine,
-    MultiLine as FbsMultiLine,
-    MultiPolygon as FbsMultiPolygon,
-    Point as FbsPoint,
-    Polygon as FbsPolygon,
-    EdgeTy as FbsEdgeTy,
-    EntityTy as FbsEntityTy,
-    Geometry as FbsGeometry,
-    NodeTy as FbsNodeTy,
+    EdgeTy as FbsEdgeTy, EntityTy as FbsEntityTy, Geometry as FbsGeometry,
+    GraphEdge as FbsGraphEdge, GraphNode as FbsGraphNode, Line as FbsLine,
+    MultiLine as FbsMultiLine, MultiPolygon as FbsMultiPolygon, NodeTy as FbsNodeTy,
+    Point as FbsPoint, Polygon as FbsPolygon,
 };
 use crate::types::generated::id_generated::{
-    B2cId as FbsB2cId,
-    ColumnGroupId as FbsColumnGroupId,
-    ContentId as FbsContentId,
-    DataStateId as FbsDataStateId,
-    GenericId as FbsGenericId,
-    GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId,
-    StreamId as FbsStreamId,
-    ObjectNamespace as FbsObjectNamespace,
+    B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
+    DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
 };
 use crate::types::generated::user_project_generated::{
-    CategoryFilter as FbsCategoryFilter,
-    ColumnGroup as FbsColumnGroup,
+    AggregateOp as FbsAggregateOp, CategoryFilter as FbsCategoryFilter,
+    ColumnGroup as FbsColumnGroup, ColumnGroupType as FbsColumnGroupType,
     DataStateGeometrySource as FbsDataStateGeometrySource,
-    DeprecatedDataStateJoin as FbsDeprecatedDataStateJoin,
-    FieldFilter as FbsFieldFilter,
+    DeprecatedDataStateJoin as FbsDeprecatedDataStateJoin, FieldComparator as FbsFieldComparator,
+    FieldFilter as FbsFieldFilter, Filter as FbsFilter, JoinOperation as FbsJoinOperation,
     JoinStackEntry as FbsJoinStackEntry,
-    RangeFilter as FbsRangeFilter,
-    RawGeometrySource as FbsRawGeometrySource,
+    JoinStackEntryGeometrySourceUnion as FbsJoinStackEntryGeometrySourceUnion,
+    JoinType as FbsJoinType, LayerCombineMode as FbsLayerCombineMode,
+    RangeFilter as FbsRangeFilter, RawGeometrySource as FbsRawGeometrySource,
     RawGeometrySourceGeom as FbsRawGeometrySourceGeom,
     RelationshipRangeFilter as FbsRelationshipRangeFilter,
-    StackableDataStateJoin as FbsStackableDataStateJoin,
-    UserLayer as FbsUserLayer,
-    UserLayerDataState as FbsUserLayerDataState,
-    UserProject as FbsUserProject,
-    AggregateOp as FbsAggregateOp,
-    ColumnGroupType as FbsColumnGroupType,
-    FieldComparator as FbsFieldComparator,
-    Filter as FbsFilter,
-    JoinOperation as FbsJoinOperation,
-    JoinStackEntryGeometrySourceUnion as FbsJoinStackEntryGeometrySourceUnion,
-    JoinType as FbsJoinType,
-    LayerCombineMode as FbsLayerCombineMode,
+    StackableDataStateJoin as FbsStackableDataStateJoin, UserLayer as FbsUserLayer,
+    UserLayerDataState as FbsUserLayerDataState, UserProject as FbsUserProject,
+};
+use crate::types::id::{
+    B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
+    ObjectNamespace, StreamId,
 };
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -108,7 +70,7 @@ impl From<FbsAggregateOp> for AggregateOp {
         match fbs.0 {
             0 => Self::Average,
             1 => Self::Relative,
-            _ => panic!("Invalid value {} when constructing AggregateOp", fbs.0)
+            _ => panic!("Invalid value {} when constructing AggregateOp", fbs.0),
         }
     }
 }
@@ -137,7 +99,7 @@ impl From<FbsColumnGroupType> for ColumnGroupType {
             0 => Self::None_,
             1 => Self::Relationship,
             2 => Self::Column,
-            _ => panic!("Invalid value {} when constructing ColumnGroupType", fbs.0)
+            _ => panic!("Invalid value {} when constructing ColumnGroupType", fbs.0),
         }
     }
 }
@@ -175,7 +137,7 @@ impl From<FbsFieldComparator> for FieldComparator {
             3 => Self::LessEqual,
             4 => Self::Equal,
             5 => Self::NotEqual,
-            _ => panic!("Invalid value {} when constructing FieldComparator", fbs.0)
+            _ => panic!("Invalid value {} when constructing FieldComparator", fbs.0),
         }
     }
 }
@@ -204,7 +166,7 @@ impl From<FbsJoinOperation> for JoinOperation {
             0 => Self::Intersect,
             1 => Self::Disjoint,
             2 => Self::BufferedIntersection,
-            _ => panic!("Invalid value {} when constructing JoinOperation", fbs.0)
+            _ => panic!("Invalid value {} when constructing JoinOperation", fbs.0),
         }
     }
 }
@@ -230,7 +192,7 @@ impl From<FbsJoinType> for JoinType {
         match fbs.0 {
             0 => Self::Inner,
             1 => Self::Outer,
-            _ => panic!("Invalid value {} when constructing JoinType", fbs.0)
+            _ => panic!("Invalid value {} when constructing JoinType", fbs.0),
         }
     }
 }
@@ -256,7 +218,7 @@ impl From<FbsLayerCombineMode> for LayerCombineMode {
         match fbs.0 {
             0 => Self::Union,
             1 => Self::Difference,
-            _ => panic!("Invalid value {} when constructing LayerCombineMode", fbs.0)
+            _ => panic!("Invalid value {} when constructing LayerCombineMode", fbs.0),
         }
     }
 }
@@ -270,7 +232,10 @@ pub struct CategoryFilter {
 }
 
 impl CategoryFilter {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsCategoryFilter<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsCategoryFilter<'a>> {
         use crate::types::generated::user_project_generated::CategoryFilterBuilder as FbsCategoryFilterBuilder;
 
         let column_group_id_offset = self.column_group_id.serialize_to(builder);
@@ -335,7 +300,10 @@ pub struct RangeFilter {
 }
 
 impl RangeFilter {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsRangeFilter<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsRangeFilter<'a>> {
         use crate::types::generated::user_project_generated::RangeFilterBuilder as FbsRangeFilterBuilder;
 
         let column_group_id_offset = self.column_group_id.serialize_to(builder);
@@ -392,7 +360,10 @@ pub struct RelationshipRangeFilter {
 }
 
 impl RelationshipRangeFilter {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsRelationshipRangeFilter<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsRelationshipRangeFilter<'a>> {
         use crate::types::generated::user_project_generated::RelationshipRangeFilterBuilder as FbsRelationshipRangeFilterBuilder;
 
         let column_group_id_offset = self.column_group_id.serialize_to(builder);
@@ -468,7 +439,10 @@ impl Default for Filter {
 }
 
 impl Filter {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsFilter) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsFilter) {
         match self {
             Self::CategoryFilter(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -495,7 +469,10 @@ pub struct DataStateGeometrySource {
 }
 
 impl DataStateGeometrySource {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDataStateGeometrySource<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDataStateGeometrySource<'a>> {
         use crate::types::generated::user_project_generated::DataStateGeometrySourceBuilder as FbsDataStateGeometrySourceBuilder;
 
         let data_state_id_offset = self.data_state_id.serialize_to(builder);
@@ -509,9 +486,7 @@ impl DataStateGeometrySource {
 impl From<FbsDataStateGeometrySource<'_>> for DataStateGeometrySource {
     fn from(fbs: FbsDataStateGeometrySource<'_>) -> Self {
         let data_state_id = DataStateId::from(fbs.data_state_id());
-        Self {
-            data_state_id,
-        }
+        Self { data_state_id }
     }
 }
 
@@ -538,7 +513,10 @@ pub struct RawGeometrySource {
 }
 
 impl RawGeometrySource {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsRawGeometrySource<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsRawGeometrySource<'a>> {
         use crate::types::generated::user_project_generated::RawGeometrySourceBuilder as FbsRawGeometrySourceBuilder;
 
         let mut geoms_offsets = Vec::with_capacity(self.geoms.len());
@@ -561,9 +539,7 @@ impl From<FbsRawGeometrySource<'_>> for RawGeometrySource {
             geoms.push(elem.into());
         }
 
-        Self {
-            geoms,
-        }
+        Self { geoms }
     }
 }
 
@@ -597,7 +573,13 @@ impl Default for JoinStackEntryGeometrySourceUnion {
 }
 
 impl JoinStackEntryGeometrySourceUnion {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsJoinStackEntryGeometrySourceUnion) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (
+        WIPOffset<UnionWIPOffset>,
+        FbsJoinStackEntryGeometrySourceUnion,
+    ) {
         match self {
             Self::DataStateGeometrySource(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -623,7 +605,10 @@ pub struct ColumnGroup {
 }
 
 impl ColumnGroup {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsColumnGroup<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsColumnGroup<'a>> {
         use crate::types::generated::user_project_generated::ColumnGroupBuilder as FbsColumnGroupBuilder;
 
         let mut columns_offsets = Vec::with_capacity(self.columns.len());
@@ -695,7 +680,10 @@ pub struct DeprecatedDataStateJoin {
 }
 
 impl DeprecatedDataStateJoin {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDeprecatedDataStateJoin<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDeprecatedDataStateJoin<'a>> {
         use crate::types::generated::user_project_generated::DeprecatedDataStateJoinBuilder as FbsDeprecatedDataStateJoinBuilder;
 
         let from_offset = self.from.serialize_to(builder);
@@ -748,7 +736,10 @@ pub struct FieldFilter {
 }
 
 impl FieldFilter {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsFieldFilter<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsFieldFilter<'a>> {
         use crate::types::generated::user_project_generated::FieldFilterBuilder as FbsFieldFilterBuilder;
 
         let (filter_offset, filter_ty) = self.filter.serialize_to(builder);
@@ -763,15 +754,19 @@ impl FieldFilter {
 impl From<FbsFieldFilter<'_>> for FieldFilter {
     fn from(fbs: FbsFieldFilter<'_>) -> Self {
         let filter = match fbs.filter_type() {
-            FbsFilter::CategoryFilter => Filter::CategoryFilter(CategoryFilter::from(fbs.filter_as_category_filter().unwrap())),
-            FbsFilter::RangeFilter => Filter::RangeFilter(RangeFilter::from(fbs.filter_as_range_filter().unwrap())),
-            FbsFilter::RelationshipRangeFilter => Filter::RelationshipRangeFilter(RelationshipRangeFilter::from(fbs.filter_as_relationship_range_filter().unwrap())),
+            FbsFilter::CategoryFilter => Filter::CategoryFilter(CategoryFilter::from(
+                fbs.filter_as_category_filter().unwrap(),
+            )),
+            FbsFilter::RangeFilter => {
+                Filter::RangeFilter(RangeFilter::from(fbs.filter_as_range_filter().unwrap()))
+            }
+            FbsFilter::RelationshipRangeFilter => Filter::RelationshipRangeFilter(
+                RelationshipRangeFilter::from(fbs.filter_as_relationship_range_filter().unwrap()),
+            ),
             _ => unreachable!(),
         };
 
-        Self {
-            filter,
-        }
+        Self { filter }
     }
 }
 
@@ -801,11 +796,18 @@ pub struct JoinStackEntry {
 }
 
 impl JoinStackEntry {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsJoinStackEntry<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsJoinStackEntry<'a>> {
         use crate::types::generated::user_project_generated::JoinStackEntryBuilder as FbsJoinStackEntryBuilder;
 
-        let deprecated_data_state_id_do_not_use_offset = self.deprecated_data_state_id_do_not_use.as_ref().map(|o| o.serialize_to(builder));
-        let (geometry_source_offset, geometry_source_ty) = self.geometry_source.serialize_to(builder);
+        let deprecated_data_state_id_do_not_use_offset = self
+            .deprecated_data_state_id_do_not_use
+            .as_ref()
+            .map(|o| o.serialize_to(builder));
+        let (geometry_source_offset, geometry_source_ty) =
+            self.geometry_source.serialize_to(builder);
 
         let mut bldr = FbsJoinStackEntryBuilder::new(builder);
         bldr.add_buffer(self.buffer);
@@ -822,10 +824,22 @@ impl JoinStackEntry {
 impl From<FbsJoinStackEntry<'_>> for JoinStackEntry {
     fn from(fbs: FbsJoinStackEntry<'_>) -> Self {
         let buffer = fbs.buffer();
-        let deprecated_data_state_id_do_not_use = fbs.deprecated_data_state_id_do_not_use().map(DataStateId::from);
+        let deprecated_data_state_id_do_not_use = fbs
+            .deprecated_data_state_id_do_not_use()
+            .map(DataStateId::from);
         let geometry_source = match fbs.geometry_source_type() {
-            FbsJoinStackEntryGeometrySourceUnion::DataStateGeometrySource => JoinStackEntryGeometrySourceUnion::DataStateGeometrySource(DataStateGeometrySource::from(fbs.geometry_source_as_data_state_geometry_source().unwrap())),
-            FbsJoinStackEntryGeometrySourceUnion::RawGeometrySource => JoinStackEntryGeometrySourceUnion::RawGeometrySource(RawGeometrySource::from(fbs.geometry_source_as_raw_geometry_source().unwrap())),
+            FbsJoinStackEntryGeometrySourceUnion::DataStateGeometrySource => {
+                JoinStackEntryGeometrySourceUnion::DataStateGeometrySource(
+                    DataStateGeometrySource::from(
+                        fbs.geometry_source_as_data_state_geometry_source().unwrap(),
+                    ),
+                )
+            }
+            FbsJoinStackEntryGeometrySourceUnion::RawGeometrySource => {
+                JoinStackEntryGeometrySourceUnion::RawGeometrySource(RawGeometrySource::from(
+                    fbs.geometry_source_as_raw_geometry_source().unwrap(),
+                ))
+            }
             _ => unreachable!(),
         };
 
@@ -862,7 +876,10 @@ pub struct RawGeometrySourceGeom {
 }
 
 impl RawGeometrySourceGeom {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsRawGeometrySourceGeom<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsRawGeometrySourceGeom<'a>> {
         use crate::types::generated::user_project_generated::RawGeometrySourceGeomBuilder as FbsRawGeometrySourceGeomBuilder;
 
         let (geom_offset, geom_ty) = self.geom.serialize_to(builder);
@@ -879,15 +896,19 @@ impl From<FbsRawGeometrySourceGeom<'_>> for RawGeometrySourceGeom {
         let geom = match fbs.geom_type() {
             FbsGeometry::Point => Geometry::Point(Point::from(fbs.geom_as_point().unwrap())),
             FbsGeometry::Line => Geometry::Line(Line::from(fbs.geom_as_line().unwrap())),
-            FbsGeometry::MultiLine => Geometry::MultiLine(MultiLine::from(fbs.geom_as_multi_line().unwrap())),
-            FbsGeometry::Polygon => Geometry::Polygon(Polygon::from(fbs.geom_as_polygon().unwrap())),
-            FbsGeometry::MultiPolygon => Geometry::MultiPolygon(MultiPolygon::from(fbs.geom_as_multi_polygon().unwrap())),
+            FbsGeometry::MultiLine => {
+                Geometry::MultiLine(MultiLine::from(fbs.geom_as_multi_line().unwrap()))
+            }
+            FbsGeometry::Polygon => {
+                Geometry::Polygon(Polygon::from(fbs.geom_as_polygon().unwrap()))
+            }
+            FbsGeometry::MultiPolygon => {
+                Geometry::MultiPolygon(MultiPolygon::from(fbs.geom_as_multi_polygon().unwrap()))
+            }
             _ => unreachable!(),
         };
 
-        Self {
-            geom,
-        }
+        Self { geom }
     }
 }
 
@@ -918,7 +939,10 @@ pub struct StackableDataStateJoin {
 }
 
 impl StackableDataStateJoin {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsStackableDataStateJoin<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsStackableDataStateJoin<'a>> {
         use crate::types::generated::user_project_generated::StackableDataStateJoinBuilder as FbsStackableDataStateJoinBuilder;
 
         let mut join_stack_offsets = Vec::with_capacity(self.join_stack.len());
@@ -987,7 +1011,10 @@ pub struct UserLayer {
 }
 
 impl UserLayer {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsUserLayer<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsUserLayer<'a>> {
         use crate::types::generated::user_project_generated::UserLayerBuilder as FbsUserLayerBuilder;
 
         let mut data_states_offsets = Vec::with_capacity(self.data_states.len());
@@ -996,15 +1023,17 @@ impl UserLayer {
             data_states_offsets.push(offset);
         }
         let data_states_offset = builder.create_vector(&data_states_offsets);
-        let deprecated_data_joins_do_not_use_offset = self.deprecated_data_joins_do_not_use.as_ref().map(|v| {
-            let mut deprecated_data_joins_do_not_use_offsets = Vec::with_capacity(v.len());
-            for val in v.iter() {
-                let offset = val.serialize_to(builder);
-                deprecated_data_joins_do_not_use_offsets.push(offset);
-            }
-            let deprecated_data_joins_do_not_use_offset = builder.create_vector(&deprecated_data_joins_do_not_use_offsets);
-            deprecated_data_joins_do_not_use_offset
-        });
+        let deprecated_data_joins_do_not_use_offset =
+            self.deprecated_data_joins_do_not_use.as_ref().map(|v| {
+                let mut deprecated_data_joins_do_not_use_offsets = Vec::with_capacity(v.len());
+                for val in v.iter() {
+                    let offset = val.serialize_to(builder);
+                    deprecated_data_joins_do_not_use_offsets.push(offset);
+                }
+                let deprecated_data_joins_do_not_use_offset =
+                    builder.create_vector(&deprecated_data_joins_do_not_use_offsets);
+                deprecated_data_joins_do_not_use_offset
+            });
         let mut joins_offsets = Vec::with_capacity(self.joins.len());
         for val in self.joins.iter() {
             let offset = val.serialize_to(builder);
@@ -1034,16 +1063,17 @@ impl From<FbsUserLayer<'_>> for UserLayer {
             data_states.push(elem.into());
         }
 
-        let deprecated_data_joins_do_not_use = if let Some(val) = fbs.deprecated_data_joins_do_not_use() {
-            let mut deprecated_data_joins_do_not_use = Vec::new();
-            for elem in val {
-                deprecated_data_joins_do_not_use.push(elem.into());
-            }
+        let deprecated_data_joins_do_not_use =
+            if let Some(val) = fbs.deprecated_data_joins_do_not_use() {
+                let mut deprecated_data_joins_do_not_use = Vec::new();
+                for elem in val {
+                    deprecated_data_joins_do_not_use.push(elem.into());
+                }
 
-            Some(deprecated_data_joins_do_not_use)
-        } else {
-            None
-        };
+                Some(deprecated_data_joins_do_not_use)
+            } else {
+                None
+            };
 
         let mut joins = Vec::new();
         for elem in fbs.joins() {
@@ -1088,7 +1118,10 @@ pub struct UserLayerDataState {
 }
 
 impl UserLayerDataState {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsUserLayerDataState<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsUserLayerDataState<'a>> {
         use crate::types::generated::user_project_generated::UserLayerDataStateBuilder as FbsUserLayerDataStateBuilder;
 
         let mut active_fields_offsets = Vec::with_capacity(self.active_fields.len());
@@ -1163,7 +1196,10 @@ pub struct UserProject {
 }
 
 impl UserProject {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsUserProject<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsUserProject<'a>> {
         use crate::types::generated::user_project_generated::UserProjectBuilder as FbsUserProjectBuilder;
 
         let id_offset = self.id.serialize_to(builder);
@@ -1194,11 +1230,7 @@ impl From<FbsUserProject<'_>> for UserProject {
         }
 
         let name = fbs.name().map(ToOwned::to_owned);
-        Self {
-            id,
-            layers,
-            name,
-        }
+        Self { id, layers, name }
     }
 }
 
@@ -1334,5 +1366,4 @@ mod tests {
         let t1 = UserProject::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
-
 }

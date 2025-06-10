@@ -10,57 +10,31 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
-use flatbuffers::{WIPOffset, UnionWIPOffset};
 use bitflags::bitflags;
 use core::ops::Deref;
+use flatbuffers::{UnionWIPOffset, WIPOffset};
 
-use crate::types::id::{
-    B2cId,
-    ColumnGroupId,
-    ContentId,
-    DataStateId,
-    GenericId,
-    GraphNodeId,
-    ObjectId,
-    ObjectNamespace,
-    StreamId,
-};
-use crate::types::permissions::{
-    AccessControlList,
-    PermissionTy,
-    Role,
-};
 use crate::types::generated::id_generated::{
-    B2cId as FbsB2cId,
-    ColumnGroupId as FbsColumnGroupId,
-    ContentId as FbsContentId,
-    DataStateId as FbsDataStateId,
-    GenericId as FbsGenericId,
-    GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId,
-    StreamId as FbsStreamId,
-    ObjectNamespace as FbsObjectNamespace,
+    B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
+    DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
 };
 use crate::types::generated::notification_generated::{
-    AccessRequest as FbsAccessRequest,
-    DriveChange as FbsDriveChange,
-    Inbox as FbsInbox,
-    InboxItem as FbsInboxItem,
-    JobComplete as FbsJobComplete,
-    Notification as FbsNotification,
-    Response as FbsResponse,
-    Share as FbsShare,
+    AccessRequest as FbsAccessRequest, DriveAction as FbsDriveAction,
+    DriveChange as FbsDriveChange, Inbox as FbsInbox, InboxItem as FbsInboxItem,
+    JobComplete as FbsJobComplete, Notification as FbsNotification,
+    NotificationUnion as FbsNotificationUnion, ReadStatus as FbsReadStatus,
+    RequestStatus as FbsRequestStatus, Response as FbsResponse, Share as FbsShare,
     ShareDetails as FbsShareDetails,
-    DriveAction as FbsDriveAction,
-    NotificationUnion as FbsNotificationUnion,
-    ReadStatus as FbsReadStatus,
-    RequestStatus as FbsRequestStatus,
 };
 use crate::types::generated::permissions_generated::{
-    AccessControlList as FbsAccessControlList,
-    Role as FbsRole,
-    PermissionTy as FbsPermissionTy,
+    AccessControlList as FbsAccessControlList, PermissionTy as FbsPermissionTy, Role as FbsRole,
 };
+use crate::types::id::{
+    B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
+    ObjectNamespace, StreamId,
+};
+use crate::types::permissions::{AccessControlList, PermissionTy, Role};
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub enum DriveAction {
@@ -86,7 +60,7 @@ impl From<FbsDriveAction> for DriveAction {
             0 => Self::Add,
             1 => Self::Remove,
             2 => Self::Overwrite,
-            _ => panic!("Invalid value {} when constructing DriveAction", fbs.0)
+            _ => panic!("Invalid value {} when constructing DriveAction", fbs.0),
         }
     }
 }
@@ -112,7 +86,7 @@ impl From<FbsReadStatus> for ReadStatus {
         match fbs.0 {
             0 => Self::Unread,
             1 => Self::Read,
-            _ => panic!("Invalid value {} when constructing ReadStatus", fbs.0)
+            _ => panic!("Invalid value {} when constructing ReadStatus", fbs.0),
         }
     }
 }
@@ -141,7 +115,7 @@ impl From<FbsRequestStatus> for RequestStatus {
             0 => Self::Pending,
             1 => Self::Approved,
             2 => Self::Rejected,
-            _ => panic!("Invalid value {} when constructing RequestStatus", fbs.0)
+            _ => panic!("Invalid value {} when constructing RequestStatus", fbs.0),
         }
     }
 }
@@ -156,7 +130,10 @@ pub struct Share {
 }
 
 impl Share {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsShare<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsShare<'a>> {
         use crate::types::generated::notification_generated::ShareBuilder as FbsShareBuilder;
 
         let dest_offset = self.dest.as_ref().map(|s| builder.create_string(s));
@@ -217,7 +194,10 @@ pub struct JobComplete {
 }
 
 impl JobComplete {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsJobComplete<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsJobComplete<'a>> {
         use crate::types::generated::notification_generated::JobCompleteBuilder as FbsJobCompleteBuilder;
 
         let job_offset = self.job.serialize_to(builder);
@@ -231,9 +211,7 @@ impl JobComplete {
 impl From<FbsJobComplete<'_>> for JobComplete {
     fn from(fbs: FbsJobComplete<'_>) -> Self {
         let job = ObjectId::from(fbs.job());
-        Self {
-            job,
-        }
+        Self { job }
     }
 }
 
@@ -264,7 +242,10 @@ pub struct AccessRequest {
 }
 
 impl AccessRequest {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsAccessRequest<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsAccessRequest<'a>> {
         use crate::types::generated::notification_generated::AccessRequestBuilder as FbsAccessRequestBuilder;
 
         let msg_offset = self.msg.as_ref().map(|s| builder.create_string(s));
@@ -324,7 +305,10 @@ pub struct DriveChange {
 }
 
 impl DriveChange {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDriveChange<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDriveChange<'a>> {
         use crate::types::generated::notification_generated::DriveChangeBuilder as FbsDriveChangeBuilder;
 
         let object_offset = self.object.serialize_to(builder);
@@ -383,7 +367,10 @@ impl Default for NotificationUnion {
 }
 
 impl NotificationUnion {
-    pub fn serialize_to(&self, builder: &mut flatbuffers::FlatBufferBuilder) -> (WIPOffset<UnionWIPOffset>, FbsNotificationUnion) {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsNotificationUnion) {
         match self {
             Self::Share(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
@@ -415,7 +402,10 @@ pub struct Inbox {
 }
 
 impl Inbox {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsInbox<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsInbox<'a>> {
         use crate::types::generated::notification_generated::InboxBuilder as FbsInboxBuilder;
 
         let mut items_offsets = Vec::with_capacity(self.items.len());
@@ -438,9 +428,7 @@ impl From<FbsInbox<'_>> for Inbox {
             items.push(elem.into());
         }
 
-        Self {
-            items,
-        }
+        Self { items }
     }
 }
 
@@ -469,7 +457,10 @@ pub struct InboxItem {
 }
 
 impl InboxItem {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsInboxItem<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsInboxItem<'a>> {
         use crate::types::generated::notification_generated::InboxItemBuilder as FbsInboxItemBuilder;
 
         let notification_offset = self.notification.serialize_to(builder);
@@ -519,7 +510,10 @@ pub struct Notification {
 }
 
 impl Notification {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsNotification<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNotification<'a>> {
         use crate::types::generated::notification_generated::NotificationBuilder as FbsNotificationBuilder;
 
         let notification_offset = self.notification.as_ref().map(|u| u.serialize_to(builder));
@@ -541,10 +535,18 @@ impl From<FbsNotification<'_>> for Notification {
     fn from(fbs: FbsNotification<'_>) -> Self {
         let notification = if let Some(val) = fbs.notification() {
             let notification = match fbs.notification_type() {
-                FbsNotificationUnion::Share => NotificationUnion::Share(Share::from(fbs.notification_as_share().unwrap())),
-                FbsNotificationUnion::JobComplete => NotificationUnion::JobComplete(JobComplete::from(fbs.notification_as_job_complete().unwrap())),
-                FbsNotificationUnion::AccessRequest => NotificationUnion::AccessRequest(AccessRequest::from(fbs.notification_as_access_request().unwrap())),
-                FbsNotificationUnion::DriveChange => NotificationUnion::DriveChange(DriveChange::from(fbs.notification_as_drive_change().unwrap())),
+                FbsNotificationUnion::Share => {
+                    NotificationUnion::Share(Share::from(fbs.notification_as_share().unwrap()))
+                }
+                FbsNotificationUnion::JobComplete => NotificationUnion::JobComplete(
+                    JobComplete::from(fbs.notification_as_job_complete().unwrap()),
+                ),
+                FbsNotificationUnion::AccessRequest => NotificationUnion::AccessRequest(
+                    AccessRequest::from(fbs.notification_as_access_request().unwrap()),
+                ),
+                FbsNotificationUnion::DriveChange => NotificationUnion::DriveChange(
+                    DriveChange::from(fbs.notification_as_drive_change().unwrap()),
+                ),
                 _ => unreachable!(),
             };
 
@@ -584,7 +586,10 @@ pub struct Response {
 }
 
 impl Response {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsResponse<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsResponse<'a>> {
         use crate::types::generated::notification_generated::ResponseBuilder as FbsResponseBuilder;
 
         let msg_offset = self.msg.as_ref().map(|s| builder.create_string(s));
@@ -600,9 +605,7 @@ impl Response {
 impl From<FbsResponse<'_>> for Response {
     fn from(fbs: FbsResponse<'_>) -> Self {
         let msg = fbs.msg().map(ToOwned::to_owned);
-        Self {
-            msg,
-        }
+        Self { msg }
     }
 }
 
@@ -630,7 +633,10 @@ pub struct ShareDetails {
 }
 
 impl ShareDetails {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsShareDetails<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsShareDetails<'a>> {
         use crate::types::generated::notification_generated::ShareDetailsBuilder as FbsShareDetailsBuilder;
 
         let msg_offset = self.msg.as_ref().map(|s| builder.create_string(s));
@@ -648,10 +654,7 @@ impl From<FbsShareDetails<'_>> for ShareDetails {
     fn from(fbs: FbsShareDetails<'_>) -> Self {
         let msg = fbs.msg().map(ToOwned::to_owned);
         let notify = fbs.notify();
-        Self {
-            msg,
-            notify,
-        }
+        Self { msg, notify }
     }
 }
 
@@ -747,5 +750,4 @@ mod tests {
         let t1 = ShareDetails::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
-
 }

@@ -10,6 +10,12 @@ def test_binary():
     _t1 = Binary.from_bytes(_b)
     assert _t0 == _t1
 
+def test_binary_view():
+    _t0 = BinaryView.make_default()
+    _b = _t0.to_bytes()
+    _t1 = BinaryView.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_bool():
     _t0 = Bool.make_default()
     _b = _t0.to_bytes()
@@ -94,6 +100,12 @@ def test_large_list():
     _t1 = LargeList.from_bytes(_b)
     assert _t0 == _t1
 
+def test_large_list_view():
+    _t0 = LargeListView.make_default()
+    _b = _t0.to_bytes()
+    _t1 = LargeListView.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_large_utf_8():
     _t0 = LargeUtf8.make_default()
     _b = _t0.to_bytes()
@@ -106,6 +118,12 @@ def test_list():
     _t1 = List_.from_bytes(_b)
     assert _t0 == _t1
 
+def test_list_view():
+    _t0 = ListView.make_default()
+    _b = _t0.to_bytes()
+    _t1 = ListView.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_map():
     _t0 = Map.make_default()
     _b = _t0.to_bytes()
@@ -116,6 +134,12 @@ def test_null():
     _t0 = Null.make_default()
     _b = _t0.to_bytes()
     _t1 = Null.from_bytes(_b)
+    assert _t0 == _t1
+
+def test_run_end_encoded():
+    _t0 = RunEndEncoded.make_default()
+    _b = _t0.to_bytes()
+    _t1 = RunEndEncoded.from_bytes(_b)
     assert _t0 == _t1
 
 def test_schema():
@@ -152,4 +176,10 @@ def test_utf_8():
     _t0 = Utf8.make_default()
     _b = _t0.to_bytes()
     _t1 = Utf8.from_bytes(_b)
+    assert _t0 == _t1
+
+def test_utf_8_view():
+    _t0 = Utf8View.make_default()
+    _b = _t0.to_bytes()
+    _t1 = Utf8View.from_bytes(_b)
     assert _t0 == _t1

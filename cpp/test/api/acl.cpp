@@ -25,174 +25,249 @@
 namespace acl {
 
 ul::Result<ul::Void>
-test_new_acl(ul::RequestContext &ctx) {
-    ::ul::api::acl::new_acl(
+test_new_acl(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::types::ObjectSummaryList expected = ::ul::types::ObjectSummaryList();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::acl::new_acl(
         ctx
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::ObjectSummaryList result_value = std::get<::ul::types::ObjectSummaryList>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_new_acl_obj(test_new_acl, "acl::new_acl", &link_only_api_test_root);
+ApiTest test_new_acl_obj(test_new_acl, "acl::new_acl", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_new_from(ul::RequestContext &ctx) {
-    ::ul::api::acl::new_from(
+test_new_from(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid q0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectSummaryList expected = ::ul::types::ObjectSummaryList();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::acl::new_from(
         ctx,
-        std::nullopt
+        q0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::ObjectSummaryList result_value = std::get<::ul::types::ObjectSummaryList>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_new_from_obj(test_new_from, "acl::new_from", &link_only_api_test_root);
+ApiTest test_new_from_obj(test_new_from, "acl::new_from", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_request(ul::RequestContext &ctx) {
-    ::ul::api::acl::request(
+test_request(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    ::ul::types::AccessRequest body = ::ul::types::AccessRequest();
+    return ul::api::acl::request(
         ctx,
-        ::ul::types::AccessRequest()
+        body
     );
-    return ul::Void();
 }
 
-ApiTest test_request_obj(test_request, "acl::request", &link_only_api_test_root);
+ApiTest test_request_obj(test_request, "acl::request", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_share(ul::RequestContext &ctx) {
-    ::ul::api::acl::share(
+test_share(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    int p2 = 42;
+    return ul::api::acl::share(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        0
+        p0,
+        p1,
+        p2
     );
-    return ul::Void();
 }
 
-ApiTest test_share_obj(test_share, "acl::share", &link_only_api_test_root);
+ApiTest test_share_obj(test_share, "acl::share", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_share_with_details(ul::RequestContext &ctx) {
-    ::ul::api::acl::share_with_details(
+test_share_with_details(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    int p2 = 42;
+    ::ul::types::ShareDetails body = ::ul::types::ShareDetails();
+    return ul::api::acl::share_with_details(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        0,
-        ::ul::types::ShareDetails()
+        p0,
+        p1,
+        p2,
+        body
     );
-    return ul::Void();
 }
 
-ApiTest test_share_with_details_obj(test_share_with_details, "acl::share_with_details", &link_only_api_test_root);
+ApiTest test_share_with_details_obj(test_share_with_details, "acl::share_with_details", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_share_all(ul::RequestContext &ctx) {
-    ::ul::api::acl::share_all(
+test_share_all(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    return ul::api::acl::share_all(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0,
+        p1
     );
-    return ul::Void();
 }
 
-ApiTest test_share_all_obj(test_share_all, "acl::share_all", &link_only_api_test_root);
+ApiTest test_share_all_obj(test_share_all, "acl::share_all", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_share_all_with_details(ul::RequestContext &ctx) {
-    ::ul::api::acl::share_all_with_details(
+test_share_all_with_details(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    ::ul::types::ShareDetails body = ::ul::types::ShareDetails();
+    return ul::api::acl::share_all_with_details(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ::ul::types::ShareDetails()
+        p0,
+        p1,
+        body
     );
-    return ul::Void();
 }
 
-ApiTest test_share_all_with_details_obj(test_share_all_with_details, "acl::share_all_with_details", &link_only_api_test_root);
+ApiTest test_share_all_with_details_obj(test_share_all_with_details, "acl::share_all_with_details", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_grant(ul::RequestContext &ctx) {
-    ::ul::api::acl::grant(
+test_grant(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    int p2 = 42;
+    return ul::api::acl::grant(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        0
+        p0,
+        p1,
+        p2
     );
-    return ul::Void();
 }
 
-ApiTest test_grant_obj(test_grant, "acl::grant", &link_only_api_test_root);
+ApiTest test_grant_obj(test_grant, "acl::grant", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_grant_with_details(ul::RequestContext &ctx) {
-    ::ul::api::acl::grant_with_details(
+test_grant_with_details(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    int p2 = 42;
+    ::ul::types::ShareDetails body = ::ul::types::ShareDetails();
+    return ul::api::acl::grant_with_details(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        0,
-        ::ul::types::ShareDetails()
+        p0,
+        p1,
+        p2,
+        body
     );
-    return ul::Void();
 }
 
-ApiTest test_grant_with_details_obj(test_grant_with_details, "acl::grant_with_details", &link_only_api_test_root);
+ApiTest test_grant_with_details_obj(test_grant_with_details, "acl::grant_with_details", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_grant_all(ul::RequestContext &ctx) {
-    ::ul::api::acl::grant_all(
+test_grant_all(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    return ul::api::acl::grant_all(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0,
+        p1
     );
-    return ul::Void();
 }
 
-ApiTest test_grant_all_obj(test_grant_all, "acl::grant_all", &link_only_api_test_root);
+ApiTest test_grant_all_obj(test_grant_all, "acl::grant_all", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_grant_all_with_details(ul::RequestContext &ctx) {
-    ::ul::api::acl::grant_all_with_details(
+test_grant_all_with_details(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    ::ul::types::ShareDetails body = ::ul::types::ShareDetails();
+    return ul::api::acl::grant_all_with_details(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ::ul::types::ShareDetails()
+        p0,
+        p1,
+        body
     );
-    return ul::Void();
 }
 
-ApiTest test_grant_all_with_details_obj(test_grant_all_with_details, "acl::grant_all_with_details", &link_only_api_test_root);
+ApiTest test_grant_all_with_details_obj(test_grant_all_with_details, "acl::grant_all_with_details", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_revoke(ul::RequestContext &ctx) {
-    ::ul::api::acl::revoke(
+test_revoke(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    return ul::api::acl::revoke(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0,
+        p1
     );
-    return ul::Void();
 }
 
-ApiTest test_revoke_obj(test_revoke, "acl::revoke", &link_only_api_test_root);
+ApiTest test_revoke_obj(test_revoke, "acl::revoke", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_permissions(ul::RequestContext &ctx) {
-    ::ul::api::acl::get_permissions(
+test_get_permissions(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
+    const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
+    const std::vector<uint8_t> expected_bytes = std::vector(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::acl::get_permissions(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<uint8_t> result_value = std::get<std::vector<uint8_t>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_permissions_obj(test_get_permissions, "acl::get_permissions", &link_only_api_test_root);
+ApiTest test_get_permissions_obj(test_get_permissions, "acl::get_permissions", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_set(ul::RequestContext &ctx) {
-    ::ul::api::acl::set(
+test_set(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    return ul::api::acl::set(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0,
+        p1
     );
-    return ul::Void();
 }
 
-ApiTest test_set_obj(test_set, "acl::set", &link_only_api_test_root);
+ApiTest test_set_obj(test_set, "acl::set", &idempotent_api_test_root);
 
 } // namespace acl

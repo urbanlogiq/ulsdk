@@ -65,6 +65,14 @@ EmbeddedTable::EmbeddedTable(const ::EmbeddedTable *root)
     }
 }
 
+bool
+EmbeddedTable::operator==(const EmbeddedTable &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::DeprecatedRunSpec>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DeprecatedRunSpec &o) {
     std::vector<::flatbuffers::Offset<::ParamIndices>> param_indices_offsets = std::vector<::flatbuffers::Offset<::ParamIndices>>();
@@ -137,6 +145,23 @@ DeprecatedRunSpec::DeprecatedRunSpec(const ::DeprecatedRunSpec *root)
     }
 }
 
+bool
+DeprecatedRunSpec::operator==(const DeprecatedRunSpec &rhs) const {
+    if (this->param_indices_ != rhs.param_indices_) {
+        return false;
+    }
+    if (this->params_ != rhs.params_) {
+        return false;
+    }
+    if (this->persist_ != rhs.persist_) {
+        return false;
+    }
+    if (this->schematic_ != rhs.schematic_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::DeprecatedTaskParameter>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DeprecatedTaskParameter &o) {
     const ::flatbuffers::Offset<::flatbuffers::String> key_offset = builder.CreateString(o.key_);
@@ -204,6 +229,23 @@ DeprecatedTaskParameter::DeprecatedTaskParameter(const ::DeprecatedTaskParameter
     }
 }
 
+bool
+DeprecatedTaskParameter::operator==(const DeprecatedTaskParameter &rhs) const {
+    if (this->flags_ != rhs.flags_) {
+        return false;
+    }
+    if (this->key_ != rhs.key_) {
+        return false;
+    }
+    if (this->obj_ != rhs.obj_) {
+        return false;
+    }
+    if (this->value_ != rhs.value_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Edge>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Edge &o) {
 
@@ -239,6 +281,17 @@ Edge::Edge(const ::Edge *root)
 
     from_ = root->from();
     to_ = root->to();
+}
+
+bool
+Edge::operator==(const Edge &rhs) const {
+    if (this->from_ != rhs.from_) {
+        return false;
+    }
+    if (this->to_ != rhs.to_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Job>
@@ -354,6 +407,29 @@ Job::Job(const ::Job *root)
     }
 }
 
+bool
+Job::operator==(const Job &rhs) const {
+    if (this->attributes_ != rhs.attributes_) {
+        return false;
+    }
+    if (this->error_tys_ != rhs.error_tys_) {
+        return false;
+    }
+    if (this->params_ != rhs.params_) {
+        return false;
+    }
+    if (this->status_ != rhs.status_) {
+        return false;
+    }
+    if (this->tasks_ != rhs.tasks_) {
+        return false;
+    }
+    if (this->user_id_ != rhs.user_id_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Node>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Node &o) {
     const ::flatbuffers::Offset<::flatbuffers::String> name_offset = builder.CreateString(o.name_);
@@ -395,6 +471,17 @@ Node::Node(const ::Node *root)
     }
 }
 
+bool
+Node::operator==(const Node &rhs) const {
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->obj_ != rhs.obj_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::ParamIndices>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ParamIndices &o) {
     const decltype(builder.CreateVector(o.idxs_)) idxs_offset = builder.CreateVector(o.idxs_);
@@ -430,6 +517,14 @@ ParamIndices::ParamIndices(const ::ParamIndices *root)
     if (idxs_vector != nullptr) {
         std::copy(idxs_vector->begin(), idxs_vector->end(), std::back_inserter(idxs_));
     }
+}
+
+bool
+ParamIndices::operator==(const ParamIndices &rhs) const {
+    if (this->idxs_ != rhs.idxs_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::RunSpec>
@@ -537,6 +632,32 @@ RunSpec::RunSpec(const ::RunSpec *root)
     }
 }
 
+bool
+RunSpec::operator==(const RunSpec &rhs) const {
+    if (this->attributes_ != rhs.attributes_) {
+        return false;
+    }
+    if (this->notify_ != rhs.notify_) {
+        return false;
+    }
+    if (this->param_indices_ != rhs.param_indices_) {
+        return false;
+    }
+    if (this->params_ != rhs.params_) {
+        return false;
+    }
+    if (this->persist_ != rhs.persist_) {
+        return false;
+    }
+    if (this->priority_ != rhs.priority_) {
+        return false;
+    }
+    if (this->schematic_ != rhs.schematic_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Schematic>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Schematic &o) {
     std::vector<::flatbuffers::Offset<::AttributePair>> attributes_offsets = std::vector<::flatbuffers::Offset<::AttributePair>>();
@@ -625,6 +746,23 @@ Schematic::Schematic(const ::Schematic *root)
             nodes_.emplace_back(i);
         }
     }
+}
+
+bool
+Schematic::operator==(const Schematic &rhs) const {
+    if (this->attributes_ != rhs.attributes_) {
+        return false;
+    }
+    if (this->edges_ != rhs.edges_) {
+        return false;
+    }
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->nodes_ != rhs.nodes_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::Task>
@@ -814,6 +952,77 @@ Task::Task(const ::Task *root)
     }
 }
 
+bool
+Task::operator==(const Task &rhs) const {
+    if (this->_id_ != rhs._id_) {
+        return false;
+    }
+    if (this->barrier_count_ != rhs.barrier_count_) {
+        return false;
+    }
+    if (this->created_ != rhs.created_) {
+        return false;
+    }
+    if (this->discard_ != rhs.discard_) {
+        return false;
+    }
+    if (this->downstream_ != rhs.downstream_) {
+        return false;
+    }
+    if (this->end_ != rhs.end_) {
+        return false;
+    }
+    if (this->error_ty_ != rhs.error_ty_) {
+        return false;
+    }
+    if (this->flags_ != rhs.flags_) {
+        return false;
+    }
+    if (this->job_id_ != rhs.job_id_) {
+        return false;
+    }
+    if (this->last_updated_ != rhs.last_updated_) {
+        return false;
+    }
+    if (this->last_updated_by_pod_ != rhs.last_updated_by_pod_) {
+        return false;
+    }
+    if (this->message_ != rhs.message_) {
+        return false;
+    }
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->output_ != rhs.output_) {
+        return false;
+    }
+    if (this->params_ != rhs.params_) {
+        return false;
+    }
+    if (this->retries_ != rhs.retries_) {
+        return false;
+    }
+    if (this->schematic_id_ != rhs.schematic_id_) {
+        return false;
+    }
+    if (this->start_ != rhs.start_) {
+        return false;
+    }
+    if (this->status_ != rhs.status_) {
+        return false;
+    }
+    if (this->task_ != rhs.task_) {
+        return false;
+    }
+    if (this->upstream_ != rhs.upstream_) {
+        return false;
+    }
+    if (this->user_id_ != rhs.user_id_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::TaskList>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TaskList &o) {
     std::vector<::flatbuffers::Offset<::Task>> tasks_offsets = std::vector<::flatbuffers::Offset<::Task>>();
@@ -857,6 +1066,14 @@ TaskList::TaskList(const ::TaskList *root)
             tasks_.emplace_back(i);
         }
     }
+}
+
+bool
+TaskList::operator==(const TaskList &rhs) const {
+    if (this->tasks_ != rhs.tasks_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::TaskParameter>
@@ -920,6 +1137,17 @@ TaskParameter::TaskParameter(const ::TaskParameter *root)
             default: throw std::runtime_error("unknown union variant");
         }
     }
+}
+
+bool
+TaskParameter::operator==(const TaskParameter &rhs) const {
+    if (this->key_ != rhs.key_) {
+        return false;
+    }
+    if (this->value_ != rhs.value_) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace types

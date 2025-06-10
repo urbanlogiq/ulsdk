@@ -25,122 +25,243 @@
 namespace drive {
 
 ul::Result<ul::Void>
-test_ls(ul::RequestContext &ctx) {
-    ::ul::api::drive::ls(
+test_ls(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const std::string p0 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+    std::string p1 = "tail";
+    const ::ul::types::DirectoryList expected = ::ul::types::DirectoryList();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::drive::ls(
         ctx,
-        std::string(),
-        std::string()
+        p0,
+        p1
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::DirectoryList result_value = std::get<::ul::types::DirectoryList>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_ls_obj(test_ls, "drive::ls", &link_only_api_test_root);
+ApiTest test_ls_obj(test_ls, "drive::ls", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_create_entry(ul::RequestContext &ctx) {
-    ::ul::api::drive::create_entry(
+test_create_entry(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    std::string p1 = "tail";
+    const std::string q0 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+    const std::string q1 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+    int q2 = 42;
+    const ::ul::types::ObjectSummary expected = ::ul::types::ObjectSummary();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::drive::create_entry(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        std::string(),
-        std::string(),
-        std::string(),
-        0
+        p0,
+        p1,
+        q0,
+        q1,
+        q2
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::ObjectSummary result_value = std::get<::ul::types::ObjectSummary>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_create_entry_obj(test_create_entry, "drive::create_entry", &link_only_api_test_root);
+ApiTest test_create_entry_obj(test_create_entry, "drive::create_entry", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_roots(ul::RequestContext &ctx) {
-    ::ul::api::drive::get_roots(
+test_get_roots(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::types::DirectoryList expected = ::ul::types::DirectoryList();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::drive::get_roots(
         ctx
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::DirectoryList result_value = std::get<::ul::types::DirectoryList>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_roots_obj(test_get_roots, "drive::get_roots", &link_only_api_test_root);
+ApiTest test_get_roots_obj(test_get_roots, "drive::get_roots", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_post_file(ul::RequestContext &ctx) {
-    ::ul::api::drive::post_file(
+test_post_file(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    bool q0 = true;
+    const std::vector<ul::File> body = std::vector<ul::File>();
+    const ::ul::types::DirectoryList expected = ::ul::types::DirectoryList();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::drive::post_file(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        false,
-        std::vector<ul::File>()
+        p0,
+        q0,
+        body
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::DirectoryList result_value = std::get<::ul::types::DirectoryList>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_post_file_obj(test_post_file, "drive::post_file", &link_only_api_test_root);
+ApiTest test_post_file_obj(test_post_file, "drive::post_file", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_unlink(ul::RequestContext &ctx) {
-    ::ul::api::drive::unlink(
+test_unlink(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::DirectoryList expected = ::ul::types::DirectoryList();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::drive::unlink(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::DirectoryList result_value = std::get<::ul::types::DirectoryList>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_unlink_obj(test_unlink, "drive::unlink", &link_only_api_test_root);
+ApiTest test_unlink_obj(test_unlink, "drive::unlink", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_move(ul::RequestContext &ctx) {
-    ::ul::api::drive::move(
+test_move(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    ::ul::types::MoveRequest body = ::ul::types::MoveRequest();
+    return ul::api::drive::move(
         ctx,
-        ::ul::types::MoveRequest()
+        body
     );
-    return ul::Void();
 }
 
-ApiTest test_move_obj(test_move, "drive::move", &link_only_api_test_root);
+ApiTest test_move_obj(test_move, "drive::move", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_copy(ul::RequestContext &ctx) {
-    ::ul::api::drive::copy(
+test_copy(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    ::ul::types::MoveRequest body = ::ul::types::MoveRequest();
+    return ul::api::drive::copy(
         ctx,
-        ::ul::types::MoveRequest()
+        body
     );
-    return ul::Void();
 }
 
-ApiTest test_copy_obj(test_copy, "drive::copy", &link_only_api_test_root);
+ApiTest test_copy_obj(test_copy, "drive::copy", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_file(ul::RequestContext &ctx) {
-    ::ul::api::drive::get_file(
+test_get_file(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
+    const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
+    const std::vector<uint8_t> expected_bytes = std::vector(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::drive::get_file(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<uint8_t> result_value = std::get<std::vector<uint8_t>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_file_obj(test_get_file, "drive::get_file", &link_only_api_test_root);
+ApiTest test_get_file_obj(test_get_file, "drive::get_file", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_put_file_chunk(ul::RequestContext &ctx) {
-    ::ul::api::drive::put_file_chunk(
+test_put_file_chunk(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    int p1 = 42;
+    const std::string q0 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+    const char *body_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    const uint8_t *body_ptr = reinterpret_cast<const uint8_t *>(body_str);
+    const std::vector<uint8_t> body = std::vector(body_ptr, body_ptr + std::strlen(body_str));
+    return ul::api::drive::put_file_chunk(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000"),
-        0,
-        std::string(),
-        std::vector<uint8_t>()
+        p0,
+        p1,
+        q0,
+        body
     );
-    return ul::Void();
 }
 
-ApiTest test_put_file_chunk_obj(test_put_file_chunk, "drive::put_file_chunk", &link_only_api_test_root);
+ApiTest test_put_file_chunk_obj(test_put_file_chunk, "drive::put_file_chunk", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
-test_get_root_id(ul::RequestContext &ctx) {
-    ::ul::api::drive::get_root_id(
+test_get_root_id(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId expected = ::ul::types::ObjectId();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::drive::get_root_id(
         ctx,
-        ul::Uuid("00000000-0000-0000-0000-000000000000")
+        p0
     );
-    return ul::Void();
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::ObjectId result_value = std::get<::ul::types::ObjectId>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_root_id_obj(test_get_root_id, "drive::get_root_id", &link_only_api_test_root);
+ApiTest test_get_root_id_obj(test_get_root_id, "drive::get_root_id", &idempotent_api_test_root);
 
 } // namespace drive

@@ -10,248 +10,85 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
-use flatbuffers::{WIPOffset, UnionWIPOffset};
 use bitflags::bitflags;
 use core::ops::Deref;
+use flatbuffers::{UnionWIPOffset, WIPOffset};
 
 use crate::types::api::SortOrder;
 use crate::types::entity::{
-    EdgeTy,
-    EntityTy,
-    Geometry,
-    GraphEdge,
-    GraphNode,
-    Line,
-    MultiLine,
-    MultiPolygon,
-    NodeTy,
-    Point,
+    EdgeTy, EntityTy, Geometry, GraphEdge, GraphNode, Line, MultiLine, MultiPolygon, NodeTy, Point,
     Polygon,
 };
 use crate::types::fun::Fn_;
-use crate::types::graph::{
-    EdgeList,
-    EdgeQuery,
-    Geom,
-    GeomOp,
-    GraphQuery,
-    NodeIdPair,
-    NodeList,
-    NodeQuery,
-    OrderBy,
-    Predicate,
-    Projection,
-    QueryPathElement,
-    QueryPathElementUnion,
-    ValueTransform,
-};
-use crate::types::id::{
-    B2cId,
-    ColumnGroupId,
-    ContentId,
-    DataStateId,
-    GenericId,
-    GraphNodeId,
-    ObjectId,
-    ObjectNamespace,
-    StreamId,
-};
-use crate::types::query::{
-    AllColumns,
-    Arrow,
-    BinaryQueryElement,
-    Case,
-    Column,
-    DataCatalog,
-    DeleteQueryElement,
-    Distinct,
-    Expr,
-    ExprUnion,
-    Function,
-    Join,
-    JoinTy,
-    MvdbPartition,
-    NullableUint,
-    OrderByExpr,
-    Partition,
-    Placeholder,
-    Query,
-    QueryElement,
-    QueryElementOp,
-    QueryElementUnion,
-    QueryTableSource,
-    SetExpr,
-    TableOrderBy,
-    TablePartition,
-    TableSource,
-    TableSourceInstance,
-    TableSourceUnion,
-    TypeHint,
-    UnaryQueryElement,
-    UnsetArgument,
-    UpdateQueryElement,
-    ValueIndex,
-    ValueName,
-    Vector,
-    When,
-    Window,
-    WorklogPartition,
-};
-use crate::types::value::{
-    Point2D,
-    Tri2D,
-    VArray,
-    VBool,
-    VBytes,
-    VChar,
-    VF32,
-    VF64,
-    VFixedSizeBytes,
-    VI16,
-    VI32,
-    VI64,
-    VI8,
-    VIsize,
-    VNull,
-    VPlaceholder,
-    VStr,
-    VTimestampMs,
-    VTimestampMsUtc,
-    VTimestampNs,
-    VTimestampNsUtc,
-    VTri2D,
-    VU16,
-    VU32,
-    VU64,
-    VU8,
-    VUnit,
-    VUsize,
-    Value,
-    ValueInstance,
-    ValueTy,
-};
-use crate::types::generated::api_generated::{
-    SortOrder as FbsSortOrder,
-};
+use crate::types::generated::api_generated::SortOrder as FbsSortOrder;
 use crate::types::generated::entity_generated::{
-    GraphEdge as FbsGraphEdge,
-    GraphNode as FbsGraphNode,
-    Line as FbsLine,
-    MultiLine as FbsMultiLine,
-    MultiPolygon as FbsMultiPolygon,
-    Point as FbsPoint,
-    Polygon as FbsPolygon,
-    EdgeTy as FbsEdgeTy,
-    EntityTy as FbsEntityTy,
-    Geometry as FbsGeometry,
-    NodeTy as FbsNodeTy,
+    EdgeTy as FbsEdgeTy, EntityTy as FbsEntityTy, Geometry as FbsGeometry,
+    GraphEdge as FbsGraphEdge, GraphNode as FbsGraphNode, Line as FbsLine,
+    MultiLine as FbsMultiLine, MultiPolygon as FbsMultiPolygon, NodeTy as FbsNodeTy,
+    Point as FbsPoint, Polygon as FbsPolygon,
 };
-use crate::types::generated::fun_generated::{
-    Fn as FbsFn,
-};
+use crate::types::generated::fun_generated::Fn as FbsFn;
 use crate::types::generated::graph_generated::{
-    EdgeList as FbsEdgeList,
-    EdgeQuery as FbsEdgeQuery,
-    Geom as FbsGeom,
-    GeomOp as FbsGeomOp,
-    GraphQuery as FbsGraphQuery,
-    NodeIdPair as FbsNodeIdPair,
-    NodeList as FbsNodeList,
-    NodeQuery as FbsNodeQuery,
-    OrderBy as FbsOrderBy,
-    Projection as FbsProjection,
-    QueryPathElement as FbsQueryPathElement,
-    Predicate as FbsPredicate,
-    QueryPathElementUnion as FbsQueryPathElementUnion,
-    ValueTransform as FbsValueTransform,
+    EdgeList as FbsEdgeList, EdgeQuery as FbsEdgeQuery, Geom as FbsGeom, GeomOp as FbsGeomOp,
+    GraphQuery as FbsGraphQuery, NodeIdPair as FbsNodeIdPair, NodeList as FbsNodeList,
+    NodeQuery as FbsNodeQuery, OrderBy as FbsOrderBy, Predicate as FbsPredicate,
+    Projection as FbsProjection, QueryPathElement as FbsQueryPathElement,
+    QueryPathElementUnion as FbsQueryPathElementUnion, ValueTransform as FbsValueTransform,
 };
 use crate::types::generated::id_generated::{
-    B2cId as FbsB2cId,
-    ColumnGroupId as FbsColumnGroupId,
-    ContentId as FbsContentId,
-    DataStateId as FbsDataStateId,
-    GenericId as FbsGenericId,
-    GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId,
-    StreamId as FbsStreamId,
-    ObjectNamespace as FbsObjectNamespace,
+    B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
+    DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
 };
 use crate::types::generated::query_generated::{
-    AllColumns as FbsAllColumns,
-    Arrow as FbsArrow,
-    BinaryQueryElement as FbsBinaryQueryElement,
-    Case as FbsCase,
-    Column as FbsColumn,
-    DataCatalog as FbsDataCatalog,
-    DeleteQueryElement as FbsDeleteQueryElement,
-    Distinct as FbsDistinct,
-    Expr as FbsExpr,
-    Function as FbsFunction,
-    Join as FbsJoin,
-    MvdbPartition as FbsMvdbPartition,
-    NullableUint as FbsNullableUint,
-    OrderByExpr as FbsOrderByExpr,
-    Partition as FbsPartition,
-    Placeholder as FbsPlaceholder,
-    Query as FbsQuery,
-    QueryElement as FbsQueryElement,
-    QueryTableSource as FbsQueryTableSource,
-    SetExpr as FbsSetExpr,
-    TableOrderBy as FbsTableOrderBy,
-    TableSource as FbsTableSource,
-    TableSourceInstance as FbsTableSourceInstance,
-    UnaryQueryElement as FbsUnaryQueryElement,
-    UnsetArgument as FbsUnsetArgument,
-    UpdateQueryElement as FbsUpdateQueryElement,
-    ValueIndex as FbsValueIndex,
-    ValueName as FbsValueName,
-    Vector as FbsVector,
-    When as FbsWhen,
-    Window as FbsWindow,
+    AllColumns as FbsAllColumns, Arrow as FbsArrow, BinaryQueryElement as FbsBinaryQueryElement,
+    Case as FbsCase, Column as FbsColumn, DataCatalog as FbsDataCatalog,
+    DeleteQueryElement as FbsDeleteQueryElement, Distinct as FbsDistinct, Drive as FbsDrive,
+    Expr as FbsExpr, ExprUnion as FbsExprUnion, Function as FbsFunction, Join as FbsJoin,
+    JoinTy as FbsJoinTy, MvdbPartition as FbsMvdbPartition, NullableUint as FbsNullableUint,
+    OrderByExpr as FbsOrderByExpr, Partition as FbsPartition, Placeholder as FbsPlaceholder,
+    Query as FbsQuery, QueryElement as FbsQueryElement, QueryElementOp as FbsQueryElementOp,
+    QueryElementUnion as FbsQueryElementUnion, QueryTableSource as FbsQueryTableSource,
+    SetExpr as FbsSetExpr, TableOrderBy as FbsTableOrderBy, TablePartition as FbsTablePartition,
+    TableSource as FbsTableSource, TableSourceInstance as FbsTableSourceInstance,
+    TableSourceUnion as FbsTableSourceUnion, TypeHint as FbsTypeHint,
+    UnaryQueryElement as FbsUnaryQueryElement, UnsetArgument as FbsUnsetArgument,
+    UpdateQueryElement as FbsUpdateQueryElement, ValueIndex as FbsValueIndex,
+    ValueName as FbsValueName, Vector as FbsVector, When as FbsWhen, Window as FbsWindow,
     WorklogPartition as FbsWorklogPartition,
-    ExprUnion as FbsExprUnion,
-    JoinTy as FbsJoinTy,
-    QueryElementOp as FbsQueryElementOp,
-    QueryElementUnion as FbsQueryElementUnion,
-    TablePartition as FbsTablePartition,
-    TableSourceUnion as FbsTableSourceUnion,
-    TypeHint as FbsTypeHint,
 };
 use crate::types::generated::value_generated::{
-    Point2D as FbsPoint2D,
-    Tri2D as FbsTri2D,
-    VArray as FbsVArray,
-    VBool as FbsVBool,
-    VBytes as FbsVBytes,
-    VChar as FbsVChar,
-    VF32 as FbsVF32,
-    VF64 as FbsVF64,
-    VFixedSizeBytes as FbsVFixedSizeBytes,
-    VI16 as FbsVI16,
-    VI32 as FbsVI32,
-    VI64 as FbsVI64,
-    VI8 as FbsVI8,
-    VIsize as FbsVIsize,
-    VNull as FbsVNull,
-    VPlaceholder as FbsVPlaceholder,
-    VStr as FbsVStr,
-    VTimestampMs as FbsVTimestampMs,
-    VTimestampMsUtc as FbsVTimestampMsUtc,
-    VTimestampNs as FbsVTimestampNs,
-    VTimestampNsUtc as FbsVTimestampNsUtc,
-    VTri2D as FbsVTri2D,
-    VU16 as FbsVU16,
-    VU32 as FbsVU32,
-    VU64 as FbsVU64,
-    VU8 as FbsVU8,
-    VUnit as FbsVUnit,
-    VUsize as FbsVUsize,
-    ValueInstance as FbsValueInstance,
-    Value as FbsValue,
+    Point2D as FbsPoint2D, Tri2D as FbsTri2D, VArray as FbsVArray, VBool as FbsVBool,
+    VBytes as FbsVBytes, VChar as FbsVChar, VF32 as FbsVF32, VF64 as FbsVF64,
+    VFixedSizeBytes as FbsVFixedSizeBytes, VI8 as FbsVI8, VI16 as FbsVI16, VI32 as FbsVI32,
+    VI64 as FbsVI64, VIsize as FbsVIsize, VNull as FbsVNull, VPlaceholder as FbsVPlaceholder,
+    VStr as FbsVStr, VTimestampMs as FbsVTimestampMs, VTimestampMsUtc as FbsVTimestampMsUtc,
+    VTimestampNs as FbsVTimestampNs, VTimestampNsUtc as FbsVTimestampNsUtc, VTri2D as FbsVTri2D,
+    VU8 as FbsVU8, VU16 as FbsVU16, VU32 as FbsVU32, VU64 as FbsVU64, VUnit as FbsVUnit,
+    VUsize as FbsVUsize, Value as FbsValue, ValueInstance as FbsValueInstance,
     ValueTy as FbsValueTy,
 };
-use crate::types::generated::view_generated::{
-    View as FbsView,
+use crate::types::generated::view_generated::View as FbsView;
+use crate::types::graph::{
+    EdgeList, EdgeQuery, Geom, GeomOp, GraphQuery, NodeIdPair, NodeList, NodeQuery, OrderBy,
+    Predicate, Projection, QueryPathElement, QueryPathElementUnion, ValueTransform,
+};
+use crate::types::id::{
+    B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
+    ObjectNamespace, StreamId,
+};
+use crate::types::query::{
+    AllColumns, Arrow, BinaryQueryElement, Case, Column, DataCatalog, DeleteQueryElement, Distinct,
+    Drive, Expr, ExprUnion, Function, Join, JoinTy, MvdbPartition, NullableUint, OrderByExpr,
+    Partition, Placeholder, Query, QueryElement, QueryElementOp, QueryElementUnion,
+    QueryTableSource, SetExpr, TableOrderBy, TablePartition, TableSource, TableSourceInstance,
+    TableSourceUnion, TypeHint, UnaryQueryElement, UnsetArgument, UpdateQueryElement, ValueIndex,
+    ValueName, Vector, When, Window, WorklogPartition,
+};
+use crate::types::value::{
+    Point2D, Tri2D, VArray, VBool, VBytes, VChar, VF32, VF64, VFixedSizeBytes, VI8, VI16, VI32,
+    VI64, VIsize, VNull, VPlaceholder, VStr, VTimestampMs, VTimestampMsUtc, VTimestampNs,
+    VTimestampNsUtc, VTri2D, VU8, VU16, VU32, VU64, VUnit, VUsize, Value, ValueInstance, ValueTy,
 };
 
 /// A view allows us to pre-define a query to run on a dataset
@@ -262,7 +99,10 @@ pub struct View {
 }
 
 impl View {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsView<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsView<'a>> {
         use crate::types::generated::view_generated::ViewBuilder as FbsViewBuilder;
 
         let query_offset = self.query.serialize_to(builder);
@@ -276,9 +116,7 @@ impl View {
 impl From<FbsView<'_>> for View {
     fn from(fbs: FbsView<'_>) -> Self {
         let query = Query::from(fbs.query());
-        Self {
-            query,
-        }
+        Self { query }
     }
 }
 
@@ -310,5 +148,4 @@ mod tests {
         let t1 = View::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
-
 }

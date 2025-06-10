@@ -110,7 +110,7 @@ class AdUser:
     display_name: "str"
     id_: "str"
     user_principal_name: "str"
-    other_mails: "List[str]"
+    other_mails: "Optional[List[str]]"
     department: "Optional[str]"
     created_date_time: "str"
 
@@ -119,11 +119,13 @@ class AdUser:
         o["displayName"] = self.display_name
         o["id"] = self.id_
         o["userPrincipalName"] = self.user_principal_name
-        other_mails_list = []
-        for item in self.other_mails:
-            other_mails_var = item
-            other_mails_list.append(other_mails_var)
-        o["otherMails"] = other_mails_list
+        o["otherMails"] = None
+        if self.other_mails is not None:
+            other_mails_list = []
+            for item in self.other_mails:
+                other_mails_var = item
+                other_mails_list.append(other_mails_var)
+            o["otherMails"] = other_mails_list
         o["department"] = None
         if self.department is not None:
             o["department"] = self.department
@@ -153,14 +155,17 @@ class AdUser:
                 assert type(user_principal_name_var) is str
                 user_principal_name = user_principal_name_var
             elif key == "otherMails":
-                other_mails_var = o[key]
-                assert type(other_mails_var) is list
-                other_mails = []
-                for item in other_mails_var:
-                    other_mails_item_var = item
-                    assert type(other_mails_item_var) is str
-                    other_mails_item = other_mails_item_var
-                    other_mails.append(other_mails_item)
+                if o[key] is not None:
+                    other_mails_var = o[key]
+                    assert type(other_mails_var) is list
+                    other_mails = []
+                    for item in other_mails_var:
+                        other_mails_item_var = item
+                        assert type(other_mails_item_var) is str
+                        other_mails_item = other_mails_item_var
+                        other_mails.append(other_mails_item)
+                else:
+                    other_mails = None
             elif key == "department":
                 if o[key] is not None:
                     department_var = o[key]
@@ -176,7 +181,6 @@ class AdUser:
         assert display_name is not None
         assert id_ is not None
         assert user_principal_name is not None
-        assert other_mails is not None
         assert created_date_time is not None
 
         return cls(display_name, id_, user_principal_name, other_mails, department, created_date_time)
@@ -186,7 +190,7 @@ class AdUser:
         displayName = ""
         id = ""
         userPrincipalName = ""
-        otherMails = []
+        otherMails = None
         department = None
         createdDateTime = ""
 
@@ -572,17 +576,13 @@ class AuditLogEntry:
 
 @dataclass
 class AuditLog:
-    value: "List[List[AuditLogEntry]]"
+    value: "List[AuditLogEntry]"
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
         value_list = []
         for item in self.value:
-            value_var_list = []
-            for item in item:
-                value_var_var = item.to_dict()
-                value_var_list.append(value_var_var)
-            value_var = value_var_list
+            value_var = item.to_dict()
             value_list.append(value_var)
         o["value"] = value_list
         return o
@@ -598,13 +598,8 @@ class AuditLog:
                 value = []
                 for item in value_var:
                     value_item_var = item
-                    assert type(value_item_var) is list
-                    value_item = []
-                    for item in value_item_var:
-                        value_item_item_var = item
-                        assert type(value_item_item_var) is dict
-                        value_item_item = AuditLogEntry.from_dict(value_item_item_var)
-                        value_item.append(value_item_item)
+                    assert type(value_item_var) is dict
+                    value_item = AuditLogEntry.from_dict(value_item_var)
                     value.append(value_item)
 
         assert value is not None
@@ -622,7 +617,7 @@ class AdUserWithAuditLog:
     display_name: "str"
     id_: "str"
     user_principal_name: "str"
-    other_mails: "List[str]"
+    other_mails: "Optional[List[str]]"
     department: "Optional[str]"
     created_date_time: "str"
     audit_log: "Optional[AuditLog]"
@@ -632,11 +627,13 @@ class AdUserWithAuditLog:
         o["displayName"] = self.display_name
         o["id"] = self.id_
         o["userPrincipalName"] = self.user_principal_name
-        other_mails_list = []
-        for item in self.other_mails:
-            other_mails_var = item
-            other_mails_list.append(other_mails_var)
-        o["otherMails"] = other_mails_list
+        o["otherMails"] = None
+        if self.other_mails is not None:
+            other_mails_list = []
+            for item in self.other_mails:
+                other_mails_var = item
+                other_mails_list.append(other_mails_var)
+            o["otherMails"] = other_mails_list
         o["department"] = None
         if self.department is not None:
             o["department"] = self.department
@@ -670,14 +667,17 @@ class AdUserWithAuditLog:
                 assert type(user_principal_name_var) is str
                 user_principal_name = user_principal_name_var
             elif key == "otherMails":
-                other_mails_var = o[key]
-                assert type(other_mails_var) is list
-                other_mails = []
-                for item in other_mails_var:
-                    other_mails_item_var = item
-                    assert type(other_mails_item_var) is str
-                    other_mails_item = other_mails_item_var
-                    other_mails.append(other_mails_item)
+                if o[key] is not None:
+                    other_mails_var = o[key]
+                    assert type(other_mails_var) is list
+                    other_mails = []
+                    for item in other_mails_var:
+                        other_mails_item_var = item
+                        assert type(other_mails_item_var) is str
+                        other_mails_item = other_mails_item_var
+                        other_mails.append(other_mails_item)
+                else:
+                    other_mails = None
             elif key == "department":
                 if o[key] is not None:
                     department_var = o[key]
@@ -700,7 +700,6 @@ class AdUserWithAuditLog:
         assert display_name is not None
         assert id_ is not None
         assert user_principal_name is not None
-        assert other_mails is not None
         assert created_date_time is not None
 
         return cls(display_name, id_, user_principal_name, other_mails, department, created_date_time, audit_log)
@@ -710,7 +709,7 @@ class AdUserWithAuditLog:
         displayName = ""
         id = ""
         userPrincipalName = ""
-        otherMails = []
+        otherMails = None
         department = None
         createdDateTime = ""
         auditLog = None

@@ -102,6 +102,23 @@ CategoryFilter::CategoryFilter(const ::CategoryFilter *root)
     }
 }
 
+bool
+CategoryFilter::operator==(const CategoryFilter &rhs) const {
+    if (this->column_group_id_ != rhs.column_group_id_) {
+        return false;
+    }
+    if (this->comparator_ != rhs.comparator_) {
+        return false;
+    }
+    if (this->include_nulls_ != rhs.include_nulls_) {
+        return false;
+    }
+    if (this->values_ != rhs.values_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::RangeFilter>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const RangeFilter &o) {
     const ::flatbuffers::Offset<::ColumnGroupId> column_group_id_offset = serialize_to(builder, o.column_group_id_);
@@ -148,6 +165,23 @@ RangeFilter::RangeFilter(const ::RangeFilter *root)
     include_nulls_ = root->include_nulls();
     max_ = root->max();
     min_ = root->min();
+}
+
+bool
+RangeFilter::operator==(const RangeFilter &rhs) const {
+    if (this->column_group_id_ != rhs.column_group_id_) {
+        return false;
+    }
+    if (this->include_nulls_ != rhs.include_nulls_) {
+        return false;
+    }
+    if (this->max_ != rhs.max_) {
+        return false;
+    }
+    if (this->min_ != rhs.min_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::RelationshipRangeFilter>
@@ -217,6 +251,29 @@ RelationshipRangeFilter::RelationshipRangeFilter(const ::RelationshipRangeFilter
     min_ = root->min();
 }
 
+bool
+RelationshipRangeFilter::operator==(const RelationshipRangeFilter &rhs) const {
+    if (this->aggregate_op_ != rhs.aggregate_op_) {
+        return false;
+    }
+    if (this->column_group_id_ != rhs.column_group_id_) {
+        return false;
+    }
+    if (this->columns_ != rhs.columns_) {
+        return false;
+    }
+    if (this->include_nulls_ != rhs.include_nulls_) {
+        return false;
+    }
+    if (this->max_ != rhs.max_) {
+        return false;
+    }
+    if (this->min_ != rhs.min_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::DataStateGeometrySource>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DataStateGeometrySource &o) {
     const ::flatbuffers::Offset<::DataStateId> data_state_id_offset = serialize_to(builder, o.data_state_id_);
@@ -251,6 +308,14 @@ DataStateGeometrySource::DataStateGeometrySource(const ::DataStateGeometrySource
     if (root->data_state_id() != nullptr) {
         data_state_id_ = decltype(data_state_id_)(root->data_state_id());
     }
+}
+
+bool
+DataStateGeometrySource::operator==(const DataStateGeometrySource &rhs) const {
+    if (this->data_state_id_ != rhs.data_state_id_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::RawGeometrySource>
@@ -296,6 +361,14 @@ RawGeometrySource::RawGeometrySource(const ::RawGeometrySource *root)
             geoms_.emplace_back(i);
         }
     }
+}
+
+bool
+RawGeometrySource::operator==(const RawGeometrySource &rhs) const {
+    if (this->geoms_ != rhs.geoms_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::ColumnGroup>
@@ -371,6 +444,26 @@ ColumnGroup::ColumnGroup(const ::ColumnGroup *root)
     ty_ = root->ty();
 }
 
+bool
+ColumnGroup::operator==(const ColumnGroup &rhs) const {
+    if (this->columns_ != rhs.columns_) {
+        return false;
+    }
+    if (this->display_name_ != rhs.display_name_) {
+        return false;
+    }
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->stream_id_ != rhs.stream_id_) {
+        return false;
+    }
+    if (this->ty_ != rhs.ty_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::DeprecatedDataStateJoin>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DeprecatedDataStateJoin &o) {
     const ::flatbuffers::Offset<::DataStateId> from_offset = serialize_to(builder, o.from_);
@@ -420,6 +513,23 @@ DeprecatedDataStateJoin::DeprecatedDataStateJoin(const ::DeprecatedDataStateJoin
     if (root->to() != nullptr) {
         to_ = decltype(to_)(root->to());
     }
+}
+
+bool
+DeprecatedDataStateJoin::operator==(const DeprecatedDataStateJoin &rhs) const {
+    if (this->distance_ != rhs.distance_) {
+        return false;
+    }
+    if (this->from_ != rhs.from_) {
+        return false;
+    }
+    if (this->operation_ != rhs.operation_) {
+        return false;
+    }
+    if (this->to_ != rhs.to_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::FieldFilter>
@@ -478,6 +588,14 @@ FieldFilter::FieldFilter(const ::FieldFilter *root)
             default: throw std::runtime_error("unknown union variant");
         }
     }
+}
+
+bool
+FieldFilter::operator==(const FieldFilter &rhs) const {
+    if (this->filter_ != rhs.filter_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::JoinStackEntry>
@@ -553,6 +671,23 @@ JoinStackEntry::JoinStackEntry(const ::JoinStackEntry *root)
     mode_ = root->mode();
 }
 
+bool
+JoinStackEntry::operator==(const JoinStackEntry &rhs) const {
+    if (this->buffer_ != rhs.buffer_) {
+        return false;
+    }
+    if (this->deprecated_data_state_id_do_not_use_ != rhs.deprecated_data_state_id_do_not_use_) {
+        return false;
+    }
+    if (this->geometry_source_ != rhs.geometry_source_) {
+        return false;
+    }
+    if (this->mode_ != rhs.mode_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::RawGeometrySourceGeom>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const RawGeometrySourceGeom &o) {
     const std::pair<::flatbuffers::Offset<void>, ::Geometry> geom_offset = serialize_to(builder, o.geom_);
@@ -623,6 +758,14 @@ RawGeometrySourceGeom::RawGeometrySourceGeom(const ::RawGeometrySourceGeom *root
     }
 }
 
+bool
+RawGeometrySourceGeom::operator==(const RawGeometrySourceGeom &rhs) const {
+    if (this->geom_ != rhs.geom_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::StackableDataStateJoin>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const StackableDataStateJoin &o) {
     std::vector<::flatbuffers::Offset<::JoinStackEntry>> join_stack_offsets = std::vector<::flatbuffers::Offset<::JoinStackEntry>>();
@@ -685,6 +828,26 @@ StackableDataStateJoin::StackableDataStateJoin(const ::StackableDataStateJoin *r
         target_ = decltype(target_)(root->target());
     }
     type_ = root->type();
+}
+
+bool
+StackableDataStateJoin::operator==(const StackableDataStateJoin &rhs) const {
+    if (this->buffer_ != rhs.buffer_) {
+        return false;
+    }
+    if (this->join_stack_ != rhs.join_stack_) {
+        return false;
+    }
+    if (this->op_ != rhs.op_) {
+        return false;
+    }
+    if (this->target_ != rhs.target_) {
+        return false;
+    }
+    if (this->type_ != rhs.type_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::UserLayer>
@@ -790,6 +953,26 @@ UserLayer::UserLayer(const ::UserLayer *root)
     visible_ = root->visible();
 }
 
+bool
+UserLayer::operator==(const UserLayer &rhs) const {
+    if (this->data_states_ != rhs.data_states_) {
+        return false;
+    }
+    if (this->deprecated_data_joins_do_not_use_ != rhs.deprecated_data_joins_do_not_use_) {
+        return false;
+    }
+    if (this->joins_ != rhs.joins_) {
+        return false;
+    }
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->visible_ != rhs.visible_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::UserLayerDataState>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UserLayerDataState &o) {
     std::vector<::flatbuffers::Offset<::ColumnGroup>> active_fields_offsets = std::vector<::flatbuffers::Offset<::ColumnGroup>>();
@@ -865,6 +1048,23 @@ UserLayerDataState::UserLayerDataState(const ::UserLayerDataState *root)
     }
 }
 
+bool
+UserLayerDataState::operator==(const UserLayerDataState &rhs) const {
+    if (this->active_fields_ != rhs.active_fields_) {
+        return false;
+    }
+    if (this->data_state_id_ != rhs.data_state_id_) {
+        return false;
+    }
+    if (this->filters_ != rhs.filters_) {
+        return false;
+    }
+    if (this->stream_id_ != rhs.stream_id_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::UserProject>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UserProject &o) {
     const ::flatbuffers::Offset<::GenericId> id_offset = serialize_to(builder, o.id_);
@@ -928,6 +1128,20 @@ UserProject::UserProject(const ::UserProject *root)
     if (root->name() != nullptr) {
         name_ = std::string(*root->name()->begin(), *root->name()->end());
     }
+}
+
+bool
+UserProject::operator==(const UserProject &rhs) const {
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->layers_ != rhs.layers_) {
+        return false;
+    }
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace types

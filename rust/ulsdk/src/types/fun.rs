@@ -10,13 +10,11 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
-use flatbuffers::{WIPOffset, UnionWIPOffset};
 use bitflags::bitflags;
 use core::ops::Deref;
+use flatbuffers::{UnionWIPOffset, WIPOffset};
 
-use crate::types::generated::fun_generated::{
-    Fn as FbsFn,
-};
+use crate::types::generated::fun_generated::Fn as FbsFn;
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub enum Fn_ {
@@ -285,7 +283,7 @@ impl From<FbsFn> for Fn_ {
             32764 => Self::UlTimezone,
             32765 => Self::UlArrayContains,
             32766 => Self::UlArrayAny,
-            _ => panic!("Invalid value {} when constructing Fn_", fbs.0)
+            _ => panic!("Invalid value {} when constructing Fn_", fbs.0),
         }
     }
 }
@@ -293,5 +291,4 @@ impl From<FbsFn> for Fn_ {
 #[cfg(test)]
 mod tests {
     use super::*;
-
 }

@@ -10,20 +10,14 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
-use flatbuffers::{WIPOffset, UnionWIPOffset};
 use bitflags::bitflags;
 use core::ops::Deref;
+use flatbuffers::{UnionWIPOffset, WIPOffset};
 
 use crate::types::generated::id_generated::{
-    B2cId as FbsB2cId,
-    ColumnGroupId as FbsColumnGroupId,
-    ContentId as FbsContentId,
-    DataStateId as FbsDataStateId,
-    GenericId as FbsGenericId,
-    GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId,
-    StreamId as FbsStreamId,
-    ObjectNamespace as FbsObjectNamespace,
+    B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
+    DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
 };
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -65,7 +59,7 @@ impl From<FbsObjectNamespace> for ObjectNamespace {
             5 => Self::Drive,
             6 => Self::Notifications,
             65535 => Self::Unknown,
-            _ => panic!("Invalid value {} when constructing ObjectNamespace", fbs.0)
+            _ => panic!("Invalid value {} when constructing ObjectNamespace", fbs.0),
         }
     }
 }
@@ -76,7 +70,10 @@ pub struct B2cId {
 }
 
 impl B2cId {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsB2cId<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsB2cId<'a>> {
         use crate::types::generated::id_generated::B2cIdBuilder as FbsB2cIdBuilder;
 
         let b_offset = builder.create_vector(&self.b);
@@ -94,9 +91,7 @@ impl From<FbsB2cId<'_>> for B2cId {
             b.push(elem.into());
         }
 
-        Self {
-            b,
-        }
+        Self { b }
     }
 }
 
@@ -123,7 +118,10 @@ pub struct ColumnGroupId {
 }
 
 impl ColumnGroupId {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsColumnGroupId<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsColumnGroupId<'a>> {
         use crate::types::generated::id_generated::ColumnGroupIdBuilder as FbsColumnGroupIdBuilder;
 
         let b_offset = builder.create_vector(&self.b);
@@ -141,9 +139,7 @@ impl From<FbsColumnGroupId<'_>> for ColumnGroupId {
             b.push(elem.into());
         }
 
-        Self {
-            b,
-        }
+        Self { b }
     }
 }
 
@@ -170,7 +166,10 @@ pub struct ContentId {
 }
 
 impl ContentId {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsContentId<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsContentId<'a>> {
         use crate::types::generated::id_generated::ContentIdBuilder as FbsContentIdBuilder;
 
         let b_offset = builder.create_vector(&self.b);
@@ -188,9 +187,7 @@ impl From<FbsContentId<'_>> for ContentId {
             b.push(elem.into());
         }
 
-        Self {
-            b,
-        }
+        Self { b }
     }
 }
 
@@ -217,7 +214,10 @@ pub struct DataStateId {
 }
 
 impl DataStateId {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsDataStateId<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDataStateId<'a>> {
         use crate::types::generated::id_generated::DataStateIdBuilder as FbsDataStateIdBuilder;
 
         let b_offset = builder.create_vector(&self.b);
@@ -235,9 +235,7 @@ impl From<FbsDataStateId<'_>> for DataStateId {
             b.push(elem.into());
         }
 
-        Self {
-            b,
-        }
+        Self { b }
     }
 }
 
@@ -264,7 +262,10 @@ pub struct GenericId {
 }
 
 impl GenericId {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsGenericId<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsGenericId<'a>> {
         use crate::types::generated::id_generated::GenericIdBuilder as FbsGenericIdBuilder;
 
         let b_offset = builder.create_vector(&self.b);
@@ -282,9 +283,7 @@ impl From<FbsGenericId<'_>> for GenericId {
             b.push(elem.into());
         }
 
-        Self {
-            b,
-        }
+        Self { b }
     }
 }
 
@@ -311,7 +310,10 @@ pub struct GraphNodeId {
 }
 
 impl GraphNodeId {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsGraphNodeId<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsGraphNodeId<'a>> {
         use crate::types::generated::id_generated::GraphNodeIdBuilder as FbsGraphNodeIdBuilder;
 
         let b_offset = builder.create_vector(&self.b);
@@ -329,9 +331,7 @@ impl From<FbsGraphNodeId<'_>> for GraphNodeId {
             b.push(elem.into());
         }
 
-        Self {
-            b,
-        }
+        Self { b }
     }
 }
 
@@ -358,7 +358,10 @@ pub struct ObjectId {
 }
 
 impl ObjectId {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsObjectId<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsObjectId<'a>> {
         use crate::types::generated::id_generated::ObjectIdBuilder as FbsObjectIdBuilder;
 
         let b_offset = builder.create_vector(&self.b);
@@ -376,9 +379,7 @@ impl From<FbsObjectId<'_>> for ObjectId {
             b.push(elem.into());
         }
 
-        Self {
-            b,
-        }
+        Self { b }
     }
 }
 
@@ -405,7 +406,10 @@ pub struct StreamId {
 }
 
 impl StreamId {
-    pub fn serialize_to<'a>(&self, builder: &mut flatbuffers::FlatBufferBuilder<'a>) -> flatbuffers::WIPOffset<FbsStreamId<'a>> {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsStreamId<'a>> {
         use crate::types::generated::id_generated::StreamIdBuilder as FbsStreamIdBuilder;
 
         let b_offset = builder.create_vector(&self.b);
@@ -423,9 +427,7 @@ impl From<FbsStreamId<'_>> for StreamId {
             b.push(elem.into());
         }
 
-        Self {
-            b,
-        }
+        Self { b }
     }
 }
 
@@ -513,5 +515,4 @@ mod tests {
         let t1 = StreamId::try_from(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
-
 }

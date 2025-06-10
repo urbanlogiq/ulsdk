@@ -10,13 +10,11 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
-use flatbuffers::{WIPOffset, UnionWIPOffset};
 use bitflags::bitflags;
 use core::ops::Deref;
+use flatbuffers::{UnionWIPOffset, WIPOffset};
 
-use crate::types::generated::api_generated::{
-    SortOrder as FbsSortOrder,
-};
+use crate::types::generated::api_generated::SortOrder as FbsSortOrder;
 
 /// These constants are used to populate the `OrderByOp` struct's `order` field.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -40,7 +38,7 @@ impl From<FbsSortOrder> for SortOrder {
         match fbs.0 {
             0 => Self::ASC,
             1 => Self::DESC,
-            _ => panic!("Invalid value {} when constructing SortOrder", fbs.0)
+            _ => panic!("Invalid value {} when constructing SortOrder", fbs.0),
         }
     }
 }
@@ -48,5 +46,4 @@ impl From<FbsSortOrder> for SortOrder {
 #[cfg(test)]
 mod tests {
     use super::*;
-
 }

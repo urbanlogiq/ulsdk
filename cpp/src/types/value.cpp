@@ -153,6 +153,14 @@ VBool::VBool(const ::VBool *root)
     v_ = root->v();
 }
 
+bool
+VBool::operator==(const VBool &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::VUnit>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const VUnit &) {
 
@@ -180,6 +188,12 @@ VUnit::VUnit(const ::VUnit *root)  {
         throw std::runtime_error("cannot deserialize flatbuffer type");
     }
 
+}
+
+bool
+VUnit::operator==(const VUnit &rhs) const {
+    (void)rhs;
+    return true;
 }
 
 ::flatbuffers::Offset<::VChar>
@@ -215,6 +229,14 @@ VChar::VChar(const ::VChar *root)
     v_ = root->v();
 }
 
+bool
+VChar::operator==(const VChar &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::VNull>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const VNull &) {
 
@@ -242,6 +264,12 @@ VNull::VNull(const ::VNull *root)  {
         throw std::runtime_error("cannot deserialize flatbuffer type");
     }
 
+}
+
+bool
+VNull::operator==(const VNull &rhs) const {
+    (void)rhs;
+    return true;
 }
 
 ::flatbuffers::Offset<::VI8>
@@ -277,6 +305,14 @@ VI8::VI8(const ::VI8 *root)
     v_ = root->v();
 }
 
+bool
+VI8::operator==(const VI8 &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::VU8>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const VU8 &o) {
 
@@ -308,6 +344,14 @@ VU8::VU8(const ::VU8 *root)
     }
 
     v_ = root->v();
+}
+
+bool
+VU8::operator==(const VU8 &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::VI16>
@@ -343,6 +387,14 @@ VI16::VI16(const ::VI16 *root)
     v_ = root->v();
 }
 
+bool
+VI16::operator==(const VI16 &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::VU16>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const VU16 &o) {
 
@@ -374,6 +426,14 @@ VU16::VU16(const ::VU16 *root)
     }
 
     v_ = root->v();
+}
+
+bool
+VU16::operator==(const VU16 &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::VI32>
@@ -409,6 +469,14 @@ VI32::VI32(const ::VI32 *root)
     v_ = root->v();
 }
 
+bool
+VI32::operator==(const VI32 &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::VU32>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const VU32 &o) {
 
@@ -440,6 +508,14 @@ VU32::VU32(const ::VU32 *root)
     }
 
     v_ = root->v();
+}
+
+bool
+VU32::operator==(const VU32 &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::VF32>
@@ -475,6 +551,14 @@ VF32::VF32(const ::VF32 *root)
     v_ = root->v();
 }
 
+bool
+VF32::operator==(const VF32 &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::VIsize>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const VIsize &o) {
 
@@ -506,6 +590,14 @@ VIsize::VIsize(const ::VIsize *root)
     }
 
     v_ = root->v();
+}
+
+bool
+VIsize::operator==(const VIsize &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::VUsize>
@@ -541,6 +633,14 @@ VUsize::VUsize(const ::VUsize *root)
     v_ = root->v();
 }
 
+bool
+VUsize::operator==(const VUsize &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::VI64>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const VI64 &o) {
 
@@ -572,6 +672,14 @@ VI64::VI64(const ::VI64 *root)
     }
 
     v_ = root->v();
+}
+
+bool
+VI64::operator==(const VI64 &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::VU64>
@@ -607,6 +715,14 @@ VU64::VU64(const ::VU64 *root)
     v_ = root->v();
 }
 
+bool
+VU64::operator==(const VU64 &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::VF64>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const VF64 &o) {
 
@@ -638,6 +754,14 @@ VF64::VF64(const ::VF64 *root)
     }
 
     v_ = root->v();
+}
+
+bool
+VF64::operator==(const VF64 &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::VStr>
@@ -672,6 +796,14 @@ VStr::VStr(const ::VStr *root)
     }
 
         v_ = std::string(*root->v()->begin(), *root->v()->end());
+}
+
+bool
+VStr::operator==(const VStr &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::VBytes>
@@ -709,6 +841,14 @@ VBytes::VBytes(const ::VBytes *root)
     if (v_vector != nullptr) {
         std::copy(v_vector->begin(), v_vector->end(), std::back_inserter(v_));
     }
+}
+
+bool
+VBytes::operator==(const VBytes &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::VArray>
@@ -756,6 +896,14 @@ VArray::VArray(const ::VArray *root)
     }
 }
 
+bool
+VArray::operator==(const VArray &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
+}
+
 Point2D::Point2D()
     : x_(0)
     , y_(0) {
@@ -770,6 +918,17 @@ Point2D::Point2D(const ::Point2D *root)
 
     x_ = root->x();
     y_ = root->y();
+}
+
+bool
+Point2D::operator==(const Point2D &rhs) const {
+    if (this->x_ != rhs.x_) {
+        return false;
+    }
+    if (this->y_ != rhs.y_) {
+        return false;
+    }
+    return true;
 }
 
 Tri2D::Tri2D()
@@ -792,6 +951,20 @@ Tri2D::Tri2D(const ::Tri2D *root)
     p1_ = decltype(p1_)(&p1__local);
     const auto p2__local = root->p2();
     p2_ = decltype(p2_)(&p2__local);
+}
+
+bool
+Tri2D::operator==(const Tri2D &rhs) const {
+    if (this->p0_ != rhs.p0_) {
+        return false;
+    }
+    if (this->p1_ != rhs.p1_) {
+        return false;
+    }
+    if (this->p2_ != rhs.p2_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::VTri2D>
@@ -826,6 +999,14 @@ VTri2D::VTri2D(const ::VTri2D *root)
 
     const auto v__local = root->v();
     v_ = decltype(v_)(v__local);
+}
+
+bool
+VTri2D::operator==(const VTri2D &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::VFixedSizeBytes>
@@ -869,6 +1050,17 @@ VFixedSizeBytes::VFixedSizeBytes(const ::VFixedSizeBytes *root)
     }
 }
 
+bool
+VFixedSizeBytes::operator==(const VFixedSizeBytes &rhs) const {
+    if (this->sz_ != rhs.sz_) {
+        return false;
+    }
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::VTimestampMsUtc>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const VTimestampMsUtc &o) {
 
@@ -900,6 +1092,14 @@ VTimestampMsUtc::VTimestampMsUtc(const ::VTimestampMsUtc *root)
     }
 
     v_ = root->v();
+}
+
+bool
+VTimestampMsUtc::operator==(const VTimestampMsUtc &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::VTimestampMs>
@@ -935,6 +1135,14 @@ VTimestampMs::VTimestampMs(const ::VTimestampMs *root)
     v_ = root->v();
 }
 
+bool
+VTimestampMs::operator==(const VTimestampMs &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::VTimestampNsUtc>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const VTimestampNsUtc &o) {
 
@@ -968,6 +1176,14 @@ VTimestampNsUtc::VTimestampNsUtc(const ::VTimestampNsUtc *root)
     v_ = root->v();
 }
 
+bool
+VTimestampNsUtc::operator==(const VTimestampNsUtc &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::VTimestampNs>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const VTimestampNs &o) {
 
@@ -999,6 +1215,14 @@ VTimestampNs::VTimestampNs(const ::VTimestampNs *root)
     }
 
     v_ = root->v();
+}
+
+bool
+VTimestampNs::operator==(const VTimestampNs &rhs) const {
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::VPlaceholder>
@@ -1037,6 +1261,17 @@ VPlaceholder::VPlaceholder(const ::VPlaceholder *root)
 
         name_ = std::string(*root->name()->begin(), *root->name()->end());
     ty_ = root->ty();
+}
+
+bool
+VPlaceholder::operator==(const VPlaceholder &rhs) const {
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->ty_ != rhs.ty_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::ValueInstance>
@@ -1246,6 +1481,17 @@ ValueInstance::ValueInstance(const ::ValueInstance *root)
             default: throw std::runtime_error("unknown union variant");
         }
     }
+}
+
+bool
+ValueInstance::operator==(const ValueInstance &rhs) const {
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->v_ != rhs.v_) {
+        return false;
+    }
+    return true;
 }
 
 } // namespace types

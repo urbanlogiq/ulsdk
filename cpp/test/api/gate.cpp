@@ -25,8 +25,32 @@
 namespace gate {
 
 ul::Result<ul::Void>
+test_bootstrap(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::api::gate::Bootstrap expected = ::ul::api::gate::Bootstrap();
+    const std::vector<uint8_t> expected_bytes = ::ul::api::gate::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::gate::bootstrap(
+        ctx
+    );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::api::gate::Bootstrap result_value = std::get<::ul::api::gate::Bootstrap>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
+}
+
+ApiTest test_bootstrap_obj(test_bootstrap, "gate::bootstrap", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
 test_bootstrap_1(ul::RequestContext &ctx) {
-    const auto result = ::ul::api::gate::bootstrap(
+    auto result = ::ul::api::gate::bootstrap(
         ctx
     );
 
