@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "flatbuffers/flatbuffers.h"
+#include "ulsdk/ulsdk.h"
 #include "ulsdk/types/generated/id_generated.h"
 
 namespace ul {
@@ -36,6 +37,12 @@ struct B2cId {
     bool operator!=(const B2cId &rhs) const {
         return !(*this == rhs);
     }
+    B2cId(const ul::Uuid &o) : b_(o.to_vec()) {}
+    B2cId(const std::string &o) : b_(ul::Uuid(o).to_vec()) {}
+    std::string to_string() const {
+        ul::Uuid u = ul::Uuid(&this->b_[0]);
+        return u.to_string();
+    }
 };
 
 struct ColumnGroupId {
@@ -59,6 +66,12 @@ struct ContentId {
     bool operator==(const ContentId &rhs) const;
     bool operator!=(const ContentId &rhs) const {
         return !(*this == rhs);
+    }
+    ContentId(const ul::Uuid &o) : b_(o.to_vec()) {}
+    ContentId(const std::string &o) : b_(ul::Uuid(o).to_vec()) {}
+    std::string to_string() const {
+        ul::Uuid u = ul::Uuid(&this->b_[0]);
+        return u.to_string();
     }
 };
 
@@ -84,6 +97,12 @@ struct GenericId {
     bool operator!=(const GenericId &rhs) const {
         return !(*this == rhs);
     }
+    GenericId(const ul::Uuid &o) : b_(o.to_vec()) {}
+    GenericId(const std::string &o) : b_(ul::Uuid(o).to_vec()) {}
+    std::string to_string() const {
+        ul::Uuid u = ul::Uuid(&this->b_[0]);
+        return u.to_string();
+    }
 };
 
 struct GraphNodeId {
@@ -96,6 +115,12 @@ struct GraphNodeId {
     bool operator!=(const GraphNodeId &rhs) const {
         return !(*this == rhs);
     }
+    GraphNodeId(const ul::Uuid &o) : b_(o.to_vec()) {}
+    GraphNodeId(const std::string &o) : b_(ul::Uuid(o).to_vec()) {}
+    std::string to_string() const {
+        ul::Uuid u = ul::Uuid(&this->b_[0]);
+        return u.to_string();
+    }
 };
 
 struct ObjectId {
@@ -107,6 +132,12 @@ struct ObjectId {
     bool operator==(const ObjectId &rhs) const;
     bool operator!=(const ObjectId &rhs) const {
         return !(*this == rhs);
+    }
+    ObjectId(const ul::Uuid &o) : b_(o.to_vec()) {}
+    ObjectId(const std::string &o) : b_(ul::Uuid(o).to_vec()) {}
+    std::string to_string() const {
+        ul::Uuid u = ul::Uuid(&this->b_[0]);
+        return u.to_string();
     }
 };
 

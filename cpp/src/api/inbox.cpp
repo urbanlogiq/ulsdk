@@ -73,7 +73,7 @@ Result<Void>
 set_status(
     ul::RequestContext &ctx,
     const std::string &folder,
-    const Uuid &id,
+    const ::ul::types::ObjectId &id,
     int64_t status
 ) {
     std::string path = "/v1/api/ulv2/inbox/:folder/:id/status/:status";
@@ -100,7 +100,7 @@ Result<Void>
 clear_status(
     ul::RequestContext &ctx,
     const std::string &folder,
-    const Uuid &id
+    const ::ul::types::ObjectId &id
 ) {
     std::string path = "/v1/api/ulv2/inbox/:folder/:id";
     const size_t folder_idx = path.find(":folder");

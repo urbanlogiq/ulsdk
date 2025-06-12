@@ -43,7 +43,7 @@ public final class TestApiAcl {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID q0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId q0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.types.ObjectSummaryList expected = new com.urbanlogiq.ulsdk.types.ObjectSummaryList();
         byte[] expectedBytes = expected.toBytes();
         ctx.setResponse(expectedBytes);
@@ -85,8 +85,8 @@ public final class TestApiAcl {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
-        java.util.UUID p1 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         int p2 = 42;
         com.urbanlogiq.ulsdk.api.acl.Acl.share(
             ctx,
@@ -108,8 +108,8 @@ public final class TestApiAcl {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
-        java.util.UUID p1 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         int p2 = 42;
         com.urbanlogiq.ulsdk.types.ShareDetails body = new com.urbanlogiq.ulsdk.types.ShareDetails();
         com.urbanlogiq.ulsdk.api.acl.Acl.shareWithDetails(
@@ -133,8 +133,8 @@ public final class TestApiAcl {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
-        java.util.UUID p1 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.api.acl.Acl.shareAll(
             ctx,
             p0,
@@ -154,8 +154,8 @@ public final class TestApiAcl {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
-        java.util.UUID p1 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.types.ShareDetails body = new com.urbanlogiq.ulsdk.types.ShareDetails();
         com.urbanlogiq.ulsdk.api.acl.Acl.shareAllWithDetails(
             ctx,
@@ -177,8 +177,8 @@ public final class TestApiAcl {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
-        java.util.UUID p1 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         int p2 = 42;
         com.urbanlogiq.ulsdk.api.acl.Acl.grant(
             ctx,
@@ -200,8 +200,8 @@ public final class TestApiAcl {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
-        java.util.UUID p1 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         int p2 = 42;
         com.urbanlogiq.ulsdk.types.ShareDetails body = new com.urbanlogiq.ulsdk.types.ShareDetails();
         com.urbanlogiq.ulsdk.api.acl.Acl.grantWithDetails(
@@ -225,8 +225,8 @@ public final class TestApiAcl {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
-        java.util.UUID p1 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.api.acl.Acl.grantAll(
             ctx,
             p0,
@@ -246,8 +246,8 @@ public final class TestApiAcl {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
-        java.util.UUID p1 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.types.ShareDetails body = new com.urbanlogiq.ulsdk.types.ShareDetails();
         com.urbanlogiq.ulsdk.api.acl.Acl.grantAllWithDetails(
             ctx,
@@ -269,8 +269,8 @@ public final class TestApiAcl {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
-        java.util.UUID p1 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.api.acl.Acl.revoke(
             ctx,
             p0,
@@ -290,7 +290,7 @@ public final class TestApiAcl {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         byte[] expected = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".getBytes();
         byte[] expectedBytes = expected.clone();
         ctx.setResponse(expectedBytes);
@@ -313,8 +313,8 @@ public final class TestApiAcl {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
-        java.util.UUID p1 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.api.acl.Acl.set(
             ctx,
             p0,

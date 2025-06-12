@@ -7,6 +7,7 @@
 #include <cstdint>
 
 #include "ulsdk/request_context.h"
+#include "ulsdk/types/id.h"
 #include "ulsdk/types/notification.h"
 #include "ulsdk/types/object.h"
 #include "ulsdk/ulsdk.h"
@@ -33,7 +34,7 @@ new_acl(
 Result<::ul::types::ObjectSummaryList>
 new_from(
     ul::RequestContext &ctx,
-    std::optional<Uuid> extends
+    std::optional<::ul::types::ObjectId> extends
 );
 
 /**
@@ -55,8 +56,8 @@ request(
 Result<Void>
 share(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &to,
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &to,
     int64_t permission_bits
 );
 
@@ -70,8 +71,8 @@ share(
 Result<Void>
 share_with_details(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &to,
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &to,
     int64_t permission_bits,
     const ::ul::types::ShareDetails &share_details
 );
@@ -84,8 +85,8 @@ share_with_details(
 Result<Void>
 share_all(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &to
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &to
 );
 
 /**
@@ -97,8 +98,8 @@ share_all(
 Result<Void>
 share_all_with_details(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &to,
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &to,
     const ::ul::types::ShareDetails &share_details
 );
 
@@ -111,8 +112,8 @@ share_all_with_details(
 Result<Void>
 grant(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &to,
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &to,
     int64_t permission_bits
 );
 
@@ -126,8 +127,8 @@ grant(
 Result<Void>
 grant_with_details(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &to,
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &to,
     int64_t permission_bits,
     const ::ul::types::ShareDetails &grant_details
 );
@@ -140,8 +141,8 @@ grant_with_details(
 Result<Void>
 grant_all(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &to
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &to
 );
 
 /**
@@ -153,8 +154,8 @@ grant_all(
 Result<Void>
 grant_all_with_details(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &to,
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &to,
     const ::ul::types::ShareDetails &grant_details
 );
 
@@ -166,8 +167,8 @@ grant_all_with_details(
 Result<Void>
 revoke(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &from
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &from
 );
 
 /**
@@ -178,7 +179,7 @@ revoke(
 Result<std::vector<uint8_t>>
 get_permissions(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::ObjectId &id
 );
 
 /**
@@ -189,8 +190,8 @@ get_permissions(
 Result<Void>
 set(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &acl_id
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &acl_id
 );
 
 } // namespace acl

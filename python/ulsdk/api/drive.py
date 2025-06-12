@@ -11,7 +11,7 @@ from uuid import UUID
 from ..request_context import RequestContext
 from ..request_context import File
 from ..types.fs import DirectoryList, MoveRequest
-from ..types.id import ObjectId
+from ..types.id import B2cId, ObjectId
 from ..types.object import ObjectSummary
 
 def ls(
@@ -47,7 +47,7 @@ def ls(
 
 def create_entry(
     ctx: RequestContext,
-    root: UUID,
+    root: "ObjectId",
     tail: str,
     ty: str,
     mime: str,
@@ -57,7 +57,7 @@ def create_entry(
 
     Arguments:
     ctx: RequestContext -- A request context object
-    root: UUID -- The directory into which the new entry will be created
+    root: "ObjectId" -- The directory into which the new entry will be created
     tail: str -- The name of the new entry
     ty: str -- The type of entry to create: `file` or `directory`.
     mime: str -- The mime type of the entry to create, if this is a new file entry.
@@ -101,7 +101,7 @@ def get_roots(
 
 def post_file(
     ctx: RequestContext,
-    root: UUID,
+    root: "ObjectId",
     force: bool,
     files: List[File],
 ) -> DirectoryList:
@@ -109,7 +109,7 @@ def post_file(
 
     Arguments:
     ctx: RequestContext -- A request context object
-    root: UUID -- The directory into which the file will be uploaded
+    root: "ObjectId" -- The directory into which the file will be uploaded
     force: bool -- Whether to overwrite the file if it already exists.
     files: List[File] -- The files to upload as part of a multipart upload
 
@@ -129,13 +129,13 @@ def post_file(
 
 def unlink(
     ctx: RequestContext,
-    entry: UUID,
+    entry: "ObjectId",
 ) -> DirectoryList:
     """Removes the specified drive entry from its parent directory.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    entry: UUID -- The ID of the entry to remove
+    entry: "ObjectId" -- The ID of the entry to remove
 
     Returns:
     An updated list of directory entries
@@ -187,13 +187,13 @@ def copy(
 
 def get_file(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
 ) -> bytes:
     """Retrieves a file by id.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the file to retrieve
+    id_: "ObjectId" -- The ID of the file to retrieve
 
     Returns:
     The contents of the file referenced by the specified ID
@@ -209,7 +209,7 @@ def get_file(
 
 def put_file_chunk(
     ctx: RequestContext,
-    file_id: UUID,
+    file_id: "ObjectId",
     idx: int,
     hash: str,
     chunk: bytes,
@@ -218,7 +218,7 @@ def put_file_chunk(
 
     Arguments:
     ctx: RequestContext -- A request context object
-    file_id: UUID -- The ID of the file to which to set a file chunk
+    file_id: "ObjectId" -- The ID of the file to which to set a file chunk
     idx: int -- The index of the file chunk to set
     hash: str -- The hash of the chunk to upload.
     chunk: bytes -- Binary file chunk data
@@ -238,13 +238,13 @@ def put_file_chunk(
 
 def get_root_id(
     ctx: RequestContext,
-    b2cid: UUID,
+    b2cid: "B2cId",
 ) -> ObjectId:
     """Retrieves the id of the drive root directory for the specified principal (user or group).
 
     Arguments:
     ctx: RequestContext -- A request context object
-    b2cid: UUID -- The principal (user or group) ID to retrieve the drive root directory for.
+    b2cid: "B2cId" -- The principal (user or group) ID to retrieve the drive root directory for.
 
     Returns:
     Drive directory root ID

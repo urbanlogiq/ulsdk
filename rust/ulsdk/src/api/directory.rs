@@ -184,7 +184,10 @@ pub struct GroupMembership {
 ///
 /// Returns
 /// * Details of the specified principal
-pub async fn get_principal(ctx: &dyn RequestContext, id: Uuid) -> Result<Principal, Error> {
+pub async fn get_principal(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::B2cId,
+) -> Result<Principal, Error> {
     let path = "/v1/api/uldirectory/v1/principal/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
@@ -336,7 +339,7 @@ pub async fn update_current_user(
 /// * The complete details of the specified user, including audit log if specified.
 pub async fn get_user(
     ctx: &dyn RequestContext,
-    id: Uuid,
+    id: crate::types::id::B2cId,
     audit_log: Option<bool>,
 ) -> Result<AdUserWithAuditLog, Error> {
     let path = "/v1/api/uldirectory/v1/user/:id".replace(":id", &id.to_string());
@@ -361,7 +364,7 @@ pub async fn get_user(
 /// * `update_user_request` - The details which which to update the user
 pub async fn update_user(
     ctx: &dyn RequestContext,
-    id: Uuid,
+    id: crate::types::id::B2cId,
     update_user_request: UpdateUser,
 ) -> Result<(), Error> {
     let path = "/v1/api/uldirectory/v1/user/:id".replace(":id", &id.to_string());
@@ -376,7 +379,10 @@ pub async fn update_user(
 ///
 /// * `ctx` - A request context object
 /// * `id` - The ID of the user to delete
-pub async fn delete_user(ctx: &dyn RequestContext, id: Uuid) -> Result<(), Error> {
+pub async fn delete_user(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::B2cId,
+) -> Result<(), Error> {
     let path = "/v1/api/uldirectory/v1/user/:id".replace(":id", &id.to_string());
     ctx.delete(&path, None, None).await?;
     Ok(())
@@ -428,7 +434,7 @@ pub async fn create_group(
 /// * The grouyp membership list.
 pub async fn get_group_members(
     ctx: &dyn RequestContext,
-    id: Uuid,
+    id: crate::types::id::B2cId,
 ) -> Result<Vec<GroupMembership>, Error> {
     let path = "/v1/api/uldirectory/v1/group/:id/members".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
@@ -441,7 +447,10 @@ pub async fn get_group_members(
 ///
 /// * `ctx` - A request context object
 /// * `id` - The ID of the group to delete
-pub async fn delete_group(ctx: &dyn RequestContext, id: Uuid) -> Result<(), Error> {
+pub async fn delete_group(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::B2cId,
+) -> Result<(), Error> {
     let path = "/v1/api/uldirectory/v1/group/:id".replace(":id", &id.to_string());
     ctx.delete(&path, None, None).await?;
     Ok(())
@@ -456,8 +465,8 @@ pub async fn delete_group(ctx: &dyn RequestContext, id: Uuid) -> Result<(), Erro
 /// * `member` - The ID of the member to add
 pub async fn add_group_member(
     ctx: &dyn RequestContext,
-    group: Uuid,
-    member: Uuid,
+    group: crate::types::id::B2cId,
+    member: crate::types::id::B2cId,
 ) -> Result<(), Error> {
     let path = "/v1/api/uldirectory/v1/group/:group/:member"
         .replace(":group", &group.to_string())
@@ -476,8 +485,8 @@ pub async fn add_group_member(
 /// * `member` - The ID of the member to remove
 pub async fn remove_group_member(
     ctx: &dyn RequestContext,
-    group: Uuid,
-    member: Uuid,
+    group: crate::types::id::B2cId,
+    member: crate::types::id::B2cId,
 ) -> Result<(), Error> {
     let path = "/v1/api/uldirectory/v1/group/:group/:member"
         .replace(":group", &group.to_string())
@@ -509,7 +518,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = Principal::default();
         let expected_bytes = serde_json::to_vec(&expected).unwrap();
         ctx.set_response(expected_bytes);
@@ -700,7 +709,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let q0 = true;
         let q0 = Some(q0);
         let expected = AdUserWithAuditLog::default();
@@ -725,7 +734,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let body = UpdateUser::default();
         update_user(&ctx, p0, body).await.unwrap();
     }
@@ -745,7 +754,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         delete_user(&ctx, p0).await.unwrap();
     }
 
@@ -812,7 +821,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let mut expected = Vec::with_capacity(5);
         for i in 0..5 {
             expected.push(GroupMembership::default());
@@ -838,7 +847,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         delete_group(&ctx, p0).await.unwrap();
     }
 
@@ -857,8 +866,8 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         add_group_member(&ctx, p0, p1).await.unwrap();
     }
 
@@ -877,8 +886,8 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         remove_group_member(&ctx, p0, p1).await.unwrap();
     }
 }

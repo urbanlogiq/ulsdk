@@ -8,6 +8,7 @@ from flatbuffers.table import Table
 from flatbuffers.builder import Builder
 from flatbuffers.util import RemoveSizePrefix
 from typing import Union, List, Optional, Self, Tuple
+import uuid
 from .generated.B2cId import B2cId as FbsB2cId
 from .generated.ColumnGroupId import ColumnGroupId as FbsColumnGroupId
 from .generated.ContentId import ContentId as FbsContentId
@@ -81,6 +82,19 @@ class B2cId:
             eq = eq and self.b[i] == other.b[i]
 
         return eq
+
+    def __str__(self):
+        return str(uuid.UUID(bytes=self.b))
+
+    @classmethod
+    def from_uuid(cls, o: Union[str, uuid.UUID]) -> Self:
+        if isinstance(o, uuid.UUID):
+            return cls(o.bytes)
+        elif isinstance(o, str):
+            id = uuid.UUID(o)
+            return cls(id.bytes)
+        else:
+            raise Exception(f"cannot create instance of type from variable {uuid}")
 
 @dataclass
 class ColumnGroupId:
@@ -190,6 +204,19 @@ class ContentId:
 
         return eq
 
+    def __str__(self):
+        return str(uuid.UUID(bytes=self.b))
+
+    @classmethod
+    def from_uuid(cls, o: Union[str, uuid.UUID]) -> Self:
+        if isinstance(o, uuid.UUID):
+            return cls(o.bytes)
+        elif isinstance(o, str):
+            id = uuid.UUID(o)
+            return cls(id.bytes)
+        else:
+            raise Exception(f"cannot create instance of type from variable {uuid}")
+
 @dataclass
 class DataStateId:
     b: "bytes"
@@ -298,6 +325,19 @@ class GenericId:
 
         return eq
 
+    def __str__(self):
+        return str(uuid.UUID(bytes=self.b))
+
+    @classmethod
+    def from_uuid(cls, o: Union[str, uuid.UUID]) -> Self:
+        if isinstance(o, uuid.UUID):
+            return cls(o.bytes)
+        elif isinstance(o, str):
+            id = uuid.UUID(o)
+            return cls(id.bytes)
+        else:
+            raise Exception(f"cannot create instance of type from variable {uuid}")
+
 @dataclass
 class GraphNodeId:
     b: "bytes"
@@ -352,6 +392,19 @@ class GraphNodeId:
 
         return eq
 
+    def __str__(self):
+        return str(uuid.UUID(bytes=self.b))
+
+    @classmethod
+    def from_uuid(cls, o: Union[str, uuid.UUID]) -> Self:
+        if isinstance(o, uuid.UUID):
+            return cls(o.bytes)
+        elif isinstance(o, str):
+            id = uuid.UUID(o)
+            return cls(id.bytes)
+        else:
+            raise Exception(f"cannot create instance of type from variable {uuid}")
+
 @dataclass
 class ObjectId:
     b: "bytes"
@@ -405,6 +458,19 @@ class ObjectId:
             eq = eq and self.b[i] == other.b[i]
 
         return eq
+
+    def __str__(self):
+        return str(uuid.UUID(bytes=self.b))
+
+    @classmethod
+    def from_uuid(cls, o: Union[str, uuid.UUID]) -> Self:
+        if isinstance(o, uuid.UUID):
+            return cls(o.bytes)
+        elif isinstance(o, str):
+            id = uuid.UUID(o)
+            return cls(id.bytes)
+        else:
+            raise Exception(f"cannot create instance of type from variable {uuid}")
 
 @dataclass
 class StreamId:

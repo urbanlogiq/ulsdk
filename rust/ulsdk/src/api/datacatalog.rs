@@ -34,8 +34,8 @@ use crate::types::table::{DiffStream, History, NewTable};
 /// * The datacatalog object
 pub async fn get_object_at_revision(
     ctx: &dyn RequestContext,
-    object_id: Uuid,
-    content_id: Uuid,
+    object_id: crate::types::id::ObjectId,
+    content_id: crate::types::id::ContentId,
 ) -> Result<DataCatalogObject, Error> {
     let path = "/v1/api/ulv2/datacatalog/content/:object_id/:content_id"
         .replace(":object_id", &object_id.to_string())
@@ -53,7 +53,10 @@ pub async fn get_object_at_revision(
 ///
 /// Returns
 /// * The ID of the object's ACL
-pub async fn get_acl(ctx: &dyn RequestContext, id: Uuid) -> Result<ObjectId, Error> {
+pub async fn get_acl(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+) -> Result<ObjectId, Error> {
     let path = "/v1/api/ulv2/datacatalog/object/acl/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     res.as_slice().try_into().map_err(Error::from)
@@ -68,7 +71,10 @@ pub async fn get_acl(ctx: &dyn RequestContext, id: Uuid) -> Result<ObjectId, Err
 ///
 /// Returns
 /// * The summary for the head revision of the object
-pub async fn get_head_revision(ctx: &dyn RequestContext, id: Uuid) -> Result<ObjectSummary, Error> {
+pub async fn get_head_revision(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+) -> Result<ObjectSummary, Error> {
     let path = "/v1/api/ulv2/datacatalog/object/head/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     res.as_slice().try_into().map_err(Error::from)
@@ -83,7 +89,10 @@ pub async fn get_head_revision(ctx: &dyn RequestContext, id: Uuid) -> Result<Obj
 ///
 /// Returns
 /// * Object content
-pub async fn get_object(ctx: &dyn RequestContext, id: Uuid) -> Result<DataCatalogObject, Error> {
+pub async fn get_object(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+) -> Result<DataCatalogObject, Error> {
     let path = "/v1/api/ulv2/datacatalog/object/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     res.as_slice().try_into().map_err(Error::from)
@@ -98,7 +107,7 @@ pub async fn get_object(ctx: &dyn RequestContext, id: Uuid) -> Result<DataCatalo
 /// * `object` - Object contents with which to update the specified object
 pub async fn update_object(
     ctx: &dyn RequestContext,
-    id: Uuid,
+    id: crate::types::id::ObjectId,
     object: DataCatalogObject,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/object/:id".replace(":id", &id.to_string());
@@ -118,7 +127,7 @@ pub async fn update_object(
 /// * `attributes` - A string:string json map with the new attributes
 pub async fn update_attributes(
     ctx: &dyn RequestContext,
-    id: Uuid,
+    id: crate::types::id::ObjectId,
     overwrite: bool,
     attributes: serde_json::Map<String, serde_json::Value>,
 ) -> Result<(), Error> {
@@ -142,7 +151,11 @@ pub async fn update_attributes(
 /// * `ctx` - A request context object
 /// * `id` - The ID of the object whose attribute will be deleted
 /// * `key` - The key of the attribute to delete
-pub async fn delete_attribute(ctx: &dyn RequestContext, id: Uuid, key: &str) -> Result<(), Error> {
+pub async fn delete_attribute(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+    key: &str,
+) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/object/:id/attributes/:key"
         .replace(":id", &id.to_string())
         .replace(":key", key);
@@ -334,7 +347,7 @@ pub async fn query_aggregate_relative_histo(
 /// * Stream data as requested
 pub async fn stream_get_arrow(
     ctx: &dyn RequestContext,
-    id: Uuid,
+    id: crate::types::id::ObjectId,
 ) -> Result<Vec<arrow::record_batch::RecordBatch>, Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
@@ -356,7 +369,10 @@ pub async fn stream_get_arrow(
 ///
 /// Returns
 /// * Stream data as requested
-pub async fn stream_get_parquet(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u8>, Error> {
+pub async fn stream_get_parquet(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
     headers.insert(
@@ -377,7 +393,10 @@ pub async fn stream_get_parquet(ctx: &dyn RequestContext, id: Uuid) -> Result<Ve
 ///
 /// Returns
 /// * Stream data as requested
-pub async fn stream_get_csv(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u8>, Error> {
+pub async fn stream_get_csv(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
     headers.insert(
@@ -398,7 +417,10 @@ pub async fn stream_get_csv(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u8
 ///
 /// Returns
 /// * Stream data as requested
-pub async fn stream_get_xlsx(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u8>, Error> {
+pub async fn stream_get_xlsx(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
     headers.insert(
@@ -421,7 +443,10 @@ pub async fn stream_get_xlsx(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u
 ///
 /// Returns
 /// * Stream data as requested
-pub async fn stream_get_json(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u8>, Error> {
+pub async fn stream_get_json(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
     headers.insert(
@@ -442,7 +467,10 @@ pub async fn stream_get_json(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u
 ///
 /// Returns
 /// * Stream data as requested
-pub async fn stream_get_text(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u8>, Error> {
+pub async fn stream_get_text(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
     headers.insert(
@@ -463,7 +491,10 @@ pub async fn stream_get_text(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u
 ///
 /// Returns
 /// * Stream data as requested
-pub async fn stream_get_html(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u8>, Error> {
+pub async fn stream_get_html(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
     headers.insert(
@@ -484,7 +515,7 @@ pub async fn stream_get_html(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u
 /// * `data` - The Arrow record batches to append
 pub async fn stream_put_arrow(
     ctx: &dyn RequestContext,
-    id: Uuid,
+    id: crate::types::id::ObjectId,
     data: Vec<arrow::record_batch::RecordBatch>,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
@@ -509,7 +540,7 @@ pub async fn stream_put_arrow(
 /// * `data` - The Arrow record batches to append
 pub async fn stream_put_diffstream(
     ctx: &dyn RequestContext,
-    id: Uuid,
+    id: crate::types::id::ObjectId,
     data: DiffStream,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
@@ -528,7 +559,7 @@ pub async fn stream_put_diffstream(
 /// * `data` - The Arrow record batches to append
 pub async fn stream_put_json(
     ctx: &dyn RequestContext,
-    id: Uuid,
+    id: crate::types::id::ObjectId,
     data: Vec<serde_json::Map<String, serde_json::Value>>,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
@@ -546,7 +577,10 @@ pub async fn stream_put_json(
 ///
 /// Returns
 /// * The metadata as generated from the stream data
-pub async fn generate_metadata(ctx: &dyn RequestContext, id: Uuid) -> Result<Metadata, Error> {
+pub async fn generate_metadata(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+) -> Result<Metadata, Error> {
     let path =
         "/v1/api/ulv2/datacatalog/stream/:id/generated/metadata".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
@@ -567,7 +601,7 @@ pub async fn generate_metadata(ctx: &dyn RequestContext, id: Uuid) -> Result<Met
 /// * `metadata` - The metadata to update the stream with
 pub async fn update_metadata(
     ctx: &dyn RequestContext,
-    id: Uuid,
+    id: crate::types::id::ObjectId,
     metadata: Option<Metadata>,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id/metadata".replace(":id", &id.to_string());
@@ -588,7 +622,10 @@ pub async fn update_metadata(
 ///
 /// * `ctx` - A request context object
 /// * `id` - The ID of the stream to compact
-pub async fn stream_compact(ctx: &dyn RequestContext, id: Uuid) -> Result<(), Error> {
+pub async fn stream_compact(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id/compact".replace(":id", &id.to_string());
     let body = Bytes::new();
     ctx.post(&path, body, "text/plain", None, None).await?;
@@ -607,8 +644,8 @@ pub async fn stream_compact(ctx: &dyn RequestContext, id: Uuid) -> Result<(), Er
 /// * The history of the row
 pub async fn table_row_history(
     ctx: &dyn RequestContext,
-    id: Uuid,
-    row: Uuid,
+    id: crate::types::id::ObjectId,
+    row: crate::types::id::GenericId,
 ) -> Result<History, Error> {
     let path = "/v1/api/ulv2/datacatalog/table/:id/history/:row"
         .replace(":id", &id.to_string())
@@ -626,7 +663,10 @@ pub async fn table_row_history(
 ///
 /// Returns
 /// * The history of the table
-pub async fn table_history(ctx: &dyn RequestContext, id: Uuid) -> Result<History, Error> {
+pub async fn table_history(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+) -> Result<History, Error> {
     let path = "/v1/api/ulv2/datacatalog/table/:id/history".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     res.as_slice().try_into().map_err(Error::from)
@@ -644,8 +684,8 @@ pub async fn table_history(ctx: &dyn RequestContext, id: Uuid) -> Result<History
 /// * The directory ID for the row's attachments
 pub async fn get_table_attachments_directory(
     ctx: &dyn RequestContext,
-    id: Uuid,
-    row: Uuid,
+    id: crate::types::id::ObjectId,
+    row: crate::types::id::GenericId,
 ) -> Result<ObjectId, Error> {
     let path = "/v1/api/ulv2/datacatalog/table/:id/attachments/:row"
         .replace(":id", &id.to_string())
@@ -666,8 +706,8 @@ pub async fn get_table_attachments_directory(
 /// * The directory ID for the row's attachments
 pub async fn get_or_create_table_attachments_directory(
     ctx: &dyn RequestContext,
-    id: Uuid,
-    row: Uuid,
+    id: crate::types::id::ObjectId,
+    row: crate::types::id::GenericId,
 ) -> Result<ObjectId, Error> {
     let path = "/v1/api/ulv2/datacatalog/table/:id/attachments/:row"
         .replace(":id", &id.to_string())
@@ -689,7 +729,7 @@ pub async fn get_or_create_table_attachments_directory(
 /// * The ID of the newly created table
 pub async fn create_table(
     ctx: &dyn RequestContext,
-    id: Uuid,
+    id: crate::types::id::ObjectId,
     new_table: NewTable,
 ) -> Result<ObjectId, Error> {
     let path = "/v1/api/ulv2/datacatalog/table/:id".replace(":id", &id.to_string());
@@ -896,8 +936,8 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::ContentId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = DataCatalogObject::default();
         let expected_bytes: Vec<u8> = expected.clone().into();
         ctx.set_response(expected_bytes);
@@ -920,7 +960,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = ObjectId::default();
         let expected_bytes: Vec<u8> = expected.clone().into();
         ctx.set_response(expected_bytes);
@@ -943,7 +983,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = ObjectSummary::default();
         let expected_bytes: Vec<u8> = expected.clone().into();
         ctx.set_response(expected_bytes);
@@ -966,7 +1006,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = DataCatalogObject::default();
         let expected_bytes: Vec<u8> = expected.clone().into();
         ctx.set_response(expected_bytes);
@@ -989,7 +1029,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let body = crate::types::DataCatalogObject::default();
         update_object(&ctx, p0, body).await.unwrap();
     }
@@ -1009,7 +1049,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let q0 = true;
         let body = serde_json::Map::<String, serde_json::Value>::default();
         update_attributes(&ctx, p0, q0, body).await.unwrap();
@@ -1030,7 +1070,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let p1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
         delete_attribute(&ctx, p0, p1).await.unwrap();
     }
@@ -1211,7 +1251,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let (expected, expected_bytes) = crate::make_test_batches();
         ctx.set_response(expected_bytes);
         let result = stream_get_arrow(&ctx, p0).await.unwrap();
@@ -1232,7 +1272,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         let expected_bytes = expected.clone();
         ctx.set_response(expected_bytes);
@@ -1255,7 +1295,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         let expected_bytes = expected.clone();
         ctx.set_response(expected_bytes);
@@ -1278,7 +1318,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         let expected_bytes = expected.clone();
         ctx.set_response(expected_bytes);
@@ -1301,7 +1341,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         let expected_bytes = expected.clone();
         ctx.set_response(expected_bytes);
@@ -1324,7 +1364,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         let expected_bytes = expected.clone();
         ctx.set_response(expected_bytes);
@@ -1347,7 +1387,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         let expected_bytes = expected.clone();
         ctx.set_response(expected_bytes);
@@ -1370,7 +1410,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let (body, body_bytes) = crate::make_test_batches();
         stream_put_arrow(&ctx, p0, body).await.unwrap();
     }
@@ -1390,7 +1430,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let body = crate::types::DiffStream::default();
         stream_put_diffstream(&ctx, p0, body).await.unwrap();
     }
@@ -1410,7 +1450,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let body = Vec::new();
         stream_put_json(&ctx, p0, body).await.unwrap();
     }
@@ -1430,7 +1470,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = Metadata::default();
         let expected_bytes: Vec<u8> = expected.clone().into();
         ctx.set_response(expected_bytes);
@@ -1453,7 +1493,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let body = crate::types::Metadata::default();
         let body = Some(body);
         update_metadata(&ctx, p0, body).await.unwrap();
@@ -1474,7 +1514,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         stream_compact(&ctx, p0).await.unwrap();
     }
 
@@ -1493,8 +1533,8 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::GenericId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = History::default();
         let expected_bytes: Vec<u8> = expected.clone().into();
         ctx.set_response(expected_bytes);
@@ -1517,7 +1557,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = History::default();
         let expected_bytes: Vec<u8> = expected.clone().into();
         ctx.set_response(expected_bytes);
@@ -1540,8 +1580,8 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::GenericId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = ObjectId::default();
         let expected_bytes: Vec<u8> = expected.clone().into();
         ctx.set_response(expected_bytes);
@@ -1564,8 +1604,8 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::GenericId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = ObjectId::default();
         let expected_bytes: Vec<u8> = expected.clone().into();
         ctx.set_response(expected_bytes);
@@ -1590,7 +1630,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let body = crate::types::NewTable::default();
         let expected = ObjectId::default();
         let expected_bytes: Vec<u8> = expected.clone().into();

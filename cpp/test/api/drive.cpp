@@ -55,7 +55,7 @@ ApiTest test_ls_obj(test_ls, "drive::ls", &idempotent_api_test_root);
 ul::Result<ul::Void>
 test_create_entry(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     std::string p1 = "tail";
     const std::string q0 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
     const std::string q1 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
@@ -113,7 +113,7 @@ ApiTest test_get_roots_obj(test_get_roots, "drive::get_roots", &idempotent_api_t
 ul::Result<ul::Void>
 test_post_file(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     bool q0 = true;
     const std::vector<ul::File> body = std::vector<ul::File>();
     const ::ul::types::DirectoryList expected = ::ul::types::DirectoryList();
@@ -143,7 +143,7 @@ ApiTest test_post_file_obj(test_post_file, "drive::post_file", &idempotent_api_t
 ul::Result<ul::Void>
 test_unlink(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     const ::ul::types::DirectoryList expected = ::ul::types::DirectoryList();
     const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
     ctx.set_response(expected_bytes);
@@ -193,7 +193,7 @@ ApiTest test_copy_obj(test_copy, "drive::copy", &idempotent_api_test_root);
 ul::Result<ul::Void>
 test_get_file(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
     const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
     const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
@@ -221,7 +221,7 @@ ApiTest test_get_file_obj(test_get_file, "drive::get_file", &idempotent_api_test
 ul::Result<ul::Void>
 test_put_file_chunk(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     int p1 = 42;
     const std::string q0 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
     const char *body_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
@@ -241,7 +241,7 @@ ApiTest test_put_file_chunk_obj(test_put_file_chunk, "drive::put_file_chunk", &i
 ul::Result<ul::Void>
 test_get_root_id(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p0 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
     const ::ul::types::ObjectId expected = ::ul::types::ObjectId();
     const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
     ctx.set_response(expected_bytes);

@@ -35,14 +35,14 @@ def create_job(
 
 def get_job(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
     timeout: Optional[int],
 ) -> Job:
     """Fetch the details of the job with the given ID. By default this will block until the job is complete.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the job to fetch
+    id_: "ObjectId" -- The ID of the job to fetch
     timeout: Optional[int] -- Timeout in milliseconds to wait before returning a response
 
     Returns:
@@ -62,13 +62,13 @@ def get_job(
 
 def get_task(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
 ) -> Task:
     """Fetch the details of the task with the given ID.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the task to fetch
+    id_: "ObjectId" -- The ID of the task to fetch
 
     Returns:
     The details of the task

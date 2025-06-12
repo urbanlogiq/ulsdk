@@ -51,7 +51,7 @@ create_job(
 Result<::ul::types::Job>
 get_job(
     ul::RequestContext &ctx,
-    const Uuid &id,
+    const ::ul::types::ObjectId &id,
     std::optional<int64_t> timeout
 ) {
     std::string path = "/v1/api/ulv2/schematicevaluator/jobs/:id";
@@ -76,7 +76,7 @@ get_job(
 Result<::ul::types::Task>
 get_task(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::ObjectId &id
 ) {
     std::string path = "/v1/api/ulv2/schematicevaluator/tasks/:id";
     const size_t id_idx = path.find(":id");

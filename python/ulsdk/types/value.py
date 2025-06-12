@@ -8,6 +8,7 @@ from flatbuffers.table import Table
 from flatbuffers.builder import Builder
 from flatbuffers.util import RemoveSizePrefix
 from typing import Union, List, Optional, Self, Tuple
+import uuid
 from .generated.Point2D import Point2D as FbsPoint2D
 from .generated.Tri2D import Tri2D as FbsTri2D
 from .generated.VArray import VArray as FbsVArray

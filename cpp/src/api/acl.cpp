@@ -50,7 +50,7 @@ new_acl(
 Result<::ul::types::ObjectSummaryList>
 new_from(
     ul::RequestContext &ctx,
-    std::optional<Uuid> extends
+    std::optional<::ul::types::ObjectId> extends
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/";
 
@@ -92,8 +92,8 @@ request(
 Result<Void>
 share(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &to,
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &to,
     int64_t permission_bits
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to/:permission";
@@ -119,8 +119,8 @@ share(
 Result<Void>
 share_with_details(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &to,
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &to,
     int64_t permission_bits,
     const ::ul::types::ShareDetails &share_details
 ) {
@@ -147,8 +147,8 @@ share_with_details(
 Result<Void>
 share_all(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &to
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &to
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to";
     const size_t id_idx = path.find(":id");
@@ -171,8 +171,8 @@ share_all(
 Result<Void>
 share_all_with_details(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &to,
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &to,
     const ::ul::types::ShareDetails &share_details
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to";
@@ -196,8 +196,8 @@ share_all_with_details(
 Result<Void>
 grant(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &to,
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &to,
     int64_t permission_bits
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to/:permission";
@@ -223,8 +223,8 @@ grant(
 Result<Void>
 grant_with_details(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &to,
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &to,
     int64_t permission_bits,
     const ::ul::types::ShareDetails &grant_details
 ) {
@@ -251,8 +251,8 @@ grant_with_details(
 Result<Void>
 grant_all(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &to
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &to
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to";
     const size_t id_idx = path.find(":id");
@@ -275,8 +275,8 @@ grant_all(
 Result<Void>
 grant_all_with_details(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &to,
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &to,
     const ::ul::types::ShareDetails &grant_details
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to";
@@ -300,8 +300,8 @@ grant_all_with_details(
 Result<Void>
 revoke(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &from
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &from
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/revoke/:id/:from";
     const size_t id_idx = path.find(":id");
@@ -324,7 +324,7 @@ revoke(
 Result<std::vector<uint8_t>>
 get_permissions(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::ObjectId &id
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/perms/:id";
     const size_t id_idx = path.find(":id");
@@ -340,8 +340,8 @@ get_permissions(
 Result<Void>
 set(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &acl_id
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ObjectId &acl_id
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/set/:id/:acl_id";
     const size_t id_idx = path.find(":id");

@@ -51,7 +51,7 @@ ApiTest test_new_acl_obj(test_new_acl, "acl::new_acl", &idempotent_api_test_root
 ul::Result<ul::Void>
 test_new_from(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid q0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId q0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     const ::ul::types::ObjectSummaryList expected = ::ul::types::ObjectSummaryList();
     const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
     ctx.set_response(expected_bytes);
@@ -89,8 +89,8 @@ ApiTest test_request_obj(test_request, "acl::request", &idempotent_api_test_root
 ul::Result<ul::Void>
 test_share(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
-    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     int p2 = 42;
     return ul::api::acl::share(
         ctx,
@@ -105,8 +105,8 @@ ApiTest test_share_obj(test_share, "acl::share", &idempotent_api_test_root);
 ul::Result<ul::Void>
 test_share_with_details(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
-    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     int p2 = 42;
     ::ul::types::ShareDetails body = ::ul::types::ShareDetails();
     return ul::api::acl::share_with_details(
@@ -123,8 +123,8 @@ ApiTest test_share_with_details_obj(test_share_with_details, "acl::share_with_de
 ul::Result<ul::Void>
 test_share_all(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
-    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     return ul::api::acl::share_all(
         ctx,
         p0,
@@ -137,8 +137,8 @@ ApiTest test_share_all_obj(test_share_all, "acl::share_all", &idempotent_api_tes
 ul::Result<ul::Void>
 test_share_all_with_details(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
-    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     ::ul::types::ShareDetails body = ::ul::types::ShareDetails();
     return ul::api::acl::share_all_with_details(
         ctx,
@@ -153,8 +153,8 @@ ApiTest test_share_all_with_details_obj(test_share_all_with_details, "acl::share
 ul::Result<ul::Void>
 test_grant(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
-    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     int p2 = 42;
     return ul::api::acl::grant(
         ctx,
@@ -169,8 +169,8 @@ ApiTest test_grant_obj(test_grant, "acl::grant", &idempotent_api_test_root);
 ul::Result<ul::Void>
 test_grant_with_details(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
-    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     int p2 = 42;
     ::ul::types::ShareDetails body = ::ul::types::ShareDetails();
     return ul::api::acl::grant_with_details(
@@ -187,8 +187,8 @@ ApiTest test_grant_with_details_obj(test_grant_with_details, "acl::grant_with_de
 ul::Result<ul::Void>
 test_grant_all(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
-    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     return ul::api::acl::grant_all(
         ctx,
         p0,
@@ -201,8 +201,8 @@ ApiTest test_grant_all_obj(test_grant_all, "acl::grant_all", &idempotent_api_tes
 ul::Result<ul::Void>
 test_grant_all_with_details(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
-    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     ::ul::types::ShareDetails body = ::ul::types::ShareDetails();
     return ul::api::acl::grant_all_with_details(
         ctx,
@@ -217,8 +217,8 @@ ApiTest test_grant_all_with_details_obj(test_grant_all_with_details, "acl::grant
 ul::Result<ul::Void>
 test_revoke(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
-    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     return ul::api::acl::revoke(
         ctx,
         p0,
@@ -231,7 +231,7 @@ ApiTest test_revoke_obj(test_revoke, "acl::revoke", &idempotent_api_test_root);
 ul::Result<ul::Void>
 test_get_permissions(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
     const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
     const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
@@ -259,8 +259,8 @@ ApiTest test_get_permissions_obj(test_get_permissions, "acl::get_permissions", &
 ul::Result<ul::Void>
 test_set(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
-    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     return ul::api::acl::set(
         ctx,
         p0,

@@ -1996,7 +1996,7 @@ to_bytes(const GroupMembership &o) {
 Result<Principal>
 get_principal(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::B2cId &id
 ) {
     std::string path = "/v1/api/uldirectory/v1/principal/:id";
     const size_t id_idx = path.find(":id");
@@ -2237,7 +2237,7 @@ update_current_user(
 Result<AdUserWithAuditLog>
 get_user(
     ul::RequestContext &ctx,
-    const Uuid &id,
+    const ::ul::types::B2cId &id,
     std::optional<bool> audit_log
 ) {
     std::string path = "/v1/api/uldirectory/v1/user/:id";
@@ -2267,7 +2267,7 @@ get_user(
 Result<Void>
 update_user(
     ul::RequestContext &ctx,
-    const Uuid &id,
+    const ::ul::types::B2cId &id,
     const UpdateUser &update_user_request
 ) {
     std::string path = "/v1/api/uldirectory/v1/user/:id";
@@ -2289,7 +2289,7 @@ update_user(
 Result<Void>
 delete_user(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::B2cId &id
 ) {
     std::string path = "/v1/api/uldirectory/v1/user/:id";
     const size_t id_idx = path.find(":id");
@@ -2368,7 +2368,7 @@ create_group(
 Result<std::vector<GroupMembership>>
 get_group_members(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::B2cId &id
 ) {
     std::string path = "/v1/api/uldirectory/v1/group/:id/members";
     const size_t id_idx = path.find(":id");
@@ -2406,7 +2406,7 @@ get_group_members(
 Result<Void>
 delete_group(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::B2cId &id
 ) {
     std::string path = "/v1/api/uldirectory/v1/group/:id";
     const size_t id_idx = path.find(":id");
@@ -2426,8 +2426,8 @@ delete_group(
 Result<Void>
 add_group_member(
     ul::RequestContext &ctx,
-    const Uuid &group,
-    const Uuid &member
+    const ::ul::types::B2cId &group,
+    const ::ul::types::B2cId &member
 ) {
     std::string path = "/v1/api/uldirectory/v1/group/:group/:member";
     const size_t group_idx = path.find(":group");
@@ -2450,8 +2450,8 @@ add_group_member(
 Result<Void>
 remove_group_member(
     ul::RequestContext &ctx,
-    const Uuid &group,
-    const Uuid &member
+    const ::ul::types::B2cId &group,
+    const ::ul::types::B2cId &member
 ) {
     std::string path = "/v1/api/uldirectory/v1/group/:group/:member";
     const size_t group_idx = path.find(":group");

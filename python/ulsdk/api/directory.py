@@ -9,6 +9,7 @@ from typing import Optional, Any, List, Dict, Self
 from urllib.parse import quote_plus
 from uuid import UUID
 from ..request_context import RequestContext
+from ..types.id import B2cId
 
 @dataclass
 class Principal:
@@ -1100,13 +1101,13 @@ class GroupMembership:
 
 def get_principal(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "B2cId",
 ) -> Principal:
     """Retrieves a single principal by id.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID (uuid-style) of the principal to search for
+    id_: "B2cId" -- The ID (uuid-style) of the principal to search for
 
     Returns:
     Details of the specified principal
@@ -1293,14 +1294,14 @@ def update_current_user(
 
 def get_user(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "B2cId",
     audit_log: Optional[bool],
 ) -> AdUserWithAuditLog:
     """Retrieves details of a user by id.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the user to retrieve details for
+    id_: "B2cId" -- The ID of the user to retrieve details for
     audit_log: Optional[bool] -- Whether to include the user's audit log in the response.
 
     Returns:
@@ -1321,14 +1322,14 @@ def get_user(
 
 def update_user(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "B2cId",
     update_user_request: UpdateUser,
 ) -> None:
     """Updates a user by id.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the user to update
+    id_: "B2cId" -- The ID of the user to update
     update_user_request: UpdateUser -- The details which which to update the user
     """
 
@@ -1343,13 +1344,13 @@ def update_user(
 
 def delete_user(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "B2cId",
 ) -> None:
     """Deletes a user by id.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the user to delete
+    id_: "B2cId" -- The ID of the user to delete
     """
 
     path = "/v1/api/uldirectory/v1/user/:id"
@@ -1406,13 +1407,13 @@ def create_group(
 
 def get_group_members(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "B2cId",
 ) -> List[GroupMembership]:
     """Retrieves a listing of all members of a group by group id.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the group to retrieve members for
+    id_: "B2cId" -- The ID of the group to retrieve members for
 
     Returns:
     The grouyp membership list.
@@ -1432,13 +1433,13 @@ def get_group_members(
 
 def delete_group(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "B2cId",
 ) -> None:
     """Deletes a group by id.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the group to delete
+    id_: "B2cId" -- The ID of the group to delete
     """
 
     path = "/v1/api/uldirectory/v1/group/:id"
@@ -1451,15 +1452,15 @@ def delete_group(
 
 def add_group_member(
     ctx: RequestContext,
-    group: UUID,
-    member: UUID,
+    group: "B2cId",
+    member: "B2cId",
 ) -> None:
     """Adds a member to a group.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    group: UUID -- The ID of the group to which to add the member
-    member: UUID -- The ID of the member to add
+    group: "B2cId" -- The ID of the group to which to add the member
+    member: "B2cId" -- The ID of the member to add
     """
 
     path = "/v1/api/uldirectory/v1/group/:group/:member"
@@ -1474,15 +1475,15 @@ def add_group_member(
 
 def remove_group_member(
     ctx: RequestContext,
-    group: UUID,
-    member: UUID,
+    group: "B2cId",
+    member: "B2cId",
 ) -> None:
     """Removes a member from a group.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    group: UUID -- The ID of the group from which to remove the member
-    member: UUID -- The ID of the member to remove
+    group: "B2cId" -- The ID of the group from which to remove the member
+    member: "B2cId" -- The ID of the member to remove
     """
 
     path = "/v1/api/uldirectory/v1/group/:group/:member"

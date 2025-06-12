@@ -48,7 +48,7 @@ public final class Drive {
      */
     public static com.urbanlogiq.ulsdk.types.ObjectSummary createEntry(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID root,
+        com.urbanlogiq.ulsdk.types.ObjectId root,
         String tail,
         String ty,
         String mime,
@@ -97,7 +97,7 @@ public final class Drive {
      */
     public static com.urbanlogiq.ulsdk.types.DirectoryList postFile(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID root,
+        com.urbanlogiq.ulsdk.types.ObjectId root,
         Boolean force,
         java.util.ArrayList<com.urbanlogiq.ulsdk.File> files
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
@@ -122,7 +122,7 @@ public final class Drive {
      */
     public static com.urbanlogiq.ulsdk.types.DirectoryList unlink(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID entry
+        com.urbanlogiq.ulsdk.types.ObjectId entry
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/drive/:entry";
         path = path.replace(":entry", entry.toString());
@@ -183,7 +183,7 @@ public final class Drive {
      */
     public static byte[] getFile(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.ObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/drive/file/:id";
         path = path.replace(":id", id.toString());
@@ -206,7 +206,7 @@ public final class Drive {
      */
     public static void putFileChunk(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID fileId,
+        com.urbanlogiq.ulsdk.types.ObjectId fileId,
         Integer idx,
         String hash,
         byte[] chunk
@@ -235,7 +235,7 @@ public final class Drive {
      */
     public static com.urbanlogiq.ulsdk.types.ObjectId getRootId(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID b2Cid
+        com.urbanlogiq.ulsdk.types.B2cId b2Cid
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/drive/root/:b2cid";
         path = path.replace(":b2cid", b2Cid.toString());

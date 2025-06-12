@@ -91,7 +91,7 @@ ApiTest test_create_key_obj(test_create_key, "keys::create_key", &idempotent_api
 ul::Result<ul::Void>
 test_update_key(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const std::string p0 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
     const ::ul::api::keys::UpdateKey body = ::ul::api::keys::UpdateKey();
     return ul::api::keys::update_key(
         ctx,
@@ -105,7 +105,7 @@ ApiTest test_update_key_obj(test_update_key, "keys::update_key", &idempotent_api
 ul::Result<ul::Void>
 test_get_key(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const std::string p0 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
     const ::ul::api::keys::Key expected = ::ul::api::keys::Key();
     const std::vector<uint8_t> expected_bytes = ::ul::api::keys::to_bytes(expected);
     ctx.set_response(expected_bytes);
@@ -131,7 +131,7 @@ ApiTest test_get_key_obj(test_get_key, "keys::get_key", &idempotent_api_test_roo
 ul::Result<ul::Void>
 test_delete_key(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const std::string p0 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
     return ul::api::keys::delete_key(
         ctx,
         p0

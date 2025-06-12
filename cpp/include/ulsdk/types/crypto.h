@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "flatbuffers/flatbuffers.h"
+#include "ulsdk/ulsdk.h"
 #include "ulsdk/types/generated/crypto_generated.h"
 
 namespace ul {

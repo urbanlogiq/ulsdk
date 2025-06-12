@@ -36,7 +36,7 @@ namespace ul {
 const size_t UUID_BYTES = 16;
 
 class Uuid {
-    unsigned char _bytes[UUID_BYTES];
+    unsigned char bytes_[UUID_BYTES];
 
 public:
     Uuid() = delete;
@@ -45,6 +45,7 @@ public:
     Uuid(const std::string& str);
 
     std::string to_string() const;
+    std::vector<uint8_t> to_vec() const;
 };
 
 enum class Region { CA, US };

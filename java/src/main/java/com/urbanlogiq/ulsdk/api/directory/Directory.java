@@ -14,7 +14,7 @@ public final class Directory {
      */
     public static com.urbanlogiq.ulsdk.api.directory.Principal getPrincipal(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.B2cId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/uldirectory/v1/principal/:id";
         path = path.replace(":id", id.toString());
@@ -220,7 +220,7 @@ public final class Directory {
      */
     public static com.urbanlogiq.ulsdk.api.directory.AdUserWithAuditLog getUser(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
+        com.urbanlogiq.ulsdk.types.B2cId id,
         Boolean auditLog
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/uldirectory/v1/user/:id";
@@ -248,7 +248,7 @@ public final class Directory {
      */
     public static void updateUser(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
+        com.urbanlogiq.ulsdk.types.B2cId id,
         com.urbanlogiq.ulsdk.api.directory.UpdateUser updateUserRequest
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/uldirectory/v1/user/:id";
@@ -271,7 +271,7 @@ public final class Directory {
      */
     public static void deleteUser(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.B2cId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/uldirectory/v1/user/:id";
         path = path.replace(":id", id.toString());
@@ -338,7 +338,7 @@ public final class Directory {
      */
     public static com.urbanlogiq.ulsdk.api.directory.GroupMembership[] getGroupMembers(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.B2cId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/uldirectory/v1/group/:id/members";
         path = path.replace(":id", id.toString());
@@ -366,7 +366,7 @@ public final class Directory {
      */
     public static void deleteGroup(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.B2cId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/uldirectory/v1/group/:id";
         path = path.replace(":id", id.toString());
@@ -387,8 +387,8 @@ public final class Directory {
      */
     public static void addGroupMember(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID group,
-        java.util.UUID member
+        com.urbanlogiq.ulsdk.types.B2cId group,
+        com.urbanlogiq.ulsdk.types.B2cId member
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/uldirectory/v1/group/:group/:member";
         path = path.replace(":group", group.toString());
@@ -412,8 +412,8 @@ public final class Directory {
      */
     public static void removeGroupMember(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID group,
-        java.util.UUID member
+        com.urbanlogiq.ulsdk.types.B2cId group,
+        com.urbanlogiq.ulsdk.types.B2cId member
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/uldirectory/v1/group/:group/:member";
         path = path.replace(":group", group.toString());

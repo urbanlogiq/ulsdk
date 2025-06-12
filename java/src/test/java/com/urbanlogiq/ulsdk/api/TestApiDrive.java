@@ -47,7 +47,7 @@ public final class TestApiDrive {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         String p1 = "tail";
         String q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         String q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
@@ -99,7 +99,7 @@ public final class TestApiDrive {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         boolean q0 = true;
         java.util.ArrayList<com.urbanlogiq.ulsdk.File> body = new java.util.ArrayList<com.urbanlogiq.ulsdk.File>();
         com.urbanlogiq.ulsdk.types.DirectoryList expected = new com.urbanlogiq.ulsdk.types.DirectoryList();
@@ -126,7 +126,7 @@ public final class TestApiDrive {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.types.DirectoryList expected = new com.urbanlogiq.ulsdk.types.DirectoryList();
         byte[] expectedBytes = expected.toBytes();
         ctx.setResponse(expectedBytes);
@@ -187,7 +187,7 @@ public final class TestApiDrive {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         byte[] expected = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".getBytes();
         byte[] expectedBytes = expected.clone();
         ctx.setResponse(expectedBytes);
@@ -210,7 +210,7 @@ public final class TestApiDrive {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         int p1 = 42;
         String q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         byte[] body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".getBytes();
@@ -235,7 +235,7 @@ public final class TestApiDrive {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p0 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.types.ObjectId expected = new com.urbanlogiq.ulsdk.types.ObjectId();
         byte[] expectedBytes = expected.toBytes();
         ctx.setResponse(expectedBytes);

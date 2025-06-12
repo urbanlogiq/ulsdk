@@ -54,7 +54,7 @@ pub async fn clear_all_status(ctx: &dyn RequestContext, folder: &str) -> Result<
 pub async fn set_status(
     ctx: &dyn RequestContext,
     folder: &str,
-    id: Uuid,
+    id: crate::types::id::ObjectId,
     status: i64,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/inbox/:folder/:id/status/:status"
@@ -73,7 +73,11 @@ pub async fn set_status(
 /// * `ctx` - A request context object
 /// * `folder` - The name of the folder to clear the status in
 /// * `id` - The ID of the notification to clear the status for
-pub async fn clear_status(ctx: &dyn RequestContext, folder: &str, id: Uuid) -> Result<(), Error> {
+pub async fn clear_status(
+    ctx: &dyn RequestContext,
+    folder: &str,
+    id: crate::types::id::ObjectId,
+) -> Result<(), Error> {
     let path = "/v1/api/ulv2/inbox/:folder/:id"
         .replace(":folder", folder)
         .replace(":id", &id.to_string());
@@ -147,7 +151,7 @@ mod tests {
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let p2 = 42;
         set_status(&ctx, p0, p1, p2).await.unwrap();
     }
@@ -168,7 +172,7 @@ mod tests {
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         clear_status(&ctx, p0, p1).await.unwrap();
     }
 }

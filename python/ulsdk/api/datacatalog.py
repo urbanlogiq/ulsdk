@@ -9,7 +9,7 @@ from typing import Optional, Any, List, Dict, Self
 from urllib.parse import quote_plus
 from uuid import UUID
 from ..request_context import RequestContext
-from ..types.id import ObjectId
+from ..types.id import ContentId, GenericId, ObjectId
 from ..types.metadata import Metadata
 from ..types.object import (
     DataCatalogObject,
@@ -23,15 +23,15 @@ from ..types.table import DiffStream, History, NewTable
 
 def get_object_at_revision(
     ctx: RequestContext,
-    object_id: UUID,
-    content_id: UUID,
+    object_id: "ObjectId",
+    content_id: "ContentId",
 ) -> DataCatalogObject:
     """Fetch an object at a given content ID revision
 
     Arguments:
     ctx: RequestContext -- A request context object
-    object_id: UUID -- The ID of the object to fetch content from
-    content_id: UUID -- The ID of the content to fetch
+    object_id: "ObjectId" -- The ID of the object to fetch content from
+    content_id: "ContentId" -- The ID of the content to fetch
 
     Returns:
     The datacatalog object
@@ -48,13 +48,13 @@ def get_object_at_revision(
 
 def get_acl(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
 ) -> ObjectId:
     """Fetch the ID of the ACL object associated with the given object ID
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the object to fetch the ACL for
+    id_: "ObjectId" -- The ID of the object to fetch the ACL for
 
     Returns:
     The ID of the object's ACL
@@ -70,13 +70,13 @@ def get_acl(
 
 def get_head_revision(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
 ) -> ObjectSummary:
     """Fetch the head revision of the object with the given ID
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the object to fetch the head revision for
+    id_: "ObjectId" -- The ID of the object to fetch the head revision for
 
     Returns:
     The summary for the head revision of the object
@@ -92,13 +92,13 @@ def get_head_revision(
 
 def get_object(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
 ) -> DataCatalogObject:
     """Fetch the object with the given ID at its head revision
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the object to fetch
+    id_: "ObjectId" -- The ID of the object to fetch
 
     Returns:
     Object content
@@ -114,14 +114,14 @@ def get_object(
 
 def update_object(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
     object: DataCatalogObject,
 ) -> None:
     """Update the object with the given ID
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the object to update
+    id_: "ObjectId" -- The ID of the object to update
     object: DataCatalogObject -- Object contents with which to update the specified object
     """
 
@@ -136,7 +136,7 @@ def update_object(
 
 def update_attributes(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
     overwrite: bool,
     attributes: Dict[str, Any],
 ) -> None:
@@ -144,7 +144,7 @@ def update_attributes(
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the object whose attributes will be updated
+    id_: "ObjectId" -- The ID of the object whose attributes will be updated
     overwrite: bool -- True to overwrite existing attributes or false to fail if there is a conflict.
     attributes: Dict[str, Any] -- A string:string json map with the new attributes
     """
@@ -162,14 +162,14 @@ def update_attributes(
 
 def delete_attribute(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
     key: str,
 ) -> None:
     """Delete the attribute with the given key from the object with the given ID
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the object whose attribute will be deleted
+    id_: "ObjectId" -- The ID of the object whose attribute will be deleted
     key: str -- The key of the attribute to delete
     """
 
@@ -358,13 +358,13 @@ def query_aggregate_relative_histo(
 
 def stream_get_arrow(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
 ) -> List[RecordBatch]:
     """Fetch the stream with the given ID
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the stream to fetch
+    id_: "ObjectId" -- The ID of the stream to fetch
 
     Returns:
     Stream data as requested
@@ -383,13 +383,13 @@ def stream_get_arrow(
 
 def stream_get_parquet(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
 ) -> bytes:
     """Fetch the stream with the given ID
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the stream to fetch
+    id_: "ObjectId" -- The ID of the stream to fetch
 
     Returns:
     Stream data as requested
@@ -407,13 +407,13 @@ def stream_get_parquet(
 
 def stream_get_csv(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
 ) -> bytes:
     """Fetch the stream with the given ID
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the stream to fetch
+    id_: "ObjectId" -- The ID of the stream to fetch
 
     Returns:
     Stream data as requested
@@ -431,13 +431,13 @@ def stream_get_csv(
 
 def stream_get_xlsx(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
 ) -> bytes:
     """Fetch the stream with the given ID
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the stream to fetch
+    id_: "ObjectId" -- The ID of the stream to fetch
 
     Returns:
     Stream data as requested
@@ -455,13 +455,13 @@ def stream_get_xlsx(
 
 def stream_get_json(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
 ) -> bytes:
     """Fetch the stream with the given ID
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the stream to fetch
+    id_: "ObjectId" -- The ID of the stream to fetch
 
     Returns:
     Stream data as requested
@@ -479,13 +479,13 @@ def stream_get_json(
 
 def stream_get_text(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
 ) -> bytes:
     """Fetch the stream with the given ID
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the stream to fetch
+    id_: "ObjectId" -- The ID of the stream to fetch
 
     Returns:
     Stream data as requested
@@ -503,13 +503,13 @@ def stream_get_text(
 
 def stream_get_html(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
 ) -> bytes:
     """Fetch the stream with the given ID
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the stream to fetch
+    id_: "ObjectId" -- The ID of the stream to fetch
 
     Returns:
     Stream data as requested
@@ -527,14 +527,14 @@ def stream_get_html(
 
 def stream_put_arrow(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
     data: List[RecordBatch],
 ) -> None:
     """Append data, in Apache Arrow format, to the specified stream
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the stream to append data to
+    id_: "ObjectId" -- The ID of the stream to append data to
     data: List[RecordBatch] -- The Arrow record batches to append
     """
 
@@ -557,14 +557,14 @@ def stream_put_arrow(
 
 def stream_put_diffstream(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
     data: DiffStream,
 ) -> None:
     """Append a diffstream to the specified stream
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the stream to append data to
+    id_: "ObjectId" -- The ID of the stream to append data to
     data: DiffStream -- The Arrow record batches to append
     """
 
@@ -579,14 +579,14 @@ def stream_put_diffstream(
 
 def stream_put_json(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
     data: List[Dict[str, Any]],
 ) -> None:
     """Append JSON data to the specified stream
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the stream to append data to
+    id_: "ObjectId" -- The ID of the stream to append data to
     data: List[Dict[str, Any]] -- The Arrow record batches to append
     """
 
@@ -605,13 +605,13 @@ def stream_put_json(
 
 def generate_metadata(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
 ) -> Metadata:
     """Generate metadata for the specified stream
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the stream to generate metadata for
+    id_: "ObjectId" -- The ID of the stream to generate metadata for
 
     Returns:
     The metadata as generated from the stream data
@@ -627,7 +627,7 @@ def generate_metadata(
 
 def update_metadata(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
     metadata: Optional[Metadata],
 ) -> None:
     """Given a stream ID and metadata, update the stream metadata to a combination of:
@@ -639,7 +639,7 @@ def update_metadata(
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the stream to update metadata for
+    id_: "ObjectId" -- The ID of the stream to update metadata for
     metadata: Optional[Metadata] -- The metadata to update the stream with
     """
 
@@ -656,13 +656,13 @@ def update_metadata(
 
 def stream_compact(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
 ) -> None:
     """Compact the specified stream
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the stream to compact
+    id_: "ObjectId" -- The ID of the stream to compact
     """
 
     path = "/v1/api/ulv2/datacatalog/stream/:id/compact"
@@ -676,15 +676,15 @@ def stream_compact(
 
 def table_row_history(
     ctx: RequestContext,
-    id_: UUID,
-    row: UUID,
+    id_: "ObjectId",
+    row: "GenericId",
 ) -> History:
     """Fetch the history of a row in a table
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the table to fetch the row history from
-    row: UUID -- The ID of the row to fetch the history for
+    id_: "ObjectId" -- The ID of the table to fetch the row history from
+    row: "GenericId" -- The ID of the row to fetch the history for
 
     Returns:
     The history of the row
@@ -701,13 +701,13 @@ def table_row_history(
 
 def table_history(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
 ) -> History:
     """Fetch the history of a table
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the table to fetch the history from
+    id_: "ObjectId" -- The ID of the table to fetch the history from
 
     Returns:
     The history of the table
@@ -723,15 +723,15 @@ def table_history(
 
 def get_table_attachments_directory(
     ctx: RequestContext,
-    id_: UUID,
-    row: UUID,
+    id_: "ObjectId",
+    row: "GenericId",
 ) -> ObjectId:
     """Fetch the directory ID for a row's file attachments location
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the table to fetch the attachments directory ID from
-    row: UUID -- The ID of the row to fetch the attachments directory ID for
+    id_: "ObjectId" -- The ID of the table to fetch the attachments directory ID from
+    row: "GenericId" -- The ID of the row to fetch the attachments directory ID for
 
     Returns:
     The directory ID for the row's attachments
@@ -748,15 +748,15 @@ def get_table_attachments_directory(
 
 def get_or_create_table_attachments_directory(
     ctx: RequestContext,
-    id_: UUID,
-    row: UUID,
+    id_: "ObjectId",
+    row: "GenericId",
 ) -> ObjectId:
     """Fetch the directory ID for a row's file attachments location, creating it if it doesn't exist
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the table to fetch the attachments directory ID from
-    row: UUID -- The ID of the row to fetch the attachments directory ID for
+    id_: "ObjectId" -- The ID of the table to fetch the attachments directory ID from
+    row: "GenericId" -- The ID of the row to fetch the attachments directory ID for
 
     Returns:
     The directory ID for the row's attachments
@@ -774,14 +774,14 @@ def get_or_create_table_attachments_directory(
 
 def create_table(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
     new_table: NewTable,
 ) -> ObjectId:
     """Create a new table in the provided directory
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the directory to create the table in
+    id_: "ObjectId" -- The ID of the directory to create the table in
     new_table: NewTable -- New table creation details
 
     Returns:

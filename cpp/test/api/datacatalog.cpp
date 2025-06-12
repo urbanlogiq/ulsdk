@@ -27,8 +27,8 @@ namespace datacatalog {
 ul::Result<ul::Void>
 test_get_object_at_revision(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
-    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ContentId p1 = ::ul::types::ContentId("00000000-0000-0000-0000-000000000000");
     const ::ul::types::DataCatalogObject expected = ::ul::types::DataCatalogObject();
     const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
     ctx.set_response(expected_bytes);
@@ -55,7 +55,7 @@ ApiTest test_get_object_at_revision_obj(test_get_object_at_revision, "datacatalo
 ul::Result<ul::Void>
 test_get_acl(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     const ::ul::types::ObjectId expected = ::ul::types::ObjectId();
     const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
     ctx.set_response(expected_bytes);
@@ -81,7 +81,7 @@ ApiTest test_get_acl_obj(test_get_acl, "datacatalog::get_acl", &idempotent_api_t
 ul::Result<ul::Void>
 test_get_head_revision(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     const ::ul::types::ObjectSummary expected = ::ul::types::ObjectSummary();
     const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
     ctx.set_response(expected_bytes);
@@ -107,7 +107,7 @@ ApiTest test_get_head_revision_obj(test_get_head_revision, "datacatalog::get_hea
 ul::Result<ul::Void>
 test_get_object(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     const ::ul::types::DataCatalogObject expected = ::ul::types::DataCatalogObject();
     const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
     ctx.set_response(expected_bytes);
@@ -133,7 +133,7 @@ ApiTest test_get_object_obj(test_get_object, "datacatalog::get_object", &idempot
 ul::Result<ul::Void>
 test_update_object(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     ::ul::types::DataCatalogObject body = ::ul::types::DataCatalogObject();
     return ul::api::datacatalog::update_object(
         ctx,
@@ -147,7 +147,7 @@ ApiTest test_update_object_obj(test_update_object, "datacatalog::update_object",
 ul::Result<ul::Void>
 test_update_attributes(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     bool q0 = true;
     const std::map<std::string, ul::JsonValue> body = std::map<std::string, ul::JsonValue>();
     return ul::api::datacatalog::update_attributes(
@@ -163,7 +163,7 @@ ApiTest test_update_attributes_obj(test_update_attributes, "datacatalog::update_
 ul::Result<ul::Void>
 test_delete_attribute(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     const std::string p1 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
     return ul::api::datacatalog::delete_attribute(
         ctx,
@@ -355,7 +355,7 @@ ApiTest test_query_aggregate_relative_histo_obj(test_query_aggregate_relative_hi
 ul::Result<ul::Void>
 test_stream_get_arrow(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     std::vector<uint8_t> expected_bytes;
     const auto expected = make_test_arrow_batches(expected_bytes);
     ctx.set_response(expected_bytes);
@@ -377,7 +377,7 @@ ApiTest test_stream_get_arrow_obj(test_stream_get_arrow, "datacatalog::stream_ge
 ul::Result<ul::Void>
 test_stream_get_parquet(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
     const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
     const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
@@ -405,7 +405,7 @@ ApiTest test_stream_get_parquet_obj(test_stream_get_parquet, "datacatalog::strea
 ul::Result<ul::Void>
 test_stream_get_csv(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
     const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
     const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
@@ -433,7 +433,7 @@ ApiTest test_stream_get_csv_obj(test_stream_get_csv, "datacatalog::stream_get_cs
 ul::Result<ul::Void>
 test_stream_get_xlsx(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
     const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
     const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
@@ -461,7 +461,7 @@ ApiTest test_stream_get_xlsx_obj(test_stream_get_xlsx, "datacatalog::stream_get_
 ul::Result<ul::Void>
 test_stream_get_json(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
     const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
     const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
@@ -489,7 +489,7 @@ ApiTest test_stream_get_json_obj(test_stream_get_json, "datacatalog::stream_get_
 ul::Result<ul::Void>
 test_stream_get_text(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
     const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
     const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
@@ -517,7 +517,7 @@ ApiTest test_stream_get_text_obj(test_stream_get_text, "datacatalog::stream_get_
 ul::Result<ul::Void>
 test_stream_get_html(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
     const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
     const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
@@ -545,7 +545,7 @@ ApiTest test_stream_get_html_obj(test_stream_get_html, "datacatalog::stream_get_
 ul::Result<ul::Void>
 test_stream_put_arrow(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     std::vector<uint8_t> body_bytes;
     const auto body = make_test_arrow_batches(body_bytes);
     return ul::api::datacatalog::stream_put_arrow(
@@ -560,7 +560,7 @@ ApiTest test_stream_put_arrow_obj(test_stream_put_arrow, "datacatalog::stream_pu
 ul::Result<ul::Void>
 test_stream_put_diffstream(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     ::ul::types::DiffStream body = ::ul::types::DiffStream();
     return ul::api::datacatalog::stream_put_diffstream(
         ctx,
@@ -574,7 +574,7 @@ ApiTest test_stream_put_diffstream_obj(test_stream_put_diffstream, "datacatalog:
 ul::Result<ul::Void>
 test_stream_put_json(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     const std::vector<std::map<std::string, ul::JsonValue>> body;
     return ul::api::datacatalog::stream_put_json(
         ctx,
@@ -588,7 +588,7 @@ ApiTest test_stream_put_json_obj(test_stream_put_json, "datacatalog::stream_put_
 ul::Result<ul::Void>
 test_generate_metadata(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     const ::ul::types::Metadata expected = ::ul::types::Metadata();
     const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
     ctx.set_response(expected_bytes);
@@ -614,7 +614,7 @@ ApiTest test_generate_metadata_obj(test_generate_metadata, "datacatalog::generat
 ul::Result<ul::Void>
 test_update_metadata(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     ::ul::types::Metadata body = ::ul::types::Metadata();
     return ul::api::datacatalog::update_metadata(
         ctx,
@@ -628,7 +628,7 @@ ApiTest test_update_metadata_obj(test_update_metadata, "datacatalog::update_meta
 ul::Result<ul::Void>
 test_stream_compact(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     return ul::api::datacatalog::stream_compact(
         ctx,
         p0
@@ -640,8 +640,8 @@ ApiTest test_stream_compact_obj(test_stream_compact, "datacatalog::stream_compac
 ul::Result<ul::Void>
 test_table_row_history(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
-    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::GenericId p1 = ::ul::types::GenericId("00000000-0000-0000-0000-000000000000");
     const ::ul::types::History expected = ::ul::types::History();
     const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
     ctx.set_response(expected_bytes);
@@ -668,7 +668,7 @@ ApiTest test_table_row_history_obj(test_table_row_history, "datacatalog::table_r
 ul::Result<ul::Void>
 test_table_history(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     const ::ul::types::History expected = ::ul::types::History();
     const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
     ctx.set_response(expected_bytes);
@@ -694,8 +694,8 @@ ApiTest test_table_history_obj(test_table_history, "datacatalog::table_history",
 ul::Result<ul::Void>
 test_get_table_attachments_directory(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
-    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::GenericId p1 = ::ul::types::GenericId("00000000-0000-0000-0000-000000000000");
     const ::ul::types::ObjectId expected = ::ul::types::ObjectId();
     const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
     ctx.set_response(expected_bytes);
@@ -722,8 +722,8 @@ ApiTest test_get_table_attachments_directory_obj(test_get_table_attachments_dire
 ul::Result<ul::Void>
 test_get_or_create_table_attachments_directory(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
-    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::GenericId p1 = ::ul::types::GenericId("00000000-0000-0000-0000-000000000000");
     const ::ul::types::ObjectId expected = ::ul::types::ObjectId();
     const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
     ctx.set_response(expected_bytes);
@@ -750,7 +750,7 @@ ApiTest test_get_or_create_table_attachments_directory_obj(test_get_or_create_ta
 ul::Result<ul::Void>
 test_create_table(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     ::ul::types::NewTable body = ::ul::types::NewTable();
     const ::ul::types::ObjectId expected = ::ul::types::ObjectId();
     const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);

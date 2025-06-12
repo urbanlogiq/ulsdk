@@ -15,6 +15,9 @@ class TestContext(RequestContext):
         self._context = context
         self._response = bytes()
 
+    def set_response(self, response: bytes):
+        self._response = response
+
     def user_id(self) -> uuid.UUID:
         return self._context.user_id()
 
@@ -33,7 +36,7 @@ class TestContext(RequestContext):
     ) -> bytes:
         echo_path = "/v1/echo/"
         self._context.get(echo_path, params, headers, **kwargs)
-        return self.response
+        return self._response
 
     def put(
         self,
@@ -45,10 +48,10 @@ class TestContext(RequestContext):
         **kwargs,
     ) -> bytes:
         echo_path = "/v1/echo/"
-        response = self._context.put(echo_path, body, mimetype, params, headers, **kwargs)
-        if response != self.response:
+        response = self._context.put(echo_path, self._response, mimetype, params, headers, **kwargs)
+        if response != self._response:
             raise Exception("Test failure, expected response to match request")
-        return self.response
+        return self._response
 
     def post(
         self,
@@ -60,10 +63,10 @@ class TestContext(RequestContext):
         **kwargs,
     ) -> bytes:
         echo_path = "/v1/echo/"
-        response = self._context.post(echo_path, body, mimetype, params, headers, **kwargs)
-        if response != self.response:
+        response = self._context.post(echo_path, self._response, mimetype, params, headers, **kwargs)
+        if response != self._response:
             raise Exception("Test failure, expected response to match request")
-        return self.response
+        return self._response
 
     def upload(
         self,
@@ -72,7 +75,7 @@ class TestContext(RequestContext):
     ) -> bytes:
         echo_path = "/v1/echo/"
         self._context.upload(echo_path, files)
-        return self.response
+        return self._response
 
     def delete(
         self,
@@ -83,4 +86,4 @@ class TestContext(RequestContext):
     ) -> bytes:
         echo_path = "/v1/echo/"
         self._context.delete(echo_path, params, headers, **kwargs)
-        return self.response
+        return self._response

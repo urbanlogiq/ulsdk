@@ -8,6 +8,7 @@ from flatbuffers.table import Table
 from flatbuffers.builder import Builder
 from flatbuffers.util import RemoveSizePrefix
 from typing import Union, List, Optional, Self, Tuple
+import uuid
 from .generated.Binary import Binary as FbsBinary
 from .generated.BinaryView import BinaryView as FbsBinaryView
 from .generated.Bool import Bool as FbsBool

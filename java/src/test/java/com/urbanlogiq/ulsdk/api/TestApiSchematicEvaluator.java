@@ -45,7 +45,7 @@ public final class TestApiSchematicEvaluator {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         int q0 = 42;
         com.urbanlogiq.ulsdk.types.Job expected = new com.urbanlogiq.ulsdk.types.Job();
         byte[] expectedBytes = expected.toBytes();
@@ -70,7 +70,7 @@ public final class TestApiSchematicEvaluator {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.types.Task expected = new com.urbanlogiq.ulsdk.types.Task();
         byte[] expectedBytes = expected.toBytes();
         ctx.setResponse(expectedBytes);

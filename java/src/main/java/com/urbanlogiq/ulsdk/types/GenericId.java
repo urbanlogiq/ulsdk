@@ -73,7 +73,7 @@ public final class GenericId {
         this(java.util.UUID.fromString(s));
     }
 
-    public java.util.UUID toId() {
+    public java.util.UUID toUuid() {
         long lo = 0;
         long hi = 0;
         for (int i = 0; i < 8; i++) {
@@ -83,5 +83,10 @@ public final class GenericId {
             hi = hi | bh;
         }
         return new java.util.UUID(hi, lo);
+    }
+
+    @Override
+    public String toString() {
+        return this.toUuid().toString();
     }
 }

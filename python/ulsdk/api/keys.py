@@ -263,14 +263,14 @@ def create_key(
 
 def update_key(
     ctx: RequestContext,
-    id_: UUID,
+    id_: str,
     update_key: UpdateKey,
 ) -> None:
     """Updates an API key by id.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the key to update.
+    id_: str -- The ID of the key to update.
     update_key: UpdateKey -- The details with which to update the key.
     """
 
@@ -285,13 +285,13 @@ def update_key(
 
 def get_key(
     ctx: RequestContext,
-    id_: UUID,
+    id_: str,
 ) -> Key:
     """Retrieves an API key by id.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the key to retrieve.
+    id_: str -- The ID of the key to retrieve.
 
     Returns:
     The key details. Note that the secret key is not stored and cannot be retrieved with this API.
@@ -308,13 +308,13 @@ def get_key(
 
 def delete_key(
     ctx: RequestContext,
-    id_: UUID,
+    id_: str,
 ) -> None:
     """Deletes an API key by id.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the key to delete
+    id_: str -- The ID of the key to delete
     """
 
     path = "/v1/api/uldirectory/v1/keys/:id"

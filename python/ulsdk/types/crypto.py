@@ -8,6 +8,7 @@ from flatbuffers.table import Table
 from flatbuffers.builder import Builder
 from flatbuffers.util import RemoveSizePrefix
 from typing import Union, List, Optional, Self, Tuple
+import uuid
 from .generated.CryptHeader import CryptHeader as FbsCryptHeader
 from .generated.EncryptedObject import EncryptedObject as FbsEncryptedObject
 from .generated.Sha256 import Sha256 as FbsSha256

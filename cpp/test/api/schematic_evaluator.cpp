@@ -53,7 +53,7 @@ ApiTest test_create_job_obj(test_create_job, "schematic_evaluator::create_job", 
 ul::Result<ul::Void>
 test_get_job(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     int q0 = 42;
     const ::ul::types::Job expected = ::ul::types::Job();
     const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
@@ -81,7 +81,7 @@ ApiTest test_get_job_obj(test_get_job, "schematic_evaluator::get_job", &idempote
 ul::Result<ul::Void>
 test_get_task(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     const ::ul::types::Task expected = ::ul::types::Task();
     const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
     ctx.set_response(expected_bytes);

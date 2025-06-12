@@ -9,6 +9,7 @@ from typing import Optional, Any, List, Dict, Self
 from urllib.parse import quote_plus
 from uuid import UUID
 from ..request_context import RequestContext
+from ..types.id import ObjectId
 from ..types.notification import Inbox
 
 def fetch(
@@ -55,7 +56,7 @@ def clear_all_status(
 def set_status(
     ctx: RequestContext,
     folder: str,
-    id_: UUID,
+    id_: "ObjectId",
     status: int,
 ) -> None:
     """Set the status of a notification in the specified folder
@@ -63,7 +64,7 @@ def set_status(
     Arguments:
     ctx: RequestContext -- A request context object
     folder: str -- The name of the folder to set the status in
-    id_: UUID -- The ID of the notification to set the status for
+    id_: "ObjectId" -- The ID of the notification to set the status for
     status: int -- The status to set for the notification
     """
 
@@ -81,14 +82,14 @@ def set_status(
 def clear_status(
     ctx: RequestContext,
     folder: str,
-    id_: UUID,
+    id_: "ObjectId",
 ) -> None:
     """Clear the status of a notification in the specified folder
 
     Arguments:
     ctx: RequestContext -- A request context object
     folder: str -- The name of the folder to clear the status in
-    id_: UUID -- The ID of the notification to clear the status for
+    id_: "ObjectId" -- The ID of the notification to clear the status for
     """
 
     path = "/v1/api/ulv2/inbox/:folder/:id"

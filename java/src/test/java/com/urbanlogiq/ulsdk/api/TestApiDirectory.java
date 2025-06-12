@@ -33,7 +33,7 @@ public final class TestApiDirectory {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p0 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.api.directory.Principal expected = new com.urbanlogiq.ulsdk.api.directory.Principal();
         byte[] expectedBytes = new org.json.JSONObject(expected.toMap()).toString().getBytes();
         ctx.setResponse(expectedBytes);
@@ -221,7 +221,7 @@ public final class TestApiDirectory {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p0 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
         boolean q0 = true;
         com.urbanlogiq.ulsdk.api.directory.AdUserWithAuditLog expected = new com.urbanlogiq.ulsdk.api.directory.AdUserWithAuditLog();
         byte[] expectedBytes = new org.json.JSONObject(expected.toMap()).toString().getBytes();
@@ -246,7 +246,7 @@ public final class TestApiDirectory {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p0 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.api.directory.UpdateUser body = new com.urbanlogiq.ulsdk.api.directory.UpdateUser();
         com.urbanlogiq.ulsdk.api.directory.Directory.updateUser(
             ctx,
@@ -267,7 +267,7 @@ public final class TestApiDirectory {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p0 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.api.directory.Directory.deleteUser(
             ctx,
             p0
@@ -333,7 +333,7 @@ public final class TestApiDirectory {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p0 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.api.directory.GroupMembership[] expected = new com.urbanlogiq.ulsdk.api.directory.GroupMembership[5];
         for (int i = 0; i < 5; i++) {
             expected[i] = new com.urbanlogiq.ulsdk.api.directory.GroupMembership();
@@ -359,7 +359,7 @@ public final class TestApiDirectory {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p0 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.api.directory.Directory.deleteGroup(
             ctx,
             p0
@@ -378,8 +378,8 @@ public final class TestApiDirectory {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
-        java.util.UUID p1 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p0 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p1 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.api.directory.Directory.addGroupMember(
             ctx,
             p0,
@@ -399,8 +399,8 @@ public final class TestApiDirectory {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
-        java.util.UUID p1 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p0 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p1 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.api.directory.Directory.removeGroupMember(
             ctx,
             p0,

@@ -35,8 +35,8 @@ namespace datacatalog {
 Result<::ul::types::DataCatalogObject>
 get_object_at_revision(
     ul::RequestContext &ctx,
-    const Uuid &object_id,
-    const Uuid &content_id
+    const ::ul::types::ObjectId &object_id,
+    const ::ul::types::ContentId &content_id
 );
 
 /**
@@ -47,7 +47,7 @@ get_object_at_revision(
 Result<::ul::types::ObjectId>
 get_acl(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::ObjectId &id
 );
 
 /**
@@ -58,7 +58,7 @@ get_acl(
 Result<::ul::types::ObjectSummary>
 get_head_revision(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::ObjectId &id
 );
 
 /**
@@ -69,7 +69,7 @@ get_head_revision(
 Result<::ul::types::DataCatalogObject>
 get_object(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::ObjectId &id
 );
 
 /**
@@ -80,7 +80,7 @@ get_object(
 Result<Void>
 update_object(
     ul::RequestContext &ctx,
-    const Uuid &id,
+    const ::ul::types::ObjectId &id,
     const ::ul::types::DataCatalogObject &object
 );
 
@@ -93,7 +93,7 @@ update_object(
 Result<Void>
 update_attributes(
     ul::RequestContext &ctx,
-    const Uuid &id,
+    const ::ul::types::ObjectId &id,
     bool overwrite,
     const std::map<std::string, ul::JsonValue> &attributes
 );
@@ -106,7 +106,7 @@ update_attributes(
 Result<Void>
 delete_attribute(
     ul::RequestContext &ctx,
-    const Uuid &id,
+    const ::ul::types::ObjectId &id,
     const std::string &key
 );
 
@@ -207,7 +207,7 @@ query_aggregate_relative_histo(
 Result<std::vector<std::shared_ptr<::arrow::RecordBatch>>>
 stream_get_arrow(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::ObjectId &id
 );
 
 /**
@@ -218,7 +218,7 @@ stream_get_arrow(
 Result<std::vector<uint8_t>>
 stream_get_parquet(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::ObjectId &id
 );
 
 /**
@@ -229,7 +229,7 @@ stream_get_parquet(
 Result<std::vector<uint8_t>>
 stream_get_csv(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::ObjectId &id
 );
 
 /**
@@ -240,7 +240,7 @@ stream_get_csv(
 Result<std::vector<uint8_t>>
 stream_get_xlsx(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::ObjectId &id
 );
 
 /**
@@ -251,7 +251,7 @@ stream_get_xlsx(
 Result<std::vector<uint8_t>>
 stream_get_json(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::ObjectId &id
 );
 
 /**
@@ -262,7 +262,7 @@ stream_get_json(
 Result<std::vector<uint8_t>>
 stream_get_text(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::ObjectId &id
 );
 
 /**
@@ -273,7 +273,7 @@ stream_get_text(
 Result<std::vector<uint8_t>>
 stream_get_html(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::ObjectId &id
 );
 
 /**
@@ -284,7 +284,7 @@ stream_get_html(
 Result<Void>
 stream_put_arrow(
     ul::RequestContext &ctx,
-    const Uuid &id,
+    const ::ul::types::ObjectId &id,
     const std::vector<std::shared_ptr<::arrow::RecordBatch>> &data
 );
 
@@ -296,7 +296,7 @@ stream_put_arrow(
 Result<Void>
 stream_put_diffstream(
     ul::RequestContext &ctx,
-    const Uuid &id,
+    const ::ul::types::ObjectId &id,
     const ::ul::types::DiffStream &data
 );
 
@@ -308,7 +308,7 @@ stream_put_diffstream(
 Result<Void>
 stream_put_json(
     ul::RequestContext &ctx,
-    const Uuid &id,
+    const ::ul::types::ObjectId &id,
     const std::vector<std::map<std::string, ul::JsonValue>> &data
 );
 
@@ -320,7 +320,7 @@ stream_put_json(
 Result<::ul::types::Metadata>
 generate_metadata(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::ObjectId &id
 );
 
 /**
@@ -336,7 +336,7 @@ Also, update the stream object to point to the updated metadata and to have an u
 Result<Void>
 update_metadata(
     ul::RequestContext &ctx,
-    const Uuid &id,
+    const ::ul::types::ObjectId &id,
     const std::optional<::ul::types::Metadata> &metadata
 );
 
@@ -347,7 +347,7 @@ update_metadata(
 Result<Void>
 stream_compact(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::ObjectId &id
 );
 
 /**
@@ -359,8 +359,8 @@ stream_compact(
 Result<::ul::types::History>
 table_row_history(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &row
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::GenericId &row
 );
 
 /**
@@ -371,7 +371,7 @@ table_row_history(
 Result<::ul::types::History>
 table_history(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::ObjectId &id
 );
 
 /**
@@ -383,8 +383,8 @@ table_history(
 Result<::ul::types::ObjectId>
 get_table_attachments_directory(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &row
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::GenericId &row
 );
 
 /**
@@ -396,8 +396,8 @@ get_table_attachments_directory(
 Result<::ul::types::ObjectId>
 get_or_create_table_attachments_directory(
     ul::RequestContext &ctx,
-    const Uuid &id,
-    const Uuid &row
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::GenericId &row
 );
 
 /**
@@ -409,7 +409,7 @@ get_or_create_table_attachments_directory(
 Result<::ul::types::ObjectId>
 create_table(
     ul::RequestContext &ctx,
-    const Uuid &id,
+    const ::ul::types::ObjectId &id,
     const ::ul::types::NewTable &new_table
 );
 

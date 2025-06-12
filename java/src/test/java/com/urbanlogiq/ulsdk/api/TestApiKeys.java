@@ -94,7 +94,7 @@ public final class TestApiKeys {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        String p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         com.urbanlogiq.ulsdk.api.keys.UpdateKey body = new com.urbanlogiq.ulsdk.api.keys.UpdateKey();
         com.urbanlogiq.ulsdk.api.keys.Keys.updateKey(
             ctx,
@@ -115,7 +115,7 @@ public final class TestApiKeys {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        String p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         com.urbanlogiq.ulsdk.api.keys.Key expected = new com.urbanlogiq.ulsdk.api.keys.Key();
         byte[] expectedBytes = new org.json.JSONObject(expected.toMap()).toString().getBytes();
         ctx.setResponse(expectedBytes);
@@ -138,7 +138,7 @@ public final class TestApiKeys {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        java.util.UUID p0 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        String p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         com.urbanlogiq.ulsdk.api.keys.Keys.deleteKey(
             ctx,
             p0

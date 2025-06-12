@@ -7,6 +7,7 @@
 #include <cstdint>
 
 #include "ulsdk/request_context.h"
+#include "ulsdk/types/id.h"
 #include "ulsdk/types/notification.h"
 #include "ulsdk/ulsdk.h"
 
@@ -46,7 +47,7 @@ Result<Void>
 set_status(
     ul::RequestContext &ctx,
     const std::string &folder,
-    const Uuid &id,
+    const ::ul::types::ObjectId &id,
     int64_t status
 );
 
@@ -59,7 +60,7 @@ Result<Void>
 clear_status(
     ul::RequestContext &ctx,
     const std::string &folder,
-    const Uuid &id
+    const ::ul::types::ObjectId &id
 );
 
 } // namespace inbox

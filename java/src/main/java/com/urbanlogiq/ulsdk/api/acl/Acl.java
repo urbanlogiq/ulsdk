@@ -31,7 +31,7 @@ public final class Acl {
      */
     public static com.urbanlogiq.ulsdk.types.ObjectSummaryList newFrom(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID extends_
+        com.urbanlogiq.ulsdk.types.ObjectId extends_
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/acl/";
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
@@ -77,8 +77,8 @@ public final class Acl {
      */
     public static void share(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
-        java.util.UUID to,
+        com.urbanlogiq.ulsdk.types.ObjectId id,
+        com.urbanlogiq.ulsdk.types.ObjectId to,
         Integer permissionBits
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to/:permission";
@@ -106,8 +106,8 @@ public final class Acl {
      */
     public static void shareWithDetails(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
-        java.util.UUID to,
+        com.urbanlogiq.ulsdk.types.ObjectId id,
+        com.urbanlogiq.ulsdk.types.ObjectId to,
         Integer permissionBits,
         com.urbanlogiq.ulsdk.types.ShareDetails shareDetails
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
@@ -134,8 +134,8 @@ public final class Acl {
      */
     public static void shareAll(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
-        java.util.UUID to
+        com.urbanlogiq.ulsdk.types.ObjectId id,
+        com.urbanlogiq.ulsdk.types.ObjectId to
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to";
         path = path.replace(":id", id.toString());
@@ -160,8 +160,8 @@ public final class Acl {
      */
     public static void shareAllWithDetails(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
-        java.util.UUID to,
+        com.urbanlogiq.ulsdk.types.ObjectId id,
+        com.urbanlogiq.ulsdk.types.ObjectId to,
         com.urbanlogiq.ulsdk.types.ShareDetails shareDetails
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to";
@@ -187,8 +187,8 @@ public final class Acl {
      */
     public static void grant(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
-        java.util.UUID to,
+        com.urbanlogiq.ulsdk.types.ObjectId id,
+        com.urbanlogiq.ulsdk.types.ObjectId to,
         Integer permissionBits
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to/:permission";
@@ -216,8 +216,8 @@ public final class Acl {
      */
     public static void grantWithDetails(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
-        java.util.UUID to,
+        com.urbanlogiq.ulsdk.types.ObjectId id,
+        com.urbanlogiq.ulsdk.types.ObjectId to,
         Integer permissionBits,
         com.urbanlogiq.ulsdk.types.ShareDetails grantDetails
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
@@ -244,8 +244,8 @@ public final class Acl {
      */
     public static void grantAll(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
-        java.util.UUID to
+        com.urbanlogiq.ulsdk.types.ObjectId id,
+        com.urbanlogiq.ulsdk.types.ObjectId to
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to";
         path = path.replace(":id", id.toString());
@@ -270,8 +270,8 @@ public final class Acl {
      */
     public static void grantAllWithDetails(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
-        java.util.UUID to,
+        com.urbanlogiq.ulsdk.types.ObjectId id,
+        com.urbanlogiq.ulsdk.types.ObjectId to,
         com.urbanlogiq.ulsdk.types.ShareDetails grantDetails
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to";
@@ -296,8 +296,8 @@ public final class Acl {
      */
     public static void revoke(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
-        java.util.UUID from
+        com.urbanlogiq.ulsdk.types.ObjectId id,
+        com.urbanlogiq.ulsdk.types.ObjectId from
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/acl/revoke/:id/:from";
         path = path.replace(":id", id.toString());
@@ -321,7 +321,7 @@ public final class Acl {
      */
     public static byte[] getPermissions(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.ObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/acl/perms/:id";
         path = path.replace(":id", id.toString());
@@ -342,8 +342,8 @@ public final class Acl {
      */
     public static void set(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
-        java.util.UUID aclId
+        com.urbanlogiq.ulsdk.types.ObjectId id,
+        com.urbanlogiq.ulsdk.types.ObjectId aclId
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/acl/set/:id/:acl_id";
         path = path.replace(":id", id.toString());

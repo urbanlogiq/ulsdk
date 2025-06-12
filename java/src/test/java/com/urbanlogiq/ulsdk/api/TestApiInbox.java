@@ -65,7 +65,7 @@ public final class TestApiInbox {
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
         String p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-        java.util.UUID p1 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         int p2 = 42;
         com.urbanlogiq.ulsdk.api.inbox.Inbox.setStatus(
             ctx,
@@ -88,7 +88,7 @@ public final class TestApiInbox {
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
         String p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-        java.util.UUID p1 = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.api.inbox.Inbox.clearStatus(
             ctx,
             p0,

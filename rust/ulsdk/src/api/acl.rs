@@ -43,7 +43,7 @@ pub async fn new_acl(ctx: &dyn RequestContext) -> Result<ObjectSummaryList, Erro
 /// * An object summary list containing a single entry with the new ACL.
 pub async fn new_from(
     ctx: &dyn RequestContext,
-    extends: Option<Uuid>,
+    extends: Option<crate::types::id::ObjectId>,
 ) -> Result<ObjectSummaryList, Error> {
     let path = "/v1/api/ulv2/datacatalog/acl/";
     let mut params = ParamMap::new();
@@ -82,8 +82,8 @@ pub async fn request(ctx: &dyn RequestContext, request: AccessRequest) -> Result
 /// * `permission_bits` - The permission bitset (see the PermissionTy enum for more information).
 pub async fn share(
     ctx: &dyn RequestContext,
-    id: Uuid,
-    to: Uuid,
+    id: crate::types::id::ObjectId,
+    to: crate::types::id::ObjectId,
     permission_bits: i64,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to/:permission"
@@ -106,8 +106,8 @@ pub async fn share(
 /// * `share_details` - A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
 pub async fn share_with_details(
     ctx: &dyn RequestContext,
-    id: Uuid,
-    to: Uuid,
+    id: crate::types::id::ObjectId,
+    to: crate::types::id::ObjectId,
     permission_bits: i64,
     share_details: ShareDetails,
 ) -> Result<(), Error> {
@@ -128,7 +128,11 @@ pub async fn share_with_details(
 /// * `ctx` - A request context object
 /// * `id` - The ID of the object that will be shared.
 /// * `to` - The ID of the access control list that the object will be shared with.
-pub async fn share_all(ctx: &dyn RequestContext, id: Uuid, to: Uuid) -> Result<(), Error> {
+pub async fn share_all(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+    to: crate::types::id::ObjectId,
+) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to"
         .replace(":id", &id.to_string())
         .replace(":to", &to.to_string());
@@ -147,8 +151,8 @@ pub async fn share_all(ctx: &dyn RequestContext, id: Uuid, to: Uuid) -> Result<(
 /// * `share_details` - A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
 pub async fn share_all_with_details(
     ctx: &dyn RequestContext,
-    id: Uuid,
-    to: Uuid,
+    id: crate::types::id::ObjectId,
+    to: crate::types::id::ObjectId,
     share_details: ShareDetails,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to"
@@ -170,8 +174,8 @@ pub async fn share_all_with_details(
 /// * `permission_bits` - The permission bitset (see the PermissionTy enum for more information).
 pub async fn grant(
     ctx: &dyn RequestContext,
-    id: Uuid,
-    to: Uuid,
+    id: crate::types::id::ObjectId,
+    to: crate::types::id::ObjectId,
     permission_bits: i64,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to/:permission"
@@ -194,8 +198,8 @@ pub async fn grant(
 /// * `grant_details` - A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
 pub async fn grant_with_details(
     ctx: &dyn RequestContext,
-    id: Uuid,
-    to: Uuid,
+    id: crate::types::id::ObjectId,
+    to: crate::types::id::ObjectId,
     permission_bits: i64,
     grant_details: ShareDetails,
 ) -> Result<(), Error> {
@@ -216,7 +220,11 @@ pub async fn grant_with_details(
 /// * `ctx` - A request context object
 /// * `id` - The ID of the object to which access will be granted.
 /// * `to` - The ID of the access control list that the object will be granted to.
-pub async fn grant_all(ctx: &dyn RequestContext, id: Uuid, to: Uuid) -> Result<(), Error> {
+pub async fn grant_all(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+    to: crate::types::id::ObjectId,
+) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to"
         .replace(":id", &id.to_string())
         .replace(":to", &to.to_string());
@@ -235,8 +243,8 @@ pub async fn grant_all(ctx: &dyn RequestContext, id: Uuid, to: Uuid) -> Result<(
 /// * `grant_details` - A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
 pub async fn grant_all_with_details(
     ctx: &dyn RequestContext,
-    id: Uuid,
-    to: Uuid,
+    id: crate::types::id::ObjectId,
+    to: crate::types::id::ObjectId,
     grant_details: ShareDetails,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to"
@@ -255,7 +263,11 @@ pub async fn grant_all_with_details(
 /// * `ctx` - A request context object
 /// * `id` - The ID of the object from which access will be revoked.
 /// * `from` - The ID of the access control list that access to the object will be revoked from.
-pub async fn revoke(ctx: &dyn RequestContext, id: Uuid, from: Uuid) -> Result<(), Error> {
+pub async fn revoke(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+    from: crate::types::id::ObjectId,
+) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/acl/revoke/:id/:from"
         .replace(":id", &id.to_string())
         .replace(":from", &from.to_string());
@@ -273,7 +285,10 @@ pub async fn revoke(ctx: &dyn RequestContext, id: Uuid, from: Uuid) -> Result<()
 ///
 /// Returns
 /// * The 32-bit integer bitmap corresponding to the permissions the caller has on the object.
-pub async fn get_permissions(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u8>, Error> {
+pub async fn get_permissions(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/datacatalog/acl/perms/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     Ok(res)
@@ -286,7 +301,11 @@ pub async fn get_permissions(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u
 /// * `ctx` - A request context object
 /// * `id` - The ID of the object which will have its ACL set.
 /// * `acl_id` - The ID of the ACL object which will be used as the object ACL.
-pub async fn set(ctx: &dyn RequestContext, id: Uuid, acl_id: Uuid) -> Result<(), Error> {
+pub async fn set(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+    acl_id: crate::types::id::ObjectId,
+) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/acl/set/:id/:acl_id"
         .replace(":id", &id.to_string())
         .replace(":acl_id", &acl_id.to_string());
@@ -340,7 +359,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let q0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let q0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let q0 = Some(q0);
         let expected = ObjectSummaryList::default();
         let expected_bytes: Vec<u8> = expected.clone().into();
@@ -383,8 +402,8 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let p2 = 42;
         share(&ctx, p0, p1, p2).await.unwrap();
     }
@@ -404,8 +423,8 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let p2 = 42;
         let body = crate::types::ShareDetails::default();
         share_with_details(&ctx, p0, p1, p2, body).await.unwrap();
@@ -426,8 +445,8 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         share_all(&ctx, p0, p1).await.unwrap();
     }
 
@@ -446,8 +465,8 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let body = crate::types::ShareDetails::default();
         share_all_with_details(&ctx, p0, p1, body).await.unwrap();
     }
@@ -467,8 +486,8 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let p2 = 42;
         grant(&ctx, p0, p1, p2).await.unwrap();
     }
@@ -488,8 +507,8 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let p2 = 42;
         let body = crate::types::ShareDetails::default();
         grant_with_details(&ctx, p0, p1, p2, body).await.unwrap();
@@ -510,8 +529,8 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         grant_all(&ctx, p0, p1).await.unwrap();
     }
 
@@ -530,8 +549,8 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let body = crate::types::ShareDetails::default();
         grant_all_with_details(&ctx, p0, p1, body).await.unwrap();
     }
@@ -551,8 +570,8 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         revoke(&ctx, p0, p1).await.unwrap();
     }
 
@@ -571,7 +590,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         let expected_bytes = expected.clone();
         ctx.set_response(expected_bytes);
@@ -594,8 +613,8 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         set(&ctx, p0, p1).await.unwrap();
     }
 }

@@ -9,6 +9,7 @@ from typing import Optional, Any, List, Dict, Self
 from urllib.parse import quote_plus
 from uuid import UUID
 from ..request_context import RequestContext
+from ..types.id import ObjectId
 from ..types.notification import AccessRequest, ShareDetails
 from ..types.object import ObjectSummaryList
 
@@ -33,13 +34,13 @@ def new_acl(
 
 def new_from(
     ctx: RequestContext,
-    extends: Optional[UUID],
+    extends: Optional["ObjectId"],
 ) -> ObjectSummaryList:
     """Create a new access control list that inherits from an existing ACL
 
     Arguments:
     ctx: RequestContext -- A request context object
-    extends: Optional[UUID] -- The ID of the access control list to inherit from
+    extends: Optional["ObjectId"] -- The ID of the access control list to inherit from
 
     Returns:
     An object summary list containing a single entry with the new ACL.
@@ -75,16 +76,16 @@ def request(
 
 def share(
     ctx: RequestContext,
-    id_: UUID,
-    to: UUID,
+    id_: "ObjectId",
+    to: "ObjectId",
     permission_bits: int,
 ) -> None:
     """Share an object to a specific access control list principal with specified permissions.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the object that will be shared.
-    to: UUID -- The ID of the access control list that the object will be shared with.
+    id_: "ObjectId" -- The ID of the object that will be shared.
+    to: "ObjectId" -- The ID of the access control list that the object will be shared with.
     permission_bits: int -- The permission bitset (see the PermissionTy enum for more information).
     """
 
@@ -101,8 +102,8 @@ def share(
 
 def share_with_details(
     ctx: RequestContext,
-    id_: UUID,
-    to: UUID,
+    id_: "ObjectId",
+    to: "ObjectId",
     permission_bits: int,
     share_details: ShareDetails,
 ) -> None:
@@ -110,8 +111,8 @@ def share_with_details(
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the object that will be shared.
-    to: UUID -- The ID of the access control list that the object will be shared with.
+    id_: "ObjectId" -- The ID of the object that will be shared.
+    to: "ObjectId" -- The ID of the access control list that the object will be shared with.
     permission_bits: int -- The permission bitset (see the PermissionTy enum for more information).
     share_details: ShareDetails -- A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
     """
@@ -129,15 +130,15 @@ def share_with_details(
 
 def share_all(
     ctx: RequestContext,
-    id_: UUID,
-    to: UUID,
+    id_: "ObjectId",
+    to: "ObjectId",
 ) -> None:
     """Share an object to a specific access control list principal with all permissions.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the object that will be shared.
-    to: UUID -- The ID of the access control list that the object will be shared with.
+    id_: "ObjectId" -- The ID of the object that will be shared.
+    to: "ObjectId" -- The ID of the access control list that the object will be shared with.
     """
 
     path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to"
@@ -152,16 +153,16 @@ def share_all(
 
 def share_all_with_details(
     ctx: RequestContext,
-    id_: UUID,
-    to: UUID,
+    id_: "ObjectId",
+    to: "ObjectId",
     share_details: ShareDetails,
 ) -> None:
     """Share an object to a specific access control list principal with all permissions.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the object that will be shared.
-    to: UUID -- The ID of the access control list that the object will be shared with.
+    id_: "ObjectId" -- The ID of the object that will be shared.
+    to: "ObjectId" -- The ID of the access control list that the object will be shared with.
     share_details: ShareDetails -- A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
     """
 
@@ -177,16 +178,16 @@ def share_all_with_details(
 
 def grant(
     ctx: RequestContext,
-    id_: UUID,
-    to: UUID,
+    id_: "ObjectId",
+    to: "ObjectId",
     permission_bits: int,
 ) -> None:
     """Grant an object to a specific access control list principal with specified permissions. Unlike the share operation, grant operations will fail with a 403 if the user performing the operation does not have the appropriate access.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the object to which access will be granted.
-    to: UUID -- The ID of the access control list that the object will be granted to.
+    id_: "ObjectId" -- The ID of the object to which access will be granted.
+    to: "ObjectId" -- The ID of the access control list that the object will be granted to.
     permission_bits: int -- The permission bitset (see the PermissionTy enum for more information).
     """
 
@@ -203,8 +204,8 @@ def grant(
 
 def grant_with_details(
     ctx: RequestContext,
-    id_: UUID,
-    to: UUID,
+    id_: "ObjectId",
+    to: "ObjectId",
     permission_bits: int,
     grant_details: ShareDetails,
 ) -> None:
@@ -212,8 +213,8 @@ def grant_with_details(
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the object to which access will be granted.
-    to: UUID -- The ID of the access control list that the object will be granted to.
+    id_: "ObjectId" -- The ID of the object to which access will be granted.
+    to: "ObjectId" -- The ID of the access control list that the object will be granted to.
     permission_bits: int -- The permission bitset (see the PermissionTy enum for more information).
     grant_details: ShareDetails -- A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
     """
@@ -231,15 +232,15 @@ def grant_with_details(
 
 def grant_all(
     ctx: RequestContext,
-    id_: UUID,
-    to: UUID,
+    id_: "ObjectId",
+    to: "ObjectId",
 ) -> None:
     """Grant an object to a specific access control list principal with all permissions. Unlike the share operation, grant operations will fail with a 403 if the user performing the operation does not have the appropriate access.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the object to which access will be granted.
-    to: UUID -- The ID of the access control list that the object will be granted to.
+    id_: "ObjectId" -- The ID of the object to which access will be granted.
+    to: "ObjectId" -- The ID of the access control list that the object will be granted to.
     """
 
     path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to"
@@ -254,16 +255,16 @@ def grant_all(
 
 def grant_all_with_details(
     ctx: RequestContext,
-    id_: UUID,
-    to: UUID,
+    id_: "ObjectId",
+    to: "ObjectId",
     grant_details: ShareDetails,
 ) -> None:
     """Grant an object to a specific access control list principal with all permissions. Unlike the share operation, grant operations will fail with a 403 if the user performing the operation does not have the appropriate access.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the object to which access will be granted.
-    to: UUID -- The ID of the access control list that the object will be granted to.
+    id_: "ObjectId" -- The ID of the object to which access will be granted.
+    to: "ObjectId" -- The ID of the access control list that the object will be granted to.
     grant_details: ShareDetails -- A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
     """
 
@@ -279,15 +280,15 @@ def grant_all_with_details(
 
 def revoke(
     ctx: RequestContext,
-    id_: UUID,
-    from_: UUID,
+    id_: "ObjectId",
+    from_: "ObjectId",
 ) -> None:
     """Revoke all access from a specified ACL to an object.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the object from which access will be revoked.
-    from_: UUID -- The ID of the access control list that access to the object will be revoked from.
+    id_: "ObjectId" -- The ID of the object from which access will be revoked.
+    from_: "ObjectId" -- The ID of the access control list that access to the object will be revoked from.
     """
 
     path = "/v1/api/ulv2/datacatalog/acl/revoke/:id/:from"
@@ -302,13 +303,13 @@ def revoke(
 
 def get_permissions(
     ctx: RequestContext,
-    id_: UUID,
+    id_: "ObjectId",
 ) -> bytes:
     """Get the permissions the caller has on the object with the given ID.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the object which will be queried for permissions.
+    id_: "ObjectId" -- The ID of the object which will be queried for permissions.
 
     Returns:
     The 32-bit integer bitmap corresponding to the permissions the caller has on the object.
@@ -324,15 +325,15 @@ def get_permissions(
 
 def set(
     ctx: RequestContext,
-    id_: UUID,
-    acl_id: UUID,
+    id_: "ObjectId",
+    acl_id: "ObjectId",
 ) -> None:
     """Forcibly set an object's ACL to another ACL object. Note that the target ACL needs to contain the exact same permissions as the current ACL otherwise this method will return 400 Bad Request. This is a safeguard to ensure the user cannot lock themselves out of an object.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: UUID -- The ID of the object which will have its ACL set.
-    acl_id: UUID -- The ID of the ACL object which will be used as the object ACL.
+    id_: "ObjectId" -- The ID of the object which will have its ACL set.
+    acl_id: "ObjectId" -- The ID of the ACL object which will be used as the object ACL.
     """
 
     path = "/v1/api/ulv2/datacatalog/acl/set/:id/:acl_id"

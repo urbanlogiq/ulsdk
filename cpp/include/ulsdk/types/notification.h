@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "flatbuffers/flatbuffers.h"
+#include "ulsdk/ulsdk.h"
 #include "ulsdk/types/id.h"
 #include "ulsdk/types/permissions.h"
 #include "ulsdk/types/generated/notification_generated.h"

@@ -36,7 +36,7 @@ create_job(
 Result<::ul::types::Job>
 get_job(
     ul::RequestContext &ctx,
-    const Uuid &id,
+    const ::ul::types::ObjectId &id,
     std::optional<int64_t> timeout
 );
 
@@ -48,7 +48,7 @@ get_job(
 Result<::ul::types::Task>
 get_task(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const ::ul::types::ObjectId &id
 );
 
 } // namespace schematic_evaluator

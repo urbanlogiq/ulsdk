@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "flatbuffers/flatbuffers.h"
+#include "ulsdk/ulsdk.h"
 #include "ulsdk/types/api.h"
 #include "ulsdk/types/entity.h"
 #include "ulsdk/types/fun.h"

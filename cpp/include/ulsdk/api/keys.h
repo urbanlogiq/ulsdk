@@ -106,7 +106,7 @@ create_key(
 Result<Void>
 update_key(
     ul::RequestContext &ctx,
-    const Uuid &id,
+    const std::string &id,
     const UpdateKey &update_key
 );
 
@@ -118,7 +118,7 @@ update_key(
 Result<Key>
 get_key(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const std::string &id
 );
 
 /**
@@ -128,7 +128,7 @@ get_key(
 Result<Void>
 delete_key(
     ul::RequestContext &ctx,
-    const Uuid &id
+    const std::string &id
 );
 
 } // namespace keys

@@ -66,7 +66,7 @@ ul::Result<ul::Void>
 test_set_status(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     const std::string p0 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     int p2 = 42;
     return ul::api::inbox::set_status(
         ctx,
@@ -82,7 +82,7 @@ ul::Result<ul::Void>
 test_clear_status(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     const std::string p0 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     return ul::api::inbox::clear_status(
         ctx,
         p0,

@@ -57,7 +57,7 @@ public final class Inbox {
     public static void setStatus(
         com.urbanlogiq.ulsdk.RequestContext ctx,
         String folder,
-        java.util.UUID id,
+        com.urbanlogiq.ulsdk.types.ObjectId id,
         Integer status
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/inbox/:folder/:id/status/:status";
@@ -84,7 +84,7 @@ public final class Inbox {
     public static void clearStatus(
         com.urbanlogiq.ulsdk.RequestContext ctx,
         String folder,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.ObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/inbox/:folder/:id";
         path = path.replace(":folder", folder.toString());

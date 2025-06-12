@@ -49,7 +49,7 @@ static uint8_t unhex(char c) {
 }
 
 Uuid::Uuid(const uint8_t* b) {
-    std::copy(b, b + UUID_BYTES, _bytes);
+    std::copy(b, b + UUID_BYTES, bytes_);
 }
 
 Uuid::Uuid(const std::string& str) {
@@ -65,13 +65,13 @@ Uuid::Uuid(const std::string& str) {
                 uint8_t lo = unhex(str[ii + 1]);
                 uint8_t byte = hi | lo;
 
-                _bytes[i++] = byte;
+                bytes_[i++] = byte;
                 ii += 2;
             }
         }
     } else if (size == 32) {
         for (size_t ii = 0; ii < size; ii += 2) {
-            _bytes[i++] = unhex(str[ii]) << 4 | unhex(str[ii + 1]);
+            bytes_[i++] = unhex(str[ii]) << 4 | unhex(str[ii + 1]);
         }
     } else {
         throw std::invalid_argument("invalid UUID string");
@@ -82,17 +82,21 @@ std::string Uuid::to_string() const {
     std::string result;
     result.reserve(36);
 
-    result += hex(4, &_bytes[0]);
+    result += hex(4, &bytes_[0]);
     result += '-';
-    result += hex(2, &_bytes[4]);
+    result += hex(2, &bytes_[4]);
     result += '-';
-    result += hex(2, &_bytes[6]);
+    result += hex(2, &bytes_[6]);
     result += '-';
-    result += hex(2, &_bytes[8]);
+    result += hex(2, &bytes_[8]);
     result += '-';
-    result += hex(6, &_bytes[10]);
+    result += hex(6, &bytes_[10]);
 
     return result;
+}
+
+std::vector<uint8_t> Uuid::to_vec() const {
+    return std::vector(&bytes_[0], &bytes_[UUID_BYTES]);
 }
 
 std::string url_encode(const std::string& input) {

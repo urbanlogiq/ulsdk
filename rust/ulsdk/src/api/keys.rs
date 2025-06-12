@@ -80,10 +80,10 @@ pub async fn create_key(ctx: &dyn RequestContext) -> Result<CreateKey, Error> {
 /// * `update_key` - The details with which to update the key.
 pub async fn update_key(
     ctx: &dyn RequestContext,
-    id: Uuid,
+    id: &str,
     update_key: UpdateKey,
 ) -> Result<(), Error> {
-    let path = "/v1/api/uldirectory/v1/keys/:id".replace(":id", &id.to_string());
+    let path = "/v1/api/uldirectory/v1/keys/:id".replace(":id", id);
     let body = Bytes::from(serde_json::to_vec(&update_key)?);
     ctx.put(&path, body, "application/json", None, None).await?;
     Ok(())
@@ -98,8 +98,8 @@ pub async fn update_key(
 ///
 /// Returns
 /// * The key details. Note that the secret key is not stored and cannot be retrieved with this API.
-pub async fn get_key(ctx: &dyn RequestContext, id: Uuid) -> Result<Key, Error> {
-    let path = "/v1/api/uldirectory/v1/keys/:id".replace(":id", &id.to_string());
+pub async fn get_key(ctx: &dyn RequestContext, id: &str) -> Result<Key, Error> {
+    let path = "/v1/api/uldirectory/v1/keys/:id".replace(":id", id);
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }
@@ -110,8 +110,8 @@ pub async fn get_key(ctx: &dyn RequestContext, id: Uuid) -> Result<Key, Error> {
 ///
 /// * `ctx` - A request context object
 /// * `id` - The ID of the key to delete
-pub async fn delete_key(ctx: &dyn RequestContext, id: Uuid) -> Result<(), Error> {
-    let path = "/v1/api/uldirectory/v1/keys/:id".replace(":id", &id.to_string());
+pub async fn delete_key(ctx: &dyn RequestContext, id: &str) -> Result<(), Error> {
+    let path = "/v1/api/uldirectory/v1/keys/:id".replace(":id", id);
     ctx.delete(&path, None, None).await?;
     Ok(())
 }
@@ -221,7 +221,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
         let body = UpdateKey::default();
         update_key(&ctx, p0, body).await.unwrap();
     }
@@ -241,7 +241,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
         let expected = Key::default();
         let expected_bytes = serde_json::to_vec(&expected).unwrap();
         ctx.set_response(expected_bytes);
@@ -264,7 +264,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
         delete_key(&ctx, p0).await.unwrap();
     }
 }

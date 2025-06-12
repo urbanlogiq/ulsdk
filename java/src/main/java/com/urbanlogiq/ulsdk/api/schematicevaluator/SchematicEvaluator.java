@@ -36,7 +36,7 @@ public final class SchematicEvaluator {
      */
     public static com.urbanlogiq.ulsdk.types.Job getJob(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
+        com.urbanlogiq.ulsdk.types.ObjectId id,
         Integer timeout
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/schematicevaluator/jobs/:id";
@@ -62,7 +62,7 @@ public final class SchematicEvaluator {
      */
     public static com.urbanlogiq.ulsdk.types.Task getTask(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.ObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/schematicevaluator/tasks/:id";
         path = path.replace(":id", id.toString());

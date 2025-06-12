@@ -50,7 +50,7 @@ public final class Keys {
      */
     public static void updateKey(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
+        String id,
         com.urbanlogiq.ulsdk.api.keys.UpdateKey updateKey
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/uldirectory/v1/keys/:id";
@@ -74,7 +74,7 @@ public final class Keys {
      */
     public static com.urbanlogiq.ulsdk.api.keys.Key getKey(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        String id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/uldirectory/v1/keys/:id";
         path = path.replace(":id", id.toString());
@@ -96,7 +96,7 @@ public final class Keys {
      */
     public static void deleteKey(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        String id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/uldirectory/v1/keys/:id";
         path = path.replace(":id", id.toString());

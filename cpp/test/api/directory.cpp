@@ -27,7 +27,7 @@ namespace directory {
 ul::Result<ul::Void>
 test_get_principal(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p0 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
     const ::ul::api::directory::Principal expected = ::ul::api::directory::Principal();
     const std::vector<uint8_t> expected_bytes = ::ul::api::directory::to_bytes(expected);
     ctx.set_response(expected_bytes);
@@ -257,7 +257,7 @@ ApiTest test_update_current_user_obj(test_update_current_user, "directory::updat
 ul::Result<ul::Void>
 test_get_user(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p0 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
     bool q0 = true;
     const ::ul::api::directory::AdUserWithAuditLog expected = ::ul::api::directory::AdUserWithAuditLog();
     const std::vector<uint8_t> expected_bytes = ::ul::api::directory::to_bytes(expected);
@@ -285,7 +285,7 @@ ApiTest test_get_user_obj(test_get_user, "directory::get_user", &idempotent_api_
 ul::Result<ul::Void>
 test_update_user(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p0 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
     const ::ul::api::directory::UpdateUser body = ::ul::api::directory::UpdateUser();
     return ul::api::directory::update_user(
         ctx,
@@ -299,7 +299,7 @@ ApiTest test_update_user_obj(test_update_user, "directory::update_user", &idempo
 ul::Result<ul::Void>
 test_delete_user(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p0 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
     return ul::api::directory::delete_user(
         ctx,
         p0
@@ -371,7 +371,7 @@ ApiTest test_create_group_obj(test_create_group, "directory::create_group", &ide
 ul::Result<ul::Void>
 test_get_group_members(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p0 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
     std::vector<::ul::api::directory::GroupMembership> expected;
     std::vector<uint8_t> expected_bytes;
     expected_bytes.push_back((uint8_t)'[');
@@ -407,7 +407,7 @@ ApiTest test_get_group_members_obj(test_get_group_members, "directory::get_group
 ul::Result<ul::Void>
 test_delete_group(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p0 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
     return ul::api::directory::delete_group(
         ctx,
         p0
@@ -419,8 +419,8 @@ ApiTest test_delete_group_obj(test_delete_group, "directory::delete_group", &ide
 ul::Result<ul::Void>
 test_add_group_member(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
-    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p0 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p1 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
     return ul::api::directory::add_group_member(
         ctx,
         p0,
@@ -433,8 +433,8 @@ ApiTest test_add_group_member_obj(test_add_group_member, "directory::add_group_m
 ul::Result<ul::Void>
 test_remove_group_member(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ul::Uuid p0 = ul::Uuid("00000000-0000-0000-0000-000000000000");
-    const ul::Uuid p1 = ul::Uuid("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p0 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p1 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
     return ul::api::directory::remove_group_member(
         ctx,
         p0,

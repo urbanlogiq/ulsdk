@@ -15,8 +15,8 @@ public final class Datacatalog {
      */
     public static com.urbanlogiq.ulsdk.types.DataCatalogObject getObjectAtRevision(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID objectId,
-        java.util.UUID contentId
+        com.urbanlogiq.ulsdk.types.ObjectId objectId,
+        com.urbanlogiq.ulsdk.types.ContentId contentId
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/content/:object_id/:content_id";
         path = path.replace(":object_id", objectId.toString());
@@ -38,7 +38,7 @@ public final class Datacatalog {
      */
     public static com.urbanlogiq.ulsdk.types.ObjectId getAcl(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.ObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/object/acl/:id";
         path = path.replace(":id", id.toString());
@@ -59,7 +59,7 @@ public final class Datacatalog {
      */
     public static com.urbanlogiq.ulsdk.types.ObjectSummary getHeadRevision(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.ObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/object/head/:id";
         path = path.replace(":id", id.toString());
@@ -80,7 +80,7 @@ public final class Datacatalog {
      */
     public static com.urbanlogiq.ulsdk.types.DataCatalogObject getObject(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.ObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/object/:id";
         path = path.replace(":id", id.toString());
@@ -101,7 +101,7 @@ public final class Datacatalog {
      */
     public static void updateObject(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
+        com.urbanlogiq.ulsdk.types.ObjectId id,
         com.urbanlogiq.ulsdk.types.DataCatalogObject object
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/object/:id";
@@ -126,7 +126,7 @@ public final class Datacatalog {
      */
     public static void updateAttributes(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
+        com.urbanlogiq.ulsdk.types.ObjectId id,
         Boolean overwrite,
         org.json.JSONObject attributes
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
@@ -153,7 +153,7 @@ public final class Datacatalog {
      */
     public static void deleteAttribute(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
+        com.urbanlogiq.ulsdk.types.ObjectId id,
         String key
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/object/:id/attributes/:key";
@@ -344,7 +344,7 @@ public final class Datacatalog {
      */
     public static org.apache.arrow.vector.ipc.ArrowStreamReader streamGetArrow(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.ObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id";
         path = path.replace(":id", id.toString());
@@ -366,7 +366,7 @@ public final class Datacatalog {
      */
     public static byte[] streamGetParquet(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.ObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id";
         path = path.replace(":id", id.toString());
@@ -388,7 +388,7 @@ public final class Datacatalog {
      */
     public static byte[] streamGetCsv(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.ObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id";
         path = path.replace(":id", id.toString());
@@ -410,7 +410,7 @@ public final class Datacatalog {
      */
     public static byte[] streamGetXlsx(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.ObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id";
         path = path.replace(":id", id.toString());
@@ -432,7 +432,7 @@ public final class Datacatalog {
      */
     public static byte[] streamGetJson(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.ObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id";
         path = path.replace(":id", id.toString());
@@ -454,7 +454,7 @@ public final class Datacatalog {
      */
     public static byte[] streamGetText(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.ObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id";
         path = path.replace(":id", id.toString());
@@ -476,7 +476,7 @@ public final class Datacatalog {
      */
     public static byte[] streamGetHtml(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.ObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id";
         path = path.replace(":id", id.toString());
@@ -498,7 +498,7 @@ public final class Datacatalog {
      */
     public static void streamPutArrow(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
+        com.urbanlogiq.ulsdk.types.ObjectId id,
         org.apache.arrow.vector.ipc.ArrowStreamReader data
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id";
@@ -531,7 +531,7 @@ public final class Datacatalog {
      */
     public static void streamPutDiffstream(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
+        com.urbanlogiq.ulsdk.types.ObjectId id,
         com.urbanlogiq.ulsdk.types.DiffStream data
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id";
@@ -555,7 +555,7 @@ public final class Datacatalog {
      */
     public static void streamPutJson(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
+        com.urbanlogiq.ulsdk.types.ObjectId id,
         org.json.JSONObject[] data
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id";
@@ -583,7 +583,7 @@ public final class Datacatalog {
      */
     public static com.urbanlogiq.ulsdk.types.Metadata generateMetadata(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.ObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id/generated/metadata";
         path = path.replace(":id", id.toString());
@@ -609,7 +609,7 @@ public final class Datacatalog {
      */
     public static void updateMetadata(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
+        com.urbanlogiq.ulsdk.types.ObjectId id,
         com.urbanlogiq.ulsdk.types.Metadata metadata
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id/metadata";
@@ -635,7 +635,7 @@ public final class Datacatalog {
      */
     public static void streamCompact(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.ObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id/compact";
         path = path.replace(":id", id.toString());
@@ -659,8 +659,8 @@ public final class Datacatalog {
      */
     public static com.urbanlogiq.ulsdk.types.History tableRowHistory(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
-        java.util.UUID row
+        com.urbanlogiq.ulsdk.types.ObjectId id,
+        com.urbanlogiq.ulsdk.types.GenericId row
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/table/:id/history/:row";
         path = path.replace(":id", id.toString());
@@ -682,7 +682,7 @@ public final class Datacatalog {
      */
     public static com.urbanlogiq.ulsdk.types.History tableHistory(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id
+        com.urbanlogiq.ulsdk.types.ObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/table/:id/history";
         path = path.replace(":id", id.toString());
@@ -704,8 +704,8 @@ public final class Datacatalog {
      */
     public static com.urbanlogiq.ulsdk.types.ObjectId getTableAttachmentsDirectory(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
-        java.util.UUID row
+        com.urbanlogiq.ulsdk.types.ObjectId id,
+        com.urbanlogiq.ulsdk.types.GenericId row
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/table/:id/attachments/:row";
         path = path.replace(":id", id.toString());
@@ -728,8 +728,8 @@ public final class Datacatalog {
      */
     public static com.urbanlogiq.ulsdk.types.ObjectId getOrCreateTableAttachmentsDirectory(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
-        java.util.UUID row
+        com.urbanlogiq.ulsdk.types.ObjectId id,
+        com.urbanlogiq.ulsdk.types.GenericId row
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/table/:id/attachments/:row";
         path = path.replace(":id", id.toString());
@@ -754,7 +754,7 @@ public final class Datacatalog {
      */
     public static com.urbanlogiq.ulsdk.types.ObjectId createTable(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        java.util.UUID id,
+        com.urbanlogiq.ulsdk.types.ObjectId id,
         com.urbanlogiq.ulsdk.types.NewTable newTable
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/table/:id";

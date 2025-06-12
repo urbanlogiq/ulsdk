@@ -112,6 +112,47 @@ impl From<B2cId> for Vec<u8> {
     }
 }
 
+impl From<uuid::Uuid> for B2cId {
+    fn from(o: uuid::Uuid) -> B2cId {
+        B2cId {
+            b: o.as_bytes().to_vec(),
+        }
+    }
+}
+
+impl From<&uuid::Uuid> for B2cId {
+    fn from(o: &uuid::Uuid) -> B2cId {
+        B2cId {
+            b: o.as_bytes().to_vec(),
+        }
+    }
+}
+
+impl From<B2cId> for uuid::Uuid {
+    fn from(o: B2cId) -> uuid::Uuid {
+        uuid::Uuid::from_slice(&o.b).unwrap()
+    }
+}
+
+impl From<&B2cId> for uuid::Uuid {
+    fn from(o: &B2cId) -> uuid::Uuid {
+        uuid::Uuid::from_slice(&o.b).unwrap()
+    }
+}
+
+impl std::str::FromStr for B2cId {
+    type Err = uuid::Error;
+    fn from_str(o: &str) -> Result<B2cId, Self::Err> {
+        uuid::Uuid::from_str(o).map(Into::into)
+    }
+}
+
+impl ToString for B2cId {
+    fn to_string(&self) -> String {
+        uuid::Uuid::from(self).to_string()
+    }
+}
+
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ColumnGroupId {
     pub b: Vec<u8>,
@@ -205,6 +246,47 @@ impl From<ContentId> for Vec<u8> {
         let offset = obj.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+}
+
+impl From<uuid::Uuid> for ContentId {
+    fn from(o: uuid::Uuid) -> ContentId {
+        ContentId {
+            b: o.as_bytes().to_vec(),
+        }
+    }
+}
+
+impl From<&uuid::Uuid> for ContentId {
+    fn from(o: &uuid::Uuid) -> ContentId {
+        ContentId {
+            b: o.as_bytes().to_vec(),
+        }
+    }
+}
+
+impl From<ContentId> for uuid::Uuid {
+    fn from(o: ContentId) -> uuid::Uuid {
+        uuid::Uuid::from_slice(&o.b).unwrap()
+    }
+}
+
+impl From<&ContentId> for uuid::Uuid {
+    fn from(o: &ContentId) -> uuid::Uuid {
+        uuid::Uuid::from_slice(&o.b).unwrap()
+    }
+}
+
+impl std::str::FromStr for ContentId {
+    type Err = uuid::Error;
+    fn from_str(o: &str) -> Result<ContentId, Self::Err> {
+        uuid::Uuid::from_str(o).map(Into::into)
+    }
+}
+
+impl ToString for ContentId {
+    fn to_string(&self) -> String {
+        uuid::Uuid::from(self).to_string()
     }
 }
 
@@ -304,6 +386,47 @@ impl From<GenericId> for Vec<u8> {
     }
 }
 
+impl From<uuid::Uuid> for GenericId {
+    fn from(o: uuid::Uuid) -> GenericId {
+        GenericId {
+            b: o.as_bytes().to_vec(),
+        }
+    }
+}
+
+impl From<&uuid::Uuid> for GenericId {
+    fn from(o: &uuid::Uuid) -> GenericId {
+        GenericId {
+            b: o.as_bytes().to_vec(),
+        }
+    }
+}
+
+impl From<GenericId> for uuid::Uuid {
+    fn from(o: GenericId) -> uuid::Uuid {
+        uuid::Uuid::from_slice(&o.b).unwrap()
+    }
+}
+
+impl From<&GenericId> for uuid::Uuid {
+    fn from(o: &GenericId) -> uuid::Uuid {
+        uuid::Uuid::from_slice(&o.b).unwrap()
+    }
+}
+
+impl std::str::FromStr for GenericId {
+    type Err = uuid::Error;
+    fn from_str(o: &str) -> Result<GenericId, Self::Err> {
+        uuid::Uuid::from_str(o).map(Into::into)
+    }
+}
+
+impl ToString for GenericId {
+    fn to_string(&self) -> String {
+        uuid::Uuid::from(self).to_string()
+    }
+}
+
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct GraphNodeId {
     pub b: Vec<u8>,
@@ -352,6 +475,47 @@ impl From<GraphNodeId> for Vec<u8> {
     }
 }
 
+impl From<uuid::Uuid> for GraphNodeId {
+    fn from(o: uuid::Uuid) -> GraphNodeId {
+        GraphNodeId {
+            b: o.as_bytes().to_vec(),
+        }
+    }
+}
+
+impl From<&uuid::Uuid> for GraphNodeId {
+    fn from(o: &uuid::Uuid) -> GraphNodeId {
+        GraphNodeId {
+            b: o.as_bytes().to_vec(),
+        }
+    }
+}
+
+impl From<GraphNodeId> for uuid::Uuid {
+    fn from(o: GraphNodeId) -> uuid::Uuid {
+        uuid::Uuid::from_slice(&o.b).unwrap()
+    }
+}
+
+impl From<&GraphNodeId> for uuid::Uuid {
+    fn from(o: &GraphNodeId) -> uuid::Uuid {
+        uuid::Uuid::from_slice(&o.b).unwrap()
+    }
+}
+
+impl std::str::FromStr for GraphNodeId {
+    type Err = uuid::Error;
+    fn from_str(o: &str) -> Result<GraphNodeId, Self::Err> {
+        uuid::Uuid::from_str(o).map(Into::into)
+    }
+}
+
+impl ToString for GraphNodeId {
+    fn to_string(&self) -> String {
+        uuid::Uuid::from(self).to_string()
+    }
+}
+
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ObjectId {
     pub b: Vec<u8>,
@@ -397,6 +561,47 @@ impl From<ObjectId> for Vec<u8> {
         let offset = obj.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+}
+
+impl From<uuid::Uuid> for ObjectId {
+    fn from(o: uuid::Uuid) -> ObjectId {
+        ObjectId {
+            b: o.as_bytes().to_vec(),
+        }
+    }
+}
+
+impl From<&uuid::Uuid> for ObjectId {
+    fn from(o: &uuid::Uuid) -> ObjectId {
+        ObjectId {
+            b: o.as_bytes().to_vec(),
+        }
+    }
+}
+
+impl From<ObjectId> for uuid::Uuid {
+    fn from(o: ObjectId) -> uuid::Uuid {
+        uuid::Uuid::from_slice(&o.b).unwrap()
+    }
+}
+
+impl From<&ObjectId> for uuid::Uuid {
+    fn from(o: &ObjectId) -> uuid::Uuid {
+        uuid::Uuid::from_slice(&o.b).unwrap()
+    }
+}
+
+impl std::str::FromStr for ObjectId {
+    type Err = uuid::Error;
+    fn from_str(o: &str) -> Result<ObjectId, Self::Err> {
+        uuid::Uuid::from_str(o).map(Into::into)
+    }
+}
+
+impl ToString for ObjectId {
+    fn to_string(&self) -> String {
+        uuid::Uuid::from(self).to_string()
     }
 }
 

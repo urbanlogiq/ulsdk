@@ -58,7 +58,7 @@ pub async fn ls(ctx: &dyn RequestContext, root: &str, tail: &str) -> Result<Dire
 /// * A summary of the object created
 pub async fn create_entry(
     ctx: &dyn RequestContext,
-    root: Uuid,
+    root: crate::types::id::ObjectId,
     tail: &str,
     ty: &str,
     mime: &str,
@@ -106,7 +106,7 @@ pub async fn get_roots(ctx: &dyn RequestContext) -> Result<DirectoryList, Error>
 /// * An updated list of directory entries
 pub async fn post_file(
     ctx: &dyn RequestContext,
-    root: Uuid,
+    root: crate::types::id::ObjectId,
     force: bool,
     files: Vec<File>,
 ) -> Result<DirectoryList, Error> {
@@ -130,7 +130,10 @@ pub async fn post_file(
 ///
 /// Returns
 /// * An updated list of directory entries
-pub async fn unlink(ctx: &dyn RequestContext, entry: Uuid) -> Result<DirectoryList, Error> {
+pub async fn unlink(
+    ctx: &dyn RequestContext,
+    entry: crate::types::id::ObjectId,
+) -> Result<DirectoryList, Error> {
     let path = "/v1/api/ulv2/drive/:entry".replace(":entry", &entry.to_string());
     let res = ctx.delete(&path, None, None).await?;
     res.as_slice().try_into().map_err(Error::from)
@@ -173,7 +176,10 @@ pub async fn copy(ctx: &dyn RequestContext, copy_request: MoveRequest) -> Result
 ///
 /// Returns
 /// * The contents of the file referenced by the specified ID
-pub async fn get_file(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u8>, Error> {
+pub async fn get_file(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/drive/file/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     Ok(res)
@@ -190,7 +196,7 @@ pub async fn get_file(ctx: &dyn RequestContext, id: Uuid) -> Result<Vec<u8>, Err
 /// * `chunk` - Binary file chunk data
 pub async fn put_file_chunk(
     ctx: &dyn RequestContext,
-    file_id: Uuid,
+    file_id: crate::types::id::ObjectId,
     idx: i64,
     hash: &str,
     chunk: Vec<u8>,
@@ -216,7 +222,10 @@ pub async fn put_file_chunk(
 ///
 /// Returns
 /// * Drive directory root ID
-pub async fn get_root_id(ctx: &dyn RequestContext, b2cid: Uuid) -> Result<ObjectId, Error> {
+pub async fn get_root_id(
+    ctx: &dyn RequestContext,
+    b2cid: crate::types::id::B2cId,
+) -> Result<ObjectId, Error> {
     let path = "/v1/api/ulv2/drive/root/:b2cid".replace(":b2cid", &b2cid.to_string());
     let res = ctx.get(&path, None, None).await?;
     res.as_slice().try_into().map_err(Error::from)
@@ -269,7 +278,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let p1 = "tail".into();
         let q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
         let q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
@@ -318,7 +327,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let q0 = true;
         let body = Vec::new();
         let expected = DirectoryList::default();
@@ -343,7 +352,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = DirectoryList::default();
         let expected_bytes: Vec<u8> = expected.clone().into();
         ctx.set_response(expected_bytes);
@@ -404,7 +413,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         let expected_bytes = expected.clone();
         ctx.set_response(expected_bytes);
@@ -427,7 +436,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let p1 = 42;
         let q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
         let body = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".to_vec();
@@ -449,7 +458,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = ObjectId::default();
         let expected_bytes: Vec<u8> = expected.clone().into();
         ctx.set_response(expected_bytes);

@@ -47,7 +47,7 @@ pub async fn create_job(ctx: &dyn RequestContext, job: RunSpec) -> Result<Object
 /// * The details of the job
 pub async fn get_job(
     ctx: &dyn RequestContext,
-    id: Uuid,
+    id: crate::types::id::ObjectId,
     timeout: Option<i64>,
 ) -> Result<Job, Error> {
     let path = "/v1/api/ulv2/schematicevaluator/jobs/:id".replace(":id", &id.to_string());
@@ -69,7 +69,10 @@ pub async fn get_job(
 ///
 /// Returns
 /// * The details of the task
-pub async fn get_task(ctx: &dyn RequestContext, id: Uuid) -> Result<Task, Error> {
+pub async fn get_task(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+) -> Result<Task, Error> {
     let path = "/v1/api/ulv2/schematicevaluator/tasks/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     res.as_slice().try_into().map_err(Error::from)
@@ -121,7 +124,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let q0 = 42;
         let q0 = Some(q0);
         let expected = Job::default();
@@ -146,7 +149,7 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = Task::default();
         let expected_bytes: Vec<u8> = expected.clone().into();
         ctx.set_response(expected_bytes);
