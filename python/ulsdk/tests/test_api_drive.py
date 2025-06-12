@@ -29,9 +29,6 @@ def test_ls():
         p0,
         p1
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_create_entry():
@@ -60,9 +57,6 @@ def test_create_entry():
         q1,
         q2
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_get_roots():
@@ -81,9 +75,6 @@ def test_get_roots():
     result = get_roots(
         ctx
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_post_file():
@@ -108,9 +99,6 @@ def test_post_file():
         q0,
         body
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_unlink():
@@ -131,9 +119,6 @@ def test_unlink():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_move():
@@ -186,9 +171,6 @@ def test_get_file():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_put_file_chunk():
@@ -231,7 +213,4 @@ def test_get_root_id():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected

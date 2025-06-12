@@ -27,9 +27,6 @@ def test_create_job():
         ctx,
         body
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_get_job():
@@ -52,9 +49,6 @@ def test_get_job():
         p0,
         q0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_get_task():
@@ -75,7 +69,4 @@ def test_get_task():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected

@@ -29,9 +29,6 @@ def test_get_object_at_revision():
         p0,
         p1
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_get_acl():
@@ -52,9 +49,6 @@ def test_get_acl():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_get_head_revision():
@@ -75,9 +69,6 @@ def test_get_head_revision():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_get_object():
@@ -98,9 +89,6 @@ def test_get_object():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_update_object():
@@ -177,9 +165,6 @@ def test_get_object_summaries():
         ctx,
         body
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_bulk_fetch_objects():
@@ -200,9 +185,6 @@ def test_bulk_fetch_objects():
         ctx,
         body
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_create_object():
@@ -221,9 +203,6 @@ def test_create_object():
     result = create_object(
         ctx
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_query_aggregate_numeric():
@@ -403,9 +382,6 @@ def test_stream_get_parquet():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_stream_get_csv():
@@ -426,9 +402,6 @@ def test_stream_get_csv():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_stream_get_xlsx():
@@ -449,9 +422,6 @@ def test_stream_get_xlsx():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_stream_get_json():
@@ -472,9 +442,6 @@ def test_stream_get_json():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_stream_get_text():
@@ -495,9 +462,6 @@ def test_stream_get_text():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_stream_get_html():
@@ -518,9 +482,6 @@ def test_stream_get_html():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_stream_put_arrow():
@@ -605,9 +566,6 @@ def test_generate_metadata():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_update_metadata():
@@ -664,9 +622,6 @@ def test_table_row_history():
         p0,
         p1
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_table_history():
@@ -687,9 +642,6 @@ def test_table_history():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_get_table_attachments_directory():
@@ -712,9 +664,6 @@ def test_get_table_attachments_directory():
         p0,
         p1
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_get_or_create_table_attachments_directory():
@@ -737,9 +686,6 @@ def test_get_or_create_table_attachments_directory():
         p0,
         p1
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_create_table():
@@ -762,9 +708,6 @@ def test_create_table():
         p0,
         body
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_query_arrow():
@@ -814,9 +757,6 @@ def test_query_parquet():
         ctx,
         body
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_query_csv():
@@ -837,9 +777,6 @@ def test_query_csv():
         ctx,
         body
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_query_xlsx():
@@ -860,9 +797,6 @@ def test_query_xlsx():
         ctx,
         body
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_query_json():
@@ -883,9 +817,6 @@ def test_query_json():
         ctx,
         body
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_query_text():
@@ -906,9 +837,6 @@ def test_query_text():
         ctx,
         body
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_query_html():
@@ -929,7 +857,4 @@ def test_query_html():
         ctx,
         body
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected

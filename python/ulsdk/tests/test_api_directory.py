@@ -27,9 +27,6 @@ def test_get_principal():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_get_principals():
@@ -54,9 +51,6 @@ def test_get_principals():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_query_principals():
@@ -81,9 +75,6 @@ def test_query_principals():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_get_users():
@@ -106,9 +97,6 @@ def test_get_users():
     result = get_users(
         ctx
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_get_users_display_names():
@@ -131,9 +119,6 @@ def test_get_users_display_names():
     result = get_users_display_names(
         ctx
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_get_current_user():
@@ -154,9 +139,6 @@ def test_get_current_user():
         ctx,
         q0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_create_user():
@@ -177,9 +159,6 @@ def test_create_user():
         ctx,
         body
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_update_current_user():
@@ -218,9 +197,6 @@ def test_get_user():
         p0,
         q0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_update_user():
@@ -277,9 +253,6 @@ def test_get_groups():
     result = get_groups(
         ctx
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_create_group():
@@ -300,9 +273,6 @@ def test_create_group():
         ctx,
         body
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_get_group_members():
@@ -327,9 +297,6 @@ def test_get_group_members():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_delete_group():

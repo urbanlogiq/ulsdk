@@ -27,9 +27,6 @@ def test_fetch():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_clear_all_status():

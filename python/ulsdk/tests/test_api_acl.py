@@ -25,9 +25,6 @@ def test_new_acl():
     result = new_acl(
         ctx
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_new_from():
@@ -48,9 +45,6 @@ def test_new_from():
         ctx,
         q0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_request():
@@ -265,9 +259,6 @@ def test_get_permissions():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_set():

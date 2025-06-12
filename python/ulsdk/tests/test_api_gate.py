@@ -25,9 +25,6 @@ def test_bootstrap():
     result = bootstrap(
         ctx
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_bootstrap_1():

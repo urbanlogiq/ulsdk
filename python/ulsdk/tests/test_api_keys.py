@@ -25,9 +25,6 @@ def test_get_keys():
     result = get_keys(
         ctx
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_get_keys_1():
@@ -60,9 +57,6 @@ def test_create_key():
     result = create_key(
         ctx
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_update_key():
@@ -101,9 +95,6 @@ def test_get_key():
         ctx,
         p0
     );
-    if result != expected:
-        print(f"result: {result}")
-        print(f"expected: {expected}")
     assert result == expected
 
 def test_delete_key():
