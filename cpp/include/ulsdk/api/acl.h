@@ -50,21 +50,21 @@ request(
 /**
  * Share an object to a specific access control list principal with specified permissions.
  * @param id The ID of the object that will be shared.
- * @param to The ID of the access control list that the object will be shared with.
+ * @param to The ID of the principal who will be granted access to the object.
  * @param permission_bits The permission bitset (see the PermissionTy enum for more information).
  */
 Result<Void>
 share(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
-    const ::ul::types::ObjectId &to,
+    const ::ul::types::B2cId &to,
     int64_t permission_bits
 );
 
 /**
  * Share an object to a specific access control list principal with specified permissions.
  * @param id The ID of the object that will be shared.
- * @param to The ID of the access control list that the object will be shared with.
+ * @param to The ID of the principal who will be granted access to the object.
  * @param permission_bits The permission bitset (see the PermissionTy enum for more information).
  * @param share_details A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
  */
@@ -72,7 +72,7 @@ Result<Void>
 share_with_details(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
-    const ::ul::types::ObjectId &to,
+    const ::ul::types::B2cId &to,
     int64_t permission_bits,
     const ::ul::types::ShareDetails &share_details
 );
@@ -80,47 +80,47 @@ share_with_details(
 /**
  * Share an object to a specific access control list principal with all permissions.
  * @param id The ID of the object that will be shared.
- * @param to The ID of the access control list that the object will be shared with.
+ * @param to The ID of the principal who will be granted access to the object.
  */
 Result<Void>
 share_all(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
-    const ::ul::types::ObjectId &to
+    const ::ul::types::B2cId &to
 );
 
 /**
  * Share an object to a specific access control list principal with all permissions.
  * @param id The ID of the object that will be shared.
- * @param to The ID of the access control list that the object will be shared with.
+ * @param to The ID of the principal who will be granted access to the object.
  * @param share_details A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
  */
 Result<Void>
 share_all_with_details(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
-    const ::ul::types::ObjectId &to,
+    const ::ul::types::B2cId &to,
     const ::ul::types::ShareDetails &share_details
 );
 
 /**
  * Grant an object to a specific access control list principal with specified permissions. Unlike the share operation, grant operations will fail with a 403 if the user performing the operation does not have the appropriate access.
  * @param id The ID of the object to which access will be granted.
- * @param to The ID of the access control list that the object will be granted to.
+ * @param to The ID of the principal who will be granted access to the object.
  * @param permission_bits The permission bitset (see the PermissionTy enum for more information).
  */
 Result<Void>
 grant(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
-    const ::ul::types::ObjectId &to,
+    const ::ul::types::B2cId &to,
     int64_t permission_bits
 );
 
 /**
  * Grant an object to a specific access control list principal with specified permissions. Unlike the share operation, grant operations will fail with a 403 if the user performing the operation does not have the appropriate access.
  * @param id The ID of the object to which access will be granted.
- * @param to The ID of the access control list that the object will be granted to.
+ * @param to The ID of the principal who will be granted access to the object.
  * @param permission_bits The permission bitset (see the PermissionTy enum for more information).
  * @param grant_details A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
  */
@@ -128,7 +128,7 @@ Result<Void>
 grant_with_details(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
-    const ::ul::types::ObjectId &to,
+    const ::ul::types::B2cId &to,
     int64_t permission_bits,
     const ::ul::types::ShareDetails &grant_details
 );
@@ -136,7 +136,7 @@ grant_with_details(
 /**
  * Grant an object to a specific access control list principal with all permissions. Unlike the share operation, grant operations will fail with a 403 if the user performing the operation does not have the appropriate access.
  * @param id The ID of the object to which access will be granted.
- * @param to The ID of the access control list that the object will be granted to.
+ * @param to The ID of the principal who will be granted access to the object.
  */
 Result<Void>
 grant_all(
@@ -148,27 +148,27 @@ grant_all(
 /**
  * Grant an object to a specific access control list principal with all permissions. Unlike the share operation, grant operations will fail with a 403 if the user performing the operation does not have the appropriate access.
  * @param id The ID of the object to which access will be granted.
- * @param to The ID of the access control list that the object will be granted to.
+ * @param to The ID of the principal who will be granted access to the object.
  * @param grant_details A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
  */
 Result<Void>
 grant_all_with_details(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
-    const ::ul::types::ObjectId &to,
+    const ::ul::types::B2cId &to,
     const ::ul::types::ShareDetails &grant_details
 );
 
 /**
  * Revoke all access from a specified ACL to an object.
  * @param id The ID of the object from which access will be revoked.
- * @param from The ID of the access control list that access to the object will be revoked from.
+ * @param from The ID of the principal whose access will be revoked.
  */
 Result<Void>
 revoke(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
-    const ::ul::types::ObjectId &from
+    const ::ul::types::B2cId &from
 );
 
 /**

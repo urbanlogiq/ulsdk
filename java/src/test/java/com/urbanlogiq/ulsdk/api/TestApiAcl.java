@@ -86,7 +86,7 @@ public final class TestApiAcl {
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
         com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
-        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p1 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
         int p2 = 42;
         com.urbanlogiq.ulsdk.api.acl.Acl.share(
             ctx,
@@ -109,7 +109,7 @@ public final class TestApiAcl {
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
         com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
-        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p1 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
         int p2 = 42;
         com.urbanlogiq.ulsdk.types.ShareDetails body = new com.urbanlogiq.ulsdk.types.ShareDetails();
         com.urbanlogiq.ulsdk.api.acl.Acl.shareWithDetails(
@@ -134,7 +134,7 @@ public final class TestApiAcl {
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
         com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
-        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p1 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.api.acl.Acl.shareAll(
             ctx,
             p0,
@@ -155,7 +155,7 @@ public final class TestApiAcl {
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
         com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
-        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p1 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.types.ShareDetails body = new com.urbanlogiq.ulsdk.types.ShareDetails();
         com.urbanlogiq.ulsdk.api.acl.Acl.shareAllWithDetails(
             ctx,
@@ -178,7 +178,7 @@ public final class TestApiAcl {
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
         com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
-        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p1 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
         int p2 = 42;
         com.urbanlogiq.ulsdk.api.acl.Acl.grant(
             ctx,
@@ -201,7 +201,7 @@ public final class TestApiAcl {
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
         com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
-        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p1 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
         int p2 = 42;
         com.urbanlogiq.ulsdk.types.ShareDetails body = new com.urbanlogiq.ulsdk.types.ShareDetails();
         com.urbanlogiq.ulsdk.api.acl.Acl.grantWithDetails(
@@ -247,7 +247,7 @@ public final class TestApiAcl {
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
         com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
-        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p1 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.types.ShareDetails body = new com.urbanlogiq.ulsdk.types.ShareDetails();
         com.urbanlogiq.ulsdk.api.acl.Acl.grantAllWithDetails(
             ctx,
@@ -270,7 +270,7 @@ public final class TestApiAcl {
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
         com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
-        com.urbanlogiq.ulsdk.types.ObjectId p1 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p1 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.api.acl.Acl.revoke(
             ctx,
             p0,

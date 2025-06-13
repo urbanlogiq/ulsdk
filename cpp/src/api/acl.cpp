@@ -93,7 +93,7 @@ Result<Void>
 share(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
-    const ::ul::types::ObjectId &to,
+    const ::ul::types::B2cId &to,
     int64_t permission_bits
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to/:permission";
@@ -120,7 +120,7 @@ Result<Void>
 share_with_details(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
-    const ::ul::types::ObjectId &to,
+    const ::ul::types::B2cId &to,
     int64_t permission_bits,
     const ::ul::types::ShareDetails &share_details
 ) {
@@ -148,7 +148,7 @@ Result<Void>
 share_all(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
-    const ::ul::types::ObjectId &to
+    const ::ul::types::B2cId &to
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to";
     const size_t id_idx = path.find(":id");
@@ -172,7 +172,7 @@ Result<Void>
 share_all_with_details(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
-    const ::ul::types::ObjectId &to,
+    const ::ul::types::B2cId &to,
     const ::ul::types::ShareDetails &share_details
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to";
@@ -197,7 +197,7 @@ Result<Void>
 grant(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
-    const ::ul::types::ObjectId &to,
+    const ::ul::types::B2cId &to,
     int64_t permission_bits
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to/:permission";
@@ -224,7 +224,7 @@ Result<Void>
 grant_with_details(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
-    const ::ul::types::ObjectId &to,
+    const ::ul::types::B2cId &to,
     int64_t permission_bits,
     const ::ul::types::ShareDetails &grant_details
 ) {
@@ -276,7 +276,7 @@ Result<Void>
 grant_all_with_details(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
-    const ::ul::types::ObjectId &to,
+    const ::ul::types::B2cId &to,
     const ::ul::types::ShareDetails &grant_details
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to";
@@ -301,7 +301,7 @@ Result<Void>
 revoke(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
-    const ::ul::types::ObjectId &from
+    const ::ul::types::B2cId &from
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/acl/revoke/:id/:from";
     const size_t id_idx = path.find(":id");

@@ -90,7 +90,7 @@ ul::Result<ul::Void>
 test_share(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
-    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p1 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
     int p2 = 42;
     return ul::api::acl::share(
         ctx,
@@ -106,7 +106,7 @@ ul::Result<ul::Void>
 test_share_with_details(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
-    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p1 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
     int p2 = 42;
     ::ul::types::ShareDetails body = ::ul::types::ShareDetails();
     return ul::api::acl::share_with_details(
@@ -124,7 +124,7 @@ ul::Result<ul::Void>
 test_share_all(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
-    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p1 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
     return ul::api::acl::share_all(
         ctx,
         p0,
@@ -138,7 +138,7 @@ ul::Result<ul::Void>
 test_share_all_with_details(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
-    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p1 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
     ::ul::types::ShareDetails body = ::ul::types::ShareDetails();
     return ul::api::acl::share_all_with_details(
         ctx,
@@ -154,7 +154,7 @@ ul::Result<ul::Void>
 test_grant(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
-    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p1 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
     int p2 = 42;
     return ul::api::acl::grant(
         ctx,
@@ -170,7 +170,7 @@ ul::Result<ul::Void>
 test_grant_with_details(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
-    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p1 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
     int p2 = 42;
     ::ul::types::ShareDetails body = ::ul::types::ShareDetails();
     return ul::api::acl::grant_with_details(
@@ -202,7 +202,7 @@ ul::Result<ul::Void>
 test_grant_all_with_details(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
-    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p1 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
     ::ul::types::ShareDetails body = ::ul::types::ShareDetails();
     return ul::api::acl::grant_all_with_details(
         ctx,
@@ -218,7 +218,7 @@ ul::Result<ul::Void>
 test_revoke(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
-    const ::ul::types::ObjectId p1 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p1 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
     return ul::api::acl::revoke(
         ctx,
         p0,

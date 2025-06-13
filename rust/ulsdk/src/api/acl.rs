@@ -78,12 +78,12 @@ pub async fn request(ctx: &dyn RequestContext, request: AccessRequest) -> Result
 ///
 /// * `ctx` - A request context object
 /// * `id` - The ID of the object that will be shared.
-/// * `to` - The ID of the access control list that the object will be shared with.
+/// * `to` - The ID of the principal who will be granted access to the object.
 /// * `permission_bits` - The permission bitset (see the PermissionTy enum for more information).
 pub async fn share(
     ctx: &dyn RequestContext,
     id: crate::types::id::ObjectId,
-    to: crate::types::id::ObjectId,
+    to: crate::types::id::B2cId,
     permission_bits: i64,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to/:permission"
@@ -101,13 +101,13 @@ pub async fn share(
 ///
 /// * `ctx` - A request context object
 /// * `id` - The ID of the object that will be shared.
-/// * `to` - The ID of the access control list that the object will be shared with.
+/// * `to` - The ID of the principal who will be granted access to the object.
 /// * `permission_bits` - The permission bitset (see the PermissionTy enum for more information).
 /// * `share_details` - A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
 pub async fn share_with_details(
     ctx: &dyn RequestContext,
     id: crate::types::id::ObjectId,
-    to: crate::types::id::ObjectId,
+    to: crate::types::id::B2cId,
     permission_bits: i64,
     share_details: ShareDetails,
 ) -> Result<(), Error> {
@@ -127,11 +127,11 @@ pub async fn share_with_details(
 ///
 /// * `ctx` - A request context object
 /// * `id` - The ID of the object that will be shared.
-/// * `to` - The ID of the access control list that the object will be shared with.
+/// * `to` - The ID of the principal who will be granted access to the object.
 pub async fn share_all(
     ctx: &dyn RequestContext,
     id: crate::types::id::ObjectId,
-    to: crate::types::id::ObjectId,
+    to: crate::types::id::B2cId,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to"
         .replace(":id", &id.to_string())
@@ -147,12 +147,12 @@ pub async fn share_all(
 ///
 /// * `ctx` - A request context object
 /// * `id` - The ID of the object that will be shared.
-/// * `to` - The ID of the access control list that the object will be shared with.
+/// * `to` - The ID of the principal who will be granted access to the object.
 /// * `share_details` - A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
 pub async fn share_all_with_details(
     ctx: &dyn RequestContext,
     id: crate::types::id::ObjectId,
-    to: crate::types::id::ObjectId,
+    to: crate::types::id::B2cId,
     share_details: ShareDetails,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to"
@@ -170,12 +170,12 @@ pub async fn share_all_with_details(
 ///
 /// * `ctx` - A request context object
 /// * `id` - The ID of the object to which access will be granted.
-/// * `to` - The ID of the access control list that the object will be granted to.
+/// * `to` - The ID of the principal who will be granted access to the object.
 /// * `permission_bits` - The permission bitset (see the PermissionTy enum for more information).
 pub async fn grant(
     ctx: &dyn RequestContext,
     id: crate::types::id::ObjectId,
-    to: crate::types::id::ObjectId,
+    to: crate::types::id::B2cId,
     permission_bits: i64,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to/:permission"
@@ -193,13 +193,13 @@ pub async fn grant(
 ///
 /// * `ctx` - A request context object
 /// * `id` - The ID of the object to which access will be granted.
-/// * `to` - The ID of the access control list that the object will be granted to.
+/// * `to` - The ID of the principal who will be granted access to the object.
 /// * `permission_bits` - The permission bitset (see the PermissionTy enum for more information).
 /// * `grant_details` - A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
 pub async fn grant_with_details(
     ctx: &dyn RequestContext,
     id: crate::types::id::ObjectId,
-    to: crate::types::id::ObjectId,
+    to: crate::types::id::B2cId,
     permission_bits: i64,
     grant_details: ShareDetails,
 ) -> Result<(), Error> {
@@ -219,7 +219,7 @@ pub async fn grant_with_details(
 ///
 /// * `ctx` - A request context object
 /// * `id` - The ID of the object to which access will be granted.
-/// * `to` - The ID of the access control list that the object will be granted to.
+/// * `to` - The ID of the principal who will be granted access to the object.
 pub async fn grant_all(
     ctx: &dyn RequestContext,
     id: crate::types::id::ObjectId,
@@ -239,12 +239,12 @@ pub async fn grant_all(
 ///
 /// * `ctx` - A request context object
 /// * `id` - The ID of the object to which access will be granted.
-/// * `to` - The ID of the access control list that the object will be granted to.
+/// * `to` - The ID of the principal who will be granted access to the object.
 /// * `grant_details` - A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
 pub async fn grant_all_with_details(
     ctx: &dyn RequestContext,
     id: crate::types::id::ObjectId,
-    to: crate::types::id::ObjectId,
+    to: crate::types::id::B2cId,
     grant_details: ShareDetails,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to"
@@ -262,11 +262,11 @@ pub async fn grant_all_with_details(
 ///
 /// * `ctx` - A request context object
 /// * `id` - The ID of the object from which access will be revoked.
-/// * `from` - The ID of the access control list that access to the object will be revoked from.
+/// * `from` - The ID of the principal whose access will be revoked.
 pub async fn revoke(
     ctx: &dyn RequestContext,
     id: crate::types::id::ObjectId,
-    from: crate::types::id::ObjectId,
+    from: crate::types::id::B2cId,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/acl/revoke/:id/:from"
         .replace(":id", &id.to_string())
@@ -403,7 +403,7 @@ mod tests {
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let p2 = 42;
         share(&ctx, p0, p1, p2).await.unwrap();
     }
@@ -424,7 +424,7 @@ mod tests {
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let p2 = 42;
         let body = crate::types::ShareDetails::default();
         share_with_details(&ctx, p0, p1, p2, body).await.unwrap();
@@ -446,7 +446,7 @@ mod tests {
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         share_all(&ctx, p0, p1).await.unwrap();
     }
 
@@ -466,7 +466,7 @@ mod tests {
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let body = crate::types::ShareDetails::default();
         share_all_with_details(&ctx, p0, p1, body).await.unwrap();
     }
@@ -487,7 +487,7 @@ mod tests {
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let p2 = 42;
         grant(&ctx, p0, p1, p2).await.unwrap();
     }
@@ -508,7 +508,7 @@ mod tests {
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let p2 = 42;
         let body = crate::types::ShareDetails::default();
         grant_with_details(&ctx, p0, p1, p2, body).await.unwrap();
@@ -550,7 +550,7 @@ mod tests {
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let body = crate::types::ShareDetails::default();
         grant_all_with_details(&ctx, p0, p1, body).await.unwrap();
     }
@@ -571,7 +571,7 @@ mod tests {
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         revoke(&ctx, p0, p1).await.unwrap();
     }
 

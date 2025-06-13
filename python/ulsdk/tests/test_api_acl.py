@@ -74,7 +74,7 @@ def test_share():
     key_ctx = ApiKeyContext(key, Environment.Stage)
     ctx = TestContext(key_ctx)
     p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
-    p1 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
+    p1 = B2cId.from_uuid("00000000-0000-0000-0000-000000000000");
     p2 = 42
     share(
         ctx,
@@ -94,7 +94,7 @@ def test_share_with_details():
     key_ctx = ApiKeyContext(key, Environment.Stage)
     ctx = TestContext(key_ctx)
     p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
-    p1 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
+    p1 = B2cId.from_uuid("00000000-0000-0000-0000-000000000000");
     p2 = 42
     body = ShareDetails.make_default()
     share_with_details(
@@ -116,7 +116,7 @@ def test_share_all():
     key_ctx = ApiKeyContext(key, Environment.Stage)
     ctx = TestContext(key_ctx)
     p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
-    p1 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
+    p1 = B2cId.from_uuid("00000000-0000-0000-0000-000000000000");
     share_all(
         ctx,
         p0,
@@ -134,7 +134,7 @@ def test_share_all_with_details():
     key_ctx = ApiKeyContext(key, Environment.Stage)
     ctx = TestContext(key_ctx)
     p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
-    p1 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
+    p1 = B2cId.from_uuid("00000000-0000-0000-0000-000000000000");
     body = ShareDetails.make_default()
     share_all_with_details(
         ctx,
@@ -154,7 +154,7 @@ def test_grant():
     key_ctx = ApiKeyContext(key, Environment.Stage)
     ctx = TestContext(key_ctx)
     p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
-    p1 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
+    p1 = B2cId.from_uuid("00000000-0000-0000-0000-000000000000");
     p2 = 42
     grant(
         ctx,
@@ -174,7 +174,7 @@ def test_grant_with_details():
     key_ctx = ApiKeyContext(key, Environment.Stage)
     ctx = TestContext(key_ctx)
     p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
-    p1 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
+    p1 = B2cId.from_uuid("00000000-0000-0000-0000-000000000000");
     p2 = 42
     body = ShareDetails.make_default()
     grant_with_details(
@@ -214,7 +214,7 @@ def test_grant_all_with_details():
     key_ctx = ApiKeyContext(key, Environment.Stage)
     ctx = TestContext(key_ctx)
     p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
-    p1 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
+    p1 = B2cId.from_uuid("00000000-0000-0000-0000-000000000000");
     body = ShareDetails.make_default()
     grant_all_with_details(
         ctx,
@@ -234,7 +234,7 @@ def test_revoke():
     key_ctx = ApiKeyContext(key, Environment.Stage)
     ctx = TestContext(key_ctx)
     p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
-    p1 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
+    p1 = B2cId.from_uuid("00000000-0000-0000-0000-000000000000");
     revoke(
         ctx,
         p0,

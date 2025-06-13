@@ -72,13 +72,13 @@ public final class Acl {
      * 
      * @param ctx A request context object
      * @param id The ID of the object that will be shared.
-     * @param to The ID of the access control list that the object will be shared with.
+     * @param to The ID of the principal who will be granted access to the object.
      * @param permission_bits The permission bitset (see the PermissionTy enum for more information).
      */
     public static void share(
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.types.ObjectId id,
-        com.urbanlogiq.ulsdk.types.ObjectId to,
+        com.urbanlogiq.ulsdk.types.B2cId to,
         Integer permissionBits
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to/:permission";
@@ -100,14 +100,14 @@ public final class Acl {
      * 
      * @param ctx A request context object
      * @param id The ID of the object that will be shared.
-     * @param to The ID of the access control list that the object will be shared with.
+     * @param to The ID of the principal who will be granted access to the object.
      * @param permission_bits The permission bitset (see the PermissionTy enum for more information).
      * @param share_details A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
      */
     public static void shareWithDetails(
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.types.ObjectId id,
-        com.urbanlogiq.ulsdk.types.ObjectId to,
+        com.urbanlogiq.ulsdk.types.B2cId to,
         Integer permissionBits,
         com.urbanlogiq.ulsdk.types.ShareDetails shareDetails
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
@@ -130,12 +130,12 @@ public final class Acl {
      * 
      * @param ctx A request context object
      * @param id The ID of the object that will be shared.
-     * @param to The ID of the access control list that the object will be shared with.
+     * @param to The ID of the principal who will be granted access to the object.
      */
     public static void shareAll(
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.types.ObjectId id,
-        com.urbanlogiq.ulsdk.types.ObjectId to
+        com.urbanlogiq.ulsdk.types.B2cId to
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to";
         path = path.replace(":id", id.toString());
@@ -155,13 +155,13 @@ public final class Acl {
      * 
      * @param ctx A request context object
      * @param id The ID of the object that will be shared.
-     * @param to The ID of the access control list that the object will be shared with.
+     * @param to The ID of the principal who will be granted access to the object.
      * @param share_details A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
      */
     public static void shareAllWithDetails(
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.types.ObjectId id,
-        com.urbanlogiq.ulsdk.types.ObjectId to,
+        com.urbanlogiq.ulsdk.types.B2cId to,
         com.urbanlogiq.ulsdk.types.ShareDetails shareDetails
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to";
@@ -182,13 +182,13 @@ public final class Acl {
      * 
      * @param ctx A request context object
      * @param id The ID of the object to which access will be granted.
-     * @param to The ID of the access control list that the object will be granted to.
+     * @param to The ID of the principal who will be granted access to the object.
      * @param permission_bits The permission bitset (see the PermissionTy enum for more information).
      */
     public static void grant(
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.types.ObjectId id,
-        com.urbanlogiq.ulsdk.types.ObjectId to,
+        com.urbanlogiq.ulsdk.types.B2cId to,
         Integer permissionBits
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to/:permission";
@@ -210,14 +210,14 @@ public final class Acl {
      * 
      * @param ctx A request context object
      * @param id The ID of the object to which access will be granted.
-     * @param to The ID of the access control list that the object will be granted to.
+     * @param to The ID of the principal who will be granted access to the object.
      * @param permission_bits The permission bitset (see the PermissionTy enum for more information).
      * @param grant_details A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
      */
     public static void grantWithDetails(
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.types.ObjectId id,
-        com.urbanlogiq.ulsdk.types.ObjectId to,
+        com.urbanlogiq.ulsdk.types.B2cId to,
         Integer permissionBits,
         com.urbanlogiq.ulsdk.types.ShareDetails grantDetails
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
@@ -240,7 +240,7 @@ public final class Acl {
      * 
      * @param ctx A request context object
      * @param id The ID of the object to which access will be granted.
-     * @param to The ID of the access control list that the object will be granted to.
+     * @param to The ID of the principal who will be granted access to the object.
      */
     public static void grantAll(
         com.urbanlogiq.ulsdk.RequestContext ctx,
@@ -265,13 +265,13 @@ public final class Acl {
      * 
      * @param ctx A request context object
      * @param id The ID of the object to which access will be granted.
-     * @param to The ID of the access control list that the object will be granted to.
+     * @param to The ID of the principal who will be granted access to the object.
      * @param grant_details A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
      */
     public static void grantAllWithDetails(
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.types.ObjectId id,
-        com.urbanlogiq.ulsdk.types.ObjectId to,
+        com.urbanlogiq.ulsdk.types.B2cId to,
         com.urbanlogiq.ulsdk.types.ShareDetails grantDetails
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to";
@@ -292,12 +292,12 @@ public final class Acl {
      * 
      * @param ctx A request context object
      * @param id The ID of the object from which access will be revoked.
-     * @param from The ID of the access control list that access to the object will be revoked from.
+     * @param from The ID of the principal whose access will be revoked.
      */
     public static void revoke(
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.types.ObjectId id,
-        com.urbanlogiq.ulsdk.types.ObjectId from
+        com.urbanlogiq.ulsdk.types.B2cId from
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/acl/revoke/:id/:from";
         path = path.replace(":id", id.toString());

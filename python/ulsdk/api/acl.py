@@ -9,7 +9,7 @@ from typing import Optional, Any, List, Dict, Self
 from urllib.parse import quote_plus
 from uuid import UUID
 from ..request_context import RequestContext
-from ..types.id import ObjectId
+from ..types.id import B2cId, ObjectId
 from ..types.notification import AccessRequest, ShareDetails
 from ..types.object import ObjectSummaryList
 
@@ -77,7 +77,7 @@ def request(
 def share(
     ctx: RequestContext,
     id_: "ObjectId",
-    to: "ObjectId",
+    to: "B2cId",
     permission_bits: int,
 ) -> None:
     """Share an object to a specific access control list principal with specified permissions.
@@ -85,7 +85,7 @@ def share(
     Arguments:
     ctx: RequestContext -- A request context object
     id_: "ObjectId" -- The ID of the object that will be shared.
-    to: "ObjectId" -- The ID of the access control list that the object will be shared with.
+    to: "B2cId" -- The ID of the principal who will be granted access to the object.
     permission_bits: int -- The permission bitset (see the PermissionTy enum for more information).
     """
 
@@ -103,7 +103,7 @@ def share(
 def share_with_details(
     ctx: RequestContext,
     id_: "ObjectId",
-    to: "ObjectId",
+    to: "B2cId",
     permission_bits: int,
     share_details: ShareDetails,
 ) -> None:
@@ -112,7 +112,7 @@ def share_with_details(
     Arguments:
     ctx: RequestContext -- A request context object
     id_: "ObjectId" -- The ID of the object that will be shared.
-    to: "ObjectId" -- The ID of the access control list that the object will be shared with.
+    to: "B2cId" -- The ID of the principal who will be granted access to the object.
     permission_bits: int -- The permission bitset (see the PermissionTy enum for more information).
     share_details: ShareDetails -- A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
     """
@@ -131,14 +131,14 @@ def share_with_details(
 def share_all(
     ctx: RequestContext,
     id_: "ObjectId",
-    to: "ObjectId",
+    to: "B2cId",
 ) -> None:
     """Share an object to a specific access control list principal with all permissions.
 
     Arguments:
     ctx: RequestContext -- A request context object
     id_: "ObjectId" -- The ID of the object that will be shared.
-    to: "ObjectId" -- The ID of the access control list that the object will be shared with.
+    to: "B2cId" -- The ID of the principal who will be granted access to the object.
     """
 
     path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to"
@@ -154,7 +154,7 @@ def share_all(
 def share_all_with_details(
     ctx: RequestContext,
     id_: "ObjectId",
-    to: "ObjectId",
+    to: "B2cId",
     share_details: ShareDetails,
 ) -> None:
     """Share an object to a specific access control list principal with all permissions.
@@ -162,7 +162,7 @@ def share_all_with_details(
     Arguments:
     ctx: RequestContext -- A request context object
     id_: "ObjectId" -- The ID of the object that will be shared.
-    to: "ObjectId" -- The ID of the access control list that the object will be shared with.
+    to: "B2cId" -- The ID of the principal who will be granted access to the object.
     share_details: ShareDetails -- A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
     """
 
@@ -179,7 +179,7 @@ def share_all_with_details(
 def grant(
     ctx: RequestContext,
     id_: "ObjectId",
-    to: "ObjectId",
+    to: "B2cId",
     permission_bits: int,
 ) -> None:
     """Grant an object to a specific access control list principal with specified permissions. Unlike the share operation, grant operations will fail with a 403 if the user performing the operation does not have the appropriate access.
@@ -187,7 +187,7 @@ def grant(
     Arguments:
     ctx: RequestContext -- A request context object
     id_: "ObjectId" -- The ID of the object to which access will be granted.
-    to: "ObjectId" -- The ID of the access control list that the object will be granted to.
+    to: "B2cId" -- The ID of the principal who will be granted access to the object.
     permission_bits: int -- The permission bitset (see the PermissionTy enum for more information).
     """
 
@@ -205,7 +205,7 @@ def grant(
 def grant_with_details(
     ctx: RequestContext,
     id_: "ObjectId",
-    to: "ObjectId",
+    to: "B2cId",
     permission_bits: int,
     grant_details: ShareDetails,
 ) -> None:
@@ -214,7 +214,7 @@ def grant_with_details(
     Arguments:
     ctx: RequestContext -- A request context object
     id_: "ObjectId" -- The ID of the object to which access will be granted.
-    to: "ObjectId" -- The ID of the access control list that the object will be granted to.
+    to: "B2cId" -- The ID of the principal who will be granted access to the object.
     permission_bits: int -- The permission bitset (see the PermissionTy enum for more information).
     grant_details: ShareDetails -- A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
     """
@@ -240,7 +240,7 @@ def grant_all(
     Arguments:
     ctx: RequestContext -- A request context object
     id_: "ObjectId" -- The ID of the object to which access will be granted.
-    to: "ObjectId" -- The ID of the access control list that the object will be granted to.
+    to: "ObjectId" -- The ID of the principal who will be granted access to the object.
     """
 
     path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to"
@@ -256,7 +256,7 @@ def grant_all(
 def grant_all_with_details(
     ctx: RequestContext,
     id_: "ObjectId",
-    to: "ObjectId",
+    to: "B2cId",
     grant_details: ShareDetails,
 ) -> None:
     """Grant an object to a specific access control list principal with all permissions. Unlike the share operation, grant operations will fail with a 403 if the user performing the operation does not have the appropriate access.
@@ -264,7 +264,7 @@ def grant_all_with_details(
     Arguments:
     ctx: RequestContext -- A request context object
     id_: "ObjectId" -- The ID of the object to which access will be granted.
-    to: "ObjectId" -- The ID of the access control list that the object will be granted to.
+    to: "B2cId" -- The ID of the principal who will be granted access to the object.
     grant_details: ShareDetails -- A ShareDetails object containing extra information for the sharing operation, including whether or not to notify the target of the operation, and to provide a message.
     """
 
@@ -281,14 +281,14 @@ def grant_all_with_details(
 def revoke(
     ctx: RequestContext,
     id_: "ObjectId",
-    from_: "ObjectId",
+    from_: "B2cId",
 ) -> None:
     """Revoke all access from a specified ACL to an object.
 
     Arguments:
     ctx: RequestContext -- A request context object
     id_: "ObjectId" -- The ID of the object from which access will be revoked.
-    from_: "ObjectId" -- The ID of the access control list that access to the object will be revoked from.
+    from_: "B2cId" -- The ID of the principal whose access will be revoked.
     """
 
     path = "/v1/api/ulv2/datacatalog/acl/revoke/:id/:from"
