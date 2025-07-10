@@ -18,13 +18,7 @@ namespace api {
 namespace drive {
 
 /**
- * Retrieves a directory listing from a unix-style path rooted at `root`. `root` may be one of:
-- `me` for the current user's drive
-- `union` for the union of the current user's drive and all shared drives
-- the UUID of any drive directory
-
-Paths may include wildcards like `*`.
-                
+ * Retrieves a directory listing from a unix-style path rooted at `root` where `root` may be the UUID of any drive directory. Paths may include wildcards like `*`.
  * @param root The root directory to list files for, or one of "me" or "union".
  * @param tail The unix-style path specifier to use for the file listing.
  * @return The directory listing
@@ -34,6 +28,32 @@ ls(
     ul::RequestContext &ctx,
     const std::string &root,
     const std::string &tail
+);
+
+/**
+ * Retrieves a directory listing from a unix-style path rooted at the current user's home root. Paths may include wildcards like `*`.
+ * @param tail The unix-style path specifier to use for the file listing.
+ * @return The directory listing
+ */
+Result<::ul::types::DirectoryList>
+ls_me(
+    ul::RequestContext &ctx,
+    const std::string &tail
+);
+
+/**
+ * Retrieves a directory listing from a union of all the drive roots the user has access to. Paths may include wildcards like `*`.
+ * @param tail The unix-style path specifier to use for the file listing.
+ * @param dedupe Deduplicate results of union queries
+ * @param exclude_public Remove entries from the result set that are accessible to unauthenticated users.
+ * @return The directory listing
+ */
+Result<::ul::types::DirectoryList>
+ls_union(
+    ul::RequestContext &ctx,
+    const std::string &tail,
+    bool dedupe,
+    bool exclude_public
 );
 
 /**

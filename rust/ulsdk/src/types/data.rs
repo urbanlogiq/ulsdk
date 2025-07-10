@@ -547,20 +547,17 @@ impl From<FbsAttributePair<'_>> for AttributePair {
     }
 }
 
-impl TryFrom<&[u8]> for AttributePair {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsAttributePair>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<AttributePair> for Vec<u8> {
-    fn from(obj: AttributePair) -> Self {
+impl AttributePair {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsAttributePair>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -598,20 +595,17 @@ impl From<FbsDirectionAndRoadName<'_>> for DirectionAndRoadName {
     }
 }
 
-impl TryFrom<&[u8]> for DirectionAndRoadName {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsDirectionAndRoadName>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<DirectionAndRoadName> for Vec<u8> {
-    fn from(obj: DirectionAndRoadName) -> Self {
+impl DirectionAndRoadName {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsDirectionAndRoadName>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -665,20 +659,17 @@ impl From<FbsDirectionAndRoadNames<'_>> for DirectionAndRoadNames {
     }
 }
 
-impl TryFrom<&[u8]> for DirectionAndRoadNames {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsDirectionAndRoadNames>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<DirectionAndRoadNames> for Vec<u8> {
-    fn from(obj: DirectionAndRoadNames) -> Self {
+impl DirectionAndRoadNames {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsDirectionAndRoadNames>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -729,20 +720,17 @@ impl From<FbsNamedParameter<'_>> for NamedParameter {
     }
 }
 
-impl TryFrom<&[u8]> for NamedParameter {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsNamedParameter>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<NamedParameter> for Vec<u8> {
-    fn from(obj: NamedParameter) -> Self {
+impl NamedParameter {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsNamedParameter>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -867,20 +855,17 @@ impl From<FbsSource<'_>> for Source {
     }
 }
 
-impl TryFrom<&[u8]> for Source {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsSource>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<Source> for Vec<u8> {
-    fn from(obj: Source) -> Self {
+impl Source {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsSource>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -891,40 +876,40 @@ mod tests {
     #[test]
     fn test_attribute_pair() {
         let t0 = AttributePair::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = AttributePair::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = AttributePair::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_direction_and_road_name() {
         let t0 = DirectionAndRoadName::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = DirectionAndRoadName::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = DirectionAndRoadName::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_direction_and_road_names() {
         let t0 = DirectionAndRoadNames::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = DirectionAndRoadNames::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = DirectionAndRoadNames::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_named_parameter() {
         let t0 = NamedParameter::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = NamedParameter::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = NamedParameter::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_source() {
         let t0 = Source::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = Source::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = Source::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 }

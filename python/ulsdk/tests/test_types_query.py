@@ -58,6 +58,12 @@ def test_drive():
     _t1 = Drive.from_bytes(_b)
     assert _t0 == _t1
 
+def test_explain():
+    _t0 = Explain.make_default()
+    _b = _t0.to_bytes()
+    _t1 = Explain.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_expr():
     _t0 = Expr.make_default()
     _b = _t0.to_bytes()

@@ -5,7 +5,12 @@
 from dataclasses import dataclass
 import json
 from pyarrow import RecordBatch, BufferOutputStream, RecordBatchStreamWriter, RecordBatchStreamReader
-from typing import Optional, Any, List, Dict, Self
+from typing import Optional, Any, List, Dict
+import sys
+if sys.version_info.minor < 11:
+    from typing_extensions import Self
+else:
+    from typing import Self
 from urllib.parse import quote_plus
 from uuid import UUID
 from ..request_context import RequestContext

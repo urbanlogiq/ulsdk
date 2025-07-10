@@ -1024,20 +1024,17 @@ impl From<FbsPoint<'_>> for Point {
     }
 }
 
-impl TryFrom<&[u8]> for Point {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsPoint>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<Point> for Vec<u8> {
-    fn from(obj: Point) -> Self {
+impl Point {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsPoint>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1077,20 +1074,17 @@ impl From<FbsLine<'_>> for Line {
     }
 }
 
-impl TryFrom<&[u8]> for Line {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsLine>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<Line> for Vec<u8> {
-    fn from(obj: Line) -> Self {
+impl Line {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsLine>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1130,20 +1124,17 @@ impl From<FbsMultiLine<'_>> for MultiLine {
     }
 }
 
-impl TryFrom<&[u8]> for MultiLine {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsMultiLine>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<MultiLine> for Vec<u8> {
-    fn from(obj: MultiLine) -> Self {
+impl MultiLine {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsMultiLine>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1185,20 +1176,17 @@ impl From<FbsPolygon<'_>> for Polygon {
     }
 }
 
-impl TryFrom<&[u8]> for Polygon {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsPolygon>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<Polygon> for Vec<u8> {
-    fn from(obj: Polygon) -> Self {
+impl Polygon {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsPolygon>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1238,20 +1226,17 @@ impl From<FbsMultiPolygon<'_>> for MultiPolygon {
     }
 }
 
-impl TryFrom<&[u8]> for MultiPolygon {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsMultiPolygon>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<MultiPolygon> for Vec<u8> {
-    fn from(obj: MultiPolygon) -> Self {
+impl MultiPolygon {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsMultiPolygon>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1336,20 +1321,17 @@ impl From<FbsGraphEdge<'_>> for GraphEdge {
     }
 }
 
-impl TryFrom<&[u8]> for GraphEdge {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsGraphEdge>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<GraphEdge> for Vec<u8> {
-    fn from(obj: GraphEdge) -> Self {
+impl GraphEdge {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsGraphEdge>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1453,20 +1435,17 @@ impl From<FbsGraphNode<'_>> for GraphNode {
     }
 }
 
-impl TryFrom<&[u8]> for GraphNode {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsGraphNode>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<GraphNode> for Vec<u8> {
-    fn from(obj: GraphNode) -> Self {
+impl GraphNode {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsGraphNode>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1477,56 +1456,56 @@ mod tests {
     #[test]
     fn test_graph_edge() {
         let t0 = GraphEdge::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = GraphEdge::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = GraphEdge::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_graph_node() {
         let t0 = GraphNode::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = GraphNode::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = GraphNode::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_line() {
         let t0 = Line::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = Line::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = Line::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_multi_line() {
         let t0 = MultiLine::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = MultiLine::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = MultiLine::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_multi_polygon() {
         let t0 = MultiPolygon::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = MultiPolygon::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = MultiPolygon::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_point() {
         let t0 = Point::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = Point::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = Point::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_polygon() {
         let t0 = Polygon::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = Polygon::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = Polygon::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 }

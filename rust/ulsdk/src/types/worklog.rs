@@ -249,20 +249,17 @@ impl From<FbsByteArray<'_>> for ByteArray {
     }
 }
 
-impl TryFrom<&[u8]> for ByteArray {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsByteArray>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<ByteArray> for Vec<u8> {
-    fn from(obj: ByteArray) -> Self {
+impl ByteArray {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsByteArray>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -291,20 +288,17 @@ impl From<FbsParameterFlags<'_>> for ParameterFlags {
     }
 }
 
-impl TryFrom<&[u8]> for ParameterFlags {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsParameterFlags>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<ParameterFlags> for Vec<u8> {
-    fn from(obj: ParameterFlags) -> Self {
+impl ParameterFlags {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsParameterFlags>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -395,20 +389,17 @@ impl From<FbsLayout<'_>> for Layout {
     }
 }
 
-impl TryFrom<&[u8]> for Layout {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsLayout>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<Layout> for Vec<u8> {
-    fn from(obj: Layout) -> Self {
+impl Layout {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsLayout>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -529,20 +520,17 @@ impl From<FbsTileSettings<'_>> for TileSettings {
     }
 }
 
-impl TryFrom<&[u8]> for TileSettings {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsTileSettings>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<TileSettings> for Vec<u8> {
-    fn from(obj: TileSettings) -> Self {
+impl TileSettings {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsTileSettings>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -580,20 +568,17 @@ impl From<FbsTileData<'_>> for TileData {
     }
 }
 
-impl TryFrom<&[u8]> for TileData {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsTileData>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<TileData> for Vec<u8> {
-    fn from(obj: TileData) -> Self {
+impl TileData {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsTileData>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -639,20 +624,17 @@ impl From<FbsUserSettings<'_>> for UserSettings {
     }
 }
 
-impl TryFrom<&[u8]> for UserSettings {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsUserSettings>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<UserSettings> for Vec<u8> {
-    fn from(obj: UserSettings) -> Self {
+impl UserSettings {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsUserSettings>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -784,20 +766,17 @@ impl From<FbsWorkLog<'_>> for WorkLog {
     }
 }
 
-impl TryFrom<&[u8]> for WorkLog {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsWorkLog>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<WorkLog> for Vec<u8> {
-    fn from(obj: WorkLog) -> Self {
+impl WorkLog {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsWorkLog>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -856,20 +835,17 @@ impl From<FbsWorklogParameter<'_>> for WorklogParameter {
     }
 }
 
-impl TryFrom<&[u8]> for WorklogParameter {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsWorklogParameter>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<WorklogParameter> for Vec<u8> {
-    fn from(obj: WorklogParameter) -> Self {
+impl WorklogParameter {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsWorklogParameter>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -880,64 +856,64 @@ mod tests {
     #[test]
     fn test_byte_array() {
         let t0 = ByteArray::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = ByteArray::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = ByteArray::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_layout() {
         let t0 = Layout::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = Layout::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = Layout::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_parameter_flags() {
         let t0 = ParameterFlags::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = ParameterFlags::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = ParameterFlags::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_tile_data() {
         let t0 = TileData::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = TileData::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = TileData::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_tile_settings() {
         let t0 = TileSettings::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = TileSettings::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = TileSettings::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_user_settings() {
         let t0 = UserSettings::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = UserSettings::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = UserSettings::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_work_log() {
         let t0 = WorkLog::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = WorkLog::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = WorkLog::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_worklog_parameter() {
         let t0 = WorklogParameter::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = WorklogParameter::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = WorklogParameter::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 }

@@ -5,7 +5,12 @@
 from dataclasses import dataclass
 import json
 from pyarrow import RecordBatch, BufferOutputStream, RecordBatchStreamWriter, RecordBatchStreamReader
-from typing import Optional, Any, List, Dict, Self
+from typing import Optional, Any, List, Dict
+import sys
+if sys.version_info.minor < 11:
+    from typing_extensions import Self
+else:
+    from typing import Self
 from urllib.parse import quote_plus
 from uuid import UUID
 from ..request_context import RequestContext
@@ -19,13 +24,7 @@ def ls(
     root: str,
     tail: str,
 ) -> DirectoryList:
-    """Retrieves a directory listing from a unix-style path rooted at `root`. `root` may be one of:
-    - `me` for the current user's drive
-    - `union` for the union of the current user's drive and all shared drives
-    - the UUID of any drive directory
-    
-    Paths may include wildcards like `*`.
-                    
+    """Retrieves a directory listing from a unix-style path rooted at `root` where `root` may be the UUID of any drive directory. Paths may include wildcards like `*`.
 
     Arguments:
     ctx: RequestContext -- A request context object
@@ -41,6 +40,57 @@ def ls(
     path = path.replace("*tail", tail, 1)
 
     params = dict()
+    headers = dict()
+    res = ctx.get(path, params=params, headers=headers)
+    return DirectoryList.from_bytes(res)
+
+def ls_me(
+    ctx: RequestContext,
+    tail: str,
+) -> DirectoryList:
+    """Retrieves a directory listing from a unix-style path rooted at the current user's home root. Paths may include wildcards like `*`.
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+    tail: str -- The unix-style path specifier to use for the file listing.
+
+    Returns:
+    The directory listing
+    """
+
+    path = "/v1/api/ulv2/drive/me/*tail"
+    path = path.replace("*tail", tail, 1)
+
+    params = dict()
+    headers = dict()
+    res = ctx.get(path, params=params, headers=headers)
+    return DirectoryList.from_bytes(res)
+
+def ls_union(
+    ctx: RequestContext,
+    tail: str,
+    dedupe: bool,
+    exclude_public: bool,
+) -> DirectoryList:
+    """Retrieves a directory listing from a union of all the drive roots the user has access to. Paths may include wildcards like `*`.
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+    tail: str -- The unix-style path specifier to use for the file listing.
+    dedupe: bool -- Deduplicate results of union queries
+    exclude_public: bool -- Remove entries from the result set that are accessible to unauthenticated users.
+
+    Returns:
+    The directory listing
+    """
+
+    path = "/v1/api/ulv2/drive/union/*tail"
+    path = path.replace("*tail", tail, 1)
+
+    params = dict()
+    params["dedupe"] = "true" if dedupe else "false"
+    params["exclude_public"] = "true" if exclude_public else "false"
+
     headers = dict()
     res = ctx.get(path, params=params, headers=headers)
     return DirectoryList.from_bytes(res)

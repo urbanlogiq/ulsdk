@@ -164,20 +164,17 @@ impl From<FbsGeomOp<'_>> for GeomOp {
     }
 }
 
-impl TryFrom<&[u8]> for GeomOp {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsGeomOp>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<GeomOp> for Vec<u8> {
-    fn from(obj: GeomOp) -> Self {
+impl GeomOp {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsGeomOp>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -644,20 +641,17 @@ impl From<FbsNodeQuery<'_>> for NodeQuery {
     }
 }
 
-impl TryFrom<&[u8]> for NodeQuery {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsNodeQuery>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<NodeQuery> for Vec<u8> {
-    fn from(obj: NodeQuery) -> Self {
+impl NodeQuery {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsNodeQuery>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -686,20 +680,17 @@ impl From<FbsEdgeQuery<'_>> for EdgeQuery {
     }
 }
 
-impl TryFrom<&[u8]> for EdgeQuery {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsEdgeQuery>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<EdgeQuery> for Vec<u8> {
-    fn from(obj: EdgeQuery) -> Self {
+impl EdgeQuery {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsEdgeQuery>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -771,20 +762,17 @@ impl From<FbsEdgeList<'_>> for EdgeList {
     }
 }
 
-impl TryFrom<&[u8]> for EdgeList {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsEdgeList>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<EdgeList> for Vec<u8> {
-    fn from(obj: EdgeList) -> Self {
+impl EdgeList {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsEdgeList>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -830,20 +818,17 @@ impl From<FbsGeom<'_>> for Geom {
     }
 }
 
-impl TryFrom<&[u8]> for Geom {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsGeom>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<Geom> for Vec<u8> {
-    fn from(obj: Geom) -> Self {
+impl Geom {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsGeom>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -915,20 +900,17 @@ impl From<FbsGraphQuery<'_>> for GraphQuery {
     }
 }
 
-impl TryFrom<&[u8]> for GraphQuery {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsGraphQuery>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<GraphQuery> for Vec<u8> {
-    fn from(obj: GraphQuery) -> Self {
+impl GraphQuery {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsGraphQuery>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -965,20 +947,17 @@ impl From<FbsNodeIdPair<'_>> for NodeIdPair {
     }
 }
 
-impl TryFrom<&[u8]> for NodeIdPair {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsNodeIdPair>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<NodeIdPair> for Vec<u8> {
-    fn from(obj: NodeIdPair) -> Self {
+impl NodeIdPair {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsNodeIdPair>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1018,20 +997,17 @@ impl From<FbsNodeList<'_>> for NodeList {
     }
 }
 
-impl TryFrom<&[u8]> for NodeList {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsNodeList>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<NodeList> for Vec<u8> {
-    fn from(obj: NodeList) -> Self {
+impl NodeList {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsNodeList>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1072,20 +1048,17 @@ impl From<FbsOrderBy<'_>> for OrderBy {
     }
 }
 
-impl TryFrom<&[u8]> for OrderBy {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsOrderBy>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<OrderBy> for Vec<u8> {
-    fn from(obj: OrderBy) -> Self {
+impl OrderBy {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsOrderBy>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1119,20 +1092,17 @@ impl From<FbsProjection<'_>> for Projection {
     }
 }
 
-impl TryFrom<&[u8]> for Projection {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsProjection>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<Projection> for Vec<u8> {
-    fn from(obj: Projection) -> Self {
+impl Projection {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsProjection>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1173,20 +1143,17 @@ impl From<FbsQueryPathElement<'_>> for QueryPathElement {
     }
 }
 
-impl TryFrom<&[u8]> for QueryPathElement {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsQueryPathElement>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<QueryPathElement> for Vec<u8> {
-    fn from(obj: QueryPathElement) -> Self {
+impl QueryPathElement {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsQueryPathElement>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1197,88 +1164,88 @@ mod tests {
     #[test]
     fn test_edge_list() {
         let t0 = EdgeList::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = EdgeList::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = EdgeList::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_edge_query() {
         let t0 = EdgeQuery::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = EdgeQuery::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = EdgeQuery::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_geom() {
         let t0 = Geom::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = Geom::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = Geom::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_geom_op() {
         let t0 = GeomOp::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = GeomOp::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = GeomOp::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_graph_query() {
         let t0 = GraphQuery::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = GraphQuery::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = GraphQuery::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_node_id_pair() {
         let t0 = NodeIdPair::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = NodeIdPair::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = NodeIdPair::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_node_list() {
         let t0 = NodeList::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = NodeList::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = NodeList::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_node_query() {
         let t0 = NodeQuery::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = NodeQuery::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = NodeQuery::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_order_by() {
         let t0 = OrderBy::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = OrderBy::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = OrderBy::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_projection() {
         let t0 = Projection::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = Projection::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = Projection::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_query_path_element() {
         let t0 = QueryPathElement::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = QueryPathElement::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = QueryPathElement::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 }

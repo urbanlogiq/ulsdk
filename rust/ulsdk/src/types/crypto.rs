@@ -50,20 +50,17 @@ impl From<FbsSha256<'_>> for Sha256 {
     }
 }
 
-impl TryFrom<&[u8]> for Sha256 {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsSha256>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<Sha256> for Vec<u8> {
-    fn from(obj: Sha256) -> Self {
+impl Sha256 {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsSha256>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -136,20 +133,17 @@ impl From<FbsCryptHeader<'_>> for CryptHeader {
     }
 }
 
-impl TryFrom<&[u8]> for CryptHeader {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsCryptHeader>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<CryptHeader> for Vec<u8> {
-    fn from(obj: CryptHeader) -> Self {
+impl CryptHeader {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsCryptHeader>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -188,20 +182,17 @@ impl From<FbsEncryptedObject<'_>> for EncryptedObject {
     }
 }
 
-impl TryFrom<&[u8]> for EncryptedObject {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsEncryptedObject>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<EncryptedObject> for Vec<u8> {
-    fn from(obj: EncryptedObject) -> Self {
+impl EncryptedObject {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsEncryptedObject>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -240,20 +231,17 @@ impl From<FbsSignature<'_>> for Signature {
     }
 }
 
-impl TryFrom<&[u8]> for Signature {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsSignature>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<Signature> for Vec<u8> {
-    fn from(obj: Signature) -> Self {
+impl Signature {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsSignature>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -264,32 +252,32 @@ mod tests {
     #[test]
     fn test_crypt_header() {
         let t0 = CryptHeader::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = CryptHeader::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = CryptHeader::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_encrypted_object() {
         let t0 = EncryptedObject::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = EncryptedObject::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = EncryptedObject::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_sha_256() {
         let t0 = Sha256::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = Sha256::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = Sha256::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_signature() {
         let t0 = Signature::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = Signature::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = Signature::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 }

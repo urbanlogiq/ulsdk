@@ -41,7 +41,7 @@ pub async fn get_object_at_revision(
         .replace(":object_id", &object_id.to_string())
         .replace(":content_id", &content_id.to_string());
     let res = ctx.get(&path, None, None).await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::DataCatalogObject::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Fetch the ID of the ACL object associated with the given object ID
@@ -59,7 +59,7 @@ pub async fn get_acl(
 ) -> Result<ObjectId, Error> {
     let path = "/v1/api/ulv2/datacatalog/object/acl/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::ObjectId::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Fetch the head revision of the object with the given ID
@@ -77,7 +77,7 @@ pub async fn get_head_revision(
 ) -> Result<ObjectSummary, Error> {
     let path = "/v1/api/ulv2/datacatalog/object/head/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::ObjectSummary::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Fetch the object with the given ID at its head revision
@@ -95,7 +95,7 @@ pub async fn get_object(
 ) -> Result<DataCatalogObject, Error> {
     let path = "/v1/api/ulv2/datacatalog/object/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::DataCatalogObject::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Update the object with the given ID
@@ -111,7 +111,7 @@ pub async fn update_object(
     object: DataCatalogObject,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/object/:id".replace(":id", &id.to_string());
-    let body = Bytes::from(Vec::<u8>::from(object));
+    let body = Bytes::from(object.to_fbs_bytes());
     ctx.post(&path, body, "application/octet-stream", None, None)
         .await?;
     Ok(())
@@ -177,11 +177,11 @@ pub async fn get_object_summaries(
     object_ids: ObjectIdList,
 ) -> Result<ObjectSummaryList, Error> {
     let path = "/v1/api/ulv2/datacatalog/object_summaries";
-    let body = Bytes::from(Vec::<u8>::from(object_ids));
+    let body = Bytes::from(object_ids.to_fbs_bytes());
     let res = ctx
         .post(&path, body, "application/octet-stream", None, None)
         .await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::ObjectSummaryList::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Given a list of object IDs, fetch their contents in bulk
@@ -198,11 +198,11 @@ pub async fn bulk_fetch_objects(
     object_ids: ObjectIdList,
 ) -> Result<ObjectIdPairList, Error> {
     let path = "/v1/api/ulv2/datacatalog/object_list";
-    let body = Bytes::from(Vec::<u8>::from(object_ids));
+    let body = Bytes::from(object_ids.to_fbs_bytes());
     let res = ctx
         .post(&path, body, "application/octet-stream", None, None)
         .await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::ObjectIdPairList::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Create a new, empty object
@@ -217,7 +217,7 @@ pub async fn create_object(ctx: &dyn RequestContext) -> Result<ObjectSummaryList
     let path = "/v1/api/ulv2/datacatalog/objects";
     let body = Bytes::new();
     let res = ctx.post(&path, body, "text/plain", None, None).await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::ObjectSummaryList::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// INTERNAL
@@ -239,7 +239,7 @@ pub async fn query_aggregate_numeric(
     let mut params = ParamMap::new();
     params.insert("columns".to_owned(), columns.to_owned());
 
-    let body = Bytes::from(Vec::<u8>::from(query));
+    let body = Bytes::from(query.to_fbs_bytes());
     let res = ctx
         .post(&path, body, "application/octet-stream", Some(params), None)
         .await?;
@@ -265,7 +265,7 @@ pub async fn query_aggregate_string(
     let mut params = ParamMap::new();
     params.insert("columns".to_owned(), columns.to_owned());
 
-    let body = Bytes::from(Vec::<u8>::from(query));
+    let body = Bytes::from(query.to_fbs_bytes());
     let res = ctx
         .post(&path, body, "application/octet-stream", Some(params), None)
         .await?;
@@ -294,7 +294,7 @@ pub async fn query_aggregate_histo(
     params.insert("buckets".to_owned(), buckets.to_string());
     params.insert("columns".to_owned(), columns.to_owned());
 
-    let body = Bytes::from(Vec::<u8>::from(query));
+    let body = Bytes::from(query.to_fbs_bytes());
     let res = ctx
         .post(&path, body, "application/octet-stream", Some(params), None)
         .await?;
@@ -329,7 +329,7 @@ pub async fn query_aggregate_relative_histo(
         denominator_columns.to_owned(),
     );
 
-    let body = Bytes::from(Vec::<u8>::from(query));
+    let body = Bytes::from(query.to_fbs_bytes());
     let res = ctx
         .post(&path, body, "application/octet-stream", Some(params), None)
         .await?;
@@ -544,7 +544,7 @@ pub async fn stream_put_diffstream(
     data: DiffStream,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
-    let body = Bytes::from(Vec::<u8>::from(data));
+    let body = Bytes::from(data.to_fbs_bytes());
     ctx.put(&path, body, "application/octet-stream", None, None)
         .await?;
     Ok(())
@@ -584,7 +584,7 @@ pub async fn generate_metadata(
     let path =
         "/v1/api/ulv2/datacatalog/stream/:id/generated/metadata".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::Metadata::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Given a stream ID and metadata, update the stream metadata to a combination of:
@@ -606,7 +606,7 @@ pub async fn update_metadata(
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id/metadata".replace(":id", &id.to_string());
     let body = if let Some(metadata) = metadata {
-        let body = Bytes::from(Vec::<u8>::from(metadata));
+        let body = Bytes::from(metadata.to_fbs_bytes());
         body
     } else {
         Bytes::new()
@@ -651,7 +651,7 @@ pub async fn table_row_history(
         .replace(":id", &id.to_string())
         .replace(":row", &row.to_string());
     let res = ctx.get(&path, None, None).await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::History::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Fetch the history of a table
@@ -669,7 +669,7 @@ pub async fn table_history(
 ) -> Result<History, Error> {
     let path = "/v1/api/ulv2/datacatalog/table/:id/history".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::History::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Fetch the directory ID for a row's file attachments location
@@ -691,7 +691,7 @@ pub async fn get_table_attachments_directory(
         .replace(":id", &id.to_string())
         .replace(":row", &row.to_string());
     let res = ctx.get(&path, None, None).await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::ObjectId::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Fetch the directory ID for a row's file attachments location, creating it if it doesn't exist
@@ -714,7 +714,7 @@ pub async fn get_or_create_table_attachments_directory(
         .replace(":row", &row.to_string());
     let body = Bytes::new();
     let res = ctx.post(&path, body, "text/plain", None, None).await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::ObjectId::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Create a new table in the provided directory
@@ -733,11 +733,11 @@ pub async fn create_table(
     new_table: NewTable,
 ) -> Result<ObjectId, Error> {
     let path = "/v1/api/ulv2/datacatalog/table/:id".replace(":id", &id.to_string());
-    let body = Bytes::from(Vec::<u8>::from(new_table));
+    let body = Bytes::from(new_table.to_fbs_bytes());
     let res = ctx
         .post(&path, body, "application/octet-stream", None, None)
         .await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::ObjectId::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Query the datacatalog, returning data in Apache Arrow IPC Stream format
@@ -760,7 +760,7 @@ pub async fn query_arrow(
         HeaderValue::from_static("application/vnd.apache.arrow.stream"),
     );
 
-    let body = Bytes::from(Vec::<u8>::from(query));
+    let body = Bytes::from(query.to_fbs_bytes());
     let res = ctx
         .post(&path, body, "application/octet-stream", None, Some(headers))
         .await?;
@@ -784,7 +784,7 @@ pub async fn query_parquet(ctx: &dyn RequestContext, query: Query) -> Result<Vec
         HeaderValue::from_static("application/vnd.apache.parquet"),
     );
 
-    let body = Bytes::from(Vec::<u8>::from(query));
+    let body = Bytes::from(query.to_fbs_bytes());
     let res = ctx
         .post(&path, body, "application/octet-stream", None, Some(headers))
         .await?;
@@ -808,7 +808,7 @@ pub async fn query_csv(ctx: &dyn RequestContext, query: Query) -> Result<Vec<u8>
         HeaderValue::from_static("text/csv"),
     );
 
-    let body = Bytes::from(Vec::<u8>::from(query));
+    let body = Bytes::from(query.to_fbs_bytes());
     let res = ctx
         .post(&path, body, "application/octet-stream", None, Some(headers))
         .await?;
@@ -834,7 +834,7 @@ pub async fn query_xlsx(ctx: &dyn RequestContext, query: Query) -> Result<Vec<u8
         ),
     );
 
-    let body = Bytes::from(Vec::<u8>::from(query));
+    let body = Bytes::from(query.to_fbs_bytes());
     let res = ctx
         .post(&path, body, "application/octet-stream", None, Some(headers))
         .await?;
@@ -858,7 +858,7 @@ pub async fn query_json(ctx: &dyn RequestContext, query: Query) -> Result<Vec<u8
         HeaderValue::from_static("application/json"),
     );
 
-    let body = Bytes::from(Vec::<u8>::from(query));
+    let body = Bytes::from(query.to_fbs_bytes());
     let res = ctx
         .post(&path, body, "application/octet-stream", None, Some(headers))
         .await?;
@@ -882,7 +882,7 @@ pub async fn query_text(ctx: &dyn RequestContext, query: Query) -> Result<Vec<u8
         HeaderValue::from_static("text/plain"),
     );
 
-    let body = Bytes::from(Vec::<u8>::from(query));
+    let body = Bytes::from(query.to_fbs_bytes());
     let res = ctx
         .post(&path, body, "application/octet-stream", None, Some(headers))
         .await?;
@@ -906,7 +906,7 @@ pub async fn query_html(ctx: &dyn RequestContext, query: Query) -> Result<Vec<u8
         HeaderValue::from_static("text/html"),
     );
 
-    let body = Bytes::from(Vec::<u8>::from(query));
+    let body = Bytes::from(query.to_fbs_bytes());
     let res = ctx
         .post(&path, body, "application/octet-stream", None, Some(headers))
         .await?;
@@ -939,7 +939,7 @@ mod tests {
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let p1 = crate::types::ContentId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = DataCatalogObject::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = get_object_at_revision(&ctx, p0, p1).await.unwrap();
         assert_eq!(result, expected);
@@ -962,7 +962,7 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = ObjectId::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = get_acl(&ctx, p0).await.unwrap();
         assert_eq!(result, expected);
@@ -985,7 +985,7 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = ObjectSummary::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = get_head_revision(&ctx, p0).await.unwrap();
         assert_eq!(result, expected);
@@ -1008,7 +1008,7 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = DataCatalogObject::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = get_object(&ctx, p0).await.unwrap();
         assert_eq!(result, expected);
@@ -1092,7 +1092,7 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let body = crate::types::ObjectIdList::default();
         let expected = ObjectSummaryList::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = get_object_summaries(&ctx, body).await.unwrap();
         assert_eq!(result, expected);
@@ -1115,7 +1115,7 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let body = crate::types::ObjectIdList::default();
         let expected = ObjectIdPairList::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = bulk_fetch_objects(&ctx, body).await.unwrap();
         assert_eq!(result, expected);
@@ -1137,7 +1137,7 @@ mod tests {
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let expected = ObjectSummaryList::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = create_object(&ctx).await.unwrap();
         assert_eq!(result, expected);
@@ -1472,7 +1472,7 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = Metadata::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = generate_metadata(&ctx, p0).await.unwrap();
         assert_eq!(result, expected);
@@ -1536,7 +1536,7 @@ mod tests {
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let p1 = crate::types::GenericId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = History::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = table_row_history(&ctx, p0, p1).await.unwrap();
         assert_eq!(result, expected);
@@ -1559,7 +1559,7 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = History::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = table_history(&ctx, p0).await.unwrap();
         assert_eq!(result, expected);
@@ -1583,7 +1583,7 @@ mod tests {
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let p1 = crate::types::GenericId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = ObjectId::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = get_table_attachments_directory(&ctx, p0, p1).await.unwrap();
         assert_eq!(result, expected);
@@ -1607,7 +1607,7 @@ mod tests {
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let p1 = crate::types::GenericId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = ObjectId::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = get_or_create_table_attachments_directory(&ctx, p0, p1)
             .await
@@ -1633,7 +1633,7 @@ mod tests {
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let body = crate::types::NewTable::default();
         let expected = ObjectId::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = create_table(&ctx, p0, body).await.unwrap();
         assert_eq!(result, expected);

@@ -66,8 +66,9 @@ use crate::types::generated::query_generated::{
     AllColumns as FbsAllColumns, Arrow as FbsArrow, BinaryQueryElement as FbsBinaryQueryElement,
     Case as FbsCase, Column as FbsColumn, DataCatalog as FbsDataCatalog,
     DeleteQueryElement as FbsDeleteQueryElement, Distinct as FbsDistinct, Drive as FbsDrive,
-    Expr as FbsExpr, ExprUnion as FbsExprUnion, Function as FbsFunction, Join as FbsJoin,
-    JoinTy as FbsJoinTy, MvdbPartition as FbsMvdbPartition, NullableUint as FbsNullableUint,
+    Explain as FbsExplain, ExplainFormat as FbsExplainFormat, Expr as FbsExpr,
+    ExprUnion as FbsExprUnion, Function as FbsFunction, Join as FbsJoin, JoinTy as FbsJoinTy,
+    MvdbPartition as FbsMvdbPartition, NullableUint as FbsNullableUint,
     OrderByExpr as FbsOrderByExpr, Partition as FbsPartition, Placeholder as FbsPlaceholder,
     Query as FbsQuery, QueryElement as FbsQueryElement, QueryElementOp as FbsQueryElementOp,
     QueryElementUnion as FbsQueryElementUnion, QueryTableSource as FbsQueryTableSource,
@@ -108,11 +109,11 @@ use crate::types::id::{
 };
 use crate::types::query::{
     AllColumns, Arrow, BinaryQueryElement, Case, Column, DataCatalog, DeleteQueryElement, Distinct,
-    Drive, Expr, ExprUnion, Function, Join, JoinTy, MvdbPartition, NullableUint, OrderByExpr,
-    Partition, Placeholder, Query, QueryElement, QueryElementOp, QueryElementUnion,
-    QueryTableSource, SetExpr, TableOrderBy, TablePartition, TableSource, TableSourceInstance,
-    TableSourceUnion, TypeHint, UnaryQueryElement, UnsetArgument, UpdateQueryElement, ValueIndex,
-    ValueName, Vector, When, Window, WorklogPartition,
+    Drive, Explain, ExplainFormat, Expr, ExprUnion, Function, Join, JoinTy, MvdbPartition,
+    NullableUint, OrderByExpr, Partition, Placeholder, Query, QueryElement, QueryElementOp,
+    QueryElementUnion, QueryTableSource, SetExpr, TableOrderBy, TablePartition, TableSource,
+    TableSourceInstance, TableSourceUnion, TypeHint, UnaryQueryElement, UnsetArgument,
+    UpdateQueryElement, ValueIndex, ValueName, Vector, When, Window, WorklogPartition,
 };
 use crate::types::usecase::{UseCase, UseCaseInput, UseCaseInputPair, UseCaseModule, UseCaseTy};
 use crate::types::value::{
@@ -216,20 +217,17 @@ impl From<FbsUserPreferences<'_>> for UserPreferences {
     }
 }
 
-impl TryFrom<&[u8]> for UserPreferences {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsUserPreferences>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<UserPreferences> for Vec<u8> {
-    fn from(obj: UserPreferences) -> Self {
+impl UserPreferences {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsUserPreferences>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -240,8 +238,8 @@ mod tests {
     #[test]
     fn test_user_preferences() {
         let t0 = UserPreferences::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = UserPreferences::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = UserPreferences::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 }

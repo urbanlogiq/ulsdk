@@ -7,7 +7,12 @@ from enum import Enum
 from flatbuffers.table import Table
 from flatbuffers.builder import Builder
 from flatbuffers.util import RemoveSizePrefix
-from typing import Union, List, Optional, Self, Tuple
+from typing import Union, List, Optional, Tuple
+import sys
+if sys.version_info.minor < 11:
+    from typing_extensions import Self
+else:
+    from typing import Self
 import uuid
 from .api import SortOrder
 from .entity import (
@@ -99,6 +104,7 @@ from .generated.Distinct import Distinct as FbsDistinct
 from .generated.Drive import Drive as FbsDrive
 from .generated.EdgeList import EdgeList as FbsEdgeList
 from .generated.EdgeQuery import EdgeQuery as FbsEdgeQuery
+from .generated.Explain import Explain as FbsExplain
 from .generated.Expr import Expr as FbsExpr
 from .generated.Function import Function as FbsFunction
 from .generated.GenericId import GenericId as FbsGenericId
@@ -179,6 +185,12 @@ from .generated.QueryPathElementUnion import QueryPathElementUnion as FbsQueryPa
 from .generated.TablePartition import TablePartition as FbsTablePartition
 from .generated.TableSourceUnion import TableSourceUnion as FbsTableSourceUnion
 from .generated.Value import Value as FbsValue
+
+class ExplainFormat(Enum):
+    Tree = 0
+    Indent = 1
+    Json = 2
+    Graphviz = 3
 
 class JoinTy(Enum):
     Inner = 0
@@ -1713,8 +1725,67 @@ class Arrow:
         return eq
 
 @dataclass
+class Explain:
+    analyze: "bool"
+
+    format: "ExplainFormat"
+
+    verbose: "bool"
+
+    @classmethod
+    def from_fbs(cls, o: FbsExplain) -> Self:
+        analyze = o.Analyze()
+        format = ExplainFormat(o.Format())
+        verbose = o.Verbose()
+        return cls(analyze, format, verbose)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsExplain.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.Explain import (
+            Start,
+            AddAnalyze,
+            AddFormat,
+            AddVerbose,
+            End,
+        )
+
+        Start(builder)
+        AddAnalyze(builder, self.analyze)
+        AddFormat(builder, self.format.value)
+        AddVerbose(builder, self.verbose)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        analyze = False
+        format = ExplainFormat(0)
+        verbose = False
+        return cls(analyze, format, verbose)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.analyze == other.analyze
+        eq = eq and self.format == other.format
+        eq = eq and self.verbose == other.verbose
+
+        return eq
+
+@dataclass
 class Query:
     bound_sources: Optional["List[TableSourceInstance]"]
+
+    explain: Optional["Explain"]
 
     limit: "int"
 
@@ -1732,6 +1803,10 @@ class Query:
                 if bound_sources_obj is not None:
                     bound_sources_val = TableSourceInstance.from_fbs(bound_sources_obj)
                 bound_sources.append(bound_sources_val)
+        explain = None
+        explain_obj = o.Explain()
+        if explain_obj is not None:
+            explain = Explain.from_fbs(explain_obj)
         limit = o.Limit()
         query_obj = o.Query()
         if query_obj is not None:
@@ -1746,7 +1821,7 @@ class Query:
                 if values_obj is not None:
                     values_val = ValueInstance.from_fbs(values_obj)
                 values.append(values_val)
-        return cls(bound_sources, limit, query, values)
+        return cls(bound_sources, explain, limit, query, values)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -1759,6 +1834,7 @@ class Query:
             Start,
             AddBoundSources,
             StartBoundSourcesVector,
+            AddExplain,
             AddLimit,
             AddQuery,
             AddValues,
@@ -1774,6 +1850,9 @@ class Query:
             for i in reversed(range(len(self.bound_sources))):
                 builder.PrependUOffsetTRelative(bound_sources_offsets[i])
             bound_sources_offset = builder.EndVector()
+        explain_offset = None
+        if self.explain is not None:
+            explain_offset = self.explain.serialize_to(builder)
         query_offset = self.query.serialize_to(builder)
         values_offset = None
         if self.values is not None:
@@ -1788,6 +1867,8 @@ class Query:
         Start(builder)
         if bound_sources_offset is not None:
             AddBoundSources(builder, bound_sources_offset)
+        if explain_offset is not None:
+            AddExplain(builder, explain_offset)
         AddLimit(builder, self.limit)
         AddQuery(builder, query_offset)
         if values_offset is not None:
@@ -1803,10 +1884,11 @@ class Query:
     @classmethod
     def make_default(cls) -> Self:
         bound_sources = []
+        explain = Explain.make_default()
         limit = 0
         query = QueryElement.make_default()
         values = []
-        return cls(bound_sources, limit, query, values)
+        return cls(bound_sources, explain, limit, query, values)
 
     def __eq__(self, other) -> bool:
         eq = True
@@ -1821,6 +1903,7 @@ class Query:
             return False
         elif self_bound_sources is None and other_bound_sources is not None:
             return False
+        eq = eq and self.explain == other.explain
         eq = eq and self.limit == other.limit
         eq = eq and self.query == other.query
         self_values = self.values

@@ -1464,6 +1464,61 @@ Arrow::operator==(const Arrow &rhs) const {
     return true;
 }
 
+::flatbuffers::Offset<::Explain>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Explain &o) {
+
+    ::ExplainBuilder instance_builder = ::ExplainBuilder(builder);
+    instance_builder.add_analyze(o.analyze_);
+    instance_builder.add_format(o.format_);
+    instance_builder.add_verbose(o.verbose_);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const Explain &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+Explain::Explain()
+    : analyze_(false)
+    , format_(ExplainFormat(0))
+    , verbose_(false) {
+}
+
+Explain::Explain(const std::vector<uint8_t> &bytes)
+    : Explain(::flatbuffers::GetSizePrefixedRoot<::Explain>(bytes.data())) {
+}
+
+Explain::Explain(const ::Explain *root) 
+    : analyze_(false)
+    , format_(ExplainFormat(0))
+    , verbose_(false) {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    analyze_ = root->analyze();
+    format_ = root->format();
+    verbose_ = root->verbose();
+}
+
+bool
+Explain::operator==(const Explain &rhs) const {
+    if (this->analyze_ != rhs.analyze_) {
+        return false;
+    }
+    if (this->format_ != rhs.format_) {
+        return false;
+    }
+    if (this->verbose_ != rhs.verbose_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Query>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Query &o) {
     std::optional<::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::TableSourceInstance>>>> bound_sources_offset = std::nullopt;
@@ -1476,6 +1531,11 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Query &o) {
         }
         const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::TableSourceInstance>>> bound_sources_offset_val = builder.CreateVector(bound_sources_offsets);
         bound_sources_offset = std::make_optional(bound_sources_offset_val);
+    }
+    std::optional<::flatbuffers::Offset<::Explain>> explain_offset = std::nullopt;
+    if (o.explain_.has_value()) {
+        const ::flatbuffers::Offset<::Explain> explain_offset_val = serialize_to(builder, o.explain_.value());
+        explain_offset = std::make_optional(explain_offset_val);
     }
     const ::flatbuffers::Offset<::QueryElement> query_offset = serialize_to(builder, o.query_);
     std::optional<::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::ValueInstance>>>> values_offset = std::nullopt;
@@ -1493,6 +1553,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Query &o) {
     ::QueryBuilder instance_builder = ::QueryBuilder(builder);
     if (bound_sources_offset.has_value()) {
         instance_builder.add_bound_sources(bound_sources_offset.value());
+    }
+    if (explain_offset.has_value()) {
+        instance_builder.add_explain(explain_offset.value());
     }
     instance_builder.add_limit(o.limit_);
     instance_builder.add_query(query_offset);
@@ -1512,6 +1575,7 @@ std::vector<uint8_t> to_bytes(const Query &o) {
 
 Query::Query()
     : bound_sources_(std::nullopt)
+    , explain_(std::nullopt)
     , limit_(0)
     , query_()
     , values_(std::nullopt) {
@@ -1523,6 +1587,7 @@ Query::Query(const std::vector<uint8_t> &bytes)
 
 Query::Query(const ::Query *root) 
     : bound_sources_(std::nullopt)
+    , explain_(std::nullopt)
     , limit_(0)
     , query_()
     , values_(std::nullopt) {
@@ -1538,6 +1603,9 @@ Query::Query(const ::Query *root)
             bound_sources__target.emplace_back(i);
         }
         bound_sources_ = std::make_optional(bound_sources__target);
+    }
+    if (root->explain() != nullptr) {
+        explain_ = decltype(explain_)(root->explain());
     }
     limit_ = root->limit();
     if (root->query() != nullptr) {
@@ -1557,6 +1625,9 @@ Query::Query(const ::Query *root)
 bool
 Query::operator==(const Query &rhs) const {
     if (this->bound_sources_ != rhs.bound_sources_) {
+        return false;
+    }
+    if (this->explain_ != rhs.explain_) {
         return false;
     }
     if (this->limit_ != rhs.limit_) {

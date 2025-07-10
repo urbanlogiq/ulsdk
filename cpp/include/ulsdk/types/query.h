@@ -32,6 +32,7 @@ struct DataCatalog;
 struct DeleteQueryElement;
 struct Distinct;
 struct Drive;
+struct Explain;
 struct Expr;
 struct Function;
 struct Join;
@@ -57,6 +58,7 @@ struct When;
 struct Window;
 struct WorklogPartition;
 
+using ::ExplainFormat;
 typedef std::variant<
     std::shared_ptr<ValueIndex>,
     std::shared_ptr<Column>,
@@ -363,8 +365,23 @@ struct Arrow {
     }
 };
 
+struct Explain {
+    bool analyze_;
+    ExplainFormat format_;
+    bool verbose_;
+
+    Explain();
+    Explain(const ::Explain *root);
+    Explain(const std::vector<uint8_t> &bytes);
+    bool operator==(const Explain &rhs) const;
+    bool operator!=(const Explain &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
 struct Query {
     std::optional<std::vector<TableSourceInstance>> bound_sources_;
+    std::optional<Explain> explain_;
     uint32_t limit_;
     QueryElement query_;
     std::optional<std::vector<ValueInstance>> values_;
@@ -612,6 +629,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DataCatalog &);
 ::flatbuffers::Offset<::Arrow>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Arrow &);
 
+::flatbuffers::Offset<::Explain>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Explain &);
+
 ::flatbuffers::Offset<::Query>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Query &);
 
@@ -711,6 +731,9 @@ to_bytes(const DataCatalog &o);
 
 std::vector<uint8_t>
 to_bytes(const Arrow &o);
+
+std::vector<uint8_t>
+to_bytes(const Explain &o);
 
 std::vector<uint8_t>
 to_bytes(const Query &o);

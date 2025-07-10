@@ -28,7 +28,7 @@ use crate::types::notification::Inbox;
 pub async fn fetch(ctx: &dyn RequestContext, folder: &str) -> Result<Inbox, Error> {
     let path = "/v1/api/ulv2/inbox/:folder".replace(":folder", folder);
     let res = ctx.get(&path, None, None).await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::Inbox::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Clear the status of all notifications in the specified folder
@@ -110,7 +110,7 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
         let expected = Inbox::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = fetch(&ctx, p0).await.unwrap();
         assert_eq!(result, expected);

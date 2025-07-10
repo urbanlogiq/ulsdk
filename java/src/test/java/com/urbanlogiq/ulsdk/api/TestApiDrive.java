@@ -36,6 +36,56 @@ public final class TestApiDrive {
     }
 
     @Test
+    public void testLsMe() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String caUser = System.getenv("CA_USER");
+        String caAccessKey = System.getenv("CA_ACCESS_KEY");
+        String caSecretKey = System.getenv("CA_SECRET_KEY");
+
+        if (caUser == null || caAccessKey == null || caSecretKey == null) {
+            throw new RuntimeException("user / key not present, cannot run tests");
+        }
+
+        com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
+        com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
+        String p0 = "tail";
+        com.urbanlogiq.ulsdk.types.DirectoryList expected = new com.urbanlogiq.ulsdk.types.DirectoryList();
+        byte[] expectedBytes = expected.toBytes();
+        ctx.setResponse(expectedBytes);
+        com.urbanlogiq.ulsdk.types.DirectoryList result = com.urbanlogiq.ulsdk.api.drive.Drive.lsMe(
+            ctx,
+            p0
+        );
+        org.junit.Assert.assertTrue(result.equals(expected));
+    }
+
+    @Test
+    public void testLsUnion() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String caUser = System.getenv("CA_USER");
+        String caAccessKey = System.getenv("CA_ACCESS_KEY");
+        String caSecretKey = System.getenv("CA_SECRET_KEY");
+
+        if (caUser == null || caAccessKey == null || caSecretKey == null) {
+            throw new RuntimeException("user / key not present, cannot run tests");
+        }
+
+        com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
+        com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
+        String p0 = "tail";
+        boolean q0 = true;
+        boolean q1 = true;
+        com.urbanlogiq.ulsdk.types.DirectoryList expected = new com.urbanlogiq.ulsdk.types.DirectoryList();
+        byte[] expectedBytes = expected.toBytes();
+        ctx.setResponse(expectedBytes);
+        com.urbanlogiq.ulsdk.types.DirectoryList result = com.urbanlogiq.ulsdk.api.drive.Drive.lsUnion(
+            ctx,
+            p0,
+            q0,
+            q1
+        );
+        org.junit.Assert.assertTrue(result.equals(expected));
+    }
+
+    @Test
     public void testCreateEntry() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");

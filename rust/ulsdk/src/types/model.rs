@@ -66,20 +66,17 @@ impl From<FbsModel<'_>> for Model {
     }
 }
 
-impl TryFrom<&[u8]> for Model {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsModel>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<Model> for Vec<u8> {
-    fn from(obj: Model) -> Self {
+impl Model {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsModel>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -90,8 +87,8 @@ mod tests {
     #[test]
     fn test_model() {
         let t0 = Model::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = Model::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = Model::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 }

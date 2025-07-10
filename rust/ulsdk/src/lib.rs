@@ -12,7 +12,8 @@ pub mod types;
 
 use arrow::ipc::writer::StreamWriter;
 use arrow::record_batch::RecordBatch;
-use serde_derive::Deserialize;
+use serde::de::{Error as SerdeError, Unexpected, Visitor};
+use serde::Deserialize;
 use std::fmt::{self, Display, Formatter};
 use std::str::FromStr;
 
@@ -131,4 +132,97 @@ fn make_test_batches() -> (Vec<RecordBatch>, Vec<u8>) {
     }
 
     (vec![batch], buffer)
+}
+
+fn raw_id_from_str<E>(visitor: &IdVisitor, guid: &str) -> Result<[u8; 16], E>
+where
+    E: SerdeError,
+{
+    match guid.len() {
+        24 => match base64::decode(guid) {
+            Ok(b) => {
+                let array: [u8; 16] =
+                    b.as_slice()
+                        .try_into()
+                        .map_err(|_: std::array::TryFromSliceError| {
+                            SerdeError::invalid_value(Unexpected::Str(guid), visitor)
+                        })?;
+                Ok(array)
+            }
+            Err(_) => Err(SerdeError::invalid_value(Unexpected::Str(guid), visitor)),
+        },
+        38 => {
+            if (guid.starts_with('"') && guid.ends_with('"'))
+                || (guid.starts_with('{') && guid.ends_with('}'))
+            {
+                raw_id_from_str(visitor, &guid[1..guid.len() - 1])
+            } else {
+                Err(SerdeError::invalid_value(Unexpected::Str(guid), visitor))
+            }
+        }
+        36 => {
+            let guid = uuid::Uuid::parse_str(guid)
+                .map_err(|_| SerdeError::invalid_value(Unexpected::Str(guid), visitor))?;
+
+            Ok(*guid.as_bytes())
+        }
+        32 => hex::decode(guid)
+            .map(|v| v.try_into().unwrap())
+            .map_err(|_| SerdeError::invalid_value(Unexpected::Str(guid), visitor)),
+        len => Err(SerdeError::invalid_length(len, visitor)),
+    }
+}
+
+pub const CANONICAL_UUID_LENGTH: usize = 36;
+
+fn id_to_utf8(id: &[u8; 16]) -> [u8; CANONICAL_UUID_LENGTH] {
+    const ID_UTF8_CHARS: &[u8; 16] = b"0123456789abcdef";
+    const ID_UTF8_POSITIONS: &[usize; 16] =
+        &[0, 2, 4, 6, 9, 11, 14, 16, 19, 21, 24, 26, 28, 30, 32, 34];
+    const ID_UTF8_HYPHEN_POSITIONS: &[usize; 4] = &[8, 13, 18, 23];
+
+    let mut buf = [0u8; CANONICAL_UUID_LENGTH];
+    for (i, b) in id.iter().enumerate() {
+        let b = *b;
+        let i0 = ((b >> 4) & 0xf) as usize;
+        let i1 = (b & 0xf) as usize;
+        let b0 = ID_UTF8_CHARS[i0];
+        let b1 = ID_UTF8_CHARS[i1];
+        let idx = ID_UTF8_POSITIONS[i];
+        buf[idx] = b0;
+        buf[idx + 1] = b1;
+    }
+
+    for idx in ID_UTF8_HYPHEN_POSITIONS {
+        buf[*idx] = b'-';
+    }
+
+    buf
+}
+
+struct IdVisitor;
+
+impl Visitor<'_> for IdVisitor {
+    type Value = [u8; 16];
+
+    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_str("24/32/36 byte string")
+    }
+
+    fn visit_bytes<E>(self, value: &[u8]) -> Result<Self::Value, E>
+    where
+        E: SerdeError,
+    {
+        match value.len() {
+            16 => Ok(value.try_into().unwrap()),
+            len => Err(SerdeError::invalid_length(len, &self)),
+        }
+    }
+
+    fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+    where
+        E: SerdeError,
+    {
+        raw_id_from_str(&self, value)
+    }
 }

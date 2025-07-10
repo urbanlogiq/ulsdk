@@ -149,20 +149,17 @@ impl From<FbsVBool<'_>> for VBool {
     }
 }
 
-impl TryFrom<&[u8]> for VBool {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVBool>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VBool> for Vec<u8> {
-    fn from(obj: VBool) -> Self {
+impl VBool {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVBool>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -187,20 +184,17 @@ impl From<FbsVUnit<'_>> for VUnit {
     }
 }
 
-impl TryFrom<&[u8]> for VUnit {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVUnit>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VUnit> for Vec<u8> {
-    fn from(obj: VUnit) -> Self {
+impl VUnit {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVUnit>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -229,20 +223,17 @@ impl From<FbsVChar<'_>> for VChar {
     }
 }
 
-impl TryFrom<&[u8]> for VChar {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVChar>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VChar> for Vec<u8> {
-    fn from(obj: VChar) -> Self {
+impl VChar {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVChar>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -267,20 +258,17 @@ impl From<FbsVNull<'_>> for VNull {
     }
 }
 
-impl TryFrom<&[u8]> for VNull {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVNull>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VNull> for Vec<u8> {
-    fn from(obj: VNull) -> Self {
+impl VNull {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVNull>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -309,20 +297,17 @@ impl From<FbsVI8<'_>> for VI8 {
     }
 }
 
-impl TryFrom<&[u8]> for VI8 {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVI8>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VI8> for Vec<u8> {
-    fn from(obj: VI8) -> Self {
+impl VI8 {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVI8>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -351,20 +336,17 @@ impl From<FbsVU8<'_>> for VU8 {
     }
 }
 
-impl TryFrom<&[u8]> for VU8 {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVU8>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VU8> for Vec<u8> {
-    fn from(obj: VU8) -> Self {
+impl VU8 {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVU8>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -393,20 +375,17 @@ impl From<FbsVI16<'_>> for VI16 {
     }
 }
 
-impl TryFrom<&[u8]> for VI16 {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVI16>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VI16> for Vec<u8> {
-    fn from(obj: VI16) -> Self {
+impl VI16 {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVI16>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -435,20 +414,17 @@ impl From<FbsVU16<'_>> for VU16 {
     }
 }
 
-impl TryFrom<&[u8]> for VU16 {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVU16>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VU16> for Vec<u8> {
-    fn from(obj: VU16) -> Self {
+impl VU16 {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVU16>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -477,20 +453,17 @@ impl From<FbsVI32<'_>> for VI32 {
     }
 }
 
-impl TryFrom<&[u8]> for VI32 {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVI32>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VI32> for Vec<u8> {
-    fn from(obj: VI32) -> Self {
+impl VI32 {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVI32>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -519,20 +492,17 @@ impl From<FbsVU32<'_>> for VU32 {
     }
 }
 
-impl TryFrom<&[u8]> for VU32 {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVU32>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VU32> for Vec<u8> {
-    fn from(obj: VU32) -> Self {
+impl VU32 {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVU32>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -561,20 +531,17 @@ impl From<FbsVF32<'_>> for VF32 {
     }
 }
 
-impl TryFrom<&[u8]> for VF32 {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVF32>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VF32> for Vec<u8> {
-    fn from(obj: VF32) -> Self {
+impl VF32 {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVF32>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -603,20 +570,17 @@ impl From<FbsVIsize<'_>> for VIsize {
     }
 }
 
-impl TryFrom<&[u8]> for VIsize {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVIsize>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VIsize> for Vec<u8> {
-    fn from(obj: VIsize) -> Self {
+impl VIsize {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVIsize>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -645,20 +609,17 @@ impl From<FbsVUsize<'_>> for VUsize {
     }
 }
 
-impl TryFrom<&[u8]> for VUsize {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVUsize>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VUsize> for Vec<u8> {
-    fn from(obj: VUsize) -> Self {
+impl VUsize {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVUsize>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -687,20 +648,17 @@ impl From<FbsVI64<'_>> for VI64 {
     }
 }
 
-impl TryFrom<&[u8]> for VI64 {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVI64>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VI64> for Vec<u8> {
-    fn from(obj: VI64) -> Self {
+impl VI64 {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVI64>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -729,20 +687,17 @@ impl From<FbsVU64<'_>> for VU64 {
     }
 }
 
-impl TryFrom<&[u8]> for VU64 {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVU64>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VU64> for Vec<u8> {
-    fn from(obj: VU64) -> Self {
+impl VU64 {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVU64>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -771,20 +726,17 @@ impl From<FbsVF64<'_>> for VF64 {
     }
 }
 
-impl TryFrom<&[u8]> for VF64 {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVF64>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VF64> for Vec<u8> {
-    fn from(obj: VF64) -> Self {
+impl VF64 {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVF64>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -815,20 +767,17 @@ impl From<FbsVStr<'_>> for VStr {
     }
 }
 
-impl TryFrom<&[u8]> for VStr {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVStr>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VStr> for Vec<u8> {
-    fn from(obj: VStr) -> Self {
+impl VStr {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVStr>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -863,20 +812,17 @@ impl From<FbsVBytes<'_>> for VBytes {
     }
 }
 
-impl TryFrom<&[u8]> for VBytes {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVBytes>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VBytes> for Vec<u8> {
-    fn from(obj: VBytes) -> Self {
+impl VBytes {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVBytes>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -916,20 +862,17 @@ impl From<FbsVArray<'_>> for VArray {
     }
 }
 
-impl TryFrom<&[u8]> for VArray {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVArray>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VArray> for Vec<u8> {
-    fn from(obj: VArray) -> Self {
+impl VArray {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVArray>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1011,20 +954,17 @@ impl From<FbsVTri2D<'_>> for VTri2D {
     }
 }
 
-impl TryFrom<&[u8]> for VTri2D {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVTri2D>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VTri2D> for Vec<u8> {
-    fn from(obj: VTri2D) -> Self {
+impl VTri2D {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVTri2D>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1062,20 +1002,17 @@ impl From<FbsVFixedSizeBytes<'_>> for VFixedSizeBytes {
     }
 }
 
-impl TryFrom<&[u8]> for VFixedSizeBytes {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVFixedSizeBytes>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VFixedSizeBytes> for Vec<u8> {
-    fn from(obj: VFixedSizeBytes) -> Self {
+impl VFixedSizeBytes {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVFixedSizeBytes>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1104,20 +1041,17 @@ impl From<FbsVTimestampMsUtc<'_>> for VTimestampMsUtc {
     }
 }
 
-impl TryFrom<&[u8]> for VTimestampMsUtc {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVTimestampMsUtc>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VTimestampMsUtc> for Vec<u8> {
-    fn from(obj: VTimestampMsUtc) -> Self {
+impl VTimestampMsUtc {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVTimestampMsUtc>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1146,20 +1080,17 @@ impl From<FbsVTimestampMs<'_>> for VTimestampMs {
     }
 }
 
-impl TryFrom<&[u8]> for VTimestampMs {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVTimestampMs>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VTimestampMs> for Vec<u8> {
-    fn from(obj: VTimestampMs) -> Self {
+impl VTimestampMs {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVTimestampMs>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1188,20 +1119,17 @@ impl From<FbsVTimestampNsUtc<'_>> for VTimestampNsUtc {
     }
 }
 
-impl TryFrom<&[u8]> for VTimestampNsUtc {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVTimestampNsUtc>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VTimestampNsUtc> for Vec<u8> {
-    fn from(obj: VTimestampNsUtc) -> Self {
+impl VTimestampNsUtc {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVTimestampNsUtc>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1230,20 +1158,17 @@ impl From<FbsVTimestampNs<'_>> for VTimestampNs {
     }
 }
 
-impl TryFrom<&[u8]> for VTimestampNs {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVTimestampNs>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VTimestampNs> for Vec<u8> {
-    fn from(obj: VTimestampNs) -> Self {
+impl VTimestampNs {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVTimestampNs>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1277,20 +1202,17 @@ impl From<FbsVPlaceholder<'_>> for VPlaceholder {
     }
 }
 
-impl TryFrom<&[u8]> for VPlaceholder {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsVPlaceholder>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<VPlaceholder> for Vec<u8> {
-    fn from(obj: VPlaceholder) -> Self {
+impl VPlaceholder {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsVPlaceholder>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1545,20 +1467,17 @@ impl From<FbsValueInstance<'_>> for ValueInstance {
     }
 }
 
-impl TryFrom<&[u8]> for ValueInstance {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsValueInstance>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<ValueInstance> for Vec<u8> {
-    fn from(obj: ValueInstance) -> Self {
+impl ValueInstance {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsValueInstance>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1569,216 +1488,216 @@ mod tests {
     #[test]
     fn test_v_array() {
         let t0 = VArray::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VArray::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VArray::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_v_bool() {
         let t0 = VBool::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VBool::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VBool::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_v_bytes() {
         let t0 = VBytes::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VBytes::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VBytes::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_v_char() {
         let t0 = VChar::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VChar::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VChar::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_vf32() {
         let t0 = VF32::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VF32::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VF32::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_vf64() {
         let t0 = VF64::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VF64::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VF64::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_v_fixed_size_bytes() {
         let t0 = VFixedSizeBytes::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VFixedSizeBytes::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VFixedSizeBytes::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_vi16() {
         let t0 = VI16::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VI16::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VI16::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_vi32() {
         let t0 = VI32::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VI32::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VI32::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_vi64() {
         let t0 = VI64::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VI64::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VI64::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_vi8() {
         let t0 = VI8::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VI8::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VI8::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_v_isize() {
         let t0 = VIsize::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VIsize::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VIsize::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_v_null() {
         let t0 = VNull::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VNull::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VNull::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_v_placeholder() {
         let t0 = VPlaceholder::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VPlaceholder::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VPlaceholder::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_v_str() {
         let t0 = VStr::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VStr::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VStr::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_v_timestamp_ms() {
         let t0 = VTimestampMs::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VTimestampMs::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VTimestampMs::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_v_timestamp_ms_utc() {
         let t0 = VTimestampMsUtc::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VTimestampMsUtc::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VTimestampMsUtc::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_v_timestamp_ns() {
         let t0 = VTimestampNs::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VTimestampNs::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VTimestampNs::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_v_timestamp_ns_utc() {
         let t0 = VTimestampNsUtc::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VTimestampNsUtc::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VTimestampNsUtc::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_v_tri_2d() {
         let t0 = VTri2D::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VTri2D::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VTri2D::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_vu16() {
         let t0 = VU16::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VU16::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VU16::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_vu32() {
         let t0 = VU32::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VU32::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VU32::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_vu64() {
         let t0 = VU64::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VU64::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VU64::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_vu8() {
         let t0 = VU8::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VU8::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VU8::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_v_unit() {
         let t0 = VUnit::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VUnit::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VUnit::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_v_usize() {
         let t0 = VUsize::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = VUsize::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = VUsize::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_value_instance() {
         let t0 = ValueInstance::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = ValueInstance::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = ValueInstance::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 }

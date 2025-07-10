@@ -84,6 +84,7 @@ class Fn(object):
     Ceil = 78
     StAstext = 79
     StIntersection = 80
+    StAsbinary = 81
     UlTimezone = 32764
     UlArrayContains = 32765
     UlArrayAny = 32766

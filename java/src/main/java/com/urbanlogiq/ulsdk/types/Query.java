@@ -13,6 +13,14 @@ public final class Query {
         this._boundSources = value;
     }
 
+    com.urbanlogiq.ulsdk.types.Explain _explain;
+    public com.urbanlogiq.ulsdk.types.Explain getExplain() {
+        return this._explain;
+    }
+    public void setExplain(com.urbanlogiq.ulsdk.types.Explain value) {
+        this._explain = value;
+    }
+
     long _limit;
     public long getLimit() {
         return this._limit;
@@ -49,6 +57,9 @@ public final class Query {
             }
             this._boundSources = boundSources;
         }
+        if (o.explain() != null) {
+            this._explain = new com.urbanlogiq.ulsdk.types.Explain(o.explain());
+        }
         this._limit = o.limit();
         this._query = new com.urbanlogiq.ulsdk.types.QueryElement(o.query());
         if (o.valuesVector() != null) {
@@ -81,6 +92,10 @@ public final class Query {
             }
             boundSourcesOffset = builder.endVector();
         }
+        Integer explainOffset = null;
+        if (this._explain != null) {
+            explainOffset = this._explain.serializeTo(builder);
+        }
         int queryOffset = this._query.serializeTo(builder);
         Integer valuesOffset = null;
         if (this._values != null) {
@@ -97,6 +112,9 @@ public final class Query {
         com.urbanlogiq.ulsdk.types.generated.Query.startQuery(builder);
         if (boundSourcesOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.Query.addBoundSources(builder, boundSourcesOffset);
+        }
+        if (explainOffset != null) {
+            com.urbanlogiq.ulsdk.types.generated.Query.addExplain(builder, explainOffset);
         }
         com.urbanlogiq.ulsdk.types.generated.Query.addLimit(builder, this._limit);
         com.urbanlogiq.ulsdk.types.generated.Query.addQuery(builder, queryOffset);
@@ -115,6 +133,7 @@ public final class Query {
 
     public Query() {
         this._boundSources = new com.urbanlogiq.ulsdk.types.TableSourceInstance[0];
+        this._explain = new com.urbanlogiq.ulsdk.types.Explain();
         this._query = new com.urbanlogiq.ulsdk.types.QueryElement();
         this._values = new com.urbanlogiq.ulsdk.types.ValueInstance[0];
     }

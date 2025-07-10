@@ -42,13 +42,17 @@ public final class Query extends com.google.flatbuffers.Table {
   public int boundSourcesLength() { int o = __offset(10); return o != 0 ? __vector_len(o) : 0; }
   public TableSourceInstance._Vector boundSourcesVector() { return boundSourcesVector(new TableSourceInstance._Vector()); }
   public TableSourceInstance._Vector boundSourcesVector(TableSourceInstance._Vector obj) { int o = __offset(10); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
+  public Explain explain() { return explain(new Explain()); }
+  public Explain explain(Explain obj) { int o = __offset(12); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
 
   public static int createQuery(FlatBufferBuilder builder,
       int queryOffset,
       int valuesOffset,
       long limit,
-      int boundSourcesOffset) {
-    builder.startTable(4);
+      int boundSourcesOffset,
+      int explainOffset) {
+    builder.startTable(5);
+    Query.addExplain(builder, explainOffset);
     Query.addBoundSources(builder, boundSourcesOffset);
     Query.addLimit(builder, limit);
     Query.addValues(builder, valuesOffset);
@@ -56,7 +60,7 @@ public final class Query extends com.google.flatbuffers.Table {
     return Query.endQuery(builder);
   }
 
-  public static void startQuery(FlatBufferBuilder builder) { builder.startTable(4); }
+  public static void startQuery(FlatBufferBuilder builder) { builder.startTable(5); }
   public static void addQuery(FlatBufferBuilder builder, int queryOffset) { builder.addOffset(0, queryOffset, 0); }
   public static void addValues(FlatBufferBuilder builder, int valuesOffset) { builder.addOffset(1, valuesOffset, 0); }
   public static int createValuesVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
@@ -65,6 +69,7 @@ public final class Query extends com.google.flatbuffers.Table {
   public static void addBoundSources(FlatBufferBuilder builder, int boundSourcesOffset) { builder.addOffset(3, boundSourcesOffset, 0); }
   public static int createBoundSourcesVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
   public static void startBoundSourcesVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
+  public static void addExplain(FlatBufferBuilder builder, int explainOffset) { builder.addOffset(4, explainOffset, 0); }
   public static int endQuery(FlatBufferBuilder builder) {
     int o = builder.endTable();
     builder.required(o, 4);  // query

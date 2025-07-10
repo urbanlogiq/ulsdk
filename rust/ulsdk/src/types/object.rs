@@ -370,20 +370,17 @@ impl From<FbsDataCatalogObject<'_>> for DataCatalogObject {
     }
 }
 
-impl TryFrom<&[u8]> for DataCatalogObject {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsDataCatalogObject>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<DataCatalogObject> for Vec<u8> {
-    fn from(obj: DataCatalogObject) -> Self {
+impl DataCatalogObject {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsDataCatalogObject>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -423,20 +420,17 @@ impl From<FbsObjectIdList<'_>> for ObjectIdList {
     }
 }
 
-impl TryFrom<&[u8]> for ObjectIdList {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsObjectIdList>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<ObjectIdList> for Vec<u8> {
-    fn from(obj: ObjectIdList) -> Self {
+impl ObjectIdList {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsObjectIdList>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -486,20 +480,17 @@ impl From<FbsObjectIdPair<'_>> for ObjectIdPair {
     }
 }
 
-impl TryFrom<&[u8]> for ObjectIdPair {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsObjectIdPair>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<ObjectIdPair> for Vec<u8> {
-    fn from(obj: ObjectIdPair) -> Self {
+impl ObjectIdPair {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsObjectIdPair>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -539,20 +530,17 @@ impl From<FbsObjectIdPairList<'_>> for ObjectIdPairList {
     }
 }
 
-impl TryFrom<&[u8]> for ObjectIdPairList {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsObjectIdPairList>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<ObjectIdPairList> for Vec<u8> {
-    fn from(obj: ObjectIdPairList) -> Self {
+impl ObjectIdPairList {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsObjectIdPairList>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -609,20 +597,17 @@ impl From<FbsObjectSummary<'_>> for ObjectSummary {
     }
 }
 
-impl TryFrom<&[u8]> for ObjectSummary {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsObjectSummary>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<ObjectSummary> for Vec<u8> {
-    fn from(obj: ObjectSummary) -> Self {
+impl ObjectSummary {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsObjectSummary>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -662,20 +647,17 @@ impl From<FbsObjectSummaryList<'_>> for ObjectSummaryList {
     }
 }
 
-impl TryFrom<&[u8]> for ObjectSummaryList {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsObjectSummaryList>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<ObjectSummaryList> for Vec<u8> {
-    fn from(obj: ObjectSummaryList) -> Self {
+impl ObjectSummaryList {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsObjectSummaryList>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -686,48 +668,48 @@ mod tests {
     #[test]
     fn test_data_catalog_object() {
         let t0 = DataCatalogObject::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = DataCatalogObject::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = DataCatalogObject::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_object_id_list() {
         let t0 = ObjectIdList::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = ObjectIdList::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = ObjectIdList::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_object_id_pair() {
         let t0 = ObjectIdPair::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = ObjectIdPair::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = ObjectIdPair::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_object_id_pair_list() {
         let t0 = ObjectIdPairList::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = ObjectIdPairList::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = ObjectIdPairList::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_object_summary() {
         let t0 = ObjectSummary::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = ObjectSummary::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = ObjectSummary::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_object_summary_list() {
         let t0 = ObjectSummaryList::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = ObjectSummaryList::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = ObjectSummaryList::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 }

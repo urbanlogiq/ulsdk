@@ -53,6 +53,62 @@ test_ls(ul::RequestContext &rctx) {
 ApiTest test_ls_obj(test_ls, "drive::ls", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
+test_ls_me(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    std::string p0 = "tail";
+    const ::ul::types::DirectoryList expected = ::ul::types::DirectoryList();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::drive::ls_me(
+        ctx,
+        p0
+    );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::DirectoryList result_value = std::get<::ul::types::DirectoryList>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
+}
+
+ApiTest test_ls_me_obj(test_ls_me, "drive::ls_me", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
+test_ls_union(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    std::string p0 = "tail";
+    bool q0 = true;
+    bool q1 = true;
+    const ::ul::types::DirectoryList expected = ::ul::types::DirectoryList();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::drive::ls_union(
+        ctx,
+        p0,
+        q0,
+        q1
+    );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::DirectoryList result_value = std::get<::ul::types::DirectoryList>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
+}
+
+ApiTest test_ls_union_obj(test_ls_union, "drive::ls_union", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
 test_create_entry(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");

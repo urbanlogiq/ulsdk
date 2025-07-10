@@ -31,6 +31,50 @@ def test_ls():
     );
     assert result == expected
 
+def test_ls_me():
+    user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
+    access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None
+    secret_key = os.environ["CA_SECRET_KEY"] if "CA_SECRET_KEY" in os.environ else None
+
+    if user == None or access_key is None or secret_key is None:
+        raise Exception("cannot run test as no credentials are specified")
+    key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
+    key_ctx = ApiKeyContext(key, Environment.Stage)
+    ctx = TestContext(key_ctx)
+    p0 = "tail";
+    expected = DirectoryList.make_default();
+    expected_bytes = expected.to_bytes();
+    ctx.set_response(expected_bytes);
+    result = ls_me(
+        ctx,
+        p0
+    );
+    assert result == expected
+
+def test_ls_union():
+    user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
+    access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None
+    secret_key = os.environ["CA_SECRET_KEY"] if "CA_SECRET_KEY" in os.environ else None
+
+    if user == None or access_key is None or secret_key is None:
+        raise Exception("cannot run test as no credentials are specified")
+    key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
+    key_ctx = ApiKeyContext(key, Environment.Stage)
+    ctx = TestContext(key_ctx)
+    p0 = "tail";
+    q0 = True
+    q1 = True
+    expected = DirectoryList.make_default();
+    expected_bytes = expected.to_bytes();
+    ctx.set_response(expected_bytes);
+    result = ls_union(
+        ctx,
+        p0,
+        q0,
+        q1
+    );
+    assert result == expected
+
 def test_create_entry():
     user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
     access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None

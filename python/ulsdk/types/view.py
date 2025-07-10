@@ -7,7 +7,12 @@ from enum import Enum
 from flatbuffers.table import Table
 from flatbuffers.builder import Builder
 from flatbuffers.util import RemoveSizePrefix
-from typing import Union, List, Optional, Self, Tuple
+from typing import Union, List, Optional, Tuple
+import sys
+if sys.version_info.minor < 11:
+    from typing_extensions import Self
+else:
+    from typing import Self
 import uuid
 from .api import SortOrder
 from .entity import (
@@ -61,6 +66,8 @@ from .query import (
     DeleteQueryElement,
     Distinct,
     Drive,
+    Explain,
+    ExplainFormat,
     Expr,
     ExprUnion,
     Function,
@@ -141,6 +148,7 @@ from .generated.Distinct import Distinct as FbsDistinct
 from .generated.Drive import Drive as FbsDrive
 from .generated.EdgeList import EdgeList as FbsEdgeList
 from .generated.EdgeQuery import EdgeQuery as FbsEdgeQuery
+from .generated.Explain import Explain as FbsExplain
 from .generated.Expr import Expr as FbsExpr
 from .generated.Function import Function as FbsFunction
 from .generated.GenericId import GenericId as FbsGenericId

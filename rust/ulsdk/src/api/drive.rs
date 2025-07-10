@@ -19,13 +19,7 @@ use crate::types::fs::{DirectoryList, MoveRequest};
 use crate::types::id::ObjectId;
 use crate::types::object::ObjectSummary;
 
-/// Retrieves a directory listing from a unix-style path rooted at `root`. `root` may be one of:
-/// - `me` for the current user's drive
-/// - `union` for the union of the current user's drive and all shared drives
-/// - the UUID of any drive directory
-///
-/// Paths may include wildcards like `*`.
-///                 
+/// Retrieves a directory listing from a unix-style path rooted at `root` where `root` may be the UUID of any drive directory. Paths may include wildcards like `*`.
 ///
 /// # Arguments
 ///
@@ -40,7 +34,54 @@ pub async fn ls(ctx: &dyn RequestContext, root: &str, tail: &str) -> Result<Dire
         .replace(":root", root)
         .replace("*tail", tail);
     let res = ctx.get(&path, None, None).await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::DirectoryList::from_fbs_bytes(res.as_slice()).map_err(Error::from)
+}
+
+/// Retrieves a directory listing from a unix-style path rooted at the current user's home root. Paths may include wildcards like `*`.
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+/// * `tail` - The unix-style path specifier to use for the file listing.
+///
+/// Returns
+/// * The directory listing
+pub async fn ls_me(ctx: &dyn RequestContext, tail: &str) -> Result<DirectoryList, Error> {
+    let path = "/v1/api/ulv2/drive/me/*tail".replace("*tail", tail);
+    let res = ctx.get(&path, None, None).await?;
+    crate::types::DirectoryList::from_fbs_bytes(res.as_slice()).map_err(Error::from)
+}
+
+/// Retrieves a directory listing from a union of all the drive roots the user has access to. Paths may include wildcards like `*`.
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+/// * `tail` - The unix-style path specifier to use for the file listing.
+/// * `dedupe` - Deduplicate results of union queries
+/// * `exclude_public` - Remove entries from the result set that are accessible to unauthenticated users.
+///
+/// Returns
+/// * The directory listing
+pub async fn ls_union(
+    ctx: &dyn RequestContext,
+    tail: &str,
+    dedupe: bool,
+    exclude_public: bool,
+) -> Result<DirectoryList, Error> {
+    let path = "/v1/api/ulv2/drive/union/*tail".replace("*tail", tail);
+    let mut params = ParamMap::new();
+    params.insert(
+        "dedupe".to_owned(),
+        if dedupe { "true" } else { "false" }.to_owned(),
+    );
+    params.insert(
+        "exclude_public".to_owned(),
+        if exclude_public { "true" } else { "false" }.to_owned(),
+    );
+
+    let res = ctx.get(&path, Some(params), None).await?;
+    crate::types::DirectoryList::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Creates a new file or directory at a specified path rooted at `root`.
@@ -76,7 +117,7 @@ pub async fn create_entry(
     let res = ctx
         .post(&path, body, "text/plain", Some(params), None)
         .await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::ObjectSummary::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Retrieves a list of the top-level drive root directories that the current user has access to.
@@ -90,7 +131,7 @@ pub async fn create_entry(
 pub async fn get_roots(ctx: &dyn RequestContext) -> Result<DirectoryList, Error> {
     let path = "/v1/api/ulv2/drive/*";
     let res = ctx.get(&path, None, None).await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::DirectoryList::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Creates a new file in the specified directory with the specified content. Please use the `put_file_chunk` endpoint to upload files larger than 1GB.
@@ -118,7 +159,7 @@ pub async fn post_file(
     );
 
     let res = ctx.upload(&path, files).await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::DirectoryList::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Removes the specified drive entry from its parent directory.
@@ -136,7 +177,7 @@ pub async fn unlink(
 ) -> Result<DirectoryList, Error> {
     let path = "/v1/api/ulv2/drive/:entry".replace(":entry", &entry.to_string());
     let res = ctx.delete(&path, None, None).await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::DirectoryList::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Moves a file or directory to a new location.
@@ -147,7 +188,7 @@ pub async fn unlink(
 /// * `move_request` - Details of the move operation.
 pub async fn move_(ctx: &dyn RequestContext, move_request: MoveRequest) -> Result<(), Error> {
     let path = "/v1/api/ulv2/drive/move";
-    let body = Bytes::from(Vec::<u8>::from(move_request));
+    let body = Bytes::from(move_request.to_fbs_bytes());
     ctx.post(&path, body, "application/octet-stream", None, None)
         .await?;
     Ok(())
@@ -161,7 +202,7 @@ pub async fn move_(ctx: &dyn RequestContext, move_request: MoveRequest) -> Resul
 /// * `copy_request` - Details of the copy operation.
 pub async fn copy(ctx: &dyn RequestContext, copy_request: MoveRequest) -> Result<(), Error> {
     let path = "/v1/api/ulv2/drive/copy";
-    let body = Bytes::from(Vec::<u8>::from(copy_request));
+    let body = Bytes::from(copy_request.to_fbs_bytes());
     ctx.post(&path, body, "application/octet-stream", None, None)
         .await?;
     Ok(())
@@ -228,7 +269,7 @@ pub async fn get_root_id(
 ) -> Result<ObjectId, Error> {
     let path = "/v1/api/ulv2/drive/root/:b2cid".replace(":b2cid", &b2cid.to_string());
     let res = ctx.get(&path, None, None).await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::ObjectId::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 #[cfg(test)]
@@ -257,9 +298,57 @@ mod tests {
         let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
         let p1 = "tail".into();
         let expected = DirectoryList::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = ls(&ctx, p0, p1).await.unwrap();
+        assert_eq!(result, expected);
+    }
+
+    #[tokio::test]
+    async fn test_ls_me() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = "tail".into();
+        let expected = DirectoryList::default();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+        ctx.set_response(expected_bytes);
+        let result = ls_me(&ctx, p0).await.unwrap();
+        assert_eq!(result, expected);
+    }
+
+    #[tokio::test]
+    async fn test_ls_union() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+        let p0 = "tail".into();
+        let q0 = true;
+        let q1 = true;
+        let expected = DirectoryList::default();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+        ctx.set_response(expected_bytes);
+        let result = ls_union(&ctx, p0, q0, q1).await.unwrap();
         assert_eq!(result, expected);
     }
 
@@ -284,7 +373,7 @@ mod tests {
         let q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
         let q2 = 42;
         let expected = ObjectSummary::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = create_entry(&ctx, p0, p1, q0, q1, q2).await.unwrap();
         assert_eq!(result, expected);
@@ -306,7 +395,7 @@ mod tests {
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let expected = DirectoryList::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = get_roots(&ctx).await.unwrap();
         assert_eq!(result, expected);
@@ -331,7 +420,7 @@ mod tests {
         let q0 = true;
         let body = Vec::new();
         let expected = DirectoryList::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = post_file(&ctx, p0, q0, body).await.unwrap();
         assert_eq!(result, expected);
@@ -354,7 +443,7 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = DirectoryList::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = unlink(&ctx, p0).await.unwrap();
         assert_eq!(result, expected);
@@ -460,7 +549,7 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = ObjectId::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = get_root_id(&ctx, p0).await.unwrap();
         assert_eq!(result, expected);

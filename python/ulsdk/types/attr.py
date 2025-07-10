@@ -7,7 +7,12 @@ from enum import Enum
 from flatbuffers.table import Table
 from flatbuffers.builder import Builder
 from flatbuffers.util import RemoveSizePrefix
-from typing import Union, List, Optional, Self, Tuple
+from typing import Union, List, Optional, Tuple
+import sys
+if sys.version_info.minor < 11:
+    from typing_extensions import Self
+else:
+    from typing import Self
 import uuid
 from .value import (
     Point2D,

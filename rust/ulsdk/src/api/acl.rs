@@ -29,7 +29,7 @@ pub async fn new_acl(ctx: &dyn RequestContext) -> Result<ObjectSummaryList, Erro
     let path = "/v1/api/ulv2/datacatalog/acl/";
     let body = Bytes::new();
     let res = ctx.post(&path, body, "text/plain", None, None).await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::ObjectSummaryList::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Create a new access control list that inherits from an existing ACL
@@ -55,7 +55,7 @@ pub async fn new_from(
     let res = ctx
         .post(&path, body, "text/plain", Some(params), None)
         .await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::ObjectSummaryList::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Request access to an object
@@ -66,7 +66,7 @@ pub async fn new_from(
 /// * `request` - The access request object containing details about the permissions desired
 pub async fn request(ctx: &dyn RequestContext, request: AccessRequest) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/acl/request";
-    let body = Bytes::from(Vec::<u8>::from(request));
+    let body = Bytes::from(request.to_fbs_bytes());
     ctx.post(&path, body, "application/octet-stream", None, None)
         .await?;
     Ok(())
@@ -115,7 +115,7 @@ pub async fn share_with_details(
         .replace(":id", &id.to_string())
         .replace(":to", &to.to_string())
         .replace(":permission", &permission_bits.to_string());
-    let body = Bytes::from(Vec::<u8>::from(share_details));
+    let body = Bytes::from(share_details.to_fbs_bytes());
     ctx.post(&path, body, "application/octet-stream", None, None)
         .await?;
     Ok(())
@@ -158,7 +158,7 @@ pub async fn share_all_with_details(
     let path = "/v1/api/ulv2/datacatalog/acl/share/:id/:to"
         .replace(":id", &id.to_string())
         .replace(":to", &to.to_string());
-    let body = Bytes::from(Vec::<u8>::from(share_details));
+    let body = Bytes::from(share_details.to_fbs_bytes());
     ctx.post(&path, body, "application/octet-stream", None, None)
         .await?;
     Ok(())
@@ -207,7 +207,7 @@ pub async fn grant_with_details(
         .replace(":id", &id.to_string())
         .replace(":to", &to.to_string())
         .replace(":permission", &permission_bits.to_string());
-    let body = Bytes::from(Vec::<u8>::from(grant_details));
+    let body = Bytes::from(grant_details.to_fbs_bytes());
     ctx.post(&path, body, "application/octet-stream", None, None)
         .await?;
     Ok(())
@@ -250,7 +250,7 @@ pub async fn grant_all_with_details(
     let path = "/v1/api/ulv2/datacatalog/acl/grant/:id/:to"
         .replace(":id", &id.to_string())
         .replace(":to", &to.to_string());
-    let body = Bytes::from(Vec::<u8>::from(grant_details));
+    let body = Bytes::from(grant_details.to_fbs_bytes());
     ctx.post(&path, body, "application/octet-stream", None, None)
         .await?;
     Ok(())
@@ -338,7 +338,7 @@ mod tests {
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let expected = ObjectSummaryList::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = new_acl(&ctx).await.unwrap();
         assert_eq!(result, expected);
@@ -362,7 +362,7 @@ mod tests {
         let q0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let q0 = Some(q0);
         let expected = ObjectSummaryList::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = new_from(&ctx, q0).await.unwrap();
         assert_eq!(result, expected);

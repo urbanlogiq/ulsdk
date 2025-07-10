@@ -6,13 +6,7 @@ package com.urbanlogiq.ulsdk.api.drive;
 
 public final class Drive {
     /**
-     * Retrieves a directory listing from a unix-style path rooted at `root`. `root` may be one of:
-     * - `me` for the current user's drive
-     * - `union` for the union of the current user's drive and all shared drives
-     * - the UUID of any drive directory
-     * 
-     * Paths may include wildcards like `*`.
-     *                 
+     * Retrieves a directory listing from a unix-style path rooted at `root` where `root` may be the UUID of any drive directory. Paths may include wildcards like `*`.
      * 
      * @param ctx A request context object
      * @param root The root directory to list files for, or one of "me" or "union".
@@ -29,6 +23,55 @@ public final class Drive {
         path = path.replace("*tail", tail);
 
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+
+        byte[] res = ctx.get(path, params, headers);
+        return new com.urbanlogiq.ulsdk.types.DirectoryList(res);
+    }
+
+    /**
+     * Retrieves a directory listing from a unix-style path rooted at the current user's home root. Paths may include wildcards like `*`.
+     * 
+     * @param ctx A request context object
+     * @param tail The unix-style path specifier to use for the file listing.
+     * @return The directory listing
+     */
+    public static com.urbanlogiq.ulsdk.types.DirectoryList lsMe(
+        com.urbanlogiq.ulsdk.RequestContext ctx,
+        String tail
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/drive/me/*tail";
+        path = path.replace("*tail", tail);
+
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+
+        byte[] res = ctx.get(path, params, headers);
+        return new com.urbanlogiq.ulsdk.types.DirectoryList(res);
+    }
+
+    /**
+     * Retrieves a directory listing from a union of all the drive roots the user has access to. Paths may include wildcards like `*`.
+     * 
+     * @param ctx A request context object
+     * @param tail The unix-style path specifier to use for the file listing.
+     * @param dedupe Deduplicate results of union queries
+     * @param exclude_public Remove entries from the result set that are accessible to unauthenticated users.
+     * @return The directory listing
+     */
+    public static com.urbanlogiq.ulsdk.types.DirectoryList lsUnion(
+        com.urbanlogiq.ulsdk.RequestContext ctx,
+        String tail,
+        Boolean dedupe,
+        Boolean excludePublic
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/drive/union/*tail";
+        path = path.replace("*tail", tail);
+
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        params.add(new com.urbanlogiq.ulsdk.Pair("dedupe", dedupe.toString()));
+        params.add(new com.urbanlogiq.ulsdk.Pair("exclude_public", excludePublic.toString()));
+
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
 
         byte[] res = ctx.get(path, params, headers);

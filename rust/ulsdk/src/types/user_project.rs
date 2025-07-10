@@ -274,20 +274,17 @@ impl From<FbsCategoryFilter<'_>> for CategoryFilter {
     }
 }
 
-impl TryFrom<&[u8]> for CategoryFilter {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsCategoryFilter>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<CategoryFilter> for Vec<u8> {
-    fn from(obj: CategoryFilter) -> Self {
+impl CategoryFilter {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsCategoryFilter>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -332,20 +329,17 @@ impl From<FbsRangeFilter<'_>> for RangeFilter {
     }
 }
 
-impl TryFrom<&[u8]> for RangeFilter {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsRangeFilter>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<RangeFilter> for Vec<u8> {
-    fn from(obj: RangeFilter) -> Self {
+impl RangeFilter {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsRangeFilter>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -408,20 +402,17 @@ impl From<FbsRelationshipRangeFilter<'_>> for RelationshipRangeFilter {
     }
 }
 
-impl TryFrom<&[u8]> for RelationshipRangeFilter {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsRelationshipRangeFilter>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<RelationshipRangeFilter> for Vec<u8> {
-    fn from(obj: RelationshipRangeFilter) -> Self {
+impl RelationshipRangeFilter {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsRelationshipRangeFilter>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -490,20 +481,17 @@ impl From<FbsDataStateGeometrySource<'_>> for DataStateGeometrySource {
     }
 }
 
-impl TryFrom<&[u8]> for DataStateGeometrySource {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsDataStateGeometrySource>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<DataStateGeometrySource> for Vec<u8> {
-    fn from(obj: DataStateGeometrySource) -> Self {
+impl DataStateGeometrySource {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsDataStateGeometrySource>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -543,20 +531,17 @@ impl From<FbsRawGeometrySource<'_>> for RawGeometrySource {
     }
 }
 
-impl TryFrom<&[u8]> for RawGeometrySource {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsRawGeometrySource>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<RawGeometrySource> for Vec<u8> {
-    fn from(obj: RawGeometrySource) -> Self {
+impl RawGeometrySource {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsRawGeometrySource>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -654,20 +639,17 @@ impl From<FbsColumnGroup<'_>> for ColumnGroup {
     }
 }
 
-impl TryFrom<&[u8]> for ColumnGroup {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsColumnGroup>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<ColumnGroup> for Vec<u8> {
-    fn from(obj: ColumnGroup) -> Self {
+impl ColumnGroup {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsColumnGroup>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -713,20 +695,17 @@ impl From<FbsDeprecatedDataStateJoin<'_>> for DeprecatedDataStateJoin {
     }
 }
 
-impl TryFrom<&[u8]> for DeprecatedDataStateJoin {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsDeprecatedDataStateJoin>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<DeprecatedDataStateJoin> for Vec<u8> {
-    fn from(obj: DeprecatedDataStateJoin) -> Self {
+impl DeprecatedDataStateJoin {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsDeprecatedDataStateJoin>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -770,20 +749,17 @@ impl From<FbsFieldFilter<'_>> for FieldFilter {
     }
 }
 
-impl TryFrom<&[u8]> for FieldFilter {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsFieldFilter>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<FieldFilter> for Vec<u8> {
-    fn from(obj: FieldFilter) -> Self {
+impl FieldFilter {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsFieldFilter>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -853,20 +829,17 @@ impl From<FbsJoinStackEntry<'_>> for JoinStackEntry {
     }
 }
 
-impl TryFrom<&[u8]> for JoinStackEntry {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsJoinStackEntry>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<JoinStackEntry> for Vec<u8> {
-    fn from(obj: JoinStackEntry) -> Self {
+impl JoinStackEntry {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsJoinStackEntry>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -912,20 +885,17 @@ impl From<FbsRawGeometrySourceGeom<'_>> for RawGeometrySourceGeom {
     }
 }
 
-impl TryFrom<&[u8]> for RawGeometrySourceGeom {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsRawGeometrySourceGeom>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<RawGeometrySourceGeom> for Vec<u8> {
-    fn from(obj: RawGeometrySourceGeom) -> Self {
+impl RawGeometrySourceGeom {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsRawGeometrySourceGeom>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -984,20 +954,17 @@ impl From<FbsStackableDataStateJoin<'_>> for StackableDataStateJoin {
     }
 }
 
-impl TryFrom<&[u8]> for StackableDataStateJoin {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsStackableDataStateJoin>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<StackableDataStateJoin> for Vec<u8> {
-    fn from(obj: StackableDataStateJoin) -> Self {
+impl StackableDataStateJoin {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsStackableDataStateJoin>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1092,20 +1059,17 @@ impl From<FbsUserLayer<'_>> for UserLayer {
     }
 }
 
-impl TryFrom<&[u8]> for UserLayer {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsUserLayer>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<UserLayer> for Vec<u8> {
-    fn from(obj: UserLayer) -> Self {
+impl UserLayer {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsUserLayer>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1171,20 +1135,17 @@ impl From<FbsUserLayerDataState<'_>> for UserLayerDataState {
     }
 }
 
-impl TryFrom<&[u8]> for UserLayerDataState {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsUserLayerDataState>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<UserLayerDataState> for Vec<u8> {
-    fn from(obj: UserLayerDataState) -> Self {
+impl UserLayerDataState {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsUserLayerDataState>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1234,20 +1195,17 @@ impl From<FbsUserProject<'_>> for UserProject {
     }
 }
 
-impl TryFrom<&[u8]> for UserProject {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsUserProject>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<UserProject> for Vec<u8> {
-    fn from(obj: UserProject) -> Self {
+impl UserProject {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsUserProject>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -1258,112 +1216,112 @@ mod tests {
     #[test]
     fn test_category_filter() {
         let t0 = CategoryFilter::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = CategoryFilter::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = CategoryFilter::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_column_group() {
         let t0 = ColumnGroup::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = ColumnGroup::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = ColumnGroup::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_data_state_geometry_source() {
         let t0 = DataStateGeometrySource::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = DataStateGeometrySource::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = DataStateGeometrySource::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_deprecated_data_state_join() {
         let t0 = DeprecatedDataStateJoin::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = DeprecatedDataStateJoin::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = DeprecatedDataStateJoin::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_field_filter() {
         let t0 = FieldFilter::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = FieldFilter::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = FieldFilter::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_join_stack_entry() {
         let t0 = JoinStackEntry::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = JoinStackEntry::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = JoinStackEntry::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_range_filter() {
         let t0 = RangeFilter::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = RangeFilter::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = RangeFilter::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_raw_geometry_source() {
         let t0 = RawGeometrySource::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = RawGeometrySource::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = RawGeometrySource::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_raw_geometry_source_geom() {
         let t0 = RawGeometrySourceGeom::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = RawGeometrySourceGeom::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = RawGeometrySourceGeom::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_relationship_range_filter() {
         let t0 = RelationshipRangeFilter::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = RelationshipRangeFilter::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = RelationshipRangeFilter::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_stackable_data_state_join() {
         let t0 = StackableDataStateJoin::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = StackableDataStateJoin::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = StackableDataStateJoin::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_user_layer() {
         let t0 = UserLayer::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = UserLayer::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = UserLayer::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_user_layer_data_state() {
         let t0 = UserLayerDataState::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = UserLayerDataState::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = UserLayerDataState::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_user_project() {
         let t0 = UserProject::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = UserProject::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = UserProject::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 }

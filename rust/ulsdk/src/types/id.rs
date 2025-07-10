@@ -64,19 +64,37 @@ impl From<FbsObjectNamespace> for ObjectNamespace {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone)]
-pub struct B2cId {
-    pub b: Vec<u8>,
-}
+#[derive(Copy, Clone, PartialOrd, PartialEq, Eq, Ord, Hash, Default)]
+pub struct B2cId([u8; 16]);
 
 impl B2cId {
+    pub fn as_bytes(&self) -> &[u8; 16] {
+        &self.0
+    }
+
+    pub fn nil() -> Self {
+        Self([0u8; 16])
+    }
+
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsB2cId>(bytes)?;
+        Ok(Self::from(fbs))
+    }
+
     pub fn serialize_to<'a>(
         &self,
         builder: &mut flatbuffers::FlatBufferBuilder<'a>,
     ) -> flatbuffers::WIPOffset<FbsB2cId<'a>> {
         use crate::types::generated::id_generated::B2cIdBuilder as FbsB2cIdBuilder;
 
-        let b_offset = builder.create_vector(&self.b);
+        let b_offset = builder.create_vector(&self.0);
 
         let mut bldr = FbsB2cIdBuilder::new(builder);
         bldr.add_b(b_offset);
@@ -86,73 +104,79 @@ impl B2cId {
 
 impl From<FbsB2cId<'_>> for B2cId {
     fn from(fbs: FbsB2cId<'_>) -> Self {
-        let mut b = Vec::new();
-        for elem in fbs.b() {
-            b.push(elem.into());
+        let mut b = [0u8; 16];
+        for (dest, src) in b.iter_mut().zip(fbs.b().iter()) {
+            *dest = src;
         }
 
-        Self { b }
+        Self(b)
     }
 }
 
-impl TryFrom<&[u8]> for B2cId {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsB2cId>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<B2cId> for Vec<u8> {
-    fn from(obj: B2cId) -> Self {
-        let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
-        bldr.finish_size_prefixed(offset, None);
-        bldr.finished_data().to_vec()
-    }
-}
-
-impl From<uuid::Uuid> for B2cId {
-    fn from(o: uuid::Uuid) -> B2cId {
-        B2cId {
-            b: o.as_bytes().to_vec(),
-        }
-    }
-}
-
-impl From<&uuid::Uuid> for B2cId {
-    fn from(o: &uuid::Uuid) -> B2cId {
-        B2cId {
-            b: o.as_bytes().to_vec(),
-        }
+impl<T> From<T> for B2cId
+where
+    T: AsRef<[u8]>,
+{
+    fn from(obj: T) -> Self {
+        let b: [u8; 16] = obj.as_ref().try_into().unwrap();
+        Self(b)
     }
 }
 
 impl From<B2cId> for uuid::Uuid {
     fn from(o: B2cId) -> uuid::Uuid {
-        uuid::Uuid::from_slice(&o.b).unwrap()
+        uuid::Uuid::from_slice(&o.0).unwrap()
     }
 }
 
 impl From<&B2cId> for uuid::Uuid {
     fn from(o: &B2cId) -> uuid::Uuid {
-        uuid::Uuid::from_slice(&o.b).unwrap()
+        uuid::Uuid::from_slice(&o.0).unwrap()
     }
 }
 
 impl std::str::FromStr for B2cId {
     type Err = uuid::Error;
-    fn from_str(o: &str) -> Result<B2cId, Self::Err> {
+    fn from_str(o: &str) -> Result<Self, Self::Err> {
         uuid::Uuid::from_str(o).map(Into::into)
     }
 }
 
-impl ToString for B2cId {
-    fn to_string(&self) -> String {
-        uuid::Uuid::from(self).to_string()
+impl std::fmt::Display for B2cId {
+    #[inline]
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        uuid::Uuid::from(self).fmt(f)
     }
 }
 
+impl std::fmt::Debug for B2cId {
+    #[inline]
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self, f)
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for B2cId {
+    fn deserialize<D>(deserializer: D) -> Result<B2cId, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        deserializer
+            .deserialize_str(crate::IdVisitor)
+            .map(B2cId::from)
+    }
+}
+
+impl serde::Serialize for B2cId {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let raw_utf8 = crate::id_to_utf8(&self.0);
+        let s = unsafe { std::str::from_utf8_unchecked(&raw_utf8) };
+        serializer.serialize_str(&s)
+    }
+}
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct ColumnGroupId {
     pub b: Vec<u8>,
@@ -184,36 +208,51 @@ impl From<FbsColumnGroupId<'_>> for ColumnGroupId {
     }
 }
 
-impl TryFrom<&[u8]> for ColumnGroupId {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
+impl ColumnGroupId {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let fbs = flatbuffers::size_prefixed_root::<FbsColumnGroupId>(bytes)?;
         Ok(Self::from(fbs))
     }
 }
 
-impl From<ColumnGroupId> for Vec<u8> {
-    fn from(obj: ColumnGroupId) -> Self {
+#[derive(Copy, Clone, PartialOrd, PartialEq, Eq, Ord, Hash, Default)]
+pub struct ContentId([u8; 16]);
+
+impl ContentId {
+    pub fn as_bytes(&self) -> &[u8; 16] {
+        &self.0
+    }
+
+    pub fn nil() -> Self {
+        Self([0u8; 16])
+    }
+
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
-}
 
-#[derive(Default, PartialEq, Debug, Clone)]
-pub struct ContentId {
-    pub b: Vec<u8>,
-}
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsContentId>(bytes)?;
+        Ok(Self::from(fbs))
+    }
 
-impl ContentId {
     pub fn serialize_to<'a>(
         &self,
         builder: &mut flatbuffers::FlatBufferBuilder<'a>,
     ) -> flatbuffers::WIPOffset<FbsContentId<'a>> {
         use crate::types::generated::id_generated::ContentIdBuilder as FbsContentIdBuilder;
 
-        let b_offset = builder.create_vector(&self.b);
+        let b_offset = builder.create_vector(&self.0);
 
         let mut bldr = FbsContentIdBuilder::new(builder);
         bldr.add_b(b_offset);
@@ -223,73 +262,79 @@ impl ContentId {
 
 impl From<FbsContentId<'_>> for ContentId {
     fn from(fbs: FbsContentId<'_>) -> Self {
-        let mut b = Vec::new();
-        for elem in fbs.b() {
-            b.push(elem.into());
+        let mut b = [0u8; 16];
+        for (dest, src) in b.iter_mut().zip(fbs.b().iter()) {
+            *dest = src;
         }
 
-        Self { b }
+        Self(b)
     }
 }
 
-impl TryFrom<&[u8]> for ContentId {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsContentId>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<ContentId> for Vec<u8> {
-    fn from(obj: ContentId) -> Self {
-        let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
-        bldr.finish_size_prefixed(offset, None);
-        bldr.finished_data().to_vec()
-    }
-}
-
-impl From<uuid::Uuid> for ContentId {
-    fn from(o: uuid::Uuid) -> ContentId {
-        ContentId {
-            b: o.as_bytes().to_vec(),
-        }
-    }
-}
-
-impl From<&uuid::Uuid> for ContentId {
-    fn from(o: &uuid::Uuid) -> ContentId {
-        ContentId {
-            b: o.as_bytes().to_vec(),
-        }
+impl<T> From<T> for ContentId
+where
+    T: AsRef<[u8]>,
+{
+    fn from(obj: T) -> Self {
+        let b: [u8; 16] = obj.as_ref().try_into().unwrap();
+        Self(b)
     }
 }
 
 impl From<ContentId> for uuid::Uuid {
     fn from(o: ContentId) -> uuid::Uuid {
-        uuid::Uuid::from_slice(&o.b).unwrap()
+        uuid::Uuid::from_slice(&o.0).unwrap()
     }
 }
 
 impl From<&ContentId> for uuid::Uuid {
     fn from(o: &ContentId) -> uuid::Uuid {
-        uuid::Uuid::from_slice(&o.b).unwrap()
+        uuid::Uuid::from_slice(&o.0).unwrap()
     }
 }
 
 impl std::str::FromStr for ContentId {
     type Err = uuid::Error;
-    fn from_str(o: &str) -> Result<ContentId, Self::Err> {
+    fn from_str(o: &str) -> Result<Self, Self::Err> {
         uuid::Uuid::from_str(o).map(Into::into)
     }
 }
 
-impl ToString for ContentId {
-    fn to_string(&self) -> String {
-        uuid::Uuid::from(self).to_string()
+impl std::fmt::Display for ContentId {
+    #[inline]
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        uuid::Uuid::from(self).fmt(f)
     }
 }
 
+impl std::fmt::Debug for ContentId {
+    #[inline]
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self, f)
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for ContentId {
+    fn deserialize<D>(deserializer: D) -> Result<ContentId, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        deserializer
+            .deserialize_str(crate::IdVisitor)
+            .map(ContentId::from)
+    }
+}
+
+impl serde::Serialize for ContentId {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let raw_utf8 = crate::id_to_utf8(&self.0);
+        let s = unsafe { std::str::from_utf8_unchecked(&raw_utf8) };
+        serializer.serialize_str(&s)
+    }
+}
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct DataStateId {
     pub b: Vec<u8>,
@@ -321,36 +366,51 @@ impl From<FbsDataStateId<'_>> for DataStateId {
     }
 }
 
-impl TryFrom<&[u8]> for DataStateId {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
+impl DataStateId {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let fbs = flatbuffers::size_prefixed_root::<FbsDataStateId>(bytes)?;
         Ok(Self::from(fbs))
     }
 }
 
-impl From<DataStateId> for Vec<u8> {
-    fn from(obj: DataStateId) -> Self {
+#[derive(Copy, Clone, PartialOrd, PartialEq, Eq, Ord, Hash, Default)]
+pub struct GenericId([u8; 16]);
+
+impl GenericId {
+    pub fn as_bytes(&self) -> &[u8; 16] {
+        &self.0
+    }
+
+    pub fn nil() -> Self {
+        Self([0u8; 16])
+    }
+
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
-}
 
-#[derive(Default, PartialEq, Debug, Clone)]
-pub struct GenericId {
-    pub b: Vec<u8>,
-}
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsGenericId>(bytes)?;
+        Ok(Self::from(fbs))
+    }
 
-impl GenericId {
     pub fn serialize_to<'a>(
         &self,
         builder: &mut flatbuffers::FlatBufferBuilder<'a>,
     ) -> flatbuffers::WIPOffset<FbsGenericId<'a>> {
         use crate::types::generated::id_generated::GenericIdBuilder as FbsGenericIdBuilder;
 
-        let b_offset = builder.create_vector(&self.b);
+        let b_offset = builder.create_vector(&self.0);
 
         let mut bldr = FbsGenericIdBuilder::new(builder);
         bldr.add_b(b_offset);
@@ -360,86 +420,110 @@ impl GenericId {
 
 impl From<FbsGenericId<'_>> for GenericId {
     fn from(fbs: FbsGenericId<'_>) -> Self {
-        let mut b = Vec::new();
-        for elem in fbs.b() {
-            b.push(elem.into());
+        let mut b = [0u8; 16];
+        for (dest, src) in b.iter_mut().zip(fbs.b().iter()) {
+            *dest = src;
         }
 
-        Self { b }
+        Self(b)
     }
 }
 
-impl TryFrom<&[u8]> for GenericId {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsGenericId>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<GenericId> for Vec<u8> {
-    fn from(obj: GenericId) -> Self {
-        let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
-        bldr.finish_size_prefixed(offset, None);
-        bldr.finished_data().to_vec()
-    }
-}
-
-impl From<uuid::Uuid> for GenericId {
-    fn from(o: uuid::Uuid) -> GenericId {
-        GenericId {
-            b: o.as_bytes().to_vec(),
-        }
-    }
-}
-
-impl From<&uuid::Uuid> for GenericId {
-    fn from(o: &uuid::Uuid) -> GenericId {
-        GenericId {
-            b: o.as_bytes().to_vec(),
-        }
+impl<T> From<T> for GenericId
+where
+    T: AsRef<[u8]>,
+{
+    fn from(obj: T) -> Self {
+        let b: [u8; 16] = obj.as_ref().try_into().unwrap();
+        Self(b)
     }
 }
 
 impl From<GenericId> for uuid::Uuid {
     fn from(o: GenericId) -> uuid::Uuid {
-        uuid::Uuid::from_slice(&o.b).unwrap()
+        uuid::Uuid::from_slice(&o.0).unwrap()
     }
 }
 
 impl From<&GenericId> for uuid::Uuid {
     fn from(o: &GenericId) -> uuid::Uuid {
-        uuid::Uuid::from_slice(&o.b).unwrap()
+        uuid::Uuid::from_slice(&o.0).unwrap()
     }
 }
 
 impl std::str::FromStr for GenericId {
     type Err = uuid::Error;
-    fn from_str(o: &str) -> Result<GenericId, Self::Err> {
+    fn from_str(o: &str) -> Result<Self, Self::Err> {
         uuid::Uuid::from_str(o).map(Into::into)
     }
 }
 
-impl ToString for GenericId {
-    fn to_string(&self) -> String {
-        uuid::Uuid::from(self).to_string()
+impl std::fmt::Display for GenericId {
+    #[inline]
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        uuid::Uuid::from(self).fmt(f)
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone)]
-pub struct GraphNodeId {
-    pub b: Vec<u8>,
+impl std::fmt::Debug for GenericId {
+    #[inline]
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self, f)
+    }
 }
 
+impl<'de> serde::Deserialize<'de> for GenericId {
+    fn deserialize<D>(deserializer: D) -> Result<GenericId, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        deserializer
+            .deserialize_str(crate::IdVisitor)
+            .map(GenericId::from)
+    }
+}
+
+impl serde::Serialize for GenericId {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let raw_utf8 = crate::id_to_utf8(&self.0);
+        let s = unsafe { std::str::from_utf8_unchecked(&raw_utf8) };
+        serializer.serialize_str(&s)
+    }
+}
+#[derive(Copy, Clone, PartialOrd, PartialEq, Eq, Ord, Hash, Default)]
+pub struct GraphNodeId([u8; 16]);
+
 impl GraphNodeId {
+    pub fn as_bytes(&self) -> &[u8; 16] {
+        &self.0
+    }
+
+    pub fn nil() -> Self {
+        Self([0u8; 16])
+    }
+
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsGraphNodeId>(bytes)?;
+        Ok(Self::from(fbs))
+    }
+
     pub fn serialize_to<'a>(
         &self,
         builder: &mut flatbuffers::FlatBufferBuilder<'a>,
     ) -> flatbuffers::WIPOffset<FbsGraphNodeId<'a>> {
         use crate::types::generated::id_generated::GraphNodeIdBuilder as FbsGraphNodeIdBuilder;
 
-        let b_offset = builder.create_vector(&self.b);
+        let b_offset = builder.create_vector(&self.0);
 
         let mut bldr = FbsGraphNodeIdBuilder::new(builder);
         bldr.add_b(b_offset);
@@ -449,86 +533,110 @@ impl GraphNodeId {
 
 impl From<FbsGraphNodeId<'_>> for GraphNodeId {
     fn from(fbs: FbsGraphNodeId<'_>) -> Self {
-        let mut b = Vec::new();
-        for elem in fbs.b() {
-            b.push(elem.into());
+        let mut b = [0u8; 16];
+        for (dest, src) in b.iter_mut().zip(fbs.b().iter()) {
+            *dest = src;
         }
 
-        Self { b }
+        Self(b)
     }
 }
 
-impl TryFrom<&[u8]> for GraphNodeId {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsGraphNodeId>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<GraphNodeId> for Vec<u8> {
-    fn from(obj: GraphNodeId) -> Self {
-        let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
-        bldr.finish_size_prefixed(offset, None);
-        bldr.finished_data().to_vec()
-    }
-}
-
-impl From<uuid::Uuid> for GraphNodeId {
-    fn from(o: uuid::Uuid) -> GraphNodeId {
-        GraphNodeId {
-            b: o.as_bytes().to_vec(),
-        }
-    }
-}
-
-impl From<&uuid::Uuid> for GraphNodeId {
-    fn from(o: &uuid::Uuid) -> GraphNodeId {
-        GraphNodeId {
-            b: o.as_bytes().to_vec(),
-        }
+impl<T> From<T> for GraphNodeId
+where
+    T: AsRef<[u8]>,
+{
+    fn from(obj: T) -> Self {
+        let b: [u8; 16] = obj.as_ref().try_into().unwrap();
+        Self(b)
     }
 }
 
 impl From<GraphNodeId> for uuid::Uuid {
     fn from(o: GraphNodeId) -> uuid::Uuid {
-        uuid::Uuid::from_slice(&o.b).unwrap()
+        uuid::Uuid::from_slice(&o.0).unwrap()
     }
 }
 
 impl From<&GraphNodeId> for uuid::Uuid {
     fn from(o: &GraphNodeId) -> uuid::Uuid {
-        uuid::Uuid::from_slice(&o.b).unwrap()
+        uuid::Uuid::from_slice(&o.0).unwrap()
     }
 }
 
 impl std::str::FromStr for GraphNodeId {
     type Err = uuid::Error;
-    fn from_str(o: &str) -> Result<GraphNodeId, Self::Err> {
+    fn from_str(o: &str) -> Result<Self, Self::Err> {
         uuid::Uuid::from_str(o).map(Into::into)
     }
 }
 
-impl ToString for GraphNodeId {
-    fn to_string(&self) -> String {
-        uuid::Uuid::from(self).to_string()
+impl std::fmt::Display for GraphNodeId {
+    #[inline]
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        uuid::Uuid::from(self).fmt(f)
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone)]
-pub struct ObjectId {
-    pub b: Vec<u8>,
+impl std::fmt::Debug for GraphNodeId {
+    #[inline]
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self, f)
+    }
 }
 
+impl<'de> serde::Deserialize<'de> for GraphNodeId {
+    fn deserialize<D>(deserializer: D) -> Result<GraphNodeId, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        deserializer
+            .deserialize_str(crate::IdVisitor)
+            .map(GraphNodeId::from)
+    }
+}
+
+impl serde::Serialize for GraphNodeId {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let raw_utf8 = crate::id_to_utf8(&self.0);
+        let s = unsafe { std::str::from_utf8_unchecked(&raw_utf8) };
+        serializer.serialize_str(&s)
+    }
+}
+#[derive(Copy, Clone, PartialOrd, PartialEq, Eq, Ord, Hash, Default)]
+pub struct ObjectId([u8; 16]);
+
 impl ObjectId {
+    pub fn as_bytes(&self) -> &[u8; 16] {
+        &self.0
+    }
+
+    pub fn nil() -> Self {
+        Self([0u8; 16])
+    }
+
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsObjectId>(bytes)?;
+        Ok(Self::from(fbs))
+    }
+
     pub fn serialize_to<'a>(
         &self,
         builder: &mut flatbuffers::FlatBufferBuilder<'a>,
     ) -> flatbuffers::WIPOffset<FbsObjectId<'a>> {
         use crate::types::generated::id_generated::ObjectIdBuilder as FbsObjectIdBuilder;
 
-        let b_offset = builder.create_vector(&self.b);
+        let b_offset = builder.create_vector(&self.0);
 
         let mut bldr = FbsObjectIdBuilder::new(builder);
         bldr.add_b(b_offset);
@@ -538,73 +646,79 @@ impl ObjectId {
 
 impl From<FbsObjectId<'_>> for ObjectId {
     fn from(fbs: FbsObjectId<'_>) -> Self {
-        let mut b = Vec::new();
-        for elem in fbs.b() {
-            b.push(elem.into());
+        let mut b = [0u8; 16];
+        for (dest, src) in b.iter_mut().zip(fbs.b().iter()) {
+            *dest = src;
         }
 
-        Self { b }
+        Self(b)
     }
 }
 
-impl TryFrom<&[u8]> for ObjectId {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsObjectId>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<ObjectId> for Vec<u8> {
-    fn from(obj: ObjectId) -> Self {
-        let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
-        bldr.finish_size_prefixed(offset, None);
-        bldr.finished_data().to_vec()
-    }
-}
-
-impl From<uuid::Uuid> for ObjectId {
-    fn from(o: uuid::Uuid) -> ObjectId {
-        ObjectId {
-            b: o.as_bytes().to_vec(),
-        }
-    }
-}
-
-impl From<&uuid::Uuid> for ObjectId {
-    fn from(o: &uuid::Uuid) -> ObjectId {
-        ObjectId {
-            b: o.as_bytes().to_vec(),
-        }
+impl<T> From<T> for ObjectId
+where
+    T: AsRef<[u8]>,
+{
+    fn from(obj: T) -> Self {
+        let b: [u8; 16] = obj.as_ref().try_into().unwrap();
+        Self(b)
     }
 }
 
 impl From<ObjectId> for uuid::Uuid {
     fn from(o: ObjectId) -> uuid::Uuid {
-        uuid::Uuid::from_slice(&o.b).unwrap()
+        uuid::Uuid::from_slice(&o.0).unwrap()
     }
 }
 
 impl From<&ObjectId> for uuid::Uuid {
     fn from(o: &ObjectId) -> uuid::Uuid {
-        uuid::Uuid::from_slice(&o.b).unwrap()
+        uuid::Uuid::from_slice(&o.0).unwrap()
     }
 }
 
 impl std::str::FromStr for ObjectId {
     type Err = uuid::Error;
-    fn from_str(o: &str) -> Result<ObjectId, Self::Err> {
+    fn from_str(o: &str) -> Result<Self, Self::Err> {
         uuid::Uuid::from_str(o).map(Into::into)
     }
 }
 
-impl ToString for ObjectId {
-    fn to_string(&self) -> String {
-        uuid::Uuid::from(self).to_string()
+impl std::fmt::Display for ObjectId {
+    #[inline]
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        uuid::Uuid::from(self).fmt(f)
     }
 }
 
+impl std::fmt::Debug for ObjectId {
+    #[inline]
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self, f)
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for ObjectId {
+    fn deserialize<D>(deserializer: D) -> Result<ObjectId, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        deserializer
+            .deserialize_str(crate::IdVisitor)
+            .map(ObjectId::from)
+    }
+}
+
+impl serde::Serialize for ObjectId {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let raw_utf8 = crate::id_to_utf8(&self.0);
+        let s = unsafe { std::str::from_utf8_unchecked(&raw_utf8) };
+        serializer.serialize_str(&s)
+    }
+}
 #[derive(Default, PartialEq, Debug, Clone)]
 pub struct StreamId {
     pub b: Vec<u8>,
@@ -636,20 +750,17 @@ impl From<FbsStreamId<'_>> for StreamId {
     }
 }
 
-impl TryFrom<&[u8]> for StreamId {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsStreamId>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<StreamId> for Vec<u8> {
-    fn from(obj: StreamId) -> Self {
+impl StreamId {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsStreamId>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -660,64 +771,64 @@ mod tests {
     #[test]
     fn test_b_2c_id() {
         let t0 = B2cId::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = B2cId::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = B2cId::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_column_group_id() {
         let t0 = ColumnGroupId::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = ColumnGroupId::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = ColumnGroupId::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_content_id() {
         let t0 = ContentId::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = ContentId::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = ContentId::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_data_state_id() {
         let t0 = DataStateId::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = DataStateId::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = DataStateId::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_generic_id() {
         let t0 = GenericId::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = GenericId::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = GenericId::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_graph_node_id() {
         let t0 = GraphNodeId::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = GraphNodeId::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = GraphNodeId::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_object_id() {
         let t0 = ObjectId::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = ObjectId::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = ObjectId::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_stream_id() {
         let t0 = StreamId::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = StreamId::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = StreamId::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 }

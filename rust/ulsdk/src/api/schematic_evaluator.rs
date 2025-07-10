@@ -28,11 +28,11 @@ use crate::types::job::{Job, RunSpec, Task};
 /// * The ID of the newly created job
 pub async fn create_job(ctx: &dyn RequestContext, job: RunSpec) -> Result<ObjectId, Error> {
     let path = "/v1/api/ulv2/schematicevaluator/jobs";
-    let body = Bytes::from(Vec::<u8>::from(job));
+    let body = Bytes::from(job.to_fbs_bytes());
     let res = ctx
         .post(&path, body, "application/octet-stream", None, None)
         .await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::ObjectId::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Fetch the details of the job with the given ID. By default this will block until the job is complete.
@@ -57,7 +57,7 @@ pub async fn get_job(
     }
 
     let res = ctx.get(&path, Some(params), None).await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::Job::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Fetch the details of the task with the given ID.
@@ -75,7 +75,7 @@ pub async fn get_task(
 ) -> Result<Task, Error> {
     let path = "/v1/api/ulv2/schematicevaluator/tasks/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
-    res.as_slice().try_into().map_err(Error::from)
+    crate::types::Task::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 #[cfg(test)]
@@ -103,7 +103,7 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let body = crate::types::RunSpec::default();
         let expected = ObjectId::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = create_job(&ctx, body).await.unwrap();
         assert_eq!(result, expected);
@@ -128,7 +128,7 @@ mod tests {
         let q0 = 42;
         let q0 = Some(q0);
         let expected = Job::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = get_job(&ctx, p0, q0).await.unwrap();
         assert_eq!(result, expected);
@@ -151,7 +151,7 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
         let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let expected = Task::default();
-        let expected_bytes: Vec<u8> = expected.clone().into();
+        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
         let result = get_task(&ctx, p0).await.unwrap();
         assert_eq!(result, expected);

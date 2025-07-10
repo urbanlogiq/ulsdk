@@ -53,6 +53,52 @@ ls(
     return ::ul::types::DirectoryList(std::get<std::vector<uint8_t>>(res));
 }
 
+Result<::ul::types::DirectoryList>
+ls_me(
+    ul::RequestContext &ctx,
+    const std::string &tail
+) {
+    std::string path = "/v1/api/ulv2/drive/me/*tail";
+    const size_t tail_idx = path.find("*tail");
+    const std::string encoded_tail = ::ul::url_encode(tail);
+    path.replace(tail_idx, 5, encoded_tail);
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+    const Result<std::vector<uint8_t>> res = ctx.get(path, params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<::ul::types::DirectoryList>(error);
+    }
+    return ::ul::types::DirectoryList(std::get<std::vector<uint8_t>>(res));
+}
+
+Result<::ul::types::DirectoryList>
+ls_union(
+    ul::RequestContext &ctx,
+    const std::string &tail,
+    bool dedupe,
+    bool exclude_public
+) {
+    std::string path = "/v1/api/ulv2/drive/union/*tail";
+    const size_t tail_idx = path.find("*tail");
+    const std::string encoded_tail = ::ul::url_encode(tail);
+    path.replace(tail_idx, 5, encoded_tail);
+
+    std::map<std::string, std::string> params;
+    params["dedupe"] = dedupe ? "true" : "false";
+    params["exclude_public"] = exclude_public ? "true" : "false";
+
+    std::map<std::string, std::string> headers;
+    const Result<std::vector<uint8_t>> res = ctx.get(path, params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<::ul::types::DirectoryList>(error);
+    }
+    return ::ul::types::DirectoryList(std::get<std::vector<uint8_t>>(res));
+}
+
 Result<::ul::types::ObjectSummary>
 create_entry(
     ul::RequestContext &ctx,

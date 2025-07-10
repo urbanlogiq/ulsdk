@@ -89,6 +89,7 @@ public final class Fn {
   public static final short Ceil = 78;
   public static final short StAstext = 79;
   public static final short StIntersection = 80;
+  public static final short StAsbinary = 81;
   public static final short UlTimezone = 32764;
   public static final short UlArrayContains = 32765;
   public static final short UlArrayAny = 32766;

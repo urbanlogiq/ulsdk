@@ -7,7 +7,12 @@ from enum import Enum
 from flatbuffers.table import Table
 from flatbuffers.builder import Builder
 from flatbuffers.util import RemoveSizePrefix
-from typing import Union, List, Optional, Self, Tuple
+from typing import Union, List, Optional, Tuple
+import sys
+if sys.version_info.minor < 11:
+    from typing_extensions import Self
+else:
+    from typing import Self
 import uuid
 
 class Fn(Enum):
@@ -92,6 +97,7 @@ class Fn(Enum):
     Ceil = 78
     StAstext = 79
     StIntersection = 80
+    StAsbinary = 81
     UlTimezone = 32764
     UlArrayContains = 32765
     UlArrayAny = 32766

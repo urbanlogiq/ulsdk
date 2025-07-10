@@ -115,6 +115,9 @@ struct DeleteQueryElementBuilder;
 struct QueryElement;
 struct QueryElementBuilder;
 
+struct Explain;
+struct ExplainBuilder;
+
 struct Query;
 struct QueryBuilder;
 
@@ -525,6 +528,42 @@ template<> struct QueryElementUnionTraits<DeleteQueryElement> {
 
 bool VerifyQueryElementUnion(::flatbuffers::Verifier &verifier, const void *obj, QueryElementUnion type);
 bool VerifyQueryElementUnionVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<QueryElementUnion> *types);
+
+enum class ExplainFormat : uint8_t {
+  Tree = 0,
+  Indent = 1,
+  Json = 2,
+  Graphviz = 3,
+  MIN = Tree,
+  MAX = Graphviz
+};
+
+inline const ExplainFormat (&EnumValuesExplainFormat())[4] {
+  static const ExplainFormat values[] = {
+    ExplainFormat::Tree,
+    ExplainFormat::Indent,
+    ExplainFormat::Json,
+    ExplainFormat::Graphviz
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesExplainFormat() {
+  static const char * const names[5] = {
+    "Tree",
+    "Indent",
+    "Json",
+    "Graphviz",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameExplainFormat(ExplainFormat e) {
+  if (::flatbuffers::IsOutRange(e, ExplainFormat::Tree, ExplainFormat::Graphviz)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesExplainFormat()[index];
+}
 
 struct ValueIndex FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef ValueIndexBuilder Builder;
@@ -3101,6 +3140,73 @@ struct QueryElement::Traits {
   static auto constexpr Create = CreateQueryElement;
 };
 
+struct Explain FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ExplainBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_FORMAT = 4,
+    VT_ANALYZE = 6,
+    VT_VERBOSE = 8
+  };
+  ExplainFormat format() const {
+    return static_cast<ExplainFormat>(GetField<uint8_t>(VT_FORMAT, 0));
+  }
+  bool analyze() const {
+    return GetField<uint8_t>(VT_ANALYZE, 0) != 0;
+  }
+  bool verbose() const {
+    return GetField<uint8_t>(VT_VERBOSE, 0) != 0;
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_FORMAT, 1) &&
+           VerifyField<uint8_t>(verifier, VT_ANALYZE, 1) &&
+           VerifyField<uint8_t>(verifier, VT_VERBOSE, 1) &&
+           verifier.EndTable();
+  }
+};
+
+struct ExplainBuilder {
+  typedef Explain Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_format(ExplainFormat format) {
+    fbb_.AddElement<uint8_t>(Explain::VT_FORMAT, static_cast<uint8_t>(format), 0);
+  }
+  void add_analyze(bool analyze) {
+    fbb_.AddElement<uint8_t>(Explain::VT_ANALYZE, static_cast<uint8_t>(analyze), 0);
+  }
+  void add_verbose(bool verbose) {
+    fbb_.AddElement<uint8_t>(Explain::VT_VERBOSE, static_cast<uint8_t>(verbose), 0);
+  }
+  explicit ExplainBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<Explain> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<Explain>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<Explain> CreateExplain(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ExplainFormat format = ExplainFormat::Tree,
+    bool analyze = false,
+    bool verbose = false) {
+  ExplainBuilder builder_(_fbb);
+  builder_.add_verbose(verbose);
+  builder_.add_analyze(analyze);
+  builder_.add_format(format);
+  return builder_.Finish();
+}
+
+struct Explain::Traits {
+  using type = Explain;
+  static auto constexpr Create = CreateExplain;
+};
+
 struct Query FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef QueryBuilder Builder;
   struct Traits;
@@ -3108,7 +3214,8 @@ struct Query FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_QUERY = 4,
     VT_VALUES = 6,
     VT_LIMIT = 8,
-    VT_BOUND_SOURCES = 10
+    VT_BOUND_SOURCES = 10,
+    VT_EXPLAIN = 12
   };
   const QueryElement *query() const {
     return GetPointer<const QueryElement *>(VT_QUERY);
@@ -3122,6 +3229,9 @@ struct Query FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::Vector<::flatbuffers::Offset<TableSourceInstance>> *bound_sources() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<TableSourceInstance>> *>(VT_BOUND_SOURCES);
   }
+  const Explain *explain() const {
+    return GetPointer<const Explain *>(VT_EXPLAIN);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_QUERY) &&
@@ -3133,6 +3243,8 @@ struct Query FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_BOUND_SOURCES) &&
            verifier.VerifyVector(bound_sources()) &&
            verifier.VerifyVectorOfTables(bound_sources()) &&
+           VerifyOffset(verifier, VT_EXPLAIN) &&
+           verifier.VerifyTable(explain()) &&
            verifier.EndTable();
   }
 };
@@ -3153,6 +3265,9 @@ struct QueryBuilder {
   void add_bound_sources(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<TableSourceInstance>>> bound_sources) {
     fbb_.AddOffset(Query::VT_BOUND_SOURCES, bound_sources);
   }
+  void add_explain(::flatbuffers::Offset<Explain> explain) {
+    fbb_.AddOffset(Query::VT_EXPLAIN, explain);
+  }
   explicit QueryBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -3170,8 +3285,10 @@ inline ::flatbuffers::Offset<Query> CreateQuery(
     ::flatbuffers::Offset<QueryElement> query = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ValueInstance>>> values = 0,
     uint32_t limit = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<TableSourceInstance>>> bound_sources = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<TableSourceInstance>>> bound_sources = 0,
+    ::flatbuffers::Offset<Explain> explain = 0) {
   QueryBuilder builder_(_fbb);
+  builder_.add_explain(explain);
   builder_.add_bound_sources(bound_sources);
   builder_.add_limit(limit);
   builder_.add_values(values);
@@ -3189,7 +3306,8 @@ inline ::flatbuffers::Offset<Query> CreateQueryDirect(
     ::flatbuffers::Offset<QueryElement> query = 0,
     const std::vector<::flatbuffers::Offset<ValueInstance>> *values = nullptr,
     uint32_t limit = 0,
-    const std::vector<::flatbuffers::Offset<TableSourceInstance>> *bound_sources = nullptr) {
+    const std::vector<::flatbuffers::Offset<TableSourceInstance>> *bound_sources = nullptr,
+    ::flatbuffers::Offset<Explain> explain = 0) {
   auto values__ = values ? _fbb.CreateVector<::flatbuffers::Offset<ValueInstance>>(*values) : 0;
   auto bound_sources__ = bound_sources ? _fbb.CreateVector<::flatbuffers::Offset<TableSourceInstance>>(*bound_sources) : 0;
   return CreateQuery(
@@ -3197,7 +3315,8 @@ inline ::flatbuffers::Offset<Query> CreateQueryDirect(
       query,
       values__,
       limit,
-      bound_sources__);
+      bound_sources__,
+      explain);
 }
 
 inline bool VerifyExprUnion(::flatbuffers::Verifier &verifier, const void *obj, ExprUnion type) {

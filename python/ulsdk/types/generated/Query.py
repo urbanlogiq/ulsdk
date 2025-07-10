@@ -5,6 +5,7 @@
 import flatbuffers
 from flatbuffers.compat import import_numpy
 from typing import Any
+from .Explain import Explain
 from .QueryElement import QueryElement
 from .TableSourceInstance import TableSourceInstance
 from .ValueInstance import ValueInstance
@@ -94,8 +95,18 @@ class Query(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         return o == 0
 
+    # Query
+    def Explain(self) -> Optional[Explain]:
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
+        if o != 0:
+            x = self._tab.Indirect(o + self._tab.Pos)
+            obj = Explain()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
 def QueryStart(builder: flatbuffers.Builder):
-    builder.StartObject(4)
+    builder.StartObject(5)
 
 def Start(builder: flatbuffers.Builder):
     QueryStart(builder)
@@ -135,6 +146,12 @@ def QueryStartBoundSourcesVector(builder, numElems: int) -> int:
 
 def StartBoundSourcesVector(builder, numElems: int) -> int:
     return QueryStartBoundSourcesVector(builder, numElems)
+
+def QueryAddExplain(builder: flatbuffers.Builder, explain: int):
+    builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(explain), 0)
+
+def AddExplain(builder: flatbuffers.Builder, explain: int):
+    QueryAddExplain(builder, explain)
 
 def QueryEnd(builder: flatbuffers.Builder) -> int:
     return builder.EndObject()

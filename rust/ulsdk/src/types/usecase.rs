@@ -66,8 +66,9 @@ use crate::types::generated::query_generated::{
     AllColumns as FbsAllColumns, Arrow as FbsArrow, BinaryQueryElement as FbsBinaryQueryElement,
     Case as FbsCase, Column as FbsColumn, DataCatalog as FbsDataCatalog,
     DeleteQueryElement as FbsDeleteQueryElement, Distinct as FbsDistinct, Drive as FbsDrive,
-    Expr as FbsExpr, ExprUnion as FbsExprUnion, Function as FbsFunction, Join as FbsJoin,
-    JoinTy as FbsJoinTy, MvdbPartition as FbsMvdbPartition, NullableUint as FbsNullableUint,
+    Explain as FbsExplain, ExplainFormat as FbsExplainFormat, Expr as FbsExpr,
+    ExprUnion as FbsExprUnion, Function as FbsFunction, Join as FbsJoin, JoinTy as FbsJoinTy,
+    MvdbPartition as FbsMvdbPartition, NullableUint as FbsNullableUint,
     OrderByExpr as FbsOrderByExpr, Partition as FbsPartition, Placeholder as FbsPlaceholder,
     Query as FbsQuery, QueryElement as FbsQueryElement, QueryElementOp as FbsQueryElementOp,
     QueryElementUnion as FbsQueryElementUnion, QueryTableSource as FbsQueryTableSource,
@@ -105,11 +106,11 @@ use crate::types::id::{
 };
 use crate::types::query::{
     AllColumns, Arrow, BinaryQueryElement, Case, Column, DataCatalog, DeleteQueryElement, Distinct,
-    Drive, Expr, ExprUnion, Function, Join, JoinTy, MvdbPartition, NullableUint, OrderByExpr,
-    Partition, Placeholder, Query, QueryElement, QueryElementOp, QueryElementUnion,
-    QueryTableSource, SetExpr, TableOrderBy, TablePartition, TableSource, TableSourceInstance,
-    TableSourceUnion, TypeHint, UnaryQueryElement, UnsetArgument, UpdateQueryElement, ValueIndex,
-    ValueName, Vector, When, Window, WorklogPartition,
+    Drive, Explain, ExplainFormat, Expr, ExprUnion, Function, Join, JoinTy, MvdbPartition,
+    NullableUint, OrderByExpr, Partition, Placeholder, Query, QueryElement, QueryElementOp,
+    QueryElementUnion, QueryTableSource, SetExpr, TableOrderBy, TablePartition, TableSource,
+    TableSourceInstance, TableSourceUnion, TypeHint, UnaryQueryElement, UnsetArgument,
+    UpdateQueryElement, ValueIndex, ValueName, Vector, When, Window, WorklogPartition,
 };
 use crate::types::value::{
     Point2D, Tri2D, VArray, VBool, VBytes, VChar, VF32, VF64, VFixedSizeBytes, VI8, VI16, VI32,
@@ -373,20 +374,17 @@ impl From<FbsUseCase<'_>> for UseCase {
     }
 }
 
-impl TryFrom<&[u8]> for UseCase {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsUseCase>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<UseCase> for Vec<u8> {
-    fn from(obj: UseCase) -> Self {
+impl UseCase {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsUseCase>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -445,20 +443,17 @@ impl From<FbsUseCaseInputPair<'_>> for UseCaseInputPair {
     }
 }
 
-impl TryFrom<&[u8]> for UseCaseInputPair {
-    type Error = flatbuffers::InvalidFlatbuffer;
-    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsUseCaseInputPair>(bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
-impl From<UseCaseInputPair> for Vec<u8> {
-    fn from(obj: UseCaseInputPair) -> Self {
+impl UseCaseInputPair {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = obj.serialize_to(&mut bldr);
+        let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let fbs = flatbuffers::size_prefixed_root::<FbsUseCaseInputPair>(bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -469,16 +464,16 @@ mod tests {
     #[test]
     fn test_use_case() {
         let t0 = UseCase::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = UseCase::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = UseCase::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
     #[test]
     fn test_use_case_input_pair() {
         let t0 = UseCaseInputPair::default();
-        let buf: Vec<u8> = t0.clone().into();
-        let t1 = UseCaseInputPair::try_from(buf.as_slice()).unwrap();
+        let buf = t0.to_fbs_bytes();
+        let t1 = UseCaseInputPair::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 }

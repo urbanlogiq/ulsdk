@@ -86,6 +86,7 @@ public final class Fn {
     public static final short Ceil = com.urbanlogiq.ulsdk.types.generated.Fn.Ceil;
     public static final short StAstext = com.urbanlogiq.ulsdk.types.generated.Fn.StAstext;
     public static final short StIntersection = com.urbanlogiq.ulsdk.types.generated.Fn.StIntersection;
+    public static final short StAsbinary = com.urbanlogiq.ulsdk.types.generated.Fn.StAsbinary;
     public static final short UlTimezone = com.urbanlogiq.ulsdk.types.generated.Fn.UlTimezone;
     public static final short UlArrayContains = com.urbanlogiq.ulsdk.types.generated.Fn.UlArrayContains;
     public static final short UlArrayAny = com.urbanlogiq.ulsdk.types.generated.Fn.UlArrayAny;

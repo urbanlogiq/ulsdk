@@ -39,7 +39,7 @@ pub const ENUM_MAX_FN: i16 = 32766;
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_FN: [Fn; 84] = [
+pub const ENUM_VALUES_FN: [Fn; 85] = [
     Fn::None,
     Fn::True,
     Fn::False,
@@ -121,6 +121,7 @@ pub const ENUM_VALUES_FN: [Fn; 84] = [
     Fn::Ceil,
     Fn::StAstext,
     Fn::StIntersection,
+    Fn::StAsbinary,
     Fn::UlTimezone,
     Fn::UlArrayContains,
     Fn::UlArrayAny,
@@ -212,6 +213,7 @@ impl Fn {
     pub const Ceil: Self = Self(78);
     pub const StAstext: Self = Self(79);
     pub const StIntersection: Self = Self(80);
+    pub const StAsbinary: Self = Self(81);
     pub const UlTimezone: Self = Self(32764);
     pub const UlArrayContains: Self = Self(32765);
     pub const UlArrayAny: Self = Self(32766);
@@ -300,6 +302,7 @@ impl Fn {
         Self::Ceil,
         Self::StAstext,
         Self::StIntersection,
+        Self::StAsbinary,
         Self::UlTimezone,
         Self::UlArrayContains,
         Self::UlArrayAny,
@@ -388,6 +391,7 @@ impl Fn {
             Self::Ceil => Some("Ceil"),
             Self::StAstext => Some("StAstext"),
             Self::StIntersection => Some("StIntersection"),
+            Self::StAsbinary => Some("StAsbinary"),
             Self::UlTimezone => Some("UlTimezone"),
             Self::UlArrayContains => Some("UlArrayContains"),
             Self::UlArrayAny => Some("UlArrayAny"),

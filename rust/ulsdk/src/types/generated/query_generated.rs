@@ -879,6 +879,118 @@ impl<'a> flatbuffers::Verifiable for QueryElementUnion {
 impl flatbuffers::SimpleToVerifyInSlice for QueryElementUnion {}
 pub struct QueryElementUnionUnionTableOffset {}
 
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+pub const ENUM_MIN_EXPLAIN_FORMAT: u8 = 0;
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+pub const ENUM_MAX_EXPLAIN_FORMAT: u8 = 3;
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+#[allow(non_camel_case_types)]
+pub const ENUM_VALUES_EXPLAIN_FORMAT: [ExplainFormat; 4] = [
+    ExplainFormat::Tree,
+    ExplainFormat::Indent,
+    ExplainFormat::Json,
+    ExplainFormat::Graphviz,
+];
+
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+#[repr(transparent)]
+pub struct ExplainFormat(pub u8);
+#[allow(non_upper_case_globals)]
+impl ExplainFormat {
+    pub const Tree: Self = Self(0);
+    pub const Indent: Self = Self(1);
+    pub const Json: Self = Self(2);
+    pub const Graphviz: Self = Self(3);
+
+    pub const ENUM_MIN: u8 = 0;
+    pub const ENUM_MAX: u8 = 3;
+    pub const ENUM_VALUES: &'static [Self] =
+        &[Self::Tree, Self::Indent, Self::Json, Self::Graphviz];
+    /// Returns the variant's name or "" if unknown.
+    pub fn variant_name(self) -> Option<&'static str> {
+        match self {
+            Self::Tree => Some("Tree"),
+            Self::Indent => Some("Indent"),
+            Self::Json => Some("Json"),
+            Self::Graphviz => Some("Graphviz"),
+            _ => None,
+        }
+    }
+}
+impl core::fmt::Debug for ExplainFormat {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        if let Some(name) = self.variant_name() {
+            f.write_str(name)
+        } else {
+            f.write_fmt(format_args!("<UNKNOWN {:?}>", self.0))
+        }
+    }
+}
+impl Serialize for ExplainFormat {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_unit_variant(
+            "ExplainFormat",
+            self.0 as u32,
+            self.variant_name().unwrap(),
+        )
+    }
+}
+
+impl<'a> flatbuffers::Follow<'a> for ExplainFormat {
+    type Inner = Self;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        let b = flatbuffers::read_scalar_at::<u8>(buf, loc);
+        Self(b)
+    }
+}
+
+impl flatbuffers::Push for ExplainFormat {
+    type Output = ExplainFormat;
+    #[inline]
+    unsafe fn push(&self, dst: &mut [u8], _written_len: usize) {
+        flatbuffers::emplace_scalar::<u8>(dst, self.0);
+    }
+}
+
+impl flatbuffers::EndianScalar for ExplainFormat {
+    type Scalar = u8;
+    #[inline]
+    fn to_little_endian(self) -> u8 {
+        self.0.to_le()
+    }
+    #[inline]
+    #[allow(clippy::wrong_self_convention)]
+    fn from_little_endian(v: u8) -> Self {
+        let b = u8::from_le(v);
+        Self(b)
+    }
+}
+
+impl<'a> flatbuffers::Verifiable for ExplainFormat {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        u8::run_verifier(v, pos)
+    }
+}
+
+impl flatbuffers::SimpleToVerifyInSlice for ExplainFormat {}
 pub enum ValueIndexOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -7702,6 +7814,167 @@ impl core::fmt::Debug for QueryElement<'_> {
         ds.finish()
     }
 }
+pub enum ExplainOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct Explain<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for Explain<'a> {
+    type Inner = Explain<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> Explain<'a> {
+    pub const VT_FORMAT: flatbuffers::VOffsetT = 4;
+    pub const VT_ANALYZE: flatbuffers::VOffsetT = 6;
+    pub const VT_VERBOSE: flatbuffers::VOffsetT = 8;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        Explain { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+        args: &'args ExplainArgs,
+    ) -> flatbuffers::WIPOffset<Explain<'bldr>> {
+        let mut builder = ExplainBuilder::new(_fbb);
+        builder.add_verbose(args.verbose);
+        builder.add_analyze(args.analyze);
+        builder.add_format(args.format);
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn format(&self) -> ExplainFormat {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<ExplainFormat>(Explain::VT_FORMAT, Some(ExplainFormat::Tree))
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn analyze(&self) -> bool {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<bool>(Explain::VT_ANALYZE, Some(false))
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn verbose(&self) -> bool {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<bool>(Explain::VT_VERBOSE, Some(false))
+                .unwrap()
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for Explain<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<ExplainFormat>("format", Self::VT_FORMAT, false)?
+            .visit_field::<bool>("analyze", Self::VT_ANALYZE, false)?
+            .visit_field::<bool>("verbose", Self::VT_VERBOSE, false)?
+            .finish();
+        Ok(())
+    }
+}
+pub struct ExplainArgs {
+    pub format: ExplainFormat,
+    pub analyze: bool,
+    pub verbose: bool,
+}
+impl<'a> Default for ExplainArgs {
+    #[inline]
+    fn default() -> Self {
+        ExplainArgs {
+            format: ExplainFormat::Tree,
+            analyze: false,
+            verbose: false,
+        }
+    }
+}
+
+impl Serialize for Explain<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("Explain", 3)?;
+        s.serialize_field("format", &self.format())?;
+        s.serialize_field("analyze", &self.analyze())?;
+        s.serialize_field("verbose", &self.verbose())?;
+        s.end()
+    }
+}
+
+pub struct ExplainBuilder<'a: 'b, 'b> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b> ExplainBuilder<'a, 'b> {
+    #[inline]
+    pub fn add_format(&mut self, format: ExplainFormat) {
+        self.fbb_
+            .push_slot::<ExplainFormat>(Explain::VT_FORMAT, format, ExplainFormat::Tree);
+    }
+    #[inline]
+    pub fn add_analyze(&mut self, analyze: bool) {
+        self.fbb_
+            .push_slot::<bool>(Explain::VT_ANALYZE, analyze, false);
+    }
+    #[inline]
+    pub fn add_verbose(&mut self, verbose: bool) {
+        self.fbb_
+            .push_slot::<bool>(Explain::VT_VERBOSE, verbose, false);
+    }
+    #[inline]
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ExplainBuilder<'a, 'b> {
+        let start = _fbb.start_table();
+        ExplainBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<Explain<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for Explain<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("Explain");
+        ds.field("format", &self.format());
+        ds.field("analyze", &self.analyze());
+        ds.field("verbose", &self.verbose());
+        ds.finish()
+    }
+}
 pub enum QueryOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -7724,6 +7997,7 @@ impl<'a> Query<'a> {
     pub const VT_VALUES: flatbuffers::VOffsetT = 6;
     pub const VT_LIMIT: flatbuffers::VOffsetT = 8;
     pub const VT_BOUND_SOURCES: flatbuffers::VOffsetT = 10;
+    pub const VT_EXPLAIN: flatbuffers::VOffsetT = 12;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -7735,6 +8009,9 @@ impl<'a> Query<'a> {
         args: &'args QueryArgs<'args>,
     ) -> flatbuffers::WIPOffset<Query<'bldr>> {
         let mut builder = QueryBuilder::new(_fbb);
+        if let Some(x) = args.explain {
+            builder.add_explain(x);
+        }
         if let Some(x) = args.bound_sources {
             builder.add_bound_sources(x);
         }
@@ -7793,6 +8070,16 @@ impl<'a> Query<'a> {
             >>(Query::VT_BOUND_SOURCES, None)
         }
     }
+    #[inline]
+    pub fn explain(&self) -> Option<Explain<'a>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<Explain>>(Query::VT_EXPLAIN, None)
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for Query<'_> {
@@ -7815,6 +8102,11 @@ impl flatbuffers::Verifiable for Query<'_> {
             .visit_field::<flatbuffers::ForwardsUOffset<
                 flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<TableSourceInstance>>,
             >>("bound_sources", Self::VT_BOUND_SOURCES, false)?
+            .visit_field::<flatbuffers::ForwardsUOffset<Explain>>(
+                "explain",
+                Self::VT_EXPLAIN,
+                false,
+            )?
             .finish();
         Ok(())
     }
@@ -7832,6 +8124,7 @@ pub struct QueryArgs<'a> {
             flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<TableSourceInstance<'a>>>,
         >,
     >,
+    pub explain: Option<flatbuffers::WIPOffset<Explain<'a>>>,
 }
 impl<'a> Default for QueryArgs<'a> {
     #[inline]
@@ -7841,6 +8134,7 @@ impl<'a> Default for QueryArgs<'a> {
             values: None,
             limit: 0,
             bound_sources: None,
+            explain: None,
         }
     }
 }
@@ -7850,7 +8144,7 @@ impl Serialize for Query<'_> {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("Query", 4)?;
+        let mut s = serializer.serialize_struct("Query", 5)?;
         s.serialize_field("query", &self.query())?;
         if let Some(f) = self.values() {
             s.serialize_field("values", &f)?;
@@ -7862,6 +8156,11 @@ impl Serialize for Query<'_> {
             s.serialize_field("bound_sources", &f)?;
         } else {
             s.skip_field("bound_sources")?;
+        }
+        if let Some(f) = self.explain() {
+            s.serialize_field("explain", &f)?;
+        } else {
+            s.skip_field("explain")?;
         }
         s.end()
     }
@@ -7902,6 +8201,11 @@ impl<'a: 'b, 'b> QueryBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(Query::VT_BOUND_SOURCES, bound_sources);
     }
     #[inline]
+    pub fn add_explain(&mut self, explain: flatbuffers::WIPOffset<Explain<'b>>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<Explain>>(Query::VT_EXPLAIN, explain);
+    }
+    #[inline]
     pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> QueryBuilder<'a, 'b> {
         let start = _fbb.start_table();
         QueryBuilder {
@@ -7924,6 +8228,7 @@ impl core::fmt::Debug for Query<'_> {
         ds.field("values", &self.values());
         ds.field("limit", &self.limit());
         ds.field("bound_sources", &self.bound_sources());
+        ds.field("explain", &self.explain());
         ds.finish()
     }
 }

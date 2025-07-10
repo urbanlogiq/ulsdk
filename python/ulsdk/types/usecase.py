@@ -7,7 +7,12 @@ from enum import Enum
 from flatbuffers.table import Table
 from flatbuffers.builder import Builder
 from flatbuffers.util import RemoveSizePrefix
-from typing import Union, List, Optional, Self, Tuple
+from typing import Union, List, Optional, Tuple
+import sys
+if sys.version_info.minor < 11:
+    from typing_extensions import Self
+else:
+    from typing import Self
 import uuid
 from .Schema import (
     Binary,
@@ -104,6 +109,8 @@ from .query import (
     DeleteQueryElement,
     Distinct,
     Drive,
+    Explain,
+    ExplainFormat,
     Expr,
     ExprUnion,
     Function,
@@ -192,6 +199,7 @@ from .generated.Drive import Drive as FbsDrive
 from .generated.Duration import Duration as FbsDuration
 from .generated.EdgeList import EdgeList as FbsEdgeList
 from .generated.EdgeQuery import EdgeQuery as FbsEdgeQuery
+from .generated.Explain import Explain as FbsExplain
 from .generated.Expr import Expr as FbsExpr
 from .generated.Field import Field as FbsField
 from .generated.FixedSizeBinary import FixedSizeBinary as FbsFixedSizeBinary
