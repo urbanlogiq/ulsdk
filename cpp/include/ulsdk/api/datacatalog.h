@@ -401,15 +401,13 @@ get_or_create_table_attachments_directory(
 );
 
 /**
- * Create a new table in the provided directory
- * @param id The ID of the directory to create the table in
+ * Create a new table
  * @param new_table New table creation details
  * @return The ID of the newly created table
  */
 Result<::ul::types::ObjectId>
 create_table(
     ul::RequestContext &ctx,
-    const ::ul::types::ObjectId &id,
     const ::ul::types::NewTable &new_table
 );
 

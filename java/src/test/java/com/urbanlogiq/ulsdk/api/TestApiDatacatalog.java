@@ -844,14 +844,12 @@ public final class TestApiDatacatalog {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.types.NewTable body = new com.urbanlogiq.ulsdk.types.NewTable();
         com.urbanlogiq.ulsdk.types.ObjectId expected = new com.urbanlogiq.ulsdk.types.ObjectId();
         byte[] expectedBytes = expected.toBytes();
         ctx.setResponse(expectedBytes);
         com.urbanlogiq.ulsdk.types.ObjectId result = com.urbanlogiq.ulsdk.api.datacatalog.Datacatalog.createTable(
             ctx,
-            p0,
             body
         );
         org.junit.Assert.assertTrue(result.equals(expected));

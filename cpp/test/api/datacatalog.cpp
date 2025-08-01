@@ -750,14 +750,12 @@ ApiTest test_get_or_create_table_attachments_directory_obj(test_get_or_create_ta
 ul::Result<ul::Void>
 test_create_table(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     ::ul::types::NewTable body = ::ul::types::NewTable();
     const ::ul::types::ObjectId expected = ::ul::types::ObjectId();
     const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
     ctx.set_response(expected_bytes);
     auto result = ul::api::datacatalog::create_table(
         ctx,
-        p0,
         body
     );
 

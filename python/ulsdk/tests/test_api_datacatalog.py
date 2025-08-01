@@ -698,14 +698,12 @@ def test_create_table():
     key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
     key_ctx = ApiKeyContext(key, Environment.Stage)
     ctx = TestContext(key_ctx)
-    p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
     body = NewTable.make_default()
     expected = ObjectId.make_default();
     expected_bytes = expected.to_bytes();
     ctx.set_response(expected_bytes);
     result = create_table(
         ctx,
-        p0,
         body
     );
     assert result == expected

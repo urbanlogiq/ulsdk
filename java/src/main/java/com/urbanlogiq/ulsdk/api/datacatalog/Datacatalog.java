@@ -745,21 +745,17 @@ public final class Datacatalog {
     }
 
     /**
-     * Create a new table in the provided directory
+     * Create a new table
      * 
      * @param ctx A request context object
-     * @param id The ID of the directory to create the table in
      * @param new_table New table creation details
      * @return The ID of the newly created table
      */
     public static com.urbanlogiq.ulsdk.types.ObjectId createTable(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        com.urbanlogiq.ulsdk.types.ObjectId id,
         com.urbanlogiq.ulsdk.types.NewTable newTable
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/ulv2/datacatalog/table/:id";
-        path = path.replace(":id", id.toString());
-
+        String path = "/v1/api/ulv2/datacatalog/table";
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
 

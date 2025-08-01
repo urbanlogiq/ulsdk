@@ -717,22 +717,20 @@ pub async fn get_or_create_table_attachments_directory(
     crate::types::ObjectId::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
-/// Create a new table in the provided directory
+/// Create a new table
 ///
 /// # Arguments
 ///
 /// * `ctx` - A request context object
-/// * `id` - The ID of the directory to create the table in
 /// * `new_table` - New table creation details
 ///
 /// Returns
 /// * The ID of the newly created table
 pub async fn create_table(
     ctx: &dyn RequestContext,
-    id: crate::types::id::ObjectId,
     new_table: NewTable,
 ) -> Result<ObjectId, Error> {
-    let path = "/v1/api/ulv2/datacatalog/table/:id".replace(":id", &id.to_string());
+    let path = "/v1/api/ulv2/datacatalog/table";
     let body = Bytes::from(new_table.to_fbs_bytes());
     let res = ctx
         .post(&path, body, "application/octet-stream", None, None)
@@ -1630,12 +1628,11 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
         let body = crate::types::NewTable::default();
         let expected = ObjectId::default();
         let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
         ctx.set_response(expected_bytes);
-        let result = create_table(&ctx, p0, body).await.unwrap();
+        let result = create_table(&ctx, body).await.unwrap();
         assert_eq!(result, expected);
     }
 

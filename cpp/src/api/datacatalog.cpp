@@ -736,12 +736,9 @@ get_or_create_table_attachments_directory(
 Result<::ul::types::ObjectId>
 create_table(
     ul::RequestContext &ctx,
-    const ::ul::types::ObjectId &id,
     const ::ul::types::NewTable &new_table
 ) {
-    std::string path = "/v1/api/ulv2/datacatalog/table/:id";
-    const size_t id_idx = path.find(":id");
-    path.replace(id_idx, 3, id.to_string());
+    std::string path = "/v1/api/ulv2/datacatalog/table";
 
     std::map<std::string, std::string> params;
 

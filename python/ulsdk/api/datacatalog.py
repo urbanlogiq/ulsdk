@@ -779,23 +779,19 @@ def get_or_create_table_attachments_directory(
 
 def create_table(
     ctx: RequestContext,
-    id_: "ObjectId",
     new_table: NewTable,
 ) -> ObjectId:
-    """Create a new table in the provided directory
+    """Create a new table
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: "ObjectId" -- The ID of the directory to create the table in
     new_table: NewTable -- New table creation details
 
     Returns:
     The ID of the newly created table
     """
 
-    path = "/v1/api/ulv2/datacatalog/table/:id"
-    path = path.replace(":id", str(id_), 1)
-
+    path = "/v1/api/ulv2/datacatalog/table"
     params = dict()
     headers = dict()
     body = new_table.to_bytes()
