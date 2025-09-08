@@ -2081,7 +2081,7 @@ class Schema:
         if self.features is not None:
             StartFeaturesVector(builder, len(self.features))
             for i in reversed(range(len(self.features))):
-                builder.PrependInt64(self.features[i])
+                builder.PrependInt64(self.features[i].value)
             features_offset = builder.EndVector()
         fields_offset = None
         if self.fields is not None:

@@ -10,5 +10,6 @@ public final class LayerCombineMode {
   private LayerCombineMode() { }
   public static final long Union = 0L;
   public static final long Difference = 1L;
+  public static final long Intersection = 2L;
 }
 

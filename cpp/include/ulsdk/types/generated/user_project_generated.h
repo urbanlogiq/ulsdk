@@ -254,29 +254,32 @@ inline const char *EnumNameJoinOperation(JoinOperation e) {
 enum class LayerCombineMode : uint32_t {
   Union = 0,
   Difference = 1,
+  Intersection = 2,
   MIN = Union,
-  MAX = Difference
+  MAX = Intersection
 };
 
-inline const LayerCombineMode (&EnumValuesLayerCombineMode())[2] {
+inline const LayerCombineMode (&EnumValuesLayerCombineMode())[3] {
   static const LayerCombineMode values[] = {
     LayerCombineMode::Union,
-    LayerCombineMode::Difference
+    LayerCombineMode::Difference,
+    LayerCombineMode::Intersection
   };
   return values;
 }
 
 inline const char * const *EnumNamesLayerCombineMode() {
-  static const char * const names[3] = {
+  static const char * const names[4] = {
     "Union",
     "Difference",
+    "Intersection",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameLayerCombineMode(LayerCombineMode e) {
-  if (::flatbuffers::IsOutRange(e, LayerCombineMode::Union, LayerCombineMode::Difference)) return "";
+  if (::flatbuffers::IsOutRange(e, LayerCombineMode::Union, LayerCombineMode::Intersection)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesLayerCombineMode()[index];
 }

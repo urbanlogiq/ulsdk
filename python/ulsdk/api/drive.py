@@ -174,7 +174,7 @@ def post_file(
     params["force"] = "true" if force else "false"
 
     headers = dict()
-    res = ctx.upload(path, files)
+    res = ctx.upload(path, files, params=params, headers=headers)
     return DirectoryList.from_bytes(res)
 
 def unlink(

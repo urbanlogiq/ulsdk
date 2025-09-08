@@ -4,6 +4,7 @@
 #![allow(unused)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
+#![allow(mismatched_lifetime_syntaxes)]
 #![allow(clippy::extra_unused_lifetimes)]
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::needless_lifetimes)]
@@ -234,6 +235,256 @@ impl<'a> flatbuffers::Verifiable for MeasureType {
 }
 
 impl flatbuffers::SimpleToVerifyInSlice for MeasureType {}
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+pub const ENUM_MIN_CHART_LABEL: u8 = 0;
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+pub const ENUM_MAX_CHART_LABEL: u8 = 34;
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+#[allow(non_camel_case_types)]
+pub const ENUM_VALUES_CHART_LABEL: [ChartLabel; 35] = [
+    ChartLabel::FATALITIES,
+    ChartLabel::TARGET,
+    ChartLabel::RATE_OF_FATALITIES,
+    ChartLabel::SERIOUS_INJURIES,
+    ChartLabel::RATE_OF_SERIOUS_INJURIES,
+    ChartLabel::PERCENT_OF_CRASHES,
+    ChartLabel::NUMBER_OF_FATALITIES,
+    ChartLabel::INJURIES,
+    ChartLabel::RATE_OF_INJURIES,
+    ChartLabel::SAFETY_EVENTS,
+    ChartLabel::RATE_OF_SAFETY_EVENTS,
+    ChartLabel::PERCENT_OF_PEOPLE,
+    ChartLabel::PERCENT_OF_TEENS,
+    ChartLabel::AVERAGE_BIKE_AND_PEDESTRIAN_COUNTS,
+    ChartLabel::TRANSIT_RIDERSHIP,
+    ChartLabel::SHARE_OF_HOUSING_AND_TRANSPORTATION_COSTS,
+    ChartLabel::PERCENT_OF_HOUSEHOLDS,
+    ChartLabel::MILES_OF_SEA_LEVEL_RISE,
+    ChartLabel::PERCENT_OF_POPULATION,
+    ChartLabel::PERCENT_OF_INTERSTATE_PAVEMENT_LANE_MILES,
+    ChartLabel::PERCENT_OF_NON_INTERSTATE_NHS_PAVEMENT_LANE_MILES,
+    ChartLabel::PERCENT_OF_NHS_BRIDGES,
+    ChartLabel::PERCENT_OF_TRANSIT_REVENUE_VEHICLES,
+    ChartLabel::PERCENT_OF_TRANSIT_FACILITIES,
+    ChartLabel::PERCENT_OF_TRANSIT_INSPECTIONS,
+    ChartLabel::PERCENT_OF_TRANSIT_TRIPS,
+    ChartLabel::MEAN_DISTANCE,
+    ChartLabel::PERCENT_OF_PERSONS_MILES_TRAVELLED,
+    ChartLabel::TRUCK_TRAVEL_TIME_RELIABILITY,
+    ChartLabel::PERCENT_OF_PERSONS_MILES_TRAVELLED_SPACE,
+    ChartLabel::PERCENT_OF_CITY_TRANSIT_FLEET,
+    ChartLabel::PERCENT_CHANGE_IN_TAILPIPE_EMISSIONS,
+    ChartLabel::PERCENT_OF_REGISTERED_ELECTRIC_VEHICLES,
+    ChartLabel::MILES_OF_BIKEWAYS,
+    ChartLabel::MILES_OF_WALKWAYS,
+];
+
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+#[repr(transparent)]
+pub struct ChartLabel(pub u8);
+#[allow(non_upper_case_globals)]
+impl ChartLabel {
+    pub const FATALITIES: Self = Self(0);
+    pub const TARGET: Self = Self(1);
+    pub const RATE_OF_FATALITIES: Self = Self(2);
+    pub const SERIOUS_INJURIES: Self = Self(3);
+    pub const RATE_OF_SERIOUS_INJURIES: Self = Self(4);
+    pub const PERCENT_OF_CRASHES: Self = Self(5);
+    pub const NUMBER_OF_FATALITIES: Self = Self(6);
+    pub const INJURIES: Self = Self(7);
+    pub const RATE_OF_INJURIES: Self = Self(8);
+    pub const SAFETY_EVENTS: Self = Self(9);
+    pub const RATE_OF_SAFETY_EVENTS: Self = Self(10);
+    pub const PERCENT_OF_PEOPLE: Self = Self(11);
+    pub const PERCENT_OF_TEENS: Self = Self(12);
+    pub const AVERAGE_BIKE_AND_PEDESTRIAN_COUNTS: Self = Self(13);
+    pub const TRANSIT_RIDERSHIP: Self = Self(14);
+    pub const SHARE_OF_HOUSING_AND_TRANSPORTATION_COSTS: Self = Self(15);
+    pub const PERCENT_OF_HOUSEHOLDS: Self = Self(16);
+    pub const MILES_OF_SEA_LEVEL_RISE: Self = Self(17);
+    pub const PERCENT_OF_POPULATION: Self = Self(18);
+    pub const PERCENT_OF_INTERSTATE_PAVEMENT_LANE_MILES: Self = Self(19);
+    pub const PERCENT_OF_NON_INTERSTATE_NHS_PAVEMENT_LANE_MILES: Self = Self(20);
+    pub const PERCENT_OF_NHS_BRIDGES: Self = Self(21);
+    pub const PERCENT_OF_TRANSIT_REVENUE_VEHICLES: Self = Self(22);
+    pub const PERCENT_OF_TRANSIT_FACILITIES: Self = Self(23);
+    pub const PERCENT_OF_TRANSIT_INSPECTIONS: Self = Self(24);
+    pub const PERCENT_OF_TRANSIT_TRIPS: Self = Self(25);
+    pub const MEAN_DISTANCE: Self = Self(26);
+    pub const PERCENT_OF_PERSONS_MILES_TRAVELLED: Self = Self(27);
+    pub const TRUCK_TRAVEL_TIME_RELIABILITY: Self = Self(28);
+    pub const PERCENT_OF_PERSONS_MILES_TRAVELLED_SPACE: Self = Self(29);
+    pub const PERCENT_OF_CITY_TRANSIT_FLEET: Self = Self(30);
+    pub const PERCENT_CHANGE_IN_TAILPIPE_EMISSIONS: Self = Self(31);
+    pub const PERCENT_OF_REGISTERED_ELECTRIC_VEHICLES: Self = Self(32);
+    pub const MILES_OF_BIKEWAYS: Self = Self(33);
+    pub const MILES_OF_WALKWAYS: Self = Self(34);
+
+    pub const ENUM_MIN: u8 = 0;
+    pub const ENUM_MAX: u8 = 34;
+    pub const ENUM_VALUES: &'static [Self] = &[
+        Self::FATALITIES,
+        Self::TARGET,
+        Self::RATE_OF_FATALITIES,
+        Self::SERIOUS_INJURIES,
+        Self::RATE_OF_SERIOUS_INJURIES,
+        Self::PERCENT_OF_CRASHES,
+        Self::NUMBER_OF_FATALITIES,
+        Self::INJURIES,
+        Self::RATE_OF_INJURIES,
+        Self::SAFETY_EVENTS,
+        Self::RATE_OF_SAFETY_EVENTS,
+        Self::PERCENT_OF_PEOPLE,
+        Self::PERCENT_OF_TEENS,
+        Self::AVERAGE_BIKE_AND_PEDESTRIAN_COUNTS,
+        Self::TRANSIT_RIDERSHIP,
+        Self::SHARE_OF_HOUSING_AND_TRANSPORTATION_COSTS,
+        Self::PERCENT_OF_HOUSEHOLDS,
+        Self::MILES_OF_SEA_LEVEL_RISE,
+        Self::PERCENT_OF_POPULATION,
+        Self::PERCENT_OF_INTERSTATE_PAVEMENT_LANE_MILES,
+        Self::PERCENT_OF_NON_INTERSTATE_NHS_PAVEMENT_LANE_MILES,
+        Self::PERCENT_OF_NHS_BRIDGES,
+        Self::PERCENT_OF_TRANSIT_REVENUE_VEHICLES,
+        Self::PERCENT_OF_TRANSIT_FACILITIES,
+        Self::PERCENT_OF_TRANSIT_INSPECTIONS,
+        Self::PERCENT_OF_TRANSIT_TRIPS,
+        Self::MEAN_DISTANCE,
+        Self::PERCENT_OF_PERSONS_MILES_TRAVELLED,
+        Self::TRUCK_TRAVEL_TIME_RELIABILITY,
+        Self::PERCENT_OF_PERSONS_MILES_TRAVELLED_SPACE,
+        Self::PERCENT_OF_CITY_TRANSIT_FLEET,
+        Self::PERCENT_CHANGE_IN_TAILPIPE_EMISSIONS,
+        Self::PERCENT_OF_REGISTERED_ELECTRIC_VEHICLES,
+        Self::MILES_OF_BIKEWAYS,
+        Self::MILES_OF_WALKWAYS,
+    ];
+    /// Returns the variant's name or "" if unknown.
+    pub fn variant_name(self) -> Option<&'static str> {
+        match self {
+            Self::FATALITIES => Some("FATALITIES"),
+            Self::TARGET => Some("TARGET"),
+            Self::RATE_OF_FATALITIES => Some("RATE_OF_FATALITIES"),
+            Self::SERIOUS_INJURIES => Some("SERIOUS_INJURIES"),
+            Self::RATE_OF_SERIOUS_INJURIES => Some("RATE_OF_SERIOUS_INJURIES"),
+            Self::PERCENT_OF_CRASHES => Some("PERCENT_OF_CRASHES"),
+            Self::NUMBER_OF_FATALITIES => Some("NUMBER_OF_FATALITIES"),
+            Self::INJURIES => Some("INJURIES"),
+            Self::RATE_OF_INJURIES => Some("RATE_OF_INJURIES"),
+            Self::SAFETY_EVENTS => Some("SAFETY_EVENTS"),
+            Self::RATE_OF_SAFETY_EVENTS => Some("RATE_OF_SAFETY_EVENTS"),
+            Self::PERCENT_OF_PEOPLE => Some("PERCENT_OF_PEOPLE"),
+            Self::PERCENT_OF_TEENS => Some("PERCENT_OF_TEENS"),
+            Self::AVERAGE_BIKE_AND_PEDESTRIAN_COUNTS => Some("AVERAGE_BIKE_AND_PEDESTRIAN_COUNTS"),
+            Self::TRANSIT_RIDERSHIP => Some("TRANSIT_RIDERSHIP"),
+            Self::SHARE_OF_HOUSING_AND_TRANSPORTATION_COSTS => {
+                Some("SHARE_OF_HOUSING_AND_TRANSPORTATION_COSTS")
+            }
+            Self::PERCENT_OF_HOUSEHOLDS => Some("PERCENT_OF_HOUSEHOLDS"),
+            Self::MILES_OF_SEA_LEVEL_RISE => Some("MILES_OF_SEA_LEVEL_RISE"),
+            Self::PERCENT_OF_POPULATION => Some("PERCENT_OF_POPULATION"),
+            Self::PERCENT_OF_INTERSTATE_PAVEMENT_LANE_MILES => {
+                Some("PERCENT_OF_INTERSTATE_PAVEMENT_LANE_MILES")
+            }
+            Self::PERCENT_OF_NON_INTERSTATE_NHS_PAVEMENT_LANE_MILES => {
+                Some("PERCENT_OF_NON_INTERSTATE_NHS_PAVEMENT_LANE_MILES")
+            }
+            Self::PERCENT_OF_NHS_BRIDGES => Some("PERCENT_OF_NHS_BRIDGES"),
+            Self::PERCENT_OF_TRANSIT_REVENUE_VEHICLES => {
+                Some("PERCENT_OF_TRANSIT_REVENUE_VEHICLES")
+            }
+            Self::PERCENT_OF_TRANSIT_FACILITIES => Some("PERCENT_OF_TRANSIT_FACILITIES"),
+            Self::PERCENT_OF_TRANSIT_INSPECTIONS => Some("PERCENT_OF_TRANSIT_INSPECTIONS"),
+            Self::PERCENT_OF_TRANSIT_TRIPS => Some("PERCENT_OF_TRANSIT_TRIPS"),
+            Self::MEAN_DISTANCE => Some("MEAN_DISTANCE"),
+            Self::PERCENT_OF_PERSONS_MILES_TRAVELLED => Some("PERCENT_OF_PERSONS_MILES_TRAVELLED"),
+            Self::TRUCK_TRAVEL_TIME_RELIABILITY => Some("TRUCK_TRAVEL_TIME_RELIABILITY"),
+            Self::PERCENT_OF_PERSONS_MILES_TRAVELLED_SPACE => {
+                Some("PERCENT_OF_PERSONS_MILES_TRAVELLED_SPACE")
+            }
+            Self::PERCENT_OF_CITY_TRANSIT_FLEET => Some("PERCENT_OF_CITY_TRANSIT_FLEET"),
+            Self::PERCENT_CHANGE_IN_TAILPIPE_EMISSIONS => {
+                Some("PERCENT_CHANGE_IN_TAILPIPE_EMISSIONS")
+            }
+            Self::PERCENT_OF_REGISTERED_ELECTRIC_VEHICLES => {
+                Some("PERCENT_OF_REGISTERED_ELECTRIC_VEHICLES")
+            }
+            Self::MILES_OF_BIKEWAYS => Some("MILES_OF_BIKEWAYS"),
+            Self::MILES_OF_WALKWAYS => Some("MILES_OF_WALKWAYS"),
+            _ => None,
+        }
+    }
+}
+impl core::fmt::Debug for ChartLabel {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        if let Some(name) = self.variant_name() {
+            f.write_str(name)
+        } else {
+            f.write_fmt(format_args!("<UNKNOWN {:?}>", self.0))
+        }
+    }
+}
+impl Serialize for ChartLabel {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_unit_variant("ChartLabel", self.0 as u32, self.variant_name().unwrap())
+    }
+}
+
+impl<'a> flatbuffers::Follow<'a> for ChartLabel {
+    type Inner = Self;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        let b = flatbuffers::read_scalar_at::<u8>(buf, loc);
+        Self(b)
+    }
+}
+
+impl flatbuffers::Push for ChartLabel {
+    type Output = ChartLabel;
+    #[inline]
+    unsafe fn push(&self, dst: &mut [u8], _written_len: usize) {
+        flatbuffers::emplace_scalar::<u8>(dst, self.0);
+    }
+}
+
+impl flatbuffers::EndianScalar for ChartLabel {
+    type Scalar = u8;
+    #[inline]
+    fn to_little_endian(self) -> u8 {
+        self.0.to_le()
+    }
+    #[inline]
+    #[allow(clippy::wrong_self_convention)]
+    fn from_little_endian(v: u8) -> Self {
+        let b = u8::from_le(v);
+        Self(b)
+    }
+}
+
+impl<'a> flatbuffers::Verifiable for ChartLabel {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        u8::run_verifier(v, pos)
+    }
+}
+
+impl flatbuffers::SimpleToVerifyInSlice for ChartLabel {}
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."

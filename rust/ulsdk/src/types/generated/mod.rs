@@ -4,6 +4,7 @@
 #![allow(unused)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
+#![allow(mismatched_lifetime_syntaxes)]
 #![allow(clippy::extra_unused_lifetimes)]
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::needless_lifetimes)]
@@ -46,3 +47,4 @@ pub mod derq_generated;
 pub mod sjwifi_generated;
 pub mod sfmd_generated;
 pub mod permissions_generated;
+pub mod services_generated;

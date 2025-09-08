@@ -5,6 +5,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(unused)]
+#![allow(mismatched_lifetime_syntaxes)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::useless_conversion)]
 #![allow(clippy::needless_borrow)]
@@ -371,6 +372,7 @@ pub enum EntityTy {
     T_INTERSECTION_SAFETY_COUNTS = 270,
     T_ROAD_SEGMENT_SAFETY_COUNTS = 271,
     T_HEXAGON_BOUNDARY = 272,
+    T_COMPASS_IOT_POINT = 273,
 }
 
 impl From<EntityTy> for FbsEntityTy {
@@ -673,6 +675,7 @@ impl From<EntityTy> for FbsEntityTy {
             EntityTy::T_INTERSECTION_SAFETY_COUNTS => FbsEntityTy::T_INTERSECTION_SAFETY_COUNTS,
             EntityTy::T_ROAD_SEGMENT_SAFETY_COUNTS => FbsEntityTy::T_ROAD_SEGMENT_SAFETY_COUNTS,
             EntityTy::T_HEXAGON_BOUNDARY => FbsEntityTy::T_HEXAGON_BOUNDARY,
+            EntityTy::T_COMPASS_IOT_POINT => FbsEntityTy::T_COMPASS_IOT_POINT,
         }
     }
 }
@@ -953,6 +956,7 @@ impl From<FbsEntityTy> for EntityTy {
             270 => Self::T_INTERSECTION_SAFETY_COUNTS,
             271 => Self::T_ROAD_SEGMENT_SAFETY_COUNTS,
             272 => Self::T_HEXAGON_BOUNDARY,
+            273 => Self::T_COMPASS_IOT_POINT,
             _ => panic!("Invalid value {} when constructing EntityTy", fbs.0),
         }
     }

@@ -251,7 +251,7 @@ class NodeQuery:
         if self.entity_tys is not None:
             StartEntityTysVector(builder, len(self.entity_tys))
             for i in reversed(range(len(self.entity_tys))):
-                builder.PrependInt32(self.entity_tys[i])
+                builder.PrependInt32(self.entity_tys[i].value)
             entity_tys_offset = builder.EndVector()
         geom_op_offset = None
         if self.geom_op is not None:

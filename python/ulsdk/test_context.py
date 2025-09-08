@@ -3,17 +3,15 @@
 import uuid
 from typing import Dict, List, Optional, Union
 
-from .keys import Environment, Region
-from .request_context import RequestContext, File
 from .api_key_context import ApiKeyContext
+from .keys import Environment, Region
+from .request_context import File, RequestContext
+
 
 class TestContext(RequestContext):
-    def __init__(
-        self,
-        context: ApiKeyContext
-    ):
+    def __init__(self, context: ApiKeyContext):
         self._context = context
-        self._response = bytes()
+        self._response = b""
 
     def set_response(self, response: bytes):
         self._response = response
@@ -48,7 +46,9 @@ class TestContext(RequestContext):
         **kwargs,
     ) -> bytes:
         echo_path = "/v1/echo/"
-        response = self._context.put(echo_path, self._response, mimetype, params, headers, **kwargs)
+        response = self._context.put(
+            echo_path, self._response, mimetype, params, headers, **kwargs
+        )
         if response != self._response:
             raise Exception("Test failure, expected response to match request")
         return self._response
@@ -63,7 +63,9 @@ class TestContext(RequestContext):
         **kwargs,
     ) -> bytes:
         echo_path = "/v1/echo/"
-        response = self._context.post(echo_path, self._response, mimetype, params, headers, **kwargs)
+        response = self._context.post(
+            echo_path, self._response, mimetype, params, headers, **kwargs
+        )
         if response != self._response:
             raise Exception("Test failure, expected response to match request")
         return self._response
@@ -72,9 +74,11 @@ class TestContext(RequestContext):
         self,
         path: str,
         files: List[File],
+        params: Optional[Dict] = None,
+        headers: Optional[Dict[str, str]] = None,
     ) -> bytes:
         echo_path = "/v1/echo/"
-        self._context.upload(echo_path, files)
+        self._context.upload(echo_path, files, params, headers)
         return self._response
 
     def delete(

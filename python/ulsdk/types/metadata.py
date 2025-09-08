@@ -1249,7 +1249,7 @@ class WorldGraphGeometry:
         )
         StartEdgePathVector(builder, len(self.edge_path))
         for i in reversed(range(len(self.edge_path))):
-            builder.PrependInt32(self.edge_path[i])
+            builder.PrependInt32(self.edge_path[i].value)
         edge_path_offset = builder.EndVector()
         start_stream_id_offset = None
         if self.start_stream_id is not None:

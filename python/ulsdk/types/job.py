@@ -670,7 +670,7 @@ class Job:
         if self.error_tys is not None:
             StartErrorTysVector(builder, len(self.error_tys))
             for i in reversed(range(len(self.error_tys))):
-                builder.PrependInt32(self.error_tys[i])
+                builder.PrependInt32(self.error_tys[i].value)
             error_tys_offset = builder.EndVector()
         params_offsets = list()
         for value in self.params:

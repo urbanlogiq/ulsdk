@@ -4,6 +4,7 @@
 #![allow(unused)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
+#![allow(mismatched_lifetime_syntaxes)]
 #![allow(clippy::extra_unused_lifetimes)]
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::needless_lifetimes)]

@@ -5,6 +5,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(unused)]
+#![allow(mismatched_lifetime_syntaxes)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::useless_conversion)]
 #![allow(clippy::needless_borrow)]
@@ -202,6 +203,7 @@ pub enum LayerCombineMode {
     #[default]
     Union = 0,
     Difference = 1,
+    Intersection = 2,
 }
 
 impl From<LayerCombineMode> for FbsLayerCombineMode {
@@ -209,6 +211,7 @@ impl From<LayerCombineMode> for FbsLayerCombineMode {
         match val {
             LayerCombineMode::Union => FbsLayerCombineMode::Union,
             LayerCombineMode::Difference => FbsLayerCombineMode::Difference,
+            LayerCombineMode::Intersection => FbsLayerCombineMode::Intersection,
         }
     }
 }
@@ -218,6 +221,7 @@ impl From<FbsLayerCombineMode> for LayerCombineMode {
         match fbs.0 {
             0 => Self::Union,
             1 => Self::Difference,
+            2 => Self::Intersection,
             _ => panic!("Invalid value {} when constructing LayerCombineMode", fbs.0),
         }
     }

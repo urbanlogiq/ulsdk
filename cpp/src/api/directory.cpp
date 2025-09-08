@@ -2370,7 +2370,7 @@ get_group_members(
     ul::RequestContext &ctx,
     const ::ul::types::B2cId &id
 ) {
-    std::string path = "/v1/api/uldirectory/v1/group/:id/members";
+    std::string path = "/v1/api/uldirectory/v1/group/:id";
     const size_t id_idx = path.find(":id");
     path.replace(id_idx, 3, id.to_string());
 

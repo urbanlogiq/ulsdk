@@ -431,12 +431,12 @@ pub async fn create_group(
 /// * `id` - The ID of the group to retrieve members for
 ///
 /// Returns
-/// * The grouyp membership list.
+/// * The group membership list.
 pub async fn get_group_members(
     ctx: &dyn RequestContext,
     id: crate::types::id::B2cId,
 ) -> Result<Vec<GroupMembership>, Error> {
-    let path = "/v1/api/uldirectory/v1/group/:id/members".replace(":id", &id.to_string());
+    let path = "/v1/api/uldirectory/v1/group/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }

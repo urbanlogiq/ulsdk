@@ -7,4 +7,5 @@ package com.urbanlogiq.ulsdk.types;
 public final class LayerCombineMode {
     public static final long Union = com.urbanlogiq.ulsdk.types.generated.LayerCombineMode.Union;
     public static final long Difference = com.urbanlogiq.ulsdk.types.generated.LayerCombineMode.Difference;
+    public static final long Intersection = com.urbanlogiq.ulsdk.types.generated.LayerCombineMode.Intersection;
 }

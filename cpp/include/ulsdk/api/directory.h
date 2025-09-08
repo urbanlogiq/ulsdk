@@ -439,7 +439,7 @@ create_group(
 /**
  * Retrieves a listing of all members of a group by group id.
  * @param id The ID of the group to retrieve members for
- * @return The grouyp membership list.
+ * @return The group membership list.
  */
 Result<std::vector<GroupMembership>>
 get_group_members(

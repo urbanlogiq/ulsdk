@@ -4,16 +4,16 @@ import base64
 import hashlib
 import time
 import urllib.parse
+import uuid
 from typing import Dict, List, Optional, Union, cast
+
 import nacl.encoding
 import nacl.signing
 import requests
 from requests import Request, Session
-import uuid
 
-from .keys import Key, Environment, Region
-from .request_context import RequestContext, _get_endpoint, File
-
+from .keys import Environment, Key, Region
+from .request_context import File, RequestContext, _get_endpoint
 
 REQUEST_TYPE = "ul1_request"
 SIGNATURE_V1 = "UL1-ED25519"
@@ -242,11 +242,18 @@ class ApiKeyContext(RequestContext):
         self,
         path: str,
         files: List[File],
+        params: Optional[Dict] = None,
+        headers: Optional[Dict[str, str]] = None,
     ) -> bytes:
-        endpoint = _get_endpoint(self._key.region, self._environment, path)
-        file_dict = {f._name: (f._name, f._data, f._mimetype) for f in files}
+        if params is None:
+            params = dict()
 
-        headers = dict()
+        if headers is None:
+            headers = dict()
+
+        endpoint = _get_endpoint(self._key.region, self._environment, path)
+        file_dict = {f.name: (f.name, f.data, f.mimetype) for f in files}
+
         kwargs = {"files": file_dict}
 
         s = Session()
@@ -257,8 +264,8 @@ class ApiKeyContext(RequestContext):
         file_hashes = []
 
         for file in files:
-            file_hash = hash(file._data)
-            file_hashes.append(f"{file._name}={file_hash}")
+            file_hash = hash(file.data)
+            file_hashes.append(f"{file.name}={file_hash}")
         file_hash_header_value = ", ".join(file_hashes)
 
         headers["x-ul-file-hash"] = file_hash_header_value
@@ -275,7 +282,7 @@ class ApiKeyContext(RequestContext):
             else None
         )
         headers = _generate_auth_header(
-            self._key, "POST", path, None, headers, data_as_bytes
+            self._key, "POST", path, params, headers, data_as_bytes
         )
 
         # We need to preserve the prepped headers because they contain the correct content-length and content-type.
@@ -286,6 +293,10 @@ class ApiKeyContext(RequestContext):
         # The following is type-ignored because the typing for PreparedRequest.headers is CaseInsensitiveDict[str],
         # and that type is declared within the requests library and not exported.
         prepped.headers = headers  # type: ignore
+
+        # Add query parameters to the prepared request
+        if params:
+            prepped.prepare_url(endpoint, params)
 
         res = s.send(prepped)
         res.raise_for_status()

@@ -5,6 +5,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(unused)]
+#![allow(mismatched_lifetime_syntaxes)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::useless_conversion)]
 #![allow(clippy::needless_borrow)]
@@ -517,6 +518,7 @@ impl NodeQuery {
                 EntityTy::T_INTERSECTION_SAFETY_COUNTS => FbsEntityTy::T_INTERSECTION_SAFETY_COUNTS,
                 EntityTy::T_ROAD_SEGMENT_SAFETY_COUNTS => FbsEntityTy::T_ROAD_SEGMENT_SAFETY_COUNTS,
                 EntityTy::T_HEXAGON_BOUNDARY => FbsEntityTy::T_HEXAGON_BOUNDARY,
+                EntityTy::T_COMPASS_IOT_POINT => FbsEntityTy::T_COMPASS_IOT_POINT,
             }));
             entity_tys_offset
         });

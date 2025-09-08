@@ -4,6 +4,7 @@
 #![allow(unused)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
+#![allow(mismatched_lifetime_syntaxes)]
 #![allow(clippy::extra_unused_lifetimes)]
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::needless_lifetimes)]
@@ -593,14 +594,17 @@ pub const ENUM_MIN_LAYER_COMBINE_MODE: u32 = 0;
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
-pub const ENUM_MAX_LAYER_COMBINE_MODE: u32 = 1;
+pub const ENUM_MAX_LAYER_COMBINE_MODE: u32 = 2;
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_LAYER_COMBINE_MODE: [LayerCombineMode; 2] =
-    [LayerCombineMode::Union, LayerCombineMode::Difference];
+pub const ENUM_VALUES_LAYER_COMBINE_MODE: [LayerCombineMode; 3] = [
+    LayerCombineMode::Union,
+    LayerCombineMode::Difference,
+    LayerCombineMode::Intersection,
+];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 #[repr(transparent)]
@@ -609,15 +613,17 @@ pub struct LayerCombineMode(pub u32);
 impl LayerCombineMode {
     pub const Union: Self = Self(0);
     pub const Difference: Self = Self(1);
+    pub const Intersection: Self = Self(2);
 
     pub const ENUM_MIN: u32 = 0;
-    pub const ENUM_MAX: u32 = 1;
-    pub const ENUM_VALUES: &'static [Self] = &[Self::Union, Self::Difference];
+    pub const ENUM_MAX: u32 = 2;
+    pub const ENUM_VALUES: &'static [Self] = &[Self::Union, Self::Difference, Self::Intersection];
     /// Returns the variant's name or "" if unknown.
     pub fn variant_name(self) -> Option<&'static str> {
         match self {
             Self::Union => Some("Union"),
             Self::Difference => Some("Difference"),
+            Self::Intersection => Some("Intersection"),
             _ => None,
         }
     }

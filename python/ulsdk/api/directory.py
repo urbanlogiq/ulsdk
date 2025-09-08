@@ -1421,10 +1421,10 @@ def get_group_members(
     id_: "B2cId" -- The ID of the group to retrieve members for
 
     Returns:
-    The grouyp membership list.
+    The group membership list.
     """
 
-    path = "/v1/api/uldirectory/v1/group/:id/members"
+    path = "/v1/api/uldirectory/v1/group/:id"
     path = path.replace(":id", str(id_), 1)
 
     params = dict()

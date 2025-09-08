@@ -100,6 +100,7 @@ class JoinType(Enum):
 class LayerCombineMode(Enum):
     Union_ = 0
     Difference = 1
+    Intersection = 2
 
 
 @dataclass

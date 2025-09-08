@@ -5,6 +5,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(unused)]
+#![allow(mismatched_lifetime_syntaxes)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::useless_conversion)]
 #![allow(clippy::needless_borrow)]

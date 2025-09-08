@@ -1,10 +1,10 @@
 # Copyright (c), CommunityLogiq Software
 
-from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Union, NamedTuple
 import uuid
+from abc import ABC, abstractmethod
+from typing import Dict, List, NamedTuple, Optional, Union
 
-from .keys import Region, Environment
+from .keys import Environment, Region
 
 
 def _get_endpoint(region: Region, environment: Environment, api: str) -> str:
@@ -84,6 +84,8 @@ class RequestContext(ABC):
         self,
         path: str,
         files: List[File],
+        params: Optional[Dict] = None,
+        headers: Optional[Dict[str, str]] = None,
     ) -> bytes:
         """Upload a batch of files to the specified endpoint using a multipart POST request"""
 

@@ -4,6 +4,7 @@
 #![allow(unused)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
+#![allow(mismatched_lifetime_syntaxes)]
 #![allow(clippy::extra_unused_lifetimes)]
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::needless_lifetimes)]
@@ -34,13 +35,13 @@ pub const ENUM_MIN_ENTITY_TY: i32 = 0;
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
-pub const ENUM_MAX_ENTITY_TY: i32 = 272;
+pub const ENUM_MAX_ENTITY_TY: i32 = 273;
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_ENTITY_TY: [EntityTy; 273] = [
+pub const ENUM_VALUES_ENTITY_TY: [EntityTy; 274] = [
     EntityTy::T_INVALID,
     EntityTy::T_TFC,
     EntityTy::T_TFC_LOOP,
@@ -314,6 +315,7 @@ pub const ENUM_VALUES_ENTITY_TY: [EntityTy; 273] = [
     EntityTy::T_INTERSECTION_SAFETY_COUNTS,
     EntityTy::T_ROAD_SEGMENT_SAFETY_COUNTS,
     EntityTy::T_HEXAGON_BOUNDARY,
+    EntityTy::T_COMPASS_IOT_POINT,
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
@@ -594,9 +596,10 @@ impl EntityTy {
     pub const T_INTERSECTION_SAFETY_COUNTS: Self = Self(270);
     pub const T_ROAD_SEGMENT_SAFETY_COUNTS: Self = Self(271);
     pub const T_HEXAGON_BOUNDARY: Self = Self(272);
+    pub const T_COMPASS_IOT_POINT: Self = Self(273);
 
     pub const ENUM_MIN: i32 = 0;
-    pub const ENUM_MAX: i32 = 272;
+    pub const ENUM_MAX: i32 = 273;
     pub const ENUM_VALUES: &'static [Self] = &[
         Self::T_INVALID,
         Self::T_TFC,
@@ -871,6 +874,7 @@ impl EntityTy {
         Self::T_INTERSECTION_SAFETY_COUNTS,
         Self::T_ROAD_SEGMENT_SAFETY_COUNTS,
         Self::T_HEXAGON_BOUNDARY,
+        Self::T_COMPASS_IOT_POINT,
     ];
     /// Returns the variant's name or "" if unknown.
     pub fn variant_name(self) -> Option<&'static str> {
@@ -1168,6 +1172,7 @@ impl EntityTy {
             Self::T_INTERSECTION_SAFETY_COUNTS => Some("T_INTERSECTION_SAFETY_COUNTS"),
             Self::T_ROAD_SEGMENT_SAFETY_COUNTS => Some("T_ROAD_SEGMENT_SAFETY_COUNTS"),
             Self::T_HEXAGON_BOUNDARY => Some("T_HEXAGON_BOUNDARY"),
+            Self::T_COMPASS_IOT_POINT => Some("T_COMPASS_IOT_POINT"),
             _ => None,
         }
     }

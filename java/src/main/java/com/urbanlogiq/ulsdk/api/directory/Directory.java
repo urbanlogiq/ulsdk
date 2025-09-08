@@ -334,13 +334,13 @@ public final class Directory {
      * 
      * @param ctx A request context object
      * @param id The ID of the group to retrieve members for
-     * @return The grouyp membership list.
+     * @return The group membership list.
      */
     public static com.urbanlogiq.ulsdk.api.directory.GroupMembership[] getGroupMembers(
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.types.B2cId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/group/:id/members";
+        String path = "/v1/api/uldirectory/v1/group/:id";
         path = path.replace(":id", id.toString());
 
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();

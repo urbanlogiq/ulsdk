@@ -5,3 +5,4 @@
 class LayerCombineMode(object):
     Union = 0
     Difference = 1
+    Intersection = 2
