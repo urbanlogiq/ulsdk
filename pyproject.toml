@@ -1,6 +1,6 @@
 [project]
 name = "ulsdk"
-version = "0.7.0"
+version = "0.8.0"
 description = "A Python SDK for the UrbanLogiq API"
 dependencies = [
   "flatbuffers",
@@ -15,7 +15,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.poetry]
 name = "ulsdk"
-version = "0.7.0"
+version = "0.8.0"
 description = "A Python SDK for the UrbanLogiq API"
 authors = ["UrbanLogiq <customersuccess@urbanlogiq.com>"]
 
