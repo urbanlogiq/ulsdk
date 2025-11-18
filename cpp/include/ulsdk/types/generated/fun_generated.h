@@ -96,6 +96,79 @@ enum class Fn : int16_t {
   StAstext = 79,
   StIntersection = 80,
   StAsbinary = 81,
+  PointToH3 = 82,
+  GeomToH3 = 83,
+  ArrayAnyValue = 84,
+  ArrayAppend = 85,
+  ArrayDims = 86,
+  ArrayDistance = 87,
+  ArrayDistinct = 88,
+  ArrayElement = 89,
+  ArrayExcept = 90,
+  ArrayExtract = 91,
+  ArrayHas = 92,
+  ArrayHasAll = 93,
+  ArrayHasAny = 94,
+  ArrayIntersect = 95,
+  ArrayLength = 96,
+  ArrayMax = 97,
+  ArrayMin = 98,
+  ArrayNdims = 99,
+  ArrayPopBack = 100,
+  ArrayPopFront = 101,
+  ArrayPosition = 102,
+  ArrayPositions = 103,
+  ArrayPrepend = 104,
+  ArrayRemove = 105,
+  ArrayRemoveAll = 106,
+  ArrayRemoveN = 107,
+  ArrayRepeat = 108,
+  ArrayReplace = 109,
+  ArrayReplaceAll = 110,
+  ArrayReplaceN = 111,
+  ArrayResize = 112,
+  ArrayReverse = 113,
+  ArraySlice = 114,
+  ArrayUnion = 115,
+  Ascii = 116,
+  BitLength = 117,
+  Btrim = 118,
+  CharacterLength = 119,
+  Chr = 120,
+  ConcatWs = 121,
+  Contains = 122,
+  EndsWith = 123,
+  FindInSet = 124,
+  Initcap = 125,
+  Instr = 126,
+  Left = 127,
+  Length = 128,
+  Levenshtein = 129,
+  Lower = 130,
+  Lpad = 131,
+  Ltrim = 132,
+  OctetLength = 133,
+  Overlay = 134,
+  Position = 135,
+  Repeat = 136,
+  Replace = 137,
+  Reverse = 138,
+  Right = 139,
+  Rpad = 140,
+  Rtrim = 141,
+  SplitPart = 142,
+  StartsWith = 143,
+  Strpos = 144,
+  Substr = 145,
+  SubstrIndex = 146,
+  ToHex = 147,
+  Translate = 148,
+  Trim = 149,
+  Upper = 150,
+  Uuid = 151,
+  Unnest = 152,
+  PercentileCont = 153,
+  CorrelationId = 32763,
   UlTimezone = 32764,
   UlArrayContains = 32765,
   UlArrayAny = 32766,
@@ -103,7 +176,7 @@ enum class Fn : int16_t {
   MAX = UlArrayAny
 };
 
-inline const Fn (&EnumValuesFn())[85] {
+inline const Fn (&EnumValuesFn())[158] {
   static const Fn values[] = {
     Fn::None,
     Fn::True,
@@ -187,6 +260,79 @@ inline const Fn (&EnumValuesFn())[85] {
     Fn::StAstext,
     Fn::StIntersection,
     Fn::StAsbinary,
+    Fn::PointToH3,
+    Fn::GeomToH3,
+    Fn::ArrayAnyValue,
+    Fn::ArrayAppend,
+    Fn::ArrayDims,
+    Fn::ArrayDistance,
+    Fn::ArrayDistinct,
+    Fn::ArrayElement,
+    Fn::ArrayExcept,
+    Fn::ArrayExtract,
+    Fn::ArrayHas,
+    Fn::ArrayHasAll,
+    Fn::ArrayHasAny,
+    Fn::ArrayIntersect,
+    Fn::ArrayLength,
+    Fn::ArrayMax,
+    Fn::ArrayMin,
+    Fn::ArrayNdims,
+    Fn::ArrayPopBack,
+    Fn::ArrayPopFront,
+    Fn::ArrayPosition,
+    Fn::ArrayPositions,
+    Fn::ArrayPrepend,
+    Fn::ArrayRemove,
+    Fn::ArrayRemoveAll,
+    Fn::ArrayRemoveN,
+    Fn::ArrayRepeat,
+    Fn::ArrayReplace,
+    Fn::ArrayReplaceAll,
+    Fn::ArrayReplaceN,
+    Fn::ArrayResize,
+    Fn::ArrayReverse,
+    Fn::ArraySlice,
+    Fn::ArrayUnion,
+    Fn::Ascii,
+    Fn::BitLength,
+    Fn::Btrim,
+    Fn::CharacterLength,
+    Fn::Chr,
+    Fn::ConcatWs,
+    Fn::Contains,
+    Fn::EndsWith,
+    Fn::FindInSet,
+    Fn::Initcap,
+    Fn::Instr,
+    Fn::Left,
+    Fn::Length,
+    Fn::Levenshtein,
+    Fn::Lower,
+    Fn::Lpad,
+    Fn::Ltrim,
+    Fn::OctetLength,
+    Fn::Overlay,
+    Fn::Position,
+    Fn::Repeat,
+    Fn::Replace,
+    Fn::Reverse,
+    Fn::Right,
+    Fn::Rpad,
+    Fn::Rtrim,
+    Fn::SplitPart,
+    Fn::StartsWith,
+    Fn::Strpos,
+    Fn::Substr,
+    Fn::SubstrIndex,
+    Fn::ToHex,
+    Fn::Translate,
+    Fn::Trim,
+    Fn::Upper,
+    Fn::Uuid,
+    Fn::Unnest,
+    Fn::PercentileCont,
+    Fn::CorrelationId,
     Fn::UlTimezone,
     Fn::UlArrayContains,
     Fn::UlArrayAny
@@ -278,6 +424,79 @@ inline const char *EnumNameFn(Fn e) {
     case Fn::StAstext: return "StAstext";
     case Fn::StIntersection: return "StIntersection";
     case Fn::StAsbinary: return "StAsbinary";
+    case Fn::PointToH3: return "PointToH3";
+    case Fn::GeomToH3: return "GeomToH3";
+    case Fn::ArrayAnyValue: return "ArrayAnyValue";
+    case Fn::ArrayAppend: return "ArrayAppend";
+    case Fn::ArrayDims: return "ArrayDims";
+    case Fn::ArrayDistance: return "ArrayDistance";
+    case Fn::ArrayDistinct: return "ArrayDistinct";
+    case Fn::ArrayElement: return "ArrayElement";
+    case Fn::ArrayExcept: return "ArrayExcept";
+    case Fn::ArrayExtract: return "ArrayExtract";
+    case Fn::ArrayHas: return "ArrayHas";
+    case Fn::ArrayHasAll: return "ArrayHasAll";
+    case Fn::ArrayHasAny: return "ArrayHasAny";
+    case Fn::ArrayIntersect: return "ArrayIntersect";
+    case Fn::ArrayLength: return "ArrayLength";
+    case Fn::ArrayMax: return "ArrayMax";
+    case Fn::ArrayMin: return "ArrayMin";
+    case Fn::ArrayNdims: return "ArrayNdims";
+    case Fn::ArrayPopBack: return "ArrayPopBack";
+    case Fn::ArrayPopFront: return "ArrayPopFront";
+    case Fn::ArrayPosition: return "ArrayPosition";
+    case Fn::ArrayPositions: return "ArrayPositions";
+    case Fn::ArrayPrepend: return "ArrayPrepend";
+    case Fn::ArrayRemove: return "ArrayRemove";
+    case Fn::ArrayRemoveAll: return "ArrayRemoveAll";
+    case Fn::ArrayRemoveN: return "ArrayRemoveN";
+    case Fn::ArrayRepeat: return "ArrayRepeat";
+    case Fn::ArrayReplace: return "ArrayReplace";
+    case Fn::ArrayReplaceAll: return "ArrayReplaceAll";
+    case Fn::ArrayReplaceN: return "ArrayReplaceN";
+    case Fn::ArrayResize: return "ArrayResize";
+    case Fn::ArrayReverse: return "ArrayReverse";
+    case Fn::ArraySlice: return "ArraySlice";
+    case Fn::ArrayUnion: return "ArrayUnion";
+    case Fn::Ascii: return "Ascii";
+    case Fn::BitLength: return "BitLength";
+    case Fn::Btrim: return "Btrim";
+    case Fn::CharacterLength: return "CharacterLength";
+    case Fn::Chr: return "Chr";
+    case Fn::ConcatWs: return "ConcatWs";
+    case Fn::Contains: return "Contains";
+    case Fn::EndsWith: return "EndsWith";
+    case Fn::FindInSet: return "FindInSet";
+    case Fn::Initcap: return "Initcap";
+    case Fn::Instr: return "Instr";
+    case Fn::Left: return "Left";
+    case Fn::Length: return "Length";
+    case Fn::Levenshtein: return "Levenshtein";
+    case Fn::Lower: return "Lower";
+    case Fn::Lpad: return "Lpad";
+    case Fn::Ltrim: return "Ltrim";
+    case Fn::OctetLength: return "OctetLength";
+    case Fn::Overlay: return "Overlay";
+    case Fn::Position: return "Position";
+    case Fn::Repeat: return "Repeat";
+    case Fn::Replace: return "Replace";
+    case Fn::Reverse: return "Reverse";
+    case Fn::Right: return "Right";
+    case Fn::Rpad: return "Rpad";
+    case Fn::Rtrim: return "Rtrim";
+    case Fn::SplitPart: return "SplitPart";
+    case Fn::StartsWith: return "StartsWith";
+    case Fn::Strpos: return "Strpos";
+    case Fn::Substr: return "Substr";
+    case Fn::SubstrIndex: return "SubstrIndex";
+    case Fn::ToHex: return "ToHex";
+    case Fn::Translate: return "Translate";
+    case Fn::Trim: return "Trim";
+    case Fn::Upper: return "Upper";
+    case Fn::Uuid: return "Uuid";
+    case Fn::Unnest: return "Unnest";
+    case Fn::PercentileCont: return "PercentileCont";
+    case Fn::CorrelationId: return "CorrelationId";
     case Fn::UlTimezone: return "UlTimezone";
     case Fn::UlArrayContains: return "UlArrayContains";
     case Fn::UlArrayAny: return "UlArrayAny";

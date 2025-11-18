@@ -87,6 +87,26 @@ test_distinct() {
 TypeTest test_distinct_obj(test_distinct, "Distinct");
 
 bool
+test_do_nothing() {
+    ::ul::types::DoNothing t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::DoNothing deserialized = ::ul::types::DoNothing(bytes);
+    return true;
+}
+
+TypeTest test_do_nothing_obj(test_do_nothing, "DoNothing");
+
+bool
+test_do_update() {
+    ::ul::types::DoUpdate t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::DoUpdate deserialized = ::ul::types::DoUpdate(bytes);
+    return true;
+}
+
+TypeTest test_do_update_obj(test_do_update, "DoUpdate");
+
+bool
 test_drive() {
     ::ul::types::Drive t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
@@ -127,6 +147,26 @@ test_function() {
 TypeTest test_function_obj(test_function, "Function");
 
 bool
+test_insert_conflicting() {
+    ::ul::types::InsertConflicting t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::InsertConflicting deserialized = ::ul::types::InsertConflicting(bytes);
+    return true;
+}
+
+TypeTest test_insert_conflicting_obj(test_insert_conflicting, "InsertConflicting");
+
+bool
+test_insert_query_element() {
+    ::ul::types::InsertQueryElement t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::InsertQueryElement deserialized = ::ul::types::InsertQueryElement(bytes);
+    return true;
+}
+
+TypeTest test_insert_query_element_obj(test_insert_query_element, "InsertQueryElement");
+
+bool
 test_join() {
     ::ul::types::Join t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
@@ -155,6 +195,16 @@ test_nullable_uint() {
 }
 
 TypeTest test_nullable_uint_obj(test_nullable_uint, "NullableUint");
+
+bool
+test_on_conflict() {
+    ::ul::types::OnConflict t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::OnConflict deserialized = ::ul::types::OnConflict(bytes);
+    return true;
+}
+
+TypeTest test_on_conflict_obj(test_on_conflict, "OnConflict");
 
 bool
 test_order_by_expr() {
@@ -305,6 +355,26 @@ test_value_name() {
 }
 
 TypeTest test_value_name_obj(test_value_name, "ValueName");
+
+bool
+test_value_row() {
+    ::ul::types::ValueRow t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::ValueRow deserialized = ::ul::types::ValueRow(bytes);
+    return true;
+}
+
+TypeTest test_value_row_obj(test_value_row, "ValueRow");
+
+bool
+test_values() {
+    ::ul::types::Values t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::Values deserialized = ::ul::types::Values(bytes);
+    return true;
+}
+
+TypeTest test_values_obj(test_values, "Values");
 
 bool
 test_vector() {

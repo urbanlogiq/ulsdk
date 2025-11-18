@@ -52,6 +52,18 @@ def test_distinct():
     _t1 = Distinct.from_bytes(_b)
     assert _t0 == _t1
 
+def test_do_nothing():
+    _t0 = DoNothing.make_default()
+    _b = _t0.to_bytes()
+    _t1 = DoNothing.from_bytes(_b)
+    assert _t0 == _t1
+
+def test_do_update():
+    _t0 = DoUpdate.make_default()
+    _b = _t0.to_bytes()
+    _t1 = DoUpdate.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_drive():
     _t0 = Drive.make_default()
     _b = _t0.to_bytes()
@@ -76,6 +88,18 @@ def test_function():
     _t1 = Function.from_bytes(_b)
     assert _t0 == _t1
 
+def test_insert_conflicting():
+    _t0 = InsertConflicting.make_default()
+    _b = _t0.to_bytes()
+    _t1 = InsertConflicting.from_bytes(_b)
+    assert _t0 == _t1
+
+def test_insert_query_element():
+    _t0 = InsertQueryElement.make_default()
+    _b = _t0.to_bytes()
+    _t1 = InsertQueryElement.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_join():
     _t0 = Join.make_default()
     _b = _t0.to_bytes()
@@ -92,6 +116,12 @@ def test_nullable_uint():
     _t0 = NullableUint.make_default()
     _b = _t0.to_bytes()
     _t1 = NullableUint.from_bytes(_b)
+    assert _t0 == _t1
+
+def test_on_conflict():
+    _t0 = OnConflict.make_default()
+    _b = _t0.to_bytes()
+    _t1 = OnConflict.from_bytes(_b)
     assert _t0 == _t1
 
 def test_order_by_expr():
@@ -182,6 +212,18 @@ def test_value_name():
     _t0 = ValueName.make_default()
     _b = _t0.to_bytes()
     _t1 = ValueName.from_bytes(_b)
+    assert _t0 == _t1
+
+def test_value_row():
+    _t0 = ValueRow.make_default()
+    _b = _t0.to_bytes()
+    _t1 = ValueRow.from_bytes(_b)
+    assert _t0 == _t1
+
+def test_values():
+    _t0 = Values.make_default()
+    _b = _t0.to_bytes()
+    _t1 = Values.from_bytes(_b)
     assert _t0 == _t1
 
 def test_vector():

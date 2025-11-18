@@ -31,13 +31,18 @@ struct Column;
 struct DataCatalog;
 struct DeleteQueryElement;
 struct Distinct;
+struct DoNothing;
+struct DoUpdate;
 struct Drive;
 struct Explain;
 struct Expr;
 struct Function;
+struct InsertConflicting;
+struct InsertQueryElement;
 struct Join;
 struct MvdbPartition;
 struct NullableUint;
+struct OnConflict;
 struct OrderByExpr;
 struct Partition;
 struct Placeholder;
@@ -53,10 +58,18 @@ struct UnsetArgument;
 struct UpdateQueryElement;
 struct ValueIndex;
 struct ValueName;
+struct ValueRow;
+struct Values;
 struct Vector;
 struct When;
 struct Window;
 struct WorklogPartition;
+
+typedef std::variant<
+    std::shared_ptr<InsertConflicting>,
+    std::shared_ptr<DoNothing>,
+    std::shared_ptr<DoUpdate>
+> ConflictAction;
 
 using ::ExplainFormat;
 typedef std::variant<
@@ -78,7 +91,8 @@ typedef std::variant<
     std::shared_ptr<UnaryQueryElement>,
     std::shared_ptr<BinaryQueryElement>,
     std::shared_ptr<UpdateQueryElement>,
-    std::shared_ptr<DeleteQueryElement>
+    std::shared_ptr<DeleteQueryElement>,
+    std::shared_ptr<InsertQueryElement>
 > QueryElementUnion;
 
 typedef std::variant<
@@ -93,10 +107,57 @@ typedef std::variant<
     std::shared_ptr<QueryTableSource>,
     std::shared_ptr<Vector>,
     std::shared_ptr<Placeholder>,
-    std::shared_ptr<Drive>
+    std::shared_ptr<Drive>,
+    std::shared_ptr<Values>
 > TableSourceUnion;
 
 using ::TypeHint;
+///
+/// This variant is for selecting the default behavior of an INSERT statement
+/// where there may be conflicts; it inserts the rows if there is a conflict.
+///
+struct InsertConflicting {
+
+    InsertConflicting();
+    InsertConflicting(const ::InsertConflicting *root);
+    InsertConflicting(const std::vector<uint8_t> &bytes);
+    bool operator==(const InsertConflicting &rhs) const;
+    bool operator!=(const InsertConflicting &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+///
+/// This variant indicates that if there is a conflict, the action is to "do
+/// nothing", or to skip the conflicting rows.
+///
+struct DoNothing {
+
+    DoNothing();
+    DoNothing(const ::DoNothing *root);
+    DoNothing(const std::vector<uint8_t> &bytes);
+    bool operator==(const DoNothing &rhs) const;
+    bool operator!=(const DoNothing &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+///
+/// On conflict, update values according to the expressions provided; this
+/// is equivalent to an `upsert` operation.
+///
+struct DoUpdate {
+    std::vector<SetExpr> assignments_;
+
+    DoUpdate();
+    DoUpdate(const ::DoUpdate *root);
+    DoUpdate(const std::vector<uint8_t> &bytes);
+    bool operator==(const DoUpdate &rhs) const;
+    bool operator!=(const DoUpdate &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
 struct ValueIndex {
     uint32_t idx_;
 
@@ -447,6 +508,18 @@ struct Drive {
     }
 };
 
+struct Values {
+    std::vector<ValueRow> rows_;
+
+    Values();
+    Values(const ::Values *root);
+    Values(const std::vector<uint8_t> &bytes);
+    bool operator==(const Values &rhs) const;
+    bool operator!=(const Values &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
 struct UpdateQueryElement {
     std::optional<Function> filter_;
     std::vector<SetExpr> sets_;
@@ -470,6 +543,35 @@ struct DeleteQueryElement {
     DeleteQueryElement(const std::vector<uint8_t> &bytes);
     bool operator==(const DeleteQueryElement &rhs) const;
     bool operator!=(const DeleteQueryElement &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+struct OnConflict {
+    std::optional<ConflictAction> action_;
+    std::vector<std::string> conflict_target_;
+
+    OnConflict();
+    OnConflict(const ::OnConflict *root);
+    OnConflict(const std::vector<uint8_t> &bytes);
+    bool operator==(const OnConflict &rhs) const;
+    bool operator!=(const OnConflict &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+struct InsertQueryElement {
+    std::vector<std::string> columns_;
+    TableSourceUnion dest_;
+    std::optional<OnConflict> on_conflict_;
+    std::optional<std::vector<std::string>> returning_;
+    QueryElement source_;
+
+    InsertQueryElement();
+    InsertQueryElement(const ::InsertQueryElement *root);
+    InsertQueryElement(const std::vector<uint8_t> &bytes);
+    bool operator==(const InsertQueryElement &rhs) const;
+    bool operator!=(const InsertQueryElement &rhs) const {
         return !(*this == rhs);
     }
 };
@@ -548,6 +650,18 @@ struct TableSourceInstance {
     }
 };
 
+struct ValueRow {
+    std::vector<Expr> row_;
+
+    ValueRow();
+    ValueRow(const ::ValueRow *root);
+    ValueRow(const std::vector<uint8_t> &bytes);
+    bool operator==(const ValueRow &rhs) const;
+    bool operator!=(const ValueRow &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
 struct When {
     Expr cond_;
     Expr value_;
@@ -561,6 +675,8 @@ struct When {
     }
 };
 
+std::pair<::flatbuffers::Offset<void>, ::ConflictAction>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ConflictAction &o);
 std::pair<::flatbuffers::Offset<void>, ::ExprUnion>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ExprUnion &o);
 std::pair<::flatbuffers::Offset<void>, ::QueryElementUnion>
@@ -569,6 +685,15 @@ std::pair<::flatbuffers::Offset<void>, ::TablePartition>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TablePartition &o);
 std::pair<::flatbuffers::Offset<void>, ::TableSourceUnion>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TableSourceUnion &o);
+::flatbuffers::Offset<::InsertConflicting>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const InsertConflicting &);
+
+::flatbuffers::Offset<::DoNothing>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DoNothing &);
+
+::flatbuffers::Offset<::DoUpdate>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DoUpdate &);
+
 ::flatbuffers::Offset<::ValueIndex>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ValueIndex &);
 
@@ -647,11 +772,20 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Placeholder &);
 ::flatbuffers::Offset<::Drive>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Drive &);
 
+::flatbuffers::Offset<::Values>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Values &);
+
 ::flatbuffers::Offset<::UpdateQueryElement>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UpdateQueryElement &);
 
 ::flatbuffers::Offset<::DeleteQueryElement>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DeleteQueryElement &);
+
+::flatbuffers::Offset<::OnConflict>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const OnConflict &);
+
+::flatbuffers::Offset<::InsertQueryElement>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const InsertQueryElement &);
 
 ::flatbuffers::Offset<::Join>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Join &);
@@ -668,9 +802,21 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TableSource &);
 ::flatbuffers::Offset<::TableSourceInstance>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TableSourceInstance &);
 
+::flatbuffers::Offset<::ValueRow>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ValueRow &);
+
 ::flatbuffers::Offset<::When>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const When &);
 
+
+std::vector<uint8_t>
+to_bytes(const InsertConflicting &o);
+
+std::vector<uint8_t>
+to_bytes(const DoNothing &o);
+
+std::vector<uint8_t>
+to_bytes(const DoUpdate &o);
 
 std::vector<uint8_t>
 to_bytes(const ValueIndex &o);
@@ -751,10 +897,19 @@ std::vector<uint8_t>
 to_bytes(const Drive &o);
 
 std::vector<uint8_t>
+to_bytes(const Values &o);
+
+std::vector<uint8_t>
 to_bytes(const UpdateQueryElement &o);
 
 std::vector<uint8_t>
 to_bytes(const DeleteQueryElement &o);
+
+std::vector<uint8_t>
+to_bytes(const OnConflict &o);
+
+std::vector<uint8_t>
+to_bytes(const InsertQueryElement &o);
 
 std::vector<uint8_t>
 to_bytes(const Join &o);
@@ -770,6 +925,9 @@ to_bytes(const TableSource &o);
 
 std::vector<uint8_t>
 to_bytes(const TableSourceInstance &o);
+
+std::vector<uint8_t>
+to_bytes(const ValueRow &o);
 
 std::vector<uint8_t>
 to_bytes(const When &o);

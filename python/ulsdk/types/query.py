@@ -101,6 +101,8 @@ from .generated.DataCatalog import DataCatalog as FbsDataCatalog
 from .generated.DataStateId import DataStateId as FbsDataStateId
 from .generated.DeleteQueryElement import DeleteQueryElement as FbsDeleteQueryElement
 from .generated.Distinct import Distinct as FbsDistinct
+from .generated.DoNothing import DoNothing as FbsDoNothing
+from .generated.DoUpdate import DoUpdate as FbsDoUpdate
 from .generated.Drive import Drive as FbsDrive
 from .generated.EdgeList import EdgeList as FbsEdgeList
 from .generated.EdgeQuery import EdgeQuery as FbsEdgeQuery
@@ -114,6 +116,8 @@ from .generated.GraphEdge import GraphEdge as FbsGraphEdge
 from .generated.GraphNode import GraphNode as FbsGraphNode
 from .generated.GraphNodeId import GraphNodeId as FbsGraphNodeId
 from .generated.GraphQuery import GraphQuery as FbsGraphQuery
+from .generated.InsertConflicting import InsertConflicting as FbsInsertConflicting
+from .generated.InsertQueryElement import InsertQueryElement as FbsInsertQueryElement
 from .generated.Join import Join as FbsJoin
 from .generated.Line import Line as FbsLine
 from .generated.MultiLine import MultiLine as FbsMultiLine
@@ -124,6 +128,7 @@ from .generated.NodeList import NodeList as FbsNodeList
 from .generated.NodeQuery import NodeQuery as FbsNodeQuery
 from .generated.NullableUint import NullableUint as FbsNullableUint
 from .generated.ObjectId import ObjectId as FbsObjectId
+from .generated.OnConflict import OnConflict as FbsOnConflict
 from .generated.OrderBy import OrderBy as FbsOrderBy
 from .generated.OrderByExpr import OrderByExpr as FbsOrderByExpr
 from .generated.Partition import Partition as FbsPartition
@@ -174,10 +179,13 @@ from .generated.VUsize import VUsize as FbsVUsize
 from .generated.ValueIndex import ValueIndex as FbsValueIndex
 from .generated.ValueInstance import ValueInstance as FbsValueInstance
 from .generated.ValueName import ValueName as FbsValueName
+from .generated.ValueRow import ValueRow as FbsValueRow
+from .generated.Values import Values as FbsValues
 from .generated.Vector import Vector as FbsVector
 from .generated.When import When as FbsWhen
 from .generated.Window import Window as FbsWindow
 from .generated.WorklogPartition import WorklogPartition as FbsWorklogPartition
+from .generated.ConflictAction import ConflictAction as FbsConflictAction
 from .generated.ExprUnion import ExprUnion as FbsExprUnion
 from .generated.Geometry import Geometry as FbsGeometry
 from .generated.QueryElementUnion import QueryElementUnion as FbsQueryElementUnion
@@ -211,6 +219,200 @@ class TypeHint(Enum):
     Base64 = 3
     Uuid = 4
 
+
+@dataclass
+class InsertConflicting:
+    """ This variant is for selecting the default behavior of an INSERT statement
+     where there may be conflicts; it inserts the rows if there is a conflict.
+    """
+
+    @classmethod
+    def from_fbs(cls, o: FbsInsertConflicting) -> Self:
+        return cls()
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsInsertConflicting.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.InsertConflicting import (
+            Start,
+            End,
+        )
+
+        Start(builder)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        return cls()
+
+    def __eq__(self, other) -> bool:
+        eq = True
+
+        return eq
+
+@dataclass
+class DoNothing:
+    """ This variant indicates that if there is a conflict, the action is to "do
+     nothing", or to skip the conflicting rows.
+    """
+
+    @classmethod
+    def from_fbs(cls, o: FbsDoNothing) -> Self:
+        return cls()
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsDoNothing.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.DoNothing import (
+            Start,
+            End,
+        )
+
+        Start(builder)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        return cls()
+
+    def __eq__(self, other) -> bool:
+        eq = True
+
+        return eq
+
+@dataclass
+class DoUpdate:
+    """ On conflict, update values according to the expressions provided; this
+     is equivalent to an `upsert` operation.
+    """
+
+    assignments: "List[SetExpr]"
+
+    @classmethod
+    def from_fbs(cls, o: FbsDoUpdate) -> Self:
+        assignments = list()
+        if not o.AssignmentsIsNone():
+            for i in range(o.AssignmentsLength()):
+                assignments_val = None
+                assignments_obj = o.Assignments(i)
+                if assignments_obj is not None:
+                    assignments_val = SetExpr.from_fbs(assignments_obj)
+                assignments.append(assignments_val)
+        return cls(assignments)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsDoUpdate.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.DoUpdate import (
+            Start,
+            AddAssignments,
+            StartAssignmentsVector,
+            End,
+        )
+        assignments_offsets = list()
+        for value in self.assignments:
+            assignments_offsets.append(value.serialize_to(builder))
+        StartAssignmentsVector(builder, len(self.assignments))
+        for i in reversed(range(len(self.assignments))):
+            builder.PrependUOffsetTRelative(assignments_offsets[i])
+        assignments_offset = builder.EndVector()
+
+        Start(builder)
+        AddAssignments(builder, assignments_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        assignments = []
+        return cls(assignments)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        if len(self.assignments) != len(other.assignments):
+            return False
+        for i in range(len(self.assignments)):
+            eq = eq and self.assignments[i] == other.assignments[i]
+
+        return eq
+
+@dataclass
+class ConflictAction:
+    value: Union[
+        "InsertConflicting",
+        "DoNothing",
+        "DoUpdate",
+    ]
+
+    def serialize_to(self, builder: Builder) -> Tuple[int, int]:
+        from .generated.ConflictAction import ConflictAction
+        offset = self.value.serialize_to(builder)
+        if isinstance(self.value, InsertConflicting):
+            return (offset, ConflictAction().InsertConflicting)
+        elif isinstance(self.value, DoNothing):
+            return (offset, ConflictAction().DoNothing)
+        elif isinstance(self.value, DoUpdate):
+            return (offset, ConflictAction().DoUpdate)
+        raise ValueError("Invalid union type")
+
+    @classmethod
+    def from_fbs(cls, o: Optional[Table], ty: int) -> Self:
+        assert o is not None
+        source = o.Bytes
+        pos = o.Pos
+        ConflictAction_ty_instance = FbsConflictAction()
+        if ty == ConflictAction_ty_instance.InsertConflicting:
+            val = FbsInsertConflicting();
+            val.Init(source, pos)
+            return cls(InsertConflicting.from_fbs(val))
+        elif ty == ConflictAction_ty_instance.DoNothing:
+            val = FbsDoNothing();
+            val.Init(source, pos)
+            return cls(DoNothing.from_fbs(val))
+        elif ty == ConflictAction_ty_instance.DoUpdate:
+            val = FbsDoUpdate();
+            val.Init(source, pos)
+            return cls(DoUpdate.from_fbs(val))
+        else:
+            raise ValueError("Invalid union type")
+
+    @classmethod
+    def make_default(cls) -> Self:
+        return cls(InsertConflicting.make_default())
+
+    def __eq__(self, other) -> bool:
+        if type(self.value) is not type(other.value):
+            return False
+        return self.value == other.value
 
 @dataclass
 class ValueIndex:
@@ -2171,6 +2373,67 @@ class Drive:
         return eq
 
 @dataclass
+class Values:
+    rows: "List[ValueRow]"
+
+    @classmethod
+    def from_fbs(cls, o: FbsValues) -> Self:
+        rows = list()
+        if not o.RowsIsNone():
+            for i in range(o.RowsLength()):
+                rows_val = None
+                rows_obj = o.Rows(i)
+                if rows_obj is not None:
+                    rows_val = ValueRow.from_fbs(rows_obj)
+                rows.append(rows_val)
+        return cls(rows)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsValues.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.Values import (
+            Start,
+            AddRows,
+            StartRowsVector,
+            End,
+        )
+        rows_offsets = list()
+        for value in self.rows:
+            rows_offsets.append(value.serialize_to(builder))
+        StartRowsVector(builder, len(self.rows))
+        for i in reversed(range(len(self.rows))):
+            builder.PrependUOffsetTRelative(rows_offsets[i])
+        rows_offset = builder.EndVector()
+
+        Start(builder)
+        AddRows(builder, rows_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        rows = []
+        return cls(rows)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        if len(self.rows) != len(other.rows):
+            return False
+        for i in range(len(self.rows)):
+            eq = eq and self.rows[i] == other.rows[i]
+
+        return eq
+
+@dataclass
 class TableSourceUnion:
     value: Union[
         "DataCatalog",
@@ -2180,6 +2443,7 @@ class TableSourceUnion:
         "Vector",
         "Placeholder",
         "Drive",
+        "Values",
     ]
 
     def serialize_to(self, builder: Builder) -> Tuple[int, int]:
@@ -2199,6 +2463,8 @@ class TableSourceUnion:
             return (offset, TableSourceUnion().Placeholder)
         elif isinstance(self.value, Drive):
             return (offset, TableSourceUnion().Drive)
+        elif isinstance(self.value, Values):
+            return (offset, TableSourceUnion().Values)
         raise ValueError("Invalid union type")
 
     @classmethod
@@ -2235,6 +2501,10 @@ class TableSourceUnion:
             val = FbsDrive();
             val.Init(source, pos)
             return cls(Drive.from_fbs(val))
+        elif ty == TableSourceUnion_ty_instance.Values:
+            val = FbsValues();
+            val.Init(source, pos)
+            return cls(Values.from_fbs(val))
         else:
             raise ValueError("Invalid union type")
 
@@ -2403,12 +2673,216 @@ class DeleteQueryElement:
         return eq
 
 @dataclass
+class OnConflict:
+    action: Optional["ConflictAction"]
+
+    conflict_target: "List[str]"
+
+    @classmethod
+    def from_fbs(cls, o: FbsOnConflict) -> Self:
+        action = None
+        action_val = o.Action()
+        if action_val is not None:
+            action_ty = o.ActionType()
+            action = ConflictAction.from_fbs(action_val, action_ty)
+        conflict_target = list()
+        if not o.ConflictTargetIsNone():
+            for i in range(o.ConflictTargetLength()):
+                conflict_target.append(o.ConflictTarget(i))
+        return cls(action, conflict_target)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsOnConflict.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.OnConflict import (
+            Start,
+            AddAction,
+            AddActionType,
+            AddConflictTarget,
+            StartConflictTargetVector,
+            End,
+        )
+        action_offset, action_ty = (None, None)
+        if self.action is not None:
+            action_offset, action_ty = self.action.serialize_to(builder)
+        conflict_target_offsets = list()
+        for value in self.conflict_target:
+            conflict_target_offsets.append(builder.CreateString(value))
+        StartConflictTargetVector(builder, len(self.conflict_target))
+        for i in reversed(range(len(self.conflict_target))):
+            builder.PrependUOffsetTRelative(conflict_target_offsets[i])
+        conflict_target_offset = builder.EndVector()
+
+        Start(builder)
+        if action_offset is not None and action_ty is not None:
+            AddAction(builder, action_offset)
+            AddActionType(builder, action_ty)
+        AddConflictTarget(builder, conflict_target_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        action = ConflictAction.make_default()
+        conflict_target = []
+        return cls(action, conflict_target)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.action == other.action
+        if len(self.conflict_target) != len(other.conflict_target):
+            return False
+        for i in range(len(self.conflict_target)):
+            eq = eq and self.conflict_target[i] == other.conflict_target[i]
+
+        return eq
+
+@dataclass
+class InsertQueryElement:
+    columns: "List[str]"
+
+    dest: "TableSourceUnion"
+
+    on_conflict: Optional["OnConflict"]
+
+    returning: Optional["List[str]"]
+
+    source: "QueryElement"
+
+    @classmethod
+    def from_fbs(cls, o: FbsInsertQueryElement) -> Self:
+        columns = list()
+        if not o.ColumnsIsNone():
+            for i in range(o.ColumnsLength()):
+                columns.append(o.Columns(i))
+        dest_val = o.Dest()
+        if dest_val is not None:
+            dest_ty = o.DestType()
+            dest = TableSourceUnion.from_fbs(dest_val, dest_ty)
+        else:
+            raise ValueError("Dest is required")
+        on_conflict = None
+        on_conflict_obj = o.OnConflict()
+        if on_conflict_obj is not None:
+            on_conflict = OnConflict.from_fbs(on_conflict_obj)
+        returning = list()
+        if not o.ReturningIsNone():
+            for i in range(o.ReturningLength()):
+                returning.append(o.Returning(i))
+        source_obj = o.Source()
+        if source_obj is not None:
+            source = QueryElement.from_fbs(source_obj)
+        else:
+            raise ValueError("Source is required")
+        return cls(columns, dest, on_conflict, returning, source)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsInsertQueryElement.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.InsertQueryElement import (
+            Start,
+            AddColumns,
+            StartColumnsVector,
+            AddDest,
+            AddDestType,
+            AddOnConflict,
+            AddReturning,
+            StartReturningVector,
+            AddSource,
+            End,
+        )
+        columns_offsets = list()
+        for value in self.columns:
+            columns_offsets.append(builder.CreateString(value))
+        StartColumnsVector(builder, len(self.columns))
+        for i in reversed(range(len(self.columns))):
+            builder.PrependUOffsetTRelative(columns_offsets[i])
+        columns_offset = builder.EndVector()
+        dest_offset, dest_ty = self.dest.serialize_to(builder)
+        on_conflict_offset = None
+        if self.on_conflict is not None:
+            on_conflict_offset = self.on_conflict.serialize_to(builder)
+        returning_offset = None
+        if self.returning is not None:
+            returning_offsets = list()
+            for value in self.returning:
+                returning_offsets.append(builder.CreateString(value))
+            StartReturningVector(builder, len(self.returning))
+            for i in reversed(range(len(self.returning))):
+                builder.PrependUOffsetTRelative(returning_offsets[i])
+            returning_offset = builder.EndVector()
+        source_offset = self.source.serialize_to(builder)
+
+        Start(builder)
+        AddColumns(builder, columns_offset)
+        AddDest(builder, dest_offset)
+        AddDestType(builder, dest_ty)
+        if on_conflict_offset is not None:
+            AddOnConflict(builder, on_conflict_offset)
+        if returning_offset is not None:
+            AddReturning(builder, returning_offset)
+        AddSource(builder, source_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        columns = []
+        dest = TableSourceUnion.make_default()
+        on_conflict = OnConflict.make_default()
+        returning = []
+        source = QueryElement.make_default()
+        return cls(columns, dest, on_conflict, returning, source)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        if len(self.columns) != len(other.columns):
+            return False
+        for i in range(len(self.columns)):
+            eq = eq and self.columns[i] == other.columns[i]
+        eq = eq and self.dest == other.dest
+        eq = eq and self.on_conflict == other.on_conflict
+        self_returning = self.returning
+        other_returning = other.returning
+        if self_returning is not None and other_returning is not None:
+            if len(self_returning) != len(other_returning):
+                return False
+            for i in range(len(self_returning)):
+                eq = eq and self_returning[i] == other_returning[i]
+        elif self_returning is not None and other_returning is None:
+            return False
+        elif self_returning is None and other_returning is not None:
+            return False
+        eq = eq and self.source == other.source
+
+        return eq
+
+@dataclass
 class QueryElementUnion:
     value: Union[
         "UnaryQueryElement",
         "BinaryQueryElement",
         "UpdateQueryElement",
         "DeleteQueryElement",
+        "InsertQueryElement",
     ]
 
     def serialize_to(self, builder: Builder) -> Tuple[int, int]:
@@ -2422,6 +2896,8 @@ class QueryElementUnion:
             return (offset, QueryElementUnion().UpdateQueryElement)
         elif isinstance(self.value, DeleteQueryElement):
             return (offset, QueryElementUnion().DeleteQueryElement)
+        elif isinstance(self.value, InsertQueryElement):
+            return (offset, QueryElementUnion().InsertQueryElement)
         raise ValueError("Invalid union type")
 
     @classmethod
@@ -2446,6 +2922,10 @@ class QueryElementUnion:
             val = FbsDeleteQueryElement();
             val.Init(source, pos)
             return cls(DeleteQueryElement.from_fbs(val))
+        elif ty == QueryElementUnion_ty_instance.InsertQueryElement:
+            val = FbsInsertQueryElement();
+            val.Init(source, pos)
+            return cls(InsertQueryElement.from_fbs(val))
         else:
             raise ValueError("Invalid union type")
 
@@ -2896,6 +3376,67 @@ class TableSourceInstance:
     def __eq__(self, other) -> bool:
         eq = True
         eq = eq and self.t == other.t
+
+        return eq
+
+@dataclass
+class ValueRow:
+    row: "List[Expr]"
+
+    @classmethod
+    def from_fbs(cls, o: FbsValueRow) -> Self:
+        row = list()
+        if not o.RowIsNone():
+            for i in range(o.RowLength()):
+                row_val = None
+                row_obj = o.Row(i)
+                if row_obj is not None:
+                    row_val = Expr.from_fbs(row_obj)
+                row.append(row_val)
+        return cls(row)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsValueRow.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.ValueRow import (
+            Start,
+            AddRow,
+            StartRowVector,
+            End,
+        )
+        row_offsets = list()
+        for value in self.row:
+            row_offsets.append(value.serialize_to(builder))
+        StartRowVector(builder, len(self.row))
+        for i in reversed(range(len(self.row))):
+            builder.PrependUOffsetTRelative(row_offsets[i])
+        row_offset = builder.EndVector()
+
+        Start(builder)
+        AddRow(builder, row_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        row = []
+        return cls(row)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        if len(self.row) != len(other.row):
+            return False
+        for i in range(len(self.row)):
+            eq = eq and self.row[i] == other.row[i]
 
         return eq
 

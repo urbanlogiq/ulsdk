@@ -9,6 +9,25 @@
 namespace ul {
 namespace types {
 
+std::pair<::flatbuffers::Offset<void>, ::ConflictAction>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ConflictAction &o) {
+    if (std::holds_alternative<std::shared_ptr<InsertConflicting>>(o)) {
+        const std::shared_ptr<InsertConflicting> &v = std::get<std::shared_ptr<InsertConflicting>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::ConflictAction::InsertConflicting);
+    } else if (std::holds_alternative<std::shared_ptr<DoNothing>>(o)) {
+        const std::shared_ptr<DoNothing> &v = std::get<std::shared_ptr<DoNothing>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::ConflictAction::DoNothing);
+    } else if (std::holds_alternative<std::shared_ptr<DoUpdate>>(o)) {
+        const std::shared_ptr<DoUpdate> &v = std::get<std::shared_ptr<DoUpdate>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::ConflictAction::DoUpdate);
+    } else { 
+        throw std::runtime_error("unreachable");
+    }
+}
+
 std::pair<::flatbuffers::Offset<void>, ::ExprUnion>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ExprUnion &o) {
     if (std::holds_alternative<std::shared_ptr<ValueIndex>>(o)) {
@@ -74,6 +93,10 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const QueryElementUnion 
         const std::shared_ptr<DeleteQueryElement> &v = std::get<std::shared_ptr<DeleteQueryElement>>(o);
         const auto offset = serialize_to(builder, *v);
         return std::make_pair(offset.Union(), ::QueryElementUnion::DeleteQueryElement);
+    } else if (std::holds_alternative<std::shared_ptr<InsertQueryElement>>(o)) {
+        const std::shared_ptr<InsertQueryElement> &v = std::get<std::shared_ptr<InsertQueryElement>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::QueryElementUnion::InsertQueryElement);
     } else { 
         throw std::runtime_error("unreachable");
     }
@@ -124,9 +147,136 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TableSourceUnion &
         const std::shared_ptr<Drive> &v = std::get<std::shared_ptr<Drive>>(o);
         const auto offset = serialize_to(builder, *v);
         return std::make_pair(offset.Union(), ::TableSourceUnion::Drive);
+    } else if (std::holds_alternative<std::shared_ptr<Values>>(o)) {
+        const std::shared_ptr<Values> &v = std::get<std::shared_ptr<Values>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::TableSourceUnion::Values);
     } else { 
         throw std::runtime_error("unreachable");
     }
+}
+
+::flatbuffers::Offset<::InsertConflicting>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const InsertConflicting &) {
+
+    ::InsertConflictingBuilder instance_builder = ::InsertConflictingBuilder(builder);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const InsertConflicting &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+InsertConflicting::InsertConflicting() {
+}
+
+InsertConflicting::InsertConflicting(const std::vector<uint8_t> &bytes)
+    : InsertConflicting(::flatbuffers::GetSizePrefixedRoot<::InsertConflicting>(bytes.data())) {
+}
+
+InsertConflicting::InsertConflicting(const ::InsertConflicting *root)  {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+}
+
+bool
+InsertConflicting::operator==(const InsertConflicting &rhs) const {
+    (void)rhs;
+    return true;
+}
+
+::flatbuffers::Offset<::DoNothing>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DoNothing &) {
+
+    ::DoNothingBuilder instance_builder = ::DoNothingBuilder(builder);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const DoNothing &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+DoNothing::DoNothing() {
+}
+
+DoNothing::DoNothing(const std::vector<uint8_t> &bytes)
+    : DoNothing(::flatbuffers::GetSizePrefixedRoot<::DoNothing>(bytes.data())) {
+}
+
+DoNothing::DoNothing(const ::DoNothing *root)  {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+}
+
+bool
+DoNothing::operator==(const DoNothing &rhs) const {
+    (void)rhs;
+    return true;
+}
+
+::flatbuffers::Offset<::DoUpdate>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DoUpdate &o) {
+    std::vector<::flatbuffers::Offset<::SetExpr>> assignments_offsets = std::vector<::flatbuffers::Offset<::SetExpr>>();
+    assignments_offsets.reserve(o.assignments_.size());
+    for (const auto &i: o.assignments_) {
+        assignments_offsets.push_back(serialize_to(builder, i));
+    }
+    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::SetExpr>>> assignments_offset = builder.CreateVector(assignments_offsets);
+
+    ::DoUpdateBuilder instance_builder = ::DoUpdateBuilder(builder);
+    instance_builder.add_assignments(assignments_offset);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const DoUpdate &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+DoUpdate::DoUpdate()
+    : assignments_() {
+}
+
+DoUpdate::DoUpdate(const std::vector<uint8_t> &bytes)
+    : DoUpdate(::flatbuffers::GetSizePrefixedRoot<::DoUpdate>(bytes.data())) {
+}
+
+DoUpdate::DoUpdate(const ::DoUpdate *root) 
+    : assignments_() {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    const auto &assignments_vector = root->assignments();
+    if (assignments_vector != nullptr) {
+        assignments_.reserve(assignments_vector->size());
+        for (const auto &i: *assignments_vector) {
+            assignments_.emplace_back(i);
+        }
+    }
+}
+
+bool
+DoUpdate::operator==(const DoUpdate &rhs) const {
+    if (this->assignments_ != rhs.assignments_) {
+        return false;
+    }
+    return true;
 }
 
 ::flatbuffers::Offset<::ValueIndex>
@@ -1169,6 +1319,12 @@ QueryElement::QueryElement(const ::QueryElement *root)
                 q_ = q__shared;
                 break;
             }
+            case ::QueryElementUnion::InsertQueryElement: {
+                const auto q__local = static_cast<const ::InsertQueryElement *>(root->q());
+                std::shared_ptr<InsertQueryElement> q__shared = std::make_shared<InsertQueryElement>(q__local);
+                q_ = q__shared;
+                break;
+            }
             default: throw std::runtime_error("unknown union variant");
         }
     }
@@ -1877,6 +2033,59 @@ Drive::operator==(const Drive &rhs) const {
     return true;
 }
 
+::flatbuffers::Offset<::Values>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Values &o) {
+    std::vector<::flatbuffers::Offset<::ValueRow>> rows_offsets = std::vector<::flatbuffers::Offset<::ValueRow>>();
+    rows_offsets.reserve(o.rows_.size());
+    for (const auto &i: o.rows_) {
+        rows_offsets.push_back(serialize_to(builder, i));
+    }
+    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::ValueRow>>> rows_offset = builder.CreateVector(rows_offsets);
+
+    ::ValuesBuilder instance_builder = ::ValuesBuilder(builder);
+    instance_builder.add_rows(rows_offset);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const Values &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+Values::Values()
+    : rows_() {
+}
+
+Values::Values(const std::vector<uint8_t> &bytes)
+    : Values(::flatbuffers::GetSizePrefixedRoot<::Values>(bytes.data())) {
+}
+
+Values::Values(const ::Values *root) 
+    : rows_() {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    const auto &rows_vector = root->rows();
+    if (rows_vector != nullptr) {
+        rows_.reserve(rows_vector->size());
+        for (const auto &i: *rows_vector) {
+            rows_.emplace_back(i);
+        }
+    }
+}
+
+bool
+Values::operator==(const Values &rhs) const {
+    if (this->rows_ != rhs.rows_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::UpdateQueryElement>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UpdateQueryElement &o) {
     std::optional<::flatbuffers::Offset<::Function>> filter_offset = std::nullopt;
@@ -1980,6 +2189,12 @@ UpdateQueryElement::UpdateQueryElement(const ::UpdateQueryElement *root)
             case ::TableSourceUnion::Drive: {
                 const auto source__local = static_cast<const ::Drive *>(root->source());
                 std::shared_ptr<Drive> source__shared = std::make_shared<Drive>(source__local);
+                source_ = source__shared;
+                break;
+            }
+            case ::TableSourceUnion::Values: {
+                const auto source__local = static_cast<const ::Values *>(root->source());
+                std::shared_ptr<Values> source__shared = std::make_shared<Values>(source__local);
                 source_ = source__shared;
                 break;
             }
@@ -2092,6 +2307,12 @@ DeleteQueryElement::DeleteQueryElement(const ::DeleteQueryElement *root)
                 source_ = source__shared;
                 break;
             }
+            case ::TableSourceUnion::Values: {
+                const auto source__local = static_cast<const ::Values *>(root->source());
+                std::shared_ptr<Values> source__shared = std::make_shared<Values>(source__local);
+                source_ = source__shared;
+                break;
+            }
             default: throw std::runtime_error("unknown union variant");
         }
     }
@@ -2100,6 +2321,263 @@ DeleteQueryElement::DeleteQueryElement(const ::DeleteQueryElement *root)
 bool
 DeleteQueryElement::operator==(const DeleteQueryElement &rhs) const {
     if (this->filter_ != rhs.filter_) {
+        return false;
+    }
+    if (this->source_ != rhs.source_) {
+        return false;
+    }
+    return true;
+}
+
+::flatbuffers::Offset<::OnConflict>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const OnConflict &o) {
+    std::optional<std::pair<::flatbuffers::Offset<void>, ::ConflictAction>> action_offset = std::nullopt;
+    if (o.action_.has_value()) {
+        const std::pair<::flatbuffers::Offset<void>, ::ConflictAction> action_offset_val = serialize_to(builder, o.action_.value());
+        action_offset = std::make_optional(action_offset_val);
+    }
+    std::vector<::flatbuffers::Offset<::flatbuffers::String>> conflict_target_offsets = std::vector<::flatbuffers::Offset<::flatbuffers::String>>();
+    for (const auto &i: o.conflict_target_) {
+        conflict_target_offsets.push_back(builder.CreateString(i));
+    }
+    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> conflict_target_offset = builder.CreateVector(conflict_target_offsets);
+
+    ::OnConflictBuilder instance_builder = ::OnConflictBuilder(builder);
+    if (action_offset.has_value()) {
+        const auto action_opt = action_offset.value();
+        instance_builder.add_action(action_opt.first);
+        instance_builder.add_action_type(action_opt.second);
+    }
+    instance_builder.add_conflict_target(conflict_target_offset);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const OnConflict &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+OnConflict::OnConflict()
+    : action_(std::nullopt)
+    , conflict_target_() {
+}
+
+OnConflict::OnConflict(const std::vector<uint8_t> &bytes)
+    : OnConflict(::flatbuffers::GetSizePrefixedRoot<::OnConflict>(bytes.data())) {
+}
+
+OnConflict::OnConflict(const ::OnConflict *root) 
+    : action_(std::nullopt)
+    , conflict_target_() {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    if (root->action() != nullptr) {
+        switch (root->action_type()) {
+            case ::ConflictAction::NONE: throw std::runtime_error("unexpected none variant");
+            case ::ConflictAction::InsertConflicting: {
+                const auto action__local = static_cast<const ::InsertConflicting *>(root->action());
+                std::shared_ptr<InsertConflicting> action__shared = std::make_shared<InsertConflicting>(action__local);
+                action_ = action__shared;
+                break;
+            }
+            case ::ConflictAction::DoNothing: {
+                const auto action__local = static_cast<const ::DoNothing *>(root->action());
+                std::shared_ptr<DoNothing> action__shared = std::make_shared<DoNothing>(action__local);
+                action_ = action__shared;
+                break;
+            }
+            case ::ConflictAction::DoUpdate: {
+                const auto action__local = static_cast<const ::DoUpdate *>(root->action());
+                std::shared_ptr<DoUpdate> action__shared = std::make_shared<DoUpdate>(action__local);
+                action_ = action__shared;
+                break;
+            }
+            default: throw std::runtime_error("unknown union variant");
+        }
+    }
+    const auto &conflict_target_vector = root->conflict_target();
+    if (conflict_target_vector != nullptr) {
+        conflict_target_.reserve(conflict_target_vector->size());
+        for (const auto &i: *conflict_target_vector) {
+            conflict_target_.emplace_back(i->begin(), i->end());
+        }
+    }
+}
+
+bool
+OnConflict::operator==(const OnConflict &rhs) const {
+    if (this->action_ != rhs.action_) {
+        return false;
+    }
+    if (this->conflict_target_ != rhs.conflict_target_) {
+        return false;
+    }
+    return true;
+}
+
+::flatbuffers::Offset<::InsertQueryElement>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const InsertQueryElement &o) {
+    std::vector<::flatbuffers::Offset<::flatbuffers::String>> columns_offsets = std::vector<::flatbuffers::Offset<::flatbuffers::String>>();
+    for (const auto &i: o.columns_) {
+        columns_offsets.push_back(builder.CreateString(i));
+    }
+    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> columns_offset = builder.CreateVector(columns_offsets);
+    const std::pair<::flatbuffers::Offset<void>, ::TableSourceUnion> dest_offset = serialize_to(builder, o.dest_);
+    std::optional<::flatbuffers::Offset<::OnConflict>> on_conflict_offset = std::nullopt;
+    if (o.on_conflict_.has_value()) {
+        const ::flatbuffers::Offset<::OnConflict> on_conflict_offset_val = serialize_to(builder, o.on_conflict_.value());
+        on_conflict_offset = std::make_optional(on_conflict_offset_val);
+    }
+    std::optional<::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>>> returning_offset = std::nullopt;
+    if (o.returning_.has_value()) {
+        const auto &returning__var = o.returning_.value();
+        std::vector<::flatbuffers::Offset<::flatbuffers::String>> returning_offsets = std::vector<::flatbuffers::Offset<::flatbuffers::String>>();
+        for (const auto &i: returning__var) {
+            returning_offsets.push_back(builder.CreateString(i));
+        }
+        const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> returning_offset_val = builder.CreateVector(returning_offsets);
+        returning_offset = std::make_optional(returning_offset_val);
+    }
+    const ::flatbuffers::Offset<::QueryElement> source_offset = serialize_to(builder, o.source_);
+
+    ::InsertQueryElementBuilder instance_builder = ::InsertQueryElementBuilder(builder);
+    instance_builder.add_columns(columns_offset);
+    instance_builder.add_dest(dest_offset.first);
+    instance_builder.add_dest_type(dest_offset.second);
+    if (on_conflict_offset.has_value()) {
+        instance_builder.add_on_conflict(on_conflict_offset.value());
+    }
+    if (returning_offset.has_value()) {
+        instance_builder.add_returning(returning_offset.value());
+    }
+    instance_builder.add_source(source_offset);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const InsertQueryElement &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+InsertQueryElement::InsertQueryElement()
+    : columns_()
+    , dest_(std::make_shared<DataCatalog>())
+    , on_conflict_(std::nullopt)
+    , returning_(std::nullopt)
+    , source_() {
+}
+
+InsertQueryElement::InsertQueryElement(const std::vector<uint8_t> &bytes)
+    : InsertQueryElement(::flatbuffers::GetSizePrefixedRoot<::InsertQueryElement>(bytes.data())) {
+}
+
+InsertQueryElement::InsertQueryElement(const ::InsertQueryElement *root) 
+    : columns_()
+    , dest_(std::make_shared<DataCatalog>())
+    , on_conflict_(std::nullopt)
+    , returning_(std::nullopt)
+    , source_() {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    const auto &columns_vector = root->columns();
+    if (columns_vector != nullptr) {
+        columns_.reserve(columns_vector->size());
+        for (const auto &i: *columns_vector) {
+            columns_.emplace_back(i->begin(), i->end());
+        }
+    }
+    if (root->dest() != nullptr) {
+        switch (root->dest_type()) {
+            case ::TableSourceUnion::NONE: throw std::runtime_error("unexpected none variant");
+            case ::TableSourceUnion::DataCatalog: {
+                const auto dest__local = static_cast<const ::DataCatalog *>(root->dest());
+                std::shared_ptr<DataCatalog> dest__shared = std::make_shared<DataCatalog>(dest__local);
+                dest_ = dest__shared;
+                break;
+            }
+            case ::TableSourceUnion::Arrow: {
+                const auto dest__local = static_cast<const ::Arrow *>(root->dest());
+                std::shared_ptr<Arrow> dest__shared = std::make_shared<Arrow>(dest__local);
+                dest_ = dest__shared;
+                break;
+            }
+            case ::TableSourceUnion::GraphQuery: {
+                const auto dest__local = static_cast<const ::GraphQuery *>(root->dest());
+                std::shared_ptr<GraphQuery> dest__shared = std::make_shared<GraphQuery>(dest__local);
+                dest_ = dest__shared;
+                break;
+            }
+            case ::TableSourceUnion::QueryTableSource: {
+                const auto dest__local = static_cast<const ::QueryTableSource *>(root->dest());
+                std::shared_ptr<QueryTableSource> dest__shared = std::make_shared<QueryTableSource>(dest__local);
+                dest_ = dest__shared;
+                break;
+            }
+            case ::TableSourceUnion::Vector: {
+                const auto dest__local = static_cast<const ::Vector *>(root->dest());
+                std::shared_ptr<Vector> dest__shared = std::make_shared<Vector>(dest__local);
+                dest_ = dest__shared;
+                break;
+            }
+            case ::TableSourceUnion::Placeholder: {
+                const auto dest__local = static_cast<const ::Placeholder *>(root->dest());
+                std::shared_ptr<Placeholder> dest__shared = std::make_shared<Placeholder>(dest__local);
+                dest_ = dest__shared;
+                break;
+            }
+            case ::TableSourceUnion::Drive: {
+                const auto dest__local = static_cast<const ::Drive *>(root->dest());
+                std::shared_ptr<Drive> dest__shared = std::make_shared<Drive>(dest__local);
+                dest_ = dest__shared;
+                break;
+            }
+            case ::TableSourceUnion::Values: {
+                const auto dest__local = static_cast<const ::Values *>(root->dest());
+                std::shared_ptr<Values> dest__shared = std::make_shared<Values>(dest__local);
+                dest_ = dest__shared;
+                break;
+            }
+            default: throw std::runtime_error("unknown union variant");
+        }
+    }
+    if (root->on_conflict() != nullptr) {
+        on_conflict_ = decltype(on_conflict_)(root->on_conflict());
+    }
+    const auto &returning_vector = root->returning();
+    if (returning_vector != nullptr) {
+        std::vector<std::string> returning__target = std::vector<std::string>();
+        for (const auto &i: *returning_vector) {
+            returning__target.emplace_back(i->begin(), i->end());
+        }
+        returning_ = std::make_optional(returning__target);
+    }
+    if (root->source() != nullptr) {
+        source_ = decltype(source_)(root->source());
+    }
+}
+
+bool
+InsertQueryElement::operator==(const InsertQueryElement &rhs) const {
+    if (this->columns_ != rhs.columns_) {
+        return false;
+    }
+    if (this->dest_ != rhs.dest_) {
+        return false;
+    }
+    if (this->on_conflict_ != rhs.on_conflict_) {
+        return false;
+    }
+    if (this->returning_ != rhs.returning_) {
         return false;
     }
     if (this->source_ != rhs.source_) {
@@ -2470,6 +2948,12 @@ TableSource::TableSource(const ::TableSource *root)
                 t_ = t__shared;
                 break;
             }
+            case ::TableSourceUnion::Values: {
+                const auto t__local = static_cast<const ::Values *>(root->t());
+                std::shared_ptr<Values> t__shared = std::make_shared<Values>(t__local);
+                t_ = t__shared;
+                break;
+            }
             default: throw std::runtime_error("unknown union variant");
         }
     }
@@ -2572,6 +3056,12 @@ TableSourceInstance::TableSourceInstance(const ::TableSourceInstance *root)
                 t_ = t__shared;
                 break;
             }
+            case ::TableSourceUnion::Values: {
+                const auto t__local = static_cast<const ::Values *>(root->t());
+                std::shared_ptr<Values> t__shared = std::make_shared<Values>(t__local);
+                t_ = t__shared;
+                break;
+            }
             default: throw std::runtime_error("unknown union variant");
         }
     }
@@ -2580,6 +3070,59 @@ TableSourceInstance::TableSourceInstance(const ::TableSourceInstance *root)
 bool
 TableSourceInstance::operator==(const TableSourceInstance &rhs) const {
     if (this->t_ != rhs.t_) {
+        return false;
+    }
+    return true;
+}
+
+::flatbuffers::Offset<::ValueRow>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ValueRow &o) {
+    std::vector<::flatbuffers::Offset<::Expr>> row_offsets = std::vector<::flatbuffers::Offset<::Expr>>();
+    row_offsets.reserve(o.row_.size());
+    for (const auto &i: o.row_) {
+        row_offsets.push_back(serialize_to(builder, i));
+    }
+    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::Expr>>> row_offset = builder.CreateVector(row_offsets);
+
+    ::ValueRowBuilder instance_builder = ::ValueRowBuilder(builder);
+    instance_builder.add_row(row_offset);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const ValueRow &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+ValueRow::ValueRow()
+    : row_() {
+}
+
+ValueRow::ValueRow(const std::vector<uint8_t> &bytes)
+    : ValueRow(::flatbuffers::GetSizePrefixedRoot<::ValueRow>(bytes.data())) {
+}
+
+ValueRow::ValueRow(const ::ValueRow *root) 
+    : row_() {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    const auto &row_vector = root->row();
+    if (row_vector != nullptr) {
+        row_.reserve(row_vector->size());
+        for (const auto &i: *row_vector) {
+            row_.emplace_back(i);
+        }
+    }
+}
+
+bool
+ValueRow::operator==(const ValueRow &rhs) const {
+    if (this->row_ != rhs.row_) {
         return false;
     }
     return true;

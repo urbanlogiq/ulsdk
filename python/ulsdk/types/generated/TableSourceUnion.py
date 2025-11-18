@@ -11,3 +11,4 @@ class TableSourceUnion(object):
     Vector = 5
     Placeholder = 6
     Drive = 7
+    Values = 8

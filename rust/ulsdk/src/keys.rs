@@ -1,5 +1,6 @@
 // Copyright (c), CommunityLogiq Software
 
+use base64::Engine;
 use serde_derive::Deserialize;
 use std::collections::HashMap;
 use uuid::Uuid;
@@ -36,7 +37,9 @@ impl Key {
             user_id,
             region,
             access_key: access_key.to_owned(),
-            secret_key: base64::decode(secret_key).map_err(|e| Error::from(e.to_string()))?,
+            secret_key: base64::engine::general_purpose::STANDARD
+                .decode(secret_key)
+                .map_err(|e| Error::from(e.to_string()))?,
         })
     }
 
@@ -81,6 +84,8 @@ pub fn load_key(profile: &str) -> Result<Key, Error> {
         user_id: key.user_id,
         access_key: key.access_key,
         region: key.region,
-        secret_key: base64::decode(secret_key).map_err(|e| Error::from(e.to_string()))?,
+        secret_key: base64::engine::general_purpose::STANDARD
+            .decode(secret_key)
+            .map_err(|e| Error::from(e.to_string()))?,
     })
 }

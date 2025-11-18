@@ -13,8 +13,9 @@ public final class QueryElementUnion {
   public static final byte BinaryQueryElement = 2;
   public static final byte UpdateQueryElement = 3;
   public static final byte DeleteQueryElement = 4;
+  public static final byte InsertQueryElement = 5;
 
-  public static final String[] names = { "NONE", "UnaryQueryElement", "BinaryQueryElement", "UpdateQueryElement", "DeleteQueryElement", };
+  public static final String[] names = { "NONE", "UnaryQueryElement", "BinaryQueryElement", "UpdateQueryElement", "DeleteQueryElement", "InsertQueryElement", };
 
   public static String name(int e) { return names[e]; }
 }

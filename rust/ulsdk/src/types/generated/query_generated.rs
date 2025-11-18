@@ -525,13 +525,13 @@ pub const ENUM_MIN_TABLE_SOURCE_UNION: u8 = 0;
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
-pub const ENUM_MAX_TABLE_SOURCE_UNION: u8 = 7;
+pub const ENUM_MAX_TABLE_SOURCE_UNION: u8 = 8;
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_TABLE_SOURCE_UNION: [TableSourceUnion; 8] = [
+pub const ENUM_VALUES_TABLE_SOURCE_UNION: [TableSourceUnion; 9] = [
     TableSourceUnion::NONE,
     TableSourceUnion::DataCatalog,
     TableSourceUnion::Arrow,
@@ -540,6 +540,7 @@ pub const ENUM_VALUES_TABLE_SOURCE_UNION: [TableSourceUnion; 8] = [
     TableSourceUnion::Vector,
     TableSourceUnion::Placeholder,
     TableSourceUnion::Drive,
+    TableSourceUnion::Values,
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
@@ -555,9 +556,10 @@ impl TableSourceUnion {
     pub const Vector: Self = Self(5);
     pub const Placeholder: Self = Self(6);
     pub const Drive: Self = Self(7);
+    pub const Values: Self = Self(8);
 
     pub const ENUM_MIN: u8 = 0;
-    pub const ENUM_MAX: u8 = 7;
+    pub const ENUM_MAX: u8 = 8;
     pub const ENUM_VALUES: &'static [Self] = &[
         Self::NONE,
         Self::DataCatalog,
@@ -567,6 +569,7 @@ impl TableSourceUnion {
         Self::Vector,
         Self::Placeholder,
         Self::Drive,
+        Self::Values,
     ];
     /// Returns the variant's name or "" if unknown.
     pub fn variant_name(self) -> Option<&'static str> {
@@ -579,6 +582,7 @@ impl TableSourceUnion {
             Self::Vector => Some("Vector"),
             Self::Placeholder => Some("Placeholder"),
             Self::Drive => Some("Drive"),
+            Self::Values => Some("Values"),
             _ => None,
         }
     }
@@ -762,23 +766,142 @@ impl flatbuffers::SimpleToVerifyInSlice for QueryElementOp {}
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
-pub const ENUM_MIN_QUERY_ELEMENT_UNION: u8 = 0;
+pub const ENUM_MIN_CONFLICT_ACTION: u8 = 0;
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
-pub const ENUM_MAX_QUERY_ELEMENT_UNION: u8 = 4;
+pub const ENUM_MAX_CONFLICT_ACTION: u8 = 3;
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_QUERY_ELEMENT_UNION: [QueryElementUnion; 5] = [
+pub const ENUM_VALUES_CONFLICT_ACTION: [ConflictAction; 4] = [
+    ConflictAction::NONE,
+    ConflictAction::InsertConflicting,
+    ConflictAction::DoNothing,
+    ConflictAction::DoUpdate,
+];
+
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+#[repr(transparent)]
+pub struct ConflictAction(pub u8);
+#[allow(non_upper_case_globals)]
+impl ConflictAction {
+    pub const NONE: Self = Self(0);
+    pub const InsertConflicting: Self = Self(1);
+    pub const DoNothing: Self = Self(2);
+    pub const DoUpdate: Self = Self(3);
+
+    pub const ENUM_MIN: u8 = 0;
+    pub const ENUM_MAX: u8 = 3;
+    pub const ENUM_VALUES: &'static [Self] = &[
+        Self::NONE,
+        Self::InsertConflicting,
+        Self::DoNothing,
+        Self::DoUpdate,
+    ];
+    /// Returns the variant's name or "" if unknown.
+    pub fn variant_name(self) -> Option<&'static str> {
+        match self {
+            Self::NONE => Some("NONE"),
+            Self::InsertConflicting => Some("InsertConflicting"),
+            Self::DoNothing => Some("DoNothing"),
+            Self::DoUpdate => Some("DoUpdate"),
+            _ => None,
+        }
+    }
+}
+impl core::fmt::Debug for ConflictAction {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        if let Some(name) = self.variant_name() {
+            f.write_str(name)
+        } else {
+            f.write_fmt(format_args!("<UNKNOWN {:?}>", self.0))
+        }
+    }
+}
+impl Serialize for ConflictAction {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_unit_variant(
+            "ConflictAction",
+            self.0 as u32,
+            self.variant_name().unwrap(),
+        )
+    }
+}
+
+impl<'a> flatbuffers::Follow<'a> for ConflictAction {
+    type Inner = Self;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        let b = flatbuffers::read_scalar_at::<u8>(buf, loc);
+        Self(b)
+    }
+}
+
+impl flatbuffers::Push for ConflictAction {
+    type Output = ConflictAction;
+    #[inline]
+    unsafe fn push(&self, dst: &mut [u8], _written_len: usize) {
+        flatbuffers::emplace_scalar::<u8>(dst, self.0);
+    }
+}
+
+impl flatbuffers::EndianScalar for ConflictAction {
+    type Scalar = u8;
+    #[inline]
+    fn to_little_endian(self) -> u8 {
+        self.0.to_le()
+    }
+    #[inline]
+    #[allow(clippy::wrong_self_convention)]
+    fn from_little_endian(v: u8) -> Self {
+        let b = u8::from_le(v);
+        Self(b)
+    }
+}
+
+impl<'a> flatbuffers::Verifiable for ConflictAction {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        u8::run_verifier(v, pos)
+    }
+}
+
+impl flatbuffers::SimpleToVerifyInSlice for ConflictAction {}
+pub struct ConflictActionUnionTableOffset {}
+
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+pub const ENUM_MIN_QUERY_ELEMENT_UNION: u8 = 0;
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+pub const ENUM_MAX_QUERY_ELEMENT_UNION: u8 = 5;
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+#[allow(non_camel_case_types)]
+pub const ENUM_VALUES_QUERY_ELEMENT_UNION: [QueryElementUnion; 6] = [
     QueryElementUnion::NONE,
     QueryElementUnion::UnaryQueryElement,
     QueryElementUnion::BinaryQueryElement,
     QueryElementUnion::UpdateQueryElement,
     QueryElementUnion::DeleteQueryElement,
+    QueryElementUnion::InsertQueryElement,
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
@@ -791,15 +914,17 @@ impl QueryElementUnion {
     pub const BinaryQueryElement: Self = Self(2);
     pub const UpdateQueryElement: Self = Self(3);
     pub const DeleteQueryElement: Self = Self(4);
+    pub const InsertQueryElement: Self = Self(5);
 
     pub const ENUM_MIN: u8 = 0;
-    pub const ENUM_MAX: u8 = 4;
+    pub const ENUM_MAX: u8 = 5;
     pub const ENUM_VALUES: &'static [Self] = &[
         Self::NONE,
         Self::UnaryQueryElement,
         Self::BinaryQueryElement,
         Self::UpdateQueryElement,
         Self::DeleteQueryElement,
+        Self::InsertQueryElement,
     ];
     /// Returns the variant's name or "" if unknown.
     pub fn variant_name(self) -> Option<&'static str> {
@@ -809,6 +934,7 @@ impl QueryElementUnion {
             Self::BinaryQueryElement => Some("BinaryQueryElement"),
             Self::UpdateQueryElement => Some("UpdateQueryElement"),
             Self::DeleteQueryElement => Some("DeleteQueryElement"),
+            Self::InsertQueryElement => Some("InsertQueryElement"),
             _ => None,
         }
     }
@@ -4575,6 +4701,264 @@ impl core::fmt::Debug for Vector<'_> {
         ds.finish()
     }
 }
+pub enum ValueRowOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct ValueRow<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for ValueRow<'a> {
+    type Inner = ValueRow<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> ValueRow<'a> {
+    pub const VT_ROW: flatbuffers::VOffsetT = 4;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        ValueRow { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+        args: &'args ValueRowArgs<'args>,
+    ) -> flatbuffers::WIPOffset<ValueRow<'bldr>> {
+        let mut builder = ValueRowBuilder::new(_fbb);
+        if let Some(x) = args.row {
+            builder.add_row(x);
+        }
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn row(&self) -> flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Expr<'a>>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<
+                    flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Expr>>,
+                >>(ValueRow::VT_ROW, None)
+                .unwrap()
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for ValueRow<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Expr>>,
+            >>("row", Self::VT_ROW, true)?
+            .finish();
+        Ok(())
+    }
+}
+pub struct ValueRowArgs<'a> {
+    pub row: Option<
+        flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Expr<'a>>>>,
+    >,
+}
+impl<'a> Default for ValueRowArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        ValueRowArgs {
+            row: None, // required field
+        }
+    }
+}
+
+impl Serialize for ValueRow<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("ValueRow", 1)?;
+        s.serialize_field("row", &self.row())?;
+        s.end()
+    }
+}
+
+pub struct ValueRowBuilder<'a: 'b, 'b> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b> ValueRowBuilder<'a, 'b> {
+    #[inline]
+    pub fn add_row(
+        &mut self,
+        row: flatbuffers::WIPOffset<
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<Expr<'b>>>,
+        >,
+    ) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(ValueRow::VT_ROW, row);
+    }
+    #[inline]
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ValueRowBuilder<'a, 'b> {
+        let start = _fbb.start_table();
+        ValueRowBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<ValueRow<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_.required(o, ValueRow::VT_ROW, "row");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for ValueRow<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("ValueRow");
+        ds.field("row", &self.row());
+        ds.finish()
+    }
+}
+pub enum ValuesOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct Values<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for Values<'a> {
+    type Inner = Values<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> Values<'a> {
+    pub const VT_ROWS: flatbuffers::VOffsetT = 4;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        Values { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+        args: &'args ValuesArgs<'args>,
+    ) -> flatbuffers::WIPOffset<Values<'bldr>> {
+        let mut builder = ValuesBuilder::new(_fbb);
+        if let Some(x) = args.rows {
+            builder.add_rows(x);
+        }
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn rows(&self) -> flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ValueRow<'a>>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<
+                    flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ValueRow>>,
+                >>(Values::VT_ROWS, None)
+                .unwrap()
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for Values<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<ValueRow>>,
+            >>("rows", Self::VT_ROWS, true)?
+            .finish();
+        Ok(())
+    }
+}
+pub struct ValuesArgs<'a> {
+    pub rows: Option<
+        flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ValueRow<'a>>>>,
+    >,
+}
+impl<'a> Default for ValuesArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        ValuesArgs {
+            rows: None, // required field
+        }
+    }
+}
+
+impl Serialize for Values<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("Values", 1)?;
+        s.serialize_field("rows", &self.rows())?;
+        s.end()
+    }
+}
+
+pub struct ValuesBuilder<'a: 'b, 'b> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b> ValuesBuilder<'a, 'b> {
+    #[inline]
+    pub fn add_rows(
+        &mut self,
+        rows: flatbuffers::WIPOffset<
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<ValueRow<'b>>>,
+        >,
+    ) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(Values::VT_ROWS, rows);
+    }
+    #[inline]
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ValuesBuilder<'a, 'b> {
+        let start = _fbb.start_table();
+        ValuesBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<Values<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_.required(o, Values::VT_ROWS, "rows");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for Values<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("Values");
+        ds.field("rows", &self.rows());
+        ds.finish()
+    }
+}
 pub enum TableSourceInstanceOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -4738,6 +5122,20 @@ impl<'a> TableSourceInstance<'a> {
             None
         }
     }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn t_as_values(&self) -> Option<Values<'a>> {
+        if self.t_type() == TableSourceUnion::Values {
+            let u = self.t();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { Values::init_from_table(u) })
+        } else {
+            None
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for TableSourceInstance<'_> {
@@ -4788,6 +5186,11 @@ impl flatbuffers::Verifiable for TableSourceInstance<'_> {
                     TableSourceUnion::Drive => v
                         .verify_union_variant::<flatbuffers::ForwardsUOffset<Drive>>(
                             "TableSourceUnion::Drive",
+                            pos,
+                        ),
+                    TableSourceUnion::Values => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<Values>>(
+                            "TableSourceUnion::Values",
                             pos,
                         ),
                     _ => Ok(()),
@@ -4860,6 +5263,12 @@ impl Serialize for TableSourceInstance<'_> {
                 let f = self
                     .t_as_drive()
                     .expect("Invalid union table, expected `TableSourceUnion::Drive`.");
+                s.serialize_field("t", &f)?;
+            }
+            TableSourceUnion::Values => {
+                let f = self
+                    .t_as_values()
+                    .expect("Invalid union table, expected `TableSourceUnion::Values`.");
                 s.serialize_field("t", &f)?;
             }
             _ => unimplemented!(),
@@ -4971,6 +5380,16 @@ impl core::fmt::Debug for TableSourceInstance<'_> {
             }
             TableSourceUnion::Drive => {
                 if let Some(x) = self.t_as_drive() {
+                    ds.field("t", &x)
+                } else {
+                    ds.field(
+                        "t",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            TableSourceUnion::Values => {
+                if let Some(x) = self.t_as_values() {
                     ds.field("t", &x)
                 } else {
                     ds.field(
@@ -5212,6 +5631,20 @@ impl<'a> TableSource<'a> {
             None
         }
     }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn t_as_values(&self) -> Option<Values<'a>> {
+        if self.t_type() == TableSourceUnion::Values {
+            let u = self.t();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { Values::init_from_table(u) })
+        } else {
+            None
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for TableSource<'_> {
@@ -5262,6 +5695,11 @@ impl flatbuffers::Verifiable for TableSource<'_> {
                     TableSourceUnion::Drive => v
                         .verify_union_variant::<flatbuffers::ForwardsUOffset<Drive>>(
                             "TableSourceUnion::Drive",
+                            pos,
+                        ),
+                    TableSourceUnion::Values => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<Values>>(
+                            "TableSourceUnion::Values",
                             pos,
                         ),
                     _ => Ok(()),
@@ -5362,6 +5800,12 @@ impl Serialize for TableSource<'_> {
                 let f = self
                     .t_as_drive()
                     .expect("Invalid union table, expected `TableSourceUnion::Drive`.");
+                s.serialize_field("t", &f)?;
+            }
+            TableSourceUnion::Values => {
+                let f = self
+                    .t_as_values()
+                    .expect("Invalid union table, expected `TableSourceUnion::Values`.");
                 s.serialize_field("t", &f)?;
             }
             _ => unimplemented!(),
@@ -5526,6 +5970,16 @@ impl core::fmt::Debug for TableSource<'_> {
             }
             TableSourceUnion::Drive => {
                 if let Some(x) = self.t_as_drive() {
+                    ds.field("t", &x)
+                } else {
+                    ds.field(
+                        "t",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            TableSourceUnion::Values => {
+                if let Some(x) = self.t_as_values() {
                     ds.field("t", &x)
                 } else {
                     ds.field(
@@ -6772,6 +7226,20 @@ impl<'a> UpdateQueryElement<'a> {
             None
         }
     }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn source_as_values(&self) -> Option<Values<'a>> {
+        if self.source_type() == TableSourceUnion::Values {
+            let u = self.source();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { Values::init_from_table(u) })
+        } else {
+            None
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for UpdateQueryElement<'_> {
@@ -6822,6 +7290,11 @@ impl flatbuffers::Verifiable for UpdateQueryElement<'_> {
                     TableSourceUnion::Drive => v
                         .verify_union_variant::<flatbuffers::ForwardsUOffset<Drive>>(
                             "TableSourceUnion::Drive",
+                            pos,
+                        ),
+                    TableSourceUnion::Values => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<Values>>(
+                            "TableSourceUnion::Values",
                             pos,
                         ),
                     _ => Ok(()),
@@ -6908,6 +7381,12 @@ impl Serialize for UpdateQueryElement<'_> {
                 let f = self
                     .source_as_drive()
                     .expect("Invalid union table, expected `TableSourceUnion::Drive`.");
+                s.serialize_field("source", &f)?;
+            }
+            TableSourceUnion::Values => {
+                let f = self
+                    .source_as_values()
+                    .expect("Invalid union table, expected `TableSourceUnion::Values`.");
                 s.serialize_field("source", &f)?;
             }
             _ => unimplemented!(),
@@ -7045,6 +7524,16 @@ impl core::fmt::Debug for UpdateQueryElement<'_> {
             }
             TableSourceUnion::Drive => {
                 if let Some(x) = self.source_as_drive() {
+                    ds.field("source", &x)
+                } else {
+                    ds.field(
+                        "source",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            TableSourceUnion::Values => {
+                if let Some(x) = self.source_as_values() {
                     ds.field("source", &x)
                 } else {
                     ds.field(
@@ -7240,6 +7729,20 @@ impl<'a> DeleteQueryElement<'a> {
             None
         }
     }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn source_as_values(&self) -> Option<Values<'a>> {
+        if self.source_type() == TableSourceUnion::Values {
+            let u = self.source();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { Values::init_from_table(u) })
+        } else {
+            None
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for DeleteQueryElement<'_> {
@@ -7290,6 +7793,11 @@ impl flatbuffers::Verifiable for DeleteQueryElement<'_> {
                     TableSourceUnion::Drive => v
                         .verify_union_variant::<flatbuffers::ForwardsUOffset<Drive>>(
                             "TableSourceUnion::Drive",
+                            pos,
+                        ),
+                    TableSourceUnion::Values => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<Values>>(
+                            "TableSourceUnion::Values",
                             pos,
                         ),
                     _ => Ok(()),
@@ -7369,6 +7877,12 @@ impl Serialize for DeleteQueryElement<'_> {
                 let f = self
                     .source_as_drive()
                     .expect("Invalid union table, expected `TableSourceUnion::Drive`.");
+                s.serialize_field("source", &f)?;
+            }
+            TableSourceUnion::Values => {
+                let f = self
+                    .source_as_values()
+                    .expect("Invalid union table, expected `TableSourceUnion::Values`.");
                 s.serialize_field("source", &f)?;
             }
             _ => unimplemented!(),
@@ -7502,12 +8016,1247 @@ impl core::fmt::Debug for DeleteQueryElement<'_> {
                     )
                 }
             }
+            TableSourceUnion::Values => {
+                if let Some(x) = self.source_as_values() {
+                    ds.field("source", &x)
+                } else {
+                    ds.field(
+                        "source",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
             _ => {
                 let x: Option<()> = None;
                 ds.field("source", &x)
             }
         };
         ds.field("filter", &self.filter());
+        ds.finish()
+    }
+}
+pub enum InsertConflictingOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+/// This variant is for selecting the default behavior of an INSERT statement
+/// where there may be conflicts; it inserts the rows if there is a conflict.
+pub struct InsertConflicting<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for InsertConflicting<'a> {
+    type Inner = InsertConflicting<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> InsertConflicting<'a> {
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        InsertConflicting { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+        _args: &'args InsertConflictingArgs,
+    ) -> flatbuffers::WIPOffset<InsertConflicting<'bldr>> {
+        let mut builder = InsertConflictingBuilder::new(_fbb);
+        builder.finish()
+    }
+}
+
+impl flatbuffers::Verifiable for InsertConflicting<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?.finish();
+        Ok(())
+    }
+}
+pub struct InsertConflictingArgs {}
+impl<'a> Default for InsertConflictingArgs {
+    #[inline]
+    fn default() -> Self {
+        InsertConflictingArgs {}
+    }
+}
+
+impl Serialize for InsertConflicting<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let s = serializer.serialize_struct("InsertConflicting", 0)?;
+        s.end()
+    }
+}
+
+pub struct InsertConflictingBuilder<'a: 'b, 'b> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b> InsertConflictingBuilder<'a, 'b> {
+    #[inline]
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> InsertConflictingBuilder<'a, 'b> {
+        let start = _fbb.start_table();
+        InsertConflictingBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<InsertConflicting<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for InsertConflicting<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("InsertConflicting");
+        ds.finish()
+    }
+}
+pub enum DoNothingOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+/// This variant indicates that if there is a conflict, the action is to "do
+/// nothing", or to skip the conflicting rows.
+pub struct DoNothing<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for DoNothing<'a> {
+    type Inner = DoNothing<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> DoNothing<'a> {
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        DoNothing { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+        _args: &'args DoNothingArgs,
+    ) -> flatbuffers::WIPOffset<DoNothing<'bldr>> {
+        let mut builder = DoNothingBuilder::new(_fbb);
+        builder.finish()
+    }
+}
+
+impl flatbuffers::Verifiable for DoNothing<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?.finish();
+        Ok(())
+    }
+}
+pub struct DoNothingArgs {}
+impl<'a> Default for DoNothingArgs {
+    #[inline]
+    fn default() -> Self {
+        DoNothingArgs {}
+    }
+}
+
+impl Serialize for DoNothing<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let s = serializer.serialize_struct("DoNothing", 0)?;
+        s.end()
+    }
+}
+
+pub struct DoNothingBuilder<'a: 'b, 'b> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b> DoNothingBuilder<'a, 'b> {
+    #[inline]
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> DoNothingBuilder<'a, 'b> {
+        let start = _fbb.start_table();
+        DoNothingBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<DoNothing<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for DoNothing<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("DoNothing");
+        ds.finish()
+    }
+}
+pub enum DoUpdateOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+/// On conflict, update values according to the expressions provided; this
+/// is equivalent to an `upsert` operation.
+pub struct DoUpdate<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for DoUpdate<'a> {
+    type Inner = DoUpdate<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> DoUpdate<'a> {
+    pub const VT_ASSIGNMENTS: flatbuffers::VOffsetT = 4;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        DoUpdate { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+        args: &'args DoUpdateArgs<'args>,
+    ) -> flatbuffers::WIPOffset<DoUpdate<'bldr>> {
+        let mut builder = DoUpdateBuilder::new(_fbb);
+        if let Some(x) = args.assignments {
+            builder.add_assignments(x);
+        }
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn assignments(
+        &self,
+    ) -> flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<SetExpr<'a>>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<
+                    flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<SetExpr>>,
+                >>(DoUpdate::VT_ASSIGNMENTS, None)
+                .unwrap()
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for DoUpdate<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<SetExpr>>,
+            >>("assignments", Self::VT_ASSIGNMENTS, true)?
+            .finish();
+        Ok(())
+    }
+}
+pub struct DoUpdateArgs<'a> {
+    pub assignments: Option<
+        flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<SetExpr<'a>>>>,
+    >,
+}
+impl<'a> Default for DoUpdateArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        DoUpdateArgs {
+            assignments: None, // required field
+        }
+    }
+}
+
+impl Serialize for DoUpdate<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("DoUpdate", 1)?;
+        s.serialize_field("assignments", &self.assignments())?;
+        s.end()
+    }
+}
+
+pub struct DoUpdateBuilder<'a: 'b, 'b> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b> DoUpdateBuilder<'a, 'b> {
+    #[inline]
+    pub fn add_assignments(
+        &mut self,
+        assignments: flatbuffers::WIPOffset<
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<SetExpr<'b>>>,
+        >,
+    ) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(DoUpdate::VT_ASSIGNMENTS, assignments);
+    }
+    #[inline]
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> DoUpdateBuilder<'a, 'b> {
+        let start = _fbb.start_table();
+        DoUpdateBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<DoUpdate<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_
+            .required(o, DoUpdate::VT_ASSIGNMENTS, "assignments");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for DoUpdate<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("DoUpdate");
+        ds.field("assignments", &self.assignments());
+        ds.finish()
+    }
+}
+pub enum OnConflictOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct OnConflict<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for OnConflict<'a> {
+    type Inner = OnConflict<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> OnConflict<'a> {
+    pub const VT_CONFLICT_TARGET: flatbuffers::VOffsetT = 4;
+    pub const VT_ACTION_TYPE: flatbuffers::VOffsetT = 6;
+    pub const VT_ACTION: flatbuffers::VOffsetT = 8;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        OnConflict { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+        args: &'args OnConflictArgs<'args>,
+    ) -> flatbuffers::WIPOffset<OnConflict<'bldr>> {
+        let mut builder = OnConflictBuilder::new(_fbb);
+        if let Some(x) = args.action {
+            builder.add_action(x);
+        }
+        if let Some(x) = args.conflict_target {
+            builder.add_conflict_target(x);
+        }
+        builder.add_action_type(args.action_type);
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn conflict_target(
+        &self,
+    ) -> flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<&'a str>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<
+                    flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<&'a str>>,
+                >>(OnConflict::VT_CONFLICT_TARGET, None)
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn action_type(&self) -> ConflictAction {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<ConflictAction>(OnConflict::VT_ACTION_TYPE, Some(ConflictAction::NONE))
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn action(&self) -> Option<flatbuffers::Table<'a>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<flatbuffers::Table<'a>>>(
+                    OnConflict::VT_ACTION,
+                    None,
+                )
+        }
+    }
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn action_as_insert_conflicting(&self) -> Option<InsertConflicting<'a>> {
+        if self.action_type() == ConflictAction::InsertConflicting {
+            self.action().map(|t| {
+                // Safety:
+                // Created from a valid Table for this object
+                // Which contains a valid union in this slot
+                unsafe { InsertConflicting::init_from_table(t) }
+            })
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn action_as_do_nothing(&self) -> Option<DoNothing<'a>> {
+        if self.action_type() == ConflictAction::DoNothing {
+            self.action().map(|t| {
+                // Safety:
+                // Created from a valid Table for this object
+                // Which contains a valid union in this slot
+                unsafe { DoNothing::init_from_table(t) }
+            })
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn action_as_do_update(&self) -> Option<DoUpdate<'a>> {
+        if self.action_type() == ConflictAction::DoUpdate {
+            self.action().map(|t| {
+                // Safety:
+                // Created from a valid Table for this object
+                // Which contains a valid union in this slot
+                unsafe { DoUpdate::init_from_table(t) }
+            })
+        } else {
+            None
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for OnConflict<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<&'_ str>>,
+            >>("conflict_target", Self::VT_CONFLICT_TARGET, true)?
+            .visit_union::<ConflictAction, _>(
+                "action_type",
+                Self::VT_ACTION_TYPE,
+                "action",
+                Self::VT_ACTION,
+                false,
+                |key, v, pos| match key {
+                    ConflictAction::InsertConflicting => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<InsertConflicting>>(
+                            "ConflictAction::InsertConflicting",
+                            pos,
+                        ),
+                    ConflictAction::DoNothing => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<DoNothing>>(
+                            "ConflictAction::DoNothing",
+                            pos,
+                        ),
+                    ConflictAction::DoUpdate => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<DoUpdate>>(
+                            "ConflictAction::DoUpdate",
+                            pos,
+                        ),
+                    _ => Ok(()),
+                },
+            )?
+            .finish();
+        Ok(())
+    }
+}
+pub struct OnConflictArgs<'a> {
+    pub conflict_target: Option<
+        flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<&'a str>>>,
+    >,
+    pub action_type: ConflictAction,
+    pub action: Option<flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>>,
+}
+impl<'a> Default for OnConflictArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        OnConflictArgs {
+            conflict_target: None, // required field
+            action_type: ConflictAction::NONE,
+            action: None,
+        }
+    }
+}
+
+impl Serialize for OnConflict<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("OnConflict", 3)?;
+        s.serialize_field("conflict_target", &self.conflict_target())?;
+        s.serialize_field("action_type", &self.action_type())?;
+        match self.action_type() {
+            ConflictAction::NONE => (),
+            ConflictAction::InsertConflicting => {
+                let f = self
+                    .action_as_insert_conflicting()
+                    .expect("Invalid union table, expected `ConflictAction::InsertConflicting`.");
+                s.serialize_field("action", &f)?;
+            }
+            ConflictAction::DoNothing => {
+                let f = self
+                    .action_as_do_nothing()
+                    .expect("Invalid union table, expected `ConflictAction::DoNothing`.");
+                s.serialize_field("action", &f)?;
+            }
+            ConflictAction::DoUpdate => {
+                let f = self
+                    .action_as_do_update()
+                    .expect("Invalid union table, expected `ConflictAction::DoUpdate`.");
+                s.serialize_field("action", &f)?;
+            }
+            _ => unimplemented!(),
+        }
+        s.end()
+    }
+}
+
+pub struct OnConflictBuilder<'a: 'b, 'b> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b> OnConflictBuilder<'a, 'b> {
+    #[inline]
+    pub fn add_conflict_target(
+        &mut self,
+        conflict_target: flatbuffers::WIPOffset<
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<&'b str>>,
+        >,
+    ) {
+        self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(
+            OnConflict::VT_CONFLICT_TARGET,
+            conflict_target,
+        );
+    }
+    #[inline]
+    pub fn add_action_type(&mut self, action_type: ConflictAction) {
+        self.fbb_.push_slot::<ConflictAction>(
+            OnConflict::VT_ACTION_TYPE,
+            action_type,
+            ConflictAction::NONE,
+        );
+    }
+    #[inline]
+    pub fn add_action(&mut self, action: flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(OnConflict::VT_ACTION, action);
+    }
+    #[inline]
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> OnConflictBuilder<'a, 'b> {
+        let start = _fbb.start_table();
+        OnConflictBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<OnConflict<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_
+            .required(o, OnConflict::VT_CONFLICT_TARGET, "conflict_target");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for OnConflict<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("OnConflict");
+        ds.field("conflict_target", &self.conflict_target());
+        ds.field("action_type", &self.action_type());
+        match self.action_type() {
+            ConflictAction::InsertConflicting => {
+                if let Some(x) = self.action_as_insert_conflicting() {
+                    ds.field("action", &x)
+                } else {
+                    ds.field(
+                        "action",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            ConflictAction::DoNothing => {
+                if let Some(x) = self.action_as_do_nothing() {
+                    ds.field("action", &x)
+                } else {
+                    ds.field(
+                        "action",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            ConflictAction::DoUpdate => {
+                if let Some(x) = self.action_as_do_update() {
+                    ds.field("action", &x)
+                } else {
+                    ds.field(
+                        "action",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            _ => {
+                let x: Option<()> = None;
+                ds.field("action", &x)
+            }
+        };
+        ds.finish()
+    }
+}
+pub enum InsertQueryElementOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct InsertQueryElement<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for InsertQueryElement<'a> {
+    type Inner = InsertQueryElement<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> InsertQueryElement<'a> {
+    pub const VT_SOURCE: flatbuffers::VOffsetT = 4;
+    pub const VT_COLUMNS: flatbuffers::VOffsetT = 6;
+    pub const VT_DEST_TYPE: flatbuffers::VOffsetT = 8;
+    pub const VT_DEST: flatbuffers::VOffsetT = 10;
+    pub const VT_ON_CONFLICT: flatbuffers::VOffsetT = 12;
+    pub const VT_RETURNING: flatbuffers::VOffsetT = 14;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        InsertQueryElement { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+        args: &'args InsertQueryElementArgs<'args>,
+    ) -> flatbuffers::WIPOffset<InsertQueryElement<'bldr>> {
+        let mut builder = InsertQueryElementBuilder::new(_fbb);
+        if let Some(x) = args.returning {
+            builder.add_returning(x);
+        }
+        if let Some(x) = args.on_conflict {
+            builder.add_on_conflict(x);
+        }
+        if let Some(x) = args.dest {
+            builder.add_dest(x);
+        }
+        if let Some(x) = args.columns {
+            builder.add_columns(x);
+        }
+        if let Some(x) = args.source {
+            builder.add_source(x);
+        }
+        builder.add_dest_type(args.dest_type);
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn source(&self) -> QueryElement<'a> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<QueryElement>>(
+                    InsertQueryElement::VT_SOURCE,
+                    None,
+                )
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn columns(&self) -> flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<&'a str>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<
+                    flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<&'a str>>,
+                >>(InsertQueryElement::VT_COLUMNS, None)
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn dest_type(&self) -> TableSourceUnion {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<TableSourceUnion>(
+                    InsertQueryElement::VT_DEST_TYPE,
+                    Some(TableSourceUnion::NONE),
+                )
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn dest(&self) -> flatbuffers::Table<'a> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<flatbuffers::Table<'a>>>(
+                    InsertQueryElement::VT_DEST,
+                    None,
+                )
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn on_conflict(&self) -> Option<OnConflict<'a>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab.get::<flatbuffers::ForwardsUOffset<OnConflict>>(
+                InsertQueryElement::VT_ON_CONFLICT,
+                None,
+            )
+        }
+    }
+    #[inline]
+    pub fn returning(
+        &self,
+    ) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<&'a str>>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab.get::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<&'a str>>,
+            >>(InsertQueryElement::VT_RETURNING, None)
+        }
+    }
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn dest_as_data_catalog(&self) -> Option<DataCatalog<'a>> {
+        if self.dest_type() == TableSourceUnion::DataCatalog {
+            let u = self.dest();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { DataCatalog::init_from_table(u) })
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn dest_as_arrow(&self) -> Option<Arrow<'a>> {
+        if self.dest_type() == TableSourceUnion::Arrow {
+            let u = self.dest();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { Arrow::init_from_table(u) })
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn dest_as_graph_query(&self) -> Option<GraphQuery<'a>> {
+        if self.dest_type() == TableSourceUnion::GraphQuery {
+            let u = self.dest();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { GraphQuery::init_from_table(u) })
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn dest_as_query_table_source(&self) -> Option<QueryTableSource<'a>> {
+        if self.dest_type() == TableSourceUnion::QueryTableSource {
+            let u = self.dest();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { QueryTableSource::init_from_table(u) })
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn dest_as_vector(&self) -> Option<Vector<'a>> {
+        if self.dest_type() == TableSourceUnion::Vector {
+            let u = self.dest();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { Vector::init_from_table(u) })
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn dest_as_placeholder(&self) -> Option<Placeholder<'a>> {
+        if self.dest_type() == TableSourceUnion::Placeholder {
+            let u = self.dest();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { Placeholder::init_from_table(u) })
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn dest_as_drive(&self) -> Option<Drive<'a>> {
+        if self.dest_type() == TableSourceUnion::Drive {
+            let u = self.dest();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { Drive::init_from_table(u) })
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn dest_as_values(&self) -> Option<Values<'a>> {
+        if self.dest_type() == TableSourceUnion::Values {
+            let u = self.dest();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { Values::init_from_table(u) })
+        } else {
+            None
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for InsertQueryElement<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<QueryElement>>(
+                "source",
+                Self::VT_SOURCE,
+                true,
+            )?
+            .visit_field::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<&'_ str>>,
+            >>("columns", Self::VT_COLUMNS, true)?
+            .visit_union::<TableSourceUnion, _>(
+                "dest_type",
+                Self::VT_DEST_TYPE,
+                "dest",
+                Self::VT_DEST,
+                true,
+                |key, v, pos| match key {
+                    TableSourceUnion::DataCatalog => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<DataCatalog>>(
+                            "TableSourceUnion::DataCatalog",
+                            pos,
+                        ),
+                    TableSourceUnion::Arrow => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<Arrow>>(
+                            "TableSourceUnion::Arrow",
+                            pos,
+                        ),
+                    TableSourceUnion::GraphQuery => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<GraphQuery>>(
+                            "TableSourceUnion::GraphQuery",
+                            pos,
+                        ),
+                    TableSourceUnion::QueryTableSource => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<QueryTableSource>>(
+                            "TableSourceUnion::QueryTableSource",
+                            pos,
+                        ),
+                    TableSourceUnion::Vector => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<Vector>>(
+                            "TableSourceUnion::Vector",
+                            pos,
+                        ),
+                    TableSourceUnion::Placeholder => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<Placeholder>>(
+                            "TableSourceUnion::Placeholder",
+                            pos,
+                        ),
+                    TableSourceUnion::Drive => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<Drive>>(
+                            "TableSourceUnion::Drive",
+                            pos,
+                        ),
+                    TableSourceUnion::Values => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<Values>>(
+                            "TableSourceUnion::Values",
+                            pos,
+                        ),
+                    _ => Ok(()),
+                },
+            )?
+            .visit_field::<flatbuffers::ForwardsUOffset<OnConflict>>(
+                "on_conflict",
+                Self::VT_ON_CONFLICT,
+                false,
+            )?
+            .visit_field::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<&'_ str>>,
+            >>("returning", Self::VT_RETURNING, false)?
+            .finish();
+        Ok(())
+    }
+}
+pub struct InsertQueryElementArgs<'a> {
+    pub source: Option<flatbuffers::WIPOffset<QueryElement<'a>>>,
+    pub columns: Option<
+        flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<&'a str>>>,
+    >,
+    pub dest_type: TableSourceUnion,
+    pub dest: Option<flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>>,
+    pub on_conflict: Option<flatbuffers::WIPOffset<OnConflict<'a>>>,
+    pub returning: Option<
+        flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<&'a str>>>,
+    >,
+}
+impl<'a> Default for InsertQueryElementArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        InsertQueryElementArgs {
+            source: None,  // required field
+            columns: None, // required field
+            dest_type: TableSourceUnion::NONE,
+            dest: None, // required field
+            on_conflict: None,
+            returning: None,
+        }
+    }
+}
+
+impl Serialize for InsertQueryElement<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("InsertQueryElement", 6)?;
+        s.serialize_field("source", &self.source())?;
+        s.serialize_field("columns", &self.columns())?;
+        s.serialize_field("dest_type", &self.dest_type())?;
+        match self.dest_type() {
+            TableSourceUnion::NONE => (),
+            TableSourceUnion::DataCatalog => {
+                let f = self
+                    .dest_as_data_catalog()
+                    .expect("Invalid union table, expected `TableSourceUnion::DataCatalog`.");
+                s.serialize_field("dest", &f)?;
+            }
+            TableSourceUnion::Arrow => {
+                let f = self
+                    .dest_as_arrow()
+                    .expect("Invalid union table, expected `TableSourceUnion::Arrow`.");
+                s.serialize_field("dest", &f)?;
+            }
+            TableSourceUnion::GraphQuery => {
+                let f = self
+                    .dest_as_graph_query()
+                    .expect("Invalid union table, expected `TableSourceUnion::GraphQuery`.");
+                s.serialize_field("dest", &f)?;
+            }
+            TableSourceUnion::QueryTableSource => {
+                let f = self
+                    .dest_as_query_table_source()
+                    .expect("Invalid union table, expected `TableSourceUnion::QueryTableSource`.");
+                s.serialize_field("dest", &f)?;
+            }
+            TableSourceUnion::Vector => {
+                let f = self
+                    .dest_as_vector()
+                    .expect("Invalid union table, expected `TableSourceUnion::Vector`.");
+                s.serialize_field("dest", &f)?;
+            }
+            TableSourceUnion::Placeholder => {
+                let f = self
+                    .dest_as_placeholder()
+                    .expect("Invalid union table, expected `TableSourceUnion::Placeholder`.");
+                s.serialize_field("dest", &f)?;
+            }
+            TableSourceUnion::Drive => {
+                let f = self
+                    .dest_as_drive()
+                    .expect("Invalid union table, expected `TableSourceUnion::Drive`.");
+                s.serialize_field("dest", &f)?;
+            }
+            TableSourceUnion::Values => {
+                let f = self
+                    .dest_as_values()
+                    .expect("Invalid union table, expected `TableSourceUnion::Values`.");
+                s.serialize_field("dest", &f)?;
+            }
+            _ => unimplemented!(),
+        }
+        if let Some(f) = self.on_conflict() {
+            s.serialize_field("on_conflict", &f)?;
+        } else {
+            s.skip_field("on_conflict")?;
+        }
+        if let Some(f) = self.returning() {
+            s.serialize_field("returning", &f)?;
+        } else {
+            s.skip_field("returning")?;
+        }
+        s.end()
+    }
+}
+
+pub struct InsertQueryElementBuilder<'a: 'b, 'b> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b> InsertQueryElementBuilder<'a, 'b> {
+    #[inline]
+    pub fn add_source(&mut self, source: flatbuffers::WIPOffset<QueryElement<'b>>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<QueryElement>>(
+                InsertQueryElement::VT_SOURCE,
+                source,
+            );
+    }
+    #[inline]
+    pub fn add_columns(
+        &mut self,
+        columns: flatbuffers::WIPOffset<
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<&'b str>>,
+        >,
+    ) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(InsertQueryElement::VT_COLUMNS, columns);
+    }
+    #[inline]
+    pub fn add_dest_type(&mut self, dest_type: TableSourceUnion) {
+        self.fbb_.push_slot::<TableSourceUnion>(
+            InsertQueryElement::VT_DEST_TYPE,
+            dest_type,
+            TableSourceUnion::NONE,
+        );
+    }
+    #[inline]
+    pub fn add_dest(&mut self, dest: flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(InsertQueryElement::VT_DEST, dest);
+    }
+    #[inline]
+    pub fn add_on_conflict(&mut self, on_conflict: flatbuffers::WIPOffset<OnConflict<'b>>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<OnConflict>>(
+                InsertQueryElement::VT_ON_CONFLICT,
+                on_conflict,
+            );
+    }
+    #[inline]
+    pub fn add_returning(
+        &mut self,
+        returning: flatbuffers::WIPOffset<
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<&'b str>>,
+        >,
+    ) {
+        self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(
+            InsertQueryElement::VT_RETURNING,
+            returning,
+        );
+    }
+    #[inline]
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> InsertQueryElementBuilder<'a, 'b> {
+        let start = _fbb.start_table();
+        InsertQueryElementBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<InsertQueryElement<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_
+            .required(o, InsertQueryElement::VT_SOURCE, "source");
+        self.fbb_
+            .required(o, InsertQueryElement::VT_COLUMNS, "columns");
+        self.fbb_.required(o, InsertQueryElement::VT_DEST, "dest");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for InsertQueryElement<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("InsertQueryElement");
+        ds.field("source", &self.source());
+        ds.field("columns", &self.columns());
+        ds.field("dest_type", &self.dest_type());
+        match self.dest_type() {
+            TableSourceUnion::DataCatalog => {
+                if let Some(x) = self.dest_as_data_catalog() {
+                    ds.field("dest", &x)
+                } else {
+                    ds.field(
+                        "dest",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            TableSourceUnion::Arrow => {
+                if let Some(x) = self.dest_as_arrow() {
+                    ds.field("dest", &x)
+                } else {
+                    ds.field(
+                        "dest",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            TableSourceUnion::GraphQuery => {
+                if let Some(x) = self.dest_as_graph_query() {
+                    ds.field("dest", &x)
+                } else {
+                    ds.field(
+                        "dest",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            TableSourceUnion::QueryTableSource => {
+                if let Some(x) = self.dest_as_query_table_source() {
+                    ds.field("dest", &x)
+                } else {
+                    ds.field(
+                        "dest",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            TableSourceUnion::Vector => {
+                if let Some(x) = self.dest_as_vector() {
+                    ds.field("dest", &x)
+                } else {
+                    ds.field(
+                        "dest",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            TableSourceUnion::Placeholder => {
+                if let Some(x) = self.dest_as_placeholder() {
+                    ds.field("dest", &x)
+                } else {
+                    ds.field(
+                        "dest",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            TableSourceUnion::Drive => {
+                if let Some(x) = self.dest_as_drive() {
+                    ds.field("dest", &x)
+                } else {
+                    ds.field(
+                        "dest",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            TableSourceUnion::Values => {
+                if let Some(x) = self.dest_as_values() {
+                    ds.field("dest", &x)
+                } else {
+                    ds.field(
+                        "dest",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            _ => {
+                let x: Option<()> = None;
+                ds.field("dest", &x)
+            }
+        };
+        ds.field("on_conflict", &self.on_conflict());
+        ds.field("returning", &self.returning());
         ds.finish()
     }
 }
@@ -7632,6 +9381,21 @@ impl<'a> QueryElement<'a> {
             None
         }
     }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn q_as_insert_query_element(&self) -> Option<InsertQueryElement<'a>> {
+        if self.q_type() == QueryElementUnion::InsertQueryElement {
+            self.q().map(|t| {
+                // Safety:
+                // Created from a valid Table for this object
+                // Which contains a valid union in this slot
+                unsafe { InsertQueryElement::init_from_table(t) }
+            })
+        } else {
+            None
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for QueryElement<'_> {
@@ -7667,6 +9431,11 @@ impl flatbuffers::Verifiable for QueryElement<'_> {
                     QueryElementUnion::DeleteQueryElement => v
                         .verify_union_variant::<flatbuffers::ForwardsUOffset<DeleteQueryElement>>(
                             "QueryElementUnion::DeleteQueryElement",
+                            pos,
+                        ),
+                    QueryElementUnion::InsertQueryElement => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<InsertQueryElement>>(
+                            "QueryElementUnion::InsertQueryElement",
                             pos,
                         ),
                     _ => Ok(()),
@@ -7720,6 +9489,12 @@ impl Serialize for QueryElement<'_> {
             QueryElementUnion::DeleteQueryElement => {
                 let f = self.q_as_delete_query_element().expect(
                     "Invalid union table, expected `QueryElementUnion::DeleteQueryElement`.",
+                );
+                s.serialize_field("q", &f)?;
+            }
+            QueryElementUnion::InsertQueryElement => {
+                let f = self.q_as_insert_query_element().expect(
+                    "Invalid union table, expected `QueryElementUnion::InsertQueryElement`.",
                 );
                 s.serialize_field("q", &f)?;
             }
@@ -7799,6 +9574,16 @@ impl core::fmt::Debug for QueryElement<'_> {
             }
             QueryElementUnion::DeleteQueryElement => {
                 if let Some(x) = self.q_as_delete_query_element() {
+                    ds.field("q", &x)
+                } else {
+                    ds.field(
+                        "q",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            QueryElementUnion::InsertQueryElement => {
+                if let Some(x) = self.q_as_insert_query_element() {
                     ds.field("q", &x)
                 } else {
                     ds.field(

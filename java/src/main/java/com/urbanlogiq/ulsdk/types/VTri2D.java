@@ -22,8 +22,8 @@ public final class VTri2D {
     }
 
     public int serializeTo(com.google.flatbuffers.FlatBufferBuilder builder) {
-        int vOffset = this._v.serializeTo(builder);
         com.urbanlogiq.ulsdk.types.generated.VTri2D.startVTri2D(builder);
+        int vOffset = this._v.serializeTo(builder);
         com.urbanlogiq.ulsdk.types.generated.VTri2D.addV(builder, vOffset);
         return com.urbanlogiq.ulsdk.types.generated.VTri2D.endVTri2D(builder);
     }

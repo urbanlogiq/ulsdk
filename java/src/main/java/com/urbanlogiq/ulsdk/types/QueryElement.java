@@ -32,6 +32,10 @@ public final class QueryElement {
             com.google.flatbuffers.Table qFbsTable = o.q(new com.urbanlogiq.ulsdk.types.generated.DeleteQueryElement());
             com.urbanlogiq.ulsdk.types.generated.DeleteQueryElement qFbsValue = (com.urbanlogiq.ulsdk.types.generated.DeleteQueryElement)qFbsTable;
             qValue = new com.urbanlogiq.ulsdk.types.DeleteQueryElement(qFbsValue);
+        } else if (qTy == com.urbanlogiq.ulsdk.types.generated.QueryElementUnion.InsertQueryElement) {
+            com.google.flatbuffers.Table qFbsTable = o.q(new com.urbanlogiq.ulsdk.types.generated.InsertQueryElement());
+            com.urbanlogiq.ulsdk.types.generated.InsertQueryElement qFbsValue = (com.urbanlogiq.ulsdk.types.generated.InsertQueryElement)qFbsTable;
+            qValue = new com.urbanlogiq.ulsdk.types.InsertQueryElement(qFbsValue);
         }
         if (qValue != null) {
             this._q = new com.urbanlogiq.ulsdk.types.QueryElementUnion(qValue);

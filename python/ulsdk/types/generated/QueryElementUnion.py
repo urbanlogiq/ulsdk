@@ -8,3 +8,4 @@ class QueryElementUnion(object):
     BinaryQueryElement = 2
     UpdateQueryElement = 3
     DeleteQueryElement = 4
+    InsertQueryElement = 5

@@ -1014,9 +1014,9 @@ class VTri2D:
             AddV,
             End,
         )
-        v_offset = self.v.serialize_to(builder)
 
         Start(builder)
+        v_offset = self.v.serialize_to(builder)
         AddV(builder, v_offset)
         return End(builder)
 

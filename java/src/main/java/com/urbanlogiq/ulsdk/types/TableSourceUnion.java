@@ -14,7 +14,8 @@ public final class TableSourceUnion {
             && !(value instanceof com.urbanlogiq.ulsdk.types.QueryTableSource)
             && !(value instanceof com.urbanlogiq.ulsdk.types.Vector)
             && !(value instanceof com.urbanlogiq.ulsdk.types.Placeholder)
-            && !(value instanceof com.urbanlogiq.ulsdk.types.Drive)) {
+            && !(value instanceof com.urbanlogiq.ulsdk.types.Drive)
+            && !(value instanceof com.urbanlogiq.ulsdk.types.Values)) {
             throw new com.urbanlogiq.ulsdk.InvalidVariantException("TableSourceUnion", value);
         }
 
@@ -57,6 +58,11 @@ public final class TableSourceUnion {
             int offset = o.serializeTo(builder);
             byte ty = com.urbanlogiq.ulsdk.types.generated.TableSourceUnion.Drive;
             return new com.urbanlogiq.ulsdk.Pair<Integer, Byte>(offset, ty);
+        } else if (this._value instanceof com.urbanlogiq.ulsdk.types.Values) {
+            com.urbanlogiq.ulsdk.types.Values o = (com.urbanlogiq.ulsdk.types.Values)this._value;
+            int offset = o.serializeTo(builder);
+            byte ty = com.urbanlogiq.ulsdk.types.generated.TableSourceUnion.Values;
+            return new com.urbanlogiq.ulsdk.Pair<Integer, Byte>(offset, ty);
         } else {
             throw new RuntimeException("unreachable variant");
         }
@@ -81,6 +87,8 @@ public final class TableSourceUnion {
             this._value = new com.urbanlogiq.ulsdk.types.Placeholder((com.urbanlogiq.ulsdk.types.generated.Placeholder)o);
         } else if (ty == com.urbanlogiq.ulsdk.types.generated.TableSourceUnion.Drive) {
             this._value = new com.urbanlogiq.ulsdk.types.Drive((com.urbanlogiq.ulsdk.types.generated.Drive)o);
+        } else if (ty == com.urbanlogiq.ulsdk.types.generated.TableSourceUnion.Values) {
+            this._value = new com.urbanlogiq.ulsdk.types.Values((com.urbanlogiq.ulsdk.types.generated.Values)o);
         }
     }
 

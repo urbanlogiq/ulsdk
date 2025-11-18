@@ -11,7 +11,8 @@ public final class QueryElementUnion {
         if (!(value instanceof com.urbanlogiq.ulsdk.types.UnaryQueryElement)
             && !(value instanceof com.urbanlogiq.ulsdk.types.BinaryQueryElement)
             && !(value instanceof com.urbanlogiq.ulsdk.types.UpdateQueryElement)
-            && !(value instanceof com.urbanlogiq.ulsdk.types.DeleteQueryElement)) {
+            && !(value instanceof com.urbanlogiq.ulsdk.types.DeleteQueryElement)
+            && !(value instanceof com.urbanlogiq.ulsdk.types.InsertQueryElement)) {
             throw new com.urbanlogiq.ulsdk.InvalidVariantException("QueryElementUnion", value);
         }
 
@@ -39,6 +40,11 @@ public final class QueryElementUnion {
             int offset = o.serializeTo(builder);
             byte ty = com.urbanlogiq.ulsdk.types.generated.QueryElementUnion.DeleteQueryElement;
             return new com.urbanlogiq.ulsdk.Pair<Integer, Byte>(offset, ty);
+        } else if (this._value instanceof com.urbanlogiq.ulsdk.types.InsertQueryElement) {
+            com.urbanlogiq.ulsdk.types.InsertQueryElement o = (com.urbanlogiq.ulsdk.types.InsertQueryElement)this._value;
+            int offset = o.serializeTo(builder);
+            byte ty = com.urbanlogiq.ulsdk.types.generated.QueryElementUnion.InsertQueryElement;
+            return new com.urbanlogiq.ulsdk.Pair<Integer, Byte>(offset, ty);
         } else {
             throw new RuntimeException("unreachable variant");
         }
@@ -57,6 +63,8 @@ public final class QueryElementUnion {
             this._value = new com.urbanlogiq.ulsdk.types.UpdateQueryElement((com.urbanlogiq.ulsdk.types.generated.UpdateQueryElement)o);
         } else if (ty == com.urbanlogiq.ulsdk.types.generated.QueryElementUnion.DeleteQueryElement) {
             this._value = new com.urbanlogiq.ulsdk.types.DeleteQueryElement((com.urbanlogiq.ulsdk.types.generated.DeleteQueryElement)o);
+        } else if (ty == com.urbanlogiq.ulsdk.types.generated.QueryElementUnion.InsertQueryElement) {
+            this._value = new com.urbanlogiq.ulsdk.types.InsertQueryElement((com.urbanlogiq.ulsdk.types.generated.InsertQueryElement)o);
         }
     }
 

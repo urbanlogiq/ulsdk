@@ -106,19 +106,25 @@ from .query import (
     BinaryQueryElement,
     Case,
     Column,
+    ConflictAction,
     DataCatalog,
     DeleteQueryElement,
     Distinct,
+    DoNothing,
+    DoUpdate,
     Drive,
     Explain,
     ExplainFormat,
     Expr,
     ExprUnion,
     Function,
+    InsertConflicting,
+    InsertQueryElement,
     Join,
     JoinTy,
     MvdbPartition,
     NullableUint,
+    OnConflict,
     OrderByExpr,
     Partition,
     Placeholder,
@@ -139,6 +145,8 @@ from .query import (
     UpdateQueryElement,
     ValueIndex,
     ValueName,
+    ValueRow,
+    Values,
     Vector,
     When,
     Window,
@@ -202,6 +210,8 @@ from .generated.DeleteQueryElement import DeleteQueryElement as FbsDeleteQueryEl
 from .generated.DictionaryEncoding import DictionaryEncoding as FbsDictionaryEncoding
 from .generated.DiffStream import DiffStream as FbsDiffStream
 from .generated.Distinct import Distinct as FbsDistinct
+from .generated.DoNothing import DoNothing as FbsDoNothing
+from .generated.DoUpdate import DoUpdate as FbsDoUpdate
 from .generated.Drive import Drive as FbsDrive
 from .generated.Duration import Duration as FbsDuration
 from .generated.EdgeList import EdgeList as FbsEdgeList
@@ -221,6 +231,8 @@ from .generated.GraphNode import GraphNode as FbsGraphNode
 from .generated.GraphNodeId import GraphNodeId as FbsGraphNodeId
 from .generated.GraphQuery import GraphQuery as FbsGraphQuery
 from .generated.History import History as FbsHistory
+from .generated.InsertConflicting import InsertConflicting as FbsInsertConflicting
+from .generated.InsertQueryElement import InsertQueryElement as FbsInsertQueryElement
 from .generated.Int import Int as FbsInt
 from .generated.Interval import Interval as FbsInterval
 from .generated.Join import Join as FbsJoin
@@ -244,6 +256,7 @@ from .generated.NodeQuery import NodeQuery as FbsNodeQuery
 from .generated.Null import Null as FbsNull
 from .generated.NullableUint import NullableUint as FbsNullableUint
 from .generated.ObjectId import ObjectId as FbsObjectId
+from .generated.OnConflict import OnConflict as FbsOnConflict
 from .generated.OpEntry import OpEntry as FbsOpEntry
 from .generated.OrderBy import OrderBy as FbsOrderBy
 from .generated.OrderByExpr import OrderByExpr as FbsOrderByExpr
@@ -307,11 +320,14 @@ from .generated.VUsize import VUsize as FbsVUsize
 from .generated.ValueIndex import ValueIndex as FbsValueIndex
 from .generated.ValueInstance import ValueInstance as FbsValueInstance
 from .generated.ValueName import ValueName as FbsValueName
+from .generated.ValueRow import ValueRow as FbsValueRow
+from .generated.Values import Values as FbsValues
 from .generated.Vector import Vector as FbsVector
 from .generated.When import When as FbsWhen
 from .generated.Window import Window as FbsWindow
 from .generated.WorklogPartition import WorklogPartition as FbsWorklogPartition
 from .generated.ChangeOp import ChangeOp as FbsChangeOp
+from .generated.ConflictAction import ConflictAction as FbsConflictAction
 from .generated.ExprUnion import ExprUnion as FbsExprUnion
 from .generated.Geometry import Geometry as FbsGeometry
 from .generated.Op import Op as FbsOp

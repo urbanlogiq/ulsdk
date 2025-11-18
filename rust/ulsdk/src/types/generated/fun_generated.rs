@@ -40,7 +40,7 @@ pub const ENUM_MAX_FN: i16 = 32766;
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_FN: [Fn; 85] = [
+pub const ENUM_VALUES_FN: [Fn; 158] = [
     Fn::None,
     Fn::True,
     Fn::False,
@@ -123,6 +123,79 @@ pub const ENUM_VALUES_FN: [Fn; 85] = [
     Fn::StAstext,
     Fn::StIntersection,
     Fn::StAsbinary,
+    Fn::PointToH3,
+    Fn::GeomToH3,
+    Fn::ArrayAnyValue,
+    Fn::ArrayAppend,
+    Fn::ArrayDims,
+    Fn::ArrayDistance,
+    Fn::ArrayDistinct,
+    Fn::ArrayElement,
+    Fn::ArrayExcept,
+    Fn::ArrayExtract,
+    Fn::ArrayHas,
+    Fn::ArrayHasAll,
+    Fn::ArrayHasAny,
+    Fn::ArrayIntersect,
+    Fn::ArrayLength,
+    Fn::ArrayMax,
+    Fn::ArrayMin,
+    Fn::ArrayNdims,
+    Fn::ArrayPopBack,
+    Fn::ArrayPopFront,
+    Fn::ArrayPosition,
+    Fn::ArrayPositions,
+    Fn::ArrayPrepend,
+    Fn::ArrayRemove,
+    Fn::ArrayRemoveAll,
+    Fn::ArrayRemoveN,
+    Fn::ArrayRepeat,
+    Fn::ArrayReplace,
+    Fn::ArrayReplaceAll,
+    Fn::ArrayReplaceN,
+    Fn::ArrayResize,
+    Fn::ArrayReverse,
+    Fn::ArraySlice,
+    Fn::ArrayUnion,
+    Fn::Ascii,
+    Fn::BitLength,
+    Fn::Btrim,
+    Fn::CharacterLength,
+    Fn::Chr,
+    Fn::ConcatWs,
+    Fn::Contains,
+    Fn::EndsWith,
+    Fn::FindInSet,
+    Fn::Initcap,
+    Fn::Instr,
+    Fn::Left,
+    Fn::Length,
+    Fn::Levenshtein,
+    Fn::Lower,
+    Fn::Lpad,
+    Fn::Ltrim,
+    Fn::OctetLength,
+    Fn::Overlay,
+    Fn::Position,
+    Fn::Repeat,
+    Fn::Replace,
+    Fn::Reverse,
+    Fn::Right,
+    Fn::Rpad,
+    Fn::Rtrim,
+    Fn::SplitPart,
+    Fn::StartsWith,
+    Fn::Strpos,
+    Fn::Substr,
+    Fn::SubstrIndex,
+    Fn::ToHex,
+    Fn::Translate,
+    Fn::Trim,
+    Fn::Upper,
+    Fn::Uuid,
+    Fn::Unnest,
+    Fn::PercentileCont,
+    Fn::CorrelationId,
     Fn::UlTimezone,
     Fn::UlArrayContains,
     Fn::UlArrayAny,
@@ -215,6 +288,79 @@ impl Fn {
     pub const StAstext: Self = Self(79);
     pub const StIntersection: Self = Self(80);
     pub const StAsbinary: Self = Self(81);
+    pub const PointToH3: Self = Self(82);
+    pub const GeomToH3: Self = Self(83);
+    pub const ArrayAnyValue: Self = Self(84);
+    pub const ArrayAppend: Self = Self(85);
+    pub const ArrayDims: Self = Self(86);
+    pub const ArrayDistance: Self = Self(87);
+    pub const ArrayDistinct: Self = Self(88);
+    pub const ArrayElement: Self = Self(89);
+    pub const ArrayExcept: Self = Self(90);
+    pub const ArrayExtract: Self = Self(91);
+    pub const ArrayHas: Self = Self(92);
+    pub const ArrayHasAll: Self = Self(93);
+    pub const ArrayHasAny: Self = Self(94);
+    pub const ArrayIntersect: Self = Self(95);
+    pub const ArrayLength: Self = Self(96);
+    pub const ArrayMax: Self = Self(97);
+    pub const ArrayMin: Self = Self(98);
+    pub const ArrayNdims: Self = Self(99);
+    pub const ArrayPopBack: Self = Self(100);
+    pub const ArrayPopFront: Self = Self(101);
+    pub const ArrayPosition: Self = Self(102);
+    pub const ArrayPositions: Self = Self(103);
+    pub const ArrayPrepend: Self = Self(104);
+    pub const ArrayRemove: Self = Self(105);
+    pub const ArrayRemoveAll: Self = Self(106);
+    pub const ArrayRemoveN: Self = Self(107);
+    pub const ArrayRepeat: Self = Self(108);
+    pub const ArrayReplace: Self = Self(109);
+    pub const ArrayReplaceAll: Self = Self(110);
+    pub const ArrayReplaceN: Self = Self(111);
+    pub const ArrayResize: Self = Self(112);
+    pub const ArrayReverse: Self = Self(113);
+    pub const ArraySlice: Self = Self(114);
+    pub const ArrayUnion: Self = Self(115);
+    pub const Ascii: Self = Self(116);
+    pub const BitLength: Self = Self(117);
+    pub const Btrim: Self = Self(118);
+    pub const CharacterLength: Self = Self(119);
+    pub const Chr: Self = Self(120);
+    pub const ConcatWs: Self = Self(121);
+    pub const Contains: Self = Self(122);
+    pub const EndsWith: Self = Self(123);
+    pub const FindInSet: Self = Self(124);
+    pub const Initcap: Self = Self(125);
+    pub const Instr: Self = Self(126);
+    pub const Left: Self = Self(127);
+    pub const Length: Self = Self(128);
+    pub const Levenshtein: Self = Self(129);
+    pub const Lower: Self = Self(130);
+    pub const Lpad: Self = Self(131);
+    pub const Ltrim: Self = Self(132);
+    pub const OctetLength: Self = Self(133);
+    pub const Overlay: Self = Self(134);
+    pub const Position: Self = Self(135);
+    pub const Repeat: Self = Self(136);
+    pub const Replace: Self = Self(137);
+    pub const Reverse: Self = Self(138);
+    pub const Right: Self = Self(139);
+    pub const Rpad: Self = Self(140);
+    pub const Rtrim: Self = Self(141);
+    pub const SplitPart: Self = Self(142);
+    pub const StartsWith: Self = Self(143);
+    pub const Strpos: Self = Self(144);
+    pub const Substr: Self = Self(145);
+    pub const SubstrIndex: Self = Self(146);
+    pub const ToHex: Self = Self(147);
+    pub const Translate: Self = Self(148);
+    pub const Trim: Self = Self(149);
+    pub const Upper: Self = Self(150);
+    pub const Uuid: Self = Self(151);
+    pub const Unnest: Self = Self(152);
+    pub const PercentileCont: Self = Self(153);
+    pub const CorrelationId: Self = Self(32763);
     pub const UlTimezone: Self = Self(32764);
     pub const UlArrayContains: Self = Self(32765);
     pub const UlArrayAny: Self = Self(32766);
@@ -304,6 +450,79 @@ impl Fn {
         Self::StAstext,
         Self::StIntersection,
         Self::StAsbinary,
+        Self::PointToH3,
+        Self::GeomToH3,
+        Self::ArrayAnyValue,
+        Self::ArrayAppend,
+        Self::ArrayDims,
+        Self::ArrayDistance,
+        Self::ArrayDistinct,
+        Self::ArrayElement,
+        Self::ArrayExcept,
+        Self::ArrayExtract,
+        Self::ArrayHas,
+        Self::ArrayHasAll,
+        Self::ArrayHasAny,
+        Self::ArrayIntersect,
+        Self::ArrayLength,
+        Self::ArrayMax,
+        Self::ArrayMin,
+        Self::ArrayNdims,
+        Self::ArrayPopBack,
+        Self::ArrayPopFront,
+        Self::ArrayPosition,
+        Self::ArrayPositions,
+        Self::ArrayPrepend,
+        Self::ArrayRemove,
+        Self::ArrayRemoveAll,
+        Self::ArrayRemoveN,
+        Self::ArrayRepeat,
+        Self::ArrayReplace,
+        Self::ArrayReplaceAll,
+        Self::ArrayReplaceN,
+        Self::ArrayResize,
+        Self::ArrayReverse,
+        Self::ArraySlice,
+        Self::ArrayUnion,
+        Self::Ascii,
+        Self::BitLength,
+        Self::Btrim,
+        Self::CharacterLength,
+        Self::Chr,
+        Self::ConcatWs,
+        Self::Contains,
+        Self::EndsWith,
+        Self::FindInSet,
+        Self::Initcap,
+        Self::Instr,
+        Self::Left,
+        Self::Length,
+        Self::Levenshtein,
+        Self::Lower,
+        Self::Lpad,
+        Self::Ltrim,
+        Self::OctetLength,
+        Self::Overlay,
+        Self::Position,
+        Self::Repeat,
+        Self::Replace,
+        Self::Reverse,
+        Self::Right,
+        Self::Rpad,
+        Self::Rtrim,
+        Self::SplitPart,
+        Self::StartsWith,
+        Self::Strpos,
+        Self::Substr,
+        Self::SubstrIndex,
+        Self::ToHex,
+        Self::Translate,
+        Self::Trim,
+        Self::Upper,
+        Self::Uuid,
+        Self::Unnest,
+        Self::PercentileCont,
+        Self::CorrelationId,
         Self::UlTimezone,
         Self::UlArrayContains,
         Self::UlArrayAny,
@@ -393,6 +612,79 @@ impl Fn {
             Self::StAstext => Some("StAstext"),
             Self::StIntersection => Some("StIntersection"),
             Self::StAsbinary => Some("StAsbinary"),
+            Self::PointToH3 => Some("PointToH3"),
+            Self::GeomToH3 => Some("GeomToH3"),
+            Self::ArrayAnyValue => Some("ArrayAnyValue"),
+            Self::ArrayAppend => Some("ArrayAppend"),
+            Self::ArrayDims => Some("ArrayDims"),
+            Self::ArrayDistance => Some("ArrayDistance"),
+            Self::ArrayDistinct => Some("ArrayDistinct"),
+            Self::ArrayElement => Some("ArrayElement"),
+            Self::ArrayExcept => Some("ArrayExcept"),
+            Self::ArrayExtract => Some("ArrayExtract"),
+            Self::ArrayHas => Some("ArrayHas"),
+            Self::ArrayHasAll => Some("ArrayHasAll"),
+            Self::ArrayHasAny => Some("ArrayHasAny"),
+            Self::ArrayIntersect => Some("ArrayIntersect"),
+            Self::ArrayLength => Some("ArrayLength"),
+            Self::ArrayMax => Some("ArrayMax"),
+            Self::ArrayMin => Some("ArrayMin"),
+            Self::ArrayNdims => Some("ArrayNdims"),
+            Self::ArrayPopBack => Some("ArrayPopBack"),
+            Self::ArrayPopFront => Some("ArrayPopFront"),
+            Self::ArrayPosition => Some("ArrayPosition"),
+            Self::ArrayPositions => Some("ArrayPositions"),
+            Self::ArrayPrepend => Some("ArrayPrepend"),
+            Self::ArrayRemove => Some("ArrayRemove"),
+            Self::ArrayRemoveAll => Some("ArrayRemoveAll"),
+            Self::ArrayRemoveN => Some("ArrayRemoveN"),
+            Self::ArrayRepeat => Some("ArrayRepeat"),
+            Self::ArrayReplace => Some("ArrayReplace"),
+            Self::ArrayReplaceAll => Some("ArrayReplaceAll"),
+            Self::ArrayReplaceN => Some("ArrayReplaceN"),
+            Self::ArrayResize => Some("ArrayResize"),
+            Self::ArrayReverse => Some("ArrayReverse"),
+            Self::ArraySlice => Some("ArraySlice"),
+            Self::ArrayUnion => Some("ArrayUnion"),
+            Self::Ascii => Some("Ascii"),
+            Self::BitLength => Some("BitLength"),
+            Self::Btrim => Some("Btrim"),
+            Self::CharacterLength => Some("CharacterLength"),
+            Self::Chr => Some("Chr"),
+            Self::ConcatWs => Some("ConcatWs"),
+            Self::Contains => Some("Contains"),
+            Self::EndsWith => Some("EndsWith"),
+            Self::FindInSet => Some("FindInSet"),
+            Self::Initcap => Some("Initcap"),
+            Self::Instr => Some("Instr"),
+            Self::Left => Some("Left"),
+            Self::Length => Some("Length"),
+            Self::Levenshtein => Some("Levenshtein"),
+            Self::Lower => Some("Lower"),
+            Self::Lpad => Some("Lpad"),
+            Self::Ltrim => Some("Ltrim"),
+            Self::OctetLength => Some("OctetLength"),
+            Self::Overlay => Some("Overlay"),
+            Self::Position => Some("Position"),
+            Self::Repeat => Some("Repeat"),
+            Self::Replace => Some("Replace"),
+            Self::Reverse => Some("Reverse"),
+            Self::Right => Some("Right"),
+            Self::Rpad => Some("Rpad"),
+            Self::Rtrim => Some("Rtrim"),
+            Self::SplitPart => Some("SplitPart"),
+            Self::StartsWith => Some("StartsWith"),
+            Self::Strpos => Some("Strpos"),
+            Self::Substr => Some("Substr"),
+            Self::SubstrIndex => Some("SubstrIndex"),
+            Self::ToHex => Some("ToHex"),
+            Self::Translate => Some("Translate"),
+            Self::Trim => Some("Trim"),
+            Self::Upper => Some("Upper"),
+            Self::Uuid => Some("Uuid"),
+            Self::Unnest => Some("Unnest"),
+            Self::PercentileCont => Some("PercentileCont"),
+            Self::CorrelationId => Some("CorrelationId"),
             Self::UlTimezone => Some("UlTimezone"),
             Self::UlArrayContains => Some("UlArrayContains"),
             Self::UlArrayAny => Some("UlArrayAny"),

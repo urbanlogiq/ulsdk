@@ -112,6 +112,10 @@ public final class TableSource {
             com.google.flatbuffers.Table tFbsTable = o.t(new com.urbanlogiq.ulsdk.types.generated.Drive());
             com.urbanlogiq.ulsdk.types.generated.Drive tFbsValue = (com.urbanlogiq.ulsdk.types.generated.Drive)tFbsTable;
             tValue = new com.urbanlogiq.ulsdk.types.Drive(tFbsValue);
+        } else if (tTy == com.urbanlogiq.ulsdk.types.generated.TableSourceUnion.Values) {
+            com.google.flatbuffers.Table tFbsTable = o.t(new com.urbanlogiq.ulsdk.types.generated.Values());
+            com.urbanlogiq.ulsdk.types.generated.Values tFbsValue = (com.urbanlogiq.ulsdk.types.generated.Values)tFbsTable;
+            tValue = new com.urbanlogiq.ulsdk.types.Values(tFbsValue);
         }
         if (tValue != null) {
             this._t = new com.urbanlogiq.ulsdk.types.TableSourceUnion(tValue);

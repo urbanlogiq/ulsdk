@@ -16,8 +16,9 @@ public final class TableSourceUnion {
   public static final byte Vector = 5;
   public static final byte Placeholder = 6;
   public static final byte Drive = 7;
+  public static final byte Values = 8;
 
-  public static final String[] names = { "NONE", "DataCatalog", "Arrow", "GraphQuery", "QueryTableSource", "Vector", "Placeholder", "Drive", };
+  public static final String[] names = { "NONE", "DataCatalog", "Arrow", "GraphQuery", "QueryTableSource", "Vector", "Placeholder", "Drive", "Values", };
 
   public static String name(int e) { return names[e]; }
 }
