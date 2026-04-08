@@ -4,15 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from typing import Optional
 np = import_numpy()
 
 class ListFile(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = ListFile()
         x.Init(buf, n + offset)
@@ -23,18 +21,18 @@ class ListFile(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # ListFile
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # ListFile
-    def Mime(self) -> Optional[bytes]:
+    def Mime(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # ListFile
-    def Virus(self) -> Optional[bytes]:
+    def Virus(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -47,32 +45,32 @@ class ListFile(object):
             return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
         return 0
 
-def ListFileStart(builder: flatbuffers.Builder):
+def ListFileStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ListFileStart(builder)
 
-def ListFileAddMime(builder: flatbuffers.Builder, mime: int):
+def ListFileAddMime(builder, mime):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(mime), 0)
 
-def AddMime(builder: flatbuffers.Builder, mime: int):
+def AddMime(builder, mime):
     ListFileAddMime(builder, mime)
 
-def ListFileAddVirus(builder: flatbuffers.Builder, virus: int):
+def ListFileAddVirus(builder, virus):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(virus), 0)
 
-def AddVirus(builder: flatbuffers.Builder, virus: int):
+def AddVirus(builder, virus):
     ListFileAddVirus(builder, virus)
 
-def ListFileAddSize(builder: flatbuffers.Builder, size: int):
+def ListFileAddSize(builder, size):
     builder.PrependUint64Slot(2, size, 0)
 
-def AddSize(builder: flatbuffers.Builder, size: int):
+def AddSize(builder, size):
     ListFileAddSize(builder, size)
 
-def ListFileEnd(builder: flatbuffers.Builder) -> int:
+def ListFileEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ListFileEnd(builder)

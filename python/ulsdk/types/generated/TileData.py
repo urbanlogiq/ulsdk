@@ -4,17 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Layout import Layout
-from .TileSettings import TileSettings
-from typing import Optional
 np = import_numpy()
 
 class TileData(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = TileData()
         x.Init(buf, n + offset)
@@ -25,49 +21,51 @@ class TileData(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # TileData
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # TileData
-    def Layout(self) -> Optional[Layout]:
+    def Layout(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Layout import Layout
             obj = Layout()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # TileData
-    def TileSettings(self) -> Optional[TileSettings]:
+    def TileSettings(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .TileSettings import TileSettings
             obj = TileSettings()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def TileDataStart(builder: flatbuffers.Builder):
+def TileDataStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     TileDataStart(builder)
 
-def TileDataAddLayout(builder: flatbuffers.Builder, layout: int):
+def TileDataAddLayout(builder, layout):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(layout), 0)
 
-def AddLayout(builder: flatbuffers.Builder, layout: int):
+def AddLayout(builder, layout):
     TileDataAddLayout(builder, layout)
 
-def TileDataAddTileSettings(builder: flatbuffers.Builder, tileSettings: int):
+def TileDataAddTileSettings(builder, tileSettings):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(tileSettings), 0)
 
-def AddTileSettings(builder: flatbuffers.Builder, tileSettings: int):
+def AddTileSettings(builder, tileSettings):
     TileDataAddTileSettings(builder, tileSettings)
 
-def TileDataEnd(builder: flatbuffers.Builder) -> int:
+def TileDataEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return TileDataEnd(builder)

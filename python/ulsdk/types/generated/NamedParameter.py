@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Schema import Schema
-from typing import Optional
 np = import_numpy()
 
 class NamedParameter(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = NamedParameter()
         x.Init(buf, n + offset)
@@ -24,21 +21,22 @@ class NamedParameter(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # NamedParameter
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # NamedParameter
-    def Name(self) -> Optional[bytes]:
+    def Name(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # NamedParameter
-    def Schema(self) -> Optional[Schema]:
+    def Schema(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Schema import Schema
             obj = Schema()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -52,44 +50,44 @@ class NamedParameter(object):
         return 0
 
     # NamedParameter
-    def Description(self) -> Optional[bytes]:
+    def Description(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def NamedParameterStart(builder: flatbuffers.Builder):
+def NamedParameterStart(builder):
     builder.StartObject(4)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     NamedParameterStart(builder)
 
-def NamedParameterAddName(builder: flatbuffers.Builder, name: int):
+def NamedParameterAddName(builder, name):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
 
-def AddName(builder: flatbuffers.Builder, name: int):
+def AddName(builder, name):
     NamedParameterAddName(builder, name)
 
-def NamedParameterAddSchema(builder: flatbuffers.Builder, schema: int):
+def NamedParameterAddSchema(builder, schema):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(schema), 0)
 
-def AddSchema(builder: flatbuffers.Builder, schema: int):
+def AddSchema(builder, schema):
     NamedParameterAddSchema(builder, schema)
 
-def NamedParameterAddFlags(builder: flatbuffers.Builder, flags: int):
+def NamedParameterAddFlags(builder, flags):
     builder.PrependUint32Slot(2, flags, 0)
 
-def AddFlags(builder: flatbuffers.Builder, flags: int):
+def AddFlags(builder, flags):
     NamedParameterAddFlags(builder, flags)
 
-def NamedParameterAddDescription(builder: flatbuffers.Builder, description: int):
+def NamedParameterAddDescription(builder, description):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(description), 0)
 
-def AddDescription(builder: flatbuffers.Builder, description: int):
+def AddDescription(builder, description):
     NamedParameterAddDescription(builder, description)
 
-def NamedParameterEnd(builder: flatbuffers.Builder) -> int:
+def NamedParameterEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return NamedParameterEnd(builder)

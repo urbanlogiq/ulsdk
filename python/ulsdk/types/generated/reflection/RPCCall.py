@@ -4,17 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .KeyValue import KeyValue
-from .Object import Object
-from typing import Optional
 np = import_numpy()
 
 class RPCCall(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = RPCCall()
         x.Init(buf, n + offset)
@@ -29,62 +25,65 @@ class RPCCall(object):
         return flatbuffers.util.BufferHasIdentifier(buf, offset, b"\x42\x46\x42\x53", size_prefixed=size_prefixed)
 
     # RPCCall
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # RPCCall
-    def Name(self) -> Optional[bytes]:
+    def Name(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # RPCCall
-    def Request(self) -> Optional[Object]:
+    def Request(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Object import Object
             obj = Object()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # RPCCall
-    def Response(self) -> Optional[Object]:
+    def Response(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Object import Object
             obj = Object()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # RPCCall
-    def Attributes(self, j: int) -> Optional[KeyValue]:
+    def Attributes(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .KeyValue import KeyValue
             obj = KeyValue()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # RPCCall
-    def AttributesLength(self) -> int:
+    def AttributesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # RPCCall
-    def AttributesIsNone(self) -> bool:
+    def AttributesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         return o == 0
 
     # RPCCall
-    def Documentation(self, j: int):
+    def Documentation(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             a = self._tab.Vector(o)
@@ -92,67 +91,67 @@ class RPCCall(object):
         return ""
 
     # RPCCall
-    def DocumentationLength(self) -> int:
+    def DocumentationLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # RPCCall
-    def DocumentationIsNone(self) -> bool:
+    def DocumentationIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         return o == 0
 
-def RPCCallStart(builder: flatbuffers.Builder):
+def RPCCallStart(builder):
     builder.StartObject(5)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     RPCCallStart(builder)
 
-def RPCCallAddName(builder: flatbuffers.Builder, name: int):
+def RPCCallAddName(builder, name):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
 
-def AddName(builder: flatbuffers.Builder, name: int):
+def AddName(builder, name):
     RPCCallAddName(builder, name)
 
-def RPCCallAddRequest(builder: flatbuffers.Builder, request: int):
+def RPCCallAddRequest(builder, request):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(request), 0)
 
-def AddRequest(builder: flatbuffers.Builder, request: int):
+def AddRequest(builder, request):
     RPCCallAddRequest(builder, request)
 
-def RPCCallAddResponse(builder: flatbuffers.Builder, response: int):
+def RPCCallAddResponse(builder, response):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(response), 0)
 
-def AddResponse(builder: flatbuffers.Builder, response: int):
+def AddResponse(builder, response):
     RPCCallAddResponse(builder, response)
 
-def RPCCallAddAttributes(builder: flatbuffers.Builder, attributes: int):
+def RPCCallAddAttributes(builder, attributes):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(attributes), 0)
 
-def AddAttributes(builder: flatbuffers.Builder, attributes: int):
+def AddAttributes(builder, attributes):
     RPCCallAddAttributes(builder, attributes)
 
-def RPCCallStartAttributesVector(builder, numElems: int) -> int:
+def RPCCallStartAttributesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartAttributesVector(builder, numElems: int) -> int:
+def StartAttributesVector(builder, numElems):
     return RPCCallStartAttributesVector(builder, numElems)
 
-def RPCCallAddDocumentation(builder: flatbuffers.Builder, documentation: int):
+def RPCCallAddDocumentation(builder, documentation):
     builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(documentation), 0)
 
-def AddDocumentation(builder: flatbuffers.Builder, documentation: int):
+def AddDocumentation(builder, documentation):
     RPCCallAddDocumentation(builder, documentation)
 
-def RPCCallStartDocumentationVector(builder, numElems: int) -> int:
+def RPCCallStartDocumentationVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartDocumentationVector(builder, numElems: int) -> int:
+def StartDocumentationVector(builder, numElems):
     return RPCCallStartDocumentationVector(builder, numElems)
 
-def RPCCallEnd(builder: flatbuffers.Builder) -> int:
+def RPCCallEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return RPCCallEnd(builder)

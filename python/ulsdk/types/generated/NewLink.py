@@ -4,9 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ObjectId import ObjectId
-from typing import Optional
 np = import_numpy()
 
 # Body parameter for PUT drive/<object>
@@ -14,7 +11,7 @@ class NewLink(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = NewLink()
         x.Init(buf, n + offset)
@@ -25,46 +22,47 @@ class NewLink(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # NewLink
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # NewLink
-    def Obj(self) -> Optional[ObjectId]:
+    def Obj(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # NewLink
-    def Name(self) -> Optional[bytes]:
+    def Name(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def NewLinkStart(builder: flatbuffers.Builder):
+def NewLinkStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     NewLinkStart(builder)
 
-def NewLinkAddObj(builder: flatbuffers.Builder, obj: int):
+def NewLinkAddObj(builder, obj):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(obj), 0)
 
-def AddObj(builder: flatbuffers.Builder, obj: int):
+def AddObj(builder, obj):
     NewLinkAddObj(builder, obj)
 
-def NewLinkAddName(builder: flatbuffers.Builder, name: int):
+def NewLinkAddName(builder, name):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
 
-def AddName(builder: flatbuffers.Builder, name: int):
+def AddName(builder, name):
     NewLinkAddName(builder, name)
 
-def NewLinkEnd(builder: flatbuffers.Builder) -> int:
+def NewLinkEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return NewLinkEnd(builder)

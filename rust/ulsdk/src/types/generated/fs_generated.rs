@@ -508,8 +508,8 @@ impl<'a> ObjectRef<'a> {
         ObjectRef { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args ObjectRefArgs<'args>,
     ) -> flatbuffers::WIPOffset<ObjectRef<'bldr>> {
         let mut builder = ObjectRefBuilder::new(_fbb);
@@ -584,11 +584,11 @@ impl Serialize for ObjectRef<'_> {
     }
 }
 
-pub struct ObjectRefBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct ObjectRefBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> ObjectRefBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ObjectRefBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_id(&mut self, id: flatbuffers::WIPOffset<ObjectId<'b>>) {
         self.fbb_
@@ -603,7 +603,7 @@ impl<'a: 'b, 'b> ObjectRefBuilder<'a, 'b> {
         );
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ObjectRefBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> ObjectRefBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         ObjectRefBuilder {
             fbb_: _fbb,
@@ -651,8 +651,8 @@ impl<'a> TopLevelDirectory<'a> {
         TopLevelDirectory { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args TopLevelDirectoryArgs<'args>,
     ) -> flatbuffers::WIPOffset<TopLevelDirectory<'bldr>> {
         let mut builder = TopLevelDirectoryBuilder::new(_fbb);
@@ -715,11 +715,11 @@ impl Serialize for TopLevelDirectory<'_> {
     }
 }
 
-pub struct TopLevelDirectoryBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct TopLevelDirectoryBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> TopLevelDirectoryBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> TopLevelDirectoryBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_b2c_entity(&mut self, b2c_entity: flatbuffers::WIPOffset<B2cId<'b>>) {
         self.fbb_.push_slot_always::<flatbuffers::WIPOffset<B2cId>>(
@@ -729,8 +729,8 @@ impl<'a: 'b, 'b> TopLevelDirectoryBuilder<'a, 'b> {
     }
     #[inline]
     pub fn new(
-        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>,
-    ) -> TopLevelDirectoryBuilder<'a, 'b> {
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> TopLevelDirectoryBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         TopLevelDirectoryBuilder {
             fbb_: _fbb,
@@ -774,19 +774,19 @@ impl<'a> Chunk<'a> {
     pub const VT_BLOB: flatbuffers::VOffsetT = 4;
     pub const VT_DIGEST_TYPE: flatbuffers::VOffsetT = 6;
     pub const VT_DIGEST: flatbuffers::VOffsetT = 8;
-    pub const VT_SIZE_: flatbuffers::VOffsetT = 10;
+    pub const VT_SIZE: flatbuffers::VOffsetT = 10;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
         Chunk { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args ChunkArgs<'args>,
     ) -> flatbuffers::WIPOffset<Chunk<'bldr>> {
         let mut builder = ChunkBuilder::new(_fbb);
-        builder.add_size_(args.size_);
+        builder.add_size(args.size);
         if let Some(x) = args.digest {
             builder.add_digest(x);
         }
@@ -831,11 +831,11 @@ impl<'a> Chunk<'a> {
         }
     }
     #[inline]
-    pub fn size_(&self) -> u64 {
+    pub fn size(&self) -> u64 {
         // Safety:
         // Created from valid Table for this object
         // which contains a valid value in this slot
-        unsafe { self._tab.get::<u64>(Chunk::VT_SIZE_, Some(0)).unwrap() }
+        unsafe { self._tab.get::<u64>(Chunk::VT_SIZE, Some(0)).unwrap() }
     }
     #[inline]
     #[allow(non_snake_case)]
@@ -876,7 +876,7 @@ impl flatbuffers::Verifiable for Chunk<'_> {
                     _ => Ok(()),
                 },
             )?
-            .visit_field::<u64>("size_", Self::VT_SIZE_, false)?
+            .visit_field::<u64>("size", Self::VT_SIZE, false)?
             .finish();
         Ok(())
     }
@@ -885,7 +885,7 @@ pub struct ChunkArgs<'a> {
     pub blob: Option<flatbuffers::WIPOffset<GenericId<'a>>>,
     pub digest_type: Digest,
     pub digest: Option<flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>>,
-    pub size_: u64,
+    pub size: u64,
 }
 impl<'a> Default for ChunkArgs<'a> {
     #[inline]
@@ -894,7 +894,7 @@ impl<'a> Default for ChunkArgs<'a> {
             blob: None, // required field
             digest_type: Digest::NONE,
             digest: None, // required field
-            size_: 0,
+            size: 0,
         }
     }
 }
@@ -917,16 +917,16 @@ impl Serialize for Chunk<'_> {
             }
             _ => unimplemented!(),
         }
-        s.serialize_field("size_", &self.size_())?;
+        s.serialize_field("size", &self.size())?;
         s.end()
     }
 }
 
-pub struct ChunkBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct ChunkBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> ChunkBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ChunkBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_blob(&mut self, blob: flatbuffers::WIPOffset<GenericId<'b>>) {
         self.fbb_
@@ -943,11 +943,11 @@ impl<'a: 'b, 'b> ChunkBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(Chunk::VT_DIGEST, digest);
     }
     #[inline]
-    pub fn add_size_(&mut self, size_: u64) {
-        self.fbb_.push_slot::<u64>(Chunk::VT_SIZE_, size_, 0);
+    pub fn add_size(&mut self, size: u64) {
+        self.fbb_.push_slot::<u64>(Chunk::VT_SIZE, size, 0);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ChunkBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> ChunkBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         ChunkBuilder {
             fbb_: _fbb,
@@ -984,7 +984,7 @@ impl core::fmt::Debug for Chunk<'_> {
                 ds.field("digest", &x)
             }
         };
-        ds.field("size_", &self.size_());
+        ds.field("size", &self.size());
         ds.finish()
     }
 }
@@ -1007,7 +1007,7 @@ impl<'a> flatbuffers::Follow<'a> for File<'a> {
 
 impl<'a> File<'a> {
     pub const VT_MIME: flatbuffers::VOffsetT = 4;
-    pub const VT_SIZE_: flatbuffers::VOffsetT = 6;
+    pub const VT_SIZE: flatbuffers::VOffsetT = 6;
     pub const VT_BLOB: flatbuffers::VOffsetT = 8;
     pub const VT_VIRUS: flatbuffers::VOffsetT = 10;
     pub const VT_DIGEST_TYPE: flatbuffers::VOffsetT = 12;
@@ -1022,12 +1022,12 @@ impl<'a> File<'a> {
         File { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args FileArgs<'args>,
     ) -> flatbuffers::WIPOffset<File<'bldr>> {
         let mut builder = FileBuilder::new(_fbb);
-        builder.add_size_(args.size_);
+        builder.add_size(args.size);
         if let Some(x) = args.chunks {
             builder.add_chunks(x);
         }
@@ -1066,11 +1066,11 @@ impl<'a> File<'a> {
         }
     }
     #[inline]
-    pub fn size_(&self) -> u64 {
+    pub fn size(&self) -> u64 {
         // Safety:
         // Created from valid Table for this object
         // which contains a valid value in this slot
-        unsafe { self._tab.get::<u64>(File::VT_SIZE_, Some(0)).unwrap() }
+        unsafe { self._tab.get::<u64>(File::VT_SIZE, Some(0)).unwrap() }
     }
     #[inline]
     pub fn blob(&self) -> Option<GenericId<'a>> {
@@ -1183,7 +1183,7 @@ impl flatbuffers::Verifiable for File<'_> {
         use self::flatbuffers::Verifiable;
         v.visit_table(pos)?
             .visit_field::<flatbuffers::ForwardsUOffset<&str>>("mime", Self::VT_MIME, true)?
-            .visit_field::<u64>("size_", Self::VT_SIZE_, false)?
+            .visit_field::<u64>("size", Self::VT_SIZE, false)?
             .visit_field::<flatbuffers::ForwardsUOffset<GenericId>>("blob", Self::VT_BLOB, false)?
             .visit_field::<flatbuffers::ForwardsUOffset<&str>>("virus", Self::VT_VIRUS, false)?
             .visit_union::<Digest, _>(
@@ -1217,7 +1217,7 @@ impl flatbuffers::Verifiable for File<'_> {
 }
 pub struct FileArgs<'a> {
     pub mime: Option<flatbuffers::WIPOffset<&'a str>>,
-    pub size_: u64,
+    pub size: u64,
     pub blob: Option<flatbuffers::WIPOffset<GenericId<'a>>>,
     pub virus: Option<flatbuffers::WIPOffset<&'a str>>,
     pub digest_type: Digest,
@@ -1234,7 +1234,7 @@ impl<'a> Default for FileArgs<'a> {
     fn default() -> Self {
         FileArgs {
             mime: None, // required field
-            size_: 0,
+            size: 0,
             blob: None,
             virus: None,
             digest_type: Digest::NONE,
@@ -1254,7 +1254,7 @@ impl Serialize for File<'_> {
     {
         let mut s = serializer.serialize_struct("File", 10)?;
         s.serialize_field("mime", &self.mime())?;
-        s.serialize_field("size_", &self.size_())?;
+        s.serialize_field("size", &self.size())?;
         if let Some(f) = self.blob() {
             s.serialize_field("blob", &f)?;
         } else {
@@ -1292,19 +1292,19 @@ impl Serialize for File<'_> {
     }
 }
 
-pub struct FileBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct FileBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> FileBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> FileBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_mime(&mut self, mime: flatbuffers::WIPOffset<&'b str>) {
         self.fbb_
             .push_slot_always::<flatbuffers::WIPOffset<_>>(File::VT_MIME, mime);
     }
     #[inline]
-    pub fn add_size_(&mut self, size_: u64) {
-        self.fbb_.push_slot::<u64>(File::VT_SIZE_, size_, 0);
+    pub fn add_size(&mut self, size: u64) {
+        self.fbb_.push_slot::<u64>(File::VT_SIZE, size, 0);
     }
     #[inline]
     pub fn add_blob(&mut self, blob: flatbuffers::WIPOffset<GenericId<'b>>) {
@@ -1352,7 +1352,7 @@ impl<'a: 'b, 'b> FileBuilder<'a, 'b> {
             .push_slot::<StorageTier>(File::VT_TIER, tier, StorageTier::Hot);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> FileBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> FileBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         FileBuilder {
             fbb_: _fbb,
@@ -1372,7 +1372,7 @@ impl core::fmt::Debug for File<'_> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let mut ds = f.debug_struct("File");
         ds.field("mime", &self.mime());
-        ds.field("size_", &self.size_());
+        ds.field("size", &self.size());
         ds.field("blob", &self.blob());
         ds.field("virus", &self.virus());
         ds.field("digest_type", &self.digest_type());
@@ -1427,8 +1427,8 @@ impl<'a> Slot<'a> {
         Slot { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args SlotArgs<'args>,
     ) -> flatbuffers::WIPOffset<Slot<'bldr>> {
         let mut builder = SlotBuilder::new(_fbb);
@@ -1549,11 +1549,11 @@ impl Serialize for Slot<'_> {
     }
 }
 
-pub struct SlotBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct SlotBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> SlotBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> SlotBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_id(&mut self, id: flatbuffers::WIPOffset<ObjectId<'b>>) {
         self.fbb_
@@ -1580,7 +1580,7 @@ impl<'a: 'b, 'b> SlotBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(Slot::VT_ATTRIBUTES, attributes);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> SlotBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> SlotBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         SlotBuilder {
             fbb_: _fbb,
@@ -1633,8 +1633,8 @@ impl<'a> Directory<'a> {
         Directory { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args DirectoryArgs<'args>,
     ) -> flatbuffers::WIPOffset<Directory<'bldr>> {
         let mut builder = DirectoryBuilder::new(_fbb);
@@ -1727,11 +1727,11 @@ impl Serialize for Directory<'_> {
     }
 }
 
-pub struct DirectoryBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct DirectoryBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> DirectoryBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> DirectoryBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_slots(
         &mut self,
@@ -1755,7 +1755,7 @@ impl<'a: 'b, 'b> DirectoryBuilder<'a, 'b> {
         );
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> DirectoryBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> DirectoryBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         DirectoryBuilder {
             fbb_: _fbb,
@@ -1805,8 +1805,8 @@ impl<'a> DirectoryEntry<'a> {
         DirectoryEntry { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args DirectoryEntryArgs<'args>,
     ) -> flatbuffers::WIPOffset<DirectoryEntry<'bldr>> {
         let mut builder = DirectoryEntryBuilder::new(_fbb);
@@ -1986,11 +1986,11 @@ impl Serialize for DirectoryEntry<'_> {
     }
 }
 
-pub struct DirectoryEntryBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct DirectoryEntryBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> DirectoryEntryBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> DirectoryEntryBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_entry_type(&mut self, entry_type: Entry) {
         self.fbb_
@@ -2010,7 +2010,9 @@ impl<'a: 'b, 'b> DirectoryEntryBuilder<'a, 'b> {
             );
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> DirectoryEntryBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> DirectoryEntryBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         DirectoryEntryBuilder {
             fbb_: _fbb,
@@ -2093,8 +2095,8 @@ impl<'a> ListDirectory<'a> {
         ListDirectory { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         _args: &'args ListDirectoryArgs,
     ) -> flatbuffers::WIPOffset<ListDirectory<'bldr>> {
         let mut builder = ListDirectoryBuilder::new(_fbb);
@@ -2131,13 +2133,15 @@ impl Serialize for ListDirectory<'_> {
     }
 }
 
-pub struct ListDirectoryBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct ListDirectoryBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> ListDirectoryBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ListDirectoryBuilder<'a, 'b, A> {
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ListDirectoryBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> ListDirectoryBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         ListDirectoryBuilder {
             fbb_: _fbb,
@@ -2177,19 +2181,19 @@ impl<'a> flatbuffers::Follow<'a> for ListFile<'a> {
 impl<'a> ListFile<'a> {
     pub const VT_MIME: flatbuffers::VOffsetT = 4;
     pub const VT_VIRUS: flatbuffers::VOffsetT = 6;
-    pub const VT_SIZE_: flatbuffers::VOffsetT = 8;
+    pub const VT_SIZE: flatbuffers::VOffsetT = 8;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
         ListFile { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args ListFileArgs<'args>,
     ) -> flatbuffers::WIPOffset<ListFile<'bldr>> {
         let mut builder = ListFileBuilder::new(_fbb);
-        builder.add_size_(args.size_);
+        builder.add_size(args.size);
         if let Some(x) = args.virus {
             builder.add_virus(x);
         }
@@ -2221,11 +2225,11 @@ impl<'a> ListFile<'a> {
         }
     }
     #[inline]
-    pub fn size_(&self) -> u64 {
+    pub fn size(&self) -> u64 {
         // Safety:
         // Created from valid Table for this object
         // which contains a valid value in this slot
-        unsafe { self._tab.get::<u64>(ListFile::VT_SIZE_, Some(0)).unwrap() }
+        unsafe { self._tab.get::<u64>(ListFile::VT_SIZE, Some(0)).unwrap() }
     }
 }
 
@@ -2239,7 +2243,7 @@ impl flatbuffers::Verifiable for ListFile<'_> {
         v.visit_table(pos)?
             .visit_field::<flatbuffers::ForwardsUOffset<&str>>("mime", Self::VT_MIME, true)?
             .visit_field::<flatbuffers::ForwardsUOffset<&str>>("virus", Self::VT_VIRUS, false)?
-            .visit_field::<u64>("size_", Self::VT_SIZE_, false)?
+            .visit_field::<u64>("size", Self::VT_SIZE, false)?
             .finish();
         Ok(())
     }
@@ -2247,7 +2251,7 @@ impl flatbuffers::Verifiable for ListFile<'_> {
 pub struct ListFileArgs<'a> {
     pub mime: Option<flatbuffers::WIPOffset<&'a str>>,
     pub virus: Option<flatbuffers::WIPOffset<&'a str>>,
-    pub size_: u64,
+    pub size: u64,
 }
 impl<'a> Default for ListFileArgs<'a> {
     #[inline]
@@ -2255,7 +2259,7 @@ impl<'a> Default for ListFileArgs<'a> {
         ListFileArgs {
             mime: None, // required field
             virus: None,
-            size_: 0,
+            size: 0,
         }
     }
 }
@@ -2272,16 +2276,16 @@ impl Serialize for ListFile<'_> {
         } else {
             s.skip_field("virus")?;
         }
-        s.serialize_field("size_", &self.size_())?;
+        s.serialize_field("size", &self.size())?;
         s.end()
     }
 }
 
-pub struct ListFileBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct ListFileBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> ListFileBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ListFileBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_mime(&mut self, mime: flatbuffers::WIPOffset<&'b str>) {
         self.fbb_
@@ -2293,11 +2297,11 @@ impl<'a: 'b, 'b> ListFileBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(ListFile::VT_VIRUS, virus);
     }
     #[inline]
-    pub fn add_size_(&mut self, size_: u64) {
-        self.fbb_.push_slot::<u64>(ListFile::VT_SIZE_, size_, 0);
+    pub fn add_size(&mut self, size: u64) {
+        self.fbb_.push_slot::<u64>(ListFile::VT_SIZE, size, 0);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ListFileBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> ListFileBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         ListFileBuilder {
             fbb_: _fbb,
@@ -2317,7 +2321,7 @@ impl core::fmt::Debug for ListFile<'_> {
         let mut ds = f.debug_struct("ListFile");
         ds.field("mime", &self.mime());
         ds.field("virus", &self.virus());
-        ds.field("size_", &self.size_());
+        ds.field("size", &self.size());
         ds.finish()
     }
 }
@@ -2341,19 +2345,19 @@ impl<'a> flatbuffers::Follow<'a> for ListObject<'a> {
 impl<'a> ListObject<'a> {
     pub const VT_ID: flatbuffers::VOffsetT = 4;
     pub const VT_TY: flatbuffers::VOffsetT = 6;
-    pub const VT_SIZE_: flatbuffers::VOffsetT = 8;
+    pub const VT_SIZE: flatbuffers::VOffsetT = 8;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
         ListObject { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args ListObjectArgs<'args>,
     ) -> flatbuffers::WIPOffset<ListObject<'bldr>> {
         let mut builder = ListObjectBuilder::new(_fbb);
-        builder.add_size_(args.size_);
+        builder.add_size(args.size);
         if let Some(x) = args.id {
             builder.add_id(x);
         }
@@ -2384,11 +2388,11 @@ impl<'a> ListObject<'a> {
         }
     }
     #[inline]
-    pub fn size_(&self) -> u64 {
+    pub fn size(&self) -> u64 {
         // Safety:
         // Created from valid Table for this object
         // which contains a valid value in this slot
-        unsafe { self._tab.get::<u64>(ListObject::VT_SIZE_, Some(0)).unwrap() }
+        unsafe { self._tab.get::<u64>(ListObject::VT_SIZE, Some(0)).unwrap() }
     }
 }
 
@@ -2402,7 +2406,7 @@ impl flatbuffers::Verifiable for ListObject<'_> {
         v.visit_table(pos)?
             .visit_field::<flatbuffers::ForwardsUOffset<ObjectId>>("id", Self::VT_ID, true)?
             .visit_field::<DataCatalogObjectTy>("ty", Self::VT_TY, false)?
-            .visit_field::<u64>("size_", Self::VT_SIZE_, false)?
+            .visit_field::<u64>("size", Self::VT_SIZE, false)?
             .finish();
         Ok(())
     }
@@ -2410,7 +2414,7 @@ impl flatbuffers::Verifiable for ListObject<'_> {
 pub struct ListObjectArgs<'a> {
     pub id: Option<flatbuffers::WIPOffset<ObjectId<'a>>>,
     pub ty: DataCatalogObjectTy,
-    pub size_: u64,
+    pub size: u64,
 }
 impl<'a> Default for ListObjectArgs<'a> {
     #[inline]
@@ -2418,7 +2422,7 @@ impl<'a> Default for ListObjectArgs<'a> {
         ListObjectArgs {
             id: None, // required field
             ty: DataCatalogObjectTy::Invalid,
-            size_: 0,
+            size: 0,
         }
     }
 }
@@ -2431,16 +2435,16 @@ impl Serialize for ListObject<'_> {
         let mut s = serializer.serialize_struct("ListObject", 3)?;
         s.serialize_field("id", &self.id())?;
         s.serialize_field("ty", &self.ty())?;
-        s.serialize_field("size_", &self.size_())?;
+        s.serialize_field("size", &self.size())?;
         s.end()
     }
 }
 
-pub struct ListObjectBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct ListObjectBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> ListObjectBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ListObjectBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_id(&mut self, id: flatbuffers::WIPOffset<ObjectId<'b>>) {
         self.fbb_
@@ -2455,11 +2459,13 @@ impl<'a: 'b, 'b> ListObjectBuilder<'a, 'b> {
         );
     }
     #[inline]
-    pub fn add_size_(&mut self, size_: u64) {
-        self.fbb_.push_slot::<u64>(ListObject::VT_SIZE_, size_, 0);
+    pub fn add_size(&mut self, size: u64) {
+        self.fbb_.push_slot::<u64>(ListObject::VT_SIZE, size, 0);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ListObjectBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> ListObjectBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         ListObjectBuilder {
             fbb_: _fbb,
@@ -2479,7 +2485,7 @@ impl core::fmt::Debug for ListObject<'_> {
         let mut ds = f.debug_struct("ListObject");
         ds.field("id", &self.id());
         ds.field("ty", &self.ty());
-        ds.field("size_", &self.size_());
+        ds.field("size", &self.size());
         ds.finish()
     }
 }
@@ -2507,7 +2513,7 @@ impl<'a> ListSlot<'a> {
     pub const VT_NAME: flatbuffers::VOffsetT = 10;
     pub const VT_USER_PERMISSIONS: flatbuffers::VOffsetT = 12;
     pub const VT_TIME: flatbuffers::VOffsetT = 14;
-    pub const VT_SIZE_: flatbuffers::VOffsetT = 16;
+    pub const VT_SIZE: flatbuffers::VOffsetT = 16;
     pub const VT_ATTRIBUTES: flatbuffers::VOffsetT = 18;
     pub const VT_LAST_MODIFIED_BY: flatbuffers::VOffsetT = 20;
 
@@ -2516,12 +2522,12 @@ impl<'a> ListSlot<'a> {
         ListSlot { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args ListSlotArgs<'args>,
     ) -> flatbuffers::WIPOffset<ListSlot<'bldr>> {
         let mut builder = ListSlotBuilder::new(_fbb);
-        builder.add_size_(args.size_);
+        builder.add_size(args.size);
         builder.add_time(args.time);
         if let Some(x) = args.last_modified_by {
             builder.add_last_modified_by(x);
@@ -2609,11 +2615,11 @@ impl<'a> ListSlot<'a> {
         unsafe { self._tab.get::<u64>(ListSlot::VT_TIME, Some(0)).unwrap() }
     }
     #[inline]
-    pub fn size_(&self) -> u64 {
+    pub fn size(&self) -> u64 {
         // Safety:
         // Created from valid Table for this object
         // which contains a valid value in this slot
-        unsafe { self._tab.get::<u64>(ListSlot::VT_SIZE_, Some(0)).unwrap() }
+        unsafe { self._tab.get::<u64>(ListSlot::VT_SIZE, Some(0)).unwrap() }
     }
     #[inline]
     pub fn attributes(
@@ -2737,7 +2743,7 @@ impl flatbuffers::Verifiable for ListSlot<'_> {
             .visit_field::<flatbuffers::ForwardsUOffset<&str>>("name", Self::VT_NAME, true)?
             .visit_field::<u32>("user_permissions", Self::VT_USER_PERMISSIONS, false)?
             .visit_field::<u64>("time", Self::VT_TIME, false)?
-            .visit_field::<u64>("size_", Self::VT_SIZE_, false)?
+            .visit_field::<u64>("size", Self::VT_SIZE, false)?
             .visit_field::<flatbuffers::ForwardsUOffset<
                 flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Attr>>,
             >>("attributes", Self::VT_ATTRIBUTES, false)?
@@ -2757,7 +2763,7 @@ pub struct ListSlotArgs<'a> {
     pub name: Option<flatbuffers::WIPOffset<&'a str>>,
     pub user_permissions: u32,
     pub time: u64,
-    pub size_: u64,
+    pub size: u64,
     pub attributes: Option<
         flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Attr<'a>>>>,
     >,
@@ -2773,7 +2779,7 @@ impl<'a> Default for ListSlotArgs<'a> {
             name: None,  // required field
             user_permissions: 0,
             time: 0,
-            size_: 0,
+            size: 0,
             attributes: None,
             last_modified_by: None,
         }
@@ -2819,7 +2825,7 @@ impl Serialize for ListSlot<'_> {
         s.serialize_field("name", &self.name())?;
         s.serialize_field("user_permissions", &self.user_permissions())?;
         s.serialize_field("time", &self.time())?;
-        s.serialize_field("size_", &self.size_())?;
+        s.serialize_field("size", &self.size())?;
         if let Some(f) = self.attributes() {
             s.serialize_field("attributes", &f)?;
         } else {
@@ -2834,11 +2840,11 @@ impl Serialize for ListSlot<'_> {
     }
 }
 
-pub struct ListSlotBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct ListSlotBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> ListSlotBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ListSlotBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_id(&mut self, id: flatbuffers::WIPOffset<ObjectId<'b>>) {
         self.fbb_
@@ -2869,8 +2875,8 @@ impl<'a: 'b, 'b> ListSlotBuilder<'a, 'b> {
         self.fbb_.push_slot::<u64>(ListSlot::VT_TIME, time, 0);
     }
     #[inline]
-    pub fn add_size_(&mut self, size_: u64) {
-        self.fbb_.push_slot::<u64>(ListSlot::VT_SIZE_, size_, 0);
+    pub fn add_size(&mut self, size: u64) {
+        self.fbb_.push_slot::<u64>(ListSlot::VT_SIZE, size, 0);
     }
     #[inline]
     pub fn add_attributes(
@@ -2890,7 +2896,7 @@ impl<'a: 'b, 'b> ListSlotBuilder<'a, 'b> {
         );
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ListSlotBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> ListSlotBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         ListSlotBuilder {
             fbb_: _fbb,
@@ -2961,7 +2967,7 @@ impl core::fmt::Debug for ListSlot<'_> {
         ds.field("name", &self.name());
         ds.field("user_permissions", &self.user_permissions());
         ds.field("time", &self.time());
-        ds.field("size_", &self.size_());
+        ds.field("size", &self.size());
         ds.field("attributes", &self.attributes());
         ds.field("last_modified_by", &self.last_modified_by());
         ds.finish()
@@ -2992,8 +2998,8 @@ impl<'a> DirectoryList<'a> {
         DirectoryList { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args DirectoryListArgs<'args>,
     ) -> flatbuffers::WIPOffset<DirectoryList<'bldr>> {
         let mut builder = DirectoryListBuilder::new(_fbb);
@@ -3058,11 +3064,11 @@ impl Serialize for DirectoryList<'_> {
     }
 }
 
-pub struct DirectoryListBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct DirectoryListBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> DirectoryListBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> DirectoryListBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_slots(
         &mut self,
@@ -3074,7 +3080,9 @@ impl<'a: 'b, 'b> DirectoryListBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(DirectoryList::VT_SLOTS, slots);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> DirectoryListBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> DirectoryListBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         DirectoryListBuilder {
             fbb_: _fbb,
@@ -3123,8 +3131,8 @@ impl<'a> NewLink<'a> {
         NewLink { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args NewLinkArgs<'args>,
     ) -> flatbuffers::WIPOffset<NewLink<'bldr>> {
         let mut builder = NewLinkBuilder::new(_fbb);
@@ -3201,11 +3209,11 @@ impl Serialize for NewLink<'_> {
     }
 }
 
-pub struct NewLinkBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct NewLinkBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> NewLinkBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> NewLinkBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_obj(&mut self, obj: flatbuffers::WIPOffset<ObjectId<'b>>) {
         self.fbb_
@@ -3217,7 +3225,7 @@ impl<'a: 'b, 'b> NewLinkBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(NewLink::VT_NAME, name);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> NewLinkBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> NewLinkBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         NewLinkBuilder {
             fbb_: _fbb,
@@ -3269,8 +3277,8 @@ impl<'a> MoveRequest<'a> {
         MoveRequest { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args MoveRequestArgs<'args>,
     ) -> flatbuffers::WIPOffset<MoveRequest<'bldr>> {
         let mut builder = MoveRequestBuilder::new(_fbb);
@@ -3395,11 +3403,11 @@ impl Serialize for MoveRequest<'_> {
     }
 }
 
-pub struct MoveRequestBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct MoveRequestBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> MoveRequestBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> MoveRequestBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_entry(&mut self, entry: flatbuffers::WIPOffset<ObjectId<'b>>) {
         self.fbb_
@@ -3424,7 +3432,9 @@ impl<'a: 'b, 'b> MoveRequestBuilder<'a, 'b> {
             .push_slot::<bool>(MoveRequest::VT_OVERWRITE, overwrite, false);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> MoveRequestBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> MoveRequestBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         MoveRequestBuilder {
             fbb_: _fbb,

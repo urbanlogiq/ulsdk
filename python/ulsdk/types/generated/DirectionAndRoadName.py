@@ -4,15 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from typing import Optional
 np = import_numpy()
 
 class DirectionAndRoadName(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = DirectionAndRoadName()
         x.Init(buf, n + offset)
@@ -23,43 +21,43 @@ class DirectionAndRoadName(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # DirectionAndRoadName
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # DirectionAndRoadName
-    def Direction(self) -> Optional[bytes]:
+    def Direction(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # DirectionAndRoadName
-    def RoadName(self) -> Optional[bytes]:
+    def RoadName(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def DirectionAndRoadNameStart(builder: flatbuffers.Builder):
+def DirectionAndRoadNameStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DirectionAndRoadNameStart(builder)
 
-def DirectionAndRoadNameAddDirection(builder: flatbuffers.Builder, direction: int):
+def DirectionAndRoadNameAddDirection(builder, direction):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(direction), 0)
 
-def AddDirection(builder: flatbuffers.Builder, direction: int):
+def AddDirection(builder, direction):
     DirectionAndRoadNameAddDirection(builder, direction)
 
-def DirectionAndRoadNameAddRoadName(builder: flatbuffers.Builder, roadName: int):
+def DirectionAndRoadNameAddRoadName(builder, roadName):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(roadName), 0)
 
-def AddRoadName(builder: flatbuffers.Builder, roadName: int):
+def AddRoadName(builder, roadName):
     DirectionAndRoadNameAddRoadName(builder, roadName)
 
-def DirectionAndRoadNameEnd(builder: flatbuffers.Builder) -> int:
+def DirectionAndRoadNameEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DirectionAndRoadNameEnd(builder)

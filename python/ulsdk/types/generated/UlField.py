@@ -4,17 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ValueInstance import ValueInstance
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class UlField(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = UlField()
         x.Init(buf, n + offset)
@@ -25,18 +21,18 @@ class UlField(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # UlField
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # UlField
-    def FieldName(self) -> Optional[bytes]:
+    def FieldName(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # UlField
-    def DisplayName(self) -> Optional[bytes]:
+    def DisplayName(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -50,9 +46,10 @@ class UlField(object):
         return 0
 
     # UlField
-    def ComponentData(self) -> Optional[flatbuffers.table.Table]:
+    def ComponentData(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
@@ -80,24 +77,25 @@ class UlField(object):
         return 0
 
     # UlField
-    def Description(self) -> Optional[bytes]:
+    def Description(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(18))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # UlField
-    def BreakdownDisplayName(self) -> Optional[bytes]:
+    def BreakdownDisplayName(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # UlField
-    def Default(self) -> Optional[ValueInstance]:
+    def Default(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(22))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ValueInstance import ValueInstance
             obj = ValueInstance()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -111,94 +109,95 @@ class UlField(object):
         return 0
 
     # UlField
-    def StorageType(self) -> Optional[flatbuffers.table.Table]:
+    def StorageType(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(26))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
-def UlFieldStart(builder: flatbuffers.Builder):
+def UlFieldStart(builder):
     builder.StartObject(12)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     UlFieldStart(builder)
 
-def UlFieldAddFieldName(builder: flatbuffers.Builder, fieldName: int):
+def UlFieldAddFieldName(builder, fieldName):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(fieldName), 0)
 
-def AddFieldName(builder: flatbuffers.Builder, fieldName: int):
+def AddFieldName(builder, fieldName):
     UlFieldAddFieldName(builder, fieldName)
 
-def UlFieldAddDisplayName(builder: flatbuffers.Builder, displayName: int):
+def UlFieldAddDisplayName(builder, displayName):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(displayName), 0)
 
-def AddDisplayName(builder: flatbuffers.Builder, displayName: int):
+def AddDisplayName(builder, displayName):
     UlFieldAddDisplayName(builder, displayName)
 
-def UlFieldAddComponentDataType(builder: flatbuffers.Builder, componentDataType: int):
+def UlFieldAddComponentDataType(builder, componentDataType):
     builder.PrependUint8Slot(2, componentDataType, 0)
 
-def AddComponentDataType(builder: flatbuffers.Builder, componentDataType: int):
+def AddComponentDataType(builder, componentDataType):
     UlFieldAddComponentDataType(builder, componentDataType)
 
-def UlFieldAddComponentData(builder: flatbuffers.Builder, componentData: int):
+def UlFieldAddComponentData(builder, componentData):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(componentData), 0)
 
-def AddComponentData(builder: flatbuffers.Builder, componentData: int):
+def AddComponentData(builder, componentData):
     UlFieldAddComponentData(builder, componentData)
 
-def UlFieldAddFlags(builder: flatbuffers.Builder, flags: int):
+def UlFieldAddFlags(builder, flags):
     builder.PrependUint32Slot(4, flags, 0)
 
-def AddFlags(builder: flatbuffers.Builder, flags: int):
+def AddFlags(builder, flags):
     UlFieldAddFlags(builder, flags)
 
-def UlFieldAddUnit(builder: flatbuffers.Builder, unit: int):
+def UlFieldAddUnit(builder, unit):
     builder.PrependUint32Slot(5, unit, 0)
 
-def AddUnit(builder: flatbuffers.Builder, unit: int):
+def AddUnit(builder, unit):
     UlFieldAddUnit(builder, unit)
 
-def UlFieldAddFieldType(builder: flatbuffers.Builder, fieldType: int):
+def UlFieldAddFieldType(builder, fieldType):
     builder.PrependUint32Slot(6, fieldType, 0)
 
-def AddFieldType(builder: flatbuffers.Builder, fieldType: int):
+def AddFieldType(builder, fieldType):
     UlFieldAddFieldType(builder, fieldType)
 
-def UlFieldAddDescription(builder: flatbuffers.Builder, description: int):
+def UlFieldAddDescription(builder, description):
     builder.PrependUOffsetTRelativeSlot(7, flatbuffers.number_types.UOffsetTFlags.py_type(description), 0)
 
-def AddDescription(builder: flatbuffers.Builder, description: int):
+def AddDescription(builder, description):
     UlFieldAddDescription(builder, description)
 
-def UlFieldAddBreakdownDisplayName(builder: flatbuffers.Builder, breakdownDisplayName: int):
+def UlFieldAddBreakdownDisplayName(builder, breakdownDisplayName):
     builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(breakdownDisplayName), 0)
 
-def AddBreakdownDisplayName(builder: flatbuffers.Builder, breakdownDisplayName: int):
+def AddBreakdownDisplayName(builder, breakdownDisplayName):
     UlFieldAddBreakdownDisplayName(builder, breakdownDisplayName)
 
-def UlFieldAddDefault(builder: flatbuffers.Builder, default: int):
+def UlFieldAddDefault(builder, default):
     builder.PrependUOffsetTRelativeSlot(9, flatbuffers.number_types.UOffsetTFlags.py_type(default), 0)
 
-def AddDefault(builder: flatbuffers.Builder, default: int):
+def AddDefault(builder, default):
     UlFieldAddDefault(builder, default)
 
-def UlFieldAddStorageTypeType(builder: flatbuffers.Builder, storageTypeType: int):
+def UlFieldAddStorageTypeType(builder, storageTypeType):
     builder.PrependUint8Slot(10, storageTypeType, 0)
 
-def AddStorageTypeType(builder: flatbuffers.Builder, storageTypeType: int):
+def AddStorageTypeType(builder, storageTypeType):
     UlFieldAddStorageTypeType(builder, storageTypeType)
 
-def UlFieldAddStorageType(builder: flatbuffers.Builder, storageType: int):
+def UlFieldAddStorageType(builder, storageType):
     builder.PrependUOffsetTRelativeSlot(11, flatbuffers.number_types.UOffsetTFlags.py_type(storageType), 0)
 
-def AddStorageType(builder: flatbuffers.Builder, storageType: int):
+def AddStorageType(builder, storageType):
     UlFieldAddStorageType(builder, storageType)
 
-def UlFieldEnd(builder: flatbuffers.Builder) -> int:
+def UlFieldEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return UlFieldEnd(builder)

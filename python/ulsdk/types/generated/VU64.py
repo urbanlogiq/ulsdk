@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class VU64(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = VU64()
         x.Init(buf, n + offset)
@@ -22,7 +21,7 @@ class VU64(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # VU64
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # VU64
@@ -32,20 +31,20 @@ class VU64(object):
             return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
         return 0
 
-def VU64Start(builder: flatbuffers.Builder):
+def VU64Start(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     VU64Start(builder)
 
-def VU64AddV(builder: flatbuffers.Builder, v: int):
+def VU64AddV(builder, v):
     builder.PrependUint64Slot(0, v, 0)
 
-def AddV(builder: flatbuffers.Builder, v: int):
+def AddV(builder, v):
     VU64AddV(builder, v)
 
-def VU64End(builder: flatbuffers.Builder) -> int:
+def VU64End(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return VU64End(builder)

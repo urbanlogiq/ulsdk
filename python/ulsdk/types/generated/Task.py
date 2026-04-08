@@ -4,17 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ObjectId import ObjectId
-from .ParamIndices import ParamIndices
-from typing import Optional
 np = import_numpy()
 
 class Task(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Task()
         x.Init(buf, n + offset)
@@ -25,14 +21,15 @@ class Task(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Task
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Task
-    def _Id(self) -> Optional[ObjectId]:
+    def _Id(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -42,10 +39,11 @@ class Task(object):
     # job structure but duplicated for convenience when looking up task related
     # information.
     # Task
-    def UserId(self) -> Optional[ObjectId]:
+    def UserId(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -53,17 +51,18 @@ class Task(object):
 
     # Task object, either a source or a stream
     # Task
-    def Task(self) -> Optional[ObjectId]:
+    def Task(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Task
-    def Name(self) -> Optional[bytes]:
+    def Name(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -71,10 +70,11 @@ class Task(object):
 
     # Associated Job ID
     # Task
-    def JobId(self) -> Optional[ObjectId]:
+    def JobId(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -90,7 +90,7 @@ class Task(object):
 
     # For errors, generic information.
     # Task
-    def Message(self) -> Optional[bytes]:
+    def Message(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -98,10 +98,11 @@ class Task(object):
 
     # Parameter indices taken from the RunSpec for this particular task step.
     # Task
-    def Params(self) -> Optional[ParamIndices]:
+    def Params(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(18))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ParamIndices import ParamIndices
             obj = ParamIndices()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -112,10 +113,11 @@ class Task(object):
     # written. If it is a lookup of an existing stream, this will be populated
     # with the stream ID
     # Task
-    def Output(self) -> Optional[ObjectId]:
+    def Output(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -133,51 +135,53 @@ class Task(object):
 
     # The upstream nodes that enabled this task
     # Task
-    def Upstream(self, j: int) -> Optional[ObjectId]:
+    def Upstream(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(24))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Task
-    def UpstreamLength(self) -> int:
+    def UpstreamLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(24))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Task
-    def UpstreamIsNone(self) -> bool:
+    def UpstreamIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(24))
         return o == 0
 
     # The downstream nodes to enable once this task is complete
     # Task
-    def Downstream(self, j: int) -> Optional[ObjectId]:
+    def Downstream(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(26))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Task
-    def DownstreamLength(self) -> int:
+    def DownstreamLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(26))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Task
-    def DownstreamIsNone(self) -> bool:
+    def DownstreamIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(26))
         return o == 0
 
@@ -227,7 +231,7 @@ class Task(object):
         return 0
 
     # Task
-    def LastUpdatedByPod(self) -> Optional[bytes]:
+    def LastUpdatedByPod(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(40))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -248,167 +252,168 @@ class Task(object):
         return 0
 
     # Task
-    def SchematicId(self) -> Optional[ObjectId]:
+    def SchematicId(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(46))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def TaskStart(builder: flatbuffers.Builder):
+def TaskStart(builder):
     builder.StartObject(22)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     TaskStart(builder)
 
-def TaskAdd_Id(builder: flatbuffers.Builder, _Id: int):
+def TaskAdd_Id(builder, _Id):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(_Id), 0)
 
-def Add_Id(builder: flatbuffers.Builder, _Id: int):
+def Add_Id(builder, _Id):
     TaskAdd_Id(builder, _Id)
 
-def TaskAddUserId(builder: flatbuffers.Builder, userId: int):
+def TaskAddUserId(builder, userId):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(userId), 0)
 
-def AddUserId(builder: flatbuffers.Builder, userId: int):
+def AddUserId(builder, userId):
     TaskAddUserId(builder, userId)
 
-def TaskAddTask(builder: flatbuffers.Builder, task: int):
+def TaskAddTask(builder, task):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(task), 0)
 
-def AddTask(builder: flatbuffers.Builder, task: int):
+def AddTask(builder, task):
     TaskAddTask(builder, task)
 
-def TaskAddName(builder: flatbuffers.Builder, name: int):
+def TaskAddName(builder, name):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
 
-def AddName(builder: flatbuffers.Builder, name: int):
+def AddName(builder, name):
     TaskAddName(builder, name)
 
-def TaskAddJobId(builder: flatbuffers.Builder, jobId: int):
+def TaskAddJobId(builder, jobId):
     builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(jobId), 0)
 
-def AddJobId(builder: flatbuffers.Builder, jobId: int):
+def AddJobId(builder, jobId):
     TaskAddJobId(builder, jobId)
 
-def TaskAddStatus(builder: flatbuffers.Builder, status: int):
+def TaskAddStatus(builder, status):
     builder.PrependInt8Slot(5, status, 0)
 
-def AddStatus(builder: flatbuffers.Builder, status: int):
+def AddStatus(builder, status):
     TaskAddStatus(builder, status)
 
-def TaskAddMessage(builder: flatbuffers.Builder, message: int):
+def TaskAddMessage(builder, message):
     builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(message), 0)
 
-def AddMessage(builder: flatbuffers.Builder, message: int):
+def AddMessage(builder, message):
     TaskAddMessage(builder, message)
 
-def TaskAddParams(builder: flatbuffers.Builder, params: int):
+def TaskAddParams(builder, params):
     builder.PrependUOffsetTRelativeSlot(7, flatbuffers.number_types.UOffsetTFlags.py_type(params), 0)
 
-def AddParams(builder: flatbuffers.Builder, params: int):
+def AddParams(builder, params):
     TaskAddParams(builder, params)
 
-def TaskAddOutput(builder: flatbuffers.Builder, output: int):
+def TaskAddOutput(builder, output):
     builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(output), 0)
 
-def AddOutput(builder: flatbuffers.Builder, output: int):
+def AddOutput(builder, output):
     TaskAddOutput(builder, output)
 
-def TaskAddDiscard(builder: flatbuffers.Builder, discard: bool):
+def TaskAddDiscard(builder, discard):
     builder.PrependBoolSlot(9, discard, 0)
 
-def AddDiscard(builder: flatbuffers.Builder, discard: bool):
+def AddDiscard(builder, discard):
     TaskAddDiscard(builder, discard)
 
-def TaskAddUpstream(builder: flatbuffers.Builder, upstream: int):
+def TaskAddUpstream(builder, upstream):
     builder.PrependUOffsetTRelativeSlot(10, flatbuffers.number_types.UOffsetTFlags.py_type(upstream), 0)
 
-def AddUpstream(builder: flatbuffers.Builder, upstream: int):
+def AddUpstream(builder, upstream):
     TaskAddUpstream(builder, upstream)
 
-def TaskStartUpstreamVector(builder, numElems: int) -> int:
+def TaskStartUpstreamVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartUpstreamVector(builder, numElems: int) -> int:
+def StartUpstreamVector(builder, numElems):
     return TaskStartUpstreamVector(builder, numElems)
 
-def TaskAddDownstream(builder: flatbuffers.Builder, downstream: int):
+def TaskAddDownstream(builder, downstream):
     builder.PrependUOffsetTRelativeSlot(11, flatbuffers.number_types.UOffsetTFlags.py_type(downstream), 0)
 
-def AddDownstream(builder: flatbuffers.Builder, downstream: int):
+def AddDownstream(builder, downstream):
     TaskAddDownstream(builder, downstream)
 
-def TaskStartDownstreamVector(builder, numElems: int) -> int:
+def TaskStartDownstreamVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartDownstreamVector(builder, numElems: int) -> int:
+def StartDownstreamVector(builder, numElems):
     return TaskStartDownstreamVector(builder, numElems)
 
-def TaskAddCreated(builder: flatbuffers.Builder, created: int):
+def TaskAddCreated(builder, created):
     builder.PrependUint64Slot(12, created, 0)
 
-def AddCreated(builder: flatbuffers.Builder, created: int):
+def AddCreated(builder, created):
     TaskAddCreated(builder, created)
 
-def TaskAddStart(builder: flatbuffers.Builder, start: int):
+def TaskAddStart(builder, start):
     builder.PrependUint64Slot(13, start, 0)
 
-def AddStart(builder: flatbuffers.Builder, start: int):
+def AddStart(builder, start):
     TaskAddStart(builder, start)
 
-def TaskAddLastUpdated(builder: flatbuffers.Builder, lastUpdated: int):
+def TaskAddLastUpdated(builder, lastUpdated):
     builder.PrependUint64Slot(14, lastUpdated, 0)
 
-def AddLastUpdated(builder: flatbuffers.Builder, lastUpdated: int):
+def AddLastUpdated(builder, lastUpdated):
     TaskAddLastUpdated(builder, lastUpdated)
 
-def TaskAddEnd(builder: flatbuffers.Builder, end: int):
+def TaskAddEnd(builder, end):
     builder.PrependUint64Slot(15, end, 0)
 
-def AddEnd(builder: flatbuffers.Builder, end: int):
+def AddEnd(builder, end):
     TaskAddEnd(builder, end)
 
-def TaskAddRetries(builder: flatbuffers.Builder, retries: int):
+def TaskAddRetries(builder, retries):
     builder.PrependInt32Slot(16, retries, 0)
 
-def AddRetries(builder: flatbuffers.Builder, retries: int):
+def AddRetries(builder, retries):
     TaskAddRetries(builder, retries)
 
-def TaskAddBarrierCount(builder: flatbuffers.Builder, barrierCount: int):
+def TaskAddBarrierCount(builder, barrierCount):
     builder.PrependInt32Slot(17, barrierCount, 0)
 
-def AddBarrierCount(builder: flatbuffers.Builder, barrierCount: int):
+def AddBarrierCount(builder, barrierCount):
     TaskAddBarrierCount(builder, barrierCount)
 
-def TaskAddLastUpdatedByPod(builder: flatbuffers.Builder, lastUpdatedByPod: int):
+def TaskAddLastUpdatedByPod(builder, lastUpdatedByPod):
     builder.PrependUOffsetTRelativeSlot(18, flatbuffers.number_types.UOffsetTFlags.py_type(lastUpdatedByPod), 0)
 
-def AddLastUpdatedByPod(builder: flatbuffers.Builder, lastUpdatedByPod: int):
+def AddLastUpdatedByPod(builder, lastUpdatedByPod):
     TaskAddLastUpdatedByPod(builder, lastUpdatedByPod)
 
-def TaskAddFlags(builder: flatbuffers.Builder, flags: int):
+def TaskAddFlags(builder, flags):
     builder.PrependInt32Slot(19, flags, 0)
 
-def AddFlags(builder: flatbuffers.Builder, flags: int):
+def AddFlags(builder, flags):
     TaskAddFlags(builder, flags)
 
-def TaskAddErrorTy(builder: flatbuffers.Builder, errorTy: int):
+def TaskAddErrorTy(builder, errorTy):
     builder.PrependInt32Slot(20, errorTy, 0)
 
-def AddErrorTy(builder: flatbuffers.Builder, errorTy: int):
+def AddErrorTy(builder, errorTy):
     TaskAddErrorTy(builder, errorTy)
 
-def TaskAddSchematicId(builder: flatbuffers.Builder, schematicId: int):
+def TaskAddSchematicId(builder, schematicId):
     builder.PrependUOffsetTRelativeSlot(21, flatbuffers.number_types.UOffsetTFlags.py_type(schematicId), 0)
 
-def AddSchematicId(builder: flatbuffers.Builder, schematicId: int):
+def AddSchematicId(builder, schematicId):
     TaskAddSchematicId(builder, schematicId)
 
-def TaskEnd(builder: flatbuffers.Builder) -> int:
+def TaskEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return TaskEnd(builder)

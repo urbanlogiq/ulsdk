@@ -10,9 +10,9 @@
 
 // Ensure the included flatbuffers.h is the same version as when this file was
 // generated, otherwise it may not be compatible.
-static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
-              FLATBUFFERS_VERSION_MINOR == 5 &&
-              FLATBUFFERS_VERSION_REVISION == 26,
+static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
+              FLATBUFFERS_VERSION_MINOR == 2 &&
+              FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
 #include "Schema_generated.h"
@@ -474,11 +474,12 @@ enum class UlFieldType : uint32_t {
   FT_BINARY = 22,
   FT_TIME = 23,
   FT_GEOMETRY_OR_NODE = 24,
+  FT_STRING_ARRAY = 25,
   MIN = FT_UNKNOWN,
-  MAX = FT_GEOMETRY_OR_NODE
+  MAX = FT_STRING_ARRAY
 };
 
-inline const UlFieldType (&EnumValuesUlFieldType())[25] {
+inline const UlFieldType (&EnumValuesUlFieldType())[26] {
   static const UlFieldType values[] = {
     UlFieldType::FT_UNKNOWN,
     UlFieldType::FT_INT,
@@ -504,13 +505,14 @@ inline const UlFieldType (&EnumValuesUlFieldType())[25] {
     UlFieldType::FT_AGGREGATE_DATETIME,
     UlFieldType::FT_BINARY,
     UlFieldType::FT_TIME,
-    UlFieldType::FT_GEOMETRY_OR_NODE
+    UlFieldType::FT_GEOMETRY_OR_NODE,
+    UlFieldType::FT_STRING_ARRAY
   };
   return values;
 }
 
 inline const char * const *EnumNamesUlFieldType() {
-  static const char * const names[26] = {
+  static const char * const names[27] = {
     "FT_UNKNOWN",
     "FT_INT",
     "FT_FLOAT",
@@ -536,13 +538,14 @@ inline const char * const *EnumNamesUlFieldType() {
     "FT_BINARY",
     "FT_TIME",
     "FT_GEOMETRY_OR_NODE",
+    "FT_STRING_ARRAY",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameUlFieldType(UlFieldType e) {
-  if (::flatbuffers::IsOutRange(e, UlFieldType::FT_UNKNOWN, UlFieldType::FT_GEOMETRY_OR_NODE)) return "";
+  if (::flatbuffers::IsOutRange(e, UlFieldType::FT_UNKNOWN, UlFieldType::FT_STRING_ARRAY)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesUlFieldType()[index];
 }

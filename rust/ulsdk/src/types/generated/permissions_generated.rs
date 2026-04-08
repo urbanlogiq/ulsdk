@@ -29,7 +29,7 @@ use self::flatbuffers::{EndianScalar, Follow};
 #[allow(non_upper_case_globals)]
 mod bitflags_permission_ty {
     flatbuffers::bitflags::bitflags! {
-      #[derive(Default)]
+      #[derive(Default, Debug, Clone, Copy, PartialEq)]
       pub struct PermissionTy: u32 {
         /// Permission to browse object metadata and content but not necessarily
         /// stream the data, if it's a data stream. Note that this is for public
@@ -64,11 +64,7 @@ impl<'a> flatbuffers::Follow<'a> for PermissionTy {
     #[inline]
     unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
         let b = flatbuffers::read_scalar_at::<u32>(buf, loc);
-        // Safety:
-        // This is safe because we know bitflags is implemented with a repr transparent uint of the correct size.
-        // from_bits_unchecked will be replaced by an equivalent but safe from_bits_retain in bitflags 2.0
-        // https://github.com/bitflags/bitflags/issues/262
-        Self::from_bits_unchecked(b)
+        Self::from_bits_retain(b)
     }
 }
 
@@ -90,11 +86,7 @@ impl flatbuffers::EndianScalar for PermissionTy {
     #[allow(clippy::wrong_self_convention)]
     fn from_little_endian(v: u32) -> Self {
         let b = u32::from_le(v);
-        // Safety:
-        // This is safe because we know bitflags is implemented with a repr transparent uint of the correct size.
-        // from_bits_unchecked will be replaced by an equivalent but safe from_bits_retain in bitflags 2.0
-        // https://github.com/bitflags/bitflags/issues/262
-        unsafe { Self::from_bits_unchecked(b) }
+        Self::from_bits_retain(b)
     }
 }
 
@@ -136,8 +128,8 @@ impl<'a> Role<'a> {
         Role { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args RoleArgs<'args>,
     ) -> flatbuffers::WIPOffset<Role<'bldr>> {
         let mut builder = RoleBuilder::new(_fbb);
@@ -212,11 +204,11 @@ impl Serialize for Role<'_> {
     }
 }
 
-pub struct RoleBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct RoleBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> RoleBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> RoleBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_permission(&mut self, permission: u32) {
         self.fbb_
@@ -228,7 +220,7 @@ impl<'a: 'b, 'b> RoleBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<B2cId>>(Role::VT_PRINCIPAL, principal);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> RoleBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> RoleBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         RoleBuilder {
             fbb_: _fbb,
@@ -277,8 +269,8 @@ impl<'a> AccessControlList<'a> {
         AccessControlList { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args AccessControlListArgs<'args>,
     ) -> flatbuffers::WIPOffset<AccessControlList<'bldr>> {
         let mut builder = AccessControlListBuilder::new(_fbb);
@@ -374,11 +366,11 @@ impl Serialize for AccessControlList<'_> {
     }
 }
 
-pub struct AccessControlListBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct AccessControlListBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> AccessControlListBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> AccessControlListBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_roles(
         &mut self,
@@ -399,8 +391,8 @@ impl<'a: 'b, 'b> AccessControlListBuilder<'a, 'b> {
     }
     #[inline]
     pub fn new(
-        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>,
-    ) -> AccessControlListBuilder<'a, 'b> {
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> AccessControlListBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         AccessControlListBuilder {
             fbb_: _fbb,

@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class VNull(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = VNull()
         x.Init(buf, n + offset)
@@ -22,17 +21,17 @@ class VNull(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # VNull
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
-def VNullStart(builder: flatbuffers.Builder):
+def VNullStart(builder):
     builder.StartObject(0)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     VNullStart(builder)
 
-def VNullEnd(builder: flatbuffers.Builder) -> int:
+def VNullEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return VNullEnd(builder)

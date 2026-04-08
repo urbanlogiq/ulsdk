@@ -4,21 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Distinct import Distinct
-from .Expr import Expr
-from .Function import Function
-from .Join import Join
-from .TableOrderBy import TableOrderBy
-from .TableSource import TableSource
-from typing import Optional
 np = import_numpy()
 
 class UnaryQueryElement(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = UnaryQueryElement()
         x.Init(buf, n + offset)
@@ -29,144 +21,151 @@ class UnaryQueryElement(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # UnaryQueryElement
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # UnaryQueryElement
-    def Sources(self, j: int) -> Optional[TableSource]:
+    def Sources(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .TableSource import TableSource
             obj = TableSource()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # UnaryQueryElement
-    def SourcesLength(self) -> int:
+    def SourcesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # UnaryQueryElement
-    def SourcesIsNone(self) -> bool:
+    def SourcesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
     # UnaryQueryElement
-    def Joins(self, j: int) -> Optional[Join]:
+    def Joins(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Join import Join
             obj = Join()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # UnaryQueryElement
-    def JoinsLength(self) -> int:
+    def JoinsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # UnaryQueryElement
-    def JoinsIsNone(self) -> bool:
+    def JoinsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
     # UnaryQueryElement
-    def Filter(self) -> Optional[Function]:
+    def Filter(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Function import Function
             obj = Function()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # UnaryQueryElement
-    def Fields(self, j: int) -> Optional[Expr]:
+    def Fields(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Expr import Expr
             obj = Expr()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # UnaryQueryElement
-    def FieldsLength(self) -> int:
+    def FieldsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # UnaryQueryElement
-    def FieldsIsNone(self) -> bool:
+    def FieldsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         return o == 0
 
     # UnaryQueryElement
-    def OrderBy(self, j: int) -> Optional[TableOrderBy]:
+    def OrderBy(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .TableOrderBy import TableOrderBy
             obj = TableOrderBy()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # UnaryQueryElement
-    def OrderByLength(self) -> int:
+    def OrderByLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # UnaryQueryElement
-    def OrderByIsNone(self) -> bool:
+    def OrderByIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         return o == 0
 
     # UnaryQueryElement
-    def GroupBy(self, j: int) -> Optional[Expr]:
+    def GroupBy(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Expr import Expr
             obj = Expr()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # UnaryQueryElement
-    def GroupByLength(self) -> int:
+    def GroupByLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # UnaryQueryElement
-    def GroupByIsNone(self) -> bool:
+    def GroupByIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         return o == 0
 
     # UnaryQueryElement
-    def Distinct(self) -> Optional[Distinct]:
+    def Distinct(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Distinct import Distinct
             obj = Distinct()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -179,92 +178,109 @@ class UnaryQueryElement(object):
             return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
         return 0
 
-def UnaryQueryElementStart(builder: flatbuffers.Builder):
-    builder.StartObject(8)
+    # UnaryQueryElement
+    def Having(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
+        if o != 0:
+            x = self._tab.Indirect(o + self._tab.Pos)
+            from .Function import Function
+            obj = Function()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
 
-def Start(builder: flatbuffers.Builder):
+def UnaryQueryElementStart(builder):
+    builder.StartObject(9)
+
+def Start(builder):
     UnaryQueryElementStart(builder)
 
-def UnaryQueryElementAddSources(builder: flatbuffers.Builder, sources: int):
+def UnaryQueryElementAddSources(builder, sources):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(sources), 0)
 
-def AddSources(builder: flatbuffers.Builder, sources: int):
+def AddSources(builder, sources):
     UnaryQueryElementAddSources(builder, sources)
 
-def UnaryQueryElementStartSourcesVector(builder, numElems: int) -> int:
+def UnaryQueryElementStartSourcesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartSourcesVector(builder, numElems: int) -> int:
+def StartSourcesVector(builder, numElems):
     return UnaryQueryElementStartSourcesVector(builder, numElems)
 
-def UnaryQueryElementAddJoins(builder: flatbuffers.Builder, joins: int):
+def UnaryQueryElementAddJoins(builder, joins):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(joins), 0)
 
-def AddJoins(builder: flatbuffers.Builder, joins: int):
+def AddJoins(builder, joins):
     UnaryQueryElementAddJoins(builder, joins)
 
-def UnaryQueryElementStartJoinsVector(builder, numElems: int) -> int:
+def UnaryQueryElementStartJoinsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartJoinsVector(builder, numElems: int) -> int:
+def StartJoinsVector(builder, numElems):
     return UnaryQueryElementStartJoinsVector(builder, numElems)
 
-def UnaryQueryElementAddFilter(builder: flatbuffers.Builder, filter: int):
+def UnaryQueryElementAddFilter(builder, filter):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(filter), 0)
 
-def AddFilter(builder: flatbuffers.Builder, filter: int):
+def AddFilter(builder, filter):
     UnaryQueryElementAddFilter(builder, filter)
 
-def UnaryQueryElementAddFields(builder: flatbuffers.Builder, fields: int):
+def UnaryQueryElementAddFields(builder, fields):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(fields), 0)
 
-def AddFields(builder: flatbuffers.Builder, fields: int):
+def AddFields(builder, fields):
     UnaryQueryElementAddFields(builder, fields)
 
-def UnaryQueryElementStartFieldsVector(builder, numElems: int) -> int:
+def UnaryQueryElementStartFieldsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartFieldsVector(builder, numElems: int) -> int:
+def StartFieldsVector(builder, numElems):
     return UnaryQueryElementStartFieldsVector(builder, numElems)
 
-def UnaryQueryElementAddOrderBy(builder: flatbuffers.Builder, orderBy: int):
+def UnaryQueryElementAddOrderBy(builder, orderBy):
     builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(orderBy), 0)
 
-def AddOrderBy(builder: flatbuffers.Builder, orderBy: int):
+def AddOrderBy(builder, orderBy):
     UnaryQueryElementAddOrderBy(builder, orderBy)
 
-def UnaryQueryElementStartOrderByVector(builder, numElems: int) -> int:
+def UnaryQueryElementStartOrderByVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartOrderByVector(builder, numElems: int) -> int:
+def StartOrderByVector(builder, numElems):
     return UnaryQueryElementStartOrderByVector(builder, numElems)
 
-def UnaryQueryElementAddGroupBy(builder: flatbuffers.Builder, groupBy: int):
+def UnaryQueryElementAddGroupBy(builder, groupBy):
     builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(groupBy), 0)
 
-def AddGroupBy(builder: flatbuffers.Builder, groupBy: int):
+def AddGroupBy(builder, groupBy):
     UnaryQueryElementAddGroupBy(builder, groupBy)
 
-def UnaryQueryElementStartGroupByVector(builder, numElems: int) -> int:
+def UnaryQueryElementStartGroupByVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartGroupByVector(builder, numElems: int) -> int:
+def StartGroupByVector(builder, numElems):
     return UnaryQueryElementStartGroupByVector(builder, numElems)
 
-def UnaryQueryElementAddDistinct(builder: flatbuffers.Builder, distinct: int):
+def UnaryQueryElementAddDistinct(builder, distinct):
     builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(distinct), 0)
 
-def AddDistinct(builder: flatbuffers.Builder, distinct: int):
+def AddDistinct(builder, distinct):
     UnaryQueryElementAddDistinct(builder, distinct)
 
-def UnaryQueryElementAddLimit(builder: flatbuffers.Builder, limit: int):
+def UnaryQueryElementAddLimit(builder, limit):
     builder.PrependUint32Slot(7, limit, 0)
 
-def AddLimit(builder: flatbuffers.Builder, limit: int):
+def AddLimit(builder, limit):
     UnaryQueryElementAddLimit(builder, limit)
 
-def UnaryQueryElementEnd(builder: flatbuffers.Builder) -> int:
+def UnaryQueryElementAddHaving(builder, having):
+    builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(having), 0)
+
+def AddHaving(builder, having):
+    UnaryQueryElementAddHaving(builder, having)
+
+def UnaryQueryElementEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return UnaryQueryElementEnd(builder)

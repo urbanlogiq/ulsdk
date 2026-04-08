@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ObjectId import ObjectId
-from typing import Optional
 np = import_numpy()
 
 class MoveRequest(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = MoveRequest()
         x.Init(buf, n + offset)
@@ -24,31 +21,33 @@ class MoveRequest(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # MoveRequest
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # MoveRequest
-    def Entry(self) -> Optional[ObjectId]:
+    def Entry(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # MoveRequest
-    def DestRoot(self) -> Optional[ObjectId]:
+    def DestRoot(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # MoveRequest
-    def DestName(self) -> Optional[bytes]:
+    def DestName(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -61,38 +60,38 @@ class MoveRequest(object):
             return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
         return False
 
-def MoveRequestStart(builder: flatbuffers.Builder):
+def MoveRequestStart(builder):
     builder.StartObject(4)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     MoveRequestStart(builder)
 
-def MoveRequestAddEntry(builder: flatbuffers.Builder, entry: int):
+def MoveRequestAddEntry(builder, entry):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(entry), 0)
 
-def AddEntry(builder: flatbuffers.Builder, entry: int):
+def AddEntry(builder, entry):
     MoveRequestAddEntry(builder, entry)
 
-def MoveRequestAddDestRoot(builder: flatbuffers.Builder, destRoot: int):
+def MoveRequestAddDestRoot(builder, destRoot):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(destRoot), 0)
 
-def AddDestRoot(builder: flatbuffers.Builder, destRoot: int):
+def AddDestRoot(builder, destRoot):
     MoveRequestAddDestRoot(builder, destRoot)
 
-def MoveRequestAddDestName(builder: flatbuffers.Builder, destName: int):
+def MoveRequestAddDestName(builder, destName):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(destName), 0)
 
-def AddDestName(builder: flatbuffers.Builder, destName: int):
+def AddDestName(builder, destName):
     MoveRequestAddDestName(builder, destName)
 
-def MoveRequestAddOverwrite(builder: flatbuffers.Builder, overwrite: bool):
+def MoveRequestAddOverwrite(builder, overwrite):
     builder.PrependBoolSlot(3, overwrite, 0)
 
-def AddOverwrite(builder: flatbuffers.Builder, overwrite: bool):
+def AddOverwrite(builder, overwrite):
     MoveRequestAddOverwrite(builder, overwrite)
 
-def MoveRequestEnd(builder: flatbuffers.Builder) -> int:
+def MoveRequestEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return MoveRequestEnd(builder)

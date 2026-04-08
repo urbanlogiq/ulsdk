@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ValueInstance import ValueInstance
-from typing import Optional
 np = import_numpy()
 
 class VArray(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = VArray()
         x.Init(buf, n + offset)
@@ -24,53 +21,54 @@ class VArray(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # VArray
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # VArray
-    def V(self, j: int) -> Optional[ValueInstance]:
+    def V(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .ValueInstance import ValueInstance
             obj = ValueInstance()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # VArray
-    def VLength(self) -> int:
+    def VLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # VArray
-    def VIsNone(self) -> bool:
+    def VIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def VArrayStart(builder: flatbuffers.Builder):
+def VArrayStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     VArrayStart(builder)
 
-def VArrayAddV(builder: flatbuffers.Builder, v: int):
+def VArrayAddV(builder, v):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(v), 0)
 
-def AddV(builder: flatbuffers.Builder, v: int):
+def AddV(builder, v):
     VArrayAddV(builder, v)
 
-def VArrayStartVVector(builder, numElems: int) -> int:
+def VArrayStartVVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartVVector(builder, numElems: int) -> int:
+def StartVVector(builder, numElems):
     return VArrayStartVVector(builder, numElems)
 
-def VArrayEnd(builder: flatbuffers.Builder) -> int:
+def VArrayEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return VArrayEnd(builder)

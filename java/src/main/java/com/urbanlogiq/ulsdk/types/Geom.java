@@ -36,6 +36,10 @@ public final class Geom {
             com.google.flatbuffers.Table geomFbsTable = o.geom(new com.urbanlogiq.ulsdk.types.generated.MultiPolygon());
             com.urbanlogiq.ulsdk.types.generated.MultiPolygon geomFbsValue = (com.urbanlogiq.ulsdk.types.generated.MultiPolygon)geomFbsTable;
             geomValue = new com.urbanlogiq.ulsdk.types.MultiPolygon(geomFbsValue);
+        } else if (geomTy == com.urbanlogiq.ulsdk.types.generated.Geometry.MultiPoint) {
+            com.google.flatbuffers.Table geomFbsTable = o.geom(new com.urbanlogiq.ulsdk.types.generated.MultiPoint());
+            com.urbanlogiq.ulsdk.types.generated.MultiPoint geomFbsValue = (com.urbanlogiq.ulsdk.types.generated.MultiPoint)geomFbsTable;
+            geomValue = new com.urbanlogiq.ulsdk.types.MultiPoint(geomFbsValue);
         }
         if (geomValue != null) {
             this._geom = new com.urbanlogiq.ulsdk.types.Geometry(geomValue);

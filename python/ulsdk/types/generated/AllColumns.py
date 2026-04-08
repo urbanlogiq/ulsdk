@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .NullableUint import NullableUint
-from typing import Optional
 np = import_numpy()
 
 class AllColumns(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = AllColumns()
         x.Init(buf, n + offset)
@@ -24,33 +21,34 @@ class AllColumns(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # AllColumns
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # AllColumns
-    def Source(self) -> Optional[NullableUint]:
+    def Source(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .NullableUint import NullableUint
             obj = NullableUint()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def AllColumnsStart(builder: flatbuffers.Builder):
+def AllColumnsStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     AllColumnsStart(builder)
 
-def AllColumnsAddSource(builder: flatbuffers.Builder, source: int):
+def AllColumnsAddSource(builder, source):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(source), 0)
 
-def AddSource(builder: flatbuffers.Builder, source: int):
+def AddSource(builder, source):
     AllColumnsAddSource(builder, source)
 
-def AllColumnsEnd(builder: flatbuffers.Builder) -> int:
+def AllColumnsEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return AllColumnsEnd(builder)

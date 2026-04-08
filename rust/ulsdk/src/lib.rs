@@ -28,13 +28,13 @@ pub mod native {
     use crate::error::Error;
     pub use crate::keys::{load_key, Key};
 
-    #[derive(Clone, Copy, PartialEq)]
+    #[derive(Debug, Clone, Copy, PartialEq)]
     pub enum Environment {
         Prod,
         Stage,
     }
 
-    #[derive(Clone, Copy, PartialEq, Deserialize)]
+    #[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
     pub enum Region {
         #[serde(rename = "ca")]
         CA,

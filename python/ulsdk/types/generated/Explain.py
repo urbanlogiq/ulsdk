@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class Explain(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Explain()
         x.Init(buf, n + offset)
@@ -22,7 +21,7 @@ class Explain(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Explain
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Explain
@@ -46,32 +45,32 @@ class Explain(object):
             return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
         return False
 
-def ExplainStart(builder: flatbuffers.Builder):
+def ExplainStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ExplainStart(builder)
 
-def ExplainAddFormat(builder: flatbuffers.Builder, format: int):
+def ExplainAddFormat(builder, format):
     builder.PrependUint8Slot(0, format, 0)
 
-def AddFormat(builder: flatbuffers.Builder, format: int):
+def AddFormat(builder, format):
     ExplainAddFormat(builder, format)
 
-def ExplainAddAnalyze(builder: flatbuffers.Builder, analyze: bool):
+def ExplainAddAnalyze(builder, analyze):
     builder.PrependBoolSlot(1, analyze, 0)
 
-def AddAnalyze(builder: flatbuffers.Builder, analyze: bool):
+def AddAnalyze(builder, analyze):
     ExplainAddAnalyze(builder, analyze)
 
-def ExplainAddVerbose(builder: flatbuffers.Builder, verbose: bool):
+def ExplainAddVerbose(builder, verbose):
     builder.PrependBoolSlot(2, verbose, 0)
 
-def AddVerbose(builder: flatbuffers.Builder, verbose: bool):
+def AddVerbose(builder, verbose):
     ExplainAddVerbose(builder, verbose)
 
-def ExplainEnd(builder: flatbuffers.Builder) -> int:
+def ExplainEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ExplainEnd(builder)

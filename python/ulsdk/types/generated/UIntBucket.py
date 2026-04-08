@@ -4,18 +4,17 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class UIntBucket(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def SizeOf(cls) -> int:
+    def SizeOf(cls):
         return 16
 
     # UIntBucket
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # UIntBucket

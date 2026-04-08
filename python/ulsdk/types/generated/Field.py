@@ -4,11 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .DictionaryEncoding import DictionaryEncoding
-from .KeyValue import KeyValue
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 # ----------------------------------------------------------------------
@@ -18,7 +13,7 @@ class Field(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Field()
         x.Init(buf, n + offset)
@@ -29,12 +24,12 @@ class Field(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Field
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Name is not required, in i.e. a List
     # Field
-    def Name(self) -> Optional[bytes]:
+    def Name(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -57,9 +52,10 @@ class Field(object):
 
     # This is the type of the decoded value if the field is dictionary encoded.
     # Field
-    def Type(self) -> Optional[flatbuffers.table.Table]:
+    def Type(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
@@ -67,10 +63,11 @@ class Field(object):
 
     # Present only if the field is dictionary encoded.
     # Field
-    def Dictionary(self) -> Optional[DictionaryEncoding]:
+    def Dictionary(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .DictionaryEncoding import DictionaryEncoding
             obj = DictionaryEncoding()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -79,116 +76,118 @@ class Field(object):
     # children apply only to nested data types like Struct, List and Union. For
     # primitive types children will have length 0.
     # Field
-    def Children(self, j: int) -> Optional['Field']:
+    def Children(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Field import Field
             obj = Field()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Field
-    def ChildrenLength(self) -> int:
+    def ChildrenLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Field
-    def ChildrenIsNone(self) -> bool:
+    def ChildrenIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         return o == 0
 
     # User-defined metadata
     # Field
-    def CustomMetadata(self, j: int) -> Optional[KeyValue]:
+    def CustomMetadata(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .KeyValue import KeyValue
             obj = KeyValue()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Field
-    def CustomMetadataLength(self) -> int:
+    def CustomMetadataLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Field
-    def CustomMetadataIsNone(self) -> bool:
+    def CustomMetadataIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         return o == 0
 
-def FieldStart(builder: flatbuffers.Builder):
+def FieldStart(builder):
     builder.StartObject(7)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     FieldStart(builder)
 
-def FieldAddName(builder: flatbuffers.Builder, name: int):
+def FieldAddName(builder, name):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
 
-def AddName(builder: flatbuffers.Builder, name: int):
+def AddName(builder, name):
     FieldAddName(builder, name)
 
-def FieldAddNullable(builder: flatbuffers.Builder, nullable: bool):
+def FieldAddNullable(builder, nullable):
     builder.PrependBoolSlot(1, nullable, 0)
 
-def AddNullable(builder: flatbuffers.Builder, nullable: bool):
+def AddNullable(builder, nullable):
     FieldAddNullable(builder, nullable)
 
-def FieldAddTypeType(builder: flatbuffers.Builder, typeType: int):
+def FieldAddTypeType(builder, typeType):
     builder.PrependUint8Slot(2, typeType, 0)
 
-def AddTypeType(builder: flatbuffers.Builder, typeType: int):
+def AddTypeType(builder, typeType):
     FieldAddTypeType(builder, typeType)
 
-def FieldAddType(builder: flatbuffers.Builder, type: int):
+def FieldAddType(builder, type):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(type), 0)
 
-def AddType(builder: flatbuffers.Builder, type: int):
+def AddType(builder, type):
     FieldAddType(builder, type)
 
-def FieldAddDictionary(builder: flatbuffers.Builder, dictionary: int):
+def FieldAddDictionary(builder, dictionary):
     builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(dictionary), 0)
 
-def AddDictionary(builder: flatbuffers.Builder, dictionary: int):
+def AddDictionary(builder, dictionary):
     FieldAddDictionary(builder, dictionary)
 
-def FieldAddChildren(builder: flatbuffers.Builder, children: int):
+def FieldAddChildren(builder, children):
     builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(children), 0)
 
-def AddChildren(builder: flatbuffers.Builder, children: int):
+def AddChildren(builder, children):
     FieldAddChildren(builder, children)
 
-def FieldStartChildrenVector(builder, numElems: int) -> int:
+def FieldStartChildrenVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartChildrenVector(builder, numElems: int) -> int:
+def StartChildrenVector(builder, numElems):
     return FieldStartChildrenVector(builder, numElems)
 
-def FieldAddCustomMetadata(builder: flatbuffers.Builder, customMetadata: int):
+def FieldAddCustomMetadata(builder, customMetadata):
     builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(customMetadata), 0)
 
-def AddCustomMetadata(builder: flatbuffers.Builder, customMetadata: int):
+def AddCustomMetadata(builder, customMetadata):
     FieldAddCustomMetadata(builder, customMetadata)
 
-def FieldStartCustomMetadataVector(builder, numElems: int) -> int:
+def FieldStartCustomMetadataVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartCustomMetadataVector(builder, numElems: int) -> int:
+def StartCustomMetadataVector(builder, numElems):
     return FieldStartCustomMetadataVector(builder, numElems)
 
-def FieldEnd(builder: flatbuffers.Builder) -> int:
+def FieldEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return FieldEnd(builder)

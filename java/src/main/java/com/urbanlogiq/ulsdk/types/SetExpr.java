@@ -9,9 +9,8 @@ package com.urbanlogiq.ulsdk.types;
  */
 public final class SetExpr {
     /**
-     *  Because we cannot refer to multiple tables at once in a single UPDATE
-     *  operation we only need to name the column, we can just a string here
-     *  instead of a Column table.
+     *  The target column name. Since SET targets always refer to the target table,
+     *  we only need to name the column as a string.
      */
     String _col;
     public String getCol() {

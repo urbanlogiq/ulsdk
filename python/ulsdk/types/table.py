@@ -67,6 +67,7 @@ from .entity import (
     GraphNode,
     Line,
     MultiLine,
+    MultiPoint,
     MultiPolygon,
     NodeTy,
     Point,
@@ -101,7 +102,12 @@ from .id import (
     StreamId,
 )
 from .query import (
+    AddCol,
+    AggregateFilter,
     AllColumns,
+    AlterTableElement,
+    AlterTableOperation,
+    AlterTableOperationUnion,
     Arrow,
     BinaryQueryElement,
     Case,
@@ -113,6 +119,7 @@ from .query import (
     DoNothing,
     DoUpdate,
     Drive,
+    DropCol,
     Explain,
     ExplainFormat,
     Expr,
@@ -185,7 +192,11 @@ from .value import (
     ValueInstance,
     ValueTy,
 )
+from .generated.AddCol import AddCol as FbsAddCol
+from .generated.AggregateFilter import AggregateFilter as FbsAggregateFilter
 from .generated.AllColumns import AllColumns as FbsAllColumns
+from .generated.AlterTableElement import AlterTableElement as FbsAlterTableElement
+from .generated.AlterTableOperation import AlterTableOperation as FbsAlterTableOperation
 from .generated.Append import Append as FbsAppend
 from .generated.Arrow import Arrow as FbsArrow
 from .generated.Attr import Attr as FbsAttr
@@ -213,6 +224,7 @@ from .generated.Distinct import Distinct as FbsDistinct
 from .generated.DoNothing import DoNothing as FbsDoNothing
 from .generated.DoUpdate import DoUpdate as FbsDoUpdate
 from .generated.Drive import Drive as FbsDrive
+from .generated.DropCol import DropCol as FbsDropCol
 from .generated.Duration import Duration as FbsDuration
 from .generated.EdgeList import EdgeList as FbsEdgeList
 from .generated.EdgeQuery import EdgeQuery as FbsEdgeQuery
@@ -247,6 +259,7 @@ from .generated.ListView import ListView as FbsListView
 from .generated.Map import Map as FbsMap
 from .generated.Modify import Modify as FbsModify
 from .generated.MultiLine import MultiLine as FbsMultiLine
+from .generated.MultiPoint import MultiPoint as FbsMultiPoint
 from .generated.MultiPolygon import MultiPolygon as FbsMultiPolygon
 from .generated.MvdbPartition import MvdbPartition as FbsMvdbPartition
 from .generated.NewTable import NewTable as FbsNewTable
@@ -326,6 +339,7 @@ from .generated.Vector import Vector as FbsVector
 from .generated.When import When as FbsWhen
 from .generated.Window import Window as FbsWindow
 from .generated.WorklogPartition import WorklogPartition as FbsWorklogPartition
+from .generated.AlterTableOperationUnion import AlterTableOperationUnion as FbsAlterTableOperationUnion
 from .generated.ChangeOp import ChangeOp as FbsChangeOp
 from .generated.ConflictAction import ConflictAction as FbsConflictAction
 from .generated.ExprUnion import ExprUnion as FbsExprUnion
@@ -1304,7 +1318,7 @@ class NewTable:
     @classmethod
     def from_fbs(cls, o: FbsNewTable) -> Self:
         from_ = None
-        from__val = o.From_()
+        from__val = o.From()
         if from__val is not None:
             from__ty = o.FromType()
             from_ = TableFrom.from_fbs(from__val, from__ty)
@@ -1331,7 +1345,7 @@ class NewTable:
     def serialize_to(self, builder: Builder) -> int:
         from .generated.NewTable import (
             Start,
-            AddFrom_,
+            AddFrom,
             AddFromType,
             AddMigrate,
             AddName,
@@ -1352,7 +1366,7 @@ class NewTable:
 
         Start(builder)
         if from__offset is not None and from__ty is not None:
-            AddFrom_(builder, from__offset)
+            AddFrom(builder, from__offset)
             AddFromType(builder, from__ty)
         AddMigrate(builder, self.migrate)
         AddName(builder, name_offset)

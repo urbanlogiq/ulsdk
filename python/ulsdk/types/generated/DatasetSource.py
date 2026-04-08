@@ -4,15 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from typing import Optional
 np = import_numpy()
 
 class DatasetSource(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = DatasetSource()
         x.Init(buf, n + offset)
@@ -23,12 +21,12 @@ class DatasetSource(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # DatasetSource
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # The entity that created the data (Manifold, Government of Canada, Wejo, City
     # DatasetSource
-    def Source(self) -> Optional[bytes]:
+    def Source(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -36,7 +34,7 @@ class DatasetSource(object):
 
     # A URL to where the data set can be fetched. Ideally a direct download but
     # DatasetSource
-    def Url(self) -> Optional[bytes]:
+    def Url(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -46,38 +44,38 @@ class DatasetSource(object):
     # This is a free-form text field that isn't interpreted in any means by the
     # system.
     # DatasetSource
-    def Date(self) -> Optional[bytes]:
+    def Date(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def DatasetSourceStart(builder: flatbuffers.Builder):
+def DatasetSourceStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DatasetSourceStart(builder)
 
-def DatasetSourceAddSource(builder: flatbuffers.Builder, source: int):
+def DatasetSourceAddSource(builder, source):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(source), 0)
 
-def AddSource(builder: flatbuffers.Builder, source: int):
+def AddSource(builder, source):
     DatasetSourceAddSource(builder, source)
 
-def DatasetSourceAddUrl(builder: flatbuffers.Builder, url: int):
+def DatasetSourceAddUrl(builder, url):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(url), 0)
 
-def AddUrl(builder: flatbuffers.Builder, url: int):
+def AddUrl(builder, url):
     DatasetSourceAddUrl(builder, url)
 
-def DatasetSourceAddDate(builder: flatbuffers.Builder, date: int):
+def DatasetSourceAddDate(builder, date):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(date), 0)
 
-def AddDate(builder: flatbuffers.Builder, date: int):
+def AddDate(builder, date):
     DatasetSourceAddDate(builder, date)
 
-def DatasetSourceEnd(builder: flatbuffers.Builder) -> int:
+def DatasetSourceEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DatasetSourceEnd(builder)

@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class QueryPathElement(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = QueryPathElement()
         x.Init(buf, n + offset)
@@ -24,7 +21,7 @@ class QueryPathElement(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # QueryPathElement
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # QueryPathElement
@@ -35,34 +32,35 @@ class QueryPathElement(object):
         return 0
 
     # QueryPathElement
-    def Element(self) -> Optional[flatbuffers.table.Table]:
+    def Element(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
-def QueryPathElementStart(builder: flatbuffers.Builder):
+def QueryPathElementStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     QueryPathElementStart(builder)
 
-def QueryPathElementAddElementType(builder: flatbuffers.Builder, elementType: int):
+def QueryPathElementAddElementType(builder, elementType):
     builder.PrependUint8Slot(0, elementType, 0)
 
-def AddElementType(builder: flatbuffers.Builder, elementType: int):
+def AddElementType(builder, elementType):
     QueryPathElementAddElementType(builder, elementType)
 
-def QueryPathElementAddElement(builder: flatbuffers.Builder, element: int):
+def QueryPathElementAddElement(builder, element):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(element), 0)
 
-def AddElement(builder: flatbuffers.Builder, element: int):
+def AddElement(builder, element):
     QueryPathElementAddElement(builder, element)
 
-def QueryPathElementEnd(builder: flatbuffers.Builder) -> int:
+def QueryPathElementEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return QueryPathElementEnd(builder)

@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class Interval(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Interval()
         x.Init(buf, n + offset)
@@ -22,7 +21,7 @@ class Interval(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Interval
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Interval
@@ -32,20 +31,20 @@ class Interval(object):
             return self._tab.Get(flatbuffers.number_types.Int16Flags, o + self._tab.Pos)
         return 0
 
-def IntervalStart(builder: flatbuffers.Builder):
+def IntervalStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     IntervalStart(builder)
 
-def IntervalAddUnit(builder: flatbuffers.Builder, unit: int):
+def IntervalAddUnit(builder, unit):
     builder.PrependInt16Slot(0, unit, 0)
 
-def AddUnit(builder: flatbuffers.Builder, unit: int):
+def AddUnit(builder, unit):
     IntervalAddUnit(builder, unit)
 
-def IntervalEnd(builder: flatbuffers.Builder) -> int:
+def IntervalEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return IntervalEnd(builder)

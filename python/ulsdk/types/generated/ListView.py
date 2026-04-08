@@ -4,7 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 # Represents the same logical types that List can, but contains offsets and
@@ -14,7 +13,7 @@ class ListView(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = ListView()
         x.Init(buf, n + offset)
@@ -25,17 +24,17 @@ class ListView(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # ListView
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
-def ListViewStart(builder: flatbuffers.Builder):
+def ListViewStart(builder):
     builder.StartObject(0)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ListViewStart(builder)
 
-def ListViewEnd(builder: flatbuffers.Builder) -> int:
+def ListViewEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ListViewEnd(builder)

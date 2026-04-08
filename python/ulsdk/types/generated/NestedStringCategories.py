@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .NestedStringCategoryNode import NestedStringCategoryNode
-from typing import Optional
 np = import_numpy()
 
 class NestedStringCategories(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = NestedStringCategories()
         x.Init(buf, n + offset)
@@ -24,53 +21,54 @@ class NestedStringCategories(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # NestedStringCategories
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # NestedStringCategories
-    def NestingTree(self, j: int) -> Optional[NestedStringCategoryNode]:
+    def NestingTree(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .NestedStringCategoryNode import NestedStringCategoryNode
             obj = NestedStringCategoryNode()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # NestedStringCategories
-    def NestingTreeLength(self) -> int:
+    def NestingTreeLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # NestedStringCategories
-    def NestingTreeIsNone(self) -> bool:
+    def NestingTreeIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def NestedStringCategoriesStart(builder: flatbuffers.Builder):
+def NestedStringCategoriesStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     NestedStringCategoriesStart(builder)
 
-def NestedStringCategoriesAddNestingTree(builder: flatbuffers.Builder, nestingTree: int):
+def NestedStringCategoriesAddNestingTree(builder, nestingTree):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(nestingTree), 0)
 
-def AddNestingTree(builder: flatbuffers.Builder, nestingTree: int):
+def AddNestingTree(builder, nestingTree):
     NestedStringCategoriesAddNestingTree(builder, nestingTree)
 
-def NestedStringCategoriesStartNestingTreeVector(builder, numElems: int) -> int:
+def NestedStringCategoriesStartNestingTreeVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartNestingTreeVector(builder, numElems: int) -> int:
+def StartNestingTreeVector(builder, numElems):
     return NestedStringCategoriesStartNestingTreeVector(builder, numElems)
 
-def NestedStringCategoriesEnd(builder: flatbuffers.Builder) -> int:
+def NestedStringCategoriesEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return NestedStringCategoriesEnd(builder)

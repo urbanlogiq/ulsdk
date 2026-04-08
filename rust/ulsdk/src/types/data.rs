@@ -43,8 +43,8 @@ use crate::types::generated::data_generated::{
     DirectionAndRoadName as FbsDirectionAndRoadName,
     DirectionAndRoadNames as FbsDirectionAndRoadNames, DirectionTy as FbsDirectionTy,
     NamedParameter as FbsNamedParameter, NamedParameterFlags as FbsNamedParameterFlags,
-    RoadUserTy as FbsRoadUserTy, Source as FbsSource, StatisticTy as FbsStatisticTy,
-    TimeGranularity as FbsTimeGranularity, TurnTy as FbsTurnTy,
+    OutputSchema as FbsOutputSchema, RoadUserTy as FbsRoadUserTy, Source as FbsSource,
+    StatisticTy as FbsStatisticTy, TimeGranularity as FbsTimeGranularity, TurnTy as FbsTurnTy,
 };
 use crate::types::generated::id_generated::{
     B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
@@ -346,6 +346,16 @@ pub enum RoadUserTy {
     CROSSWALKS = 32,
     TRAMS = 33,
     TAXIS = 34,
+    OTHER_TWO_AXLE_FOUR_TIRE_VEHICLES = 35,
+    TWO_AXLE_SIX_TIRE_SINGLE_UNIT_TRUCKS = 36,
+    THREE_AXLE_SINGLE_UNIT_TRUCKS = 37,
+    FOUR_PLUS_AXLE_SINGLE_UNIT_TRUCKS = 38,
+    FOUR_AXLE_OR_FEWER_SINGLE_TRAILER_TRUCKS = 39,
+    FIVE_AXLE_TRACTOR_SEMITRAILERS = 40,
+    SIX_PLUS_AXLE_SINGLE_TRAILER_TRUCKS = 41,
+    MULTI_TRAILER_TRUCKS_SIX_AXLES = 42,
+    MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES = 43,
+    MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES = 44,
 }
 
 impl TryFrom<i32> for RoadUserTy {
@@ -393,6 +403,26 @@ impl RoadUserTy {
             Self::CROSSWALKS => Some("CROSSWALKS"),
             Self::TRAMS => Some("TRAMS"),
             Self::TAXIS => Some("TAXIS"),
+            Self::OTHER_TWO_AXLE_FOUR_TIRE_VEHICLES => Some("OTHER_TWO_AXLE_FOUR_TIRE_VEHICLES"),
+            Self::TWO_AXLE_SIX_TIRE_SINGLE_UNIT_TRUCKS => {
+                Some("TWO_AXLE_SIX_TIRE_SINGLE_UNIT_TRUCKS")
+            }
+            Self::THREE_AXLE_SINGLE_UNIT_TRUCKS => Some("THREE_AXLE_SINGLE_UNIT_TRUCKS"),
+            Self::FOUR_PLUS_AXLE_SINGLE_UNIT_TRUCKS => Some("FOUR_PLUS_AXLE_SINGLE_UNIT_TRUCKS"),
+            Self::FOUR_AXLE_OR_FEWER_SINGLE_TRAILER_TRUCKS => {
+                Some("FOUR_AXLE_OR_FEWER_SINGLE_TRAILER_TRUCKS")
+            }
+            Self::FIVE_AXLE_TRACTOR_SEMITRAILERS => Some("FIVE_AXLE_TRACTOR_SEMITRAILERS"),
+            Self::SIX_PLUS_AXLE_SINGLE_TRAILER_TRUCKS => {
+                Some("SIX_PLUS_AXLE_SINGLE_TRAILER_TRUCKS")
+            }
+            Self::MULTI_TRAILER_TRUCKS_SIX_AXLES => Some("MULTI_TRAILER_TRUCKS_SIX_AXLES"),
+            Self::MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES => {
+                Some("MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES")
+            }
+            Self::MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES => {
+                Some("MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES")
+            }
             _ => None,
         }
     }
@@ -438,6 +468,36 @@ impl From<RoadUserTy> for FbsRoadUserTy {
             RoadUserTy::CROSSWALKS => FbsRoadUserTy::CROSSWALKS,
             RoadUserTy::TRAMS => FbsRoadUserTy::TRAMS,
             RoadUserTy::TAXIS => FbsRoadUserTy::TAXIS,
+            RoadUserTy::OTHER_TWO_AXLE_FOUR_TIRE_VEHICLES => {
+                FbsRoadUserTy::OTHER_TWO_AXLE_FOUR_TIRE_VEHICLES
+            }
+            RoadUserTy::TWO_AXLE_SIX_TIRE_SINGLE_UNIT_TRUCKS => {
+                FbsRoadUserTy::TWO_AXLE_SIX_TIRE_SINGLE_UNIT_TRUCKS
+            }
+            RoadUserTy::THREE_AXLE_SINGLE_UNIT_TRUCKS => {
+                FbsRoadUserTy::THREE_AXLE_SINGLE_UNIT_TRUCKS
+            }
+            RoadUserTy::FOUR_PLUS_AXLE_SINGLE_UNIT_TRUCKS => {
+                FbsRoadUserTy::FOUR_PLUS_AXLE_SINGLE_UNIT_TRUCKS
+            }
+            RoadUserTy::FOUR_AXLE_OR_FEWER_SINGLE_TRAILER_TRUCKS => {
+                FbsRoadUserTy::FOUR_AXLE_OR_FEWER_SINGLE_TRAILER_TRUCKS
+            }
+            RoadUserTy::FIVE_AXLE_TRACTOR_SEMITRAILERS => {
+                FbsRoadUserTy::FIVE_AXLE_TRACTOR_SEMITRAILERS
+            }
+            RoadUserTy::SIX_PLUS_AXLE_SINGLE_TRAILER_TRUCKS => {
+                FbsRoadUserTy::SIX_PLUS_AXLE_SINGLE_TRAILER_TRUCKS
+            }
+            RoadUserTy::MULTI_TRAILER_TRUCKS_SIX_AXLES => {
+                FbsRoadUserTy::MULTI_TRAILER_TRUCKS_SIX_AXLES
+            }
+            RoadUserTy::MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES => {
+                FbsRoadUserTy::MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES
+            }
+            RoadUserTy::MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES => {
+                FbsRoadUserTy::MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES
+            }
         }
     }
 }
@@ -480,6 +540,16 @@ impl From<FbsRoadUserTy> for RoadUserTy {
             32 => Self::CROSSWALKS,
             33 => Self::TRAMS,
             34 => Self::TAXIS,
+            35 => Self::OTHER_TWO_AXLE_FOUR_TIRE_VEHICLES,
+            36 => Self::TWO_AXLE_SIX_TIRE_SINGLE_UNIT_TRUCKS,
+            37 => Self::THREE_AXLE_SINGLE_UNIT_TRUCKS,
+            38 => Self::FOUR_PLUS_AXLE_SINGLE_UNIT_TRUCKS,
+            39 => Self::FOUR_AXLE_OR_FEWER_SINGLE_TRAILER_TRUCKS,
+            40 => Self::FIVE_AXLE_TRACTOR_SEMITRAILERS,
+            41 => Self::SIX_PLUS_AXLE_SINGLE_TRAILER_TRUCKS,
+            42 => Self::MULTI_TRAILER_TRUCKS_SIX_AXLES,
+            43 => Self::MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES,
+            44 => Self::MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES,
             _ => panic!("Invalid value {} when constructing RoadUserTy", fbs.0),
         }
     }
@@ -964,13 +1034,80 @@ impl NamedParameter {
 }
 
 #[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+pub struct OutputSchema {
+    pub attributes: Vec<AttributePair>,
+    pub schema: Vec<Schema>,
+}
+
+impl OutputSchema {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsOutputSchema<'a>> {
+        use crate::types::generated::data_generated::OutputSchemaBuilder as FbsOutputSchemaBuilder;
+
+        let mut attributes_offsets = Vec::with_capacity(self.attributes.len());
+        for val in self.attributes.iter() {
+            let offset = val.serialize_to(builder);
+            attributes_offsets.push(offset);
+        }
+        let attributes_offset = builder.create_vector(&attributes_offsets);
+        let mut schema_offsets = Vec::with_capacity(self.schema.len());
+        for val in self.schema.iter() {
+            let offset = val.serialize_to(builder);
+            schema_offsets.push(offset);
+        }
+        let schema_offset = builder.create_vector(&schema_offsets);
+
+        let mut bldr = FbsOutputSchemaBuilder::new(builder);
+        bldr.add_attributes(attributes_offset);
+        bldr.add_schema(schema_offset);
+        bldr.finish()
+    }
+}
+
+impl From<FbsOutputSchema<'_>> for OutputSchema {
+    fn from(fbs: FbsOutputSchema<'_>) -> Self {
+        let mut attributes = Vec::new();
+        for elem in fbs.attributes() {
+            attributes.push(elem.into());
+        }
+
+        let mut schema = Vec::new();
+        for elem in fbs.schema() {
+            schema.push(elem.into());
+        }
+
+        Self { attributes, schema }
+    }
+}
+
+impl OutputSchema {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsOutputSchema>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
 pub struct Source {
     pub metadata: Option<ObjectId>,
     pub metadata_revision: Option<ContentId>,
     pub name: String,
     pub named_parameters: Option<Vec<NamedParameter>>,
     pub options: Option<Vec<u8>>,
-    pub schemas: Option<Vec<Schema>>,
+    pub output_schemas: Option<Vec<OutputSchema>>,
     pub url: String,
 }
 
@@ -1000,14 +1137,14 @@ impl Source {
             let options_offset = builder.create_vector(&v);
             options_offset
         });
-        let schemas_offset = self.schemas.as_ref().map(|v| {
-            let mut schemas_offsets = Vec::with_capacity(v.len());
+        let output_schemas_offset = self.output_schemas.as_ref().map(|v| {
+            let mut output_schemas_offsets = Vec::with_capacity(v.len());
             for val in v.iter() {
                 let offset = val.serialize_to(builder);
-                schemas_offsets.push(offset);
+                output_schemas_offsets.push(offset);
             }
-            let schemas_offset = builder.create_vector(&schemas_offsets);
-            schemas_offset
+            let output_schemas_offset = builder.create_vector(&output_schemas_offsets);
+            output_schemas_offset
         });
         let url_offset = builder.create_string(&self.url);
 
@@ -1025,8 +1162,8 @@ impl Source {
         if let Some(offset) = options_offset {
             bldr.add_options(offset);
         }
-        if let Some(offset) = schemas_offset {
-            bldr.add_schemas(offset);
+        if let Some(offset) = output_schemas_offset {
+            bldr.add_output_schemas(offset);
         }
         bldr.add_url(url_offset);
         bldr.finish()
@@ -1060,13 +1197,13 @@ impl From<FbsSource<'_>> for Source {
             None
         };
 
-        let schemas = if let Some(val) = fbs.schemas() {
-            let mut schemas = Vec::new();
+        let output_schemas = if let Some(val) = fbs.output_schemas() {
+            let mut output_schemas = Vec::new();
             for elem in val {
-                schemas.push(elem.into());
+                output_schemas.push(elem.into());
             }
 
-            Some(schemas)
+            Some(output_schemas)
         } else {
             None
         };
@@ -1078,7 +1215,7 @@ impl From<FbsSource<'_>> for Source {
             name,
             named_parameters,
             options,
-            schemas,
+            output_schemas,
             url,
         }
     }
@@ -1135,6 +1272,14 @@ mod tests {
         let t0 = NamedParameter::default();
         let buf = t0.to_fbs_bytes();
         let t1 = NamedParameter::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_output_schema() {
+        let t0 = OutputSchema::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = OutputSchema::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 

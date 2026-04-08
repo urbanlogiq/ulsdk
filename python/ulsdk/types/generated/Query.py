@@ -4,19 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Explain import Explain
-from .QueryElement import QueryElement
-from .TableSourceInstance import TableSourceInstance
-from .ValueInstance import ValueInstance
-from typing import Optional
 np = import_numpy()
 
 class Query(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Query()
         x.Init(buf, n + offset)
@@ -27,40 +21,42 @@ class Query(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Query
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Query
-    def Query(self) -> Optional[QueryElement]:
+    def Query(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .QueryElement import QueryElement
             obj = QueryElement()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Query
-    def Values(self, j: int) -> Optional[ValueInstance]:
+    def Values(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .ValueInstance import ValueInstance
             obj = ValueInstance()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Query
-    def ValuesLength(self) -> int:
+    def ValuesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Query
-    def ValuesIsNone(self) -> bool:
+    def ValuesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
@@ -72,89 +68,91 @@ class Query(object):
         return 0
 
     # Query
-    def BoundSources(self, j: int) -> Optional[TableSourceInstance]:
+    def BoundSources(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .TableSourceInstance import TableSourceInstance
             obj = TableSourceInstance()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Query
-    def BoundSourcesLength(self) -> int:
+    def BoundSourcesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Query
-    def BoundSourcesIsNone(self) -> bool:
+    def BoundSourcesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         return o == 0
 
     # Query
-    def Explain(self) -> Optional[Explain]:
+    def Explain(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Explain import Explain
             obj = Explain()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def QueryStart(builder: flatbuffers.Builder):
+def QueryStart(builder):
     builder.StartObject(5)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     QueryStart(builder)
 
-def QueryAddQuery(builder: flatbuffers.Builder, query: int):
+def QueryAddQuery(builder, query):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(query), 0)
 
-def AddQuery(builder: flatbuffers.Builder, query: int):
+def AddQuery(builder, query):
     QueryAddQuery(builder, query)
 
-def QueryAddValues(builder: flatbuffers.Builder, values: int):
+def QueryAddValues(builder, values):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(values), 0)
 
-def AddValues(builder: flatbuffers.Builder, values: int):
+def AddValues(builder, values):
     QueryAddValues(builder, values)
 
-def QueryStartValuesVector(builder, numElems: int) -> int:
+def QueryStartValuesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartValuesVector(builder, numElems: int) -> int:
+def StartValuesVector(builder, numElems):
     return QueryStartValuesVector(builder, numElems)
 
-def QueryAddLimit(builder: flatbuffers.Builder, limit: int):
+def QueryAddLimit(builder, limit):
     builder.PrependUint32Slot(2, limit, 0)
 
-def AddLimit(builder: flatbuffers.Builder, limit: int):
+def AddLimit(builder, limit):
     QueryAddLimit(builder, limit)
 
-def QueryAddBoundSources(builder: flatbuffers.Builder, boundSources: int):
+def QueryAddBoundSources(builder, boundSources):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(boundSources), 0)
 
-def AddBoundSources(builder: flatbuffers.Builder, boundSources: int):
+def AddBoundSources(builder, boundSources):
     QueryAddBoundSources(builder, boundSources)
 
-def QueryStartBoundSourcesVector(builder, numElems: int) -> int:
+def QueryStartBoundSourcesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartBoundSourcesVector(builder, numElems: int) -> int:
+def StartBoundSourcesVector(builder, numElems):
     return QueryStartBoundSourcesVector(builder, numElems)
 
-def QueryAddExplain(builder: flatbuffers.Builder, explain: int):
+def QueryAddExplain(builder, explain):
     builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(explain), 0)
 
-def AddExplain(builder: flatbuffers.Builder, explain: int):
+def AddExplain(builder, explain):
     QueryAddExplain(builder, explain)
 
-def QueryEnd(builder: flatbuffers.Builder) -> int:
+def QueryEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return QueryEnd(builder)

@@ -4,18 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .OnConflict import OnConflict
-from .QueryElement import QueryElement
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class InsertQueryElement(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = InsertQueryElement()
         x.Init(buf, n + offset)
@@ -26,21 +21,22 @@ class InsertQueryElement(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # InsertQueryElement
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # InsertQueryElement
-    def Source(self) -> Optional[QueryElement]:
+    def Source(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .QueryElement import QueryElement
             obj = QueryElement()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # InsertQueryElement
-    def Columns(self, j: int):
+    def Columns(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             a = self._tab.Vector(o)
@@ -48,14 +44,14 @@ class InsertQueryElement(object):
         return ""
 
     # InsertQueryElement
-    def ColumnsLength(self) -> int:
+    def ColumnsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # InsertQueryElement
-    def ColumnsIsNone(self) -> bool:
+    def ColumnsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
@@ -67,26 +63,28 @@ class InsertQueryElement(object):
         return 0
 
     # InsertQueryElement
-    def Dest(self) -> Optional[flatbuffers.table.Table]:
+    def Dest(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
     # InsertQueryElement
-    def OnConflict(self) -> Optional[OnConflict]:
+    def OnConflict(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .OnConflict import OnConflict
             obj = OnConflict()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # InsertQueryElement
-    def Returning(self, j: int):
+    def Returning(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             a = self._tab.Vector(o)
@@ -94,73 +92,73 @@ class InsertQueryElement(object):
         return ""
 
     # InsertQueryElement
-    def ReturningLength(self) -> int:
+    def ReturningLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # InsertQueryElement
-    def ReturningIsNone(self) -> bool:
+    def ReturningIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         return o == 0
 
-def InsertQueryElementStart(builder: flatbuffers.Builder):
+def InsertQueryElementStart(builder):
     builder.StartObject(6)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     InsertQueryElementStart(builder)
 
-def InsertQueryElementAddSource(builder: flatbuffers.Builder, source: int):
+def InsertQueryElementAddSource(builder, source):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(source), 0)
 
-def AddSource(builder: flatbuffers.Builder, source: int):
+def AddSource(builder, source):
     InsertQueryElementAddSource(builder, source)
 
-def InsertQueryElementAddColumns(builder: flatbuffers.Builder, columns: int):
+def InsertQueryElementAddColumns(builder, columns):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(columns), 0)
 
-def AddColumns(builder: flatbuffers.Builder, columns: int):
+def AddColumns(builder, columns):
     InsertQueryElementAddColumns(builder, columns)
 
-def InsertQueryElementStartColumnsVector(builder, numElems: int) -> int:
+def InsertQueryElementStartColumnsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartColumnsVector(builder, numElems: int) -> int:
+def StartColumnsVector(builder, numElems):
     return InsertQueryElementStartColumnsVector(builder, numElems)
 
-def InsertQueryElementAddDestType(builder: flatbuffers.Builder, destType: int):
+def InsertQueryElementAddDestType(builder, destType):
     builder.PrependUint8Slot(2, destType, 0)
 
-def AddDestType(builder: flatbuffers.Builder, destType: int):
+def AddDestType(builder, destType):
     InsertQueryElementAddDestType(builder, destType)
 
-def InsertQueryElementAddDest(builder: flatbuffers.Builder, dest: int):
+def InsertQueryElementAddDest(builder, dest):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(dest), 0)
 
-def AddDest(builder: flatbuffers.Builder, dest: int):
+def AddDest(builder, dest):
     InsertQueryElementAddDest(builder, dest)
 
-def InsertQueryElementAddOnConflict(builder: flatbuffers.Builder, onConflict: int):
+def InsertQueryElementAddOnConflict(builder, onConflict):
     builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(onConflict), 0)
 
-def AddOnConflict(builder: flatbuffers.Builder, onConflict: int):
+def AddOnConflict(builder, onConflict):
     InsertQueryElementAddOnConflict(builder, onConflict)
 
-def InsertQueryElementAddReturning(builder: flatbuffers.Builder, returning: int):
+def InsertQueryElementAddReturning(builder, returning):
     builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(returning), 0)
 
-def AddReturning(builder: flatbuffers.Builder, returning: int):
+def AddReturning(builder, returning):
     InsertQueryElementAddReturning(builder, returning)
 
-def InsertQueryElementStartReturningVector(builder, numElems: int) -> int:
+def InsertQueryElementStartReturningVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartReturningVector(builder, numElems: int) -> int:
+def StartReturningVector(builder, numElems):
     return InsertQueryElementStartReturningVector(builder, numElems)
 
-def InsertQueryElementEnd(builder: flatbuffers.Builder) -> int:
+def InsertQueryElementEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return InsertQueryElementEnd(builder)

@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class Geom(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Geom()
         x.Init(buf, n + offset)
@@ -24,7 +21,7 @@ class Geom(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Geom
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Geom
@@ -35,34 +32,35 @@ class Geom(object):
         return 0
 
     # Geom
-    def Geom(self) -> Optional[flatbuffers.table.Table]:
+    def Geom(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
-def GeomStart(builder: flatbuffers.Builder):
+def GeomStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     GeomStart(builder)
 
-def GeomAddGeomType(builder: flatbuffers.Builder, geomType: int):
+def GeomAddGeomType(builder, geomType):
     builder.PrependUint8Slot(0, geomType, 0)
 
-def AddGeomType(builder: flatbuffers.Builder, geomType: int):
+def AddGeomType(builder, geomType):
     GeomAddGeomType(builder, geomType)
 
-def GeomAddGeom(builder: flatbuffers.Builder, geom: int):
+def GeomAddGeom(builder, geom):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(geom), 0)
 
-def AddGeom(builder: flatbuffers.Builder, geom: int):
+def AddGeom(builder, geom):
     GeomAddGeom(builder, geom)
 
-def GeomEnd(builder: flatbuffers.Builder) -> int:
+def GeomEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return GeomEnd(builder)

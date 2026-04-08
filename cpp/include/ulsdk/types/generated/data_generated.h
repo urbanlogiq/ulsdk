@@ -10,9 +10,9 @@
 
 // Ensure the included flatbuffers.h is the same version as when this file was
 // generated, otherwise it may not be compatible.
-static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
-              FLATBUFFERS_VERSION_MINOR == 5 &&
-              FLATBUFFERS_VERSION_REVISION == 26,
+static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
+              FLATBUFFERS_VERSION_MINOR == 2 &&
+              FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
 #include "Schema_generated.h"
@@ -20,6 +20,9 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
 
 struct NamedParameter;
 struct NamedParameterBuilder;
+
+struct OutputSchema;
+struct OutputSchemaBuilder;
 
 struct Source;
 struct SourceBuilder;
@@ -201,11 +204,21 @@ enum class RoadUserTy : int32_t {
   CROSSWALKS = 32,
   TRAMS = 33,
   TAXIS = 34,
+  OTHER_TWO_AXLE_FOUR_TIRE_VEHICLES = 35,
+  TWO_AXLE_SIX_TIRE_SINGLE_UNIT_TRUCKS = 36,
+  THREE_AXLE_SINGLE_UNIT_TRUCKS = 37,
+  FOUR_PLUS_AXLE_SINGLE_UNIT_TRUCKS = 38,
+  FOUR_AXLE_OR_FEWER_SINGLE_TRAILER_TRUCKS = 39,
+  FIVE_AXLE_TRACTOR_SEMITRAILERS = 40,
+  SIX_PLUS_AXLE_SINGLE_TRAILER_TRUCKS = 41,
+  MULTI_TRAILER_TRUCKS_SIX_AXLES = 42,
+  MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES = 43,
+  MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES = 44,
   MIN = BIKES,
-  MAX = TAXIS
+  MAX = MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES
 };
 
-inline const RoadUserTy (&EnumValuesRoadUserTy())[35] {
+inline const RoadUserTy (&EnumValuesRoadUserTy())[45] {
   static const RoadUserTy values[] = {
     RoadUserTy::BIKES,
     RoadUserTy::BUSES,
@@ -241,13 +254,23 @@ inline const RoadUserTy (&EnumValuesRoadUserTy())[35] {
     RoadUserTy::PHYSICALLY_CHALLENGED_PEDS,
     RoadUserTy::CROSSWALKS,
     RoadUserTy::TRAMS,
-    RoadUserTy::TAXIS
+    RoadUserTy::TAXIS,
+    RoadUserTy::OTHER_TWO_AXLE_FOUR_TIRE_VEHICLES,
+    RoadUserTy::TWO_AXLE_SIX_TIRE_SINGLE_UNIT_TRUCKS,
+    RoadUserTy::THREE_AXLE_SINGLE_UNIT_TRUCKS,
+    RoadUserTy::FOUR_PLUS_AXLE_SINGLE_UNIT_TRUCKS,
+    RoadUserTy::FOUR_AXLE_OR_FEWER_SINGLE_TRAILER_TRUCKS,
+    RoadUserTy::FIVE_AXLE_TRACTOR_SEMITRAILERS,
+    RoadUserTy::SIX_PLUS_AXLE_SINGLE_TRAILER_TRUCKS,
+    RoadUserTy::MULTI_TRAILER_TRUCKS_SIX_AXLES,
+    RoadUserTy::MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES,
+    RoadUserTy::MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES
   };
   return values;
 }
 
 inline const char * const *EnumNamesRoadUserTy() {
-  static const char * const names[36] = {
+  static const char * const names[46] = {
     "BIKES",
     "BUSES",
     "CARS",
@@ -283,13 +306,23 @@ inline const char * const *EnumNamesRoadUserTy() {
     "CROSSWALKS",
     "TRAMS",
     "TAXIS",
+    "OTHER_TWO_AXLE_FOUR_TIRE_VEHICLES",
+    "TWO_AXLE_SIX_TIRE_SINGLE_UNIT_TRUCKS",
+    "THREE_AXLE_SINGLE_UNIT_TRUCKS",
+    "FOUR_PLUS_AXLE_SINGLE_UNIT_TRUCKS",
+    "FOUR_AXLE_OR_FEWER_SINGLE_TRAILER_TRUCKS",
+    "FIVE_AXLE_TRACTOR_SEMITRAILERS",
+    "SIX_PLUS_AXLE_SINGLE_TRAILER_TRUCKS",
+    "MULTI_TRAILER_TRUCKS_SIX_AXLES",
+    "MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES",
+    "MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameRoadUserTy(RoadUserTy e) {
-  if (::flatbuffers::IsOutRange(e, RoadUserTy::BIKES, RoadUserTy::TAXIS)) return "";
+  if (::flatbuffers::IsOutRange(e, RoadUserTy::BIKES, RoadUserTy::MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesRoadUserTy()[index];
 }
@@ -616,6 +649,81 @@ inline ::flatbuffers::Offset<NamedParameter> CreateNamedParameterDirect(
       description__);
 }
 
+struct OutputSchema FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef OutputSchemaBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_ATTRIBUTES = 4,
+    VT_SCHEMA = 6
+  };
+  const ::flatbuffers::Vector<::flatbuffers::Offset<AttributePair>> *attributes() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<AttributePair>> *>(VT_ATTRIBUTES);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<Schema>> *schema() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Schema>> *>(VT_SCHEMA);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_ATTRIBUTES) &&
+           verifier.VerifyVector(attributes()) &&
+           verifier.VerifyVectorOfTables(attributes()) &&
+           VerifyOffsetRequired(verifier, VT_SCHEMA) &&
+           verifier.VerifyVector(schema()) &&
+           verifier.VerifyVectorOfTables(schema()) &&
+           verifier.EndTable();
+  }
+};
+
+struct OutputSchemaBuilder {
+  typedef OutputSchema Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_attributes(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<AttributePair>>> attributes) {
+    fbb_.AddOffset(OutputSchema::VT_ATTRIBUTES, attributes);
+  }
+  void add_schema(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Schema>>> schema) {
+    fbb_.AddOffset(OutputSchema::VT_SCHEMA, schema);
+  }
+  explicit OutputSchemaBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<OutputSchema> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<OutputSchema>(end);
+    fbb_.Required(o, OutputSchema::VT_ATTRIBUTES);
+    fbb_.Required(o, OutputSchema::VT_SCHEMA);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<OutputSchema> CreateOutputSchema(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<AttributePair>>> attributes = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Schema>>> schema = 0) {
+  OutputSchemaBuilder builder_(_fbb);
+  builder_.add_schema(schema);
+  builder_.add_attributes(attributes);
+  return builder_.Finish();
+}
+
+struct OutputSchema::Traits {
+  using type = OutputSchema;
+  static auto constexpr Create = CreateOutputSchema;
+};
+
+inline ::flatbuffers::Offset<OutputSchema> CreateOutputSchemaDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<::flatbuffers::Offset<AttributePair>> *attributes = nullptr,
+    const std::vector<::flatbuffers::Offset<Schema>> *schema = nullptr) {
+  auto attributes__ = attributes ? _fbb.CreateVector<::flatbuffers::Offset<AttributePair>>(*attributes) : 0;
+  auto schema__ = schema ? _fbb.CreateVector<::flatbuffers::Offset<Schema>>(*schema) : 0;
+  return CreateOutputSchema(
+      _fbb,
+      attributes__,
+      schema__);
+}
+
 struct Source FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SourceBuilder Builder;
   struct Traits;
@@ -623,10 +731,10 @@ struct Source FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_URL = 4,
     VT_NAME = 6,
     VT_OPTIONS = 8,
-    VT_SCHEMAS = 10,
     VT_METADATA = 14,
     VT_METADATA_REVISION = 16,
-    VT_NAMED_PARAMETERS = 18
+    VT_NAMED_PARAMETERS = 18,
+    VT_OUTPUT_SCHEMAS = 20
   };
   const ::flatbuffers::String *url() const {
     return GetPointer<const ::flatbuffers::String *>(VT_URL);
@@ -642,9 +750,6 @@ struct Source FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return _f ? flexbuffers::GetRoot(_f->Data(), _f->size())
               : flexbuffers::Reference();
   }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<Schema>> *schemas() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Schema>> *>(VT_SCHEMAS);
-  }
   const ObjectId *metadata() const {
     return GetPointer<const ObjectId *>(VT_METADATA);
   }
@@ -653,6 +758,9 @@ struct Source FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   const ::flatbuffers::Vector<::flatbuffers::Offset<NamedParameter>> *named_parameters() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<NamedParameter>> *>(VT_NAMED_PARAMETERS);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<OutputSchema>> *output_schemas() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<OutputSchema>> *>(VT_OUTPUT_SCHEMAS);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -663,9 +771,6 @@ struct Source FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_OPTIONS) &&
            verifier.VerifyVector(options()) &&
            flexbuffers::VerifyNestedFlexBuffer(options(), verifier) &&
-           VerifyOffset(verifier, VT_SCHEMAS) &&
-           verifier.VerifyVector(schemas()) &&
-           verifier.VerifyVectorOfTables(schemas()) &&
            VerifyOffset(verifier, VT_METADATA) &&
            verifier.VerifyTable(metadata()) &&
            VerifyOffset(verifier, VT_METADATA_REVISION) &&
@@ -673,6 +778,9 @@ struct Source FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_NAMED_PARAMETERS) &&
            verifier.VerifyVector(named_parameters()) &&
            verifier.VerifyVectorOfTables(named_parameters()) &&
+           VerifyOffset(verifier, VT_OUTPUT_SCHEMAS) &&
+           verifier.VerifyVector(output_schemas()) &&
+           verifier.VerifyVectorOfTables(output_schemas()) &&
            verifier.EndTable();
   }
 };
@@ -690,9 +798,6 @@ struct SourceBuilder {
   void add_options(::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> options) {
     fbb_.AddOffset(Source::VT_OPTIONS, options);
   }
-  void add_schemas(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Schema>>> schemas) {
-    fbb_.AddOffset(Source::VT_SCHEMAS, schemas);
-  }
   void add_metadata(::flatbuffers::Offset<ObjectId> metadata) {
     fbb_.AddOffset(Source::VT_METADATA, metadata);
   }
@@ -701,6 +806,9 @@ struct SourceBuilder {
   }
   void add_named_parameters(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<NamedParameter>>> named_parameters) {
     fbb_.AddOffset(Source::VT_NAMED_PARAMETERS, named_parameters);
+  }
+  void add_output_schemas(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<OutputSchema>>> output_schemas) {
+    fbb_.AddOffset(Source::VT_OUTPUT_SCHEMAS, output_schemas);
   }
   explicit SourceBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -720,15 +828,15 @@ inline ::flatbuffers::Offset<Source> CreateSource(
     ::flatbuffers::Offset<::flatbuffers::String> url = 0,
     ::flatbuffers::Offset<::flatbuffers::String> name = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> options = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Schema>>> schemas = 0,
     ::flatbuffers::Offset<ObjectId> metadata = 0,
     ::flatbuffers::Offset<ContentId> metadata_revision = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<NamedParameter>>> named_parameters = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<NamedParameter>>> named_parameters = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<OutputSchema>>> output_schemas = 0) {
   SourceBuilder builder_(_fbb);
+  builder_.add_output_schemas(output_schemas);
   builder_.add_named_parameters(named_parameters);
   builder_.add_metadata_revision(metadata_revision);
   builder_.add_metadata(metadata);
-  builder_.add_schemas(schemas);
   builder_.add_options(options);
   builder_.add_name(name);
   builder_.add_url(url);
@@ -745,24 +853,24 @@ inline ::flatbuffers::Offset<Source> CreateSourceDirect(
     const char *url = nullptr,
     const char *name = nullptr,
     const std::vector<uint8_t> *options = nullptr,
-    const std::vector<::flatbuffers::Offset<Schema>> *schemas = nullptr,
     ::flatbuffers::Offset<ObjectId> metadata = 0,
     ::flatbuffers::Offset<ContentId> metadata_revision = 0,
-    const std::vector<::flatbuffers::Offset<NamedParameter>> *named_parameters = nullptr) {
+    const std::vector<::flatbuffers::Offset<NamedParameter>> *named_parameters = nullptr,
+    const std::vector<::flatbuffers::Offset<OutputSchema>> *output_schemas = nullptr) {
   auto url__ = url ? _fbb.CreateString(url) : 0;
   auto name__ = name ? _fbb.CreateString(name) : 0;
   auto options__ = options ? _fbb.CreateVector<uint8_t>(*options) : 0;
-  auto schemas__ = schemas ? _fbb.CreateVector<::flatbuffers::Offset<Schema>>(*schemas) : 0;
   auto named_parameters__ = named_parameters ? _fbb.CreateVector<::flatbuffers::Offset<NamedParameter>>(*named_parameters) : 0;
+  auto output_schemas__ = output_schemas ? _fbb.CreateVector<::flatbuffers::Offset<OutputSchema>>(*output_schemas) : 0;
   return CreateSource(
       _fbb,
       url__,
       name__,
       options__,
-      schemas__,
       metadata,
       metadata_revision,
-      named_parameters__);
+      named_parameters__,
+      output_schemas__);
 }
 
 struct AttributePair FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

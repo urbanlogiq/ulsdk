@@ -112,7 +112,7 @@ get_object(
     return ::ul::types::DataCatalogObject(std::get<std::vector<uint8_t>>(res));
 }
 
-Result<Void>
+Result<::ul::types::ContentId>
 update_object(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
@@ -129,9 +129,9 @@ update_object(
     const Result<std::vector<uint8_t>> res = ctx.post(path, body, "application/octet-stream", params, headers);
     if (std::holds_alternative<Error>(res)) {
         const auto error = std::get<Error>(res);
-        return Result<Void>(error);
+        return Result<::ul::types::ContentId>(error);
     }
-    return Result<Void>();
+    return ::ul::types::ContentId(std::get<std::vector<uint8_t>>(res));
 }
 
 Result<Void>
@@ -184,7 +184,7 @@ delete_attribute(
     const ::ul::types::ObjectId &id,
     const std::string &key
 ) {
-    std::string path = "/v1/api/ulv2/datacatalog/object/:id/attributes/:key";
+    std::string path = "/v1/api/ulv2/datacatalog/object/:id/attribute/:key";
     const size_t id_idx = path.find(":id");
     path.replace(id_idx, 3, id.to_string());
     const size_t key_idx = path.find(":key");
@@ -218,6 +218,25 @@ get_object_summaries(
         return Result<::ul::types::ObjectSummaryList>(error);
     }
     return ::ul::types::ObjectSummaryList(std::get<std::vector<uint8_t>>(res));
+}
+
+Result<::ul::types::ObjectIdPairList>
+bulk_fetch_metadata(
+    ul::RequestContext &ctx,
+    const ::ul::types::ObjectIdList &stream_ids
+) {
+    std::string path = "/v1/api/ulv2/datacatalog/stream/metadata_list";
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+    const std::vector<uint8_t> body = ::ul::types::to_bytes(stream_ids);
+    const Result<std::vector<uint8_t>> res = ctx.post(path, body, "application/octet-stream", params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<::ul::types::ObjectIdPairList>(error);
+    }
+    return ::ul::types::ObjectIdPairList(std::get<std::vector<uint8_t>>(res));
 }
 
 Result<::ul::types::ObjectIdPairList>

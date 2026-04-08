@@ -23,7 +23,7 @@ import java.nio.ByteOrder;
 
 @SuppressWarnings("unused")
 public final class Notification extends com.google.flatbuffers.Table {
-  public static void ValidateVersion() { Constants.FLATBUFFERS_23_5_26(); }
+  public static void ValidateVersion() { Constants.FLATBUFFERS_25_2_10(); }
   public static Notification getRootAsNotification(ByteBuffer _bb) { return getRootAsNotification(_bb, new Notification()); }
   public static Notification getRootAsNotification(ByteBuffer _bb, Notification obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
   public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }
@@ -51,6 +51,7 @@ public final class Notification extends com.google.flatbuffers.Table {
   public static void addNotification(FlatBufferBuilder builder, int notificationOffset) { builder.addOffset(2, notificationOffset, 0); }
   public static int endNotification(FlatBufferBuilder builder) {
     int o = builder.endTable();
+    builder.required(o, 8);  // notification
     return o;
   }
 

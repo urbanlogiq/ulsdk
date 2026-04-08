@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class Dates(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Dates()
         x.Init(buf, n + offset)
@@ -22,7 +21,7 @@ class Dates(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Dates
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Dates
@@ -40,7 +39,7 @@ class Dates(object):
         return 0
 
     # Dates
-    def UniqueValues(self, j: int):
+    def UniqueValues(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             a = self._tab.Vector(o)
@@ -55,19 +54,19 @@ class Dates(object):
         return 0
 
     # Dates
-    def UniqueValuesLength(self) -> int:
+    def UniqueValuesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Dates
-    def UniqueValuesIsNone(self) -> bool:
+    def UniqueValuesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
     # Dates
-    def UniqueValueCounts(self, j: int):
+    def UniqueValueCounts(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             a = self._tab.Vector(o)
@@ -82,61 +81,61 @@ class Dates(object):
         return 0
 
     # Dates
-    def UniqueValueCountsLength(self) -> int:
+    def UniqueValueCountsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Dates
-    def UniqueValueCountsIsNone(self) -> bool:
+    def UniqueValueCountsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         return o == 0
 
-def DatesStart(builder: flatbuffers.Builder):
+def DatesStart(builder):
     builder.StartObject(4)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DatesStart(builder)
 
-def DatesAddMin(builder: flatbuffers.Builder, min: int):
+def DatesAddMin(builder, min):
     builder.PrependInt64Slot(0, min, 0)
 
-def AddMin(builder: flatbuffers.Builder, min: int):
+def AddMin(builder, min):
     DatesAddMin(builder, min)
 
-def DatesAddMax(builder: flatbuffers.Builder, max: int):
+def DatesAddMax(builder, max):
     builder.PrependInt64Slot(1, max, 0)
 
-def AddMax(builder: flatbuffers.Builder, max: int):
+def AddMax(builder, max):
     DatesAddMax(builder, max)
 
-def DatesAddUniqueValues(builder: flatbuffers.Builder, uniqueValues: int):
+def DatesAddUniqueValues(builder, uniqueValues):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(uniqueValues), 0)
 
-def AddUniqueValues(builder: flatbuffers.Builder, uniqueValues: int):
+def AddUniqueValues(builder, uniqueValues):
     DatesAddUniqueValues(builder, uniqueValues)
 
-def DatesStartUniqueValuesVector(builder, numElems: int) -> int:
+def DatesStartUniqueValuesVector(builder, numElems):
     return builder.StartVector(8, numElems, 8)
 
-def StartUniqueValuesVector(builder, numElems: int) -> int:
+def StartUniqueValuesVector(builder, numElems):
     return DatesStartUniqueValuesVector(builder, numElems)
 
-def DatesAddUniqueValueCounts(builder: flatbuffers.Builder, uniqueValueCounts: int):
+def DatesAddUniqueValueCounts(builder, uniqueValueCounts):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(uniqueValueCounts), 0)
 
-def AddUniqueValueCounts(builder: flatbuffers.Builder, uniqueValueCounts: int):
+def AddUniqueValueCounts(builder, uniqueValueCounts):
     DatesAddUniqueValueCounts(builder, uniqueValueCounts)
 
-def DatesStartUniqueValueCountsVector(builder, numElems: int) -> int:
+def DatesStartUniqueValueCountsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartUniqueValueCountsVector(builder, numElems: int) -> int:
+def StartUniqueValueCountsVector(builder, numElems):
     return DatesStartUniqueValueCountsVector(builder, numElems)
 
-def DatesEnd(builder: flatbuffers.Builder) -> int:
+def DatesEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DatesEnd(builder)

@@ -23,7 +23,7 @@ import java.nio.ByteOrder;
 
 @SuppressWarnings("unused")
 public final class QueryElement extends com.google.flatbuffers.Table {
-  public static void ValidateVersion() { Constants.FLATBUFFERS_23_5_26(); }
+  public static void ValidateVersion() { Constants.FLATBUFFERS_25_2_10(); }
   public static QueryElement getRootAsQueryElement(ByteBuffer _bb) { return getRootAsQueryElement(_bb, new QueryElement()); }
   public static QueryElement getRootAsQueryElement(ByteBuffer _bb, QueryElement obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
   public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }
@@ -46,6 +46,7 @@ public final class QueryElement extends com.google.flatbuffers.Table {
   public static void addQ(FlatBufferBuilder builder, int qOffset) { builder.addOffset(1, qOffset, 0); }
   public static int endQueryElement(FlatBufferBuilder builder) {
     int o = builder.endTable();
+    builder.required(o, 6);  // q
     return o;
   }
 

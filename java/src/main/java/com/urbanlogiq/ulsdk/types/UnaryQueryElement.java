@@ -37,6 +37,14 @@ public final class UnaryQueryElement {
         this._groupBy = value;
     }
 
+    com.urbanlogiq.ulsdk.types.Function _having;
+    public com.urbanlogiq.ulsdk.types.Function getHaving() {
+        return this._having;
+    }
+    public void setHaving(com.urbanlogiq.ulsdk.types.Function value) {
+        this._having = value;
+    }
+
     com.urbanlogiq.ulsdk.types.Join[] _joins;
     public com.urbanlogiq.ulsdk.types.Join[] getJoins() {
         return this._joins;
@@ -97,6 +105,9 @@ public final class UnaryQueryElement {
                 groupBy[i] = groupByValue;
             }
             this._groupBy = groupBy;
+        }
+        if (o.having() != null) {
+            this._having = new com.urbanlogiq.ulsdk.types.Function(o.having());
         }
         if (o.joinsVector() != null) {
             com.urbanlogiq.ulsdk.types.Join[] joins = new com.urbanlogiq.ulsdk.types.Join[o.joinsLength()];
@@ -169,6 +180,10 @@ public final class UnaryQueryElement {
             }
             groupByOffset = builder.endVector();
         }
+        Integer havingOffset = null;
+        if (this._having != null) {
+            havingOffset = this._having.serializeTo(builder);
+        }
         Integer joinsOffset = null;
         if (this._joins != null) {
             int[] joinsOffsets = new int[this._joins.length];;
@@ -215,6 +230,9 @@ public final class UnaryQueryElement {
         if (groupByOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.UnaryQueryElement.addGroupBy(builder, groupByOffset);
         }
+        if (havingOffset != null) {
+            com.urbanlogiq.ulsdk.types.generated.UnaryQueryElement.addHaving(builder, havingOffset);
+        }
         if (joinsOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.UnaryQueryElement.addJoins(builder, joinsOffset);
         }
@@ -238,6 +256,7 @@ public final class UnaryQueryElement {
         this._fields = new com.urbanlogiq.ulsdk.types.Expr[0];
         this._filter = new com.urbanlogiq.ulsdk.types.Function();
         this._groupBy = new com.urbanlogiq.ulsdk.types.Expr[0];
+        this._having = new com.urbanlogiq.ulsdk.types.Function();
         this._joins = new com.urbanlogiq.ulsdk.types.Join[0];
         this._orderBy = new com.urbanlogiq.ulsdk.types.TableOrderBy[0];
         this._sources = new com.urbanlogiq.ulsdk.types.TableSource[0];

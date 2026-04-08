@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .B2cId import B2cId
-from typing import Optional
 np = import_numpy()
 
 class Role(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Role()
         x.Init(buf, n + offset)
@@ -24,7 +21,7 @@ class Role(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Role
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Role
@@ -35,35 +32,36 @@ class Role(object):
         return 0
 
     # Role
-    def Principal(self) -> Optional[B2cId]:
+    def Principal(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .B2cId import B2cId
             obj = B2cId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def RoleStart(builder: flatbuffers.Builder):
+def RoleStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     RoleStart(builder)
 
-def RoleAddPermission(builder: flatbuffers.Builder, permission: int):
+def RoleAddPermission(builder, permission):
     builder.PrependUint32Slot(0, permission, 0)
 
-def AddPermission(builder: flatbuffers.Builder, permission: int):
+def AddPermission(builder, permission):
     RoleAddPermission(builder, permission)
 
-def RoleAddPrincipal(builder: flatbuffers.Builder, principal: int):
+def RoleAddPrincipal(builder, principal):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(principal), 0)
 
-def AddPrincipal(builder: flatbuffers.Builder, principal: int):
+def AddPrincipal(builder, principal):
     RoleAddPrincipal(builder, principal)
 
-def RoleEnd(builder: flatbuffers.Builder) -> int:
+def RoleEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return RoleEnd(builder)

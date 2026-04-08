@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .FloatBucket import FloatBucket
-from typing import Optional
 np = import_numpy()
 
 class FloatAggregate(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = FloatAggregate()
         x.Init(buf, n + offset)
@@ -24,7 +21,7 @@ class FloatAggregate(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # FloatAggregate
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # FloatAggregate
@@ -70,84 +67,85 @@ class FloatAggregate(object):
         return 0.0
 
     # FloatAggregate
-    def Histo(self, j: int) -> Optional[FloatBucket]:
+    def Histo(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 16
+            from .FloatBucket import FloatBucket
             obj = FloatBucket()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # FloatAggregate
-    def HistoLength(self) -> int:
+    def HistoLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # FloatAggregate
-    def HistoIsNone(self) -> bool:
+    def HistoIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         return o == 0
 
-def FloatAggregateStart(builder: flatbuffers.Builder):
+def FloatAggregateStart(builder):
     builder.StartObject(7)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     FloatAggregateStart(builder)
 
-def FloatAggregateAddMin(builder: flatbuffers.Builder, min: float):
+def FloatAggregateAddMin(builder, min):
     builder.PrependFloat64Slot(0, min, 0.0)
 
-def AddMin(builder: flatbuffers.Builder, min: float):
+def AddMin(builder, min):
     FloatAggregateAddMin(builder, min)
 
-def FloatAggregateAddMax(builder: flatbuffers.Builder, max: float):
+def FloatAggregateAddMax(builder, max):
     builder.PrependFloat64Slot(1, max, 0.0)
 
-def AddMax(builder: flatbuffers.Builder, max: float):
+def AddMax(builder, max):
     FloatAggregateAddMax(builder, max)
 
-def FloatAggregateAddMean(builder: flatbuffers.Builder, mean: float):
+def FloatAggregateAddMean(builder, mean):
     builder.PrependFloat64Slot(2, mean, 0.0)
 
-def AddMean(builder: flatbuffers.Builder, mean: float):
+def AddMean(builder, mean):
     FloatAggregateAddMean(builder, mean)
 
-def FloatAggregateAddCount(builder: flatbuffers.Builder, count: int):
+def FloatAggregateAddCount(builder, count):
     builder.PrependUint64Slot(3, count, 0)
 
-def AddCount(builder: flatbuffers.Builder, count: int):
+def AddCount(builder, count):
     FloatAggregateAddCount(builder, count)
 
-def FloatAggregateAddSum(builder: flatbuffers.Builder, sum: float):
+def FloatAggregateAddSum(builder, sum):
     builder.PrependFloat64Slot(4, sum, 0.0)
 
-def AddSum(builder: flatbuffers.Builder, sum: float):
+def AddSum(builder, sum):
     FloatAggregateAddSum(builder, sum)
 
-def FloatAggregateAddVariance(builder: flatbuffers.Builder, variance: float):
+def FloatAggregateAddVariance(builder, variance):
     builder.PrependFloat64Slot(5, variance, 0.0)
 
-def AddVariance(builder: flatbuffers.Builder, variance: float):
+def AddVariance(builder, variance):
     FloatAggregateAddVariance(builder, variance)
 
-def FloatAggregateAddHisto(builder: flatbuffers.Builder, histo: int):
+def FloatAggregateAddHisto(builder, histo):
     builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(histo), 0)
 
-def AddHisto(builder: flatbuffers.Builder, histo: int):
+def AddHisto(builder, histo):
     FloatAggregateAddHisto(builder, histo)
 
-def FloatAggregateStartHistoVector(builder, numElems: int) -> int:
+def FloatAggregateStartHistoVector(builder, numElems):
     return builder.StartVector(16, numElems, 8)
 
-def StartHistoVector(builder, numElems: int) -> int:
+def StartHistoVector(builder, numElems):
     return FloatAggregateStartHistoVector(builder, numElems)
 
-def FloatAggregateEnd(builder: flatbuffers.Builder) -> int:
+def FloatAggregateEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return FloatAggregateEnd(builder)

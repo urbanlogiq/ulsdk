@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class TaskParameter(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = TaskParameter()
         x.Init(buf, n + offset)
@@ -24,11 +21,11 @@ class TaskParameter(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # TaskParameter
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # TaskParameter
-    def Key(self) -> Optional[bytes]:
+    def Key(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -42,40 +39,41 @@ class TaskParameter(object):
         return 0
 
     # TaskParameter
-    def Value(self) -> Optional[flatbuffers.table.Table]:
+    def Value(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
-def TaskParameterStart(builder: flatbuffers.Builder):
+def TaskParameterStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     TaskParameterStart(builder)
 
-def TaskParameterAddKey(builder: flatbuffers.Builder, key: int):
+def TaskParameterAddKey(builder, key):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(key), 0)
 
-def AddKey(builder: flatbuffers.Builder, key: int):
+def AddKey(builder, key):
     TaskParameterAddKey(builder, key)
 
-def TaskParameterAddValueType(builder: flatbuffers.Builder, valueType: int):
+def TaskParameterAddValueType(builder, valueType):
     builder.PrependUint8Slot(1, valueType, 0)
 
-def AddValueType(builder: flatbuffers.Builder, valueType: int):
+def AddValueType(builder, valueType):
     TaskParameterAddValueType(builder, valueType)
 
-def TaskParameterAddValue(builder: flatbuffers.Builder, value: int):
+def TaskParameterAddValue(builder, value):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(value), 0)
 
-def AddValue(builder: flatbuffers.Builder, value: int):
+def AddValue(builder, value):
     TaskParameterAddValue(builder, value)
 
-def TaskParameterEnd(builder: flatbuffers.Builder) -> int:
+def TaskParameterEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return TaskParameterEnd(builder)

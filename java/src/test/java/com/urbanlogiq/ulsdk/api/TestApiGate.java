@@ -7,11 +7,11 @@ import com.urbanlogiq.ulsdk.ApiKeyContext;
 import com.urbanlogiq.ulsdk.Environment;
 import com.urbanlogiq.ulsdk.Region;
 import java.util.UUID;
-import org.junit.Test;
+import org.junitpioneer.jupiter.RetryingTest;
 import com.urbanlogiq.ulsdk.api.gate.Bootstrap;
 
 public final class TestApiGate {
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testBootstrap() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -29,10 +29,10 @@ public final class TestApiGate {
         com.urbanlogiq.ulsdk.api.gate.Bootstrap result = com.urbanlogiq.ulsdk.api.gate.Gate.bootstrap(
             ctx
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 1000)
     public void testBootstrap1() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");

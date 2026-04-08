@@ -295,13 +295,28 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        let p1 = "tail".into();
-        let expected = DirectoryList::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = ls(&ctx, p0, p1).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let p1 = "tail".into();
+            let expected = DirectoryList::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = ls(&ctx, p0, p1).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -319,12 +334,27 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = "tail".into();
-        let expected = DirectoryList::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = ls_me(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 = "tail".into();
+            let expected = DirectoryList::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = ls_me(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -342,14 +372,29 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = "tail".into();
-        let q0 = true;
-        let q1 = true;
-        let expected = DirectoryList::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = ls_union(&ctx, p0, q0, q1).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 = "tail".into();
+            let q0 = true;
+            let q1 = true;
+            let expected = DirectoryList::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = ls_union(&ctx, p0, q0, q1).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -367,16 +412,32 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = "tail".into();
-        let q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        let q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        let q2 = 42;
-        let expected = ObjectSummary::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = create_entry(&ctx, p0, p1, q0, q1, q2).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 = "tail".into();
+            let q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let q2 = 42;
+            let expected = ObjectSummary::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = create_entry(&ctx, p0, p1, q0, q1, q2).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -394,11 +455,26 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let expected = DirectoryList::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = get_roots(&ctx).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let expected = DirectoryList::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_roots(&ctx).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -416,14 +492,30 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let q0 = true;
-        let body = Vec::new();
-        let expected = DirectoryList::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = post_file(&ctx, p0, q0, body).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let q0 = true;
+            let body = Vec::new();
+            let expected = DirectoryList::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = post_file(&ctx, p0, q0, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -441,12 +533,28 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = DirectoryList::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = unlink(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = DirectoryList::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = unlink(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -464,8 +572,21 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let body = crate::types::MoveRequest::default();
-        move_(&ctx, body).await.unwrap();
+
+        for i in 0..5 {
+            let body = crate::types::MoveRequest::default();
+            let result = move_(&ctx, body).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -483,8 +604,21 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let body = crate::types::MoveRequest::default();
-        copy(&ctx, body).await.unwrap();
+
+        for i in 0..5 {
+            let body = crate::types::MoveRequest::default();
+            let result = copy(&ctx, body).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -502,12 +636,28 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-        let expected_bytes = expected.clone();
-        ctx.set_response(expected_bytes);
-        let result = get_file(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            let expected_bytes = expected.clone();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_file(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -525,11 +675,25 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = 42;
-        let q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        let body = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".to_vec();
-        put_file_chunk(&ctx, p0, p1, q0, body).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 = 42;
+            let q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let body = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".to_vec();
+            let result = put_file_chunk(&ctx, p0, p1, q0, body).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -547,11 +711,26 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = ObjectId::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = get_root_id(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = ObjectId::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_root_id(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 }

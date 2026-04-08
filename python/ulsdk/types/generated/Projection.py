@@ -4,15 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from typing import Optional
 np = import_numpy()
 
 class Projection(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Projection()
         x.Init(buf, n + offset)
@@ -23,7 +21,7 @@ class Projection(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Projection
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Projection
@@ -34,32 +32,32 @@ class Projection(object):
         return 0
 
     # Projection
-    def Alias(self) -> Optional[bytes]:
+    def Alias(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def ProjectionStart(builder: flatbuffers.Builder):
+def ProjectionStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ProjectionStart(builder)
 
-def ProjectionAddPredicate(builder: flatbuffers.Builder, predicate: int):
+def ProjectionAddPredicate(builder, predicate):
     builder.PrependInt32Slot(0, predicate, 0)
 
-def AddPredicate(builder: flatbuffers.Builder, predicate: int):
+def AddPredicate(builder, predicate):
     ProjectionAddPredicate(builder, predicate)
 
-def ProjectionAddAlias(builder: flatbuffers.Builder, alias: int):
+def ProjectionAddAlias(builder, alias):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(alias), 0)
 
-def AddAlias(builder: flatbuffers.Builder, alias: int):
+def AddAlias(builder, alias):
     ProjectionAddAlias(builder, alias)
 
-def ProjectionEnd(builder: flatbuffers.Builder) -> int:
+def ProjectionEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ProjectionEnd(builder)

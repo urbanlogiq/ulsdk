@@ -23,6 +23,7 @@ from .entity import (
     GraphNode,
     Line,
     MultiLine,
+    MultiPoint,
     MultiPolygon,
     NodeTy,
     Point,
@@ -55,6 +56,7 @@ from .generated.GraphNodeId import GraphNodeId as FbsGraphNodeId
 from .generated.GraphQuery import GraphQuery as FbsGraphQuery
 from .generated.Line import Line as FbsLine
 from .generated.MultiLine import MultiLine as FbsMultiLine
+from .generated.MultiPoint import MultiPoint as FbsMultiPoint
 from .generated.MultiPolygon import MultiPolygon as FbsMultiPolygon
 from .generated.NodeIdPair import NodeIdPair as FbsNodeIdPair
 from .generated.NodeList import NodeList as FbsNodeList
@@ -806,6 +808,8 @@ class NodeList:
 class OrderBy:
     field: "str"
 
+    nulls_first: "bool"
+
     sort: "SortOrder"
 
     transform: "ValueTransform"
@@ -815,9 +819,10 @@ class OrderBy:
         field_str = o.Field()
         assert field_str is not None
         field = field_str.decode('utf-8')
+        nulls_first = o.NullsFirst()
         sort = SortOrder(o.Sort())
         transform = ValueTransform(o.Transform())
-        return cls(field, sort, transform)
+        return cls(field, nulls_first, sort, transform)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -829,6 +834,7 @@ class OrderBy:
         from .generated.OrderBy import (
             Start,
             AddField,
+            AddNullsFirst,
             AddSort,
             AddTransform,
             End,
@@ -837,6 +843,7 @@ class OrderBy:
 
         Start(builder)
         AddField(builder, field_offset)
+        AddNullsFirst(builder, self.nulls_first)
         AddSort(builder, self.sort.value)
         AddTransform(builder, self.transform.value)
         return End(builder)
@@ -850,13 +857,15 @@ class OrderBy:
     @classmethod
     def make_default(cls) -> Self:
         field = ""
+        nulls_first = False
         sort = SortOrder(0)
         transform = ValueTransform(0)
-        return cls(field, sort, transform)
+        return cls(field, nulls_first, sort, transform)
 
     def __eq__(self, other) -> bool:
         eq = True
         eq = eq and self.field == other.field
+        eq = eq and self.nulls_first == other.nulls_first
         eq = eq and self.sort == other.sort
         eq = eq and self.transform == other.transform
 

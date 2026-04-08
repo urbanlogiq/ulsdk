@@ -26,12 +26,12 @@ use crate::types::Schema::{
 use crate::types::api::SortOrder;
 use crate::types::data::{
     AttributePair, BinaryYesNo, DayOfWeek, DirectionAndRoadName, DirectionAndRoadNames,
-    DirectionTy, NamedParameter, NamedParameterFlags, RoadUserTy, Source, StatisticTy,
-    TimeGranularity, TurnTy,
+    DirectionTy, NamedParameter, NamedParameterFlags, OutputSchema, RoadUserTy, Source,
+    StatisticTy, TimeGranularity, TurnTy,
 };
 use crate::types::entity::{
-    EdgeTy, EntityTy, Geometry, GraphEdge, GraphNode, Line, MultiLine, MultiPolygon, NodeTy, Point,
-    Polygon,
+    EdgeTy, EntityTy, Geometry, GraphEdge, GraphNode, Line, MultiLine, MultiPoint, MultiPolygon,
+    NodeTy, Point, Polygon,
 };
 use crate::types::fun::Fn_;
 use crate::types::generated::Schema_generated::{
@@ -55,14 +55,14 @@ use crate::types::generated::data_generated::{
     DirectionAndRoadName as FbsDirectionAndRoadName,
     DirectionAndRoadNames as FbsDirectionAndRoadNames, DirectionTy as FbsDirectionTy,
     NamedParameter as FbsNamedParameter, NamedParameterFlags as FbsNamedParameterFlags,
-    RoadUserTy as FbsRoadUserTy, Source as FbsSource, StatisticTy as FbsStatisticTy,
-    TimeGranularity as FbsTimeGranularity, TurnTy as FbsTurnTy,
+    OutputSchema as FbsOutputSchema, RoadUserTy as FbsRoadUserTy, Source as FbsSource,
+    StatisticTy as FbsStatisticTy, TimeGranularity as FbsTimeGranularity, TurnTy as FbsTurnTy,
 };
 use crate::types::generated::entity_generated::{
     EdgeTy as FbsEdgeTy, EntityTy as FbsEntityTy, Geometry as FbsGeometry,
     GraphEdge as FbsGraphEdge, GraphNode as FbsGraphNode, Line as FbsLine,
-    MultiLine as FbsMultiLine, MultiPolygon as FbsMultiPolygon, NodeTy as FbsNodeTy,
-    Point as FbsPoint, Polygon as FbsPolygon,
+    MultiLine as FbsMultiLine, MultiPoint as FbsMultiPoint, MultiPolygon as FbsMultiPolygon,
+    NodeTy as FbsNodeTy, Point as FbsPoint, Polygon as FbsPolygon,
 };
 use crate::types::generated::fun_generated::Fn as FbsFn;
 use crate::types::generated::graph_generated::{
@@ -482,6 +482,7 @@ pub enum UlFieldType {
     FT_BINARY = 22,
     FT_TIME = 23,
     FT_GEOMETRY_OR_NODE = 24,
+    FT_STRING_ARRAY = 25,
 }
 
 impl TryFrom<u32> for UlFieldType {
@@ -519,6 +520,7 @@ impl UlFieldType {
             Self::FT_BINARY => Some("FT_BINARY"),
             Self::FT_TIME => Some("FT_TIME"),
             Self::FT_GEOMETRY_OR_NODE => Some("FT_GEOMETRY_OR_NODE"),
+            Self::FT_STRING_ARRAY => Some("FT_STRING_ARRAY"),
             _ => None,
         }
     }
@@ -552,6 +554,7 @@ impl From<UlFieldType> for FbsUlFieldType {
             UlFieldType::FT_BINARY => FbsUlFieldType::FT_BINARY,
             UlFieldType::FT_TIME => FbsUlFieldType::FT_TIME,
             UlFieldType::FT_GEOMETRY_OR_NODE => FbsUlFieldType::FT_GEOMETRY_OR_NODE,
+            UlFieldType::FT_STRING_ARRAY => FbsUlFieldType::FT_STRING_ARRAY,
         }
     }
 }
@@ -584,6 +587,7 @@ impl From<FbsUlFieldType> for UlFieldType {
             22 => Self::FT_BINARY,
             23 => Self::FT_TIME,
             24 => Self::FT_GEOMETRY_OR_NODE,
+            25 => Self::FT_STRING_ARRAY,
             _ => panic!("Invalid value {} when constructing UlFieldType", fbs.0),
         }
     }

@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ObjectId import ObjectId
-from typing import Optional
 np = import_numpy()
 
 class Share(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Share()
         x.Init(buf, n + offset)
@@ -24,28 +21,29 @@ class Share(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Share
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Share
-    def Object(self) -> Optional[ObjectId]:
+    def Object(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Share
-    def Dest(self) -> Optional[bytes]:
+    def Dest(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # Share
-    def Msg(self) -> Optional[bytes]:
+    def Msg(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -65,44 +63,44 @@ class Share(object):
             return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
         return 0
 
-def ShareStart(builder: flatbuffers.Builder):
+def ShareStart(builder):
     builder.StartObject(5)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ShareStart(builder)
 
-def ShareAddObject(builder: flatbuffers.Builder, object: int):
+def ShareAddObject(builder, object):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(object), 0)
 
-def AddObject(builder: flatbuffers.Builder, object: int):
+def AddObject(builder, object):
     ShareAddObject(builder, object)
 
-def ShareAddDest(builder: flatbuffers.Builder, dest: int):
+def ShareAddDest(builder, dest):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(dest), 0)
 
-def AddDest(builder: flatbuffers.Builder, dest: int):
+def AddDest(builder, dest):
     ShareAddDest(builder, dest)
 
-def ShareAddMsg(builder: flatbuffers.Builder, msg: int):
+def ShareAddMsg(builder, msg):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(msg), 0)
 
-def AddMsg(builder: flatbuffers.Builder, msg: int):
+def AddMsg(builder, msg):
     ShareAddMsg(builder, msg)
 
-def ShareAddOldPerms(builder: flatbuffers.Builder, oldPerms: int):
+def ShareAddOldPerms(builder, oldPerms):
     builder.PrependUint32Slot(3, oldPerms, 0)
 
-def AddOldPerms(builder: flatbuffers.Builder, oldPerms: int):
+def AddOldPerms(builder, oldPerms):
     ShareAddOldPerms(builder, oldPerms)
 
-def ShareAddNewPerms(builder: flatbuffers.Builder, newPerms: int):
+def ShareAddNewPerms(builder, newPerms):
     builder.PrependUint32Slot(4, newPerms, 0)
 
-def AddNewPerms(builder: flatbuffers.Builder, newPerms: int):
+def AddNewPerms(builder, newPerms):
     ShareAddNewPerms(builder, newPerms)
 
-def ShareEnd(builder: flatbuffers.Builder) -> int:
+def ShareEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ShareEnd(builder)

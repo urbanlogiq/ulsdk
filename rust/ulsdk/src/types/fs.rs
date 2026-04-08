@@ -27,8 +27,8 @@ use crate::types::attr::Attr;
 use crate::types::crypto::{CryptHeader, Digest, EncryptedObject, Sha256, Signature};
 use crate::types::data::{
     AttributePair, BinaryYesNo, DayOfWeek, DirectionAndRoadName, DirectionAndRoadNames,
-    DirectionTy, NamedParameter, NamedParameterFlags, RoadUserTy, Source, StatisticTy,
-    TimeGranularity, TurnTy,
+    DirectionTy, NamedParameter, NamedParameterFlags, OutputSchema, RoadUserTy, Source,
+    StatisticTy, TimeGranularity, TurnTy,
 };
 use crate::types::generated::Schema_generated::{
     Binary as FbsBinary, BinaryView as FbsBinaryView, Bool as FbsBool, Buffer as FbsBuffer,
@@ -55,8 +55,8 @@ use crate::types::generated::data_generated::{
     DirectionAndRoadName as FbsDirectionAndRoadName,
     DirectionAndRoadNames as FbsDirectionAndRoadNames, DirectionTy as FbsDirectionTy,
     NamedParameter as FbsNamedParameter, NamedParameterFlags as FbsNamedParameterFlags,
-    RoadUserTy as FbsRoadUserTy, Source as FbsSource, StatisticTy as FbsStatisticTy,
-    TimeGranularity as FbsTimeGranularity, TurnTy as FbsTurnTy,
+    OutputSchema as FbsOutputSchema, RoadUserTy as FbsRoadUserTy, Source as FbsSource,
+    StatisticTy as FbsStatisticTy, TimeGranularity as FbsTimeGranularity, TurnTy as FbsTurnTy,
 };
 use crate::types::generated::fs_generated::{
     Chunk as FbsChunk, Directory as FbsDirectory, DirectoryEntry as FbsDirectoryEntry,
@@ -244,7 +244,7 @@ pub struct File {
     pub container: Option<String>,
     pub digest: Option<Digest>,
     pub mime: String,
-    pub size_: u64,
+    pub size: u64,
     pub tier: StorageTier,
     pub virus: Option<String>,
 }
@@ -288,7 +288,7 @@ impl File {
             bldr.add_digest_type(ty);
         }
         bldr.add_mime(mime_offset);
-        bldr.add_size_(self.size_);
+        bldr.add_size(self.size);
         bldr.add_tier(FbsStorageTier::from(self.tier));
         if let Some(offset) = virus_offset {
             bldr.add_virus(offset);
@@ -325,7 +325,7 @@ impl From<FbsFile<'_>> for File {
         };
 
         let mime = fbs.mime().to_owned();
-        let size_ = fbs.size_();
+        let size = fbs.size();
         let tier = StorageTier::from(fbs.tier());
         let virus = fbs.virus().map(ToOwned::to_owned);
         Self {
@@ -335,7 +335,7 @@ impl From<FbsFile<'_>> for File {
             container,
             digest,
             mime,
-            size_,
+            size,
             tier,
             virus,
         }
@@ -531,7 +531,7 @@ impl Entry {
 #[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
 pub struct ListFile {
     pub mime: String,
-    pub size_: u64,
+    pub size: u64,
     pub virus: Option<String>,
 }
 
@@ -547,7 +547,7 @@ impl ListFile {
 
         let mut bldr = FbsListFileBuilder::new(builder);
         bldr.add_mime(mime_offset);
-        bldr.add_size_(self.size_);
+        bldr.add_size(self.size);
         if let Some(offset) = virus_offset {
             bldr.add_virus(offset);
         }
@@ -558,9 +558,9 @@ impl ListFile {
 impl From<FbsListFile<'_>> for ListFile {
     fn from(fbs: FbsListFile<'_>) -> Self {
         let mime = fbs.mime().to_owned();
-        let size_ = fbs.size_();
+        let size = fbs.size();
         let virus = fbs.virus().map(ToOwned::to_owned);
-        Self { mime, size_, virus }
+        Self { mime, size, virus }
     }
 }
 
@@ -624,7 +624,7 @@ impl ListDirectory {
 #[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
 pub struct ListObject {
     pub id: ObjectId,
-    pub size_: u64,
+    pub size: u64,
     pub ty: DataCatalogObjectTy,
 }
 
@@ -639,7 +639,7 @@ impl ListObject {
 
         let mut bldr = FbsListObjectBuilder::new(builder);
         bldr.add_id(id_offset);
-        bldr.add_size_(self.size_);
+        bldr.add_size(self.size);
         bldr.add_ty(FbsDataCatalogObjectTy::from(self.ty));
         bldr.finish()
     }
@@ -648,9 +648,9 @@ impl ListObject {
 impl From<FbsListObject<'_>> for ListObject {
     fn from(fbs: FbsListObject<'_>) -> Self {
         let id = ObjectId::from(fbs.id());
-        let size_ = fbs.size_();
+        let size = fbs.size();
         let ty = DataCatalogObjectTy::from(fbs.ty());
-        Self { id, size_, ty }
+        Self { id, size, ty }
     }
 }
 
@@ -765,7 +765,7 @@ impl ListEntry {
 pub struct Chunk {
     pub blob: GenericId,
     pub digest: Digest,
-    pub size_: u64,
+    pub size: u64,
 }
 
 impl Chunk {
@@ -782,7 +782,7 @@ impl Chunk {
         bldr.add_blob(blob_offset);
         bldr.add_digest(digest_offset);
         bldr.add_digest_type(digest_ty);
-        bldr.add_size_(self.size_);
+        bldr.add_size(self.size);
         bldr.finish()
     }
 }
@@ -795,12 +795,8 @@ impl From<FbsChunk<'_>> for Chunk {
             _ => unreachable!(),
         };
 
-        let size_ = fbs.size_();
-        Self {
-            blob,
-            digest,
-            size_,
-        }
+        let size = fbs.size();
+        Self { blob, digest, size }
     }
 }
 
@@ -943,7 +939,7 @@ pub struct ListSlot {
     pub id: ObjectId,
     pub last_modified_by: Option<B2cId>,
     pub name: String,
-    pub size_: u64,
+    pub size: u64,
     pub time: u64,
     pub user_permissions: u32,
 }
@@ -983,7 +979,7 @@ impl ListSlot {
             bldr.add_last_modified_by(offset);
         }
         bldr.add_name(name_offset);
-        bldr.add_size_(self.size_);
+        bldr.add_size(self.size);
         bldr.add_time(self.time);
         bldr.add_user_permissions(self.user_permissions);
         bldr.finish()
@@ -1022,7 +1018,7 @@ impl From<FbsListSlot<'_>> for ListSlot {
         let id = ObjectId::from(fbs.id());
         let last_modified_by = fbs.last_modified_by().map(B2cId::from);
         let name = fbs.name().to_owned();
-        let size_ = fbs.size_();
+        let size = fbs.size();
         let time = fbs.time();
         let user_permissions = fbs.user_permissions();
         Self {
@@ -1031,7 +1027,7 @@ impl From<FbsListSlot<'_>> for ListSlot {
             id,
             last_modified_by,
             name,
-            size_,
+            size,
             time,
             user_permissions,
         }

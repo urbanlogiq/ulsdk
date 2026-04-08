@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Point import Point
-from typing import Optional
 np = import_numpy()
 
 class Line(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Line()
         x.Init(buf, n + offset)
@@ -24,53 +21,54 @@ class Line(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Line
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Line
-    def LineGeo(self, j: int) -> Optional[Point]:
+    def LineGeo(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Point import Point
             obj = Point()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Line
-    def LineGeoLength(self) -> int:
+    def LineGeoLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Line
-    def LineGeoIsNone(self) -> bool:
+    def LineGeoIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def LineStart(builder: flatbuffers.Builder):
+def LineStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     LineStart(builder)
 
-def LineAddLineGeo(builder: flatbuffers.Builder, lineGeo: int):
+def LineAddLineGeo(builder, lineGeo):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(lineGeo), 0)
 
-def AddLineGeo(builder: flatbuffers.Builder, lineGeo: int):
+def AddLineGeo(builder, lineGeo):
     LineAddLineGeo(builder, lineGeo)
 
-def LineStartLineGeoVector(builder, numElems: int) -> int:
+def LineStartLineGeoVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartLineGeoVector(builder, numElems: int) -> int:
+def StartLineGeoVector(builder, numElems):
     return LineStartLineGeoVector(builder, numElems)
 
-def LineEnd(builder: flatbuffers.Builder) -> int:
+def LineEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return LineEnd(builder)

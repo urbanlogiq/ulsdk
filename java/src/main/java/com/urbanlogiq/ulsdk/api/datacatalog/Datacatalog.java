@@ -98,8 +98,9 @@ public final class Datacatalog {
      * @param ctx A request context object
      * @param id The ID of the object to update
      * @param object Object contents with which to update the specified object
+     * @return The content ID of the updated object
      */
-    public static void updateObject(
+    public static com.urbanlogiq.ulsdk.types.ContentId updateObject(
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.types.ObjectId id,
         com.urbanlogiq.ulsdk.types.DataCatalogObject object
@@ -112,8 +113,8 @@ public final class Datacatalog {
 
         byte[] body = null;
         body = object.toBytes();
-        ctx.post(path, body, "application/octet-stream", params, headers);
-        return;
+        byte[] res = ctx.post(path, body, "application/octet-stream", params, headers);
+        return new com.urbanlogiq.ulsdk.types.ContentId(res);
     }
 
     /**
@@ -156,7 +157,7 @@ public final class Datacatalog {
         com.urbanlogiq.ulsdk.types.ObjectId id,
         String key
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/ulv2/datacatalog/object/:id/attributes/:key";
+        String path = "/v1/api/ulv2/datacatalog/object/:id/attribute/:key";
         path = path.replace(":id", id.toString());
         path = path.replace(":key", key.toString());
 
@@ -186,6 +187,27 @@ public final class Datacatalog {
         body = objectIds.toBytes();
         byte[] res = ctx.post(path, body, "application/octet-stream", params, headers);
         return new com.urbanlogiq.ulsdk.types.ObjectSummaryList(res);
+    }
+
+    /**
+     * Given a list of IDs for stream objects, fetch their metadata in bulk. Note that the returned DataCatalogObject instances only have a valid metadata `obj` field.
+     * 
+     * @param ctx A request context object
+     * @param stream_ids A list of IDs of stream objects to fetch metadata for
+     * @return A list of metadata DataCatalogObjects
+     */
+    public static com.urbanlogiq.ulsdk.types.ObjectIdPairList bulkFetchMetadata(
+        com.urbanlogiq.ulsdk.RequestContext ctx,
+        com.urbanlogiq.ulsdk.types.ObjectIdList streamIds
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/datacatalog/stream/metadata_list";
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+
+        byte[] body = null;
+        body = streamIds.toBytes();
+        byte[] res = ctx.post(path, body, "application/octet-stream", params, headers);
+        return new com.urbanlogiq.ulsdk.types.ObjectIdPairList(res);
     }
 
     /**

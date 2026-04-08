@@ -12,7 +12,8 @@ public final class QueryElementUnion {
             && !(value instanceof com.urbanlogiq.ulsdk.types.BinaryQueryElement)
             && !(value instanceof com.urbanlogiq.ulsdk.types.UpdateQueryElement)
             && !(value instanceof com.urbanlogiq.ulsdk.types.DeleteQueryElement)
-            && !(value instanceof com.urbanlogiq.ulsdk.types.InsertQueryElement)) {
+            && !(value instanceof com.urbanlogiq.ulsdk.types.InsertQueryElement)
+            && !(value instanceof com.urbanlogiq.ulsdk.types.AlterTableElement)) {
             throw new com.urbanlogiq.ulsdk.InvalidVariantException("QueryElementUnion", value);
         }
 
@@ -45,6 +46,11 @@ public final class QueryElementUnion {
             int offset = o.serializeTo(builder);
             byte ty = com.urbanlogiq.ulsdk.types.generated.QueryElementUnion.InsertQueryElement;
             return new com.urbanlogiq.ulsdk.Pair<Integer, Byte>(offset, ty);
+        } else if (this._value instanceof com.urbanlogiq.ulsdk.types.AlterTableElement) {
+            com.urbanlogiq.ulsdk.types.AlterTableElement o = (com.urbanlogiq.ulsdk.types.AlterTableElement)this._value;
+            int offset = o.serializeTo(builder);
+            byte ty = com.urbanlogiq.ulsdk.types.generated.QueryElementUnion.AlterTableElement;
+            return new com.urbanlogiq.ulsdk.Pair<Integer, Byte>(offset, ty);
         } else {
             throw new RuntimeException("unreachable variant");
         }
@@ -65,6 +71,8 @@ public final class QueryElementUnion {
             this._value = new com.urbanlogiq.ulsdk.types.DeleteQueryElement((com.urbanlogiq.ulsdk.types.generated.DeleteQueryElement)o);
         } else if (ty == com.urbanlogiq.ulsdk.types.generated.QueryElementUnion.InsertQueryElement) {
             this._value = new com.urbanlogiq.ulsdk.types.InsertQueryElement((com.urbanlogiq.ulsdk.types.generated.InsertQueryElement)o);
+        } else if (ty == com.urbanlogiq.ulsdk.types.generated.QueryElementUnion.AlterTableElement) {
+            this._value = new com.urbanlogiq.ulsdk.types.AlterTableElement((com.urbanlogiq.ulsdk.types.generated.AlterTableElement)o);
         }
     }
 

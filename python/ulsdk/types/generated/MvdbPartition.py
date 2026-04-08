@@ -4,8 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from typing import Optional
 np = import_numpy()
 
 # Some multiverse databases are partitioned, and we need to refer to a specific
@@ -14,7 +12,7 @@ class MvdbPartition(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = MvdbPartition()
         x.Init(buf, n + offset)
@@ -25,30 +23,30 @@ class MvdbPartition(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # MvdbPartition
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # MvdbPartition
-    def Partition(self) -> Optional[bytes]:
+    def Partition(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def MvdbPartitionStart(builder: flatbuffers.Builder):
+def MvdbPartitionStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     MvdbPartitionStart(builder)
 
-def MvdbPartitionAddPartition(builder: flatbuffers.Builder, partition: int):
+def MvdbPartitionAddPartition(builder, partition):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(partition), 0)
 
-def AddPartition(builder: flatbuffers.Builder, partition: int):
+def AddPartition(builder, partition):
     MvdbPartitionAddPartition(builder, partition)
 
-def MvdbPartitionEnd(builder: flatbuffers.Builder) -> int:
+def MvdbPartitionEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return MvdbPartitionEnd(builder)

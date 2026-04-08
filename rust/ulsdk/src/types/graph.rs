@@ -18,16 +18,16 @@ use strum_macros::FromRepr;
 
 use crate::types::api::SortOrder;
 use crate::types::entity::{
-    EdgeTy, EntityTy, Geometry, GraphEdge, GraphNode, Line, MultiLine, MultiPolygon, NodeTy, Point,
-    Polygon,
+    EdgeTy, EntityTy, Geometry, GraphEdge, GraphNode, Line, MultiLine, MultiPoint, MultiPolygon,
+    NodeTy, Point, Polygon,
 };
 use crate::types::fun::Fn_;
 use crate::types::generated::api_generated::SortOrder as FbsSortOrder;
 use crate::types::generated::entity_generated::{
     EdgeTy as FbsEdgeTy, EntityTy as FbsEntityTy, Geometry as FbsGeometry,
     GraphEdge as FbsGraphEdge, GraphNode as FbsGraphNode, Line as FbsLine,
-    MultiLine as FbsMultiLine, MultiPolygon as FbsMultiPolygon, NodeTy as FbsNodeTy,
-    Point as FbsPoint, Polygon as FbsPolygon,
+    MultiLine as FbsMultiLine, MultiPoint as FbsMultiPoint, MultiPolygon as FbsMultiPolygon,
+    NodeTy as FbsNodeTy, Point as FbsPoint, Polygon as FbsPolygon,
 };
 use crate::types::generated::fun_generated::Fn as FbsFn;
 use crate::types::generated::graph_generated::{
@@ -577,6 +577,7 @@ impl NodeQuery {
                 EntityTy::T_ROAD_SEGMENT_SAFETY_COUNTS => FbsEntityTy::T_ROAD_SEGMENT_SAFETY_COUNTS,
                 EntityTy::T_HEXAGON_BOUNDARY => FbsEntityTy::T_HEXAGON_BOUNDARY,
                 EntityTy::T_COMPASS_IOT_POINT => FbsEntityTy::T_COMPASS_IOT_POINT,
+                EntityTy::T_LANDSLIDE_AREA => FbsEntityTy::T_LANDSLIDE_AREA,
             }));
             entity_tys_offset
         });
@@ -883,6 +884,9 @@ impl From<FbsGeom<'_>> for Geom {
             FbsGeometry::MultiPolygon => {
                 Geometry::MultiPolygon(MultiPolygon::from(fbs.geom_as_multi_polygon().unwrap()))
             }
+            FbsGeometry::MultiPoint => {
+                Geometry::MultiPoint(MultiPoint::from(fbs.geom_as_multi_point().unwrap()))
+            }
             _ => unreachable!(),
         };
 
@@ -1102,6 +1106,7 @@ impl NodeList {
 #[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
 pub struct OrderBy {
     pub field: String,
+    pub nulls_first: bool,
     pub sort: SortOrder,
     pub transform: ValueTransform,
 }
@@ -1117,6 +1122,7 @@ impl OrderBy {
 
         let mut bldr = FbsOrderByBuilder::new(builder);
         bldr.add_field(field_offset);
+        bldr.add_nulls_first(self.nulls_first);
         bldr.add_sort(FbsSortOrder::from(self.sort));
         bldr.add_transform(FbsValueTransform::from(self.transform));
         bldr.finish()
@@ -1126,10 +1132,12 @@ impl OrderBy {
 impl From<FbsOrderBy<'_>> for OrderBy {
     fn from(fbs: FbsOrderBy<'_>) -> Self {
         let field = fbs.field().to_owned();
+        let nulls_first = fbs.nulls_first();
         let sort = SortOrder::from(fbs.sort());
         let transform = ValueTransform::from(fbs.transform());
         Self {
             field,
+            nulls_first,
             sort,
             transform,
         }

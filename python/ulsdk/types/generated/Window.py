@@ -4,18 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Expr import Expr
-from .Function import Function
-from .OrderBy import OrderBy
-from typing import Optional
 np = import_numpy()
 
 class Window(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Window()
         x.Init(buf, n + offset)
@@ -26,105 +21,108 @@ class Window(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Window
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Window
-    def Fun(self) -> Optional[Function]:
+    def Fun(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Function import Function
             obj = Function()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Window
-    def Partition(self, j: int) -> Optional[Expr]:
+    def Partition(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Expr import Expr
             obj = Expr()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Window
-    def PartitionLength(self) -> int:
+    def PartitionLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Window
-    def PartitionIsNone(self) -> bool:
+    def PartitionIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
     # Window
-    def OrderBy(self, j: int) -> Optional[OrderBy]:
+    def OrderBy(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .OrderBy import OrderBy
             obj = OrderBy()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Window
-    def OrderByLength(self) -> int:
+    def OrderByLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Window
-    def OrderByIsNone(self) -> bool:
+    def OrderByIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
-def WindowStart(builder: flatbuffers.Builder):
+def WindowStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     WindowStart(builder)
 
-def WindowAddFun(builder: flatbuffers.Builder, fun: int):
+def WindowAddFun(builder, fun):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(fun), 0)
 
-def AddFun(builder: flatbuffers.Builder, fun: int):
+def AddFun(builder, fun):
     WindowAddFun(builder, fun)
 
-def WindowAddPartition(builder: flatbuffers.Builder, partition: int):
+def WindowAddPartition(builder, partition):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(partition), 0)
 
-def AddPartition(builder: flatbuffers.Builder, partition: int):
+def AddPartition(builder, partition):
     WindowAddPartition(builder, partition)
 
-def WindowStartPartitionVector(builder, numElems: int) -> int:
+def WindowStartPartitionVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartPartitionVector(builder, numElems: int) -> int:
+def StartPartitionVector(builder, numElems):
     return WindowStartPartitionVector(builder, numElems)
 
-def WindowAddOrderBy(builder: flatbuffers.Builder, orderBy: int):
+def WindowAddOrderBy(builder, orderBy):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(orderBy), 0)
 
-def AddOrderBy(builder: flatbuffers.Builder, orderBy: int):
+def AddOrderBy(builder, orderBy):
     WindowAddOrderBy(builder, orderBy)
 
-def WindowStartOrderByVector(builder, numElems: int) -> int:
+def WindowStartOrderByVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartOrderByVector(builder, numElems: int) -> int:
+def StartOrderByVector(builder, numElems):
     return WindowStartOrderByVector(builder, numElems)
 
-def WindowEnd(builder: flatbuffers.Builder) -> int:
+def WindowEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return WindowEnd(builder)

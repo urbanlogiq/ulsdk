@@ -4,18 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .DeprecatedTaskParameter import DeprecatedTaskParameter
-from .ObjectId import ObjectId
-from .ParamIndices import ParamIndices
-from typing import Optional
 np = import_numpy()
 
 class DeprecatedRunSpec(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = DeprecatedRunSpec()
         x.Init(buf, n + offset)
@@ -26,7 +21,7 @@ class DeprecatedRunSpec(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # DeprecatedRunSpec
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # DeprecatedRunSpec
@@ -37,107 +32,110 @@ class DeprecatedRunSpec(object):
         return False
 
     # DeprecatedRunSpec
-    def Schematic(self) -> Optional[ObjectId]:
+    def Schematic(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # DeprecatedRunSpec
-    def ParamIndices(self, j: int) -> Optional[ParamIndices]:
+    def ParamIndices(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .ParamIndices import ParamIndices
             obj = ParamIndices()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # DeprecatedRunSpec
-    def ParamIndicesLength(self) -> int:
+    def ParamIndicesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # DeprecatedRunSpec
-    def ParamIndicesIsNone(self) -> bool:
+    def ParamIndicesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
     # DeprecatedRunSpec
-    def Params(self, j: int) -> Optional[DeprecatedTaskParameter]:
+    def Params(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .DeprecatedTaskParameter import DeprecatedTaskParameter
             obj = DeprecatedTaskParameter()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # DeprecatedRunSpec
-    def ParamsLength(self) -> int:
+    def ParamsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # DeprecatedRunSpec
-    def ParamsIsNone(self) -> bool:
+    def ParamsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         return o == 0
 
-def DeprecatedRunSpecStart(builder: flatbuffers.Builder):
+def DeprecatedRunSpecStart(builder):
     builder.StartObject(4)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DeprecatedRunSpecStart(builder)
 
-def DeprecatedRunSpecAddPersist(builder: flatbuffers.Builder, persist: bool):
+def DeprecatedRunSpecAddPersist(builder, persist):
     builder.PrependBoolSlot(0, persist, 0)
 
-def AddPersist(builder: flatbuffers.Builder, persist: bool):
+def AddPersist(builder, persist):
     DeprecatedRunSpecAddPersist(builder, persist)
 
-def DeprecatedRunSpecAddSchematic(builder: flatbuffers.Builder, schematic: int):
+def DeprecatedRunSpecAddSchematic(builder, schematic):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(schematic), 0)
 
-def AddSchematic(builder: flatbuffers.Builder, schematic: int):
+def AddSchematic(builder, schematic):
     DeprecatedRunSpecAddSchematic(builder, schematic)
 
-def DeprecatedRunSpecAddParamIndices(builder: flatbuffers.Builder, paramIndices: int):
+def DeprecatedRunSpecAddParamIndices(builder, paramIndices):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(paramIndices), 0)
 
-def AddParamIndices(builder: flatbuffers.Builder, paramIndices: int):
+def AddParamIndices(builder, paramIndices):
     DeprecatedRunSpecAddParamIndices(builder, paramIndices)
 
-def DeprecatedRunSpecStartParamIndicesVector(builder, numElems: int) -> int:
+def DeprecatedRunSpecStartParamIndicesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartParamIndicesVector(builder, numElems: int) -> int:
+def StartParamIndicesVector(builder, numElems):
     return DeprecatedRunSpecStartParamIndicesVector(builder, numElems)
 
-def DeprecatedRunSpecAddParams(builder: flatbuffers.Builder, params: int):
+def DeprecatedRunSpecAddParams(builder, params):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(params), 0)
 
-def AddParams(builder: flatbuffers.Builder, params: int):
+def AddParams(builder, params):
     DeprecatedRunSpecAddParams(builder, params)
 
-def DeprecatedRunSpecStartParamsVector(builder, numElems: int) -> int:
+def DeprecatedRunSpecStartParamsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartParamsVector(builder, numElems: int) -> int:
+def StartParamsVector(builder, numElems):
     return DeprecatedRunSpecStartParamsVector(builder, numElems)
 
-def DeprecatedRunSpecEnd(builder: flatbuffers.Builder) -> int:
+def DeprecatedRunSpecEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DeprecatedRunSpecEnd(builder)

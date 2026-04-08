@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class RawGeom(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = RawGeom()
         x.Init(buf, n + offset)
@@ -22,11 +21,11 @@ class RawGeom(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # RawGeom
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # RawGeom
-    def Geom(self, j: int):
+    def Geom(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             a = self._tab.Vector(o)
@@ -41,37 +40,37 @@ class RawGeom(object):
         return 0
 
     # RawGeom
-    def GeomLength(self) -> int:
+    def GeomLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # RawGeom
-    def GeomIsNone(self) -> bool:
+    def GeomIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def RawGeomStart(builder: flatbuffers.Builder):
+def RawGeomStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     RawGeomStart(builder)
 
-def RawGeomAddGeom(builder: flatbuffers.Builder, geom: int):
+def RawGeomAddGeom(builder, geom):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(geom), 0)
 
-def AddGeom(builder: flatbuffers.Builder, geom: int):
+def AddGeom(builder, geom):
     RawGeomAddGeom(builder, geom)
 
-def RawGeomStartGeomVector(builder, numElems: int) -> int:
+def RawGeomStartGeomVector(builder, numElems):
     return builder.StartVector(1, numElems, 1)
 
-def StartGeomVector(builder, numElems: int) -> int:
+def StartGeomVector(builder, numElems):
     return RawGeomStartGeomVector(builder, numElems)
 
-def RawGeomEnd(builder: flatbuffers.Builder) -> int:
+def RawGeomEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return RawGeomEnd(builder)

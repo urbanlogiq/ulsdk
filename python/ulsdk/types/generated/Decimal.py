@@ -4,7 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 # Exact decimal value represented as an integer value in two's
@@ -15,7 +14,7 @@ class Decimal(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Decimal()
         x.Init(buf, n + offset)
@@ -26,7 +25,7 @@ class Decimal(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Decimal
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Total number of decimal digits
@@ -54,32 +53,32 @@ class Decimal(object):
             return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
         return 128
 
-def DecimalStart(builder: flatbuffers.Builder):
+def DecimalStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DecimalStart(builder)
 
-def DecimalAddPrecision(builder: flatbuffers.Builder, precision: int):
+def DecimalAddPrecision(builder, precision):
     builder.PrependInt32Slot(0, precision, 0)
 
-def AddPrecision(builder: flatbuffers.Builder, precision: int):
+def AddPrecision(builder, precision):
     DecimalAddPrecision(builder, precision)
 
-def DecimalAddScale(builder: flatbuffers.Builder, scale: int):
+def DecimalAddScale(builder, scale):
     builder.PrependInt32Slot(1, scale, 0)
 
-def AddScale(builder: flatbuffers.Builder, scale: int):
+def AddScale(builder, scale):
     DecimalAddScale(builder, scale)
 
-def DecimalAddBitWidth(builder: flatbuffers.Builder, bitWidth: int):
+def DecimalAddBitWidth(builder, bitWidth):
     builder.PrependInt32Slot(2, bitWidth, 128)
 
-def AddBitWidth(builder: flatbuffers.Builder, bitWidth: int):
+def AddBitWidth(builder, bitWidth):
     DecimalAddBitWidth(builder, bitWidth)
 
-def DecimalEnd(builder: flatbuffers.Builder) -> int:
+def DecimalEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DecimalEnd(builder)

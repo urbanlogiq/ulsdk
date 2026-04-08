@@ -4,18 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Chunk import Chunk
-from .GenericId import GenericId
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class File(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = File()
         x.Init(buf, n + offset)
@@ -26,11 +21,11 @@ class File(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # File
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # File
-    def Mime(self) -> Optional[bytes]:
+    def Mime(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -44,17 +39,18 @@ class File(object):
         return 0
 
     # File
-    def Blob(self) -> Optional[GenericId]:
+    def Blob(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .GenericId import GenericId
             obj = GenericId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # File
-    def Virus(self) -> Optional[bytes]:
+    def Virus(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -68,49 +64,51 @@ class File(object):
         return 0
 
     # File
-    def Digest(self) -> Optional[flatbuffers.table.Table]:
+    def Digest(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
     # File
-    def Account(self) -> Optional[bytes]:
+    def Account(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # File
-    def Container(self) -> Optional[bytes]:
+    def Container(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(18))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # File
-    def Chunks(self, j: int) -> Optional[Chunk]:
+    def Chunks(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Chunk import Chunk
             obj = Chunk()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # File
-    def ChunksLength(self) -> int:
+    def ChunksLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # File
-    def ChunksIsNone(self) -> bool:
+    def ChunksIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
         return o == 0
 
@@ -121,80 +119,80 @@ class File(object):
             return self._tab.Get(flatbuffers.number_types.Int8Flags, o + self._tab.Pos)
         return 0
 
-def FileStart(builder: flatbuffers.Builder):
+def FileStart(builder):
     builder.StartObject(10)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     FileStart(builder)
 
-def FileAddMime(builder: flatbuffers.Builder, mime: int):
+def FileAddMime(builder, mime):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(mime), 0)
 
-def AddMime(builder: flatbuffers.Builder, mime: int):
+def AddMime(builder, mime):
     FileAddMime(builder, mime)
 
-def FileAddSize(builder: flatbuffers.Builder, size: int):
+def FileAddSize(builder, size):
     builder.PrependUint64Slot(1, size, 0)
 
-def AddSize(builder: flatbuffers.Builder, size: int):
+def AddSize(builder, size):
     FileAddSize(builder, size)
 
-def FileAddBlob(builder: flatbuffers.Builder, blob: int):
+def FileAddBlob(builder, blob):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(blob), 0)
 
-def AddBlob(builder: flatbuffers.Builder, blob: int):
+def AddBlob(builder, blob):
     FileAddBlob(builder, blob)
 
-def FileAddVirus(builder: flatbuffers.Builder, virus: int):
+def FileAddVirus(builder, virus):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(virus), 0)
 
-def AddVirus(builder: flatbuffers.Builder, virus: int):
+def AddVirus(builder, virus):
     FileAddVirus(builder, virus)
 
-def FileAddDigestType(builder: flatbuffers.Builder, digestType: int):
+def FileAddDigestType(builder, digestType):
     builder.PrependUint8Slot(4, digestType, 0)
 
-def AddDigestType(builder: flatbuffers.Builder, digestType: int):
+def AddDigestType(builder, digestType):
     FileAddDigestType(builder, digestType)
 
-def FileAddDigest(builder: flatbuffers.Builder, digest: int):
+def FileAddDigest(builder, digest):
     builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(digest), 0)
 
-def AddDigest(builder: flatbuffers.Builder, digest: int):
+def AddDigest(builder, digest):
     FileAddDigest(builder, digest)
 
-def FileAddAccount(builder: flatbuffers.Builder, account: int):
+def FileAddAccount(builder, account):
     builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(account), 0)
 
-def AddAccount(builder: flatbuffers.Builder, account: int):
+def AddAccount(builder, account):
     FileAddAccount(builder, account)
 
-def FileAddContainer(builder: flatbuffers.Builder, container: int):
+def FileAddContainer(builder, container):
     builder.PrependUOffsetTRelativeSlot(7, flatbuffers.number_types.UOffsetTFlags.py_type(container), 0)
 
-def AddContainer(builder: flatbuffers.Builder, container: int):
+def AddContainer(builder, container):
     FileAddContainer(builder, container)
 
-def FileAddChunks(builder: flatbuffers.Builder, chunks: int):
+def FileAddChunks(builder, chunks):
     builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(chunks), 0)
 
-def AddChunks(builder: flatbuffers.Builder, chunks: int):
+def AddChunks(builder, chunks):
     FileAddChunks(builder, chunks)
 
-def FileStartChunksVector(builder, numElems: int) -> int:
+def FileStartChunksVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartChunksVector(builder, numElems: int) -> int:
+def StartChunksVector(builder, numElems):
     return FileStartChunksVector(builder, numElems)
 
-def FileAddTier(builder: flatbuffers.Builder, tier: int):
+def FileAddTier(builder, tier):
     builder.PrependInt8Slot(9, tier, 0)
 
-def AddTier(builder: flatbuffers.Builder, tier: int):
+def AddTier(builder, tier):
     FileAddTier(builder, tier)
 
-def FileEnd(builder: flatbuffers.Builder) -> int:
+def FileEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return FileEnd(builder)

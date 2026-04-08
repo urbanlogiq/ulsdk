@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class Expr(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Expr()
         x.Init(buf, n + offset)
@@ -24,7 +21,7 @@ class Expr(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Expr
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Expr
@@ -35,34 +32,35 @@ class Expr(object):
         return 0
 
     # Expr
-    def Exprs(self) -> Optional[flatbuffers.table.Table]:
+    def Exprs(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
-def ExprStart(builder: flatbuffers.Builder):
+def ExprStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ExprStart(builder)
 
-def ExprAddExprsType(builder: flatbuffers.Builder, exprsType: int):
+def ExprAddExprsType(builder, exprsType):
     builder.PrependUint8Slot(0, exprsType, 0)
 
-def AddExprsType(builder: flatbuffers.Builder, exprsType: int):
+def AddExprsType(builder, exprsType):
     ExprAddExprsType(builder, exprsType)
 
-def ExprAddExprs(builder: flatbuffers.Builder, exprs: int):
+def ExprAddExprs(builder, exprs):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(exprs), 0)
 
-def AddExprs(builder: flatbuffers.Builder, exprs: int):
+def AddExprs(builder, exprs):
     ExprAddExprs(builder, exprs)
 
-def ExprEnd(builder: flatbuffers.Builder) -> int:
+def ExprEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ExprEnd(builder)

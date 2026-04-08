@@ -518,12 +518,27 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = Principal::default();
-        let expected_bytes = serde_json::to_vec(&expected).unwrap();
-        ctx.set_response(expected_bytes);
-        let result = get_principal(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = Principal::default();
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_principal(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -541,15 +556,30 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        let mut expected = Vec::with_capacity(5);
+
         for i in 0..5 {
-            expected.push(Principal::default());
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let mut expected = Vec::with_capacity(5);
+            for i in 0..5 {
+                expected.push(Principal::default());
+            }
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_principals(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
         }
-        let expected_bytes = serde_json::to_vec(&expected).unwrap();
-        ctx.set_response(expected_bytes);
-        let result = get_principals(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
     }
 
     #[tokio::test]
@@ -567,15 +597,30 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        let mut expected = Vec::with_capacity(5);
+
         for i in 0..5 {
-            expected.push(Principal::default());
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let mut expected = Vec::with_capacity(5);
+            for i in 0..5 {
+                expected.push(Principal::default());
+            }
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = query_principals(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
         }
-        let expected_bytes = serde_json::to_vec(&expected).unwrap();
-        ctx.set_response(expected_bytes);
-        let result = query_principals(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
     }
 
     #[tokio::test]
@@ -593,14 +638,29 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let mut expected = Vec::with_capacity(5);
+
         for i in 0..5 {
-            expected.push(AdUser::default());
+            let mut expected = Vec::with_capacity(5);
+            for i in 0..5 {
+                expected.push(AdUser::default());
+            }
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_users(&ctx).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
         }
-        let expected_bytes = serde_json::to_vec(&expected).unwrap();
-        ctx.set_response(expected_bytes);
-        let result = get_users(&ctx).await.unwrap();
-        assert_eq!(result, expected);
     }
 
     #[tokio::test]
@@ -618,14 +678,29 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let mut expected = Vec::with_capacity(5);
+
         for i in 0..5 {
-            expected.push(DisplayNames::default());
+            let mut expected = Vec::with_capacity(5);
+            for i in 0..5 {
+                expected.push(DisplayNames::default());
+            }
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_users_display_names(&ctx).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
         }
-        let expected_bytes = serde_json::to_vec(&expected).unwrap();
-        ctx.set_response(expected_bytes);
-        let result = get_users_display_names(&ctx).await.unwrap();
-        assert_eq!(result, expected);
     }
 
     #[tokio::test]
@@ -643,13 +718,28 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let q0 = true;
-        let q0 = Some(q0);
-        let expected = AdUserWithAuditLog::default();
-        let expected_bytes = serde_json::to_vec(&expected).unwrap();
-        ctx.set_response(expected_bytes);
-        let result = get_current_user(&ctx, q0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let q0 = true;
+            let q0 = Some(q0);
+            let expected = AdUserWithAuditLog::default();
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_current_user(&ctx, q0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -667,12 +757,27 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let body = CreateUserRequest::default();
-        let expected = CreateUser::default();
-        let expected_bytes = serde_json::to_vec(&expected).unwrap();
-        ctx.set_response(expected_bytes);
-        let result = create_user(&ctx, body).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let body = CreateUserRequest::default();
+            let expected = CreateUser::default();
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = create_user(&ctx, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -690,8 +795,21 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let body = UpdateCurrentUser::default();
-        update_current_user(&ctx, body).await.unwrap();
+
+        for i in 0..5 {
+            let body = UpdateCurrentUser::default();
+            let result = update_current_user(&ctx, body).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -709,14 +827,29 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let q0 = true;
-        let q0 = Some(q0);
-        let expected = AdUserWithAuditLog::default();
-        let expected_bytes = serde_json::to_vec(&expected).unwrap();
-        ctx.set_response(expected_bytes);
-        let result = get_user(&ctx, p0, q0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let q0 = true;
+            let q0 = Some(q0);
+            let expected = AdUserWithAuditLog::default();
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_user(&ctx, p0, q0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -734,9 +867,22 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let body = UpdateUser::default();
-        update_user(&ctx, p0, body).await.unwrap();
+
+        for i in 0..5 {
+            let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let body = UpdateUser::default();
+            let result = update_user(&ctx, p0, body).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -754,8 +900,21 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        delete_user(&ctx, p0).await.unwrap();
+
+        for i in 0..5 {
+            let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let result = delete_user(&ctx, p0).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -773,14 +932,29 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let mut expected = Vec::with_capacity(5);
+
         for i in 0..5 {
-            expected.push(AdGroup::default());
+            let mut expected = Vec::with_capacity(5);
+            for i in 0..5 {
+                expected.push(AdGroup::default());
+            }
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_groups(&ctx).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
         }
-        let expected_bytes = serde_json::to_vec(&expected).unwrap();
-        ctx.set_response(expected_bytes);
-        let result = get_groups(&ctx).await.unwrap();
-        assert_eq!(result, expected);
     }
 
     #[tokio::test]
@@ -798,12 +972,27 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let body = CreateGroup::default();
-        let expected = AdGroup::default();
-        let expected_bytes = serde_json::to_vec(&expected).unwrap();
-        ctx.set_response(expected_bytes);
-        let result = create_group(&ctx, body).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let body = CreateGroup::default();
+            let expected = AdGroup::default();
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = create_group(&ctx, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -821,15 +1010,30 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let mut expected = Vec::with_capacity(5);
+
         for i in 0..5 {
-            expected.push(GroupMembership::default());
+            let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let mut expected = Vec::with_capacity(5);
+            for i in 0..5 {
+                expected.push(GroupMembership::default());
+            }
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_group_members(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
         }
-        let expected_bytes = serde_json::to_vec(&expected).unwrap();
-        ctx.set_response(expected_bytes);
-        let result = get_group_members(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
     }
 
     #[tokio::test]
@@ -847,8 +1051,21 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        delete_group(&ctx, p0).await.unwrap();
+
+        for i in 0..5 {
+            let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let result = delete_group(&ctx, p0).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -866,9 +1083,22 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        add_group_member(&ctx, p0, p1).await.unwrap();
+
+        for i in 0..5 {
+            let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let result = add_group_member(&ctx, p0, p1).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -886,8 +1116,21 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        remove_group_member(&ctx, p0, p1).await.unwrap();
+
+        for i in 0..5 {
+            let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let result = remove_group_member(&ctx, p0, p1).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 }

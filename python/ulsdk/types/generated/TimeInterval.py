@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class TimeInterval(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = TimeInterval()
         x.Init(buf, n + offset)
@@ -22,7 +21,7 @@ class TimeInterval(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # TimeInterval
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # TimeInterval
@@ -39,26 +38,26 @@ class TimeInterval(object):
             return self._tab.Get(flatbuffers.number_types.Int64Flags, o + self._tab.Pos)
         return 0
 
-def TimeIntervalStart(builder: flatbuffers.Builder):
+def TimeIntervalStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     TimeIntervalStart(builder)
 
-def TimeIntervalAddMin(builder: flatbuffers.Builder, min: int):
+def TimeIntervalAddMin(builder, min):
     builder.PrependInt64Slot(0, min, 0)
 
-def AddMin(builder: flatbuffers.Builder, min: int):
+def AddMin(builder, min):
     TimeIntervalAddMin(builder, min)
 
-def TimeIntervalAddMax(builder: flatbuffers.Builder, max: int):
+def TimeIntervalAddMax(builder, max):
     builder.PrependInt64Slot(1, max, 0)
 
-def AddMax(builder: flatbuffers.Builder, max: int):
+def AddMax(builder, max):
     TimeIntervalAddMax(builder, max)
 
-def TimeIntervalEnd(builder: flatbuffers.Builder) -> int:
+def TimeIntervalEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return TimeIntervalEnd(builder)

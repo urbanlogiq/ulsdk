@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class OnConflict(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = OnConflict()
         x.Init(buf, n + offset)
@@ -24,11 +21,11 @@ class OnConflict(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # OnConflict
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # OnConflict
-    def ConflictTarget(self, j: int):
+    def ConflictTarget(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             a = self._tab.Vector(o)
@@ -36,14 +33,14 @@ class OnConflict(object):
         return ""
 
     # OnConflict
-    def ConflictTargetLength(self) -> int:
+    def ConflictTargetLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # OnConflict
-    def ConflictTargetIsNone(self) -> bool:
+    def ConflictTargetIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
@@ -55,46 +52,47 @@ class OnConflict(object):
         return 0
 
     # OnConflict
-    def Action(self) -> Optional[flatbuffers.table.Table]:
+    def Action(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
-def OnConflictStart(builder: flatbuffers.Builder):
+def OnConflictStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     OnConflictStart(builder)
 
-def OnConflictAddConflictTarget(builder: flatbuffers.Builder, conflictTarget: int):
+def OnConflictAddConflictTarget(builder, conflictTarget):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(conflictTarget), 0)
 
-def AddConflictTarget(builder: flatbuffers.Builder, conflictTarget: int):
+def AddConflictTarget(builder, conflictTarget):
     OnConflictAddConflictTarget(builder, conflictTarget)
 
-def OnConflictStartConflictTargetVector(builder, numElems: int) -> int:
+def OnConflictStartConflictTargetVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartConflictTargetVector(builder, numElems: int) -> int:
+def StartConflictTargetVector(builder, numElems):
     return OnConflictStartConflictTargetVector(builder, numElems)
 
-def OnConflictAddActionType(builder: flatbuffers.Builder, actionType: int):
+def OnConflictAddActionType(builder, actionType):
     builder.PrependUint8Slot(1, actionType, 0)
 
-def AddActionType(builder: flatbuffers.Builder, actionType: int):
+def AddActionType(builder, actionType):
     OnConflictAddActionType(builder, actionType)
 
-def OnConflictAddAction(builder: flatbuffers.Builder, action: int):
+def OnConflictAddAction(builder, action):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(action), 0)
 
-def AddAction(builder: flatbuffers.Builder, action: int):
+def AddAction(builder, action):
     OnConflictAddAction(builder, action)
 
-def OnConflictEnd(builder: flatbuffers.Builder) -> int:
+def OnConflictEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return OnConflictEnd(builder)

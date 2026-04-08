@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class ValueIndex(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = ValueIndex()
         x.Init(buf, n + offset)
@@ -22,7 +21,7 @@ class ValueIndex(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # ValueIndex
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # ValueIndex
@@ -32,20 +31,20 @@ class ValueIndex(object):
             return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
         return 0
 
-def ValueIndexStart(builder: flatbuffers.Builder):
+def ValueIndexStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ValueIndexStart(builder)
 
-def ValueIndexAddIdx(builder: flatbuffers.Builder, idx: int):
+def ValueIndexAddIdx(builder, idx):
     builder.PrependUint32Slot(0, idx, 0)
 
-def AddIdx(builder: flatbuffers.Builder, idx: int):
+def AddIdx(builder, idx):
     ValueIndexAddIdx(builder, idx)
 
-def ValueIndexEnd(builder: flatbuffers.Builder) -> int:
+def ValueIndexEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ValueIndexEnd(builder)

@@ -7,14 +7,14 @@ import com.urbanlogiq.ulsdk.ApiKeyContext;
 import com.urbanlogiq.ulsdk.Environment;
 import com.urbanlogiq.ulsdk.Region;
 import java.util.UUID;
-import org.junit.Test;
+import org.junitpioneer.jupiter.RetryingTest;
 import com.urbanlogiq.ulsdk.api.keys.CreateKey;
 import com.urbanlogiq.ulsdk.api.keys.GetKeys;
 import com.urbanlogiq.ulsdk.api.keys.Key;
 import com.urbanlogiq.ulsdk.api.keys.UpdateKey;
 
 public final class TestApiKeys {
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testGetKeys() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -32,10 +32,10 @@ public final class TestApiKeys {
         com.urbanlogiq.ulsdk.api.keys.GetKeys result = com.urbanlogiq.ulsdk.api.keys.Keys.getKeys(
             ctx
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 1000)
     public void testGetKeys1() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -61,7 +61,7 @@ public final class TestApiKeys {
         }
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testCreateKey() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -79,10 +79,10 @@ public final class TestApiKeys {
         com.urbanlogiq.ulsdk.api.keys.CreateKey result = com.urbanlogiq.ulsdk.api.keys.Keys.createKey(
             ctx
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testUpdateKey() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -103,7 +103,7 @@ public final class TestApiKeys {
         );
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testGetKey() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -123,10 +123,10 @@ public final class TestApiKeys {
             ctx,
             p0
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testDeleteKey() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");

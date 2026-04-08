@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Polygon import Polygon
-from typing import Optional
 np = import_numpy()
 
 class MultiPolygon(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = MultiPolygon()
         x.Init(buf, n + offset)
@@ -24,53 +21,54 @@ class MultiPolygon(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # MultiPolygon
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # MultiPolygon
-    def MultipolygonGeo(self, j: int) -> Optional[Polygon]:
+    def MultipolygonGeo(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Polygon import Polygon
             obj = Polygon()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # MultiPolygon
-    def MultipolygonGeoLength(self) -> int:
+    def MultipolygonGeoLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # MultiPolygon
-    def MultipolygonGeoIsNone(self) -> bool:
+    def MultipolygonGeoIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def MultiPolygonStart(builder: flatbuffers.Builder):
+def MultiPolygonStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     MultiPolygonStart(builder)
 
-def MultiPolygonAddMultipolygonGeo(builder: flatbuffers.Builder, multipolygonGeo: int):
+def MultiPolygonAddMultipolygonGeo(builder, multipolygonGeo):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(multipolygonGeo), 0)
 
-def AddMultipolygonGeo(builder: flatbuffers.Builder, multipolygonGeo: int):
+def AddMultipolygonGeo(builder, multipolygonGeo):
     MultiPolygonAddMultipolygonGeo(builder, multipolygonGeo)
 
-def MultiPolygonStartMultipolygonGeoVector(builder, numElems: int) -> int:
+def MultiPolygonStartMultipolygonGeoVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartMultipolygonGeoVector(builder, numElems: int) -> int:
+def StartMultipolygonGeoVector(builder, numElems):
     return MultiPolygonStartMultipolygonGeoVector(builder, numElems)
 
-def MultiPolygonEnd(builder: flatbuffers.Builder) -> int:
+def MultiPolygonEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return MultiPolygonEnd(builder)

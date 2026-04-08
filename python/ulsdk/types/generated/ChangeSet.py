@@ -4,19 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Attr import Attr
-from .B2cId import B2cId
-from .ChangeOpEntry import ChangeOpEntry
-from .ContentId import ContentId
-from typing import Optional
 np = import_numpy()
 
 class ChangeSet(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = ChangeSet()
         x.Init(buf, n + offset)
@@ -27,24 +21,26 @@ class ChangeSet(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # ChangeSet
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # ChangeSet
-    def Revision(self) -> Optional[ContentId]:
+    def Revision(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ContentId import ContentId
             obj = ContentId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # ChangeSet
-    def Who(self) -> Optional[B2cId]:
+    def Who(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .B2cId import B2cId
             obj = B2cId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -58,103 +54,105 @@ class ChangeSet(object):
         return 0
 
     # ChangeSet
-    def Ops(self, j: int) -> Optional[ChangeOpEntry]:
+    def Ops(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .ChangeOpEntry import ChangeOpEntry
             obj = ChangeOpEntry()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # ChangeSet
-    def OpsLength(self) -> int:
+    def OpsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # ChangeSet
-    def OpsIsNone(self) -> bool:
+    def OpsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         return o == 0
 
     # ChangeSet
-    def Attributes(self, j: int) -> Optional[Attr]:
+    def Attributes(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Attr import Attr
             obj = Attr()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # ChangeSet
-    def AttributesLength(self) -> int:
+    def AttributesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # ChangeSet
-    def AttributesIsNone(self) -> bool:
+    def AttributesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         return o == 0
 
-def ChangeSetStart(builder: flatbuffers.Builder):
+def ChangeSetStart(builder):
     builder.StartObject(5)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ChangeSetStart(builder)
 
-def ChangeSetAddRevision(builder: flatbuffers.Builder, revision: int):
+def ChangeSetAddRevision(builder, revision):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(revision), 0)
 
-def AddRevision(builder: flatbuffers.Builder, revision: int):
+def AddRevision(builder, revision):
     ChangeSetAddRevision(builder, revision)
 
-def ChangeSetAddWho(builder: flatbuffers.Builder, who: int):
+def ChangeSetAddWho(builder, who):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(who), 0)
 
-def AddWho(builder: flatbuffers.Builder, who: int):
+def AddWho(builder, who):
     ChangeSetAddWho(builder, who)
 
-def ChangeSetAddWhen(builder: flatbuffers.Builder, when: int):
+def ChangeSetAddWhen(builder, when):
     builder.PrependUint64Slot(2, when, 0)
 
-def AddWhen(builder: flatbuffers.Builder, when: int):
+def AddWhen(builder, when):
     ChangeSetAddWhen(builder, when)
 
-def ChangeSetAddOps(builder: flatbuffers.Builder, ops: int):
+def ChangeSetAddOps(builder, ops):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(ops), 0)
 
-def AddOps(builder: flatbuffers.Builder, ops: int):
+def AddOps(builder, ops):
     ChangeSetAddOps(builder, ops)
 
-def ChangeSetStartOpsVector(builder, numElems: int) -> int:
+def ChangeSetStartOpsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartOpsVector(builder, numElems: int) -> int:
+def StartOpsVector(builder, numElems):
     return ChangeSetStartOpsVector(builder, numElems)
 
-def ChangeSetAddAttributes(builder: flatbuffers.Builder, attributes: int):
+def ChangeSetAddAttributes(builder, attributes):
     builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(attributes), 0)
 
-def AddAttributes(builder: flatbuffers.Builder, attributes: int):
+def AddAttributes(builder, attributes):
     ChangeSetAddAttributes(builder, attributes)
 
-def ChangeSetStartAttributesVector(builder, numElems: int) -> int:
+def ChangeSetStartAttributesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartAttributesVector(builder, numElems: int) -> int:
+def StartAttributesVector(builder, numElems):
     return ChangeSetStartAttributesVector(builder, numElems)
 
-def ChangeSetEnd(builder: flatbuffers.Builder) -> int:
+def ChangeSetEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ChangeSetEnd(builder)

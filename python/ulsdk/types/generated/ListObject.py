@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ObjectId import ObjectId
-from typing import Optional
 np = import_numpy()
 
 class ListObject(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = ListObject()
         x.Init(buf, n + offset)
@@ -24,14 +21,15 @@ class ListObject(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # ListObject
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # ListObject
-    def Id(self) -> Optional[ObjectId]:
+    def Id(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -51,32 +49,32 @@ class ListObject(object):
             return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
         return 0
 
-def ListObjectStart(builder: flatbuffers.Builder):
+def ListObjectStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ListObjectStart(builder)
 
-def ListObjectAddId(builder: flatbuffers.Builder, id: int):
+def ListObjectAddId(builder, id):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(id), 0)
 
-def AddId(builder: flatbuffers.Builder, id: int):
+def AddId(builder, id):
     ListObjectAddId(builder, id)
 
-def ListObjectAddTy(builder: flatbuffers.Builder, ty: int):
+def ListObjectAddTy(builder, ty):
     builder.PrependInt16Slot(1, ty, 0)
 
-def AddTy(builder: flatbuffers.Builder, ty: int):
+def AddTy(builder, ty):
     ListObjectAddTy(builder, ty)
 
-def ListObjectAddSize(builder: flatbuffers.Builder, size: int):
+def ListObjectAddSize(builder, size):
     builder.PrependUint64Slot(2, size, 0)
 
-def AddSize(builder: flatbuffers.Builder, size: int):
+def AddSize(builder, size):
     ListObjectAddSize(builder, size)
 
-def ListObjectEnd(builder: flatbuffers.Builder) -> int:
+def ListObjectEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ListObjectEnd(builder)

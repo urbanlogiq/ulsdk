@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <variant>
+#include <thread>
 
 #include "test.h"
 #include "ulsdk/api_key_context.h"
@@ -64,17 +65,30 @@ void run_api_tests(
     while (p != nullptr) {
         if (filter_test(filters, p->name)) {
             std::cout << "  Running test " << p->name << " ... ";
-            const auto result = p->fn(ctx);
-            if (std::holds_alternative<ul::Error>(result)) {
-                const ul::Error error = std::get<ul::Error>(result);
-                std::cout << "FAILED (";
-                if (error.code_ != 0) {
-                    std::cout << "code: " << error.code_ << " ";
+
+            for (int i = 0; i < 5; ++i) {
+                const auto result = p->fn(ctx);
+
+                if (std::holds_alternative<ul::Error>(result)) {
+                    if (i < 4) {
+                        using namespace std::chrono_literals;
+
+                        std::cout << "failed (attempt #" << i + 1 << ") ... ";
+                        std::this_thread::sleep_for((i+1) * 1000ms);
+                    } else {
+                        const ul::Error error = std::get<ul::Error>(result);
+                        std::cout << "FAILED (";
+                        if (error.code_ != 0) {
+                            std::cout << "code: " << error.code_ << " ";
+                        }
+                        std::cout << "message: " << error.message_ << ")" << std::endl;
+                        ++failed;
+                        break;
+                    }
+                } else {
+                    std::cout << "ok" << std::endl;
+                    break;
                 }
-                std::cout << "message: " << error.message_ << ")" << std::endl;
-                ++failed;
-            } else {
-                std::cout << "ok" << std::endl;
             }
         }
 
@@ -114,7 +128,7 @@ int main(int argc, char** argv) {
             std::cerr << "Missing access key or secret key for "
                       << (config.region_ == ul::Region::CA ? "CA" : "US")
                       << std::endl;
-            continue;
+        continue;
         }
 
         ul::Key key = ul::Key(

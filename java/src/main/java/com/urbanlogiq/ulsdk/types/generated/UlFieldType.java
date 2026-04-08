@@ -33,5 +33,6 @@ public final class UlFieldType {
   public static final long FT_BINARY = 22L;
   public static final long FT_TIME = 23L;
   public static final long FT_GEOMETRY_OR_NODE = 24L;
+  public static final long FT_STRING_ARRAY = 25L;
 }
 

@@ -421,11 +421,7 @@ InboxItem::operator==(const InboxItem &rhs) const {
 
 ::flatbuffers::Offset<::Notification>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Notification &o) {
-    std::optional<std::pair<::flatbuffers::Offset<void>, ::NotificationUnion>> notification_offset = std::nullopt;
-    if (o.notification_.has_value()) {
-        const std::pair<::flatbuffers::Offset<void>, ::NotificationUnion> notification_offset_val = serialize_to(builder, o.notification_.value());
-        notification_offset = std::make_optional(notification_offset_val);
-    }
+    const std::pair<::flatbuffers::Offset<void>, ::NotificationUnion> notification_offset = serialize_to(builder, o.notification_);
     std::optional<::flatbuffers::Offset<::B2cId>> sender_offset = std::nullopt;
     if (o.sender_.has_value()) {
         const ::flatbuffers::Offset<::B2cId> sender_offset_val = serialize_to(builder, o.sender_.value());
@@ -433,11 +429,8 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Notification &o) {
     }
 
     ::NotificationBuilder instance_builder = ::NotificationBuilder(builder);
-    if (notification_offset.has_value()) {
-        const auto notification_opt = notification_offset.value();
-        instance_builder.add_notification(notification_opt.first);
-        instance_builder.add_notification_type(notification_opt.second);
-    }
+    instance_builder.add_notification(notification_offset.first);
+    instance_builder.add_notification_type(notification_offset.second);
     if (sender_offset.has_value()) {
         instance_builder.add_sender(sender_offset.value());
     }
@@ -453,7 +446,7 @@ std::vector<uint8_t> to_bytes(const Notification &o) {
 }
 
 Notification::Notification()
-    : notification_(std::nullopt)
+    : notification_(std::make_shared<Share>())
     , sender_(std::nullopt) {
 }
 
@@ -462,7 +455,7 @@ Notification::Notification(const std::vector<uint8_t> &bytes)
 }
 
 Notification::Notification(const ::Notification *root) 
-    : notification_(std::nullopt)
+    : notification_(std::make_shared<Share>())
     , sender_(std::nullopt) {
     if (root == nullptr) {
         throw std::runtime_error("cannot deserialize flatbuffer type");

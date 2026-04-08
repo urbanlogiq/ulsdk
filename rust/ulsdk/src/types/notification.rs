@@ -569,7 +569,7 @@ impl InboxItem {
 
 #[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
 pub struct Notification {
-    pub notification: Option<NotificationUnion>,
+    pub notification: NotificationUnion,
     pub sender: Option<B2cId>,
 }
 
@@ -580,14 +580,12 @@ impl Notification {
     ) -> flatbuffers::WIPOffset<FbsNotification<'a>> {
         use crate::types::generated::notification_generated::NotificationBuilder as FbsNotificationBuilder;
 
-        let notification_offset = self.notification.as_ref().map(|u| u.serialize_to(builder));
+        let (notification_offset, notification_ty) = self.notification.serialize_to(builder);
         let sender_offset = self.sender.as_ref().map(|o| o.serialize_to(builder));
 
         let mut bldr = FbsNotificationBuilder::new(builder);
-        if let Some((offset, ty)) = notification_offset {
-            bldr.add_notification(offset);
-            bldr.add_notification_type(ty);
-        }
+        bldr.add_notification(notification_offset);
+        bldr.add_notification_type(notification_ty);
         if let Some(offset) = sender_offset {
             bldr.add_sender(offset);
         }
@@ -597,26 +595,20 @@ impl Notification {
 
 impl From<FbsNotification<'_>> for Notification {
     fn from(fbs: FbsNotification<'_>) -> Self {
-        let notification = if let Some(val) = fbs.notification() {
-            let notification = match fbs.notification_type() {
-                FbsNotificationUnion::Share => {
-                    NotificationUnion::Share(Share::from(fbs.notification_as_share().unwrap()))
-                }
-                FbsNotificationUnion::JobComplete => NotificationUnion::JobComplete(
-                    JobComplete::from(fbs.notification_as_job_complete().unwrap()),
-                ),
-                FbsNotificationUnion::AccessRequest => NotificationUnion::AccessRequest(
-                    AccessRequest::from(fbs.notification_as_access_request().unwrap()),
-                ),
-                FbsNotificationUnion::DriveChange => NotificationUnion::DriveChange(
-                    DriveChange::from(fbs.notification_as_drive_change().unwrap()),
-                ),
-                _ => unreachable!(),
-            };
-
-            Some(notification)
-        } else {
-            None
+        let notification = match fbs.notification_type() {
+            FbsNotificationUnion::Share => {
+                NotificationUnion::Share(Share::from(fbs.notification_as_share().unwrap()))
+            }
+            FbsNotificationUnion::JobComplete => NotificationUnion::JobComplete(JobComplete::from(
+                fbs.notification_as_job_complete().unwrap(),
+            )),
+            FbsNotificationUnion::AccessRequest => NotificationUnion::AccessRequest(
+                AccessRequest::from(fbs.notification_as_access_request().unwrap()),
+            ),
+            FbsNotificationUnion::DriveChange => NotificationUnion::DriveChange(DriveChange::from(
+                fbs.notification_as_drive_change().unwrap(),
+            )),
+            _ => unreachable!(),
         };
 
         let sender = fbs.sender().map(B2cId::from);

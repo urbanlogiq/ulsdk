@@ -40,4 +40,14 @@ public final class RoadUserTy {
     public static final int CROSSWALKS = com.urbanlogiq.ulsdk.types.generated.RoadUserTy.CROSSWALKS;
     public static final int TRAMS = com.urbanlogiq.ulsdk.types.generated.RoadUserTy.TRAMS;
     public static final int TAXIS = com.urbanlogiq.ulsdk.types.generated.RoadUserTy.TAXIS;
+    public static final int OTHER_TWO_AXLE_FOUR_TIRE_VEHICLES = com.urbanlogiq.ulsdk.types.generated.RoadUserTy.OTHER_TWO_AXLE_FOUR_TIRE_VEHICLES;
+    public static final int TWO_AXLE_SIX_TIRE_SINGLE_UNIT_TRUCKS = com.urbanlogiq.ulsdk.types.generated.RoadUserTy.TWO_AXLE_SIX_TIRE_SINGLE_UNIT_TRUCKS;
+    public static final int THREE_AXLE_SINGLE_UNIT_TRUCKS = com.urbanlogiq.ulsdk.types.generated.RoadUserTy.THREE_AXLE_SINGLE_UNIT_TRUCKS;
+    public static final int FOUR_PLUS_AXLE_SINGLE_UNIT_TRUCKS = com.urbanlogiq.ulsdk.types.generated.RoadUserTy.FOUR_PLUS_AXLE_SINGLE_UNIT_TRUCKS;
+    public static final int FOUR_AXLE_OR_FEWER_SINGLE_TRAILER_TRUCKS = com.urbanlogiq.ulsdk.types.generated.RoadUserTy.FOUR_AXLE_OR_FEWER_SINGLE_TRAILER_TRUCKS;
+    public static final int FIVE_AXLE_TRACTOR_SEMITRAILERS = com.urbanlogiq.ulsdk.types.generated.RoadUserTy.FIVE_AXLE_TRACTOR_SEMITRAILERS;
+    public static final int SIX_PLUS_AXLE_SINGLE_TRAILER_TRUCKS = com.urbanlogiq.ulsdk.types.generated.RoadUserTy.SIX_PLUS_AXLE_SINGLE_TRAILER_TRUCKS;
+    public static final int MULTI_TRAILER_TRUCKS_SIX_AXLES = com.urbanlogiq.ulsdk.types.generated.RoadUserTy.MULTI_TRAILER_TRUCKS_SIX_AXLES;
+    public static final int MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES = com.urbanlogiq.ulsdk.types.generated.RoadUserTy.MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES;
+    public static final int MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES = com.urbanlogiq.ulsdk.types.generated.RoadUserTy.MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES;
 }

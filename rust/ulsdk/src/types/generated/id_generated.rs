@@ -182,8 +182,8 @@ impl<'a> ObjectId<'a> {
         ObjectId { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args ObjectIdArgs<'args>,
     ) -> flatbuffers::WIPOffset<ObjectId<'bldr>> {
         let mut builder = ObjectIdBuilder::new(_fbb);
@@ -249,18 +249,18 @@ impl Serialize for ObjectId<'_> {
     }
 }
 
-pub struct ObjectIdBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct ObjectIdBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> ObjectIdBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ObjectIdBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_b(&mut self, b: flatbuffers::WIPOffset<flatbuffers::Vector<'b, u8>>) {
         self.fbb_
             .push_slot_always::<flatbuffers::WIPOffset<_>>(ObjectId::VT_B, b);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ObjectIdBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> ObjectIdBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         ObjectIdBuilder {
             fbb_: _fbb,
@@ -307,8 +307,8 @@ impl<'a> ContentId<'a> {
         ContentId { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args ContentIdArgs<'args>,
     ) -> flatbuffers::WIPOffset<ContentId<'bldr>> {
         let mut builder = ContentIdBuilder::new(_fbb);
@@ -374,18 +374,18 @@ impl Serialize for ContentId<'_> {
     }
 }
 
-pub struct ContentIdBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct ContentIdBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> ContentIdBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ContentIdBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_b(&mut self, b: flatbuffers::WIPOffset<flatbuffers::Vector<'b, u8>>) {
         self.fbb_
             .push_slot_always::<flatbuffers::WIPOffset<_>>(ContentId::VT_B, b);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ContentIdBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> ContentIdBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         ContentIdBuilder {
             fbb_: _fbb,
@@ -432,8 +432,8 @@ impl<'a> B2cId<'a> {
         B2cId { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args B2cIdArgs<'args>,
     ) -> flatbuffers::WIPOffset<B2cId<'bldr>> {
         let mut builder = B2cIdBuilder::new(_fbb);
@@ -496,18 +496,18 @@ impl Serialize for B2cId<'_> {
     }
 }
 
-pub struct B2cIdBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct B2cIdBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> B2cIdBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> B2cIdBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_b(&mut self, b: flatbuffers::WIPOffset<flatbuffers::Vector<'b, u8>>) {
         self.fbb_
             .push_slot_always::<flatbuffers::WIPOffset<_>>(B2cId::VT_B, b);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> B2cIdBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> B2cIdBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         B2cIdBuilder {
             fbb_: _fbb,
@@ -554,8 +554,8 @@ impl<'a> GenericId<'a> {
         GenericId { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args GenericIdArgs<'args>,
     ) -> flatbuffers::WIPOffset<GenericId<'bldr>> {
         let mut builder = GenericIdBuilder::new(_fbb);
@@ -621,18 +621,18 @@ impl Serialize for GenericId<'_> {
     }
 }
 
-pub struct GenericIdBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct GenericIdBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> GenericIdBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> GenericIdBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_b(&mut self, b: flatbuffers::WIPOffset<flatbuffers::Vector<'b, u8>>) {
         self.fbb_
             .push_slot_always::<flatbuffers::WIPOffset<_>>(GenericId::VT_B, b);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> GenericIdBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> GenericIdBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         GenericIdBuilder {
             fbb_: _fbb,
@@ -679,8 +679,8 @@ impl<'a> DataStateId<'a> {
         DataStateId { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args DataStateIdArgs<'args>,
     ) -> flatbuffers::WIPOffset<DataStateId<'bldr>> {
         let mut builder = DataStateIdBuilder::new(_fbb);
@@ -746,18 +746,20 @@ impl Serialize for DataStateId<'_> {
     }
 }
 
-pub struct DataStateIdBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct DataStateIdBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> DataStateIdBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> DataStateIdBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_b(&mut self, b: flatbuffers::WIPOffset<flatbuffers::Vector<'b, u8>>) {
         self.fbb_
             .push_slot_always::<flatbuffers::WIPOffset<_>>(DataStateId::VT_B, b);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> DataStateIdBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> DataStateIdBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         DataStateIdBuilder {
             fbb_: _fbb,
@@ -804,8 +806,8 @@ impl<'a> StreamId<'a> {
         StreamId { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args StreamIdArgs<'args>,
     ) -> flatbuffers::WIPOffset<StreamId<'bldr>> {
         let mut builder = StreamIdBuilder::new(_fbb);
@@ -871,18 +873,18 @@ impl Serialize for StreamId<'_> {
     }
 }
 
-pub struct StreamIdBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct StreamIdBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> StreamIdBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> StreamIdBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_b(&mut self, b: flatbuffers::WIPOffset<flatbuffers::Vector<'b, u8>>) {
         self.fbb_
             .push_slot_always::<flatbuffers::WIPOffset<_>>(StreamId::VT_B, b);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> StreamIdBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> StreamIdBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         StreamIdBuilder {
             fbb_: _fbb,
@@ -929,8 +931,8 @@ impl<'a> ColumnGroupId<'a> {
         ColumnGroupId { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args ColumnGroupIdArgs<'args>,
     ) -> flatbuffers::WIPOffset<ColumnGroupId<'bldr>> {
         let mut builder = ColumnGroupIdBuilder::new(_fbb);
@@ -996,18 +998,20 @@ impl Serialize for ColumnGroupId<'_> {
     }
 }
 
-pub struct ColumnGroupIdBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct ColumnGroupIdBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> ColumnGroupIdBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ColumnGroupIdBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_b(&mut self, b: flatbuffers::WIPOffset<flatbuffers::Vector<'b, u8>>) {
         self.fbb_
             .push_slot_always::<flatbuffers::WIPOffset<_>>(ColumnGroupId::VT_B, b);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ColumnGroupIdBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> ColumnGroupIdBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         ColumnGroupIdBuilder {
             fbb_: _fbb,
@@ -1054,8 +1058,8 @@ impl<'a> GraphNodeId<'a> {
         GraphNodeId { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args GraphNodeIdArgs<'args>,
     ) -> flatbuffers::WIPOffset<GraphNodeId<'bldr>> {
         let mut builder = GraphNodeIdBuilder::new(_fbb);
@@ -1121,18 +1125,20 @@ impl Serialize for GraphNodeId<'_> {
     }
 }
 
-pub struct GraphNodeIdBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct GraphNodeIdBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> GraphNodeIdBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> GraphNodeIdBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_b(&mut self, b: flatbuffers::WIPOffset<flatbuffers::Vector<'b, u8>>) {
         self.fbb_
             .push_slot_always::<flatbuffers::WIPOffset<_>>(GraphNodeId::VT_B, b);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> GraphNodeIdBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> GraphNodeIdBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         GraphNodeIdBuilder {
             fbb_: _fbb,

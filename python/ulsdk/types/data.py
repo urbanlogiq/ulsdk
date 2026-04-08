@@ -102,6 +102,7 @@ from .generated.Map import Map as FbsMap
 from .generated.NamedParameter import NamedParameter as FbsNamedParameter
 from .generated.Null import Null as FbsNull
 from .generated.ObjectId import ObjectId as FbsObjectId
+from .generated.OutputSchema import OutputSchema as FbsOutputSchema
 from .generated.RunEndEncoded import RunEndEncoded as FbsRunEndEncoded
 from .generated.Schema import Schema as FbsSchema
 from .generated.Source import Source as FbsSource
@@ -190,6 +191,16 @@ class RoadUserTy(Enum):
     CROSSWALKS = 32
     TRAMS = 33
     TAXIS = 34
+    OTHER_TWO_AXLE_FOUR_TIRE_VEHICLES = 35
+    TWO_AXLE_SIX_TIRE_SINGLE_UNIT_TRUCKS = 36
+    THREE_AXLE_SINGLE_UNIT_TRUCKS = 37
+    FOUR_PLUS_AXLE_SINGLE_UNIT_TRUCKS = 38
+    FOUR_AXLE_OR_FEWER_SINGLE_TRAILER_TRUCKS = 39
+    FIVE_AXLE_TRACTOR_SEMITRAILERS = 40
+    SIX_PLUS_AXLE_SINGLE_TRAILER_TRUCKS = 41
+    MULTI_TRAILER_TRUCKS_SIX_AXLES = 42
+    MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES = 43
+    MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES = 44
 
 class StatisticTy(Enum):
     PERCENTILE_15 = 15
@@ -503,6 +514,92 @@ class NamedParameter:
         return eq
 
 @dataclass
+class OutputSchema:
+    attributes: "List[AttributePair]"
+
+    schema: "List[Schema]"
+
+    @classmethod
+    def from_fbs(cls, o: FbsOutputSchema) -> Self:
+        attributes = list()
+        if not o.AttributesIsNone():
+            for i in range(o.AttributesLength()):
+                attributes_val = None
+                attributes_obj = o.Attributes(i)
+                if attributes_obj is not None:
+                    attributes_val = AttributePair.from_fbs(attributes_obj)
+                attributes.append(attributes_val)
+        schema = list()
+        if not o.SchemaIsNone():
+            for i in range(o.SchemaLength()):
+                schema_val = None
+                schema_obj = o.Schema(i)
+                if schema_obj is not None:
+                    schema_val = Schema.from_fbs(schema_obj)
+                schema.append(schema_val)
+        return cls(attributes, schema)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsOutputSchema.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.OutputSchema import (
+            Start,
+            AddAttributes,
+            StartAttributesVector,
+            AddSchema,
+            StartSchemaVector,
+            End,
+        )
+        attributes_offsets = list()
+        for value in self.attributes:
+            attributes_offsets.append(value.serialize_to(builder))
+        StartAttributesVector(builder, len(self.attributes))
+        for i in reversed(range(len(self.attributes))):
+            builder.PrependUOffsetTRelative(attributes_offsets[i])
+        attributes_offset = builder.EndVector()
+        schema_offsets = list()
+        for value in self.schema:
+            schema_offsets.append(value.serialize_to(builder))
+        StartSchemaVector(builder, len(self.schema))
+        for i in reversed(range(len(self.schema))):
+            builder.PrependUOffsetTRelative(schema_offsets[i])
+        schema_offset = builder.EndVector()
+
+        Start(builder)
+        AddAttributes(builder, attributes_offset)
+        AddSchema(builder, schema_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        attributes = []
+        schema = []
+        return cls(attributes, schema)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        if len(self.attributes) != len(other.attributes):
+            return False
+        for i in range(len(self.attributes)):
+            eq = eq and self.attributes[i] == other.attributes[i]
+        if len(self.schema) != len(other.schema):
+            return False
+        for i in range(len(self.schema)):
+            eq = eq and self.schema[i] == other.schema[i]
+
+        return eq
+
+@dataclass
 class Source:
     metadata: Optional["ObjectId"]
 
@@ -514,7 +611,7 @@ class Source:
 
     options: Optional["bytes"]
 
-    schemas: Optional["List[Schema]"]
+    output_schemas: Optional["List[OutputSchema]"]
 
     url: "str"
 
@@ -543,18 +640,18 @@ class Source:
             options = b""
         else:
             options = bytes(o.OptionsAsNumpy())
-        schemas = list()
-        if not o.SchemasIsNone():
-            for i in range(o.SchemasLength()):
-                schemas_val = None
-                schemas_obj = o.Schemas(i)
-                if schemas_obj is not None:
-                    schemas_val = Schema.from_fbs(schemas_obj)
-                schemas.append(schemas_val)
+        output_schemas = list()
+        if not o.OutputSchemasIsNone():
+            for i in range(o.OutputSchemasLength()):
+                output_schemas_val = None
+                output_schemas_obj = o.OutputSchemas(i)
+                if output_schemas_obj is not None:
+                    output_schemas_val = OutputSchema.from_fbs(output_schemas_obj)
+                output_schemas.append(output_schemas_val)
         url_str = o.Url()
         assert url_str is not None
         url = url_str.decode('utf-8')
-        return cls(metadata, metadata_revision, name, named_parameters, options, schemas, url)
+        return cls(metadata, metadata_revision, name, named_parameters, options, output_schemas, url)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -572,8 +669,8 @@ class Source:
             StartNamedParametersVector,
             AddOptions,
             StartOptionsVector,
-            AddSchemas,
-            StartSchemasVector,
+            AddOutputSchemas,
+            StartOutputSchemasVector,
             AddUrl,
             End,
         )
@@ -599,15 +696,15 @@ class Source:
             for i in reversed(range(len(self.options))):
                 builder.PrependUint8(self.options[i])
             options_offset = builder.EndVector()
-        schemas_offset = None
-        if self.schemas is not None:
-            schemas_offsets = list()
-            for value in self.schemas:
-                schemas_offsets.append(value.serialize_to(builder))
-            StartSchemasVector(builder, len(self.schemas))
-            for i in reversed(range(len(self.schemas))):
-                builder.PrependUOffsetTRelative(schemas_offsets[i])
-            schemas_offset = builder.EndVector()
+        output_schemas_offset = None
+        if self.output_schemas is not None:
+            output_schemas_offsets = list()
+            for value in self.output_schemas:
+                output_schemas_offsets.append(value.serialize_to(builder))
+            StartOutputSchemasVector(builder, len(self.output_schemas))
+            for i in reversed(range(len(self.output_schemas))):
+                builder.PrependUOffsetTRelative(output_schemas_offsets[i])
+            output_schemas_offset = builder.EndVector()
         url_offset = builder.CreateString(self.url)
 
         Start(builder)
@@ -620,8 +717,8 @@ class Source:
             AddNamedParameters(builder, named_parameters_offset)
         if options_offset is not None:
             AddOptions(builder, options_offset)
-        if schemas_offset is not None:
-            AddSchemas(builder, schemas_offset)
+        if output_schemas_offset is not None:
+            AddOutputSchemas(builder, output_schemas_offset)
         AddUrl(builder, url_offset)
         return End(builder)
 
@@ -638,9 +735,9 @@ class Source:
         name = ""
         named_parameters = []
         options = b""
-        schemas = []
+        output_schemas = []
         url = ""
-        return cls(metadata, metadata_revision, name, named_parameters, options, schemas, url)
+        return cls(metadata, metadata_revision, name, named_parameters, options, output_schemas, url)
 
     def __eq__(self, other) -> bool:
         eq = True
@@ -669,16 +766,16 @@ class Source:
             return False
         elif self_options is None and other_options is not None:
             return False
-        self_schemas = self.schemas
-        other_schemas = other.schemas
-        if self_schemas is not None and other_schemas is not None:
-            if len(self_schemas) != len(other_schemas):
+        self_output_schemas = self.output_schemas
+        other_output_schemas = other.output_schemas
+        if self_output_schemas is not None and other_output_schemas is not None:
+            if len(self_output_schemas) != len(other_output_schemas):
                 return False
-            for i in range(len(self_schemas)):
-                eq = eq and self_schemas[i] == other_schemas[i]
-        elif self_schemas is not None and other_schemas is None:
+            for i in range(len(self_output_schemas)):
+                eq = eq and self_output_schemas[i] == other_output_schemas[i]
+        elif self_output_schemas is not None and other_output_schemas is None:
             return False
-        elif self_schemas is None and other_schemas is not None:
+        elif self_output_schemas is None and other_output_schemas is not None:
             return False
         eq = eq and self.url == other.url
 

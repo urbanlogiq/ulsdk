@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class VBytes(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = VBytes()
         x.Init(buf, n + offset)
@@ -22,11 +21,11 @@ class VBytes(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # VBytes
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # VBytes
-    def V(self, j: int):
+    def V(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             a = self._tab.Vector(o)
@@ -41,37 +40,37 @@ class VBytes(object):
         return 0
 
     # VBytes
-    def VLength(self) -> int:
+    def VLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # VBytes
-    def VIsNone(self) -> bool:
+    def VIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def VBytesStart(builder: flatbuffers.Builder):
+def VBytesStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     VBytesStart(builder)
 
-def VBytesAddV(builder: flatbuffers.Builder, v: int):
+def VBytesAddV(builder, v):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(v), 0)
 
-def AddV(builder: flatbuffers.Builder, v: int):
+def AddV(builder, v):
     VBytesAddV(builder, v)
 
-def VBytesStartVVector(builder, numElems: int) -> int:
+def VBytesStartVVector(builder, numElems):
     return builder.StartVector(1, numElems, 1)
 
-def StartVVector(builder, numElems: int) -> int:
+def StartVVector(builder, numElems):
     return VBytesStartVVector(builder, numElems)
 
-def VBytesEnd(builder: flatbuffers.Builder) -> int:
+def VBytesEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return VBytesEnd(builder)

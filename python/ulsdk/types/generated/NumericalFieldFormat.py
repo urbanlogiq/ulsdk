@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class NumericalFieldFormat(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = NumericalFieldFormat()
         x.Init(buf, n + offset)
@@ -22,7 +21,7 @@ class NumericalFieldFormat(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # NumericalFieldFormat
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # NumericalFieldFormat
@@ -53,38 +52,38 @@ class NumericalFieldFormat(object):
             return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
         return 0.0
 
-def NumericalFieldFormatStart(builder: flatbuffers.Builder):
+def NumericalFieldFormatStart(builder):
     builder.StartObject(4)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     NumericalFieldFormatStart(builder)
 
-def NumericalFieldFormatAddValueType(builder: flatbuffers.Builder, valueType: int):
+def NumericalFieldFormatAddValueType(builder, valueType):
     builder.PrependUint32Slot(0, valueType, 0)
 
-def AddValueType(builder: flatbuffers.Builder, valueType: int):
+def AddValueType(builder, valueType):
     NumericalFieldFormatAddValueType(builder, valueType)
 
-def NumericalFieldFormatAddDecimalPlaces(builder: flatbuffers.Builder, decimalPlaces: int):
+def NumericalFieldFormatAddDecimalPlaces(builder, decimalPlaces):
     builder.PrependUint32Slot(1, decimalPlaces, 0)
 
-def AddDecimalPlaces(builder: flatbuffers.Builder, decimalPlaces: int):
+def AddDecimalPlaces(builder, decimalPlaces):
     NumericalFieldFormatAddDecimalPlaces(builder, decimalPlaces)
 
-def NumericalFieldFormatAddScale(builder: flatbuffers.Builder, scale: float):
+def NumericalFieldFormatAddScale(builder, scale):
     builder.PrependFloat64Slot(2, scale, 0.0)
 
-def AddScale(builder: flatbuffers.Builder, scale: float):
+def AddScale(builder, scale):
     NumericalFieldFormatAddScale(builder, scale)
 
-def NumericalFieldFormatAddOffset(builder: flatbuffers.Builder, offset: float):
+def NumericalFieldFormatAddOffset(builder, offset):
     builder.PrependFloat64Slot(3, offset, 0.0)
 
-def AddOffset(builder: flatbuffers.Builder, offset: float):
+def AddOffset(builder, offset):
     NumericalFieldFormatAddOffset(builder, offset)
 
-def NumericalFieldFormatEnd(builder: flatbuffers.Builder) -> int:
+def NumericalFieldFormatEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return NumericalFieldFormatEnd(builder)

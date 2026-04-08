@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class Edge(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Edge()
         x.Init(buf, n + offset)
@@ -22,11 +21,11 @@ class Edge(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Edge
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Edge
-    def From_(self):
+    def From(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
@@ -39,26 +38,26 @@ class Edge(object):
             return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
         return 0
 
-def EdgeStart(builder: flatbuffers.Builder):
+def EdgeStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     EdgeStart(builder)
 
-def EdgeAddFrom_(builder: flatbuffers.Builder, from_: int):
+def EdgeAddFrom(builder, from_):
     builder.PrependUint32Slot(0, from_, 0)
 
-def AddFrom_(builder: flatbuffers.Builder, from_: int):
-    EdgeAddFrom_(builder, from_)
+def AddFrom(builder, from_):
+    EdgeAddFrom(builder, from_)
 
-def EdgeAddTo(builder: flatbuffers.Builder, to: int):
+def EdgeAddTo(builder, to):
     builder.PrependUint32Slot(1, to, 0)
 
-def AddTo(builder: flatbuffers.Builder, to: int):
+def AddTo(builder, to):
     EdgeAddTo(builder, to)
 
-def EdgeEnd(builder: flatbuffers.Builder) -> int:
+def EdgeEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return EdgeEnd(builder)

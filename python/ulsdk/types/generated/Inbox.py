@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .InboxItem import InboxItem
-from typing import Optional
 np = import_numpy()
 
 class Inbox(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Inbox()
         x.Init(buf, n + offset)
@@ -24,53 +21,54 @@ class Inbox(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Inbox
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Inbox
-    def Items(self, j: int) -> Optional[InboxItem]:
+    def Items(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .InboxItem import InboxItem
             obj = InboxItem()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Inbox
-    def ItemsLength(self) -> int:
+    def ItemsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Inbox
-    def ItemsIsNone(self) -> bool:
+    def ItemsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def InboxStart(builder: flatbuffers.Builder):
+def InboxStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     InboxStart(builder)
 
-def InboxAddItems(builder: flatbuffers.Builder, items: int):
+def InboxAddItems(builder, items):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(items), 0)
 
-def AddItems(builder: flatbuffers.Builder, items: int):
+def AddItems(builder, items):
     InboxAddItems(builder, items)
 
-def InboxStartItemsVector(builder, numElems: int) -> int:
+def InboxStartItemsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartItemsVector(builder, numElems: int) -> int:
+def StartItemsVector(builder, numElems):
     return InboxStartItemsVector(builder, numElems)
 
-def InboxEnd(builder: flatbuffers.Builder) -> int:
+def InboxEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return InboxEnd(builder)

@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class GenericId(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = GenericId()
         x.Init(buf, n + offset)
@@ -22,11 +21,11 @@ class GenericId(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # GenericId
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # GenericId
-    def B(self, j: int):
+    def B(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             a = self._tab.Vector(o)
@@ -41,37 +40,37 @@ class GenericId(object):
         return 0
 
     # GenericId
-    def BLength(self) -> int:
+    def BLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # GenericId
-    def BIsNone(self) -> bool:
+    def BIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def GenericIdStart(builder: flatbuffers.Builder):
+def GenericIdStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     GenericIdStart(builder)
 
-def GenericIdAddB(builder: flatbuffers.Builder, b: int):
+def GenericIdAddB(builder, b):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(b), 0)
 
-def AddB(builder: flatbuffers.Builder, b: int):
+def AddB(builder, b):
     GenericIdAddB(builder, b)
 
-def GenericIdStartBVector(builder, numElems: int) -> int:
+def GenericIdStartBVector(builder, numElems):
     return builder.StartVector(1, numElems, 1)
 
-def StartBVector(builder, numElems: int) -> int:
+def StartBVector(builder, numElems):
     return GenericIdStartBVector(builder, numElems)
 
-def GenericIdEnd(builder: flatbuffers.Builder) -> int:
+def GenericIdEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return GenericIdEnd(builder)

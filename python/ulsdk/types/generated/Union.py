@@ -4,7 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 # A union is a complex type with children in Field
@@ -15,7 +14,7 @@ class Union(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Union()
         x.Init(buf, n + offset)
@@ -26,7 +25,7 @@ class Union(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Union
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Union
@@ -37,7 +36,7 @@ class Union(object):
         return 0
 
     # Union
-    def TypeIds(self, j: int):
+    def TypeIds(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             a = self._tab.Vector(o)
@@ -52,43 +51,43 @@ class Union(object):
         return 0
 
     # Union
-    def TypeIdsLength(self) -> int:
+    def TypeIdsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Union
-    def TypeIdsIsNone(self) -> bool:
+    def TypeIdsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
-def UnionStart(builder: flatbuffers.Builder):
+def UnionStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     UnionStart(builder)
 
-def UnionAddMode(builder: flatbuffers.Builder, mode: int):
+def UnionAddMode(builder, mode):
     builder.PrependInt16Slot(0, mode, 0)
 
-def AddMode(builder: flatbuffers.Builder, mode: int):
+def AddMode(builder, mode):
     UnionAddMode(builder, mode)
 
-def UnionAddTypeIds(builder: flatbuffers.Builder, typeIds: int):
+def UnionAddTypeIds(builder, typeIds):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(typeIds), 0)
 
-def AddTypeIds(builder: flatbuffers.Builder, typeIds: int):
+def AddTypeIds(builder, typeIds):
     UnionAddTypeIds(builder, typeIds)
 
-def UnionStartTypeIdsVector(builder, numElems: int) -> int:
+def UnionStartTypeIdsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartTypeIdsVector(builder, numElems: int) -> int:
+def StartTypeIdsVector(builder, numElems):
     return UnionStartTypeIdsVector(builder, numElems)
 
-def UnionEnd(builder: flatbuffers.Builder) -> int:
+def UnionEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return UnionEnd(builder)

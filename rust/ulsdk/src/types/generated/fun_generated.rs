@@ -40,7 +40,7 @@ pub const ENUM_MAX_FN: i16 = 32766;
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_FN: [Fn; 158] = [
+pub const ENUM_VALUES_FN: [Fn; 200] = [
     Fn::None,
     Fn::True,
     Fn::False,
@@ -195,6 +195,48 @@ pub const ENUM_VALUES_FN: [Fn; 158] = [
     Fn::Uuid,
     Fn::Unnest,
     Fn::PercentileCont,
+    Fn::ApproxPercentileCont,
+    Fn::Degrees,
+    Fn::Exp,
+    Fn::Factorial,
+    Fn::Isnan,
+    Fn::Iszero,
+    Fn::Ln,
+    Fn::Log,
+    Fn::Power,
+    Fn::Radians,
+    Fn::Sqrt,
+    Fn::Trunc,
+    Fn::Sin,
+    Fn::Cos,
+    Fn::Tan,
+    Fn::Tanh,
+    Fn::Acos,
+    Fn::Acosh,
+    Fn::Asin,
+    Fn::Asinh,
+    Fn::Atan,
+    Fn::Atan2,
+    Fn::Atanh,
+    Fn::Cbrt,
+    Fn::Cosh,
+    Fn::Cot,
+    Fn::Gcd,
+    Fn::Lcm,
+    Fn::Log10,
+    Fn::Log2,
+    Fn::Nanvl,
+    Fn::Pi,
+    Fn::Random,
+    Fn::Signum,
+    Fn::Sinh,
+    Fn::StMakePoint,
+    Fn::StCentroid,
+    Fn::StPoint,
+    Fn::Coalesce,
+    Fn::IsDistinctFrom,
+    Fn::IsNotDistinctFrom,
+    Fn::GeoFilter,
     Fn::CorrelationId,
     Fn::UlTimezone,
     Fn::UlArrayContains,
@@ -360,6 +402,48 @@ impl Fn {
     pub const Uuid: Self = Self(151);
     pub const Unnest: Self = Self(152);
     pub const PercentileCont: Self = Self(153);
+    pub const ApproxPercentileCont: Self = Self(154);
+    pub const Degrees: Self = Self(155);
+    pub const Exp: Self = Self(156);
+    pub const Factorial: Self = Self(157);
+    pub const Isnan: Self = Self(158);
+    pub const Iszero: Self = Self(159);
+    pub const Ln: Self = Self(160);
+    pub const Log: Self = Self(161);
+    pub const Power: Self = Self(162);
+    pub const Radians: Self = Self(163);
+    pub const Sqrt: Self = Self(164);
+    pub const Trunc: Self = Self(165);
+    pub const Sin: Self = Self(166);
+    pub const Cos: Self = Self(167);
+    pub const Tan: Self = Self(168);
+    pub const Tanh: Self = Self(169);
+    pub const Acos: Self = Self(170);
+    pub const Acosh: Self = Self(171);
+    pub const Asin: Self = Self(172);
+    pub const Asinh: Self = Self(173);
+    pub const Atan: Self = Self(174);
+    pub const Atan2: Self = Self(175);
+    pub const Atanh: Self = Self(176);
+    pub const Cbrt: Self = Self(177);
+    pub const Cosh: Self = Self(178);
+    pub const Cot: Self = Self(179);
+    pub const Gcd: Self = Self(180);
+    pub const Lcm: Self = Self(181);
+    pub const Log10: Self = Self(182);
+    pub const Log2: Self = Self(183);
+    pub const Nanvl: Self = Self(184);
+    pub const Pi: Self = Self(185);
+    pub const Random: Self = Self(186);
+    pub const Signum: Self = Self(187);
+    pub const Sinh: Self = Self(188);
+    pub const StMakePoint: Self = Self(189);
+    pub const StCentroid: Self = Self(190);
+    pub const StPoint: Self = Self(191);
+    pub const Coalesce: Self = Self(192);
+    pub const IsDistinctFrom: Self = Self(193);
+    pub const IsNotDistinctFrom: Self = Self(194);
+    pub const GeoFilter: Self = Self(195);
     pub const CorrelationId: Self = Self(32763);
     pub const UlTimezone: Self = Self(32764);
     pub const UlArrayContains: Self = Self(32765);
@@ -522,6 +606,48 @@ impl Fn {
         Self::Uuid,
         Self::Unnest,
         Self::PercentileCont,
+        Self::ApproxPercentileCont,
+        Self::Degrees,
+        Self::Exp,
+        Self::Factorial,
+        Self::Isnan,
+        Self::Iszero,
+        Self::Ln,
+        Self::Log,
+        Self::Power,
+        Self::Radians,
+        Self::Sqrt,
+        Self::Trunc,
+        Self::Sin,
+        Self::Cos,
+        Self::Tan,
+        Self::Tanh,
+        Self::Acos,
+        Self::Acosh,
+        Self::Asin,
+        Self::Asinh,
+        Self::Atan,
+        Self::Atan2,
+        Self::Atanh,
+        Self::Cbrt,
+        Self::Cosh,
+        Self::Cot,
+        Self::Gcd,
+        Self::Lcm,
+        Self::Log10,
+        Self::Log2,
+        Self::Nanvl,
+        Self::Pi,
+        Self::Random,
+        Self::Signum,
+        Self::Sinh,
+        Self::StMakePoint,
+        Self::StCentroid,
+        Self::StPoint,
+        Self::Coalesce,
+        Self::IsDistinctFrom,
+        Self::IsNotDistinctFrom,
+        Self::GeoFilter,
         Self::CorrelationId,
         Self::UlTimezone,
         Self::UlArrayContains,
@@ -684,6 +810,48 @@ impl Fn {
             Self::Uuid => Some("Uuid"),
             Self::Unnest => Some("Unnest"),
             Self::PercentileCont => Some("PercentileCont"),
+            Self::ApproxPercentileCont => Some("ApproxPercentileCont"),
+            Self::Degrees => Some("Degrees"),
+            Self::Exp => Some("Exp"),
+            Self::Factorial => Some("Factorial"),
+            Self::Isnan => Some("Isnan"),
+            Self::Iszero => Some("Iszero"),
+            Self::Ln => Some("Ln"),
+            Self::Log => Some("Log"),
+            Self::Power => Some("Power"),
+            Self::Radians => Some("Radians"),
+            Self::Sqrt => Some("Sqrt"),
+            Self::Trunc => Some("Trunc"),
+            Self::Sin => Some("Sin"),
+            Self::Cos => Some("Cos"),
+            Self::Tan => Some("Tan"),
+            Self::Tanh => Some("Tanh"),
+            Self::Acos => Some("Acos"),
+            Self::Acosh => Some("Acosh"),
+            Self::Asin => Some("Asin"),
+            Self::Asinh => Some("Asinh"),
+            Self::Atan => Some("Atan"),
+            Self::Atan2 => Some("Atan2"),
+            Self::Atanh => Some("Atanh"),
+            Self::Cbrt => Some("Cbrt"),
+            Self::Cosh => Some("Cosh"),
+            Self::Cot => Some("Cot"),
+            Self::Gcd => Some("Gcd"),
+            Self::Lcm => Some("Lcm"),
+            Self::Log10 => Some("Log10"),
+            Self::Log2 => Some("Log2"),
+            Self::Nanvl => Some("Nanvl"),
+            Self::Pi => Some("Pi"),
+            Self::Random => Some("Random"),
+            Self::Signum => Some("Signum"),
+            Self::Sinh => Some("Sinh"),
+            Self::StMakePoint => Some("StMakePoint"),
+            Self::StCentroid => Some("StCentroid"),
+            Self::StPoint => Some("StPoint"),
+            Self::Coalesce => Some("Coalesce"),
+            Self::IsDistinctFrom => Some("IsDistinctFrom"),
+            Self::IsNotDistinctFrom => Some("IsNotDistinctFrom"),
+            Self::GeoFilter => Some("GeoFilter"),
             Self::CorrelationId => Some("CorrelationId"),
             Self::UlTimezone => Some("UlTimezone"),
             Self::UlArrayContains => Some("UlArrayContains"),

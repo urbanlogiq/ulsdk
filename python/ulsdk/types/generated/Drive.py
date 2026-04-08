@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ObjectId import ObjectId
-from typing import Optional
 np = import_numpy()
 
 class Drive(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Drive()
         x.Init(buf, n + offset)
@@ -24,46 +21,47 @@ class Drive(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Drive
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Drive
-    def Root(self) -> Optional[ObjectId]:
+    def Root(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Drive
-    def Path(self) -> Optional[bytes]:
+    def Path(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def DriveStart(builder: flatbuffers.Builder):
+def DriveStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DriveStart(builder)
 
-def DriveAddRoot(builder: flatbuffers.Builder, root: int):
+def DriveAddRoot(builder, root):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(root), 0)
 
-def AddRoot(builder: flatbuffers.Builder, root: int):
+def AddRoot(builder, root):
     DriveAddRoot(builder, root)
 
-def DriveAddPath(builder: flatbuffers.Builder, path: int):
+def DriveAddPath(builder, path):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(path), 0)
 
-def AddPath(builder: flatbuffers.Builder, path: int):
+def AddPath(builder, path):
     DriveAddPath(builder, path)
 
-def DriveEnd(builder: flatbuffers.Builder) -> int:
+def DriveEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DriveEnd(builder)

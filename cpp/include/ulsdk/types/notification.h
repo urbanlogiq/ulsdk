@@ -124,7 +124,7 @@ struct InboxItem {
 };
 
 struct Notification {
-    std::optional<NotificationUnion> notification_;
+    NotificationUnion notification_;
     std::optional<B2cId> sender_;
 
     Notification();

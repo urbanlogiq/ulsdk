@@ -1,0 +1,15 @@
+/**
+ * The type of chart to use to display the data
+ */
+export declare enum ChartTypeTy {
+    Invalid = 0,
+    Bar = 1,
+    HorizontalBar = 2,
+    Doughnut = 3,
+    Line = 4,
+    SimpleTable = 5,
+    SingleNumber = 6,
+    Text = 7,
+    DashboardTable = 8
+}
+//# sourceMappingURL=chart-type-ty.d.ts.map

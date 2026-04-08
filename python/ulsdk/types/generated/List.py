@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class List(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = List()
         x.Init(buf, n + offset)
@@ -22,17 +21,17 @@ class List(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # List
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
-def ListStart(builder: flatbuffers.Builder):
+def ListStart(builder):
     builder.StartObject(0)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ListStart(builder)
 
-def ListEnd(builder: flatbuffers.Builder) -> int:
+def ListEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ListEnd(builder)

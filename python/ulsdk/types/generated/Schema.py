@@ -4,10 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Field import Field
-from .KeyValue import KeyValue
-from typing import Optional
 np = import_numpy()
 
 # ----------------------------------------------------------------------
@@ -16,7 +12,7 @@ class Schema(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Schema()
         x.Init(buf, n + offset)
@@ -27,7 +23,7 @@ class Schema(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Schema
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # endianness of the buffer
@@ -41,56 +37,58 @@ class Schema(object):
         return 0
 
     # Schema
-    def Fields(self, j: int) -> Optional[Field]:
+    def Fields(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Field import Field
             obj = Field()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Schema
-    def FieldsLength(self) -> int:
+    def FieldsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Schema
-    def FieldsIsNone(self) -> bool:
+    def FieldsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
     # Schema
-    def CustomMetadata(self, j: int) -> Optional[KeyValue]:
+    def CustomMetadata(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .KeyValue import KeyValue
             obj = KeyValue()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Schema
-    def CustomMetadataLength(self) -> int:
+    def CustomMetadataLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Schema
-    def CustomMetadataIsNone(self) -> bool:
+    def CustomMetadataIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
     # Features used in the stream/file.
     # Schema
-    def Features(self, j: int):
+    def Features(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             a = self._tab.Vector(o)
@@ -105,67 +103,67 @@ class Schema(object):
         return 0
 
     # Schema
-    def FeaturesLength(self) -> int:
+    def FeaturesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Schema
-    def FeaturesIsNone(self) -> bool:
+    def FeaturesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         return o == 0
 
-def SchemaStart(builder: flatbuffers.Builder):
+def SchemaStart(builder):
     builder.StartObject(4)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     SchemaStart(builder)
 
-def SchemaAddEndianness(builder: flatbuffers.Builder, endianness: int):
+def SchemaAddEndianness(builder, endianness):
     builder.PrependInt16Slot(0, endianness, 0)
 
-def AddEndianness(builder: flatbuffers.Builder, endianness: int):
+def AddEndianness(builder, endianness):
     SchemaAddEndianness(builder, endianness)
 
-def SchemaAddFields(builder: flatbuffers.Builder, fields: int):
+def SchemaAddFields(builder, fields):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(fields), 0)
 
-def AddFields(builder: flatbuffers.Builder, fields: int):
+def AddFields(builder, fields):
     SchemaAddFields(builder, fields)
 
-def SchemaStartFieldsVector(builder, numElems: int) -> int:
+def SchemaStartFieldsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartFieldsVector(builder, numElems: int) -> int:
+def StartFieldsVector(builder, numElems):
     return SchemaStartFieldsVector(builder, numElems)
 
-def SchemaAddCustomMetadata(builder: flatbuffers.Builder, customMetadata: int):
+def SchemaAddCustomMetadata(builder, customMetadata):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(customMetadata), 0)
 
-def AddCustomMetadata(builder: flatbuffers.Builder, customMetadata: int):
+def AddCustomMetadata(builder, customMetadata):
     SchemaAddCustomMetadata(builder, customMetadata)
 
-def SchemaStartCustomMetadataVector(builder, numElems: int) -> int:
+def SchemaStartCustomMetadataVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartCustomMetadataVector(builder, numElems: int) -> int:
+def StartCustomMetadataVector(builder, numElems):
     return SchemaStartCustomMetadataVector(builder, numElems)
 
-def SchemaAddFeatures(builder: flatbuffers.Builder, features: int):
+def SchemaAddFeatures(builder, features):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(features), 0)
 
-def AddFeatures(builder: flatbuffers.Builder, features: int):
+def AddFeatures(builder, features):
     SchemaAddFeatures(builder, features)
 
-def SchemaStartFeaturesVector(builder, numElems: int) -> int:
+def SchemaStartFeaturesVector(builder, numElems):
     return builder.StartVector(8, numElems, 8)
 
-def StartFeaturesVector(builder, numElems: int) -> int:
+def StartFeaturesVector(builder, numElems):
     return SchemaStartFeaturesVector(builder, numElems)
 
-def SchemaEnd(builder: flatbuffers.Builder) -> int:
+def SchemaEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return SchemaEnd(builder)

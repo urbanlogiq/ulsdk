@@ -4,19 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Attr import Attr
-from .ObjectId import ObjectId
-from .Task import Task
-from .TaskParameter import TaskParameter
-from typing import Optional
 np = import_numpy()
 
 class Job(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Job()
         x.Init(buf, n + offset)
@@ -27,7 +21,7 @@ class Job(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Job
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Is the job complete?
@@ -40,10 +34,11 @@ class Job(object):
 
     # User ID who created this job.
     # Job
-    def UserId(self) -> Optional[ObjectId]:
+    def UserId(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -51,56 +46,58 @@ class Job(object):
 
     # A list of all the tasks that constitute this job.
     # Job
-    def Tasks(self, j: int) -> Optional[Task]:
+    def Tasks(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Task import Task
             obj = Task()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Job
-    def TasksLength(self) -> int:
+    def TasksLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Job
-    def TasksIsNone(self) -> bool:
+    def TasksIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
     # Parameters verbatim from the RunSpec
     # Job
-    def Params(self, j: int) -> Optional[TaskParameter]:
+    def Params(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .TaskParameter import TaskParameter
             obj = TaskParameter()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Job
-    def ParamsLength(self) -> int:
+    def ParamsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Job
-    def ParamsIsNone(self) -> bool:
+    def ParamsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         return o == 0
 
     # Job
-    def ErrorTys(self, j: int):
+    def ErrorTys(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             a = self._tab.Vector(o)
@@ -115,109 +112,110 @@ class Job(object):
         return 0
 
     # Job
-    def ErrorTysLength(self) -> int:
+    def ErrorTysLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Job
-    def ErrorTysIsNone(self) -> bool:
+    def ErrorTysIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         return o == 0
 
     # Job
-    def Attributes(self, j: int) -> Optional[Attr]:
+    def Attributes(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Attr import Attr
             obj = Attr()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Job
-    def AttributesLength(self) -> int:
+    def AttributesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Job
-    def AttributesIsNone(self) -> bool:
+    def AttributesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         return o == 0
 
-def JobStart(builder: flatbuffers.Builder):
+def JobStart(builder):
     builder.StartObject(6)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     JobStart(builder)
 
-def JobAddStatus(builder: flatbuffers.Builder, status: int):
+def JobAddStatus(builder, status):
     builder.PrependInt8Slot(0, status, 0)
 
-def AddStatus(builder: flatbuffers.Builder, status: int):
+def AddStatus(builder, status):
     JobAddStatus(builder, status)
 
-def JobAddUserId(builder: flatbuffers.Builder, userId: int):
+def JobAddUserId(builder, userId):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(userId), 0)
 
-def AddUserId(builder: flatbuffers.Builder, userId: int):
+def AddUserId(builder, userId):
     JobAddUserId(builder, userId)
 
-def JobAddTasks(builder: flatbuffers.Builder, tasks: int):
+def JobAddTasks(builder, tasks):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(tasks), 0)
 
-def AddTasks(builder: flatbuffers.Builder, tasks: int):
+def AddTasks(builder, tasks):
     JobAddTasks(builder, tasks)
 
-def JobStartTasksVector(builder, numElems: int) -> int:
+def JobStartTasksVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartTasksVector(builder, numElems: int) -> int:
+def StartTasksVector(builder, numElems):
     return JobStartTasksVector(builder, numElems)
 
-def JobAddParams(builder: flatbuffers.Builder, params: int):
+def JobAddParams(builder, params):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(params), 0)
 
-def AddParams(builder: flatbuffers.Builder, params: int):
+def AddParams(builder, params):
     JobAddParams(builder, params)
 
-def JobStartParamsVector(builder, numElems: int) -> int:
+def JobStartParamsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartParamsVector(builder, numElems: int) -> int:
+def StartParamsVector(builder, numElems):
     return JobStartParamsVector(builder, numElems)
 
-def JobAddErrorTys(builder: flatbuffers.Builder, errorTys: int):
+def JobAddErrorTys(builder, errorTys):
     builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(errorTys), 0)
 
-def AddErrorTys(builder: flatbuffers.Builder, errorTys: int):
+def AddErrorTys(builder, errorTys):
     JobAddErrorTys(builder, errorTys)
 
-def JobStartErrorTysVector(builder, numElems: int) -> int:
+def JobStartErrorTysVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartErrorTysVector(builder, numElems: int) -> int:
+def StartErrorTysVector(builder, numElems):
     return JobStartErrorTysVector(builder, numElems)
 
-def JobAddAttributes(builder: flatbuffers.Builder, attributes: int):
+def JobAddAttributes(builder, attributes):
     builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(attributes), 0)
 
-def AddAttributes(builder: flatbuffers.Builder, attributes: int):
+def AddAttributes(builder, attributes):
     JobAddAttributes(builder, attributes)
 
-def JobStartAttributesVector(builder, numElems: int) -> int:
+def JobStartAttributesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartAttributesVector(builder, numElems: int) -> int:
+def StartAttributesVector(builder, numElems):
     return JobStartAttributesVector(builder, numElems)
 
-def JobEnd(builder: flatbuffers.Builder) -> int:
+def JobEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return JobEnd(builder)

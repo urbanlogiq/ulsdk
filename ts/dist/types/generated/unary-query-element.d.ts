@@ -1,0 +1,62 @@
+import * as flatbuffers from 'flatbuffers/js/flatbuffers';
+import { Distinct, DistinctT } from './distinct';
+import { Expr, ExprT } from './expr';
+import { Function, FunctionT } from './function';
+import { Join, JoinT } from './join';
+import { TableOrderBy, TableOrderByT } from './table-order-by';
+import { TableSource, TableSourceT } from './table-source';
+export declare class UnaryQueryElement implements flatbuffers.IUnpackableObject<UnaryQueryElementT> {
+    bb: flatbuffers.ByteBuffer | null;
+    bb_pos: number;
+    __init(i: number, bb: flatbuffers.ByteBuffer): UnaryQueryElement;
+    static getRootAsUnaryQueryElement(bb: flatbuffers.ByteBuffer, obj?: UnaryQueryElement): UnaryQueryElement;
+    static getSizePrefixedRootAsUnaryQueryElement(bb: flatbuffers.ByteBuffer, obj?: UnaryQueryElement): UnaryQueryElement;
+    sources(index: number, obj?: TableSource): TableSource | null;
+    sourcesLength(): number;
+    joins(index: number, obj?: Join): Join | null;
+    joinsLength(): number;
+    filter(obj?: Function): Function | null;
+    fields(index: number, obj?: Expr): Expr | null;
+    fieldsLength(): number;
+    orderBy(index: number, obj?: TableOrderBy): TableOrderBy | null;
+    orderByLength(): number;
+    groupBy(index: number, obj?: Expr): Expr | null;
+    groupByLength(): number;
+    distinct(obj?: Distinct): Distinct | null;
+    limit(): number;
+    static startUnaryQueryElement(builder: flatbuffers.Builder): void;
+    static addSources(builder: flatbuffers.Builder, sourcesOffset: flatbuffers.Offset): void;
+    static createSourcesVector(builder: flatbuffers.Builder, data: flatbuffers.Offset[]): flatbuffers.Offset;
+    static startSourcesVector(builder: flatbuffers.Builder, numElems: number): void;
+    static addJoins(builder: flatbuffers.Builder, joinsOffset: flatbuffers.Offset): void;
+    static createJoinsVector(builder: flatbuffers.Builder, data: flatbuffers.Offset[]): flatbuffers.Offset;
+    static startJoinsVector(builder: flatbuffers.Builder, numElems: number): void;
+    static addFilter(builder: flatbuffers.Builder, filterOffset: flatbuffers.Offset): void;
+    static addFields(builder: flatbuffers.Builder, fieldsOffset: flatbuffers.Offset): void;
+    static createFieldsVector(builder: flatbuffers.Builder, data: flatbuffers.Offset[]): flatbuffers.Offset;
+    static startFieldsVector(builder: flatbuffers.Builder, numElems: number): void;
+    static addOrderBy(builder: flatbuffers.Builder, orderByOffset: flatbuffers.Offset): void;
+    static createOrderByVector(builder: flatbuffers.Builder, data: flatbuffers.Offset[]): flatbuffers.Offset;
+    static startOrderByVector(builder: flatbuffers.Builder, numElems: number): void;
+    static addGroupBy(builder: flatbuffers.Builder, groupByOffset: flatbuffers.Offset): void;
+    static createGroupByVector(builder: flatbuffers.Builder, data: flatbuffers.Offset[]): flatbuffers.Offset;
+    static startGroupByVector(builder: flatbuffers.Builder, numElems: number): void;
+    static addDistinct(builder: flatbuffers.Builder, distinctOffset: flatbuffers.Offset): void;
+    static addLimit(builder: flatbuffers.Builder, limit: number): void;
+    static endUnaryQueryElement(builder: flatbuffers.Builder): flatbuffers.Offset;
+    unpack(): UnaryQueryElementT;
+    unpackTo(_o: UnaryQueryElementT): void;
+}
+export declare class UnaryQueryElementT implements flatbuffers.IGeneratedObject {
+    sources: (TableSourceT)[];
+    joins: (JoinT)[];
+    filter: FunctionT | null;
+    fields: (ExprT)[];
+    orderBy: (TableOrderByT)[];
+    groupBy: (ExprT)[];
+    distinct: DistinctT | null;
+    limit: number;
+    constructor(sources?: (TableSourceT)[], joins?: (JoinT)[], filter?: FunctionT | null, fields?: (ExprT)[], orderBy?: (TableOrderByT)[], groupBy?: (ExprT)[], distinct?: DistinctT | null, limit?: number);
+    pack(builder: flatbuffers.Builder): flatbuffers.Offset;
+}
+//# sourceMappingURL=unary-query-element.d.ts.map

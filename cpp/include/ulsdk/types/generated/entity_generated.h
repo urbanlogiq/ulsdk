@@ -8,15 +8,18 @@
 
 // Ensure the included flatbuffers.h is the same version as when this file was
 // generated, otherwise it may not be compatible.
-static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
-              FLATBUFFERS_VERSION_MINOR == 5 &&
-              FLATBUFFERS_VERSION_REVISION == 26,
+static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
+              FLATBUFFERS_VERSION_MINOR == 2 &&
+              FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
 #include "id_generated.h"
 
 struct Point;
 struct PointBuilder;
+
+struct MultiPoint;
+struct MultiPointBuilder;
 
 struct Line;
 struct LineBuilder;
@@ -311,11 +314,12 @@ enum class EntityTy : int32_t {
   T_ROAD_SEGMENT_SAFETY_COUNTS = 271,
   T_HEXAGON_BOUNDARY = 272,
   T_COMPASS_IOT_POINT = 273,
+  T_LANDSLIDE_AREA = 274,
   MIN = T_INVALID,
-  MAX = T_COMPASS_IOT_POINT
+  MAX = T_LANDSLIDE_AREA
 };
 
-inline const EntityTy (&EnumValuesEntityTy())[274] {
+inline const EntityTy (&EnumValuesEntityTy())[275] {
   static const EntityTy values[] = {
     EntityTy::T_INVALID,
     EntityTy::T_TFC,
@@ -590,13 +594,14 @@ inline const EntityTy (&EnumValuesEntityTy())[274] {
     EntityTy::T_INTERSECTION_SAFETY_COUNTS,
     EntityTy::T_ROAD_SEGMENT_SAFETY_COUNTS,
     EntityTy::T_HEXAGON_BOUNDARY,
-    EntityTy::T_COMPASS_IOT_POINT
+    EntityTy::T_COMPASS_IOT_POINT,
+    EntityTy::T_LANDSLIDE_AREA
   };
   return values;
 }
 
 inline const char * const *EnumNamesEntityTy() {
-  static const char * const names[275] = {
+  static const char * const names[276] = {
     "T_INVALID",
     "T_TFC",
     "T_TFC_LOOP",
@@ -871,13 +876,14 @@ inline const char * const *EnumNamesEntityTy() {
     "T_ROAD_SEGMENT_SAFETY_COUNTS",
     "T_HEXAGON_BOUNDARY",
     "T_COMPASS_IOT_POINT",
+    "T_LANDSLIDE_AREA",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameEntityTy(EntityTy e) {
-  if (::flatbuffers::IsOutRange(e, EntityTy::T_INVALID, EntityTy::T_COMPASS_IOT_POINT)) return "";
+  if (::flatbuffers::IsOutRange(e, EntityTy::T_INVALID, EntityTy::T_LANDSLIDE_AREA)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesEntityTy()[index];
 }
@@ -997,37 +1003,40 @@ enum class Geometry : uint8_t {
   MultiLine = 3,
   Polygon = 4,
   MultiPolygon = 5,
+  MultiPoint = 6,
   MIN = NONE,
-  MAX = MultiPolygon
+  MAX = MultiPoint
 };
 
-inline const Geometry (&EnumValuesGeometry())[6] {
+inline const Geometry (&EnumValuesGeometry())[7] {
   static const Geometry values[] = {
     Geometry::NONE,
     Geometry::Point,
     Geometry::Line,
     Geometry::MultiLine,
     Geometry::Polygon,
-    Geometry::MultiPolygon
+    Geometry::MultiPolygon,
+    Geometry::MultiPoint
   };
   return values;
 }
 
 inline const char * const *EnumNamesGeometry() {
-  static const char * const names[7] = {
+  static const char * const names[8] = {
     "NONE",
     "Point",
     "Line",
     "MultiLine",
     "Polygon",
     "MultiPolygon",
+    "MultiPoint",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameGeometry(Geometry e) {
-  if (::flatbuffers::IsOutRange(e, Geometry::NONE, Geometry::MultiPolygon)) return "";
+  if (::flatbuffers::IsOutRange(e, Geometry::NONE, Geometry::MultiPoint)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesGeometry()[index];
 }
@@ -1054,6 +1063,10 @@ template<> struct GeometryTraits<Polygon> {
 
 template<> struct GeometryTraits<MultiPolygon> {
   static const Geometry enum_value = Geometry::MultiPolygon;
+};
+
+template<> struct GeometryTraits<MultiPoint> {
+  static const Geometry enum_value = Geometry::MultiPoint;
 };
 
 bool VerifyGeometry(::flatbuffers::Verifier &verifier, const void *obj, Geometry type);
@@ -1113,6 +1126,65 @@ inline ::flatbuffers::Offset<Point> CreatePointDirect(
     const std::vector<float> *point_geo = nullptr) {
   auto point_geo__ = point_geo ? _fbb.CreateVector<float>(*point_geo) : 0;
   return CreatePoint(
+      _fbb,
+      point_geo__);
+}
+
+struct MultiPoint FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef MultiPointBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_POINT_GEO = 4
+  };
+  const ::flatbuffers::Vector<::flatbuffers::Offset<Point>> *point_geo() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Point>> *>(VT_POINT_GEO);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_POINT_GEO) &&
+           verifier.VerifyVector(point_geo()) &&
+           verifier.VerifyVectorOfTables(point_geo()) &&
+           verifier.EndTable();
+  }
+};
+
+struct MultiPointBuilder {
+  typedef MultiPoint Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_point_geo(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Point>>> point_geo) {
+    fbb_.AddOffset(MultiPoint::VT_POINT_GEO, point_geo);
+  }
+  explicit MultiPointBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<MultiPoint> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<MultiPoint>(end);
+    fbb_.Required(o, MultiPoint::VT_POINT_GEO);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<MultiPoint> CreateMultiPoint(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Point>>> point_geo = 0) {
+  MultiPointBuilder builder_(_fbb);
+  builder_.add_point_geo(point_geo);
+  return builder_.Finish();
+}
+
+struct MultiPoint::Traits {
+  using type = MultiPoint;
+  static auto constexpr Create = CreateMultiPoint;
+};
+
+inline ::flatbuffers::Offset<MultiPoint> CreateMultiPointDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<::flatbuffers::Offset<Point>> *point_geo = nullptr) {
+  auto point_geo__ = point_geo ? _fbb.CreateVector<::flatbuffers::Offset<Point>>(*point_geo) : 0;
+  return CreateMultiPoint(
       _fbb,
       point_geo__);
 }
@@ -1412,6 +1484,9 @@ struct GraphNode FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const MultiPolygon *_geom_as_MultiPolygon() const {
     return _geom_type() == Geometry::MultiPolygon ? static_cast<const MultiPolygon *>(_geom()) : nullptr;
   }
+  const MultiPoint *_geom_as_MultiPoint() const {
+    return _geom_type() == Geometry::MultiPoint ? static_cast<const MultiPoint *>(_geom()) : nullptr;
+  }
   /// A human-centric description of this graph node.
   const ::flatbuffers::String *_description() const {
     return GetPointer<const ::flatbuffers::String *>(VT__DESCRIPTION);
@@ -1458,6 +1533,10 @@ template<> inline const Polygon *GraphNode::_geom_as<Polygon>() const {
 
 template<> inline const MultiPolygon *GraphNode::_geom_as<MultiPolygon>() const {
   return _geom_as_MultiPolygon();
+}
+
+template<> inline const MultiPoint *GraphNode::_geom_as<MultiPoint>() const {
+  return _geom_as_MultiPoint();
 }
 
 struct GraphNodeBuilder {
@@ -1646,6 +1725,10 @@ inline bool VerifyGeometry(::flatbuffers::Verifier &verifier, const void *obj, G
     }
     case Geometry::MultiPolygon: {
       auto ptr = reinterpret_cast<const MultiPolygon *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case Geometry::MultiPoint: {
+      auto ptr = reinterpret_cast<const MultiPoint *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

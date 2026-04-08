@@ -268,6 +268,78 @@ NamedParameter::operator==(const NamedParameter &rhs) const {
     return true;
 }
 
+::flatbuffers::Offset<::OutputSchema>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const OutputSchema &o) {
+    std::vector<::flatbuffers::Offset<::AttributePair>> attributes_offsets = std::vector<::flatbuffers::Offset<::AttributePair>>();
+    attributes_offsets.reserve(o.attributes_.size());
+    for (const auto &i: o.attributes_) {
+        attributes_offsets.push_back(serialize_to(builder, i));
+    }
+    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::AttributePair>>> attributes_offset = builder.CreateVector(attributes_offsets);
+    std::vector<::flatbuffers::Offset<::Schema>> schema_offsets = std::vector<::flatbuffers::Offset<::Schema>>();
+    schema_offsets.reserve(o.schema_.size());
+    for (const auto &i: o.schema_) {
+        schema_offsets.push_back(serialize_to(builder, i));
+    }
+    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::Schema>>> schema_offset = builder.CreateVector(schema_offsets);
+
+    ::OutputSchemaBuilder instance_builder = ::OutputSchemaBuilder(builder);
+    instance_builder.add_attributes(attributes_offset);
+    instance_builder.add_schema(schema_offset);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const OutputSchema &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+OutputSchema::OutputSchema()
+    : attributes_()
+    , schema_() {
+}
+
+OutputSchema::OutputSchema(const std::vector<uint8_t> &bytes)
+    : OutputSchema(::flatbuffers::GetSizePrefixedRoot<::OutputSchema>(bytes.data())) {
+}
+
+OutputSchema::OutputSchema(const ::OutputSchema *root) 
+    : attributes_()
+    , schema_() {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    const auto &attributes_vector = root->attributes();
+    if (attributes_vector != nullptr) {
+        attributes_.reserve(attributes_vector->size());
+        for (const auto &i: *attributes_vector) {
+            attributes_.emplace_back(i);
+        }
+    }
+    const auto &schema_vector = root->schema();
+    if (schema_vector != nullptr) {
+        schema_.reserve(schema_vector->size());
+        for (const auto &i: *schema_vector) {
+            schema_.emplace_back(i);
+        }
+    }
+}
+
+bool
+OutputSchema::operator==(const OutputSchema &rhs) const {
+    if (this->attributes_ != rhs.attributes_) {
+        return false;
+    }
+    if (this->schema_ != rhs.schema_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Source>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Source &o) {
     std::optional<::flatbuffers::Offset<::ObjectId>> metadata_offset = std::nullopt;
@@ -297,16 +369,16 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Source &o) {
         const decltype(builder.CreateVector(o.options_.value())) options_offset_val = builder.CreateVector(o.options_.value());
         options_offset = std::make_optional(options_offset_val);
     }
-    std::optional<::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::Schema>>>> schemas_offset = std::nullopt;
-    if (o.schemas_.has_value()) {
-        const auto &schemas__var = o.schemas_.value();
-        std::vector<::flatbuffers::Offset<::Schema>> schemas_offsets = std::vector<::flatbuffers::Offset<::Schema>>();
-        schemas_offsets.reserve(schemas__var.size());
-        for (const auto &i: schemas__var) {
-            schemas_offsets.push_back(serialize_to(builder, i));
+    std::optional<::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::OutputSchema>>>> output_schemas_offset = std::nullopt;
+    if (o.output_schemas_.has_value()) {
+        const auto &output_schemas__var = o.output_schemas_.value();
+        std::vector<::flatbuffers::Offset<::OutputSchema>> output_schemas_offsets = std::vector<::flatbuffers::Offset<::OutputSchema>>();
+        output_schemas_offsets.reserve(output_schemas__var.size());
+        for (const auto &i: output_schemas__var) {
+            output_schemas_offsets.push_back(serialize_to(builder, i));
         }
-        const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::Schema>>> schemas_offset_val = builder.CreateVector(schemas_offsets);
-        schemas_offset = std::make_optional(schemas_offset_val);
+        const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::OutputSchema>>> output_schemas_offset_val = builder.CreateVector(output_schemas_offsets);
+        output_schemas_offset = std::make_optional(output_schemas_offset_val);
     }
     const ::flatbuffers::Offset<::flatbuffers::String> url_offset = builder.CreateString(o.url_);
 
@@ -324,8 +396,8 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Source &o) {
     if (options_offset.has_value()) {
         instance_builder.add_options(options_offset.value());
     }
-    if (schemas_offset.has_value()) {
-        instance_builder.add_schemas(schemas_offset.value());
+    if (output_schemas_offset.has_value()) {
+        instance_builder.add_output_schemas(output_schemas_offset.value());
     }
     instance_builder.add_url(url_offset);
     return instance_builder.Finish();
@@ -345,7 +417,7 @@ Source::Source()
     , name_()
     , named_parameters_(std::nullopt)
     , options_(std::nullopt)
-    , schemas_(std::nullopt)
+    , output_schemas_(std::nullopt)
     , url_() {
 }
 
@@ -359,7 +431,7 @@ Source::Source(const ::Source *root)
     , name_()
     , named_parameters_(std::nullopt)
     , options_(std::nullopt)
-    , schemas_(std::nullopt)
+    , output_schemas_(std::nullopt)
     , url_() {
     if (root == nullptr) {
         throw std::runtime_error("cannot deserialize flatbuffer type");
@@ -387,14 +459,14 @@ Source::Source(const ::Source *root)
         std::copy(options_vector->begin(), options_vector->end(), std::back_inserter(options__target));
         options_ = std::make_optional(options__target);
     }
-    const auto &schemas_vector = root->schemas();
-    if (schemas_vector != nullptr) {
-        decltype(schemas_)::value_type schemas__target = decltype(schemas_)::value_type();
-        schemas__target.reserve(schemas_vector->size());
-        for (const auto &i: *schemas_vector) {
-            schemas__target.emplace_back(i);
+    const auto &output_schemas_vector = root->output_schemas();
+    if (output_schemas_vector != nullptr) {
+        decltype(output_schemas_)::value_type output_schemas__target = decltype(output_schemas_)::value_type();
+        output_schemas__target.reserve(output_schemas_vector->size());
+        for (const auto &i: *output_schemas_vector) {
+            output_schemas__target.emplace_back(i);
         }
-        schemas_ = std::make_optional(schemas__target);
+        output_schemas_ = std::make_optional(output_schemas__target);
     }
         url_ = std::string(*root->url()->begin(), *root->url()->end());
 }
@@ -416,7 +488,7 @@ Source::operator==(const Source &rhs) const {
     if (this->options_ != rhs.options_) {
         return false;
     }
-    if (this->schemas_ != rhs.schemas_) {
+    if (this->output_schemas_ != rhs.output_schemas_) {
         return false;
     }
     if (this->url_ != rhs.url_) {

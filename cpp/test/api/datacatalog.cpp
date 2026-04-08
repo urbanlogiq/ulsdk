@@ -135,11 +135,25 @@ test_update_object(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
     ::ul::types::DataCatalogObject body = ::ul::types::DataCatalogObject();
-    return ul::api::datacatalog::update_object(
+    const ::ul::types::ContentId expected = ::ul::types::ContentId();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::update_object(
         ctx,
         p0,
         body
     );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::ContentId result_value = std::get<::ul::types::ContentId>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
 }
 
 ApiTest test_update_object_obj(test_update_object, "datacatalog::update_object", &idempotent_api_test_root);
@@ -199,6 +213,32 @@ test_get_object_summaries(ul::RequestContext &rctx) {
 }
 
 ApiTest test_get_object_summaries_obj(test_get_object_summaries, "datacatalog::get_object_summaries", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
+test_bulk_fetch_metadata(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    ::ul::types::ObjectIdList body = ::ul::types::ObjectIdList();
+    const ::ul::types::ObjectIdPairList expected = ::ul::types::ObjectIdPairList();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::bulk_fetch_metadata(
+        ctx,
+        body
+    );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::ObjectIdPairList result_value = std::get<::ul::types::ObjectIdPairList>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
+}
+
+ApiTest test_bulk_fetch_metadata_obj(test_bulk_fetch_metadata, "datacatalog::bulk_fetch_metadata", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
 test_bulk_fetch_objects(ul::RequestContext &rctx) {

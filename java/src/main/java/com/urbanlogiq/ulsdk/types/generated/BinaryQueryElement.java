@@ -23,7 +23,7 @@ import java.nio.ByteOrder;
 
 @SuppressWarnings("unused")
 public final class BinaryQueryElement extends com.google.flatbuffers.Table {
-  public static void ValidateVersion() { Constants.FLATBUFFERS_23_5_26(); }
+  public static void ValidateVersion() { Constants.FLATBUFFERS_25_2_10(); }
   public static BinaryQueryElement getRootAsBinaryQueryElement(ByteBuffer _bb) { return getRootAsBinaryQueryElement(_bb, new BinaryQueryElement()); }
   public static BinaryQueryElement getRootAsBinaryQueryElement(ByteBuffer _bb, BinaryQueryElement obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
   public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }

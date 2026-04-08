@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class HierarchicalRelationship(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = HierarchicalRelationship()
         x.Init(buf, n + offset)
@@ -22,7 +21,7 @@ class HierarchicalRelationship(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # HierarchicalRelationship
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # HierarchicalRelationship
@@ -33,7 +32,7 @@ class HierarchicalRelationship(object):
         return 0
 
     # HierarchicalRelationship
-    def Children(self, j: int):
+    def Children(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             a = self._tab.Vector(o)
@@ -48,43 +47,43 @@ class HierarchicalRelationship(object):
         return 0
 
     # HierarchicalRelationship
-    def ChildrenLength(self) -> int:
+    def ChildrenLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # HierarchicalRelationship
-    def ChildrenIsNone(self) -> bool:
+    def ChildrenIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
-def HierarchicalRelationshipStart(builder: flatbuffers.Builder):
+def HierarchicalRelationshipStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     HierarchicalRelationshipStart(builder)
 
-def HierarchicalRelationshipAddParent(builder: flatbuffers.Builder, parent: int):
+def HierarchicalRelationshipAddParent(builder, parent):
     builder.PrependInt32Slot(0, parent, 0)
 
-def AddParent(builder: flatbuffers.Builder, parent: int):
+def AddParent(builder, parent):
     HierarchicalRelationshipAddParent(builder, parent)
 
-def HierarchicalRelationshipAddChildren(builder: flatbuffers.Builder, children: int):
+def HierarchicalRelationshipAddChildren(builder, children):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(children), 0)
 
-def AddChildren(builder: flatbuffers.Builder, children: int):
+def AddChildren(builder, children):
     HierarchicalRelationshipAddChildren(builder, children)
 
-def HierarchicalRelationshipStartChildrenVector(builder, numElems: int) -> int:
+def HierarchicalRelationshipStartChildrenVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartChildrenVector(builder, numElems: int) -> int:
+def StartChildrenVector(builder, numElems):
     return HierarchicalRelationshipStartChildrenVector(builder, numElems)
 
-def HierarchicalRelationshipEnd(builder: flatbuffers.Builder) -> int:
+def HierarchicalRelationshipEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return HierarchicalRelationshipEnd(builder)

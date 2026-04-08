@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ObjectId import ObjectId
-from typing import Optional
 np = import_numpy()
 
 class TileSettings(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = TileSettings()
         x.Init(buf, n + offset)
@@ -24,7 +21,7 @@ class TileSettings(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # TileSettings
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # The column of tbe aggregation dataset to use
@@ -54,7 +51,7 @@ class TileSettings(object):
     # The field name from the metadata and dataset. Note that if it is a
     # relationshipField, it will use the displayName instead
     # TileSettings
-    def FieldName(self) -> Optional[bytes]:
+    def FieldName(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -78,10 +75,11 @@ class TileSettings(object):
 
     # The metadata id for the field shown
     # TileSettings
-    def MetadataId(self) -> Optional[ObjectId]:
+    def MetadataId(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -100,7 +98,7 @@ class TileSettings(object):
     # possible that they only want to show certain ranges, which would be stored here, but
     # that isn't currently supported
     # TileSettings
-    def SelectedColumns(self, j: int):
+    def SelectedColumns(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
         if o != 0:
             a = self._tab.Vector(o)
@@ -108,20 +106,20 @@ class TileSettings(object):
         return ""
 
     # TileSettings
-    def SelectedColumnsLength(self) -> int:
+    def SelectedColumnsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # TileSettings
-    def SelectedColumnsIsNone(self) -> bool:
+    def SelectedColumnsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
         return o == 0
 
     # The title of the tile
     # TileSettings
-    def Title(self) -> Optional[bytes]:
+    def Title(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(22))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -153,113 +151,114 @@ class TileSettings(object):
         return 0
 
     # TileSettings
-    def RecordCountStreamId(self) -> Optional[ObjectId]:
+    def RecordCountStreamId(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(30))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def TileSettingsStart(builder: flatbuffers.Builder):
+def TileSettingsStart(builder):
     builder.StartObject(14)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     TileSettingsStart(builder)
 
-def TileSettingsAddAggregation(builder: flatbuffers.Builder, aggregation: int):
+def TileSettingsAddAggregation(builder, aggregation):
     builder.PrependUint32Slot(0, aggregation, 0)
 
-def AddAggregation(builder: flatbuffers.Builder, aggregation: int):
+def AddAggregation(builder, aggregation):
     TileSettingsAddAggregation(builder, aggregation)
 
-def TileSettingsAddCategory(builder: flatbuffers.Builder, category: int):
+def TileSettingsAddCategory(builder, category):
     builder.PrependUint32Slot(1, category, 0)
 
-def AddCategory(builder: flatbuffers.Builder, category: int):
+def AddCategory(builder, category):
     TileSettingsAddCategory(builder, category)
 
-def TileSettingsAddChartType(builder: flatbuffers.Builder, chartType: int):
+def TileSettingsAddChartType(builder, chartType):
     builder.PrependUint32Slot(2, chartType, 0)
 
-def AddChartType(builder: flatbuffers.Builder, chartType: int):
+def AddChartType(builder, chartType):
     TileSettingsAddChartType(builder, chartType)
 
-def TileSettingsAddFieldName(builder: flatbuffers.Builder, fieldName: int):
+def TileSettingsAddFieldName(builder, fieldName):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(fieldName), 0)
 
-def AddFieldName(builder: flatbuffers.Builder, fieldName: int):
+def AddFieldName(builder, fieldName):
     TileSettingsAddFieldName(builder, fieldName)
 
-def TileSettingsAddGroupOthers(builder: flatbuffers.Builder, groupOthers: bool):
+def TileSettingsAddGroupOthers(builder, groupOthers):
     builder.PrependBoolSlot(4, groupOthers, 0)
 
-def AddGroupOthers(builder: flatbuffers.Builder, groupOthers: bool):
+def AddGroupOthers(builder, groupOthers):
     TileSettingsAddGroupOthers(builder, groupOthers)
 
-def TileSettingsAddIsRelationshipField(builder: flatbuffers.Builder, isRelationshipField: bool):
+def TileSettingsAddIsRelationshipField(builder, isRelationshipField):
     builder.PrependBoolSlot(5, isRelationshipField, 0)
 
-def AddIsRelationshipField(builder: flatbuffers.Builder, isRelationshipField: bool):
+def AddIsRelationshipField(builder, isRelationshipField):
     TileSettingsAddIsRelationshipField(builder, isRelationshipField)
 
-def TileSettingsAddMetadataId(builder: flatbuffers.Builder, metadataId: int):
+def TileSettingsAddMetadataId(builder, metadataId):
     builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(metadataId), 0)
 
-def AddMetadataId(builder: flatbuffers.Builder, metadataId: int):
+def AddMetadataId(builder, metadataId):
     TileSettingsAddMetadataId(builder, metadataId)
 
-def TileSettingsAddOutputStreamIndex(builder: flatbuffers.Builder, outputStreamIndex: int):
+def TileSettingsAddOutputStreamIndex(builder, outputStreamIndex):
     builder.PrependUint32Slot(7, outputStreamIndex, 0)
 
-def AddOutputStreamIndex(builder: flatbuffers.Builder, outputStreamIndex: int):
+def AddOutputStreamIndex(builder, outputStreamIndex):
     TileSettingsAddOutputStreamIndex(builder, outputStreamIndex)
 
-def TileSettingsAddSelectedColumns(builder: flatbuffers.Builder, selectedColumns: int):
+def TileSettingsAddSelectedColumns(builder, selectedColumns):
     builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(selectedColumns), 0)
 
-def AddSelectedColumns(builder: flatbuffers.Builder, selectedColumns: int):
+def AddSelectedColumns(builder, selectedColumns):
     TileSettingsAddSelectedColumns(builder, selectedColumns)
 
-def TileSettingsStartSelectedColumnsVector(builder, numElems: int) -> int:
+def TileSettingsStartSelectedColumnsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartSelectedColumnsVector(builder, numElems: int) -> int:
+def StartSelectedColumnsVector(builder, numElems):
     return TileSettingsStartSelectedColumnsVector(builder, numElems)
 
-def TileSettingsAddTitle(builder: flatbuffers.Builder, title: int):
+def TileSettingsAddTitle(builder, title):
     builder.PrependUOffsetTRelativeSlot(9, flatbuffers.number_types.UOffsetTFlags.py_type(title), 0)
 
-def AddTitle(builder: flatbuffers.Builder, title: int):
+def AddTitle(builder, title):
     TileSettingsAddTitle(builder, title)
 
-def TileSettingsAddValuesFormat(builder: flatbuffers.Builder, valuesFormat: int):
+def TileSettingsAddValuesFormat(builder, valuesFormat):
     builder.PrependUint32Slot(10, valuesFormat, 0)
 
-def AddValuesFormat(builder: flatbuffers.Builder, valuesFormat: int):
+def AddValuesFormat(builder, valuesFormat):
     TileSettingsAddValuesFormat(builder, valuesFormat)
 
-def TileSettingsAddIsRecordCountTile(builder: flatbuffers.Builder, isRecordCountTile: bool):
+def TileSettingsAddIsRecordCountTile(builder, isRecordCountTile):
     builder.PrependBoolSlot(11, isRecordCountTile, 0)
 
-def AddIsRecordCountTile(builder: flatbuffers.Builder, isRecordCountTile: bool):
+def AddIsRecordCountTile(builder, isRecordCountTile):
     TileSettingsAddIsRecordCountTile(builder, isRecordCountTile)
 
-def TileSettingsAddTextTileFontSize(builder: flatbuffers.Builder, textTileFontSize: int):
+def TileSettingsAddTextTileFontSize(builder, textTileFontSize):
     builder.PrependUint32Slot(12, textTileFontSize, 0)
 
-def AddTextTileFontSize(builder: flatbuffers.Builder, textTileFontSize: int):
+def AddTextTileFontSize(builder, textTileFontSize):
     TileSettingsAddTextTileFontSize(builder, textTileFontSize)
 
-def TileSettingsAddRecordCountStreamId(builder: flatbuffers.Builder, recordCountStreamId: int):
+def TileSettingsAddRecordCountStreamId(builder, recordCountStreamId):
     builder.PrependUOffsetTRelativeSlot(13, flatbuffers.number_types.UOffsetTFlags.py_type(recordCountStreamId), 0)
 
-def AddRecordCountStreamId(builder: flatbuffers.Builder, recordCountStreamId: int):
+def AddRecordCountStreamId(builder, recordCountStreamId):
     TileSettingsAddRecordCountStreamId(builder, recordCountStreamId)
 
-def TileSettingsEnd(builder: flatbuffers.Builder) -> int:
+def TileSettingsEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return TileSettingsEnd(builder)

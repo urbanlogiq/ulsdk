@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class VI8(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = VI8()
         x.Init(buf, n + offset)
@@ -22,7 +21,7 @@ class VI8(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # VI8
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # VI8
@@ -32,20 +31,20 @@ class VI8(object):
             return self._tab.Get(flatbuffers.number_types.Int8Flags, o + self._tab.Pos)
         return 0
 
-def VI8Start(builder: flatbuffers.Builder):
+def VI8Start(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     VI8Start(builder)
 
-def VI8AddV(builder: flatbuffers.Builder, v: int):
+def VI8AddV(builder, v):
     builder.PrependInt8Slot(0, v, 0)
 
-def AddV(builder: flatbuffers.Builder, v: int):
+def AddV(builder, v):
     VI8AddV(builder, v)
 
-def VI8End(builder: flatbuffers.Builder) -> int:
+def VI8End(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return VI8End(builder)

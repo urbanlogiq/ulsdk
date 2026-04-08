@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class ValueInstance(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = ValueInstance()
         x.Init(buf, n + offset)
@@ -24,7 +21,7 @@ class ValueInstance(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # ValueInstance
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # ValueInstance
@@ -35,47 +32,48 @@ class ValueInstance(object):
         return 0
 
     # ValueInstance
-    def V(self) -> Optional[flatbuffers.table.Table]:
+    def V(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
     # ValueInstance
-    def Name(self) -> Optional[bytes]:
+    def Name(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def ValueInstanceStart(builder: flatbuffers.Builder):
+def ValueInstanceStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ValueInstanceStart(builder)
 
-def ValueInstanceAddVType(builder: flatbuffers.Builder, vType: int):
+def ValueInstanceAddVType(builder, vType):
     builder.PrependUint8Slot(0, vType, 0)
 
-def AddVType(builder: flatbuffers.Builder, vType: int):
+def AddVType(builder, vType):
     ValueInstanceAddVType(builder, vType)
 
-def ValueInstanceAddV(builder: flatbuffers.Builder, v: int):
+def ValueInstanceAddV(builder, v):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(v), 0)
 
-def AddV(builder: flatbuffers.Builder, v: int):
+def AddV(builder, v):
     ValueInstanceAddV(builder, v)
 
-def ValueInstanceAddName(builder: flatbuffers.Builder, name: int):
+def ValueInstanceAddName(builder, name):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
 
-def AddName(builder: flatbuffers.Builder, name: int):
+def AddName(builder, name):
     ValueInstanceAddName(builder, name)
 
-def ValueInstanceEnd(builder: flatbuffers.Builder) -> int:
+def ValueInstanceEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ValueInstanceEnd(builder)

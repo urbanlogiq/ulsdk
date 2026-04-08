@@ -4,12 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Attr import Attr
-from .ObjectId import ObjectId
-from .ParamIndices import ParamIndices
-from .TaskParameter import TaskParameter
-from typing import Optional
 np = import_numpy()
 
 # A RunSpec is the data required in order to kickstart a schematic job.
@@ -23,7 +17,7 @@ class RunSpec(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = RunSpec()
         x.Init(buf, n + offset)
@@ -34,7 +28,7 @@ class RunSpec(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # RunSpec
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # RunSpec
@@ -45,60 +39,63 @@ class RunSpec(object):
         return False
 
     # RunSpec
-    def Schematic(self) -> Optional[ObjectId]:
+    def Schematic(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # RunSpec
-    def ParamIndices(self, j: int) -> Optional[ParamIndices]:
+    def ParamIndices(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .ParamIndices import ParamIndices
             obj = ParamIndices()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # RunSpec
-    def ParamIndicesLength(self) -> int:
+    def ParamIndicesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # RunSpec
-    def ParamIndicesIsNone(self) -> bool:
+    def ParamIndicesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
     # RunSpec
-    def Params(self, j: int) -> Optional[TaskParameter]:
+    def Params(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .TaskParameter import TaskParameter
             obj = TaskParameter()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # RunSpec
-    def ParamsLength(self) -> int:
+    def ParamsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # RunSpec
-    def ParamsIsNone(self) -> bool:
+    def ParamsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         return o == 0
 
@@ -117,97 +114,98 @@ class RunSpec(object):
         return True
 
     # RunSpec
-    def Attributes(self, j: int) -> Optional[Attr]:
+    def Attributes(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Attr import Attr
             obj = Attr()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # RunSpec
-    def AttributesLength(self) -> int:
+    def AttributesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # RunSpec
-    def AttributesIsNone(self) -> bool:
+    def AttributesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         return o == 0
 
-def RunSpecStart(builder: flatbuffers.Builder):
+def RunSpecStart(builder):
     builder.StartObject(7)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     RunSpecStart(builder)
 
-def RunSpecAddPersist(builder: flatbuffers.Builder, persist: bool):
+def RunSpecAddPersist(builder, persist):
     builder.PrependBoolSlot(0, persist, 0)
 
-def AddPersist(builder: flatbuffers.Builder, persist: bool):
+def AddPersist(builder, persist):
     RunSpecAddPersist(builder, persist)
 
-def RunSpecAddSchematic(builder: flatbuffers.Builder, schematic: int):
+def RunSpecAddSchematic(builder, schematic):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(schematic), 0)
 
-def AddSchematic(builder: flatbuffers.Builder, schematic: int):
+def AddSchematic(builder, schematic):
     RunSpecAddSchematic(builder, schematic)
 
-def RunSpecAddParamIndices(builder: flatbuffers.Builder, paramIndices: int):
+def RunSpecAddParamIndices(builder, paramIndices):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(paramIndices), 0)
 
-def AddParamIndices(builder: flatbuffers.Builder, paramIndices: int):
+def AddParamIndices(builder, paramIndices):
     RunSpecAddParamIndices(builder, paramIndices)
 
-def RunSpecStartParamIndicesVector(builder, numElems: int) -> int:
+def RunSpecStartParamIndicesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartParamIndicesVector(builder, numElems: int) -> int:
+def StartParamIndicesVector(builder, numElems):
     return RunSpecStartParamIndicesVector(builder, numElems)
 
-def RunSpecAddParams(builder: flatbuffers.Builder, params: int):
+def RunSpecAddParams(builder, params):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(params), 0)
 
-def AddParams(builder: flatbuffers.Builder, params: int):
+def AddParams(builder, params):
     RunSpecAddParams(builder, params)
 
-def RunSpecStartParamsVector(builder, numElems: int) -> int:
+def RunSpecStartParamsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartParamsVector(builder, numElems: int) -> int:
+def StartParamsVector(builder, numElems):
     return RunSpecStartParamsVector(builder, numElems)
 
-def RunSpecAddPriority(builder: flatbuffers.Builder, priority: int):
+def RunSpecAddPriority(builder, priority):
     builder.PrependInt32Slot(4, priority, 0)
 
-def AddPriority(builder: flatbuffers.Builder, priority: int):
+def AddPriority(builder, priority):
     RunSpecAddPriority(builder, priority)
 
-def RunSpecAddNotify(builder: flatbuffers.Builder, notify: bool):
+def RunSpecAddNotify(builder, notify):
     builder.PrependBoolSlot(5, notify, 1)
 
-def AddNotify(builder: flatbuffers.Builder, notify: bool):
+def AddNotify(builder, notify):
     RunSpecAddNotify(builder, notify)
 
-def RunSpecAddAttributes(builder: flatbuffers.Builder, attributes: int):
+def RunSpecAddAttributes(builder, attributes):
     builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(attributes), 0)
 
-def AddAttributes(builder: flatbuffers.Builder, attributes: int):
+def AddAttributes(builder, attributes):
     RunSpecAddAttributes(builder, attributes)
 
-def RunSpecStartAttributesVector(builder, numElems: int) -> int:
+def RunSpecStartAttributesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartAttributesVector(builder, numElems: int) -> int:
+def StartAttributesVector(builder, numElems):
     return RunSpecStartAttributesVector(builder, numElems)
 
-def RunSpecEnd(builder: flatbuffers.Builder) -> int:
+def RunSpecEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return RunSpecEnd(builder)

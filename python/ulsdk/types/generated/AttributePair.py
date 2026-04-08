@@ -4,15 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from typing import Optional
 np = import_numpy()
 
 class AttributePair(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = AttributePair()
         x.Init(buf, n + offset)
@@ -23,43 +21,43 @@ class AttributePair(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # AttributePair
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # AttributePair
-    def Key(self) -> Optional[bytes]:
+    def Key(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # AttributePair
-    def Value(self) -> Optional[bytes]:
+    def Value(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def AttributePairStart(builder: flatbuffers.Builder):
+def AttributePairStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     AttributePairStart(builder)
 
-def AttributePairAddKey(builder: flatbuffers.Builder, key: int):
+def AttributePairAddKey(builder, key):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(key), 0)
 
-def AddKey(builder: flatbuffers.Builder, key: int):
+def AddKey(builder, key):
     AttributePairAddKey(builder, key)
 
-def AttributePairAddValue(builder: flatbuffers.Builder, value: int):
+def AttributePairAddValue(builder, value):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(value), 0)
 
-def AddValue(builder: flatbuffers.Builder, value: int):
+def AddValue(builder, value):
     AttributePairAddValue(builder, value)
 
-def AttributePairEnd(builder: flatbuffers.Builder) -> int:
+def AttributePairEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return AttributePairEnd(builder)

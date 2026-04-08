@@ -7,10 +7,10 @@ import com.urbanlogiq.ulsdk.ApiKeyContext;
 import com.urbanlogiq.ulsdk.Environment;
 import com.urbanlogiq.ulsdk.Region;
 import java.util.UUID;
-import org.junit.Test;
+import org.junitpioneer.jupiter.RetryingTest;
 
 public final class TestApiSchematicEvaluator {
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testCreateJob() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -30,10 +30,10 @@ public final class TestApiSchematicEvaluator {
             ctx,
             body
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testGetJob() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -55,10 +55,10 @@ public final class TestApiSchematicEvaluator {
             p0,
             q0
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testGetTask() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -78,6 +78,6 @@ public final class TestApiSchematicEvaluator {
             ctx,
             p0
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 }

@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .NumericalFieldFormat import NumericalFieldFormat
-from typing import Optional
 np = import_numpy()
 
 class FloatRange(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = FloatRange()
         x.Init(buf, n + offset)
@@ -24,7 +21,7 @@ class FloatRange(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # FloatRange
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # FloatRange
@@ -42,10 +39,11 @@ class FloatRange(object):
         return 0.0
 
     # FloatRange
-    def FieldFormat(self) -> Optional[NumericalFieldFormat]:
+    def FieldFormat(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .NumericalFieldFormat import NumericalFieldFormat
             obj = NumericalFieldFormat()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -58,38 +56,38 @@ class FloatRange(object):
             return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
         return 0
 
-def FloatRangeStart(builder: flatbuffers.Builder):
+def FloatRangeStart(builder):
     builder.StartObject(4)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     FloatRangeStart(builder)
 
-def FloatRangeAddMin(builder: flatbuffers.Builder, min: float):
+def FloatRangeAddMin(builder, min):
     builder.PrependFloat64Slot(0, min, 0.0)
 
-def AddMin(builder: flatbuffers.Builder, min: float):
+def AddMin(builder, min):
     FloatRangeAddMin(builder, min)
 
-def FloatRangeAddMax(builder: flatbuffers.Builder, max: float):
+def FloatRangeAddMax(builder, max):
     builder.PrependFloat64Slot(1, max, 0.0)
 
-def AddMax(builder: flatbuffers.Builder, max: float):
+def AddMax(builder, max):
     FloatRangeAddMax(builder, max)
 
-def FloatRangeAddFieldFormat(builder: flatbuffers.Builder, fieldFormat: int):
+def FloatRangeAddFieldFormat(builder, fieldFormat):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(fieldFormat), 0)
 
-def AddFieldFormat(builder: flatbuffers.Builder, fieldFormat: int):
+def AddFieldFormat(builder, fieldFormat):
     FloatRangeAddFieldFormat(builder, fieldFormat)
 
-def FloatRangeAddAggregationProtocol(builder: flatbuffers.Builder, aggregationProtocol: int):
+def FloatRangeAddAggregationProtocol(builder, aggregationProtocol):
     builder.PrependUint32Slot(3, aggregationProtocol, 0)
 
-def AddAggregationProtocol(builder: flatbuffers.Builder, aggregationProtocol: int):
+def AddAggregationProtocol(builder, aggregationProtocol):
     FloatRangeAddAggregationProtocol(builder, aggregationProtocol)
 
-def FloatRangeEnd(builder: flatbuffers.Builder) -> int:
+def FloatRangeEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return FloatRangeEnd(builder)

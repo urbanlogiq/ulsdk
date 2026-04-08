@@ -4,18 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .AttributePair import AttributePair
-from .Edge import Edge
-from .Node import Node
-from typing import Optional
 np = import_numpy()
 
 class Schematic(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Schematic()
         x.Init(buf, n + offset)
@@ -26,138 +21,141 @@ class Schematic(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Schematic
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Schematic
-    def Nodes(self, j: int) -> Optional[Node]:
+    def Nodes(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Node import Node
             obj = Node()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Schematic
-    def NodesLength(self) -> int:
+    def NodesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Schematic
-    def NodesIsNone(self) -> bool:
+    def NodesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
     # Schematic
-    def Edges(self, j: int) -> Optional[Edge]:
+    def Edges(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Edge import Edge
             obj = Edge()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Schematic
-    def EdgesLength(self) -> int:
+    def EdgesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Schematic
-    def EdgesIsNone(self) -> bool:
+    def EdgesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
     # Schematic
-    def Attributes(self, j: int) -> Optional[AttributePair]:
+    def Attributes(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .AttributePair import AttributePair
             obj = AttributePair()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Schematic
-    def AttributesLength(self) -> int:
+    def AttributesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Schematic
-    def AttributesIsNone(self) -> bool:
+    def AttributesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
     # Schematic
-    def Name(self) -> Optional[bytes]:
+    def Name(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def SchematicStart(builder: flatbuffers.Builder):
+def SchematicStart(builder):
     builder.StartObject(4)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     SchematicStart(builder)
 
-def SchematicAddNodes(builder: flatbuffers.Builder, nodes: int):
+def SchematicAddNodes(builder, nodes):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(nodes), 0)
 
-def AddNodes(builder: flatbuffers.Builder, nodes: int):
+def AddNodes(builder, nodes):
     SchematicAddNodes(builder, nodes)
 
-def SchematicStartNodesVector(builder, numElems: int) -> int:
+def SchematicStartNodesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartNodesVector(builder, numElems: int) -> int:
+def StartNodesVector(builder, numElems):
     return SchematicStartNodesVector(builder, numElems)
 
-def SchematicAddEdges(builder: flatbuffers.Builder, edges: int):
+def SchematicAddEdges(builder, edges):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(edges), 0)
 
-def AddEdges(builder: flatbuffers.Builder, edges: int):
+def AddEdges(builder, edges):
     SchematicAddEdges(builder, edges)
 
-def SchematicStartEdgesVector(builder, numElems: int) -> int:
+def SchematicStartEdgesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartEdgesVector(builder, numElems: int) -> int:
+def StartEdgesVector(builder, numElems):
     return SchematicStartEdgesVector(builder, numElems)
 
-def SchematicAddAttributes(builder: flatbuffers.Builder, attributes: int):
+def SchematicAddAttributes(builder, attributes):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(attributes), 0)
 
-def AddAttributes(builder: flatbuffers.Builder, attributes: int):
+def AddAttributes(builder, attributes):
     SchematicAddAttributes(builder, attributes)
 
-def SchematicStartAttributesVector(builder, numElems: int) -> int:
+def SchematicStartAttributesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartAttributesVector(builder, numElems: int) -> int:
+def StartAttributesVector(builder, numElems):
     return SchematicStartAttributesVector(builder, numElems)
 
-def SchematicAddName(builder: flatbuffers.Builder, name: int):
+def SchematicAddName(builder, name):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
 
-def AddName(builder: flatbuffers.Builder, name: int):
+def AddName(builder, name):
     SchematicAddName(builder, name)
 
-def SchematicEnd(builder: flatbuffers.Builder) -> int:
+def SchematicEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return SchematicEnd(builder)

@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Task import Task
-from typing import Optional
 np = import_numpy()
 
 class TaskList(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = TaskList()
         x.Init(buf, n + offset)
@@ -24,53 +21,54 @@ class TaskList(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # TaskList
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # TaskList
-    def Tasks(self, j: int) -> Optional[Task]:
+    def Tasks(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Task import Task
             obj = Task()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # TaskList
-    def TasksLength(self) -> int:
+    def TasksLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # TaskList
-    def TasksIsNone(self) -> bool:
+    def TasksIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def TaskListStart(builder: flatbuffers.Builder):
+def TaskListStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     TaskListStart(builder)
 
-def TaskListAddTasks(builder: flatbuffers.Builder, tasks: int):
+def TaskListAddTasks(builder, tasks):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(tasks), 0)
 
-def AddTasks(builder: flatbuffers.Builder, tasks: int):
+def AddTasks(builder, tasks):
     TaskListAddTasks(builder, tasks)
 
-def TaskListStartTasksVector(builder, numElems: int) -> int:
+def TaskListStartTasksVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartTasksVector(builder, numElems: int) -> int:
+def StartTasksVector(builder, numElems):
     return TaskListStartTasksVector(builder, numElems)
 
-def TaskListEnd(builder: flatbuffers.Builder) -> int:
+def TaskListEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return TaskListEnd(builder)

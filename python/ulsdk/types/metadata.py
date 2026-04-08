@@ -67,6 +67,7 @@ from .data import (
     DirectionTy,
     NamedParameter,
     NamedParameterFlags,
+    OutputSchema,
     RoadUserTy,
     Source,
     StatisticTy,
@@ -81,6 +82,7 @@ from .entity import (
     GraphNode,
     Line,
     MultiLine,
+    MultiPoint,
     MultiPolygon,
     NodeTy,
     Point,
@@ -206,6 +208,7 @@ from .generated.ListView import ListView as FbsListView
 from .generated.Map import Map as FbsMap
 from .generated.Metadata import Metadata as FbsMetadata
 from .generated.MultiLine import MultiLine as FbsMultiLine
+from .generated.MultiPoint import MultiPoint as FbsMultiPoint
 from .generated.MultiPolygon import MultiPolygon as FbsMultiPolygon
 from .generated.NamedParameter import NamedParameter as FbsNamedParameter
 from .generated.NestedCategoryRelationshipData import NestedCategoryRelationshipData as FbsNestedCategoryRelationshipData
@@ -222,6 +225,7 @@ from .generated.Null import Null as FbsNull
 from .generated.NumericalFieldFormat import NumericalFieldFormat as FbsNumericalFieldFormat
 from .generated.ObjectId import ObjectId as FbsObjectId
 from .generated.OrderBy import OrderBy as FbsOrderBy
+from .generated.OutputSchema import OutputSchema as FbsOutputSchema
 from .generated.Point import Point as FbsPoint
 from .generated.Point2D import Point2D as FbsPoint2D
 from .generated.Polygon import Polygon as FbsPolygon
@@ -363,6 +367,7 @@ class UlFieldType(Enum):
     FT_BINARY = 22
     FT_TIME = 23
     FT_GEOMETRY_OR_NODE = 24
+    FT_STRING_ARRAY = 25
 
 class UpdateCadence(Enum):
     UC_UNSET = 0

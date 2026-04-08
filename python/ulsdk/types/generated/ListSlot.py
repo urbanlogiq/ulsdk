@@ -4,19 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Attr import Attr
-from .B2cId import B2cId
-from .ObjectId import ObjectId
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class ListSlot(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = ListSlot()
         x.Init(buf, n + offset)
@@ -27,14 +21,15 @@ class ListSlot(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # ListSlot
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # ListSlot
-    def Id(self) -> Optional[ObjectId]:
+    def Id(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -48,16 +43,17 @@ class ListSlot(object):
         return 0
 
     # ListSlot
-    def Entry(self) -> Optional[flatbuffers.table.Table]:
+    def Entry(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
     # ListSlot
-    def Name(self) -> Optional[bytes]:
+    def Name(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -85,107 +81,109 @@ class ListSlot(object):
         return 0
 
     # ListSlot
-    def Attributes(self, j: int) -> Optional[Attr]:
+    def Attributes(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(18))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Attr import Attr
             obj = Attr()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # ListSlot
-    def AttributesLength(self) -> int:
+    def AttributesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(18))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # ListSlot
-    def AttributesIsNone(self) -> bool:
+    def AttributesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(18))
         return o == 0
 
     # ListSlot
-    def LastModifiedBy(self) -> Optional[B2cId]:
+    def LastModifiedBy(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .B2cId import B2cId
             obj = B2cId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def ListSlotStart(builder: flatbuffers.Builder):
+def ListSlotStart(builder):
     builder.StartObject(9)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ListSlotStart(builder)
 
-def ListSlotAddId(builder: flatbuffers.Builder, id: int):
+def ListSlotAddId(builder, id):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(id), 0)
 
-def AddId(builder: flatbuffers.Builder, id: int):
+def AddId(builder, id):
     ListSlotAddId(builder, id)
 
-def ListSlotAddEntryType(builder: flatbuffers.Builder, entryType: int):
+def ListSlotAddEntryType(builder, entryType):
     builder.PrependUint8Slot(1, entryType, 0)
 
-def AddEntryType(builder: flatbuffers.Builder, entryType: int):
+def AddEntryType(builder, entryType):
     ListSlotAddEntryType(builder, entryType)
 
-def ListSlotAddEntry(builder: flatbuffers.Builder, entry: int):
+def ListSlotAddEntry(builder, entry):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(entry), 0)
 
-def AddEntry(builder: flatbuffers.Builder, entry: int):
+def AddEntry(builder, entry):
     ListSlotAddEntry(builder, entry)
 
-def ListSlotAddName(builder: flatbuffers.Builder, name: int):
+def ListSlotAddName(builder, name):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
 
-def AddName(builder: flatbuffers.Builder, name: int):
+def AddName(builder, name):
     ListSlotAddName(builder, name)
 
-def ListSlotAddUserPermissions(builder: flatbuffers.Builder, userPermissions: int):
+def ListSlotAddUserPermissions(builder, userPermissions):
     builder.PrependUint32Slot(4, userPermissions, 0)
 
-def AddUserPermissions(builder: flatbuffers.Builder, userPermissions: int):
+def AddUserPermissions(builder, userPermissions):
     ListSlotAddUserPermissions(builder, userPermissions)
 
-def ListSlotAddTime(builder: flatbuffers.Builder, time: int):
+def ListSlotAddTime(builder, time):
     builder.PrependUint64Slot(5, time, 0)
 
-def AddTime(builder: flatbuffers.Builder, time: int):
+def AddTime(builder, time):
     ListSlotAddTime(builder, time)
 
-def ListSlotAddSize(builder: flatbuffers.Builder, size: int):
+def ListSlotAddSize(builder, size):
     builder.PrependUint64Slot(6, size, 0)
 
-def AddSize(builder: flatbuffers.Builder, size: int):
+def AddSize(builder, size):
     ListSlotAddSize(builder, size)
 
-def ListSlotAddAttributes(builder: flatbuffers.Builder, attributes: int):
+def ListSlotAddAttributes(builder, attributes):
     builder.PrependUOffsetTRelativeSlot(7, flatbuffers.number_types.UOffsetTFlags.py_type(attributes), 0)
 
-def AddAttributes(builder: flatbuffers.Builder, attributes: int):
+def AddAttributes(builder, attributes):
     ListSlotAddAttributes(builder, attributes)
 
-def ListSlotStartAttributesVector(builder, numElems: int) -> int:
+def ListSlotStartAttributesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartAttributesVector(builder, numElems: int) -> int:
+def StartAttributesVector(builder, numElems):
     return ListSlotStartAttributesVector(builder, numElems)
 
-def ListSlotAddLastModifiedBy(builder: flatbuffers.Builder, lastModifiedBy: int):
+def ListSlotAddLastModifiedBy(builder, lastModifiedBy):
     builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(lastModifiedBy), 0)
 
-def AddLastModifiedBy(builder: flatbuffers.Builder, lastModifiedBy: int):
+def AddLastModifiedBy(builder, lastModifiedBy):
     ListSlotAddLastModifiedBy(builder, lastModifiedBy)
 
-def ListSlotEnd(builder: flatbuffers.Builder) -> int:
+def ListSlotEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ListSlotEnd(builder)

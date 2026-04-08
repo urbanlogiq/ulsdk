@@ -26,8 +26,8 @@ use crate::types::Schema::{
 use crate::types::api::SortOrder;
 use crate::types::attr::Attr;
 use crate::types::entity::{
-    EdgeTy, EntityTy, Geometry, GraphEdge, GraphNode, Line, MultiLine, MultiPolygon, NodeTy, Point,
-    Polygon,
+    EdgeTy, EntityTy, Geometry, GraphEdge, GraphNode, Line, MultiLine, MultiPoint, MultiPolygon,
+    NodeTy, Point, Polygon,
 };
 use crate::types::fun::Fn_;
 use crate::types::generated::Schema_generated::{
@@ -50,8 +50,8 @@ use crate::types::generated::attr_generated::Attr as FbsAttr;
 use crate::types::generated::entity_generated::{
     EdgeTy as FbsEdgeTy, EntityTy as FbsEntityTy, Geometry as FbsGeometry,
     GraphEdge as FbsGraphEdge, GraphNode as FbsGraphNode, Line as FbsLine,
-    MultiLine as FbsMultiLine, MultiPolygon as FbsMultiPolygon, NodeTy as FbsNodeTy,
-    Point as FbsPoint, Polygon as FbsPolygon,
+    MultiLine as FbsMultiLine, MultiPoint as FbsMultiPoint, MultiPolygon as FbsMultiPolygon,
+    NodeTy as FbsNodeTy, Point as FbsPoint, Polygon as FbsPolygon,
 };
 use crate::types::generated::fun_generated::Fn as FbsFn;
 use crate::types::generated::graph_generated::{
@@ -67,10 +67,13 @@ use crate::types::generated::id_generated::{
     ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
 };
 use crate::types::generated::query_generated::{
-    AllColumns as FbsAllColumns, Arrow as FbsArrow, BinaryQueryElement as FbsBinaryQueryElement,
-    Case as FbsCase, Column as FbsColumn, ConflictAction as FbsConflictAction,
-    DataCatalog as FbsDataCatalog, DeleteQueryElement as FbsDeleteQueryElement,
-    Distinct as FbsDistinct, DoNothing as FbsDoNothing, DoUpdate as FbsDoUpdate, Drive as FbsDrive,
+    AddCol as FbsAddCol, AggregateFilter as FbsAggregateFilter, AllColumns as FbsAllColumns,
+    AlterTableElement as FbsAlterTableElement, AlterTableOperation as FbsAlterTableOperation,
+    AlterTableOperationUnion as FbsAlterTableOperationUnion, Arrow as FbsArrow,
+    BinaryQueryElement as FbsBinaryQueryElement, Case as FbsCase, Column as FbsColumn,
+    ConflictAction as FbsConflictAction, DataCatalog as FbsDataCatalog,
+    DeleteQueryElement as FbsDeleteQueryElement, Distinct as FbsDistinct,
+    DoNothing as FbsDoNothing, DoUpdate as FbsDoUpdate, Drive as FbsDrive, DropCol as FbsDropCol,
     Explain as FbsExplain, ExplainFormat as FbsExplainFormat, Expr as FbsExpr,
     ExprUnion as FbsExprUnion, Function as FbsFunction, InsertConflicting as FbsInsertConflicting,
     InsertQueryElement as FbsInsertQueryElement, Join as FbsJoin, JoinTy as FbsJoinTy,
@@ -114,9 +117,10 @@ use crate::types::id::{
     ObjectNamespace, StreamId,
 };
 use crate::types::query::{
-    AllColumns, Arrow, BinaryQueryElement, Case, Column, ConflictAction, DataCatalog,
-    DeleteQueryElement, Distinct, DoNothing, DoUpdate, Drive, Explain, ExplainFormat, Expr,
-    ExprUnion, Function, InsertConflicting, InsertQueryElement, Join, JoinTy, MvdbPartition,
+    AddCol, AggregateFilter, AllColumns, AlterTableElement, AlterTableOperation,
+    AlterTableOperationUnion, Arrow, BinaryQueryElement, Case, Column, ConflictAction, DataCatalog,
+    DeleteQueryElement, Distinct, DoNothing, DoUpdate, Drive, DropCol, Explain, ExplainFormat,
+    Expr, ExprUnion, Function, InsertConflicting, InsertQueryElement, Join, JoinTy, MvdbPartition,
     NullableUint, OnConflict, OrderByExpr, Partition, Placeholder, Query, QueryElement,
     QueryElementOp, QueryElementUnion, QueryTableSource, SetExpr, TableOrderBy, TablePartition,
     TableSource, TableSourceInstance, TableSourceUnion, TypeHint, UnaryQueryElement, UnsetArgument,

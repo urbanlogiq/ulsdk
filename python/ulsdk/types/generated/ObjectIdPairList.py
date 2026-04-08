@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ObjectIdPair import ObjectIdPair
-from typing import Optional
 np = import_numpy()
 
 class ObjectIdPairList(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = ObjectIdPairList()
         x.Init(buf, n + offset)
@@ -24,53 +21,54 @@ class ObjectIdPairList(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # ObjectIdPairList
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # ObjectIdPairList
-    def Pairs(self, j: int) -> Optional[ObjectIdPair]:
+    def Pairs(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .ObjectIdPair import ObjectIdPair
             obj = ObjectIdPair()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # ObjectIdPairList
-    def PairsLength(self) -> int:
+    def PairsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # ObjectIdPairList
-    def PairsIsNone(self) -> bool:
+    def PairsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def ObjectIdPairListStart(builder: flatbuffers.Builder):
+def ObjectIdPairListStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ObjectIdPairListStart(builder)
 
-def ObjectIdPairListAddPairs(builder: flatbuffers.Builder, pairs: int):
+def ObjectIdPairListAddPairs(builder, pairs):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(pairs), 0)
 
-def AddPairs(builder: flatbuffers.Builder, pairs: int):
+def AddPairs(builder, pairs):
     ObjectIdPairListAddPairs(builder, pairs)
 
-def ObjectIdPairListStartPairsVector(builder, numElems: int) -> int:
+def ObjectIdPairListStartPairsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartPairsVector(builder, numElems: int) -> int:
+def StartPairsVector(builder, numElems):
     return ObjectIdPairListStartPairsVector(builder, numElems)
 
-def ObjectIdPairListEnd(builder: flatbuffers.Builder) -> int:
+def ObjectIdPairListEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ObjectIdPairListEnd(builder)

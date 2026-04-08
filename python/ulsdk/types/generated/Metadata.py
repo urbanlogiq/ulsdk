@@ -4,19 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .DatasetSource import DatasetSource
-from .UlField import UlField
-from .UlFieldRelationship import UlFieldRelationship
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class Metadata(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Metadata()
         x.Init(buf, n + offset)
@@ -27,49 +21,50 @@ class Metadata(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Metadata
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Metadata
-    def DisplayName(self) -> Optional[bytes]:
+    def DisplayName(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # Metadata
-    def Description(self) -> Optional[bytes]:
+    def Description(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # Metadata
-    def Fields(self, j: int) -> Optional[UlField]:
+    def Fields(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .UlField import UlField
             obj = UlField()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Metadata
-    def FieldsLength(self) -> int:
+    def FieldsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Metadata
-    def FieldsIsNone(self) -> bool:
+    def FieldsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
     # Metadata
-    def Summary(self, j: int):
+    def Summary(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             a = self._tab.Vector(o)
@@ -84,14 +79,14 @@ class Metadata(object):
         return 0
 
     # Metadata
-    def SummaryLength(self) -> int:
+    def SummaryLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Metadata
-    def SummaryIsNone(self) -> bool:
+    def SummaryIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         return o == 0
 
@@ -105,36 +100,38 @@ class Metadata(object):
 
     # Field groupings e.g. age ranges, ethnicities or hierarchical codes like zoning and NAICS
     # Metadata
-    def FieldRelationships(self, j: int) -> Optional[UlFieldRelationship]:
+    def FieldRelationships(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .UlFieldRelationship import UlFieldRelationship
             obj = UlFieldRelationship()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Metadata
-    def FieldRelationshipsLength(self) -> int:
+    def FieldRelationshipsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Metadata
-    def FieldRelationshipsIsNone(self) -> bool:
+    def FieldRelationshipsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         return o == 0
 
     # An optional field that is meant to provide information to the user on
     # where the data has come from
     # Metadata
-    def Source(self) -> Optional[DatasetSource]:
+    def Source(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .DatasetSource import DatasetSource
             obj = DatasetSource()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -148,9 +145,10 @@ class Metadata(object):
         return 0
 
     # Metadata
-    def GeometrySource(self) -> Optional[flatbuffers.table.Table]:
+    def GeometrySource(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
@@ -200,116 +198,116 @@ class Metadata(object):
             return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
         return -1
 
-def MetadataStart(builder: flatbuffers.Builder):
+def MetadataStart(builder):
     builder.StartObject(14)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     MetadataStart(builder)
 
-def MetadataAddDisplayName(builder: flatbuffers.Builder, displayName: int):
+def MetadataAddDisplayName(builder, displayName):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(displayName), 0)
 
-def AddDisplayName(builder: flatbuffers.Builder, displayName: int):
+def AddDisplayName(builder, displayName):
     MetadataAddDisplayName(builder, displayName)
 
-def MetadataAddDescription(builder: flatbuffers.Builder, description: int):
+def MetadataAddDescription(builder, description):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(description), 0)
 
-def AddDescription(builder: flatbuffers.Builder, description: int):
+def AddDescription(builder, description):
     MetadataAddDescription(builder, description)
 
-def MetadataAddFields(builder: flatbuffers.Builder, fields: int):
+def MetadataAddFields(builder, fields):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(fields), 0)
 
-def AddFields(builder: flatbuffers.Builder, fields: int):
+def AddFields(builder, fields):
     MetadataAddFields(builder, fields)
 
-def MetadataStartFieldsVector(builder, numElems: int) -> int:
+def MetadataStartFieldsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartFieldsVector(builder, numElems: int) -> int:
+def StartFieldsVector(builder, numElems):
     return MetadataStartFieldsVector(builder, numElems)
 
-def MetadataAddSummary(builder: flatbuffers.Builder, summary: int):
+def MetadataAddSummary(builder, summary):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(summary), 0)
 
-def AddSummary(builder: flatbuffers.Builder, summary: int):
+def AddSummary(builder, summary):
     MetadataAddSummary(builder, summary)
 
-def MetadataStartSummaryVector(builder, numElems: int) -> int:
+def MetadataStartSummaryVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartSummaryVector(builder, numElems: int) -> int:
+def StartSummaryVector(builder, numElems):
     return MetadataStartSummaryVector(builder, numElems)
 
-def MetadataAddDatasetCategory(builder: flatbuffers.Builder, datasetCategory: int):
+def MetadataAddDatasetCategory(builder, datasetCategory):
     builder.PrependUint32Slot(4, datasetCategory, 4294967295)
 
-def AddDatasetCategory(builder: flatbuffers.Builder, datasetCategory: int):
+def AddDatasetCategory(builder, datasetCategory):
     MetadataAddDatasetCategory(builder, datasetCategory)
 
-def MetadataAddFieldRelationships(builder: flatbuffers.Builder, fieldRelationships: int):
+def MetadataAddFieldRelationships(builder, fieldRelationships):
     builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(fieldRelationships), 0)
 
-def AddFieldRelationships(builder: flatbuffers.Builder, fieldRelationships: int):
+def AddFieldRelationships(builder, fieldRelationships):
     MetadataAddFieldRelationships(builder, fieldRelationships)
 
-def MetadataStartFieldRelationshipsVector(builder, numElems: int) -> int:
+def MetadataStartFieldRelationshipsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartFieldRelationshipsVector(builder, numElems: int) -> int:
+def StartFieldRelationshipsVector(builder, numElems):
     return MetadataStartFieldRelationshipsVector(builder, numElems)
 
-def MetadataAddSource(builder: flatbuffers.Builder, source: int):
+def MetadataAddSource(builder, source):
     builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(source), 0)
 
-def AddSource(builder: flatbuffers.Builder, source: int):
+def AddSource(builder, source):
     MetadataAddSource(builder, source)
 
-def MetadataAddGeometrySourceType(builder: flatbuffers.Builder, geometrySourceType: int):
+def MetadataAddGeometrySourceType(builder, geometrySourceType):
     builder.PrependUint8Slot(7, geometrySourceType, 0)
 
-def AddGeometrySourceType(builder: flatbuffers.Builder, geometrySourceType: int):
+def AddGeometrySourceType(builder, geometrySourceType):
     MetadataAddGeometrySourceType(builder, geometrySourceType)
 
-def MetadataAddGeometrySource(builder: flatbuffers.Builder, geometrySource: int):
+def MetadataAddGeometrySource(builder, geometrySource):
     builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(geometrySource), 0)
 
-def AddGeometrySource(builder: flatbuffers.Builder, geometrySource: int):
+def AddGeometrySource(builder, geometrySource):
     MetadataAddGeometrySource(builder, geometrySource)
 
-def MetadataAddAreaSelection(builder: flatbuffers.Builder, areaSelection: bool):
+def MetadataAddAreaSelection(builder, areaSelection):
     builder.PrependBoolSlot(9, areaSelection, 0)
 
-def AddAreaSelection(builder: flatbuffers.Builder, areaSelection: bool):
+def AddAreaSelection(builder, areaSelection):
     MetadataAddAreaSelection(builder, areaSelection)
 
-def MetadataAddDoNotFilterGeometryByViewport(builder: flatbuffers.Builder, doNotFilterGeometryByViewport: bool):
+def MetadataAddDoNotFilterGeometryByViewport(builder, doNotFilterGeometryByViewport):
     builder.PrependBoolSlot(10, doNotFilterGeometryByViewport, 0)
 
-def AddDoNotFilterGeometryByViewport(builder: flatbuffers.Builder, doNotFilterGeometryByViewport: bool):
+def AddDoNotFilterGeometryByViewport(builder, doNotFilterGeometryByViewport):
     MetadataAddDoNotFilterGeometryByViewport(builder, doNotFilterGeometryByViewport)
 
-def MetadataAddEntityTy(builder: flatbuffers.Builder, entityTy: int):
+def MetadataAddEntityTy(builder, entityTy):
     builder.PrependInt32Slot(11, entityTy, 0)
 
-def AddEntityTy(builder: flatbuffers.Builder, entityTy: int):
+def AddEntityTy(builder, entityTy):
     MetadataAddEntityTy(builder, entityTy)
 
-def MetadataAddUpdateCadence(builder: flatbuffers.Builder, updateCadence: int):
+def MetadataAddUpdateCadence(builder, updateCadence):
     builder.PrependUint32Slot(12, updateCadence, 0)
 
-def AddUpdateCadence(builder: flatbuffers.Builder, updateCadence: int):
+def AddUpdateCadence(builder, updateCadence):
     MetadataAddUpdateCadence(builder, updateCadence)
 
-def MetadataAddLocationDescriptionField(builder: flatbuffers.Builder, locationDescriptionField: int):
+def MetadataAddLocationDescriptionField(builder, locationDescriptionField):
     builder.PrependInt32Slot(13, locationDescriptionField, -1)
 
-def AddLocationDescriptionField(builder: flatbuffers.Builder, locationDescriptionField: int):
+def AddLocationDescriptionField(builder, locationDescriptionField):
     MetadataAddLocationDescriptionField(builder, locationDescriptionField)
 
-def MetadataEnd(builder: flatbuffers.Builder) -> int:
+def MetadataEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return MetadataEnd(builder)

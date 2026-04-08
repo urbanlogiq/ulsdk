@@ -4,19 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ContentId import ContentId
-from .NamedParameter import NamedParameter
-from .ObjectId import ObjectId
-from .Schema import Schema
-from typing import Optional
 np = import_numpy()
 
 class Source(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Source()
         x.Init(buf, n + offset)
@@ -27,25 +21,25 @@ class Source(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Source
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Source
-    def Url(self) -> Optional[bytes]:
+    def Url(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # Source
-    def Name(self) -> Optional[bytes]:
+    def Name(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # Source
-    def Options(self, j: int):
+    def Options(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             a = self._tab.Vector(o)
@@ -60,153 +54,157 @@ class Source(object):
         return 0
 
     # Source
-    def OptionsLength(self) -> int:
+    def OptionsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Source
-    def OptionsIsNone(self) -> bool:
+    def OptionsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
     # Source
-    def Schemas(self, j: int) -> Optional[Schema]:
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
-        if o != 0:
-            x = self._tab.Vector(o)
-            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
-            x = self._tab.Indirect(x)
-            obj = Schema()
-            obj.Init(self._tab.Bytes, x)
-            return obj
-        return None
-
-    # Source
-    def SchemasLength(self) -> int:
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
-        if o != 0:
-            return self._tab.VectorLen(o)
-        return 0
-
-    # Source
-    def SchemasIsNone(self) -> bool:
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
-        return o == 0
-
-    # Source
-    def Metadata(self) -> Optional[ObjectId]:
+    def Metadata(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Source
-    def MetadataRevision(self) -> Optional[ContentId]:
+    def MetadataRevision(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ContentId import ContentId
             obj = ContentId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Source
-    def NamedParameters(self, j: int) -> Optional[NamedParameter]:
+    def NamedParameters(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(18))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .NamedParameter import NamedParameter
             obj = NamedParameter()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Source
-    def NamedParametersLength(self) -> int:
+    def NamedParametersLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(18))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Source
-    def NamedParametersIsNone(self) -> bool:
+    def NamedParametersIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(18))
         return o == 0
 
-def SourceStart(builder: flatbuffers.Builder):
-    builder.StartObject(8)
+    # Source
+    def OutputSchemas(self, j):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
+        if o != 0:
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
+            x = self._tab.Indirect(x)
+            from .OutputSchema import OutputSchema
+            obj = OutputSchema()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
 
-def Start(builder: flatbuffers.Builder):
+    # Source
+    def OutputSchemasLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # Source
+    def OutputSchemasIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
+        return o == 0
+
+def SourceStart(builder):
+    builder.StartObject(9)
+
+def Start(builder):
     SourceStart(builder)
 
-def SourceAddUrl(builder: flatbuffers.Builder, url: int):
+def SourceAddUrl(builder, url):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(url), 0)
 
-def AddUrl(builder: flatbuffers.Builder, url: int):
+def AddUrl(builder, url):
     SourceAddUrl(builder, url)
 
-def SourceAddName(builder: flatbuffers.Builder, name: int):
+def SourceAddName(builder, name):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
 
-def AddName(builder: flatbuffers.Builder, name: int):
+def AddName(builder, name):
     SourceAddName(builder, name)
 
-def SourceAddOptions(builder: flatbuffers.Builder, options: int):
+def SourceAddOptions(builder, options):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(options), 0)
 
-def AddOptions(builder: flatbuffers.Builder, options: int):
+def AddOptions(builder, options):
     SourceAddOptions(builder, options)
 
-def SourceStartOptionsVector(builder, numElems: int) -> int:
+def SourceStartOptionsVector(builder, numElems):
     return builder.StartVector(1, numElems, 1)
 
-def StartOptionsVector(builder, numElems: int) -> int:
+def StartOptionsVector(builder, numElems):
     return SourceStartOptionsVector(builder, numElems)
 
-def SourceAddSchemas(builder: flatbuffers.Builder, schemas: int):
-    builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(schemas), 0)
-
-def AddSchemas(builder: flatbuffers.Builder, schemas: int):
-    SourceAddSchemas(builder, schemas)
-
-def SourceStartSchemasVector(builder, numElems: int) -> int:
-    return builder.StartVector(4, numElems, 4)
-
-def StartSchemasVector(builder, numElems: int) -> int:
-    return SourceStartSchemasVector(builder, numElems)
-
-def SourceAddMetadata(builder: flatbuffers.Builder, metadata: int):
+def SourceAddMetadata(builder, metadata):
     builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(metadata), 0)
 
-def AddMetadata(builder: flatbuffers.Builder, metadata: int):
+def AddMetadata(builder, metadata):
     SourceAddMetadata(builder, metadata)
 
-def SourceAddMetadataRevision(builder: flatbuffers.Builder, metadataRevision: int):
+def SourceAddMetadataRevision(builder, metadataRevision):
     builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(metadataRevision), 0)
 
-def AddMetadataRevision(builder: flatbuffers.Builder, metadataRevision: int):
+def AddMetadataRevision(builder, metadataRevision):
     SourceAddMetadataRevision(builder, metadataRevision)
 
-def SourceAddNamedParameters(builder: flatbuffers.Builder, namedParameters: int):
+def SourceAddNamedParameters(builder, namedParameters):
     builder.PrependUOffsetTRelativeSlot(7, flatbuffers.number_types.UOffsetTFlags.py_type(namedParameters), 0)
 
-def AddNamedParameters(builder: flatbuffers.Builder, namedParameters: int):
+def AddNamedParameters(builder, namedParameters):
     SourceAddNamedParameters(builder, namedParameters)
 
-def SourceStartNamedParametersVector(builder, numElems: int) -> int:
+def SourceStartNamedParametersVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartNamedParametersVector(builder, numElems: int) -> int:
+def StartNamedParametersVector(builder, numElems):
     return SourceStartNamedParametersVector(builder, numElems)
 
-def SourceEnd(builder: flatbuffers.Builder) -> int:
+def SourceAddOutputSchemas(builder, outputSchemas):
+    builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(outputSchemas), 0)
+
+def AddOutputSchemas(builder, outputSchemas):
+    SourceAddOutputSchemas(builder, outputSchemas)
+
+def SourceStartOutputSchemasVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+def StartOutputSchemasVector(builder, numElems):
+    return SourceStartOutputSchemasVector(builder, numElems)
+
+def SourceEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return SourceEnd(builder)

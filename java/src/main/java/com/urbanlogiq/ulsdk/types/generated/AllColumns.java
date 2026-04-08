@@ -23,7 +23,7 @@ import java.nio.ByteOrder;
 
 @SuppressWarnings("unused")
 public final class AllColumns extends com.google.flatbuffers.Table {
-  public static void ValidateVersion() { Constants.FLATBUFFERS_23_5_26(); }
+  public static void ValidateVersion() { Constants.FLATBUFFERS_25_2_10(); }
   public static AllColumns getRootAsAllColumns(ByteBuffer _bb) { return getRootAsAllColumns(_bb, new AllColumns()); }
   public static AllColumns getRootAsAllColumns(ByteBuffer _bb, AllColumns obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
   public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }

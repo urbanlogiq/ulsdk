@@ -4,9 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Expr import Expr
-from typing import Optional
 np = import_numpy()
 
 # SetExprs represent the expressions used as part of an UPDATE-type operation
@@ -14,7 +11,7 @@ class SetExpr(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = SetExpr()
         x.Init(buf, n + offset)
@@ -25,14 +22,13 @@ class SetExpr(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # SetExpr
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
-    # Because we cannot refer to multiple tables at once in a single UPDATE
-    # operation we only need to name the column, we can just a string here
-    # instead of a Column table.
+    # The target column name. Since SET targets always refer to the target table,
+    # we only need to name the column as a string.
     # SetExpr
-    def Col(self) -> Optional[bytes]:
+    def Col(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -41,35 +37,36 @@ class SetExpr(object):
     # This is the expression that is evaluted to produce the value that is
     # assigned to the column named in the `col` field.
     # SetExpr
-    def Expr(self) -> Optional[Expr]:
+    def Expr(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Expr import Expr
             obj = Expr()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def SetExprStart(builder: flatbuffers.Builder):
+def SetExprStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     SetExprStart(builder)
 
-def SetExprAddCol(builder: flatbuffers.Builder, col: int):
+def SetExprAddCol(builder, col):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(col), 0)
 
-def AddCol(builder: flatbuffers.Builder, col: int):
+def AddCol(builder, col):
     SetExprAddCol(builder, col)
 
-def SetExprAddExpr(builder: flatbuffers.Builder, expr: int):
+def SetExprAddExpr(builder, expr):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(expr), 0)
 
-def AddExpr(builder: flatbuffers.Builder, expr: int):
+def AddExpr(builder, expr):
     SetExprAddExpr(builder, expr)
 
-def SetExprEnd(builder: flatbuffers.Builder) -> int:
+def SetExprEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return SetExprEnd(builder)

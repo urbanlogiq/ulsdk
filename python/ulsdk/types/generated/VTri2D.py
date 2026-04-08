@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Tri2D import Tri2D
-from typing import Optional
 np = import_numpy()
 
 class VTri2D(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = VTri2D()
         x.Init(buf, n + offset)
@@ -24,33 +21,34 @@ class VTri2D(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # VTri2D
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # VTri2D
-    def V(self) -> Optional[Tri2D]:
+    def V(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = o + self._tab.Pos
+            from .Tri2D import Tri2D
             obj = Tri2D()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def VTri2DStart(builder: flatbuffers.Builder):
+def VTri2DStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     VTri2DStart(builder)
 
-def VTri2DAddV(builder: flatbuffers.Builder, v: Any):
+def VTri2DAddV(builder, v):
     builder.PrependStructSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(v), 0)
 
-def AddV(builder: flatbuffers.Builder, v: Any):
+def AddV(builder, v):
     VTri2DAddV(builder, v)
 
-def VTri2DEnd(builder: flatbuffers.Builder) -> int:
+def VTri2DEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return VTri2DEnd(builder)

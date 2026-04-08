@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class Point(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Point()
         x.Init(buf, n + offset)
@@ -22,11 +21,11 @@ class Point(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Point
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Point
-    def PointGeo(self, j: int):
+    def PointGeo(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             a = self._tab.Vector(o)
@@ -41,37 +40,37 @@ class Point(object):
         return 0
 
     # Point
-    def PointGeoLength(self) -> int:
+    def PointGeoLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Point
-    def PointGeoIsNone(self) -> bool:
+    def PointGeoIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def PointStart(builder: flatbuffers.Builder):
+def PointStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     PointStart(builder)
 
-def PointAddPointGeo(builder: flatbuffers.Builder, pointGeo: int):
+def PointAddPointGeo(builder, pointGeo):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(pointGeo), 0)
 
-def AddPointGeo(builder: flatbuffers.Builder, pointGeo: int):
+def AddPointGeo(builder, pointGeo):
     PointAddPointGeo(builder, pointGeo)
 
-def PointStartPointGeoVector(builder, numElems: int) -> int:
+def PointStartPointGeoVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartPointGeoVector(builder, numElems: int) -> int:
+def StartPointGeoVector(builder, numElems):
     return PointStartPointGeoVector(builder, numElems)
 
-def PointEnd(builder: flatbuffers.Builder) -> int:
+def PointEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return PointEnd(builder)

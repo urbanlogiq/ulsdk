@@ -19,8 +19,9 @@ public final class ExprUnion {
   public static final byte UnsetArgument = 8;
   public static final byte Window = 9;
   public static final byte ValueName = 10;
+  public static final byte AggregateFilter = 11;
 
-  public static final String[] names = { "NONE", "ValueIndex", "Column", "Function", "AllColumns", "Case", "OrderByExpr", "Partition", "UnsetArgument", "Window", "ValueName", };
+  public static final String[] names = { "NONE", "ValueIndex", "Column", "Function", "AllColumns", "Case", "OrderByExpr", "Partition", "UnsetArgument", "Window", "ValueName", "AggregateFilter", };
 
   public static String name(int e) { return names[e]; }
 }

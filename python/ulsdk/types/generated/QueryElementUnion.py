@@ -9,3 +9,4 @@ class QueryElementUnion(object):
     UpdateQueryElement = 3
     DeleteQueryElement = 4
     InsertQueryElement = 5
+    AlterTableElement = 6

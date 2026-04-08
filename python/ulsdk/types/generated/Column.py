@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .NullableUint import NullableUint
-from typing import Optional
 np = import_numpy()
 
 class Column(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Column()
         x.Init(buf, n + offset)
@@ -24,11 +21,11 @@ class Column(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Column
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Column
-    def Name(self) -> Optional[bytes]:
+    def Name(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -42,41 +39,42 @@ class Column(object):
         return 0
 
     # Column
-    def Source(self) -> Optional[NullableUint]:
+    def Source(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .NullableUint import NullableUint
             obj = NullableUint()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def ColumnStart(builder: flatbuffers.Builder):
+def ColumnStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ColumnStart(builder)
 
-def ColumnAddName(builder: flatbuffers.Builder, name: int):
+def ColumnAddName(builder, name):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
 
-def AddName(builder: flatbuffers.Builder, name: int):
+def AddName(builder, name):
     ColumnAddName(builder, name)
 
-def ColumnAddTypeHint(builder: flatbuffers.Builder, typeHint: int):
+def ColumnAddTypeHint(builder, typeHint):
     builder.PrependInt8Slot(1, typeHint, 0)
 
-def AddTypeHint(builder: flatbuffers.Builder, typeHint: int):
+def AddTypeHint(builder, typeHint):
     ColumnAddTypeHint(builder, typeHint)
 
-def ColumnAddSource(builder: flatbuffers.Builder, source: int):
+def ColumnAddSource(builder, source):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(source), 0)
 
-def AddSource(builder: flatbuffers.Builder, source: int):
+def AddSource(builder, source):
     ColumnAddSource(builder, source)
 
-def ColumnEnd(builder: flatbuffers.Builder) -> int:
+def ColumnEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ColumnEnd(builder)

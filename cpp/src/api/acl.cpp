@@ -338,6 +338,30 @@ get_permissions(
 }
 
 Result<Void>
+set_default_mode(
+    ul::RequestContext &ctx,
+    const ::ul::types::ObjectId &id,
+    int64_t permission
+) {
+    std::string path = "/v1/api/ulv2/datacatalog/acl/default/:id/:permission";
+    const size_t id_idx = path.find(":id");
+    path.replace(id_idx, 3, id.to_string());
+    const size_t permission_idx = path.find(":permission");
+    path.replace(permission_idx, 11, std::to_string(permission));
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+    const std::vector<uint8_t> body;
+    const Result<std::vector<uint8_t>> res = ctx.post(path, body, "text/plain", params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<Void>(error);
+    }
+    return Result<Void>();
+}
+
+Result<Void>
 set(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,

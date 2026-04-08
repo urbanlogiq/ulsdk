@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .GenericId import GenericId
-from typing import Optional
 np = import_numpy()
 
 class Delete(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Delete()
         x.Init(buf, n + offset)
@@ -24,33 +21,34 @@ class Delete(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Delete
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Delete
-    def Row(self) -> Optional[GenericId]:
+    def Row(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .GenericId import GenericId
             obj = GenericId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def DeleteStart(builder: flatbuffers.Builder):
+def DeleteStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DeleteStart(builder)
 
-def DeleteAddRow(builder: flatbuffers.Builder, row: int):
+def DeleteAddRow(builder, row):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(row), 0)
 
-def AddRow(builder: flatbuffers.Builder, row: int):
+def AddRow(builder, row):
     DeleteAddRow(builder, row)
 
-def DeleteEnd(builder: flatbuffers.Builder) -> int:
+def DeleteEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DeleteEnd(builder)

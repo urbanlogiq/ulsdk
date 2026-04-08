@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .B2cId import B2cId
-from typing import Optional
 np = import_numpy()
 
 class TopLevelDirectory(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = TopLevelDirectory()
         x.Init(buf, n + offset)
@@ -24,33 +21,34 @@ class TopLevelDirectory(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # TopLevelDirectory
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # TopLevelDirectory
-    def B2cEntity(self) -> Optional[B2cId]:
+    def B2cEntity(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .B2cId import B2cId
             obj = B2cId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def TopLevelDirectoryStart(builder: flatbuffers.Builder):
+def TopLevelDirectoryStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     TopLevelDirectoryStart(builder)
 
-def TopLevelDirectoryAddB2cEntity(builder: flatbuffers.Builder, b2cEntity: int):
+def TopLevelDirectoryAddB2cEntity(builder, b2cEntity):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(b2cEntity), 0)
 
-def AddB2cEntity(builder: flatbuffers.Builder, b2cEntity: int):
+def AddB2cEntity(builder, b2cEntity):
     TopLevelDirectoryAddB2cEntity(builder, b2cEntity)
 
-def TopLevelDirectoryEnd(builder: flatbuffers.Builder) -> int:
+def TopLevelDirectoryEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return TopLevelDirectoryEnd(builder)

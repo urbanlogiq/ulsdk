@@ -12,6 +12,7 @@
 
 #include "flatbuffers/flatbuffers.h"
 #include "ulsdk/ulsdk.h"
+#include "ulsdk/types/Schema.h"
 #include "ulsdk/types/api.h"
 #include "ulsdk/types/entity.h"
 #include "ulsdk/types/fun.h"
@@ -23,7 +24,11 @@
 namespace ul {
 namespace types {
 
+struct AddCol;
+struct AggregateFilter;
 struct AllColumns;
+struct AlterTableElement;
+struct AlterTableOperation;
 struct Arrow;
 struct BinaryQueryElement;
 struct Case;
@@ -34,6 +39,7 @@ struct Distinct;
 struct DoNothing;
 struct DoUpdate;
 struct Drive;
+struct DropCol;
 struct Explain;
 struct Expr;
 struct Function;
@@ -66,6 +72,11 @@ struct Window;
 struct WorklogPartition;
 
 typedef std::variant<
+    std::shared_ptr<AddCol>,
+    std::shared_ptr<DropCol>
+> AlterTableOperationUnion;
+
+typedef std::variant<
     std::shared_ptr<InsertConflicting>,
     std::shared_ptr<DoNothing>,
     std::shared_ptr<DoUpdate>
@@ -82,7 +93,8 @@ typedef std::variant<
     std::shared_ptr<Partition>,
     std::shared_ptr<UnsetArgument>,
     std::shared_ptr<Window>,
-    std::shared_ptr<ValueName>
+    std::shared_ptr<ValueName>,
+    std::shared_ptr<AggregateFilter>
 > ExprUnion;
 
 using ::JoinTy;
@@ -92,7 +104,8 @@ typedef std::variant<
     std::shared_ptr<BinaryQueryElement>,
     std::shared_ptr<UpdateQueryElement>,
     std::shared_ptr<DeleteQueryElement>,
-    std::shared_ptr<InsertQueryElement>
+    std::shared_ptr<InsertQueryElement>,
+    std::shared_ptr<AlterTableElement>
 > QueryElementUnion;
 
 typedef std::variant<
@@ -112,6 +125,31 @@ typedef std::variant<
 > TableSourceUnion;
 
 using ::TypeHint;
+struct AddCol {
+    std::optional<ValueInstance> default_;
+    Field field_;
+
+    AddCol();
+    AddCol(const ::AddCol *root);
+    AddCol(const std::vector<uint8_t> &bytes);
+    bool operator==(const AddCol &rhs) const;
+    bool operator!=(const AddCol &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+struct DropCol {
+    std::string col_;
+
+    DropCol();
+    DropCol(const ::DropCol *root);
+    DropCol(const std::vector<uint8_t> &bytes);
+    bool operator==(const DropCol &rhs) const;
+    bool operator!=(const DropCol &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
 ///
 /// This variant is for selecting the default behavior of an INSERT statement
 /// where there may be conflicts; it inserts the rows if there is a conflict.
@@ -307,6 +345,19 @@ struct ValueName {
     }
 };
 
+struct AggregateFilter {
+    Expr condition_;
+    Function fun_;
+
+    AggregateFilter();
+    AggregateFilter(const ::AggregateFilter *root);
+    AggregateFilter(const std::vector<uint8_t> &bytes);
+    bool operator==(const AggregateFilter &rhs) const;
+    bool operator!=(const AggregateFilter &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
 ///
 /// The Distinct function defined in fun.fbs is for use in cases like:
 /// SELECT COUNT(DISTINCT c0), SUM(c1) FROM t GROUP BY c2;
@@ -332,6 +383,7 @@ struct UnaryQueryElement {
     std::optional<std::vector<Expr>> fields_;
     std::optional<Function> filter_;
     std::optional<std::vector<Expr>> group_by_;
+    std::optional<Function> having_;
     std::optional<std::vector<Join>> joins_;
     uint32_t limit_;
     std::optional<std::vector<TableOrderBy>> order_by_;
@@ -347,7 +399,7 @@ struct UnaryQueryElement {
 };
 
 struct QueryElement {
-    std::optional<QueryElementUnion> q_;
+    QueryElementUnion q_;
 
     QueryElement();
     QueryElement(const ::QueryElement *root);
@@ -522,6 +574,8 @@ struct Values {
 
 struct UpdateQueryElement {
     std::optional<Function> filter_;
+    std::optional<std::vector<TableSource>> from_sources_;
+    std::optional<std::vector<Join>> joins_;
     std::vector<SetExpr> sets_;
     TableSourceUnion source_;
 
@@ -572,6 +626,31 @@ struct InsertQueryElement {
     InsertQueryElement(const std::vector<uint8_t> &bytes);
     bool operator==(const InsertQueryElement &rhs) const;
     bool operator!=(const InsertQueryElement &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+struct AlterTableElement {
+    std::vector<AlterTableOperation> operations_;
+    ObjectId target_;
+
+    AlterTableElement();
+    AlterTableElement(const ::AlterTableElement *root);
+    AlterTableElement(const std::vector<uint8_t> &bytes);
+    bool operator==(const AlterTableElement &rhs) const;
+    bool operator!=(const AlterTableElement &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+struct AlterTableOperation {
+    AlterTableOperationUnion op_;
+
+    AlterTableOperation();
+    AlterTableOperation(const ::AlterTableOperation *root);
+    AlterTableOperation(const std::vector<uint8_t> &bytes);
+    bool operator==(const AlterTableOperation &rhs) const;
+    bool operator!=(const AlterTableOperation &rhs) const {
         return !(*this == rhs);
     }
 };
@@ -675,6 +754,8 @@ struct When {
     }
 };
 
+std::pair<::flatbuffers::Offset<void>, ::AlterTableOperationUnion>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const AlterTableOperationUnion &o);
 std::pair<::flatbuffers::Offset<void>, ::ConflictAction>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ConflictAction &o);
 std::pair<::flatbuffers::Offset<void>, ::ExprUnion>
@@ -685,6 +766,12 @@ std::pair<::flatbuffers::Offset<void>, ::TablePartition>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TablePartition &o);
 std::pair<::flatbuffers::Offset<void>, ::TableSourceUnion>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TableSourceUnion &o);
+::flatbuffers::Offset<::AddCol>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const AddCol &);
+
+::flatbuffers::Offset<::DropCol>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DropCol &);
+
 ::flatbuffers::Offset<::InsertConflicting>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const InsertConflicting &);
 
@@ -729,6 +816,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Window &);
 
 ::flatbuffers::Offset<::ValueName>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ValueName &);
+
+::flatbuffers::Offset<::AggregateFilter>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const AggregateFilter &);
 
 ::flatbuffers::Offset<::Distinct>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Distinct &);
@@ -787,6 +877,12 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const OnConflict &);
 ::flatbuffers::Offset<::InsertQueryElement>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const InsertQueryElement &);
 
+::flatbuffers::Offset<::AlterTableElement>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const AlterTableElement &);
+
+::flatbuffers::Offset<::AlterTableOperation>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const AlterTableOperation &);
+
 ::flatbuffers::Offset<::Join>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Join &);
 
@@ -808,6 +904,12 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ValueRow &);
 ::flatbuffers::Offset<::When>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const When &);
 
+
+std::vector<uint8_t>
+to_bytes(const AddCol &o);
+
+std::vector<uint8_t>
+to_bytes(const DropCol &o);
 
 std::vector<uint8_t>
 to_bytes(const InsertConflicting &o);
@@ -853,6 +955,9 @@ to_bytes(const Window &o);
 
 std::vector<uint8_t>
 to_bytes(const ValueName &o);
+
+std::vector<uint8_t>
+to_bytes(const AggregateFilter &o);
 
 std::vector<uint8_t>
 to_bytes(const Distinct &o);
@@ -910,6 +1015,12 @@ to_bytes(const OnConflict &o);
 
 std::vector<uint8_t>
 to_bytes(const InsertQueryElement &o);
+
+std::vector<uint8_t>
+to_bytes(const AlterTableElement &o);
+
+std::vector<uint8_t>
+to_bytes(const AlterTableOperation &o);
 
 std::vector<uint8_t>
 to_bytes(const Join &o);

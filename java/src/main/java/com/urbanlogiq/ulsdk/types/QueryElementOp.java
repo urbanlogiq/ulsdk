@@ -8,4 +8,5 @@ public final class QueryElementOp {
     public static final byte Union = com.urbanlogiq.ulsdk.types.generated.QueryElementOp.Union;
     public static final byte Intersect = com.urbanlogiq.ulsdk.types.generated.QueryElementOp.Intersect;
     public static final byte Except = com.urbanlogiq.ulsdk.types.generated.QueryElementOp.Except;
+    public static final byte Minus = com.urbanlogiq.ulsdk.types.generated.QueryElementOp.Minus;
 }

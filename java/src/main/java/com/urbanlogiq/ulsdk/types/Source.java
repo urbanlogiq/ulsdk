@@ -45,12 +45,12 @@ public final class Source {
         this._options = value;
     }
 
-    com.urbanlogiq.ulsdk.types.Schema[] _schemas;
-    public com.urbanlogiq.ulsdk.types.Schema[] getSchemas() {
-        return this._schemas;
+    com.urbanlogiq.ulsdk.types.OutputSchema[] _outputSchemas;
+    public com.urbanlogiq.ulsdk.types.OutputSchema[] getOutputSchemas() {
+        return this._outputSchemas;
     }
-    public void setSchemas(com.urbanlogiq.ulsdk.types.Schema[] value) {
-        this._schemas = value;
+    public void setOutputSchemas(com.urbanlogiq.ulsdk.types.OutputSchema[] value) {
+        this._outputSchemas = value;
     }
 
     String _url;
@@ -87,16 +87,16 @@ public final class Source {
             }
             this._options = options;
         }
-        if (o.schemasVector() != null) {
-            com.urbanlogiq.ulsdk.types.Schema[] schemas = new com.urbanlogiq.ulsdk.types.Schema[o.schemasLength()];
-            for (int i = 0; i < o.schemasLength(); i++) {
-                com.urbanlogiq.ulsdk.types.Schema schemasValue = null;
-                if (o.schemas(i) != null) {
-                    schemasValue = new com.urbanlogiq.ulsdk.types.Schema(o.schemas(i));
+        if (o.outputSchemasVector() != null) {
+            com.urbanlogiq.ulsdk.types.OutputSchema[] outputSchemas = new com.urbanlogiq.ulsdk.types.OutputSchema[o.outputSchemasLength()];
+            for (int i = 0; i < o.outputSchemasLength(); i++) {
+                com.urbanlogiq.ulsdk.types.OutputSchema outputSchemasValue = null;
+                if (o.outputSchemas(i) != null) {
+                    outputSchemasValue = new com.urbanlogiq.ulsdk.types.OutputSchema(o.outputSchemas(i));
                 }
-                schemas[i] = schemasValue;
+                outputSchemas[i] = outputSchemasValue;
             }
-            this._schemas = schemas;
+            this._outputSchemas = outputSchemas;
         }
         this._url = o.url();
     }
@@ -131,17 +131,17 @@ public final class Source {
         if (this._options != null) {
             optionsOffset = builder.createByteVector(this._options);
         }
-        Integer schemasOffset = null;
-        if (this._schemas != null) {
-            int[] schemasOffsets = new int[this._schemas.length];;
-            for (int i = 0; i < this._schemas.length; i++) {
-                schemasOffsets[i] = this._schemas[i].serializeTo(builder);
+        Integer outputSchemasOffset = null;
+        if (this._outputSchemas != null) {
+            int[] outputSchemasOffsets = new int[this._outputSchemas.length];;
+            for (int i = 0; i < this._outputSchemas.length; i++) {
+                outputSchemasOffsets[i] = this._outputSchemas[i].serializeTo(builder);
             }
-            com.urbanlogiq.ulsdk.types.generated.Source.startSchemasVector(builder, this._schemas.length);
-            for (int i = schemasOffsets.length - 1; i >= 0; i--) {
-                builder.addOffset(schemasOffsets[i]);
+            com.urbanlogiq.ulsdk.types.generated.Source.startOutputSchemasVector(builder, this._outputSchemas.length);
+            for (int i = outputSchemasOffsets.length - 1; i >= 0; i--) {
+                builder.addOffset(outputSchemasOffsets[i]);
             }
-            schemasOffset = builder.endVector();
+            outputSchemasOffset = builder.endVector();
         }
         int urlOffset = builder.createString(this._url);
         com.urbanlogiq.ulsdk.types.generated.Source.startSource(builder);
@@ -158,8 +158,8 @@ public final class Source {
         if (optionsOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.Source.addOptions(builder, optionsOffset);
         }
-        if (schemasOffset != null) {
-            com.urbanlogiq.ulsdk.types.generated.Source.addSchemas(builder, schemasOffset);
+        if (outputSchemasOffset != null) {
+            com.urbanlogiq.ulsdk.types.generated.Source.addOutputSchemas(builder, outputSchemasOffset);
         }
         com.urbanlogiq.ulsdk.types.generated.Source.addUrl(builder, urlOffset);
         return com.urbanlogiq.ulsdk.types.generated.Source.endSource(builder);
@@ -178,7 +178,7 @@ public final class Source {
         this._name = new String();
         this._namedParameters = new com.urbanlogiq.ulsdk.types.NamedParameter[0];
         this._options = new byte[0];
-        this._schemas = new com.urbanlogiq.ulsdk.types.Schema[0];
+        this._outputSchemas = new com.urbanlogiq.ulsdk.types.OutputSchema[0];
         this._url = new String();
     }
 

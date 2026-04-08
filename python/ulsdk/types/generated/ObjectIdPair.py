@@ -4,18 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .DataCatalogObject import DataCatalogObject
-from .ObjectId import ObjectId
-from typing import Optional
-from typing import Union
 np = import_numpy()
 
 class ObjectIdPair(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = ObjectIdPair()
         x.Init(buf, n + offset)
@@ -26,21 +21,22 @@ class ObjectIdPair(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # ObjectIdPair
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # ObjectIdPair
-    def Id(self) -> Optional[ObjectId]:
+    def Id(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # ObjectIdPair
-    def Object(self, j: int):
+    def Object(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             a = self._tab.Vector(o)
@@ -55,46 +51,47 @@ class ObjectIdPair(object):
         return 0
 
     # ObjectIdPair
-    def ObjectNestedRoot(self) -> Union[DataCatalogObject, int]:
+    def ObjectNestedRoot(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
+            from .DataCatalogObject import DataCatalogObject
             return DataCatalogObject.GetRootAs(self._tab.Bytes, self._tab.Vector(o))
         return 0
 
     # ObjectIdPair
-    def ObjectLength(self) -> int:
+    def ObjectLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # ObjectIdPair
-    def ObjectIsNone(self) -> bool:
+    def ObjectIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
-def ObjectIdPairStart(builder: flatbuffers.Builder):
+def ObjectIdPairStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ObjectIdPairStart(builder)
 
-def ObjectIdPairAddId(builder: flatbuffers.Builder, id: int):
+def ObjectIdPairAddId(builder, id):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(id), 0)
 
-def AddId(builder: flatbuffers.Builder, id: int):
+def AddId(builder, id):
     ObjectIdPairAddId(builder, id)
 
-def ObjectIdPairAddObject(builder: flatbuffers.Builder, object: int):
+def ObjectIdPairAddObject(builder, object):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(object), 0)
 
-def AddObject(builder: flatbuffers.Builder, object: int):
+def AddObject(builder, object):
     ObjectIdPairAddObject(builder, object)
 
-def ObjectIdPairStartObjectVector(builder, numElems: int) -> int:
+def ObjectIdPairStartObjectVector(builder, numElems):
     return builder.StartVector(1, numElems, 1)
 
-def StartObjectVector(builder, numElems: int) -> int:
+def StartObjectVector(builder, numElems):
     return ObjectIdPairStartObjectVector(builder, numElems)
 
 def ObjectIdPairMakeObjectVectorFromBytes(builder, bytes):
@@ -104,8 +101,8 @@ def ObjectIdPairMakeObjectVectorFromBytes(builder, bytes):
     return builder.EndVector()
 def MakeObjectVectorFromBytes(builder, bytes):
     return ObjectIdPairMakeObjectVectorFromBytes(builder, bytes)
-def ObjectIdPairEnd(builder: flatbuffers.Builder) -> int:
+def ObjectIdPairEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ObjectIdPairEnd(builder)

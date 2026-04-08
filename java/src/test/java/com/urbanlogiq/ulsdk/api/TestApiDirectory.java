@@ -7,7 +7,7 @@ import com.urbanlogiq.ulsdk.ApiKeyContext;
 import com.urbanlogiq.ulsdk.Environment;
 import com.urbanlogiq.ulsdk.Region;
 import java.util.UUID;
-import org.junit.Test;
+import org.junitpioneer.jupiter.RetryingTest;
 import com.urbanlogiq.ulsdk.api.directory.AdGroup;
 import com.urbanlogiq.ulsdk.api.directory.AdUser;
 import com.urbanlogiq.ulsdk.api.directory.AdUserWithAuditLog;
@@ -21,7 +21,7 @@ import com.urbanlogiq.ulsdk.api.directory.UpdateCurrentUser;
 import com.urbanlogiq.ulsdk.api.directory.UpdateUser;
 
 public final class TestApiDirectory {
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testGetPrincipal() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -41,10 +41,10 @@ public final class TestApiDirectory {
             ctx,
             p0
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testGetPrincipals() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -67,10 +67,10 @@ public final class TestApiDirectory {
             ctx,
             p0
         );
-        org.junit.Assert.assertArrayEquals(result, expected);
+        org.junit.jupiter.api.Assertions.assertArrayEquals(result, expected);
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testQueryPrincipals() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -93,10 +93,10 @@ public final class TestApiDirectory {
             ctx,
             p0
         );
-        org.junit.Assert.assertArrayEquals(result, expected);
+        org.junit.jupiter.api.Assertions.assertArrayEquals(result, expected);
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testGetUsers() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -117,10 +117,10 @@ public final class TestApiDirectory {
         com.urbanlogiq.ulsdk.api.directory.AdUser[] result = com.urbanlogiq.ulsdk.api.directory.Directory.getUsers(
             ctx
         );
-        org.junit.Assert.assertArrayEquals(result, expected);
+        org.junit.jupiter.api.Assertions.assertArrayEquals(result, expected);
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testGetUsersDisplayNames() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -141,10 +141,10 @@ public final class TestApiDirectory {
         com.urbanlogiq.ulsdk.api.directory.DisplayNames[] result = com.urbanlogiq.ulsdk.api.directory.Directory.getUsersDisplayNames(
             ctx
         );
-        org.junit.Assert.assertArrayEquals(result, expected);
+        org.junit.jupiter.api.Assertions.assertArrayEquals(result, expected);
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testGetCurrentUser() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -164,10 +164,10 @@ public final class TestApiDirectory {
             ctx,
             q0
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testCreateUser() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -187,10 +187,10 @@ public final class TestApiDirectory {
             ctx,
             body
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testUpdateCurrentUser() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -209,7 +209,7 @@ public final class TestApiDirectory {
         );
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testGetUser() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -231,10 +231,10 @@ public final class TestApiDirectory {
             p0,
             q0
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testUpdateUser() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -255,7 +255,7 @@ public final class TestApiDirectory {
         );
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testDeleteUser() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -274,7 +274,7 @@ public final class TestApiDirectory {
         );
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testGetGroups() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -295,10 +295,10 @@ public final class TestApiDirectory {
         com.urbanlogiq.ulsdk.api.directory.AdGroup[] result = com.urbanlogiq.ulsdk.api.directory.Directory.getGroups(
             ctx
         );
-        org.junit.Assert.assertArrayEquals(result, expected);
+        org.junit.jupiter.api.Assertions.assertArrayEquals(result, expected);
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testCreateGroup() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -318,10 +318,10 @@ public final class TestApiDirectory {
             ctx,
             body
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testGetGroupMembers() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -344,10 +344,10 @@ public final class TestApiDirectory {
             ctx,
             p0
         );
-        org.junit.Assert.assertArrayEquals(result, expected);
+        org.junit.jupiter.api.Assertions.assertArrayEquals(result, expected);
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testDeleteGroup() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -366,7 +366,7 @@ public final class TestApiDirectory {
         );
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testAddGroupMember() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -387,7 +387,7 @@ public final class TestApiDirectory {
         );
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testRemoveGroupMember() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");

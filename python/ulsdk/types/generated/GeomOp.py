@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Geom import Geom
-from typing import Optional
 np = import_numpy()
 
 class GeomOp(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = GeomOp()
         x.Init(buf, n + offset)
@@ -24,7 +21,7 @@ class GeomOp(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # GeomOp
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # GeomOp
@@ -35,26 +32,27 @@ class GeomOp(object):
         return 0
 
     # GeomOp
-    def Geoms(self, j: int) -> Optional[Geom]:
+    def Geoms(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Geom import Geom
             obj = Geom()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # GeomOp
-    def GeomsLength(self) -> int:
+    def GeomsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # GeomOp
-    def GeomsIsNone(self) -> bool:
+    def GeomsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
@@ -65,38 +63,38 @@ class GeomOp(object):
             return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
         return 7
 
-def GeomOpStart(builder: flatbuffers.Builder):
+def GeomOpStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     GeomOpStart(builder)
 
-def GeomOpAddOp(builder: flatbuffers.Builder, op: int):
+def GeomOpAddOp(builder, op):
     builder.PrependInt16Slot(0, op, 0)
 
-def AddOp(builder: flatbuffers.Builder, op: int):
+def AddOp(builder, op):
     GeomOpAddOp(builder, op)
 
-def GeomOpAddGeoms(builder: flatbuffers.Builder, geoms: int):
+def GeomOpAddGeoms(builder, geoms):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(geoms), 0)
 
-def AddGeoms(builder: flatbuffers.Builder, geoms: int):
+def AddGeoms(builder, geoms):
     GeomOpAddGeoms(builder, geoms)
 
-def GeomOpStartGeomsVector(builder, numElems: int) -> int:
+def GeomOpStartGeomsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartGeomsVector(builder, numElems: int) -> int:
+def StartGeomsVector(builder, numElems):
     return GeomOpStartGeomsVector(builder, numElems)
 
-def GeomOpAddPredicate(builder: flatbuffers.Builder, predicate: int):
+def GeomOpAddPredicate(builder, predicate):
     builder.PrependInt32Slot(2, predicate, 7)
 
-def AddPredicate(builder: flatbuffers.Builder, predicate: int):
+def AddPredicate(builder, predicate):
     GeomOpAddPredicate(builder, predicate)
 
-def GeomOpEnd(builder: flatbuffers.Builder) -> int:
+def GeomOpEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return GeomOpEnd(builder)

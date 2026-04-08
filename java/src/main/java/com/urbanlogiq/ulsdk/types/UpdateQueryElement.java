@@ -13,6 +13,30 @@ public final class UpdateQueryElement {
         this._filter = value;
     }
 
+    /**
+     *  Additional table sources from a FROM clause (UPDATE ... FROM ... syntax).
+     *  Source indexes: target table is implicitly at index 0, from_sources start at index 1.
+     */
+    com.urbanlogiq.ulsdk.types.TableSource[] _fromSources;
+    public com.urbanlogiq.ulsdk.types.TableSource[] getFromSources() {
+        return this._fromSources;
+    }
+    public void setFromSources(com.urbanlogiq.ulsdk.types.TableSource[] value) {
+        this._fromSources = value;
+    }
+
+    /**
+     *  Joins within the FROM clause. Indexes reference the combined source list
+     *  (0 = target, 1+ = from_sources).
+     */
+    com.urbanlogiq.ulsdk.types.Join[] _joins;
+    public com.urbanlogiq.ulsdk.types.Join[] getJoins() {
+        return this._joins;
+    }
+    public void setJoins(com.urbanlogiq.ulsdk.types.Join[] value) {
+        this._joins = value;
+    }
+
     com.urbanlogiq.ulsdk.types.SetExpr[] _sets;
     public com.urbanlogiq.ulsdk.types.SetExpr[] getSets() {
         return this._sets;
@@ -32,6 +56,28 @@ public final class UpdateQueryElement {
     public UpdateQueryElement(com.urbanlogiq.ulsdk.types.generated.UpdateQueryElement o) {
         if (o.filter() != null) {
             this._filter = new com.urbanlogiq.ulsdk.types.Function(o.filter());
+        }
+        if (o.fromSourcesVector() != null) {
+            com.urbanlogiq.ulsdk.types.TableSource[] fromSources = new com.urbanlogiq.ulsdk.types.TableSource[o.fromSourcesLength()];
+            for (int i = 0; i < o.fromSourcesLength(); i++) {
+                com.urbanlogiq.ulsdk.types.TableSource fromSourcesValue = null;
+                if (o.fromSources(i) != null) {
+                    fromSourcesValue = new com.urbanlogiq.ulsdk.types.TableSource(o.fromSources(i));
+                }
+                fromSources[i] = fromSourcesValue;
+            }
+            this._fromSources = fromSources;
+        }
+        if (o.joinsVector() != null) {
+            com.urbanlogiq.ulsdk.types.Join[] joins = new com.urbanlogiq.ulsdk.types.Join[o.joinsLength()];
+            for (int i = 0; i < o.joinsLength(); i++) {
+                com.urbanlogiq.ulsdk.types.Join joinsValue = null;
+                if (o.joins(i) != null) {
+                    joinsValue = new com.urbanlogiq.ulsdk.types.Join(o.joins(i));
+                }
+                joins[i] = joinsValue;
+            }
+            this._joins = joins;
         }
         com.urbanlogiq.ulsdk.types.SetExpr[] sets = new com.urbanlogiq.ulsdk.types.SetExpr[o.setsLength()];
         for (int i = 0; i < o.setsLength(); i++) {
@@ -91,6 +137,30 @@ public final class UpdateQueryElement {
         if (this._filter != null) {
             filterOffset = this._filter.serializeTo(builder);
         }
+        Integer fromSourcesOffset = null;
+        if (this._fromSources != null) {
+            int[] fromSourcesOffsets = new int[this._fromSources.length];;
+            for (int i = 0; i < this._fromSources.length; i++) {
+                fromSourcesOffsets[i] = this._fromSources[i].serializeTo(builder);
+            }
+            com.urbanlogiq.ulsdk.types.generated.UpdateQueryElement.startFromSourcesVector(builder, this._fromSources.length);
+            for (int i = fromSourcesOffsets.length - 1; i >= 0; i--) {
+                builder.addOffset(fromSourcesOffsets[i]);
+            }
+            fromSourcesOffset = builder.endVector();
+        }
+        Integer joinsOffset = null;
+        if (this._joins != null) {
+            int[] joinsOffsets = new int[this._joins.length];;
+            for (int i = 0; i < this._joins.length; i++) {
+                joinsOffsets[i] = this._joins[i].serializeTo(builder);
+            }
+            com.urbanlogiq.ulsdk.types.generated.UpdateQueryElement.startJoinsVector(builder, this._joins.length);
+            for (int i = joinsOffsets.length - 1; i >= 0; i--) {
+                builder.addOffset(joinsOffsets[i]);
+            }
+            joinsOffset = builder.endVector();
+        }
         int[] setsOffsets = new int[this._sets.length];;
         for (int i = 0; i < this._sets.length; i++) {
             setsOffsets[i] = this._sets[i].serializeTo(builder);
@@ -104,6 +174,12 @@ public final class UpdateQueryElement {
         com.urbanlogiq.ulsdk.types.generated.UpdateQueryElement.startUpdateQueryElement(builder);
         if (filterOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.UpdateQueryElement.addFilter(builder, filterOffset);
+        }
+        if (fromSourcesOffset != null) {
+            com.urbanlogiq.ulsdk.types.generated.UpdateQueryElement.addFromSources(builder, fromSourcesOffset);
+        }
+        if (joinsOffset != null) {
+            com.urbanlogiq.ulsdk.types.generated.UpdateQueryElement.addJoins(builder, joinsOffset);
         }
         com.urbanlogiq.ulsdk.types.generated.UpdateQueryElement.addSets(builder, setsOffset);
         com.urbanlogiq.ulsdk.types.generated.UpdateQueryElement.addSource(builder, sourcePair.first());
@@ -120,6 +196,8 @@ public final class UpdateQueryElement {
 
     public UpdateQueryElement() {
         this._filter = new com.urbanlogiq.ulsdk.types.Function();
+        this._fromSources = new com.urbanlogiq.ulsdk.types.TableSource[0];
+        this._joins = new com.urbanlogiq.ulsdk.types.Join[0];
         this._sets = new com.urbanlogiq.ulsdk.types.SetExpr[0];
         this._source = new com.urbanlogiq.ulsdk.types.TableSourceUnion();
     }

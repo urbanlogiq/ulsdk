@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class VTimestampNs(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = VTimestampNs()
         x.Init(buf, n + offset)
@@ -22,7 +21,7 @@ class VTimestampNs(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # VTimestampNs
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # VTimestampNs
@@ -32,20 +31,20 @@ class VTimestampNs(object):
             return self._tab.Get(flatbuffers.number_types.Int64Flags, o + self._tab.Pos)
         return 0
 
-def VTimestampNsStart(builder: flatbuffers.Builder):
+def VTimestampNsStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     VTimestampNsStart(builder)
 
-def VTimestampNsAddV(builder: flatbuffers.Builder, v: int):
+def VTimestampNsAddV(builder, v):
     builder.PrependInt64Slot(0, v, 0)
 
-def AddV(builder: flatbuffers.Builder, v: int):
+def AddV(builder, v):
     VTimestampNsAddV(builder, v)
 
-def VTimestampNsEnd(builder: flatbuffers.Builder) -> int:
+def VTimestampNsEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return VTimestampNsEnd(builder)

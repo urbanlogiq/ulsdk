@@ -6,3 +6,4 @@ class QueryElementOp(object):
     Union = 0
     Intersect = 1
     Except = 2
+    Minus = 3

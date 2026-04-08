@@ -4,15 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from typing import Optional
 np = import_numpy()
 
 class OrderBy(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = OrderBy()
         x.Init(buf, n + offset)
@@ -23,7 +21,7 @@ class OrderBy(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # OrderBy
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # OrderBy
@@ -34,7 +32,7 @@ class OrderBy(object):
         return 0
 
     # OrderBy
-    def Field(self) -> Optional[bytes]:
+    def Field(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -47,32 +45,45 @@ class OrderBy(object):
             return self._tab.Get(flatbuffers.number_types.Int16Flags, o + self._tab.Pos)
         return 0
 
-def OrderByStart(builder: flatbuffers.Builder):
-    builder.StartObject(3)
+    # OrderBy
+    def NullsFirst(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        if o != 0:
+            return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
+        return False
 
-def Start(builder: flatbuffers.Builder):
+def OrderByStart(builder):
+    builder.StartObject(4)
+
+def Start(builder):
     OrderByStart(builder)
 
-def OrderByAddSort(builder: flatbuffers.Builder, sort: int):
+def OrderByAddSort(builder, sort):
     builder.PrependUint32Slot(0, sort, 0)
 
-def AddSort(builder: flatbuffers.Builder, sort: int):
+def AddSort(builder, sort):
     OrderByAddSort(builder, sort)
 
-def OrderByAddField(builder: flatbuffers.Builder, field: int):
+def OrderByAddField(builder, field):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(field), 0)
 
-def AddField(builder: flatbuffers.Builder, field: int):
+def AddField(builder, field):
     OrderByAddField(builder, field)
 
-def OrderByAddTransform(builder: flatbuffers.Builder, transform: int):
+def OrderByAddTransform(builder, transform):
     builder.PrependInt16Slot(2, transform, 0)
 
-def AddTransform(builder: flatbuffers.Builder, transform: int):
+def AddTransform(builder, transform):
     OrderByAddTransform(builder, transform)
 
-def OrderByEnd(builder: flatbuffers.Builder) -> int:
+def OrderByAddNullsFirst(builder, nullsFirst):
+    builder.PrependBoolSlot(3, nullsFirst, 0)
+
+def AddNullsFirst(builder, nullsFirst):
+    OrderByAddNullsFirst(builder, nullsFirst)
+
+def OrderByEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return OrderByEnd(builder)

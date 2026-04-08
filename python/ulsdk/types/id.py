@@ -92,14 +92,16 @@ class B2cId:
         return str(uuid.UUID(bytes=self.b))
 
     @classmethod
-    def from_uuid(cls, o: Union[str, uuid.UUID]) -> Self:
+    def from_uuid(cls, o: Union[str, uuid.UUID, bytes]) -> Self:
         if isinstance(o, uuid.UUID):
             return cls(o.bytes)
         elif isinstance(o, str):
             id = uuid.UUID(o)
             return cls(id.bytes)
+        elif isinstance(o, bytes):
+            return cls(o)
         else:
-            raise Exception(f"cannot create instance of type from variable {uuid}")
+            raise Exception(f"cannot create instance of type from variable {o}")
 
 @dataclass
 class ColumnGroupId:
@@ -213,14 +215,16 @@ class ContentId:
         return str(uuid.UUID(bytes=self.b))
 
     @classmethod
-    def from_uuid(cls, o: Union[str, uuid.UUID]) -> Self:
+    def from_uuid(cls, o: Union[str, uuid.UUID, bytes]) -> Self:
         if isinstance(o, uuid.UUID):
             return cls(o.bytes)
         elif isinstance(o, str):
             id = uuid.UUID(o)
             return cls(id.bytes)
+        elif isinstance(o, bytes):
+            return cls(o)
         else:
-            raise Exception(f"cannot create instance of type from variable {uuid}")
+            raise Exception(f"cannot create instance of type from variable {o}")
 
 @dataclass
 class DataStateId:
@@ -334,14 +338,16 @@ class GenericId:
         return str(uuid.UUID(bytes=self.b))
 
     @classmethod
-    def from_uuid(cls, o: Union[str, uuid.UUID]) -> Self:
+    def from_uuid(cls, o: Union[str, uuid.UUID, bytes]) -> Self:
         if isinstance(o, uuid.UUID):
             return cls(o.bytes)
         elif isinstance(o, str):
             id = uuid.UUID(o)
             return cls(id.bytes)
+        elif isinstance(o, bytes):
+            return cls(o)
         else:
-            raise Exception(f"cannot create instance of type from variable {uuid}")
+            raise Exception(f"cannot create instance of type from variable {o}")
 
 @dataclass
 class GraphNodeId:
@@ -401,14 +407,16 @@ class GraphNodeId:
         return str(uuid.UUID(bytes=self.b))
 
     @classmethod
-    def from_uuid(cls, o: Union[str, uuid.UUID]) -> Self:
+    def from_uuid(cls, o: Union[str, uuid.UUID, bytes]) -> Self:
         if isinstance(o, uuid.UUID):
             return cls(o.bytes)
         elif isinstance(o, str):
             id = uuid.UUID(o)
             return cls(id.bytes)
+        elif isinstance(o, bytes):
+            return cls(o)
         else:
-            raise Exception(f"cannot create instance of type from variable {uuid}")
+            raise Exception(f"cannot create instance of type from variable {o}")
 
 @dataclass
 class ObjectId:
@@ -468,14 +476,16 @@ class ObjectId:
         return str(uuid.UUID(bytes=self.b))
 
     @classmethod
-    def from_uuid(cls, o: Union[str, uuid.UUID]) -> Self:
+    def from_uuid(cls, o: Union[str, uuid.UUID, bytes]) -> Self:
         if isinstance(o, uuid.UUID):
             return cls(o.bytes)
         elif isinstance(o, str):
             id = uuid.UUID(o)
             return cls(id.bytes)
+        elif isinstance(o, bytes):
+            return cls(o)
         else:
-            raise Exception(f"cannot create instance of type from variable {uuid}")
+            raise Exception(f"cannot create instance of type from variable {o}")
 
 @dataclass
 class StreamId:

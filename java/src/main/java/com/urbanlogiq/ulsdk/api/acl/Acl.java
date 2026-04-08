@@ -334,6 +334,31 @@ public final class Acl {
     }
 
     /**
+     * Set the default mode of an object. This can only be done by an object's owner.
+     * 
+     * @param ctx A request context object
+     * @param id The ID of the object to which access will be granted.
+     * @param permission The permission bitset (see the PermissionTy enum for more information).
+     */
+    public static void setDefaultMode(
+        com.urbanlogiq.ulsdk.RequestContext ctx,
+        com.urbanlogiq.ulsdk.types.ObjectId id,
+        Integer permission
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/datacatalog/acl/default/:id/:permission";
+        path = path.replace(":id", id.toString());
+        path = path.replace(":permission", permission.toString());
+
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+
+        byte[] body = null;
+        body = null;
+        ctx.post(path, body, "text/plain", params, headers);
+        return;
+    }
+
+    /**
      * Forcibly set an object's ACL to another ACL object. Note that the target ACL needs to contain the exact same permissions as the current ACL otherwise this method will return 400 Bad Request. This is a safeguard to ensure the user cannot lock themselves out of an object.
      * 
      * @param ctx A request context object

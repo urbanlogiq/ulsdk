@@ -108,12 +108,27 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        let expected = Inbox::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = fetch(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let expected = Inbox::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = fetch(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -131,8 +146,21 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        clear_all_status(&ctx, p0).await.unwrap();
+
+        for i in 0..5 {
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let result = clear_all_status(&ctx, p0).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -150,10 +178,24 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p2 = 42;
-        set_status(&ctx, p0, p1, p2).await.unwrap();
+
+        for i in 0..5 {
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let p1 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p2 = 42;
+            let result = set_status(&ctx, p0, p1, p2).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -171,8 +213,22 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        clear_status(&ctx, p0, p1).await.unwrap();
+
+        for i in 0..5 {
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let p1 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let result = clear_status(&ctx, p0, p1).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 }

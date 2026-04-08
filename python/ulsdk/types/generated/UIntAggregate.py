@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .UIntBucket import UIntBucket
-from typing import Optional
 np = import_numpy()
 
 class UIntAggregate(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = UIntAggregate()
         x.Init(buf, n + offset)
@@ -24,7 +21,7 @@ class UIntAggregate(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # UIntAggregate
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # UIntAggregate
@@ -70,84 +67,85 @@ class UIntAggregate(object):
         return 0
 
     # UIntAggregate
-    def Histo(self, j: int) -> Optional[UIntBucket]:
+    def Histo(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 16
+            from .UIntBucket import UIntBucket
             obj = UIntBucket()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # UIntAggregate
-    def HistoLength(self) -> int:
+    def HistoLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # UIntAggregate
-    def HistoIsNone(self) -> bool:
+    def HistoIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         return o == 0
 
-def UIntAggregateStart(builder: flatbuffers.Builder):
+def UIntAggregateStart(builder):
     builder.StartObject(7)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     UIntAggregateStart(builder)
 
-def UIntAggregateAddMin(builder: flatbuffers.Builder, min: int):
+def UIntAggregateAddMin(builder, min):
     builder.PrependUint64Slot(0, min, 0)
 
-def AddMin(builder: flatbuffers.Builder, min: int):
+def AddMin(builder, min):
     UIntAggregateAddMin(builder, min)
 
-def UIntAggregateAddMax(builder: flatbuffers.Builder, max: int):
+def UIntAggregateAddMax(builder, max):
     builder.PrependUint64Slot(1, max, 0)
 
-def AddMax(builder: flatbuffers.Builder, max: int):
+def AddMax(builder, max):
     UIntAggregateAddMax(builder, max)
 
-def UIntAggregateAddMean(builder: flatbuffers.Builder, mean: int):
+def UIntAggregateAddMean(builder, mean):
     builder.PrependUint64Slot(2, mean, 0)
 
-def AddMean(builder: flatbuffers.Builder, mean: int):
+def AddMean(builder, mean):
     UIntAggregateAddMean(builder, mean)
 
-def UIntAggregateAddCount(builder: flatbuffers.Builder, count: int):
+def UIntAggregateAddCount(builder, count):
     builder.PrependUint64Slot(3, count, 0)
 
-def AddCount(builder: flatbuffers.Builder, count: int):
+def AddCount(builder, count):
     UIntAggregateAddCount(builder, count)
 
-def UIntAggregateAddSum(builder: flatbuffers.Builder, sum: int):
+def UIntAggregateAddSum(builder, sum):
     builder.PrependUint64Slot(4, sum, 0)
 
-def AddSum(builder: flatbuffers.Builder, sum: int):
+def AddSum(builder, sum):
     UIntAggregateAddSum(builder, sum)
 
-def UIntAggregateAddVariance(builder: flatbuffers.Builder, variance: int):
+def UIntAggregateAddVariance(builder, variance):
     builder.PrependUint64Slot(5, variance, 0)
 
-def AddVariance(builder: flatbuffers.Builder, variance: int):
+def AddVariance(builder, variance):
     UIntAggregateAddVariance(builder, variance)
 
-def UIntAggregateAddHisto(builder: flatbuffers.Builder, histo: int):
+def UIntAggregateAddHisto(builder, histo):
     builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(histo), 0)
 
-def AddHisto(builder: flatbuffers.Builder, histo: int):
+def AddHisto(builder, histo):
     UIntAggregateAddHisto(builder, histo)
 
-def UIntAggregateStartHistoVector(builder, numElems: int) -> int:
+def UIntAggregateStartHistoVector(builder, numElems):
     return builder.StartVector(16, numElems, 8)
 
-def StartHistoVector(builder, numElems: int) -> int:
+def StartHistoVector(builder, numElems):
     return UIntAggregateStartHistoVector(builder, numElems)
 
-def UIntAggregateEnd(builder: flatbuffers.Builder) -> int:
+def UIntAggregateEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return UIntAggregateEnd(builder)

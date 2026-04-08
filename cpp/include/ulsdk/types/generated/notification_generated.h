@@ -8,9 +8,9 @@
 
 // Ensure the included flatbuffers.h is the same version as when this file was
 // generated, otherwise it may not be compatible.
-static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
-              FLATBUFFERS_VERSION_MINOR == 5 &&
-              FLATBUFFERS_VERSION_REVISION == 26,
+static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
+              FLATBUFFERS_VERSION_MINOR == 2 &&
+              FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
 #include "id_generated.h"
@@ -629,7 +629,7 @@ struct Notification FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_SENDER) &&
            verifier.VerifyTable(sender()) &&
            VerifyField<uint8_t>(verifier, VT_NOTIFICATION_TYPE, 1) &&
-           VerifyOffset(verifier, VT_NOTIFICATION) &&
+           VerifyOffsetRequired(verifier, VT_NOTIFICATION) &&
            VerifyNotificationUnion(verifier, notification(), notification_type()) &&
            verifier.EndTable();
   }
@@ -671,6 +671,7 @@ struct NotificationBuilder {
   ::flatbuffers::Offset<Notification> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<Notification>(end);
+    fbb_.Required(o, Notification::VT_NOTIFICATION);
     return o;
   }
 };

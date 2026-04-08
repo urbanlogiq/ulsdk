@@ -3,6 +3,7 @@
 import uuid
 from abc import ABC, abstractmethod
 from typing import Dict, List, NamedTuple, Optional, Union
+from websockets.sync.client import ClientConnection
 
 from .keys import Environment, Region
 
@@ -11,11 +12,11 @@ def _get_endpoint(region: Region, environment: Environment, api: str) -> str:
     base = None
     match (region, environment):
         case (Region.CA, Environment.Prod):
-            base = "https://api.urbanlogiq.ca"
+            base = "https://home.urbanlogiq.ca"
         case (Region.CA, Environment.Stage):
             base = "https://stage.urbanlogiq.ca"
         case (Region.US, Environment.Prod):
-            base = "https://api.urbanlogiq.us"
+            base = "https://home.urbanlogiq.us"
         case (Region.US, Environment.Stage):
             base = "https://stage.urbanlogiq.us"
         case _:
@@ -98,3 +99,12 @@ class RequestContext(ABC):
         **kwargs,
     ) -> bytes:
         """Make a DELETE request to the given path with optional parameters and headers"""
+
+    @abstractmethod
+    def connect(
+        self,
+        path: str,
+        params: Optional[Dict] = None,
+        headers: Optional[Dict[str, str]] = None,
+    ) -> ClientConnection:
+        """Begin a websocket connection to the given endpoint"""

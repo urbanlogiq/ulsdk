@@ -328,6 +328,29 @@ def get_permissions(
     res = ctx.get(path, params=params, headers=headers)
     return res
 
+def set_default_mode(
+    ctx: RequestContext,
+    id_: "ObjectId",
+    permission: int,
+) -> None:
+    """Set the default mode of an object. This can only be done by an object's owner.
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+    id_: "ObjectId" -- The ID of the object to which access will be granted.
+    permission: int -- The permission bitset (see the PermissionTy enum for more information).
+    """
+
+    path = "/v1/api/ulv2/datacatalog/acl/default/:id/:permission"
+    path = path.replace(":id", str(id_), 1)
+    path = path.replace(":permission", str(permission), 1)
+
+    params = dict()
+    headers = dict()
+    body = None
+    ctx.post(path, body=body, mimetype="text/plain", params=params, headers=headers)
+    return
+
 def set(
     ctx: RequestContext,
     id_: "ObjectId",

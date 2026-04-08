@@ -257,6 +257,20 @@ test_get_permissions(ul::RequestContext &rctx) {
 ApiTest test_get_permissions_obj(test_get_permissions, "acl::get_permissions", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
+test_set_default_mode(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    int p1 = 42;
+    return ul::api::acl::set_default_mode(
+        ctx,
+        p0,
+        p1
+    );
+}
+
+ApiTest test_set_default_mode_obj(test_set_default_mode, "acl::set_default_mode", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
 test_set(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");

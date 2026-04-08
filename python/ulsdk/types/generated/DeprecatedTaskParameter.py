@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ObjectId import ObjectId
-from typing import Optional
 np = import_numpy()
 
 class DeprecatedTaskParameter(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = DeprecatedTaskParameter()
         x.Init(buf, n + offset)
@@ -24,18 +21,18 @@ class DeprecatedTaskParameter(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # DeprecatedTaskParameter
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # DeprecatedTaskParameter
-    def Key(self) -> Optional[bytes]:
+    def Key(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # DeprecatedTaskParameter
-    def Value(self, j: int):
+    def Value(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             a = self._tab.Vector(o)
@@ -50,22 +47,23 @@ class DeprecatedTaskParameter(object):
         return 0
 
     # DeprecatedTaskParameter
-    def ValueLength(self) -> int:
+    def ValueLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # DeprecatedTaskParameter
-    def ValueIsNone(self) -> bool:
+    def ValueIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
     # DeprecatedTaskParameter
-    def Obj(self) -> Optional[ObjectId]:
+    def Obj(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -78,44 +76,44 @@ class DeprecatedTaskParameter(object):
             return self._tab.Get(flatbuffers.number_types.Int64Flags, o + self._tab.Pos)
         return 0
 
-def DeprecatedTaskParameterStart(builder: flatbuffers.Builder):
+def DeprecatedTaskParameterStart(builder):
     builder.StartObject(4)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DeprecatedTaskParameterStart(builder)
 
-def DeprecatedTaskParameterAddKey(builder: flatbuffers.Builder, key: int):
+def DeprecatedTaskParameterAddKey(builder, key):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(key), 0)
 
-def AddKey(builder: flatbuffers.Builder, key: int):
+def AddKey(builder, key):
     DeprecatedTaskParameterAddKey(builder, key)
 
-def DeprecatedTaskParameterAddValue(builder: flatbuffers.Builder, value: int):
+def DeprecatedTaskParameterAddValue(builder, value):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(value), 0)
 
-def AddValue(builder: flatbuffers.Builder, value: int):
+def AddValue(builder, value):
     DeprecatedTaskParameterAddValue(builder, value)
 
-def DeprecatedTaskParameterStartValueVector(builder, numElems: int) -> int:
+def DeprecatedTaskParameterStartValueVector(builder, numElems):
     return builder.StartVector(1, numElems, 1)
 
-def StartValueVector(builder, numElems: int) -> int:
+def StartValueVector(builder, numElems):
     return DeprecatedTaskParameterStartValueVector(builder, numElems)
 
-def DeprecatedTaskParameterAddObj(builder: flatbuffers.Builder, obj: int):
+def DeprecatedTaskParameterAddObj(builder, obj):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(obj), 0)
 
-def AddObj(builder: flatbuffers.Builder, obj: int):
+def AddObj(builder, obj):
     DeprecatedTaskParameterAddObj(builder, obj)
 
-def DeprecatedTaskParameterAddFlags(builder: flatbuffers.Builder, flags: int):
+def DeprecatedTaskParameterAddFlags(builder, flags):
     builder.PrependInt64Slot(3, flags, 0)
 
-def AddFlags(builder: flatbuffers.Builder, flags: int):
+def AddFlags(builder, flags):
     DeprecatedTaskParameterAddFlags(builder, flags)
 
-def DeprecatedTaskParameterEnd(builder: flatbuffers.Builder) -> int:
+def DeprecatedTaskParameterEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DeprecatedTaskParameterEnd(builder)

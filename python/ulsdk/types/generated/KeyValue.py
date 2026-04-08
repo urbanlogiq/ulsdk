@@ -4,8 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from typing import Optional
 np = import_numpy()
 
 # ----------------------------------------------------------------------
@@ -15,7 +13,7 @@ class KeyValue(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = KeyValue()
         x.Init(buf, n + offset)
@@ -26,43 +24,43 @@ class KeyValue(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # KeyValue
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # KeyValue
-    def Key(self) -> Optional[bytes]:
+    def Key(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # KeyValue
-    def Value(self) -> Optional[bytes]:
+    def Value(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def KeyValueStart(builder: flatbuffers.Builder):
+def KeyValueStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     KeyValueStart(builder)
 
-def KeyValueAddKey(builder: flatbuffers.Builder, key: int):
+def KeyValueAddKey(builder, key):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(key), 0)
 
-def AddKey(builder: flatbuffers.Builder, key: int):
+def AddKey(builder, key):
     KeyValueAddKey(builder, key)
 
-def KeyValueAddValue(builder: flatbuffers.Builder, value: int):
+def KeyValueAddValue(builder, value):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(value), 0)
 
-def AddValue(builder: flatbuffers.Builder, value: int):
+def AddValue(builder, value):
     KeyValueAddValue(builder, value)
 
-def KeyValueEnd(builder: flatbuffers.Builder) -> int:
+def KeyValueEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return KeyValueEnd(builder)

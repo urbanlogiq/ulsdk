@@ -4,9 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .GenericId import GenericId
-from typing import Optional
 np = import_numpy()
 
 # The RestoreRow operation restore a deleted row in the table
@@ -16,7 +13,7 @@ class RestoreRow(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = RestoreRow()
         x.Init(buf, n + offset)
@@ -27,34 +24,35 @@ class RestoreRow(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # RestoreRow
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # The value of the ul_node_id column, which uniquely identifies the row.
     # RestoreRow
-    def Row(self) -> Optional[GenericId]:
+    def Row(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .GenericId import GenericId
             obj = GenericId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def RestoreRowStart(builder: flatbuffers.Builder):
+def RestoreRowStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     RestoreRowStart(builder)
 
-def RestoreRowAddRow(builder: flatbuffers.Builder, row: int):
+def RestoreRowAddRow(builder, row):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(row), 0)
 
-def AddRow(builder: flatbuffers.Builder, row: int):
+def AddRow(builder, row):
     RestoreRowAddRow(builder, row)
 
-def RestoreRowEnd(builder: flatbuffers.Builder) -> int:
+def RestoreRowEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return RestoreRowEnd(builder)

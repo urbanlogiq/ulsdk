@@ -56,6 +56,10 @@ public final class Expr {
             com.google.flatbuffers.Table exprsFbsTable = o.exprs(new com.urbanlogiq.ulsdk.types.generated.ValueName());
             com.urbanlogiq.ulsdk.types.generated.ValueName exprsFbsValue = (com.urbanlogiq.ulsdk.types.generated.ValueName)exprsFbsTable;
             exprsValue = new com.urbanlogiq.ulsdk.types.ValueName(exprsFbsValue);
+        } else if (exprsTy == com.urbanlogiq.ulsdk.types.generated.ExprUnion.AggregateFilter) {
+            com.google.flatbuffers.Table exprsFbsTable = o.exprs(new com.urbanlogiq.ulsdk.types.generated.AggregateFilter());
+            com.urbanlogiq.ulsdk.types.generated.AggregateFilter exprsFbsValue = (com.urbanlogiq.ulsdk.types.generated.AggregateFilter)exprsFbsTable;
+            exprsValue = new com.urbanlogiq.ulsdk.types.AggregateFilter(exprsFbsValue);
         }
         if (exprsValue != null) {
             this._exprs = new com.urbanlogiq.ulsdk.types.ExprUnion(exprsValue);

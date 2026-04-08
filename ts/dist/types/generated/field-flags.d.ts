@@ -1,0 +1,27 @@
+export declare enum FieldFlags {
+    Filterable = 1,
+    Category = 2,
+    Rangeable = 4,
+    Editable = 8,
+    Nullable = 16,
+    Aggregated = 32,
+    /**
+     * This flag indicates to the front end whether a field is required in order
+     * to filter on the dataset. Some datasets may have an unreasonably large
+     * number of results that require a filter in order to make it manageable/interpretable.
+     */
+    RequiredForFilter = 64,
+    /**
+     * This flag indicates to the BE whether a field should be added to the area report
+     */
+    DoNotIncludeInAreaReport = 128,
+    /**
+     * When aggregating this data, such as when building histograms for the area
+     * report, aggregate this field into buckets with integer ranges. This allows
+     * us to specify that certain float-type fields, which would normally be
+     * aggregated into float ranges, should be aggregated into integer ranges instead.
+     */
+    AggregateIntoIntegerBuckets = 256,
+    Readonly = 512
+}
+//# sourceMappingURL=field-flags.d.ts.map

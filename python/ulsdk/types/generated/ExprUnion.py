@@ -14,3 +14,4 @@ class ExprUnion(object):
     UnsetArgument = 8
     Window = 9
     ValueName = 10
+    AggregateFilter = 11

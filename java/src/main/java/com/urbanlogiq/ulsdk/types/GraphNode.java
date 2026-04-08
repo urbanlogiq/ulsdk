@@ -120,6 +120,10 @@ public final class GraphNode {
             com.google.flatbuffers.Table _geomFbsTable = o._Geom(new com.urbanlogiq.ulsdk.types.generated.MultiPolygon());
             com.urbanlogiq.ulsdk.types.generated.MultiPolygon _geomFbsValue = (com.urbanlogiq.ulsdk.types.generated.MultiPolygon)_geomFbsTable;
             _geomValue = new com.urbanlogiq.ulsdk.types.MultiPolygon(_geomFbsValue);
+        } else if (_geomTy == com.urbanlogiq.ulsdk.types.generated.Geometry.MultiPoint) {
+            com.google.flatbuffers.Table _geomFbsTable = o._Geom(new com.urbanlogiq.ulsdk.types.generated.MultiPoint());
+            com.urbanlogiq.ulsdk.types.generated.MultiPoint _geomFbsValue = (com.urbanlogiq.ulsdk.types.generated.MultiPoint)_geomFbsTable;
+            _geomValue = new com.urbanlogiq.ulsdk.types.MultiPoint(_geomFbsValue);
         }
         if (_geomValue != null) {
             this.__geom = new com.urbanlogiq.ulsdk.types.Geometry(_geomValue);

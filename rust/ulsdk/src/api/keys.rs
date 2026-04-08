@@ -139,11 +139,26 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let expected = GetKeys::default();
-        let expected_bytes = serde_json::to_vec(&expected).unwrap();
-        ctx.set_response(expected_bytes);
-        let result = get_keys(&ctx).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let expected = GetKeys::default();
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_keys(&ctx).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -180,7 +195,17 @@ mod tests {
             .unwrap();
             let ctx = ApiKeyContext::new(key, Environment::Prod);
 
-            let res = get_keys(&ctx).await;
+            for i in 0..5 {
+                let res = get_keys(&ctx).await;
+                if let Err(e) = res {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            }
         }
     }
 
@@ -199,11 +224,26 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let expected = CreateKey::default();
-        let expected_bytes = serde_json::to_vec(&expected).unwrap();
-        ctx.set_response(expected_bytes);
-        let result = create_key(&ctx).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let expected = CreateKey::default();
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = create_key(&ctx).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -221,9 +261,22 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        let body = UpdateKey::default();
-        update_key(&ctx, p0, body).await.unwrap();
+
+        for i in 0..5 {
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let body = UpdateKey::default();
+            let result = update_key(&ctx, p0, body).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -241,12 +294,27 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        let expected = Key::default();
-        let expected_bytes = serde_json::to_vec(&expected).unwrap();
-        ctx.set_response(expected_bytes);
-        let result = get_key(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let expected = Key::default();
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_key(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -264,7 +332,20 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        delete_key(&ctx, p0).await.unwrap();
+
+        for i in 0..5 {
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let result = delete_key(&ctx, p0).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 }

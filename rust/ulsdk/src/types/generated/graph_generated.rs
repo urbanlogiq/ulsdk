@@ -400,8 +400,8 @@ impl<'a> Projection<'a> {
         Projection { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args ProjectionArgs<'args>,
     ) -> flatbuffers::WIPOffset<Projection<'bldr>> {
         let mut builder = ProjectionBuilder::new(_fbb);
@@ -476,11 +476,11 @@ impl Serialize for Projection<'_> {
     }
 }
 
-pub struct ProjectionBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct ProjectionBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> ProjectionBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ProjectionBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_predicate(&mut self, predicate: Predicate) {
         self.fbb_
@@ -492,7 +492,9 @@ impl<'a: 'b, 'b> ProjectionBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(Projection::VT_ALIAS, alias);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ProjectionBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> ProjectionBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         ProjectionBuilder {
             fbb_: _fbb,
@@ -540,8 +542,8 @@ impl<'a> EdgeQuery<'a> {
         EdgeQuery { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args EdgeQueryArgs,
     ) -> flatbuffers::WIPOffset<EdgeQuery<'bldr>> {
         let mut builder = EdgeQueryBuilder::new(_fbb);
@@ -598,18 +600,18 @@ impl Serialize for EdgeQuery<'_> {
     }
 }
 
-pub struct EdgeQueryBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct EdgeQueryBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> EdgeQueryBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> EdgeQueryBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_edge_ty(&mut self, edge_ty: EdgeTy) {
         self.fbb_
             .push_slot::<EdgeTy>(EdgeQuery::VT_EDGE_TY, edge_ty, EdgeTy::E_INVALID);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> EdgeQueryBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> EdgeQueryBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         EdgeQueryBuilder {
             fbb_: _fbb,
@@ -656,8 +658,8 @@ impl<'a> NodeIdPair<'a> {
         NodeIdPair { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args NodeIdPairArgs<'args>,
     ) -> flatbuffers::WIPOffset<NodeIdPair<'bldr>> {
         let mut builder = NodeIdPairBuilder::new(_fbb);
@@ -745,11 +747,11 @@ impl Serialize for NodeIdPair<'_> {
     }
 }
 
-pub struct NodeIdPairBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct NodeIdPairBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> NodeIdPairBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> NodeIdPairBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_stream_id(&mut self, stream_id: flatbuffers::WIPOffset<ObjectId<'b>>) {
         self.fbb_
@@ -767,7 +769,9 @@ impl<'a: 'b, 'b> NodeIdPairBuilder<'a, 'b> {
             );
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> NodeIdPairBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> NodeIdPairBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         NodeIdPairBuilder {
             fbb_: _fbb,
@@ -816,8 +820,8 @@ impl<'a> Geom<'a> {
         Geom { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args GeomArgs,
     ) -> flatbuffers::WIPOffset<Geom<'bldr>> {
         let mut builder = GeomBuilder::new(_fbb);
@@ -919,6 +923,20 @@ impl<'a> Geom<'a> {
             None
         }
     }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn geom_as_multi_point(&self) -> Option<MultiPoint<'a>> {
+        if self.geom_type() == Geometry::MultiPoint {
+            let u = self.geom();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { MultiPoint::init_from_table(u) })
+        } else {
+            None
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for Geom<'_> {
@@ -958,6 +976,11 @@ impl flatbuffers::Verifiable for Geom<'_> {
                     Geometry::MultiPolygon => v
                         .verify_union_variant::<flatbuffers::ForwardsUOffset<MultiPolygon>>(
                             "Geometry::MultiPolygon",
+                            pos,
+                        ),
+                    Geometry::MultiPoint => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<MultiPoint>>(
+                            "Geometry::MultiPoint",
                             pos,
                         ),
                     _ => Ok(()),
@@ -1020,17 +1043,23 @@ impl Serialize for Geom<'_> {
                     .expect("Invalid union table, expected `Geometry::MultiPolygon`.");
                 s.serialize_field("geom", &f)?;
             }
+            Geometry::MultiPoint => {
+                let f = self
+                    .geom_as_multi_point()
+                    .expect("Invalid union table, expected `Geometry::MultiPoint`.");
+                s.serialize_field("geom", &f)?;
+            }
             _ => unimplemented!(),
         }
         s.end()
     }
 }
 
-pub struct GeomBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct GeomBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> GeomBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> GeomBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_geom_type(&mut self, geom_type: Geometry) {
         self.fbb_
@@ -1042,7 +1071,7 @@ impl<'a: 'b, 'b> GeomBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(Geom::VT_GEOM, geom);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> GeomBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> GeomBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         GeomBuilder {
             fbb_: _fbb,
@@ -1112,6 +1141,16 @@ impl core::fmt::Debug for Geom<'_> {
                     )
                 }
             }
+            Geometry::MultiPoint => {
+                if let Some(x) = self.geom_as_multi_point() {
+                    ds.field("geom", &x)
+                } else {
+                    ds.field(
+                        "geom",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
             _ => {
                 let x: Option<()> = None;
                 ds.field("geom", &x)
@@ -1147,8 +1186,8 @@ impl<'a> GeomOp<'a> {
         GeomOp { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args GeomOpArgs<'args>,
     ) -> flatbuffers::WIPOffset<GeomOp<'bldr>> {
         let mut builder = GeomOpBuilder::new(_fbb);
@@ -1241,11 +1280,11 @@ impl Serialize for GeomOp<'_> {
     }
 }
 
-pub struct GeomOpBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct GeomOpBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> GeomOpBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> GeomOpBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_op(&mut self, op: Fn) {
         self.fbb_.push_slot::<Fn>(GeomOp::VT_OP, op, Fn::None);
@@ -1266,7 +1305,7 @@ impl<'a: 'b, 'b> GeomOpBuilder<'a, 'b> {
             .push_slot::<Predicate>(GeomOp::VT_PREDICATE, predicate, Predicate::location);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> GeomOpBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> GeomOpBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         GeomOpBuilder {
             fbb_: _fbb,
@@ -1320,8 +1359,8 @@ impl<'a> NodeQuery<'a> {
         NodeQuery { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args NodeQueryArgs<'args>,
     ) -> flatbuffers::WIPOffset<NodeQuery<'bldr>> {
         let mut builder = NodeQueryBuilder::new(_fbb);
@@ -1533,11 +1572,11 @@ impl Serialize for NodeQuery<'_> {
     }
 }
 
-pub struct NodeQueryBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct NodeQueryBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> NodeQueryBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> NodeQueryBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_stream_ids(
         &mut self,
@@ -1594,7 +1633,7 @@ impl<'a: 'b, 'b> NodeQueryBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<GeomOp>>(NodeQuery::VT_GEOM_OP, geom_op);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> NodeQueryBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> NodeQueryBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         NodeQueryBuilder {
             fbb_: _fbb,
@@ -1646,8 +1685,8 @@ impl<'a> QueryPathElement<'a> {
         QueryPathElement { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args QueryPathElementArgs,
     ) -> flatbuffers::WIPOffset<QueryPathElement<'bldr>> {
         let mut builder = QueryPathElementBuilder::new(_fbb);
@@ -1788,11 +1827,11 @@ impl Serialize for QueryPathElement<'_> {
     }
 }
 
-pub struct QueryPathElementBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct QueryPathElementBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> QueryPathElementBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> QueryPathElementBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_element_type(&mut self, element_type: QueryPathElementUnion) {
         self.fbb_.push_slot::<QueryPathElementUnion>(
@@ -1808,8 +1847,8 @@ impl<'a: 'b, 'b> QueryPathElementBuilder<'a, 'b> {
     }
     #[inline]
     pub fn new(
-        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>,
-    ) -> QueryPathElementBuilder<'a, 'b> {
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> QueryPathElementBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         QueryPathElementBuilder {
             fbb_: _fbb,
@@ -1879,14 +1918,15 @@ impl<'a> OrderBy<'a> {
     pub const VT_SORT: flatbuffers::VOffsetT = 4;
     pub const VT_FIELD: flatbuffers::VOffsetT = 6;
     pub const VT_TRANSFORM: flatbuffers::VOffsetT = 8;
+    pub const VT_NULLS_FIRST: flatbuffers::VOffsetT = 10;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
         OrderBy { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args OrderByArgs<'args>,
     ) -> flatbuffers::WIPOffset<OrderBy<'bldr>> {
         let mut builder = OrderByBuilder::new(_fbb);
@@ -1895,6 +1935,7 @@ impl<'a> OrderBy<'a> {
         }
         builder.add_sort(args.sort);
         builder.add_transform(args.transform);
+        builder.add_nulls_first(args.nulls_first);
         builder.finish()
     }
 
@@ -1931,6 +1972,17 @@ impl<'a> OrderBy<'a> {
                 .unwrap()
         }
     }
+    #[inline]
+    pub fn nulls_first(&self) -> bool {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<bool>(OrderBy::VT_NULLS_FIRST, Some(false))
+                .unwrap()
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for OrderBy<'_> {
@@ -1944,6 +1996,7 @@ impl flatbuffers::Verifiable for OrderBy<'_> {
             .visit_field::<SortOrder>("sort", Self::VT_SORT, false)?
             .visit_field::<flatbuffers::ForwardsUOffset<&str>>("field", Self::VT_FIELD, true)?
             .visit_field::<ValueTransform>("transform", Self::VT_TRANSFORM, false)?
+            .visit_field::<bool>("nulls_first", Self::VT_NULLS_FIRST, false)?
             .finish();
         Ok(())
     }
@@ -1952,6 +2005,7 @@ pub struct OrderByArgs<'a> {
     pub sort: SortOrder,
     pub field: Option<flatbuffers::WIPOffset<&'a str>>,
     pub transform: ValueTransform,
+    pub nulls_first: bool,
 }
 impl<'a> Default for OrderByArgs<'a> {
     #[inline]
@@ -1960,6 +2014,7 @@ impl<'a> Default for OrderByArgs<'a> {
             sort: SortOrder::ASC,
             field: None, // required field
             transform: ValueTransform::NONE,
+            nulls_first: false,
         }
     }
 }
@@ -1969,19 +2024,20 @@ impl Serialize for OrderBy<'_> {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("OrderBy", 3)?;
+        let mut s = serializer.serialize_struct("OrderBy", 4)?;
         s.serialize_field("sort", &self.sort())?;
         s.serialize_field("field", &self.field())?;
         s.serialize_field("transform", &self.transform())?;
+        s.serialize_field("nulls_first", &self.nulls_first())?;
         s.end()
     }
 }
 
-pub struct OrderByBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct OrderByBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> OrderByBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> OrderByBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_sort(&mut self, sort: SortOrder) {
         self.fbb_
@@ -2001,7 +2057,12 @@ impl<'a: 'b, 'b> OrderByBuilder<'a, 'b> {
         );
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> OrderByBuilder<'a, 'b> {
+    pub fn add_nulls_first(&mut self, nulls_first: bool) {
+        self.fbb_
+            .push_slot::<bool>(OrderBy::VT_NULLS_FIRST, nulls_first, false);
+    }
+    #[inline]
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> OrderByBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         OrderByBuilder {
             fbb_: _fbb,
@@ -2022,6 +2083,7 @@ impl core::fmt::Debug for OrderBy<'_> {
         ds.field("sort", &self.sort());
         ds.field("field", &self.field());
         ds.field("transform", &self.transform());
+        ds.field("nulls_first", &self.nulls_first());
         ds.finish()
     }
 }
@@ -2053,8 +2115,8 @@ impl<'a> GraphQuery<'a> {
         GraphQuery { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args GraphQueryArgs<'args>,
     ) -> flatbuffers::WIPOffset<GraphQuery<'bldr>> {
         let mut builder = GraphQueryBuilder::new(_fbb);
@@ -2163,11 +2225,11 @@ impl Serialize for GraphQuery<'_> {
     }
 }
 
-pub struct GraphQueryBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct GraphQueryBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> GraphQueryBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> GraphQueryBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_path(
         &mut self,
@@ -2193,7 +2255,9 @@ impl<'a: 'b, 'b> GraphQueryBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(GraphQuery::VT_ORDER_BY, order_by);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> GraphQueryBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> GraphQueryBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         GraphQueryBuilder {
             fbb_: _fbb,
@@ -2242,8 +2306,8 @@ impl<'a> NodeList<'a> {
         NodeList { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args NodeListArgs<'args>,
     ) -> flatbuffers::WIPOffset<NodeList<'bldr>> {
         let mut builder = NodeListBuilder::new(_fbb);
@@ -2310,11 +2374,11 @@ impl Serialize for NodeList<'_> {
     }
 }
 
-pub struct NodeListBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct NodeListBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> NodeListBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> NodeListBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_nodes(
         &mut self,
@@ -2326,7 +2390,7 @@ impl<'a: 'b, 'b> NodeListBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(NodeList::VT_NODES, nodes);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> NodeListBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> NodeListBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         NodeListBuilder {
             fbb_: _fbb,
@@ -2373,8 +2437,8 @@ impl<'a> EdgeList<'a> {
         EdgeList { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args EdgeListArgs<'args>,
     ) -> flatbuffers::WIPOffset<EdgeList<'bldr>> {
         let mut builder = EdgeListBuilder::new(_fbb);
@@ -2441,11 +2505,11 @@ impl Serialize for EdgeList<'_> {
     }
 }
 
-pub struct EdgeListBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct EdgeListBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> EdgeListBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> EdgeListBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_edges(
         &mut self,
@@ -2457,7 +2521,7 @@ impl<'a: 'b, 'b> EdgeListBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(EdgeList::VT_EDGES, edges);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> EdgeListBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> EdgeListBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         EdgeListBuilder {
             fbb_: _fbb,

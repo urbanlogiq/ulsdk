@@ -7,6 +7,26 @@
 #include "test.h"
 
 bool
+test_add_col() {
+    ::ul::types::AddCol t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::AddCol deserialized = ::ul::types::AddCol(bytes);
+    return true;
+}
+
+TypeTest test_add_col_obj(test_add_col, "AddCol");
+
+bool
+test_aggregate_filter() {
+    ::ul::types::AggregateFilter t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::AggregateFilter deserialized = ::ul::types::AggregateFilter(bytes);
+    return true;
+}
+
+TypeTest test_aggregate_filter_obj(test_aggregate_filter, "AggregateFilter");
+
+bool
 test_all_columns() {
     ::ul::types::AllColumns t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
@@ -15,6 +35,26 @@ test_all_columns() {
 }
 
 TypeTest test_all_columns_obj(test_all_columns, "AllColumns");
+
+bool
+test_alter_table_element() {
+    ::ul::types::AlterTableElement t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::AlterTableElement deserialized = ::ul::types::AlterTableElement(bytes);
+    return true;
+}
+
+TypeTest test_alter_table_element_obj(test_alter_table_element, "AlterTableElement");
+
+bool
+test_alter_table_operation() {
+    ::ul::types::AlterTableOperation t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::AlterTableOperation deserialized = ::ul::types::AlterTableOperation(bytes);
+    return true;
+}
+
+TypeTest test_alter_table_operation_obj(test_alter_table_operation, "AlterTableOperation");
 
 bool
 test_arrow() {
@@ -115,6 +155,16 @@ test_drive() {
 }
 
 TypeTest test_drive_obj(test_drive, "Drive");
+
+bool
+test_drop_col() {
+    ::ul::types::DropCol t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::DropCol deserialized = ::ul::types::DropCol(bytes);
+    return true;
+}
+
+TypeTest test_drop_col_obj(test_drop_col, "DropCol");
 
 bool
 test_explain() {

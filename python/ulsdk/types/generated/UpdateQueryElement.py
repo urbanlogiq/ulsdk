@@ -4,18 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Function import Function
-from .SetExpr import SetExpr
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class UpdateQueryElement(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = UpdateQueryElement()
         x.Init(buf, n + offset)
@@ -26,7 +21,7 @@ class UpdateQueryElement(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # UpdateQueryElement
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # UpdateQueryElement
@@ -37,86 +32,167 @@ class UpdateQueryElement(object):
         return 0
 
     # UpdateQueryElement
-    def Source(self) -> Optional[flatbuffers.table.Table]:
+    def Source(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
     # UpdateQueryElement
-    def Sets(self, j: int) -> Optional[SetExpr]:
+    def Sets(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .SetExpr import SetExpr
             obj = SetExpr()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # UpdateQueryElement
-    def SetsLength(self) -> int:
+    def SetsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # UpdateQueryElement
-    def SetsIsNone(self) -> bool:
+    def SetsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
     # UpdateQueryElement
-    def Filter(self) -> Optional[Function]:
+    def Filter(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Function import Function
             obj = Function()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def UpdateQueryElementStart(builder: flatbuffers.Builder):
-    builder.StartObject(4)
+    # Additional table sources from a FROM clause (UPDATE ... FROM ... syntax).
+    # Source indexes: target table is implicitly at index 0, from_sources start at index 1.
+    # UpdateQueryElement
+    def FromSources(self, j):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
+        if o != 0:
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
+            x = self._tab.Indirect(x)
+            from .TableSource import TableSource
+            obj = TableSource()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
 
-def Start(builder: flatbuffers.Builder):
+    # UpdateQueryElement
+    def FromSourcesLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # UpdateQueryElement
+    def FromSourcesIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
+        return o == 0
+
+    # Joins within the FROM clause. Indexes reference the combined source list
+    # (0 = target, 1+ = from_sources).
+    # UpdateQueryElement
+    def Joins(self, j):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
+        if o != 0:
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
+            x = self._tab.Indirect(x)
+            from .Join import Join
+            obj = Join()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+    # UpdateQueryElement
+    def JoinsLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # UpdateQueryElement
+    def JoinsIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
+        return o == 0
+
+def UpdateQueryElementStart(builder):
+    builder.StartObject(6)
+
+def Start(builder):
     UpdateQueryElementStart(builder)
 
-def UpdateQueryElementAddSourceType(builder: flatbuffers.Builder, sourceType: int):
+def UpdateQueryElementAddSourceType(builder, sourceType):
     builder.PrependUint8Slot(0, sourceType, 0)
 
-def AddSourceType(builder: flatbuffers.Builder, sourceType: int):
+def AddSourceType(builder, sourceType):
     UpdateQueryElementAddSourceType(builder, sourceType)
 
-def UpdateQueryElementAddSource(builder: flatbuffers.Builder, source: int):
+def UpdateQueryElementAddSource(builder, source):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(source), 0)
 
-def AddSource(builder: flatbuffers.Builder, source: int):
+def AddSource(builder, source):
     UpdateQueryElementAddSource(builder, source)
 
-def UpdateQueryElementAddSets(builder: flatbuffers.Builder, sets: int):
+def UpdateQueryElementAddSets(builder, sets):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(sets), 0)
 
-def AddSets(builder: flatbuffers.Builder, sets: int):
+def AddSets(builder, sets):
     UpdateQueryElementAddSets(builder, sets)
 
-def UpdateQueryElementStartSetsVector(builder, numElems: int) -> int:
+def UpdateQueryElementStartSetsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartSetsVector(builder, numElems: int) -> int:
+def StartSetsVector(builder, numElems):
     return UpdateQueryElementStartSetsVector(builder, numElems)
 
-def UpdateQueryElementAddFilter(builder: flatbuffers.Builder, filter: int):
+def UpdateQueryElementAddFilter(builder, filter):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(filter), 0)
 
-def AddFilter(builder: flatbuffers.Builder, filter: int):
+def AddFilter(builder, filter):
     UpdateQueryElementAddFilter(builder, filter)
 
-def UpdateQueryElementEnd(builder: flatbuffers.Builder) -> int:
+def UpdateQueryElementAddFromSources(builder, fromSources):
+    builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(fromSources), 0)
+
+def AddFromSources(builder, fromSources):
+    UpdateQueryElementAddFromSources(builder, fromSources)
+
+def UpdateQueryElementStartFromSourcesVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+def StartFromSourcesVector(builder, numElems):
+    return UpdateQueryElementStartFromSourcesVector(builder, numElems)
+
+def UpdateQueryElementAddJoins(builder, joins):
+    builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(joins), 0)
+
+def AddJoins(builder, joins):
+    UpdateQueryElementAddJoins(builder, joins)
+
+def UpdateQueryElementStartJoinsVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+def StartJoinsVector(builder, numElems):
+    return UpdateQueryElementStartJoinsVector(builder, numElems)
+
+def UpdateQueryElementEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return UpdateQueryElementEnd(builder)

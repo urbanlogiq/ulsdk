@@ -47,6 +47,16 @@ test_named_parameter() {
 TypeTest test_named_parameter_obj(test_named_parameter, "NamedParameter");
 
 bool
+test_output_schema() {
+    ::ul::types::OutputSchema t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::OutputSchema deserialized = ::ul::types::OutputSchema(bytes);
+    return true;
+}
+
+TypeTest test_output_schema_obj(test_output_schema, "OutputSchema");
+
+bool
 test_source() {
     ::ul::types::Source t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);

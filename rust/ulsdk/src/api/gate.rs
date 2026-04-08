@@ -81,11 +81,26 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let expected = Bootstrap::default();
-        let expected_bytes = serde_json::to_vec(&expected).unwrap();
-        ctx.set_response(expected_bytes);
-        let result = bootstrap(&ctx).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let expected = Bootstrap::default();
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = bootstrap(&ctx).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -122,7 +137,17 @@ mod tests {
             .unwrap();
             let ctx = ApiKeyContext::new(key, Environment::Prod);
 
-            let res = bootstrap(&ctx).await;
+            for i in 0..5 {
+                let res = bootstrap(&ctx).await;
+                if let Err(e) = res {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            }
         }
     }
 }

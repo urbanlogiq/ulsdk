@@ -23,7 +23,7 @@ import java.nio.ByteOrder;
 
 @SuppressWarnings("unused")
 public final class UnaryQueryElement extends com.google.flatbuffers.Table {
-  public static void ValidateVersion() { Constants.FLATBUFFERS_23_5_26(); }
+  public static void ValidateVersion() { Constants.FLATBUFFERS_25_2_10(); }
   public static UnaryQueryElement getRootAsUnaryQueryElement(ByteBuffer _bb) { return getRootAsUnaryQueryElement(_bb, new UnaryQueryElement()); }
   public static UnaryQueryElement getRootAsUnaryQueryElement(ByteBuffer _bb, UnaryQueryElement obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
   public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }
@@ -59,6 +59,8 @@ public final class UnaryQueryElement extends com.google.flatbuffers.Table {
   public Distinct distinct() { return distinct(new Distinct()); }
   public Distinct distinct(Distinct obj) { int o = __offset(16); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
   public long limit() { int o = __offset(18); return o != 0 ? (long)bb.getInt(o + bb_pos) & 0xFFFFFFFFL : 0L; }
+  public Function having() { return having(new Function()); }
+  public Function having(Function obj) { int o = __offset(20); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
 
   public static int createUnaryQueryElement(FlatBufferBuilder builder,
       int sourcesOffset,
@@ -68,8 +70,10 @@ public final class UnaryQueryElement extends com.google.flatbuffers.Table {
       int orderByOffset,
       int groupByOffset,
       int distinctOffset,
-      long limit) {
-    builder.startTable(8);
+      long limit,
+      int havingOffset) {
+    builder.startTable(9);
+    UnaryQueryElement.addHaving(builder, havingOffset);
     UnaryQueryElement.addLimit(builder, limit);
     UnaryQueryElement.addDistinct(builder, distinctOffset);
     UnaryQueryElement.addGroupBy(builder, groupByOffset);
@@ -81,7 +85,7 @@ public final class UnaryQueryElement extends com.google.flatbuffers.Table {
     return UnaryQueryElement.endUnaryQueryElement(builder);
   }
 
-  public static void startUnaryQueryElement(FlatBufferBuilder builder) { builder.startTable(8); }
+  public static void startUnaryQueryElement(FlatBufferBuilder builder) { builder.startTable(9); }
   public static void addSources(FlatBufferBuilder builder, int sourcesOffset) { builder.addOffset(0, sourcesOffset, 0); }
   public static int createSourcesVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
   public static void startSourcesVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
@@ -100,6 +104,7 @@ public final class UnaryQueryElement extends com.google.flatbuffers.Table {
   public static void startGroupByVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
   public static void addDistinct(FlatBufferBuilder builder, int distinctOffset) { builder.addOffset(6, distinctOffset, 0); }
   public static void addLimit(FlatBufferBuilder builder, long limit) { builder.addInt(7, (int) limit, (int) 0L); }
+  public static void addHaving(FlatBufferBuilder builder, int havingOffset) { builder.addOffset(8, havingOffset, 0); }
   public static int endUnaryQueryElement(FlatBufferBuilder builder) {
     int o = builder.endTable();
     builder.required(o, 4);  // sources

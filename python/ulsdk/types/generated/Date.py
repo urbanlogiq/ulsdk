@@ -4,7 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 # Date is either a 32-bit or 64-bit signed integer type representing an
@@ -17,7 +16,7 @@ class Date(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Date()
         x.Init(buf, n + offset)
@@ -28,7 +27,7 @@ class Date(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Date
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Date
@@ -38,20 +37,20 @@ class Date(object):
             return self._tab.Get(flatbuffers.number_types.Int16Flags, o + self._tab.Pos)
         return 1
 
-def DateStart(builder: flatbuffers.Builder):
+def DateStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DateStart(builder)
 
-def DateAddUnit(builder: flatbuffers.Builder, unit: int):
+def DateAddUnit(builder, unit):
     builder.PrependInt16Slot(0, unit, 1)
 
-def AddUnit(builder: flatbuffers.Builder, unit: int):
+def AddUnit(builder, unit):
     DateAddUnit(builder, unit)
 
-def DateEnd(builder: flatbuffers.Builder) -> int:
+def DateEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DateEnd(builder)

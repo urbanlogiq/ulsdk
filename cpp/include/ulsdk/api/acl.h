@@ -183,6 +183,18 @@ get_permissions(
 );
 
 /**
+ * Set the default mode of an object. This can only be done by an object's owner.
+ * @param id The ID of the object to which access will be granted.
+ * @param permission The permission bitset (see the PermissionTy enum for more information).
+ */
+Result<Void>
+set_default_mode(
+    ul::RequestContext &ctx,
+    const ::ul::types::ObjectId &id,
+    int64_t permission
+);
+
+/**
  * Forcibly set an object's ACL to another ACL object. Note that the target ACL needs to contain the exact same permissions as the current ACL otherwise this method will return 400 Bad Request. This is a safeguard to ensure the user cannot lock themselves out of an object.
  * @param id The ID of the object which will have its ACL set.
  * @param acl_id The ID of the ACL object which will be used as the object ACL.

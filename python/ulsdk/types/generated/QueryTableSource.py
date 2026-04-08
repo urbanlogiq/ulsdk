@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Query import Query
-from typing import Optional
 np = import_numpy()
 
 class QueryTableSource(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = QueryTableSource()
         x.Init(buf, n + offset)
@@ -24,33 +21,34 @@ class QueryTableSource(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # QueryTableSource
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # QueryTableSource
-    def Q(self) -> Optional[Query]:
+    def Q(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Query import Query
             obj = Query()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def QueryTableSourceStart(builder: flatbuffers.Builder):
+def QueryTableSourceStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     QueryTableSourceStart(builder)
 
-def QueryTableSourceAddQ(builder: flatbuffers.Builder, q: int):
+def QueryTableSourceAddQ(builder, q):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(q), 0)
 
-def AddQ(builder: flatbuffers.Builder, q: int):
+def AddQ(builder, q):
     QueryTableSourceAddQ(builder, q)
 
-def QueryTableSourceEnd(builder: flatbuffers.Builder) -> int:
+def QueryTableSourceEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return QueryTableSourceEnd(builder)

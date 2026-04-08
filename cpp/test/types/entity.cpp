@@ -47,6 +47,16 @@ test_multi_line() {
 TypeTest test_multi_line_obj(test_multi_line, "MultiLine");
 
 bool
+test_multi_point() {
+    ::ul::types::MultiPoint t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::MultiPoint deserialized = ::ul::types::MultiPoint(bytes);
+    return true;
+}
+
+TypeTest test_multi_point_obj(test_multi_point, "MultiPoint");
+
+bool
 test_multi_polygon() {
     ::ul::types::MultiPolygon t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);

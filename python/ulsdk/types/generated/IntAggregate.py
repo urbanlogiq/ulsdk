@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .UIntBucket import UIntBucket
-from typing import Optional
 np = import_numpy()
 
 class IntAggregate(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = IntAggregate()
         x.Init(buf, n + offset)
@@ -24,7 +21,7 @@ class IntAggregate(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # IntAggregate
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # IntAggregate
@@ -70,84 +67,85 @@ class IntAggregate(object):
         return 0
 
     # IntAggregate
-    def Histo(self, j: int) -> Optional[UIntBucket]:
+    def Histo(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 16
+            from .UIntBucket import UIntBucket
             obj = UIntBucket()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # IntAggregate
-    def HistoLength(self) -> int:
+    def HistoLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # IntAggregate
-    def HistoIsNone(self) -> bool:
+    def HistoIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         return o == 0
 
-def IntAggregateStart(builder: flatbuffers.Builder):
+def IntAggregateStart(builder):
     builder.StartObject(7)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     IntAggregateStart(builder)
 
-def IntAggregateAddMin(builder: flatbuffers.Builder, min: int):
+def IntAggregateAddMin(builder, min):
     builder.PrependInt64Slot(0, min, 0)
 
-def AddMin(builder: flatbuffers.Builder, min: int):
+def AddMin(builder, min):
     IntAggregateAddMin(builder, min)
 
-def IntAggregateAddMax(builder: flatbuffers.Builder, max: int):
+def IntAggregateAddMax(builder, max):
     builder.PrependInt64Slot(1, max, 0)
 
-def AddMax(builder: flatbuffers.Builder, max: int):
+def AddMax(builder, max):
     IntAggregateAddMax(builder, max)
 
-def IntAggregateAddMean(builder: flatbuffers.Builder, mean: int):
+def IntAggregateAddMean(builder, mean):
     builder.PrependInt64Slot(2, mean, 0)
 
-def AddMean(builder: flatbuffers.Builder, mean: int):
+def AddMean(builder, mean):
     IntAggregateAddMean(builder, mean)
 
-def IntAggregateAddCount(builder: flatbuffers.Builder, count: int):
+def IntAggregateAddCount(builder, count):
     builder.PrependUint64Slot(3, count, 0)
 
-def AddCount(builder: flatbuffers.Builder, count: int):
+def AddCount(builder, count):
     IntAggregateAddCount(builder, count)
 
-def IntAggregateAddSum(builder: flatbuffers.Builder, sum: int):
+def IntAggregateAddSum(builder, sum):
     builder.PrependInt64Slot(4, sum, 0)
 
-def AddSum(builder: flatbuffers.Builder, sum: int):
+def AddSum(builder, sum):
     IntAggregateAddSum(builder, sum)
 
-def IntAggregateAddVariance(builder: flatbuffers.Builder, variance: int):
+def IntAggregateAddVariance(builder, variance):
     builder.PrependInt64Slot(5, variance, 0)
 
-def AddVariance(builder: flatbuffers.Builder, variance: int):
+def AddVariance(builder, variance):
     IntAggregateAddVariance(builder, variance)
 
-def IntAggregateAddHisto(builder: flatbuffers.Builder, histo: int):
+def IntAggregateAddHisto(builder, histo):
     builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(histo), 0)
 
-def AddHisto(builder: flatbuffers.Builder, histo: int):
+def AddHisto(builder, histo):
     IntAggregateAddHisto(builder, histo)
 
-def IntAggregateStartHistoVector(builder, numElems: int) -> int:
+def IntAggregateStartHistoVector(builder, numElems):
     return builder.StartVector(16, numElems, 8)
 
-def StartHistoVector(builder, numElems: int) -> int:
+def StartHistoVector(builder, numElems):
     return IntAggregateStartHistoVector(builder, numElems)
 
-def IntAggregateEnd(builder: flatbuffers.Builder) -> int:
+def IntAggregateEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return IntAggregateEnd(builder)

@@ -4,19 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Expr import Expr
-from .Function import Function
-from .OrderBy import OrderBy
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class TableSource(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = TableSource()
         x.Init(buf, n + offset)
@@ -27,7 +21,7 @@ class TableSource(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # TableSource
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # TableSource
@@ -38,158 +32,163 @@ class TableSource(object):
         return 0
 
     # TableSource
-    def T(self) -> Optional[flatbuffers.table.Table]:
+    def T(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
     # TableSource
-    def Fields(self, j: int) -> Optional[Expr]:
+    def Fields(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Expr import Expr
             obj = Expr()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # TableSource
-    def FieldsLength(self) -> int:
+    def FieldsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # TableSource
-    def FieldsIsNone(self) -> bool:
+    def FieldsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
     # TableSource
-    def Filter(self) -> Optional[Function]:
+    def Filter(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Function import Function
             obj = Function()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # TableSource
-    def OrderBy(self, j: int) -> Optional[OrderBy]:
+    def OrderBy(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .OrderBy import OrderBy
             obj = OrderBy()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # TableSource
-    def OrderByLength(self) -> int:
+    def OrderByLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # TableSource
-    def OrderByIsNone(self) -> bool:
+    def OrderByIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         return o == 0
 
     # TableSource
-    def GroupBy(self, j: int) -> Optional[Expr]:
+    def GroupBy(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Expr import Expr
             obj = Expr()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # TableSource
-    def GroupByLength(self) -> int:
+    def GroupByLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # TableSource
-    def GroupByIsNone(self) -> bool:
+    def GroupByIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         return o == 0
 
-def TableSourceStart(builder: flatbuffers.Builder):
+def TableSourceStart(builder):
     builder.StartObject(6)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     TableSourceStart(builder)
 
-def TableSourceAddTType(builder: flatbuffers.Builder, tType: int):
+def TableSourceAddTType(builder, tType):
     builder.PrependUint8Slot(0, tType, 0)
 
-def AddTType(builder: flatbuffers.Builder, tType: int):
+def AddTType(builder, tType):
     TableSourceAddTType(builder, tType)
 
-def TableSourceAddT(builder: flatbuffers.Builder, t: int):
+def TableSourceAddT(builder, t):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(t), 0)
 
-def AddT(builder: flatbuffers.Builder, t: int):
+def AddT(builder, t):
     TableSourceAddT(builder, t)
 
-def TableSourceAddFields(builder: flatbuffers.Builder, fields: int):
+def TableSourceAddFields(builder, fields):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(fields), 0)
 
-def AddFields(builder: flatbuffers.Builder, fields: int):
+def AddFields(builder, fields):
     TableSourceAddFields(builder, fields)
 
-def TableSourceStartFieldsVector(builder, numElems: int) -> int:
+def TableSourceStartFieldsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartFieldsVector(builder, numElems: int) -> int:
+def StartFieldsVector(builder, numElems):
     return TableSourceStartFieldsVector(builder, numElems)
 
-def TableSourceAddFilter(builder: flatbuffers.Builder, filter: int):
+def TableSourceAddFilter(builder, filter):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(filter), 0)
 
-def AddFilter(builder: flatbuffers.Builder, filter: int):
+def AddFilter(builder, filter):
     TableSourceAddFilter(builder, filter)
 
-def TableSourceAddOrderBy(builder: flatbuffers.Builder, orderBy: int):
+def TableSourceAddOrderBy(builder, orderBy):
     builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(orderBy), 0)
 
-def AddOrderBy(builder: flatbuffers.Builder, orderBy: int):
+def AddOrderBy(builder, orderBy):
     TableSourceAddOrderBy(builder, orderBy)
 
-def TableSourceStartOrderByVector(builder, numElems: int) -> int:
+def TableSourceStartOrderByVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartOrderByVector(builder, numElems: int) -> int:
+def StartOrderByVector(builder, numElems):
     return TableSourceStartOrderByVector(builder, numElems)
 
-def TableSourceAddGroupBy(builder: flatbuffers.Builder, groupBy: int):
+def TableSourceAddGroupBy(builder, groupBy):
     builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(groupBy), 0)
 
-def AddGroupBy(builder: flatbuffers.Builder, groupBy: int):
+def AddGroupBy(builder, groupBy):
     TableSourceAddGroupBy(builder, groupBy)
 
-def TableSourceStartGroupByVector(builder, numElems: int) -> int:
+def TableSourceStartGroupByVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartGroupByVector(builder, numElems: int) -> int:
+def StartGroupByVector(builder, numElems):
     return TableSourceStartGroupByVector(builder, numElems)
 
-def TableSourceEnd(builder: flatbuffers.Builder) -> int:
+def TableSourceEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return TableSourceEnd(builder)

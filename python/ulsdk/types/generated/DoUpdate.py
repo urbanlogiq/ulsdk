@@ -4,9 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .SetExpr import SetExpr
-from typing import Optional
 np = import_numpy()
 
 # On conflict, update values according to the expressions provided; this
@@ -15,7 +12,7 @@ class DoUpdate(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = DoUpdate()
         x.Init(buf, n + offset)
@@ -26,53 +23,54 @@ class DoUpdate(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # DoUpdate
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # DoUpdate
-    def Assignments(self, j: int) -> Optional[SetExpr]:
+    def Assignments(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .SetExpr import SetExpr
             obj = SetExpr()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # DoUpdate
-    def AssignmentsLength(self) -> int:
+    def AssignmentsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # DoUpdate
-    def AssignmentsIsNone(self) -> bool:
+    def AssignmentsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def DoUpdateStart(builder: flatbuffers.Builder):
+def DoUpdateStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DoUpdateStart(builder)
 
-def DoUpdateAddAssignments(builder: flatbuffers.Builder, assignments: int):
+def DoUpdateAddAssignments(builder, assignments):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(assignments), 0)
 
-def AddAssignments(builder: flatbuffers.Builder, assignments: int):
+def AddAssignments(builder, assignments):
     DoUpdateAddAssignments(builder, assignments)
 
-def DoUpdateStartAssignmentsVector(builder, numElems: int) -> int:
+def DoUpdateStartAssignmentsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartAssignmentsVector(builder, numElems: int) -> int:
+def StartAssignmentsVector(builder, numElems):
     return DoUpdateStartAssignmentsVector(builder, numElems)
 
-def DoUpdateEnd(builder: flatbuffers.Builder) -> int:
+def DoUpdateEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DoUpdateEnd(builder)

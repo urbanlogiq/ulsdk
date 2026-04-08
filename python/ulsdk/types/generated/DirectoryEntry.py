@@ -4,17 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ObjectId import ObjectId
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class DirectoryEntry(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = DirectoryEntry()
         x.Init(buf, n + offset)
@@ -25,7 +21,7 @@ class DirectoryEntry(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # DirectoryEntry
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # DirectoryEntry
@@ -36,50 +32,52 @@ class DirectoryEntry(object):
         return 0
 
     # DirectoryEntry
-    def Entry(self) -> Optional[flatbuffers.table.Table]:
+    def Entry(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
     # DirectoryEntry
-    def Parent(self) -> Optional[ObjectId]:
+    def Parent(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def DirectoryEntryStart(builder: flatbuffers.Builder):
+def DirectoryEntryStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DirectoryEntryStart(builder)
 
-def DirectoryEntryAddEntryType(builder: flatbuffers.Builder, entryType: int):
+def DirectoryEntryAddEntryType(builder, entryType):
     builder.PrependUint8Slot(0, entryType, 0)
 
-def AddEntryType(builder: flatbuffers.Builder, entryType: int):
+def AddEntryType(builder, entryType):
     DirectoryEntryAddEntryType(builder, entryType)
 
-def DirectoryEntryAddEntry(builder: flatbuffers.Builder, entry: int):
+def DirectoryEntryAddEntry(builder, entry):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(entry), 0)
 
-def AddEntry(builder: flatbuffers.Builder, entry: int):
+def AddEntry(builder, entry):
     DirectoryEntryAddEntry(builder, entry)
 
-def DirectoryEntryAddParent(builder: flatbuffers.Builder, parent: int):
+def DirectoryEntryAddParent(builder, parent):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(parent), 0)
 
-def AddParent(builder: flatbuffers.Builder, parent: int):
+def AddParent(builder, parent):
     DirectoryEntryAddParent(builder, parent)
 
-def DirectoryEntryEnd(builder: flatbuffers.Builder) -> int:
+def DirectoryEntryEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DirectoryEntryEnd(builder)

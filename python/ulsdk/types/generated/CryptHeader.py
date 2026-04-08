@@ -4,15 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from typing import Optional
 np = import_numpy()
 
 class CryptHeader(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = CryptHeader()
         x.Init(buf, n + offset)
@@ -23,19 +21,19 @@ class CryptHeader(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # CryptHeader
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # An ID for the key used to encrypt this particular encrypted object.
     # CryptHeader
-    def Kid(self) -> Optional[bytes]:
+    def Kid(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # CryptHeader
-    def Nonce(self, j: int):
+    def Nonce(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             a = self._tab.Vector(o)
@@ -50,14 +48,14 @@ class CryptHeader(object):
         return 0
 
     # CryptHeader
-    def NonceLength(self) -> int:
+    def NonceLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # CryptHeader
-    def NonceIsNone(self) -> bool:
+    def NonceIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
@@ -68,38 +66,38 @@ class CryptHeader(object):
             return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
         return 0
 
-def CryptHeaderStart(builder: flatbuffers.Builder):
+def CryptHeaderStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     CryptHeaderStart(builder)
 
-def CryptHeaderAddKid(builder: flatbuffers.Builder, kid: int):
+def CryptHeaderAddKid(builder, kid):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(kid), 0)
 
-def AddKid(builder: flatbuffers.Builder, kid: int):
+def AddKid(builder, kid):
     CryptHeaderAddKid(builder, kid)
 
-def CryptHeaderAddNonce(builder: flatbuffers.Builder, nonce: int):
+def CryptHeaderAddNonce(builder, nonce):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(nonce), 0)
 
-def AddNonce(builder: flatbuffers.Builder, nonce: int):
+def AddNonce(builder, nonce):
     CryptHeaderAddNonce(builder, nonce)
 
-def CryptHeaderStartNonceVector(builder, numElems: int) -> int:
+def CryptHeaderStartNonceVector(builder, numElems):
     return builder.StartVector(1, numElems, 1)
 
-def StartNonceVector(builder, numElems: int) -> int:
+def StartNonceVector(builder, numElems):
     return CryptHeaderStartNonceVector(builder, numElems)
 
-def CryptHeaderAddPlaintextLen(builder: flatbuffers.Builder, plaintextLen: int):
+def CryptHeaderAddPlaintextLen(builder, plaintextLen):
     builder.PrependUint32Slot(2, plaintextLen, 0)
 
-def AddPlaintextLen(builder: flatbuffers.Builder, plaintextLen: int):
+def AddPlaintextLen(builder, plaintextLen):
     CryptHeaderAddPlaintextLen(builder, plaintextLen)
 
-def CryptHeaderEnd(builder: flatbuffers.Builder) -> int:
+def CryptHeaderEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return CryptHeaderEnd(builder)

@@ -36,6 +36,10 @@ public final class QueryElement {
             com.google.flatbuffers.Table qFbsTable = o.q(new com.urbanlogiq.ulsdk.types.generated.InsertQueryElement());
             com.urbanlogiq.ulsdk.types.generated.InsertQueryElement qFbsValue = (com.urbanlogiq.ulsdk.types.generated.InsertQueryElement)qFbsTable;
             qValue = new com.urbanlogiq.ulsdk.types.InsertQueryElement(qFbsValue);
+        } else if (qTy == com.urbanlogiq.ulsdk.types.generated.QueryElementUnion.AlterTableElement) {
+            com.google.flatbuffers.Table qFbsTable = o.q(new com.urbanlogiq.ulsdk.types.generated.AlterTableElement());
+            com.urbanlogiq.ulsdk.types.generated.AlterTableElement qFbsValue = (com.urbanlogiq.ulsdk.types.generated.AlterTableElement)qFbsTable;
+            qValue = new com.urbanlogiq.ulsdk.types.AlterTableElement(qFbsValue);
         }
         if (qValue != null) {
             this._q = new com.urbanlogiq.ulsdk.types.QueryElementUnion(qValue);
@@ -47,15 +51,10 @@ public final class QueryElement {
     }
 
     public int serializeTo(com.google.flatbuffers.FlatBufferBuilder builder) {
-        com.urbanlogiq.ulsdk.Pair<Integer, Byte> qPair = null;
-        if (this._q != null) {
-            qPair = this._q.serializeTo(builder);
-        }
+        com.urbanlogiq.ulsdk.Pair<Integer, Byte> qPair = this._q.serializeTo(builder);
         com.urbanlogiq.ulsdk.types.generated.QueryElement.startQueryElement(builder);
-        if (qPair != null) {
-            com.urbanlogiq.ulsdk.types.generated.QueryElement.addQ(builder, qPair.first());
-            com.urbanlogiq.ulsdk.types.generated.QueryElement.addQType(builder, qPair.second());
-        }
+        com.urbanlogiq.ulsdk.types.generated.QueryElement.addQ(builder, qPair.first());
+        com.urbanlogiq.ulsdk.types.generated.QueryElement.addQType(builder, qPair.second());
         return com.urbanlogiq.ulsdk.types.generated.QueryElement.endQueryElement(builder);
     }
 

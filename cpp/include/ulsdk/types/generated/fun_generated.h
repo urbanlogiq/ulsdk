@@ -8,9 +8,9 @@
 
 // Ensure the included flatbuffers.h is the same version as when this file was
 // generated, otherwise it may not be compatible.
-static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
-              FLATBUFFERS_VERSION_MINOR == 5 &&
-              FLATBUFFERS_VERSION_REVISION == 26,
+static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
+              FLATBUFFERS_VERSION_MINOR == 2 &&
+              FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
 enum class Fn : int16_t {
@@ -168,6 +168,48 @@ enum class Fn : int16_t {
   Uuid = 151,
   Unnest = 152,
   PercentileCont = 153,
+  ApproxPercentileCont = 154,
+  Degrees = 155,
+  Exp = 156,
+  Factorial = 157,
+  Isnan = 158,
+  Iszero = 159,
+  Ln = 160,
+  Log = 161,
+  Power = 162,
+  Radians = 163,
+  Sqrt = 164,
+  Trunc = 165,
+  Sin = 166,
+  Cos = 167,
+  Tan = 168,
+  Tanh = 169,
+  Acos = 170,
+  Acosh = 171,
+  Asin = 172,
+  Asinh = 173,
+  Atan = 174,
+  Atan2 = 175,
+  Atanh = 176,
+  Cbrt = 177,
+  Cosh = 178,
+  Cot = 179,
+  Gcd = 180,
+  Lcm = 181,
+  Log10 = 182,
+  Log2 = 183,
+  Nanvl = 184,
+  Pi = 185,
+  Random = 186,
+  Signum = 187,
+  Sinh = 188,
+  StMakePoint = 189,
+  StCentroid = 190,
+  StPoint = 191,
+  Coalesce = 192,
+  IsDistinctFrom = 193,
+  IsNotDistinctFrom = 194,
+  GeoFilter = 195,
   CorrelationId = 32763,
   UlTimezone = 32764,
   UlArrayContains = 32765,
@@ -176,7 +218,7 @@ enum class Fn : int16_t {
   MAX = UlArrayAny
 };
 
-inline const Fn (&EnumValuesFn())[158] {
+inline const Fn (&EnumValuesFn())[200] {
   static const Fn values[] = {
     Fn::None,
     Fn::True,
@@ -332,6 +374,48 @@ inline const Fn (&EnumValuesFn())[158] {
     Fn::Uuid,
     Fn::Unnest,
     Fn::PercentileCont,
+    Fn::ApproxPercentileCont,
+    Fn::Degrees,
+    Fn::Exp,
+    Fn::Factorial,
+    Fn::Isnan,
+    Fn::Iszero,
+    Fn::Ln,
+    Fn::Log,
+    Fn::Power,
+    Fn::Radians,
+    Fn::Sqrt,
+    Fn::Trunc,
+    Fn::Sin,
+    Fn::Cos,
+    Fn::Tan,
+    Fn::Tanh,
+    Fn::Acos,
+    Fn::Acosh,
+    Fn::Asin,
+    Fn::Asinh,
+    Fn::Atan,
+    Fn::Atan2,
+    Fn::Atanh,
+    Fn::Cbrt,
+    Fn::Cosh,
+    Fn::Cot,
+    Fn::Gcd,
+    Fn::Lcm,
+    Fn::Log10,
+    Fn::Log2,
+    Fn::Nanvl,
+    Fn::Pi,
+    Fn::Random,
+    Fn::Signum,
+    Fn::Sinh,
+    Fn::StMakePoint,
+    Fn::StCentroid,
+    Fn::StPoint,
+    Fn::Coalesce,
+    Fn::IsDistinctFrom,
+    Fn::IsNotDistinctFrom,
+    Fn::GeoFilter,
     Fn::CorrelationId,
     Fn::UlTimezone,
     Fn::UlArrayContains,
@@ -496,6 +580,48 @@ inline const char *EnumNameFn(Fn e) {
     case Fn::Uuid: return "Uuid";
     case Fn::Unnest: return "Unnest";
     case Fn::PercentileCont: return "PercentileCont";
+    case Fn::ApproxPercentileCont: return "ApproxPercentileCont";
+    case Fn::Degrees: return "Degrees";
+    case Fn::Exp: return "Exp";
+    case Fn::Factorial: return "Factorial";
+    case Fn::Isnan: return "Isnan";
+    case Fn::Iszero: return "Iszero";
+    case Fn::Ln: return "Ln";
+    case Fn::Log: return "Log";
+    case Fn::Power: return "Power";
+    case Fn::Radians: return "Radians";
+    case Fn::Sqrt: return "Sqrt";
+    case Fn::Trunc: return "Trunc";
+    case Fn::Sin: return "Sin";
+    case Fn::Cos: return "Cos";
+    case Fn::Tan: return "Tan";
+    case Fn::Tanh: return "Tanh";
+    case Fn::Acos: return "Acos";
+    case Fn::Acosh: return "Acosh";
+    case Fn::Asin: return "Asin";
+    case Fn::Asinh: return "Asinh";
+    case Fn::Atan: return "Atan";
+    case Fn::Atan2: return "Atan2";
+    case Fn::Atanh: return "Atanh";
+    case Fn::Cbrt: return "Cbrt";
+    case Fn::Cosh: return "Cosh";
+    case Fn::Cot: return "Cot";
+    case Fn::Gcd: return "Gcd";
+    case Fn::Lcm: return "Lcm";
+    case Fn::Log10: return "Log10";
+    case Fn::Log2: return "Log2";
+    case Fn::Nanvl: return "Nanvl";
+    case Fn::Pi: return "Pi";
+    case Fn::Random: return "Random";
+    case Fn::Signum: return "Signum";
+    case Fn::Sinh: return "Sinh";
+    case Fn::StMakePoint: return "StMakePoint";
+    case Fn::StCentroid: return "StCentroid";
+    case Fn::StPoint: return "StPoint";
+    case Fn::Coalesce: return "Coalesce";
+    case Fn::IsDistinctFrom: return "IsDistinctFrom";
+    case Fn::IsNotDistinctFrom: return "IsNotDistinctFrom";
+    case Fn::GeoFilter: return "GeoFilter";
     case Fn::CorrelationId: return "CorrelationId";
     case Fn::UlTimezone: return "UlTimezone";
     case Fn::UlArrayContains: return "UlArrayContains";

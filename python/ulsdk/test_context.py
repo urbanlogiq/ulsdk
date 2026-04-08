@@ -2,6 +2,7 @@
 
 import uuid
 from typing import Dict, List, Optional, Union
+from websockets.sync.client import ClientConnection
 
 from .api_key_context import ApiKeyContext
 from .keys import Environment, Region
@@ -91,3 +92,11 @@ class TestContext(RequestContext):
         echo_path = "/v1/echo/"
         self._context.delete(echo_path, params, headers, **kwargs)
         return self._response
+
+    def connect(
+        self,
+        path: str,
+        params: Optional[Dict] = None,
+        headers: Optional[Dict[str, str]] = None,
+    ) -> ClientConnection:
+        raise Exception("Websockets unsupported for tests")

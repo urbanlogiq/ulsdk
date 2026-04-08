@@ -151,6 +151,7 @@ struct NodeList {
 
 struct OrderBy {
     std::string field_;
+    bool nulls_first_;
     SortOrder sort_;
     ValueTransform transform_;
 

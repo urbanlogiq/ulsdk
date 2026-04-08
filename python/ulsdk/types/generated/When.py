@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Expr import Expr
-from typing import Optional
 np = import_numpy()
 
 class When(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = When()
         x.Init(buf, n + offset)
@@ -24,49 +21,51 @@ class When(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # When
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # When
-    def Cond(self) -> Optional[Expr]:
+    def Cond(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Expr import Expr
             obj = Expr()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # When
-    def Value(self) -> Optional[Expr]:
+    def Value(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Expr import Expr
             obj = Expr()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def WhenStart(builder: flatbuffers.Builder):
+def WhenStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     WhenStart(builder)
 
-def WhenAddCond(builder: flatbuffers.Builder, cond: int):
+def WhenAddCond(builder, cond):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(cond), 0)
 
-def AddCond(builder: flatbuffers.Builder, cond: int):
+def AddCond(builder, cond):
     WhenAddCond(builder, cond)
 
-def WhenAddValue(builder: flatbuffers.Builder, value: int):
+def WhenAddValue(builder, value):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(value), 0)
 
-def AddValue(builder: flatbuffers.Builder, value: int):
+def AddValue(builder, value):
     WhenAddValue(builder, value)
 
-def WhenEnd(builder: flatbuffers.Builder) -> int:
+def WhenEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return WhenEnd(builder)

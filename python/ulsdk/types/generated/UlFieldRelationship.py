@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class UlFieldRelationship(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = UlFieldRelationship()
         x.Init(buf, n + offset)
@@ -24,11 +21,11 @@ class UlFieldRelationship(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # UlFieldRelationship
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # UlFieldRelationship
-    def RelationshipDisplayName(self) -> Optional[bytes]:
+    def RelationshipDisplayName(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -42,40 +39,41 @@ class UlFieldRelationship(object):
         return 0
 
     # UlFieldRelationship
-    def RelationshipData(self) -> Optional[flatbuffers.table.Table]:
+    def RelationshipData(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
-def UlFieldRelationshipStart(builder: flatbuffers.Builder):
+def UlFieldRelationshipStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     UlFieldRelationshipStart(builder)
 
-def UlFieldRelationshipAddRelationshipDisplayName(builder: flatbuffers.Builder, relationshipDisplayName: int):
+def UlFieldRelationshipAddRelationshipDisplayName(builder, relationshipDisplayName):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(relationshipDisplayName), 0)
 
-def AddRelationshipDisplayName(builder: flatbuffers.Builder, relationshipDisplayName: int):
+def AddRelationshipDisplayName(builder, relationshipDisplayName):
     UlFieldRelationshipAddRelationshipDisplayName(builder, relationshipDisplayName)
 
-def UlFieldRelationshipAddRelationshipDataType(builder: flatbuffers.Builder, relationshipDataType: int):
+def UlFieldRelationshipAddRelationshipDataType(builder, relationshipDataType):
     builder.PrependUint8Slot(1, relationshipDataType, 0)
 
-def AddRelationshipDataType(builder: flatbuffers.Builder, relationshipDataType: int):
+def AddRelationshipDataType(builder, relationshipDataType):
     UlFieldRelationshipAddRelationshipDataType(builder, relationshipDataType)
 
-def UlFieldRelationshipAddRelationshipData(builder: flatbuffers.Builder, relationshipData: int):
+def UlFieldRelationshipAddRelationshipData(builder, relationshipData):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(relationshipData), 0)
 
-def AddRelationshipData(builder: flatbuffers.Builder, relationshipData: int):
+def AddRelationshipData(builder, relationshipData):
     UlFieldRelationshipAddRelationshipData(builder, relationshipData)
 
-def UlFieldRelationshipEnd(builder: flatbuffers.Builder) -> int:
+def UlFieldRelationshipEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return UlFieldRelationshipEnd(builder)

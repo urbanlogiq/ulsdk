@@ -4,11 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ContentId import ContentId
-from .ObjectId import ObjectId
-from .Schema import Schema
-from typing import Optional
 np = import_numpy()
 
 # A Stream is an instance of a source. The main difference is the parameters
@@ -22,7 +17,7 @@ class Stream(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Stream()
         x.Init(buf, n + offset)
@@ -33,18 +28,18 @@ class Stream(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Stream
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Stream
-    def Url(self) -> Optional[bytes]:
+    def Url(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # Stream
-    def Options(self, j: int):
+    def Options(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             a = self._tab.Vector(o)
@@ -59,19 +54,19 @@ class Stream(object):
         return 0
 
     # Stream
-    def OptionsLength(self) -> int:
+    def OptionsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Stream
-    def OptionsIsNone(self) -> bool:
+    def OptionsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
     # Stream
-    def Parameters(self, j: int):
+    def Parameters(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             a = self._tab.Vector(o)
@@ -86,42 +81,45 @@ class Stream(object):
         return 0
 
     # Stream
-    def ParametersLength(self) -> int:
+    def ParametersLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Stream
-    def ParametersIsNone(self) -> bool:
+    def ParametersIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
     # Stream
-    def Schema(self) -> Optional[Schema]:
+    def Schema(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Schema import Schema
             obj = Schema()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Stream
-    def Metadata(self) -> Optional[ObjectId]:
+    def Metadata(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Stream
-    def MetadataRevision(self) -> Optional[ContentId]:
+    def MetadataRevision(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ContentId import ContentId
             obj = ContentId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -135,103 +133,104 @@ class Stream(object):
         return 0
 
     # Stream
-    def Substreams(self, j: int) -> Optional[ObjectId]:
+    def Substreams(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(22))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Stream
-    def SubstreamsLength(self) -> int:
+    def SubstreamsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(22))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Stream
-    def SubstreamsIsNone(self) -> bool:
+    def SubstreamsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(22))
         return o == 0
 
-def StreamStart(builder: flatbuffers.Builder):
+def StreamStart(builder):
     builder.StartObject(10)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     StreamStart(builder)
 
-def StreamAddUrl(builder: flatbuffers.Builder, url: int):
+def StreamAddUrl(builder, url):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(url), 0)
 
-def AddUrl(builder: flatbuffers.Builder, url: int):
+def AddUrl(builder, url):
     StreamAddUrl(builder, url)
 
-def StreamAddOptions(builder: flatbuffers.Builder, options: int):
+def StreamAddOptions(builder, options):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(options), 0)
 
-def AddOptions(builder: flatbuffers.Builder, options: int):
+def AddOptions(builder, options):
     StreamAddOptions(builder, options)
 
-def StreamStartOptionsVector(builder, numElems: int) -> int:
+def StreamStartOptionsVector(builder, numElems):
     return builder.StartVector(1, numElems, 1)
 
-def StartOptionsVector(builder, numElems: int) -> int:
+def StartOptionsVector(builder, numElems):
     return StreamStartOptionsVector(builder, numElems)
 
-def StreamAddParameters(builder: flatbuffers.Builder, parameters: int):
+def StreamAddParameters(builder, parameters):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(parameters), 0)
 
-def AddParameters(builder: flatbuffers.Builder, parameters: int):
+def AddParameters(builder, parameters):
     StreamAddParameters(builder, parameters)
 
-def StreamStartParametersVector(builder, numElems: int) -> int:
+def StreamStartParametersVector(builder, numElems):
     return builder.StartVector(1, numElems, 1)
 
-def StartParametersVector(builder, numElems: int) -> int:
+def StartParametersVector(builder, numElems):
     return StreamStartParametersVector(builder, numElems)
 
-def StreamAddSchema(builder: flatbuffers.Builder, schema: int):
+def StreamAddSchema(builder, schema):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(schema), 0)
 
-def AddSchema(builder: flatbuffers.Builder, schema: int):
+def AddSchema(builder, schema):
     StreamAddSchema(builder, schema)
 
-def StreamAddMetadata(builder: flatbuffers.Builder, metadata: int):
+def StreamAddMetadata(builder, metadata):
     builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(metadata), 0)
 
-def AddMetadata(builder: flatbuffers.Builder, metadata: int):
+def AddMetadata(builder, metadata):
     StreamAddMetadata(builder, metadata)
 
-def StreamAddMetadataRevision(builder: flatbuffers.Builder, metadataRevision: int):
+def StreamAddMetadataRevision(builder, metadataRevision):
     builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(metadataRevision), 0)
 
-def AddMetadataRevision(builder: flatbuffers.Builder, metadataRevision: int):
+def AddMetadataRevision(builder, metadataRevision):
     StreamAddMetadataRevision(builder, metadataRevision)
 
-def StreamAddFlags(builder: flatbuffers.Builder, flags: int):
+def StreamAddFlags(builder, flags):
     builder.PrependUint32Slot(6, flags, 0)
 
-def AddFlags(builder: flatbuffers.Builder, flags: int):
+def AddFlags(builder, flags):
     StreamAddFlags(builder, flags)
 
-def StreamAddSubstreams(builder: flatbuffers.Builder, substreams: int):
+def StreamAddSubstreams(builder, substreams):
     builder.PrependUOffsetTRelativeSlot(9, flatbuffers.number_types.UOffsetTFlags.py_type(substreams), 0)
 
-def AddSubstreams(builder: flatbuffers.Builder, substreams: int):
+def AddSubstreams(builder, substreams):
     StreamAddSubstreams(builder, substreams)
 
-def StreamStartSubstreamsVector(builder, numElems: int) -> int:
+def StreamStartSubstreamsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartSubstreamsVector(builder, numElems: int) -> int:
+def StartSubstreamsVector(builder, numElems):
     return StreamStartSubstreamsVector(builder, numElems)
 
-def StreamEnd(builder: flatbuffers.Builder) -> int:
+def StreamEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return StreamEnd(builder)

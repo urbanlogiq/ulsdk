@@ -11,8 +11,9 @@ public final class QueryElementOp {
   public static final byte Union = 0;
   public static final byte Intersect = 1;
   public static final byte Except = 2;
+  public static final byte Minus = 3;
 
-  public static final String[] names = { "Union", "Intersect", "Except", };
+  public static final String[] names = { "Union", "Intersect", "Except", "Minus", };
 
   public static String name(int e) { return names[e]; }
 }

@@ -14,7 +14,7 @@ use crate::error::Error;
 use crate::request_context::{ParamMap, RequestContext};
 use crate::{read_arrow_ipc, write_arrow_ipc};
 
-use crate::types::id::ObjectId;
+use crate::types::id::{ContentId, ObjectId};
 use crate::types::metadata::Metadata;
 use crate::types::object::{
     DataCatalogObject, ObjectIdList, ObjectIdPairList, ObjectSummary, ObjectSummaryList,
@@ -105,16 +105,20 @@ pub async fn get_object(
 /// * `ctx` - A request context object
 /// * `id` - The ID of the object to update
 /// * `object` - Object contents with which to update the specified object
+///
+/// Returns
+/// * The content ID of the updated object
 pub async fn update_object(
     ctx: &dyn RequestContext,
     id: crate::types::id::ObjectId,
     object: DataCatalogObject,
-) -> Result<(), Error> {
+) -> Result<ContentId, Error> {
     let path = "/v1/api/ulv2/datacatalog/object/:id".replace(":id", &id.to_string());
     let body = Bytes::from(object.to_fbs_bytes());
-    ctx.post(&path, body, "application/octet-stream", None, None)
+    let res = ctx
+        .post(&path, body, "application/octet-stream", None, None)
         .await?;
-    Ok(())
+    crate::types::ContentId::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Update the attributes of the object with the given ID
@@ -156,7 +160,7 @@ pub async fn delete_attribute(
     id: crate::types::id::ObjectId,
     key: &str,
 ) -> Result<(), Error> {
-    let path = "/v1/api/ulv2/datacatalog/object/:id/attributes/:key"
+    let path = "/v1/api/ulv2/datacatalog/object/:id/attribute/:key"
         .replace(":id", &id.to_string())
         .replace(":key", key);
     ctx.delete(&path, None, None).await?;
@@ -182,6 +186,27 @@ pub async fn get_object_summaries(
         .post(&path, body, "application/octet-stream", None, None)
         .await?;
     crate::types::ObjectSummaryList::from_fbs_bytes(res.as_slice()).map_err(Error::from)
+}
+
+/// Given a list of IDs for stream objects, fetch their metadata in bulk. Note that the returned DataCatalogObject instances only have a valid metadata `obj` field.
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+/// * `stream_ids` - A list of IDs of stream objects to fetch metadata for
+///
+/// Returns
+/// * A list of metadata DataCatalogObjects
+pub async fn bulk_fetch_metadata(
+    ctx: &dyn RequestContext,
+    stream_ids: ObjectIdList,
+) -> Result<ObjectIdPairList, Error> {
+    let path = "/v1/api/ulv2/datacatalog/stream/metadata_list";
+    let body = Bytes::from(stream_ids.to_fbs_bytes());
+    let res = ctx
+        .post(&path, body, "application/octet-stream", None, None)
+        .await?;
+    crate::types::ObjectIdPairList::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Given a list of object IDs, fetch their contents in bulk
@@ -934,13 +959,30 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::ContentId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = DataCatalogObject::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = get_object_at_revision(&ctx, p0, p1).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 =
+                crate::types::ContentId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = DataCatalogObject::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_object_at_revision(&ctx, p0, p1).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -958,12 +1000,28 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = ObjectId::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = get_acl(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = ObjectId::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_acl(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -981,12 +1039,28 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = ObjectSummary::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = get_head_revision(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = ObjectSummary::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_head_revision(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1004,12 +1078,28 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = DataCatalogObject::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = get_object(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = DataCatalogObject::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_object(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1027,9 +1117,29 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let body = crate::types::DataCatalogObject::default();
-        update_object(&ctx, p0, body).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let body = crate::types::DataCatalogObject::default();
+            let expected = ContentId::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = update_object(&ctx, p0, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1047,10 +1157,24 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let q0 = true;
-        let body = serde_json::Map::<String, serde_json::Value>::default();
-        update_attributes(&ctx, p0, q0, body).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let q0 = true;
+            let body = serde_json::Map::<String, serde_json::Value>::default();
+            let result = update_attributes(&ctx, p0, q0, body).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -1068,9 +1192,23 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        delete_attribute(&ctx, p0, p1).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let result = delete_attribute(&ctx, p0, p1).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -1088,12 +1226,65 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let body = crate::types::ObjectIdList::default();
-        let expected = ObjectSummaryList::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = get_object_summaries(&ctx, body).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let body = crate::types::ObjectIdList::default();
+            let expected = ObjectSummaryList::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_object_summaries(&ctx, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
+    }
+
+    #[tokio::test]
+    async fn test_bulk_fetch_metadata() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+
+        for i in 0..5 {
+            let body = crate::types::ObjectIdList::default();
+            let expected = ObjectIdPairList::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = bulk_fetch_metadata(&ctx, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1111,12 +1302,27 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let body = crate::types::ObjectIdList::default();
-        let expected = ObjectIdPairList::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = bulk_fetch_objects(&ctx, body).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let body = crate::types::ObjectIdList::default();
+            let expected = ObjectIdPairList::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = bulk_fetch_objects(&ctx, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1134,11 +1340,26 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let expected = ObjectSummaryList::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = create_object(&ctx).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let expected = ObjectSummaryList::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = create_object(&ctx).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1156,11 +1377,26 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        let body = crate::types::Query::default();
-        let (expected, expected_bytes) = crate::make_test_batches();
-        ctx.set_response(expected_bytes);
-        let result = query_aggregate_numeric(&ctx, q0, body).await.unwrap();
+
+        for i in 0..5 {
+            let q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let body = crate::types::Query::default();
+            let (expected, expected_bytes) = crate::make_test_batches();
+            ctx.set_response(expected_bytes.clone());
+            let result = query_aggregate_numeric(&ctx, q0, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1178,11 +1414,26 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        let body = crate::types::Query::default();
-        let (expected, expected_bytes) = crate::make_test_batches();
-        ctx.set_response(expected_bytes);
-        let result = query_aggregate_string(&ctx, q0, body).await.unwrap();
+
+        for i in 0..5 {
+            let q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let body = crate::types::Query::default();
+            let (expected, expected_bytes) = crate::make_test_batches();
+            ctx.set_response(expected_bytes.clone());
+            let result = query_aggregate_string(&ctx, q0, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1200,12 +1451,27 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let q0 = 42;
-        let q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        let body = crate::types::Query::default();
-        let (expected, expected_bytes) = crate::make_test_batches();
-        ctx.set_response(expected_bytes);
-        let result = query_aggregate_histo(&ctx, q0, q1, body).await.unwrap();
+
+        for i in 0..5 {
+            let q0 = 42;
+            let q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let body = crate::types::Query::default();
+            let (expected, expected_bytes) = crate::make_test_batches();
+            ctx.set_response(expected_bytes.clone());
+            let result = query_aggregate_histo(&ctx, q0, q1, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1223,15 +1489,28 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let q0 = 42;
-        let q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        let q2 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-        let body = crate::types::Query::default();
-        let (expected, expected_bytes) = crate::make_test_batches();
-        ctx.set_response(expected_bytes);
-        let result = query_aggregate_relative_histo(&ctx, q0, q1, q2, body)
-            .await
-            .unwrap();
+
+        for i in 0..5 {
+            let q0 = 42;
+            let q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let q2 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let body = crate::types::Query::default();
+            let (expected, expected_bytes) = crate::make_test_batches();
+            ctx.set_response(expected_bytes.clone());
+            let result = query_aggregate_relative_histo(&ctx, q0, q1, q2, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1249,10 +1528,26 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let (expected, expected_bytes) = crate::make_test_batches();
-        ctx.set_response(expected_bytes);
-        let result = stream_get_arrow(&ctx, p0).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let (expected, expected_bytes) = crate::make_test_batches();
+            ctx.set_response(expected_bytes.clone());
+            let result = stream_get_arrow(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1270,12 +1565,28 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-        let expected_bytes = expected.clone();
-        ctx.set_response(expected_bytes);
-        let result = stream_get_parquet(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            let expected_bytes = expected.clone();
+            ctx.set_response(expected_bytes.clone());
+            let result = stream_get_parquet(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1293,12 +1604,28 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-        let expected_bytes = expected.clone();
-        ctx.set_response(expected_bytes);
-        let result = stream_get_csv(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            let expected_bytes = expected.clone();
+            ctx.set_response(expected_bytes.clone());
+            let result = stream_get_csv(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1316,12 +1643,28 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-        let expected_bytes = expected.clone();
-        ctx.set_response(expected_bytes);
-        let result = stream_get_xlsx(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            let expected_bytes = expected.clone();
+            ctx.set_response(expected_bytes.clone());
+            let result = stream_get_xlsx(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1339,12 +1682,28 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-        let expected_bytes = expected.clone();
-        ctx.set_response(expected_bytes);
-        let result = stream_get_json(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            let expected_bytes = expected.clone();
+            ctx.set_response(expected_bytes.clone());
+            let result = stream_get_json(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1362,12 +1721,28 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-        let expected_bytes = expected.clone();
-        ctx.set_response(expected_bytes);
-        let result = stream_get_text(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            let expected_bytes = expected.clone();
+            ctx.set_response(expected_bytes.clone());
+            let result = stream_get_text(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1385,12 +1760,28 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-        let expected_bytes = expected.clone();
-        ctx.set_response(expected_bytes);
-        let result = stream_get_html(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            let expected_bytes = expected.clone();
+            ctx.set_response(expected_bytes.clone());
+            let result = stream_get_html(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1408,9 +1799,23 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let (body, body_bytes) = crate::make_test_batches();
-        stream_put_arrow(&ctx, p0, body).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let (body, body_bytes) = crate::make_test_batches();
+            let result = stream_put_arrow(&ctx, p0, body).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -1428,9 +1833,23 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let body = crate::types::DiffStream::default();
-        stream_put_diffstream(&ctx, p0, body).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let body = crate::types::DiffStream::default();
+            let result = stream_put_diffstream(&ctx, p0, body).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -1448,9 +1867,23 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let body = Vec::new();
-        stream_put_json(&ctx, p0, body).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let body = Vec::new();
+            let result = stream_put_json(&ctx, p0, body).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -1468,12 +1901,28 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = Metadata::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = generate_metadata(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = Metadata::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = generate_metadata(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1491,10 +1940,24 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let body = crate::types::Metadata::default();
-        let body = Some(body);
-        update_metadata(&ctx, p0, body).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let body = crate::types::Metadata::default();
+            let body = Some(body);
+            let result = update_metadata(&ctx, p0, body).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -1512,8 +1975,22 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        stream_compact(&ctx, p0).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let result = stream_compact(&ctx, p0).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -1531,13 +2008,30 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::GenericId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = History::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = table_row_history(&ctx, p0, p1).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 =
+                crate::types::GenericId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = History::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = table_row_history(&ctx, p0, p1).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1555,12 +2049,28 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = History::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = table_history(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = History::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = table_history(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1578,13 +2088,30 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::GenericId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = ObjectId::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = get_table_attachments_directory(&ctx, p0, p1).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 =
+                crate::types::GenericId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = ObjectId::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_table_attachments_directory(&ctx, p0, p1).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1602,15 +2129,30 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::GenericId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = ObjectId::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = get_or_create_table_attachments_directory(&ctx, p0, p1)
-            .await
-            .unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 =
+                crate::types::GenericId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = ObjectId::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_or_create_table_attachments_directory(&ctx, p0, p1).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1628,12 +2170,27 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let body = crate::types::NewTable::default();
-        let expected = ObjectId::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = create_table(&ctx, body).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let body = crate::types::NewTable::default();
+            let expected = ObjectId::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = create_table(&ctx, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1651,10 +2208,25 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let body = crate::types::Query::default();
-        let (expected, expected_bytes) = crate::make_test_batches();
-        ctx.set_response(expected_bytes);
-        let result = query_arrow(&ctx, body).await.unwrap();
+
+        for i in 0..5 {
+            let body = crate::types::Query::default();
+            let (expected, expected_bytes) = crate::make_test_batches();
+            ctx.set_response(expected_bytes.clone());
+            let result = query_arrow(&ctx, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1672,12 +2244,27 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let body = crate::types::Query::default();
-        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-        let expected_bytes = expected.clone();
-        ctx.set_response(expected_bytes);
-        let result = query_parquet(&ctx, body).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let body = crate::types::Query::default();
+            let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            let expected_bytes = expected.clone();
+            ctx.set_response(expected_bytes.clone());
+            let result = query_parquet(&ctx, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1695,12 +2282,27 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let body = crate::types::Query::default();
-        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-        let expected_bytes = expected.clone();
-        ctx.set_response(expected_bytes);
-        let result = query_csv(&ctx, body).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let body = crate::types::Query::default();
+            let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            let expected_bytes = expected.clone();
+            ctx.set_response(expected_bytes.clone());
+            let result = query_csv(&ctx, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1718,12 +2320,27 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let body = crate::types::Query::default();
-        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-        let expected_bytes = expected.clone();
-        ctx.set_response(expected_bytes);
-        let result = query_xlsx(&ctx, body).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let body = crate::types::Query::default();
+            let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            let expected_bytes = expected.clone();
+            ctx.set_response(expected_bytes.clone());
+            let result = query_xlsx(&ctx, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1741,12 +2358,27 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let body = crate::types::Query::default();
-        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-        let expected_bytes = expected.clone();
-        ctx.set_response(expected_bytes);
-        let result = query_json(&ctx, body).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let body = crate::types::Query::default();
+            let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            let expected_bytes = expected.clone();
+            ctx.set_response(expected_bytes.clone());
+            let result = query_json(&ctx, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1764,12 +2396,27 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let body = crate::types::Query::default();
-        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-        let expected_bytes = expected.clone();
-        ctx.set_response(expected_bytes);
-        let result = query_text(&ctx, body).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let body = crate::types::Query::default();
+            let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            let expected_bytes = expected.clone();
+            ctx.set_response(expected_bytes.clone());
+            let result = query_text(&ctx, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -1787,11 +2434,26 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let body = crate::types::Query::default();
-        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-        let expected_bytes = expected.clone();
-        ctx.set_response(expected_bytes);
-        let result = query_html(&ctx, body).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let body = crate::types::Query::default();
+            let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            let expected_bytes = expected.clone();
+            ctx.set_response(expected_bytes.clone());
+            let result = query_html(&ctx, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 }

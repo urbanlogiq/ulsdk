@@ -67,6 +67,7 @@ from .data import (
     DirectionTy,
     NamedParameter,
     NamedParameterFlags,
+    OutputSchema,
     RoadUserTy,
     Source,
     StatisticTy,
@@ -158,6 +159,7 @@ from .generated.NamedParameter import NamedParameter as FbsNamedParameter
 from .generated.Node import Node as FbsNode
 from .generated.Null import Null as FbsNull
 from .generated.ObjectId import ObjectId as FbsObjectId
+from .generated.OutputSchema import OutputSchema as FbsOutputSchema
 from .generated.ParamIndices import ParamIndices as FbsParamIndices
 from .generated.Point2D import Point2D as FbsPoint2D
 from .generated.RunEndEncoded import RunEndEncoded as FbsRunEndEncoded
@@ -538,7 +540,7 @@ class Edge:
 
     @classmethod
     def from_fbs(cls, o: FbsEdge) -> Self:
-        from_ = o.From_()
+        from_ = o.From()
         to = o.To()
         return cls(from_, to)
 
@@ -551,13 +553,13 @@ class Edge:
     def serialize_to(self, builder: Builder) -> int:
         from .generated.Edge import (
             Start,
-            AddFrom_,
+            AddFrom,
             AddTo,
             End,
         )
 
         Start(builder)
-        AddFrom_(builder, self.from_)
+        AddFrom(builder, self.from_)
         AddTo(builder, self.to)
         return End(builder)
 

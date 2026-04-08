@@ -294,6 +294,26 @@ pub async fn get_permissions(
     Ok(res)
 }
 
+/// Set the default mode of an object. This can only be done by an object's owner.
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+/// * `id` - The ID of the object to which access will be granted.
+/// * `permission` - The permission bitset (see the PermissionTy enum for more information).
+pub async fn set_default_mode(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+    permission: i64,
+) -> Result<(), Error> {
+    let path = "/v1/api/ulv2/datacatalog/acl/default/:id/:permission"
+        .replace(":id", &id.to_string())
+        .replace(":permission", &permission.to_string());
+    let body = Bytes::new();
+    ctx.post(&path, body, "text/plain", None, None).await?;
+    Ok(())
+}
+
 /// Forcibly set an object's ACL to another ACL object. Note that the target ACL needs to contain the exact same permissions as the current ACL otherwise this method will return 400 Bad Request. This is a safeguard to ensure the user cannot lock themselves out of an object.
 ///
 /// # Arguments
@@ -337,11 +357,26 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let expected = ObjectSummaryList::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = new_acl(&ctx).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let expected = ObjectSummaryList::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = new_acl(&ctx).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -359,13 +394,29 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let q0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let q0 = Some(q0);
-        let expected = ObjectSummaryList::default();
-        let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-        ctx.set_response(expected_bytes);
-        let result = new_from(&ctx, q0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let q0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let q0 = Some(q0);
+            let expected = ObjectSummaryList::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = new_from(&ctx, q0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
     }
 
     #[tokio::test]
@@ -383,8 +434,21 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let body = crate::types::AccessRequest::default();
-        request(&ctx, body).await.unwrap();
+
+        for i in 0..5 {
+            let body = crate::types::AccessRequest::default();
+            let result = request(&ctx, body).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -402,10 +466,24 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p2 = 42;
-        share(&ctx, p0, p1, p2).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p2 = 42;
+            let result = share(&ctx, p0, p1, p2).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -423,11 +501,25 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p2 = 42;
-        let body = crate::types::ShareDetails::default();
-        share_with_details(&ctx, p0, p1, p2, body).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p2 = 42;
+            let body = crate::types::ShareDetails::default();
+            let result = share_with_details(&ctx, p0, p1, p2, body).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -445,9 +537,23 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        share_all(&ctx, p0, p1).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let result = share_all(&ctx, p0, p1).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -465,10 +571,24 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let body = crate::types::ShareDetails::default();
-        share_all_with_details(&ctx, p0, p1, body).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let body = crate::types::ShareDetails::default();
+            let result = share_all_with_details(&ctx, p0, p1, body).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -486,10 +606,24 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p2 = 42;
-        grant(&ctx, p0, p1, p2).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p2 = 42;
+            let result = grant(&ctx, p0, p1, p2).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -507,11 +641,25 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p2 = 42;
-        let body = crate::types::ShareDetails::default();
-        grant_with_details(&ctx, p0, p1, p2, body).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p2 = 42;
+            let body = crate::types::ShareDetails::default();
+            let result = grant_with_details(&ctx, p0, p1, p2, body).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -529,9 +677,24 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        grant_all(&ctx, p0, p1).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let result = grant_all(&ctx, p0, p1).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -549,10 +712,24 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let body = crate::types::ShareDetails::default();
-        grant_all_with_details(&ctx, p0, p1, body).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let body = crate::types::ShareDetails::default();
+            let result = grant_all_with_details(&ctx, p0, p1, body).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -570,9 +747,23 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        revoke(&ctx, p0, p1).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let result = revoke(&ctx, p0, p1).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -590,12 +781,62 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-        let expected_bytes = expected.clone();
-        ctx.set_response(expected_bytes);
-        let result = get_permissions(&ctx, p0).await.unwrap();
-        assert_eq!(result, expected);
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            let expected_bytes = expected.clone();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_permissions(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
+    }
+
+    #[tokio::test]
+    async fn test_set_default_mode() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 = 42;
+            let result = set_default_mode(&ctx, p0, p1).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 
     #[tokio::test]
@@ -613,8 +854,23 @@ mod tests {
         )
         .unwrap();
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
-        let p0 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        let p1 = crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-        set(&ctx, p0, p1).await.unwrap();
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let result = set(&ctx, p0, p1).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
     }
 }

@@ -1,0 +1,20 @@
+export declare enum FieldUnit {
+    U_INVALID = 0,
+    U_METRES = 1,
+    U_DEGREES_CELSIUS = 2,
+    U_KILOGRAMS = 3,
+    U_SECONDS = 4,
+    U_DOLLARS_CAD = 5,
+    U_DOLLARS_USD = 6,
+    /**
+     * Degrees longitude / latitude
+     */
+    U_DEGREES = 7,
+    U_KPH = 8,
+    U_MPH = 9,
+    U_PERCENTAGE = 10,
+    U_ACRES = 11,
+    U_SQUARE_FEET = 12,
+    U_MILES = 13
+}
+//# sourceMappingURL=field-unit.d.ts.map

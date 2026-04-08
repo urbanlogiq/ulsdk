@@ -31,6 +31,10 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Geometry &o) {
         const std::shared_ptr<MultiPolygon> &v = std::get<std::shared_ptr<MultiPolygon>>(o);
         const auto offset = serialize_to(builder, *v);
         return std::make_pair(offset.Union(), ::Geometry::MultiPolygon);
+    } else if (std::holds_alternative<std::shared_ptr<MultiPoint>>(o)) {
+        const std::shared_ptr<MultiPoint> &v = std::get<std::shared_ptr<MultiPoint>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::Geometry::MultiPoint);
     } else { 
         throw std::runtime_error("unreachable");
     }
@@ -293,6 +297,59 @@ MultiPolygon::operator==(const MultiPolygon &rhs) const {
     return true;
 }
 
+::flatbuffers::Offset<::MultiPoint>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const MultiPoint &o) {
+    std::vector<::flatbuffers::Offset<::Point>> point_geo_offsets = std::vector<::flatbuffers::Offset<::Point>>();
+    point_geo_offsets.reserve(o.point_geo_.size());
+    for (const auto &i: o.point_geo_) {
+        point_geo_offsets.push_back(serialize_to(builder, i));
+    }
+    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::Point>>> point_geo_offset = builder.CreateVector(point_geo_offsets);
+
+    ::MultiPointBuilder instance_builder = ::MultiPointBuilder(builder);
+    instance_builder.add_point_geo(point_geo_offset);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const MultiPoint &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+MultiPoint::MultiPoint()
+    : point_geo_() {
+}
+
+MultiPoint::MultiPoint(const std::vector<uint8_t> &bytes)
+    : MultiPoint(::flatbuffers::GetSizePrefixedRoot<::MultiPoint>(bytes.data())) {
+}
+
+MultiPoint::MultiPoint(const ::MultiPoint *root) 
+    : point_geo_() {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    const auto &point_geo_vector = root->point_geo();
+    if (point_geo_vector != nullptr) {
+        point_geo_.reserve(point_geo_vector->size());
+        for (const auto &i: *point_geo_vector) {
+            point_geo_.emplace_back(i);
+        }
+    }
+}
+
+bool
+MultiPoint::operator==(const MultiPoint &rhs) const {
+    if (this->point_geo_ != rhs.point_geo_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::GraphEdge>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const GraphEdge &o) {
 
@@ -470,6 +527,12 @@ GraphNode::GraphNode(const ::GraphNode *root)
             case ::Geometry::MultiPolygon: {
                 const auto _geom__local = static_cast<const ::MultiPolygon *>(root->_geom());
                 std::shared_ptr<MultiPolygon> _geom__shared = std::make_shared<MultiPolygon>(_geom__local);
+                _geom_ = _geom__shared;
+                break;
+            }
+            case ::Geometry::MultiPoint: {
+                const auto _geom__local = static_cast<const ::MultiPoint *>(root->_geom());
+                std::shared_ptr<MultiPoint> _geom__shared = std::make_shared<MultiPoint>(_geom__local);
                 _geom_ = _geom__shared;
                 break;
             }

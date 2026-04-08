@@ -13,6 +13,14 @@ public final class OrderBy {
         this._field = value;
     }
 
+    boolean _nullsFirst;
+    public boolean getNullsFirst() {
+        return this._nullsFirst;
+    }
+    public void setNullsFirst(boolean value) {
+        this._nullsFirst = value;
+    }
+
     long _sort;
     public long getSort() {
         return this._sort;
@@ -31,6 +39,7 @@ public final class OrderBy {
 
     public OrderBy(com.urbanlogiq.ulsdk.types.generated.OrderBy o) {
         this._field = o.field();
+        this._nullsFirst = o.nullsFirst();
         this._sort = o.sort();
         this._transform = o.transform();
     }
@@ -43,6 +52,7 @@ public final class OrderBy {
         int fieldOffset = builder.createString(this._field);
         com.urbanlogiq.ulsdk.types.generated.OrderBy.startOrderBy(builder);
         com.urbanlogiq.ulsdk.types.generated.OrderBy.addField(builder, fieldOffset);
+        com.urbanlogiq.ulsdk.types.generated.OrderBy.addNullsFirst(builder, this._nullsFirst);
         com.urbanlogiq.ulsdk.types.generated.OrderBy.addSort(builder, this._sort);
         com.urbanlogiq.ulsdk.types.generated.OrderBy.addTransform(builder, this._transform);
         return com.urbanlogiq.ulsdk.types.generated.OrderBy.endOrderBy(builder);

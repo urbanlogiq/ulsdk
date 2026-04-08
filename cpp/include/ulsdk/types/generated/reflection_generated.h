@@ -8,9 +8,9 @@
 
 // Ensure the included flatbuffers.h is the same version as when this file was
 // generated, otherwise it may not be compatible.
-static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
-              FLATBUFFERS_VERSION_MINOR == 5 &&
-              FLATBUFFERS_VERSION_REVISION == 26,
+static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
+              FLATBUFFERS_VERSION_MINOR == 2 &&
+              FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
 namespace reflection {
@@ -286,6 +286,12 @@ struct KeyValue FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   int KeyCompareWithValue(const char *_key) const {
     return strcmp(key()->c_str(), _key);
   }
+  template<typename StringType>
+  int KeyCompareWithValue(const StringType& _key) const {
+    if (key()->c_str() < _key) return -1;
+    if (_key < key()->c_str()) return 1;
+    return 0;
+  }
   const ::flatbuffers::String *value() const {
     return GetPointer<const ::flatbuffers::String *>(VT_VALUE);
   }
@@ -488,6 +494,12 @@ struct Enum FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   int KeyCompareWithValue(const char *_name) const {
     return strcmp(name()->c_str(), _name);
   }
+  template<typename StringType>
+  int KeyCompareWithValue(const StringType& _name) const {
+    if (name()->c_str() < _name) return -1;
+    if (_name < name()->c_str()) return 1;
+    return 0;
+  }
   const ::flatbuffers::Vector<::flatbuffers::Offset<reflection::EnumVal>> *values() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<reflection::EnumVal>> *>(VT_VALUES);
   }
@@ -645,6 +657,12 @@ struct Field FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   int KeyCompareWithValue(const char *_name) const {
     return strcmp(name()->c_str(), _name);
+  }
+  template<typename StringType>
+  int KeyCompareWithValue(const StringType& _name) const {
+    if (name()->c_str() < _name) return -1;
+    if (_name < name()->c_str()) return 1;
+    return 0;
   }
   const reflection::Type *type() const {
     return GetPointer<const reflection::Type *>(VT_TYPE);
@@ -870,6 +888,12 @@ struct Object FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   int KeyCompareWithValue(const char *_name) const {
     return strcmp(name()->c_str(), _name);
   }
+  template<typename StringType>
+  int KeyCompareWithValue(const StringType& _name) const {
+    if (name()->c_str() < _name) return -1;
+    if (_name < name()->c_str()) return 1;
+    return 0;
+  }
   const ::flatbuffers::Vector<::flatbuffers::Offset<reflection::Field>> *fields() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<reflection::Field>> *>(VT_FIELDS);
   }
@@ -1028,6 +1052,12 @@ struct RPCCall FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   int KeyCompareWithValue(const char *_name) const {
     return strcmp(name()->c_str(), _name);
   }
+  template<typename StringType>
+  int KeyCompareWithValue(const StringType& _name) const {
+    if (name()->c_str() < _name) return -1;
+    if (_name < name()->c_str()) return 1;
+    return 0;
+  }
   const reflection::Object *request() const {
     return GetPointer<const reflection::Object *>(VT_REQUEST);
   }
@@ -1149,6 +1179,12 @@ struct Service FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   int KeyCompareWithValue(const char *_name) const {
     return strcmp(name()->c_str(), _name);
+  }
+  template<typename StringType>
+  int KeyCompareWithValue(const StringType& _name) const {
+    if (name()->c_str() < _name) return -1;
+    if (_name < name()->c_str()) return 1;
+    return 0;
   }
   const ::flatbuffers::Vector<::flatbuffers::Offset<reflection::RPCCall>> *calls() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<reflection::RPCCall>> *>(VT_CALLS);
@@ -1274,6 +1310,12 @@ struct SchemaFile FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   int KeyCompareWithValue(const char *_filename) const {
     return strcmp(filename()->c_str(), _filename);
+  }
+  template<typename StringType>
+  int KeyCompareWithValue(const StringType& _filename) const {
+    if (filename()->c_str() < _filename) return -1;
+    if (_filename < filename()->c_str()) return 1;
+    return 0;
   }
   /// Names of included files, relative to project root.
   const ::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>> *included_filenames() const {

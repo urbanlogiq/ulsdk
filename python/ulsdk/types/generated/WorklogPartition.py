@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class WorklogPartition(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = WorklogPartition()
         x.Init(buf, n + offset)
@@ -22,7 +21,7 @@ class WorklogPartition(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # WorklogPartition
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # WorklogPartition
@@ -32,20 +31,20 @@ class WorklogPartition(object):
             return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
         return 0
 
-def WorklogPartitionStart(builder: flatbuffers.Builder):
+def WorklogPartitionStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     WorklogPartitionStart(builder)
 
-def WorklogPartitionAddIdx(builder: flatbuffers.Builder, idx: int):
+def WorklogPartitionAddIdx(builder, idx):
     builder.PrependUint32Slot(0, idx, 0)
 
-def AddIdx(builder: flatbuffers.Builder, idx: int):
+def AddIdx(builder, idx):
     WorklogPartitionAddIdx(builder, idx)
 
-def WorklogPartitionEnd(builder: flatbuffers.Builder) -> int:
+def WorklogPartitionEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return WorklogPartitionEnd(builder)

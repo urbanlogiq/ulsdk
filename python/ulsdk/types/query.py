@@ -14,6 +14,49 @@ if sys.version_info.minor < 11:
 else:
     from typing import Self
 import uuid
+from .Schema import (
+    Binary,
+    BinaryView,
+    Bool,
+    Buffer,
+    Date,
+    DateUnit,
+    Decimal,
+    DictionaryEncoding,
+    DictionaryKind,
+    Duration,
+    Endianness,
+    Feature,
+    Field,
+    FixedSizeBinary,
+    FixedSizeList,
+    FloatingPoint,
+    Int,
+    Interval,
+    IntervalUnit,
+    KeyValue,
+    LargeBinary,
+    LargeList,
+    LargeListView,
+    LargeUtf8,
+    List_,
+    ListView,
+    Map,
+    MetadataVersion,
+    Null,
+    Precision,
+    RunEndEncoded,
+    Schema,
+    Struct_,
+    Time,
+    TimeUnit,
+    Timestamp,
+    Type,
+    Union_,
+    UnionMode,
+    Utf8,
+    Utf8View,
+)
 from .api import SortOrder
 from .entity import (
     EdgeTy,
@@ -23,6 +66,7 @@ from .entity import (
     GraphNode,
     Line,
     MultiLine,
+    MultiPoint,
     MultiPolygon,
     NodeTy,
     Point,
@@ -89,25 +133,42 @@ from .value import (
     ValueInstance,
     ValueTy,
 )
+from .generated.AddCol import AddCol as FbsAddCol
+from .generated.AggregateFilter import AggregateFilter as FbsAggregateFilter
 from .generated.AllColumns import AllColumns as FbsAllColumns
+from .generated.AlterTableElement import AlterTableElement as FbsAlterTableElement
+from .generated.AlterTableOperation import AlterTableOperation as FbsAlterTableOperation
 from .generated.Arrow import Arrow as FbsArrow
 from .generated.B2cId import B2cId as FbsB2cId
+from .generated.Binary import Binary as FbsBinary
 from .generated.BinaryQueryElement import BinaryQueryElement as FbsBinaryQueryElement
+from .generated.BinaryView import BinaryView as FbsBinaryView
+from .generated.Bool import Bool as FbsBool
+from .generated.Buffer import Buffer as FbsBuffer
 from .generated.Case import Case as FbsCase
 from .generated.Column import Column as FbsColumn
 from .generated.ColumnGroupId import ColumnGroupId as FbsColumnGroupId
 from .generated.ContentId import ContentId as FbsContentId
 from .generated.DataCatalog import DataCatalog as FbsDataCatalog
 from .generated.DataStateId import DataStateId as FbsDataStateId
+from .generated.Date import Date as FbsDate
+from .generated.Decimal import Decimal as FbsDecimal
 from .generated.DeleteQueryElement import DeleteQueryElement as FbsDeleteQueryElement
+from .generated.DictionaryEncoding import DictionaryEncoding as FbsDictionaryEncoding
 from .generated.Distinct import Distinct as FbsDistinct
 from .generated.DoNothing import DoNothing as FbsDoNothing
 from .generated.DoUpdate import DoUpdate as FbsDoUpdate
 from .generated.Drive import Drive as FbsDrive
+from .generated.DropCol import DropCol as FbsDropCol
+from .generated.Duration import Duration as FbsDuration
 from .generated.EdgeList import EdgeList as FbsEdgeList
 from .generated.EdgeQuery import EdgeQuery as FbsEdgeQuery
 from .generated.Explain import Explain as FbsExplain
 from .generated.Expr import Expr as FbsExpr
+from .generated.Field import Field as FbsField
+from .generated.FixedSizeBinary import FixedSizeBinary as FbsFixedSizeBinary
+from .generated.FixedSizeList import FixedSizeList as FbsFixedSizeList
+from .generated.FloatingPoint import FloatingPoint as FbsFloatingPoint
 from .generated.Function import Function as FbsFunction
 from .generated.GenericId import GenericId as FbsGenericId
 from .generated.Geom import Geom as FbsGeom
@@ -118,14 +179,26 @@ from .generated.GraphNodeId import GraphNodeId as FbsGraphNodeId
 from .generated.GraphQuery import GraphQuery as FbsGraphQuery
 from .generated.InsertConflicting import InsertConflicting as FbsInsertConflicting
 from .generated.InsertQueryElement import InsertQueryElement as FbsInsertQueryElement
+from .generated.Int import Int as FbsInt
+from .generated.Interval import Interval as FbsInterval
 from .generated.Join import Join as FbsJoin
+from .generated.KeyValue import KeyValue as FbsKeyValue
+from .generated.LargeBinary import LargeBinary as FbsLargeBinary
+from .generated.LargeList import LargeList as FbsLargeList
+from .generated.LargeListView import LargeListView as FbsLargeListView
+from .generated.LargeUtf8 import LargeUtf8 as FbsLargeUtf8
 from .generated.Line import Line as FbsLine
+from .generated.List import List as FbsList
+from .generated.ListView import ListView as FbsListView
+from .generated.Map import Map as FbsMap
 from .generated.MultiLine import MultiLine as FbsMultiLine
+from .generated.MultiPoint import MultiPoint as FbsMultiPoint
 from .generated.MultiPolygon import MultiPolygon as FbsMultiPolygon
 from .generated.MvdbPartition import MvdbPartition as FbsMvdbPartition
 from .generated.NodeIdPair import NodeIdPair as FbsNodeIdPair
 from .generated.NodeList import NodeList as FbsNodeList
 from .generated.NodeQuery import NodeQuery as FbsNodeQuery
+from .generated.Null import Null as FbsNull
 from .generated.NullableUint import NullableUint as FbsNullableUint
 from .generated.ObjectId import ObjectId as FbsObjectId
 from .generated.OnConflict import OnConflict as FbsOnConflict
@@ -141,15 +214,23 @@ from .generated.Query import Query as FbsQuery
 from .generated.QueryElement import QueryElement as FbsQueryElement
 from .generated.QueryPathElement import QueryPathElement as FbsQueryPathElement
 from .generated.QueryTableSource import QueryTableSource as FbsQueryTableSource
+from .generated.RunEndEncoded import RunEndEncoded as FbsRunEndEncoded
+from .generated.Schema import Schema as FbsSchema
 from .generated.SetExpr import SetExpr as FbsSetExpr
 from .generated.StreamId import StreamId as FbsStreamId
+from .generated.Struct_ import Struct_ as FbsStruct_
 from .generated.TableOrderBy import TableOrderBy as FbsTableOrderBy
 from .generated.TableSource import TableSource as FbsTableSource
 from .generated.TableSourceInstance import TableSourceInstance as FbsTableSourceInstance
+from .generated.Time import Time as FbsTime
+from .generated.Timestamp import Timestamp as FbsTimestamp
 from .generated.Tri2D import Tri2D as FbsTri2D
 from .generated.UnaryQueryElement import UnaryQueryElement as FbsUnaryQueryElement
+from .generated.Union import Union as FbsUnion
 from .generated.UnsetArgument import UnsetArgument as FbsUnsetArgument
 from .generated.UpdateQueryElement import UpdateQueryElement as FbsUpdateQueryElement
+from .generated.Utf8 import Utf8 as FbsUtf8
+from .generated.Utf8View import Utf8View as FbsUtf8View
 from .generated.VArray import VArray as FbsVArray
 from .generated.VBool import VBool as FbsVBool
 from .generated.VBytes import VBytes as FbsVBytes
@@ -185,6 +266,7 @@ from .generated.Vector import Vector as FbsVector
 from .generated.When import When as FbsWhen
 from .generated.Window import Window as FbsWindow
 from .generated.WorklogPartition import WorklogPartition as FbsWorklogPartition
+from .generated.AlterTableOperationUnion import AlterTableOperationUnion as FbsAlterTableOperationUnion
 from .generated.ConflictAction import ConflictAction as FbsConflictAction
 from .generated.ExprUnion import ExprUnion as FbsExprUnion
 from .generated.Geometry import Geometry as FbsGeometry
@@ -192,6 +274,7 @@ from .generated.QueryElementUnion import QueryElementUnion as FbsQueryElementUni
 from .generated.QueryPathElementUnion import QueryPathElementUnion as FbsQueryPathElementUnion
 from .generated.TablePartition import TablePartition as FbsTablePartition
 from .generated.TableSourceUnion import TableSourceUnion as FbsTableSourceUnion
+from .generated.Type import Type as FbsType
 from .generated.Value import Value as FbsValue
 
 class ExplainFormat(Enum):
@@ -211,6 +294,7 @@ class QueryElementOp(Enum):
     Union_ = 0
     Intersect = 1
     Except = 2
+    Minus = 3
 
 class TypeHint(Enum):
     None_ = 0
@@ -219,6 +303,156 @@ class TypeHint(Enum):
     Base64 = 3
     Uuid = 4
 
+
+@dataclass
+class AddCol:
+    default: Optional["ValueInstance"]
+
+    field: "Field"
+
+    @classmethod
+    def from_fbs(cls, o: FbsAddCol) -> Self:
+        default = None
+        default_obj = o.Default()
+        if default_obj is not None:
+            default = ValueInstance.from_fbs(default_obj)
+        field_obj = o.Field()
+        if field_obj is not None:
+            field = Field.from_fbs(field_obj)
+        else:
+            raise ValueError("Field is required")
+        return cls(default, field)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsAddCol.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.AddCol import (
+            Start,
+            AddDefault,
+            AddField,
+            End,
+        )
+        default_offset = None
+        if self.default is not None:
+            default_offset = self.default.serialize_to(builder)
+        field_offset = self.field.serialize_to(builder)
+
+        Start(builder)
+        if default_offset is not None:
+            AddDefault(builder, default_offset)
+        AddField(builder, field_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        default = ValueInstance.make_default()
+        field = Field.make_default()
+        return cls(default, field)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.default == other.default
+        eq = eq and self.field == other.field
+
+        return eq
+
+@dataclass
+class DropCol:
+    col: "str"
+
+    @classmethod
+    def from_fbs(cls, o: FbsDropCol) -> Self:
+        col_str = o.Col()
+        assert col_str is not None
+        col = col_str.decode('utf-8')
+        return cls(col)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsDropCol.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.DropCol import (
+            Start,
+            AddCol,
+            End,
+        )
+        col_offset = builder.CreateString(self.col)
+
+        Start(builder)
+        AddCol(builder, col_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        col = ""
+        return cls(col)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.col == other.col
+
+        return eq
+
+@dataclass
+class AlterTableOperationUnion:
+    value: Union[
+        "AddCol",
+        "DropCol",
+    ]
+
+    def serialize_to(self, builder: Builder) -> Tuple[int, int]:
+        from .generated.AlterTableOperationUnion import AlterTableOperationUnion
+        offset = self.value.serialize_to(builder)
+        if isinstance(self.value, AddCol):
+            return (offset, AlterTableOperationUnion().AddCol)
+        elif isinstance(self.value, DropCol):
+            return (offset, AlterTableOperationUnion().DropCol)
+        raise ValueError("Invalid union type")
+
+    @classmethod
+    def from_fbs(cls, o: Optional[Table], ty: int) -> Self:
+        assert o is not None
+        source = o.Bytes
+        pos = o.Pos
+        AlterTableOperationUnion_ty_instance = FbsAlterTableOperationUnion()
+        if ty == AlterTableOperationUnion_ty_instance.AddCol:
+            val = FbsAddCol();
+            val.Init(source, pos)
+            return cls(AddCol.from_fbs(val))
+        elif ty == AlterTableOperationUnion_ty_instance.DropCol:
+            val = FbsDropCol();
+            val.Init(source, pos)
+            return cls(DropCol.from_fbs(val))
+        else:
+            raise ValueError("Invalid union type")
+
+    @classmethod
+    def make_default(cls) -> Self:
+        return cls(AddCol.make_default())
+
+    def __eq__(self, other) -> bool:
+        if type(self.value) is not type(other.value):
+            return False
+        return self.value == other.value
 
 @dataclass
 class InsertConflicting:
@@ -745,7 +979,7 @@ class Case:
     @classmethod
     def from_fbs(cls, o: FbsCase) -> Self:
         else_ = None
-        else__obj = o.Else_()
+        else__obj = o.Else()
         if else__obj is not None:
             else_ = Expr.from_fbs(else__obj)
         when = list()
@@ -767,7 +1001,7 @@ class Case:
     def serialize_to(self, builder: Builder) -> int:
         from .generated.Case import (
             Start,
-            AddElse_,
+            AddElse,
             AddWhen,
             StartWhenVector,
             End,
@@ -785,7 +1019,7 @@ class Case:
 
         Start(builder)
         if else__offset is not None:
-            AddElse_(builder, else__offset)
+            AddElse(builder, else__offset)
         AddWhen(builder, when_offset)
         return End(builder)
 
@@ -1121,6 +1355,66 @@ class ValueName:
         return eq
 
 @dataclass
+class AggregateFilter:
+    condition: "Expr"
+
+    fun: "Function"
+
+    @classmethod
+    def from_fbs(cls, o: FbsAggregateFilter) -> Self:
+        condition_obj = o.Condition()
+        if condition_obj is not None:
+            condition = Expr.from_fbs(condition_obj)
+        else:
+            raise ValueError("Condition is required")
+        fun_obj = o.Fun()
+        if fun_obj is not None:
+            fun = Function.from_fbs(fun_obj)
+        else:
+            raise ValueError("Fun is required")
+        return cls(condition, fun)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsAggregateFilter.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.AggregateFilter import (
+            Start,
+            AddCondition,
+            AddFun,
+            End,
+        )
+        condition_offset = self.condition.serialize_to(builder)
+        fun_offset = self.fun.serialize_to(builder)
+
+        Start(builder)
+        AddCondition(builder, condition_offset)
+        AddFun(builder, fun_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        condition = Expr.make_default()
+        fun = Function.make_default()
+        return cls(condition, fun)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.condition == other.condition
+        eq = eq and self.fun == other.fun
+
+        return eq
+
+@dataclass
 class ExprUnion:
     value: Union[
         "ValueIndex",
@@ -1133,6 +1427,7 @@ class ExprUnion:
         "UnsetArgument",
         "Window",
         "ValueName",
+        "AggregateFilter",
     ]
 
     def serialize_to(self, builder: Builder) -> Tuple[int, int]:
@@ -1158,6 +1453,8 @@ class ExprUnion:
             return (offset, ExprUnion().Window)
         elif isinstance(self.value, ValueName):
             return (offset, ExprUnion().ValueName)
+        elif isinstance(self.value, AggregateFilter):
+            return (offset, ExprUnion().AggregateFilter)
         raise ValueError("Invalid union type")
 
     @classmethod
@@ -1206,6 +1503,10 @@ class ExprUnion:
             val = FbsValueName();
             val.Init(source, pos)
             return cls(ValueName.from_fbs(val))
+        elif ty == ExprUnion_ty_instance.AggregateFilter:
+            val = FbsAggregateFilter();
+            val.Init(source, pos)
+            return cls(AggregateFilter.from_fbs(val))
         else:
             raise ValueError("Invalid union type")
 
@@ -1311,6 +1612,8 @@ class UnaryQueryElement:
 
     group_by: Optional["List[Expr]"]
 
+    having: Optional["Function"]
+
     joins: Optional["List[Join]"]
 
     limit: "int"
@@ -1345,6 +1648,10 @@ class UnaryQueryElement:
                 if group_by_obj is not None:
                     group_by_val = Expr.from_fbs(group_by_obj)
                 group_by.append(group_by_val)
+        having = None
+        having_obj = o.Having()
+        if having_obj is not None:
+            having = Function.from_fbs(having_obj)
         joins = list()
         if not o.JoinsIsNone():
             for i in range(o.JoinsLength()):
@@ -1370,7 +1677,7 @@ class UnaryQueryElement:
                 if sources_obj is not None:
                     sources_val = TableSource.from_fbs(sources_obj)
                 sources.append(sources_val)
-        return cls(distinct, fields, filter, group_by, joins, limit, order_by, sources)
+        return cls(distinct, fields, filter, group_by, having, joins, limit, order_by, sources)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -1387,6 +1694,7 @@ class UnaryQueryElement:
             AddFilter,
             AddGroupBy,
             StartGroupByVector,
+            AddHaving,
             AddJoins,
             StartJoinsVector,
             AddLimit,
@@ -1420,6 +1728,9 @@ class UnaryQueryElement:
             for i in reversed(range(len(self.group_by))):
                 builder.PrependUOffsetTRelative(group_by_offsets[i])
             group_by_offset = builder.EndVector()
+        having_offset = None
+        if self.having is not None:
+            having_offset = self.having.serialize_to(builder)
         joins_offset = None
         if self.joins is not None:
             joins_offsets = list()
@@ -1455,6 +1766,8 @@ class UnaryQueryElement:
             AddFilter(builder, filter_offset)
         if group_by_offset is not None:
             AddGroupBy(builder, group_by_offset)
+        if having_offset is not None:
+            AddHaving(builder, having_offset)
         if joins_offset is not None:
             AddJoins(builder, joins_offset)
         AddLimit(builder, self.limit)
@@ -1475,11 +1788,12 @@ class UnaryQueryElement:
         fields = []
         filter = Function.make_default()
         group_by = []
+        having = Function.make_default()
         joins = []
         limit = 0
         order_by = []
         sources = []
-        return cls(distinct, fields, filter, group_by, joins, limit, order_by, sources)
+        return cls(distinct, fields, filter, group_by, having, joins, limit, order_by, sources)
 
     def __eq__(self, other) -> bool:
         eq = True
@@ -1507,6 +1821,7 @@ class UnaryQueryElement:
             return False
         elif self_group_by is None and other_group_by is not None:
             return False
+        eq = eq and self.having == other.having
         self_joins = self.joins
         other_joins = other.joins
         if self_joins is not None and other_joins is not None:
@@ -1539,15 +1854,16 @@ class UnaryQueryElement:
 
 @dataclass
 class QueryElement:
-    q: Optional["QueryElementUnion"]
+    q: "QueryElementUnion"
 
     @classmethod
     def from_fbs(cls, o: FbsQueryElement) -> Self:
-        q = None
         q_val = o.Q()
         if q_val is not None:
             q_ty = o.QType()
             q = QueryElementUnion.from_fbs(q_val, q_ty)
+        else:
+            raise ValueError("Q is required")
         return cls(q)
 
     @classmethod
@@ -1563,14 +1879,11 @@ class QueryElement:
             AddQType,
             End,
         )
-        q_offset, q_ty = (None, None)
-        if self.q is not None:
-            q_offset, q_ty = self.q.serialize_to(builder)
+        q_offset, q_ty = self.q.serialize_to(builder)
 
         Start(builder)
-        if q_offset is not None and q_ty is not None:
-            AddQ(builder, q_offset)
-            AddQType(builder, q_ty)
+        AddQ(builder, q_offset)
+        AddQType(builder, q_ty)
         return End(builder)
 
     def to_bytes(self) -> bytes:
@@ -2521,6 +2834,14 @@ class TableSourceUnion:
 class UpdateQueryElement:
     filter: Optional["Function"]
 
+    # Additional table sources from a FROM clause (UPDATE ... FROM ... syntax).
+    # Source indexes: target table is implicitly at index 0, from_sources start at index 1.
+    from_sources: Optional["List[TableSource]"]
+
+    # Joins within the FROM clause. Indexes reference the combined source list
+    # (0 = target, 1+ = from_sources).
+    joins: Optional["List[Join]"]
+
     sets: "List[SetExpr]"
 
     source: "TableSourceUnion"
@@ -2531,6 +2852,22 @@ class UpdateQueryElement:
         filter_obj = o.Filter()
         if filter_obj is not None:
             filter = Function.from_fbs(filter_obj)
+        from_sources = list()
+        if not o.FromSourcesIsNone():
+            for i in range(o.FromSourcesLength()):
+                from_sources_val = None
+                from_sources_obj = o.FromSources(i)
+                if from_sources_obj is not None:
+                    from_sources_val = TableSource.from_fbs(from_sources_obj)
+                from_sources.append(from_sources_val)
+        joins = list()
+        if not o.JoinsIsNone():
+            for i in range(o.JoinsLength()):
+                joins_val = None
+                joins_obj = o.Joins(i)
+                if joins_obj is not None:
+                    joins_val = Join.from_fbs(joins_obj)
+                joins.append(joins_val)
         sets = list()
         if not o.SetsIsNone():
             for i in range(o.SetsLength()):
@@ -2545,7 +2882,7 @@ class UpdateQueryElement:
             source = TableSourceUnion.from_fbs(source_val, source_ty)
         else:
             raise ValueError("Source is required")
-        return cls(filter, sets, source)
+        return cls(filter, from_sources, joins, sets, source)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -2557,6 +2894,10 @@ class UpdateQueryElement:
         from .generated.UpdateQueryElement import (
             Start,
             AddFilter,
+            AddFromSources,
+            StartFromSourcesVector,
+            AddJoins,
+            StartJoinsVector,
             AddSets,
             StartSetsVector,
             AddSource,
@@ -2566,6 +2907,24 @@ class UpdateQueryElement:
         filter_offset = None
         if self.filter is not None:
             filter_offset = self.filter.serialize_to(builder)
+        from_sources_offset = None
+        if self.from_sources is not None:
+            from_sources_offsets = list()
+            for value in self.from_sources:
+                from_sources_offsets.append(value.serialize_to(builder))
+            StartFromSourcesVector(builder, len(self.from_sources))
+            for i in reversed(range(len(self.from_sources))):
+                builder.PrependUOffsetTRelative(from_sources_offsets[i])
+            from_sources_offset = builder.EndVector()
+        joins_offset = None
+        if self.joins is not None:
+            joins_offsets = list()
+            for value in self.joins:
+                joins_offsets.append(value.serialize_to(builder))
+            StartJoinsVector(builder, len(self.joins))
+            for i in reversed(range(len(self.joins))):
+                builder.PrependUOffsetTRelative(joins_offsets[i])
+            joins_offset = builder.EndVector()
         sets_offsets = list()
         for value in self.sets:
             sets_offsets.append(value.serialize_to(builder))
@@ -2578,6 +2937,10 @@ class UpdateQueryElement:
         Start(builder)
         if filter_offset is not None:
             AddFilter(builder, filter_offset)
+        if from_sources_offset is not None:
+            AddFromSources(builder, from_sources_offset)
+        if joins_offset is not None:
+            AddJoins(builder, joins_offset)
         AddSets(builder, sets_offset)
         AddSource(builder, source_offset)
         AddSourceType(builder, source_ty)
@@ -2592,13 +2955,37 @@ class UpdateQueryElement:
     @classmethod
     def make_default(cls) -> Self:
         filter = Function.make_default()
+        from_sources = []
+        joins = []
         sets = []
         source = TableSourceUnion.make_default()
-        return cls(filter, sets, source)
+        return cls(filter, from_sources, joins, sets, source)
 
     def __eq__(self, other) -> bool:
         eq = True
         eq = eq and self.filter == other.filter
+        self_from_sources = self.from_sources
+        other_from_sources = other.from_sources
+        if self_from_sources is not None and other_from_sources is not None:
+            if len(self_from_sources) != len(other_from_sources):
+                return False
+            for i in range(len(self_from_sources)):
+                eq = eq and self_from_sources[i] == other_from_sources[i]
+        elif self_from_sources is not None and other_from_sources is None:
+            return False
+        elif self_from_sources is None and other_from_sources is not None:
+            return False
+        self_joins = self.joins
+        other_joins = other.joins
+        if self_joins is not None and other_joins is not None:
+            if len(self_joins) != len(other_joins):
+                return False
+            for i in range(len(self_joins)):
+                eq = eq and self_joins[i] == other_joins[i]
+        elif self_joins is not None and other_joins is None:
+            return False
+        elif self_joins is None and other_joins is not None:
+            return False
         if len(self.sets) != len(other.sets):
             return False
         for i in range(len(self.sets)):
@@ -2876,6 +3263,79 @@ class InsertQueryElement:
         return eq
 
 @dataclass
+class AlterTableElement:
+    operations: "List[AlterTableOperation]"
+
+    target: "ObjectId"
+
+    @classmethod
+    def from_fbs(cls, o: FbsAlterTableElement) -> Self:
+        operations = list()
+        if not o.OperationsIsNone():
+            for i in range(o.OperationsLength()):
+                operations_val = None
+                operations_obj = o.Operations(i)
+                if operations_obj is not None:
+                    operations_val = AlterTableOperation.from_fbs(operations_obj)
+                operations.append(operations_val)
+        target_obj = o.Target()
+        if target_obj is not None:
+            target = ObjectId.from_fbs(target_obj)
+        else:
+            raise ValueError("Target is required")
+        return cls(operations, target)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsAlterTableElement.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.AlterTableElement import (
+            Start,
+            AddOperations,
+            StartOperationsVector,
+            AddTarget,
+            End,
+        )
+        operations_offsets = list()
+        for value in self.operations:
+            operations_offsets.append(value.serialize_to(builder))
+        StartOperationsVector(builder, len(self.operations))
+        for i in reversed(range(len(self.operations))):
+            builder.PrependUOffsetTRelative(operations_offsets[i])
+        operations_offset = builder.EndVector()
+        target_offset = self.target.serialize_to(builder)
+
+        Start(builder)
+        AddOperations(builder, operations_offset)
+        AddTarget(builder, target_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        operations = []
+        target = ObjectId.make_default()
+        return cls(operations, target)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        if len(self.operations) != len(other.operations):
+            return False
+        for i in range(len(self.operations)):
+            eq = eq and self.operations[i] == other.operations[i]
+        eq = eq and self.target == other.target
+
+        return eq
+
+@dataclass
 class QueryElementUnion:
     value: Union[
         "UnaryQueryElement",
@@ -2883,6 +3343,7 @@ class QueryElementUnion:
         "UpdateQueryElement",
         "DeleteQueryElement",
         "InsertQueryElement",
+        "AlterTableElement",
     ]
 
     def serialize_to(self, builder: Builder) -> Tuple[int, int]:
@@ -2898,6 +3359,8 @@ class QueryElementUnion:
             return (offset, QueryElementUnion().DeleteQueryElement)
         elif isinstance(self.value, InsertQueryElement):
             return (offset, QueryElementUnion().InsertQueryElement)
+        elif isinstance(self.value, AlterTableElement):
+            return (offset, QueryElementUnion().AlterTableElement)
         raise ValueError("Invalid union type")
 
     @classmethod
@@ -2926,6 +3389,10 @@ class QueryElementUnion:
             val = FbsInsertQueryElement();
             val.Init(source, pos)
             return cls(InsertQueryElement.from_fbs(val))
+        elif ty == QueryElementUnion_ty_instance.AlterTableElement:
+            val = FbsAlterTableElement();
+            val.Init(source, pos)
+            return cls(AlterTableElement.from_fbs(val))
         else:
             raise ValueError("Invalid union type")
 
@@ -2937,6 +3404,57 @@ class QueryElementUnion:
         if type(self.value) is not type(other.value):
             return False
         return self.value == other.value
+
+@dataclass
+class AlterTableOperation:
+    op: "AlterTableOperationUnion"
+
+    @classmethod
+    def from_fbs(cls, o: FbsAlterTableOperation) -> Self:
+        op_val = o.Op()
+        if op_val is not None:
+            op_ty = o.OpType()
+            op = AlterTableOperationUnion.from_fbs(op_val, op_ty)
+        else:
+            raise ValueError("Op is required")
+        return cls(op)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsAlterTableOperation.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.AlterTableOperation import (
+            Start,
+            AddOp,
+            AddOpType,
+            End,
+        )
+        op_offset, op_ty = self.op.serialize_to(builder)
+
+        Start(builder)
+        AddOp(builder, op_offset)
+        AddOpType(builder, op_ty)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        op = AlterTableOperationUnion.make_default()
+        return cls(op)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.op == other.op
+
+        return eq
 
 @dataclass
 class Join:
@@ -3028,9 +3546,8 @@ class SetExpr:
     """ SetExprs represent the expressions used as part of an UPDATE-type operation
     """
 
-    # Because we cannot refer to multiple tables at once in a single UPDATE
-    # operation we only need to name the column, we can just a string here
-    # instead of a Column table.
+    # The target column name. Since SET targets always refer to the target table,
+    # we only need to name the column as a string.
     col: "str"
 
     # This is the expression that is evaluted to produce the value that is

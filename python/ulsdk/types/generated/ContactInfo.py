@@ -4,15 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from typing import Optional
 np = import_numpy()
 
 class ContactInfo(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = ContactInfo()
         x.Init(buf, n + offset)
@@ -23,82 +21,82 @@ class ContactInfo(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # ContactInfo
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # ContactInfo
-    def Email(self) -> Optional[bytes]:
+    def Email(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # ContactInfo
-    def Url(self) -> Optional[bytes]:
+    def Url(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # ContactInfo
-    def Name(self) -> Optional[bytes]:
+    def Name(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # ContactInfo
-    def Phone(self) -> Optional[bytes]:
+    def Phone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # ContactInfo
-    def Address(self) -> Optional[bytes]:
+    def Address(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def ContactInfoStart(builder: flatbuffers.Builder):
+def ContactInfoStart(builder):
     builder.StartObject(5)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ContactInfoStart(builder)
 
-def ContactInfoAddEmail(builder: flatbuffers.Builder, email: int):
+def ContactInfoAddEmail(builder, email):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(email), 0)
 
-def AddEmail(builder: flatbuffers.Builder, email: int):
+def AddEmail(builder, email):
     ContactInfoAddEmail(builder, email)
 
-def ContactInfoAddUrl(builder: flatbuffers.Builder, url: int):
+def ContactInfoAddUrl(builder, url):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(url), 0)
 
-def AddUrl(builder: flatbuffers.Builder, url: int):
+def AddUrl(builder, url):
     ContactInfoAddUrl(builder, url)
 
-def ContactInfoAddName(builder: flatbuffers.Builder, name: int):
+def ContactInfoAddName(builder, name):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
 
-def AddName(builder: flatbuffers.Builder, name: int):
+def AddName(builder, name):
     ContactInfoAddName(builder, name)
 
-def ContactInfoAddPhone(builder: flatbuffers.Builder, phone: int):
+def ContactInfoAddPhone(builder, phone):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(phone), 0)
 
-def AddPhone(builder: flatbuffers.Builder, phone: int):
+def AddPhone(builder, phone):
     ContactInfoAddPhone(builder, phone)
 
-def ContactInfoAddAddress(builder: flatbuffers.Builder, address: int):
+def ContactInfoAddAddress(builder, address):
     builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(address), 0)
 
-def AddAddress(builder: flatbuffers.Builder, address: int):
+def AddAddress(builder, address):
     ContactInfoAddAddress(builder, address)
 
-def ContactInfoEnd(builder: flatbuffers.Builder) -> int:
+def ContactInfoEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ContactInfoEnd(builder)

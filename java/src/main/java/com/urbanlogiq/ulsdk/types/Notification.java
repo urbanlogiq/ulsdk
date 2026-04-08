@@ -54,19 +54,14 @@ public final class Notification {
     }
 
     public int serializeTo(com.google.flatbuffers.FlatBufferBuilder builder) {
-        com.urbanlogiq.ulsdk.Pair<Integer, Byte> notificationPair = null;
-        if (this._notification != null) {
-            notificationPair = this._notification.serializeTo(builder);
-        }
+        com.urbanlogiq.ulsdk.Pair<Integer, Byte> notificationPair = this._notification.serializeTo(builder);
         Integer senderOffset = null;
         if (this._sender != null) {
             senderOffset = this._sender.serializeTo(builder);
         }
         com.urbanlogiq.ulsdk.types.generated.Notification.startNotification(builder);
-        if (notificationPair != null) {
-            com.urbanlogiq.ulsdk.types.generated.Notification.addNotification(builder, notificationPair.first());
-            com.urbanlogiq.ulsdk.types.generated.Notification.addNotificationType(builder, notificationPair.second());
-        }
+        com.urbanlogiq.ulsdk.types.generated.Notification.addNotification(builder, notificationPair.first());
+        com.urbanlogiq.ulsdk.types.generated.Notification.addNotificationType(builder, notificationPair.second());
         if (senderOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.Notification.addSender(builder, senderOffset);
         }

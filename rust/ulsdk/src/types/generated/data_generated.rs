@@ -31,7 +31,7 @@ use self::flatbuffers::{EndianScalar, Follow};
 mod bitflags_named_parameter_flags {
     flatbuffers::bitflags::bitflags! {
       /// If no flags are set, this indicates the associated NamedParameter is required.
-      #[derive(Default)]
+      #[derive(Default, Debug, Clone, Copy, PartialEq)]
       pub struct NamedParameterFlags: u32 {
         /// This variant indicates the parameter is a Value type (see the TaskParameter definition)
         const Value = 1;
@@ -56,11 +56,7 @@ impl<'a> flatbuffers::Follow<'a> for NamedParameterFlags {
     #[inline]
     unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
         let b = flatbuffers::read_scalar_at::<u32>(buf, loc);
-        // Safety:
-        // This is safe because we know bitflags is implemented with a repr transparent uint of the correct size.
-        // from_bits_unchecked will be replaced by an equivalent but safe from_bits_retain in bitflags 2.0
-        // https://github.com/bitflags/bitflags/issues/262
-        Self::from_bits_unchecked(b)
+        Self::from_bits_retain(b)
     }
 }
 
@@ -82,11 +78,7 @@ impl flatbuffers::EndianScalar for NamedParameterFlags {
     #[allow(clippy::wrong_self_convention)]
     fn from_little_endian(v: u32) -> Self {
         let b = u32::from_le(v);
-        // Safety:
-        // This is safe because we know bitflags is implemented with a repr transparent uint of the correct size.
-        // from_bits_unchecked will be replaced by an equivalent but safe from_bits_retain in bitflags 2.0
-        // https://github.com/bitflags/bitflags/issues/262
-        unsafe { Self::from_bits_unchecked(b) }
+        Self::from_bits_retain(b)
     }
 }
 
@@ -382,13 +374,13 @@ pub const ENUM_MIN_ROAD_USER_TY: i32 = 0;
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
-pub const ENUM_MAX_ROAD_USER_TY: i32 = 34;
+pub const ENUM_MAX_ROAD_USER_TY: i32 = 44;
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_ROAD_USER_TY: [RoadUserTy; 35] = [
+pub const ENUM_VALUES_ROAD_USER_TY: [RoadUserTy; 45] = [
     RoadUserTy::BIKES,
     RoadUserTy::BUSES,
     RoadUserTy::CARS,
@@ -424,6 +416,16 @@ pub const ENUM_VALUES_ROAD_USER_TY: [RoadUserTy; 35] = [
     RoadUserTy::CROSSWALKS,
     RoadUserTy::TRAMS,
     RoadUserTy::TAXIS,
+    RoadUserTy::OTHER_TWO_AXLE_FOUR_TIRE_VEHICLES,
+    RoadUserTy::TWO_AXLE_SIX_TIRE_SINGLE_UNIT_TRUCKS,
+    RoadUserTy::THREE_AXLE_SINGLE_UNIT_TRUCKS,
+    RoadUserTy::FOUR_PLUS_AXLE_SINGLE_UNIT_TRUCKS,
+    RoadUserTy::FOUR_AXLE_OR_FEWER_SINGLE_TRAILER_TRUCKS,
+    RoadUserTy::FIVE_AXLE_TRACTOR_SEMITRAILERS,
+    RoadUserTy::SIX_PLUS_AXLE_SINGLE_TRAILER_TRUCKS,
+    RoadUserTy::MULTI_TRAILER_TRUCKS_SIX_AXLES,
+    RoadUserTy::MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES,
+    RoadUserTy::MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES,
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
@@ -466,9 +468,19 @@ impl RoadUserTy {
     pub const CROSSWALKS: Self = Self(32);
     pub const TRAMS: Self = Self(33);
     pub const TAXIS: Self = Self(34);
+    pub const OTHER_TWO_AXLE_FOUR_TIRE_VEHICLES: Self = Self(35);
+    pub const TWO_AXLE_SIX_TIRE_SINGLE_UNIT_TRUCKS: Self = Self(36);
+    pub const THREE_AXLE_SINGLE_UNIT_TRUCKS: Self = Self(37);
+    pub const FOUR_PLUS_AXLE_SINGLE_UNIT_TRUCKS: Self = Self(38);
+    pub const FOUR_AXLE_OR_FEWER_SINGLE_TRAILER_TRUCKS: Self = Self(39);
+    pub const FIVE_AXLE_TRACTOR_SEMITRAILERS: Self = Self(40);
+    pub const SIX_PLUS_AXLE_SINGLE_TRAILER_TRUCKS: Self = Self(41);
+    pub const MULTI_TRAILER_TRUCKS_SIX_AXLES: Self = Self(42);
+    pub const MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES: Self = Self(43);
+    pub const MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES: Self = Self(44);
 
     pub const ENUM_MIN: i32 = 0;
-    pub const ENUM_MAX: i32 = 34;
+    pub const ENUM_MAX: i32 = 44;
     pub const ENUM_VALUES: &'static [Self] = &[
         Self::BIKES,
         Self::BUSES,
@@ -505,6 +517,16 @@ impl RoadUserTy {
         Self::CROSSWALKS,
         Self::TRAMS,
         Self::TAXIS,
+        Self::OTHER_TWO_AXLE_FOUR_TIRE_VEHICLES,
+        Self::TWO_AXLE_SIX_TIRE_SINGLE_UNIT_TRUCKS,
+        Self::THREE_AXLE_SINGLE_UNIT_TRUCKS,
+        Self::FOUR_PLUS_AXLE_SINGLE_UNIT_TRUCKS,
+        Self::FOUR_AXLE_OR_FEWER_SINGLE_TRAILER_TRUCKS,
+        Self::FIVE_AXLE_TRACTOR_SEMITRAILERS,
+        Self::SIX_PLUS_AXLE_SINGLE_TRAILER_TRUCKS,
+        Self::MULTI_TRAILER_TRUCKS_SIX_AXLES,
+        Self::MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES,
+        Self::MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES,
     ];
     /// Returns the variant's name or "" if unknown.
     pub fn variant_name(self) -> Option<&'static str> {
@@ -544,6 +566,26 @@ impl RoadUserTy {
             Self::CROSSWALKS => Some("CROSSWALKS"),
             Self::TRAMS => Some("TRAMS"),
             Self::TAXIS => Some("TAXIS"),
+            Self::OTHER_TWO_AXLE_FOUR_TIRE_VEHICLES => Some("OTHER_TWO_AXLE_FOUR_TIRE_VEHICLES"),
+            Self::TWO_AXLE_SIX_TIRE_SINGLE_UNIT_TRUCKS => {
+                Some("TWO_AXLE_SIX_TIRE_SINGLE_UNIT_TRUCKS")
+            }
+            Self::THREE_AXLE_SINGLE_UNIT_TRUCKS => Some("THREE_AXLE_SINGLE_UNIT_TRUCKS"),
+            Self::FOUR_PLUS_AXLE_SINGLE_UNIT_TRUCKS => Some("FOUR_PLUS_AXLE_SINGLE_UNIT_TRUCKS"),
+            Self::FOUR_AXLE_OR_FEWER_SINGLE_TRAILER_TRUCKS => {
+                Some("FOUR_AXLE_OR_FEWER_SINGLE_TRAILER_TRUCKS")
+            }
+            Self::FIVE_AXLE_TRACTOR_SEMITRAILERS => Some("FIVE_AXLE_TRACTOR_SEMITRAILERS"),
+            Self::SIX_PLUS_AXLE_SINGLE_TRAILER_TRUCKS => {
+                Some("SIX_PLUS_AXLE_SINGLE_TRAILER_TRUCKS")
+            }
+            Self::MULTI_TRAILER_TRUCKS_SIX_AXLES => Some("MULTI_TRAILER_TRUCKS_SIX_AXLES"),
+            Self::MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES => {
+                Some("MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES")
+            }
+            Self::MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES => {
+                Some("MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES")
+            }
             _ => None,
         }
     }
@@ -1195,8 +1237,8 @@ impl<'a> NamedParameter<'a> {
         NamedParameter { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args NamedParameterArgs<'args>,
     ) -> flatbuffers::WIPOffset<NamedParameter<'bldr>> {
         let mut builder = NamedParameterBuilder::new(_fbb);
@@ -1317,11 +1359,11 @@ impl Serialize for NamedParameter<'_> {
     }
 }
 
-pub struct NamedParameterBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct NamedParameterBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> NamedParameterBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> NamedParameterBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_name(&mut self, name: flatbuffers::WIPOffset<&'b str>) {
         self.fbb_
@@ -1345,7 +1387,9 @@ impl<'a: 'b, 'b> NamedParameterBuilder<'a, 'b> {
         );
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> NamedParameterBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> NamedParameterBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         NamedParameterBuilder {
             fbb_: _fbb,
@@ -1370,6 +1414,179 @@ impl core::fmt::Debug for NamedParameter<'_> {
         ds.finish()
     }
 }
+pub enum OutputSchemaOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct OutputSchema<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for OutputSchema<'a> {
+    type Inner = OutputSchema<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> OutputSchema<'a> {
+    pub const VT_ATTRIBUTES: flatbuffers::VOffsetT = 4;
+    pub const VT_SCHEMA: flatbuffers::VOffsetT = 6;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        OutputSchema { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args OutputSchemaArgs<'args>,
+    ) -> flatbuffers::WIPOffset<OutputSchema<'bldr>> {
+        let mut builder = OutputSchemaBuilder::new(_fbb);
+        if let Some(x) = args.schema {
+            builder.add_schema(x);
+        }
+        if let Some(x) = args.attributes {
+            builder.add_attributes(x);
+        }
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn attributes(
+        &self,
+    ) -> flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<AttributePair<'a>>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<
+                    flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<AttributePair>>,
+                >>(OutputSchema::VT_ATTRIBUTES, None)
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn schema(&self) -> flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Schema<'a>>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<
+                    flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Schema>>,
+                >>(OutputSchema::VT_SCHEMA, None)
+                .unwrap()
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for OutputSchema<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<AttributePair>>,
+            >>("attributes", Self::VT_ATTRIBUTES, true)?
+            .visit_field::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Schema>>,
+            >>("schema", Self::VT_SCHEMA, true)?
+            .finish();
+        Ok(())
+    }
+}
+pub struct OutputSchemaArgs<'a> {
+    pub attributes: Option<
+        flatbuffers::WIPOffset<
+            flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<AttributePair<'a>>>,
+        >,
+    >,
+    pub schema: Option<
+        flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Schema<'a>>>>,
+    >,
+}
+impl<'a> Default for OutputSchemaArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        OutputSchemaArgs {
+            attributes: None, // required field
+            schema: None,     // required field
+        }
+    }
+}
+
+impl Serialize for OutputSchema<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("OutputSchema", 2)?;
+        s.serialize_field("attributes", &self.attributes())?;
+        s.serialize_field("schema", &self.schema())?;
+        s.end()
+    }
+}
+
+pub struct OutputSchemaBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> OutputSchemaBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_attributes(
+        &mut self,
+        attributes: flatbuffers::WIPOffset<
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<AttributePair<'b>>>,
+        >,
+    ) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(OutputSchema::VT_ATTRIBUTES, attributes);
+    }
+    #[inline]
+    pub fn add_schema(
+        &mut self,
+        schema: flatbuffers::WIPOffset<
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<Schema<'b>>>,
+        >,
+    ) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(OutputSchema::VT_SCHEMA, schema);
+    }
+    #[inline]
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> OutputSchemaBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        OutputSchemaBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<OutputSchema<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_
+            .required(o, OutputSchema::VT_ATTRIBUTES, "attributes");
+        self.fbb_.required(o, OutputSchema::VT_SCHEMA, "schema");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for OutputSchema<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("OutputSchema");
+        ds.field("attributes", &self.attributes());
+        ds.field("schema", &self.schema());
+        ds.finish()
+    }
+}
 pub enum SourceOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -1391,21 +1608,24 @@ impl<'a> Source<'a> {
     pub const VT_URL: flatbuffers::VOffsetT = 4;
     pub const VT_NAME: flatbuffers::VOffsetT = 6;
     pub const VT_OPTIONS: flatbuffers::VOffsetT = 8;
-    pub const VT_SCHEMAS: flatbuffers::VOffsetT = 10;
     pub const VT_METADATA: flatbuffers::VOffsetT = 14;
     pub const VT_METADATA_REVISION: flatbuffers::VOffsetT = 16;
     pub const VT_NAMED_PARAMETERS: flatbuffers::VOffsetT = 18;
+    pub const VT_OUTPUT_SCHEMAS: flatbuffers::VOffsetT = 20;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
         Source { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args SourceArgs<'args>,
     ) -> flatbuffers::WIPOffset<Source<'bldr>> {
         let mut builder = SourceBuilder::new(_fbb);
+        if let Some(x) = args.output_schemas {
+            builder.add_output_schemas(x);
+        }
         if let Some(x) = args.named_parameters {
             builder.add_named_parameters(x);
         }
@@ -1414,9 +1634,6 @@ impl<'a> Source<'a> {
         }
         if let Some(x) = args.metadata {
             builder.add_metadata(x);
-        }
-        if let Some(x) = args.schemas {
-            builder.add_schemas(x);
         }
         if let Some(x) = args.options {
             builder.add_options(x);
@@ -1466,19 +1683,6 @@ impl<'a> Source<'a> {
         }
     }
     #[inline]
-    pub fn schemas(
-        &self,
-    ) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Schema<'a>>>> {
-        // Safety:
-        // Created from valid Table for this object
-        // which contains a valid value in this slot
-        unsafe {
-            self._tab.get::<flatbuffers::ForwardsUOffset<
-                flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Schema>>,
-            >>(Source::VT_SCHEMAS, None)
-        }
-    }
-    #[inline]
     pub fn metadata(&self) -> Option<ObjectId<'a>> {
         // Safety:
         // Created from valid Table for this object
@@ -1511,6 +1715,19 @@ impl<'a> Source<'a> {
             >>(Source::VT_NAMED_PARAMETERS, None)
         }
     }
+    #[inline]
+    pub fn output_schemas(
+        &self,
+    ) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<OutputSchema<'a>>>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab.get::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<OutputSchema>>,
+            >>(Source::VT_OUTPUT_SCHEMAS, None)
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for Source<'_> {
@@ -1528,9 +1745,6 @@ impl flatbuffers::Verifiable for Source<'_> {
                 Self::VT_OPTIONS,
                 false,
             )?
-            .visit_field::<flatbuffers::ForwardsUOffset<
-                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Schema>>,
-            >>("schemas", Self::VT_SCHEMAS, false)?
             .visit_field::<flatbuffers::ForwardsUOffset<ObjectId>>(
                 "metadata",
                 Self::VT_METADATA,
@@ -1544,6 +1758,9 @@ impl flatbuffers::Verifiable for Source<'_> {
             .visit_field::<flatbuffers::ForwardsUOffset<
                 flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<NamedParameter>>,
             >>("named_parameters", Self::VT_NAMED_PARAMETERS, false)?
+            .visit_field::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<OutputSchema>>,
+            >>("output_schemas", Self::VT_OUTPUT_SCHEMAS, false)?
             .finish();
         Ok(())
     }
@@ -1552,14 +1769,16 @@ pub struct SourceArgs<'a> {
     pub url: Option<flatbuffers::WIPOffset<&'a str>>,
     pub name: Option<flatbuffers::WIPOffset<&'a str>>,
     pub options: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, u8>>>,
-    pub schemas: Option<
-        flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Schema<'a>>>>,
-    >,
     pub metadata: Option<flatbuffers::WIPOffset<ObjectId<'a>>>,
     pub metadata_revision: Option<flatbuffers::WIPOffset<ContentId<'a>>>,
     pub named_parameters: Option<
         flatbuffers::WIPOffset<
             flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<NamedParameter<'a>>>,
+        >,
+    >,
+    pub output_schemas: Option<
+        flatbuffers::WIPOffset<
+            flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<OutputSchema<'a>>>,
         >,
     >,
 }
@@ -1570,10 +1789,10 @@ impl<'a> Default for SourceArgs<'a> {
             url: None,  // required field
             name: None, // required field
             options: None,
-            schemas: None,
             metadata: None,
             metadata_revision: None,
             named_parameters: None,
+            output_schemas: None,
         }
     }
 }
@@ -1583,18 +1802,13 @@ impl Serialize for Source<'_> {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("Source", 8)?;
+        let mut s = serializer.serialize_struct("Source", 9)?;
         s.serialize_field("url", &self.url())?;
         s.serialize_field("name", &self.name())?;
         if let Some(f) = self.options() {
             s.serialize_field("options", &f)?;
         } else {
             s.skip_field("options")?;
-        }
-        if let Some(f) = self.schemas() {
-            s.serialize_field("schemas", &f)?;
-        } else {
-            s.skip_field("schemas")?;
         }
         if let Some(f) = self.metadata() {
             s.serialize_field("metadata", &f)?;
@@ -1611,15 +1825,20 @@ impl Serialize for Source<'_> {
         } else {
             s.skip_field("named_parameters")?;
         }
+        if let Some(f) = self.output_schemas() {
+            s.serialize_field("output_schemas", &f)?;
+        } else {
+            s.skip_field("output_schemas")?;
+        }
         s.end()
     }
 }
 
-pub struct SourceBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct SourceBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> SourceBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> SourceBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_url(&mut self, url: flatbuffers::WIPOffset<&'b str>) {
         self.fbb_
@@ -1634,16 +1853,6 @@ impl<'a: 'b, 'b> SourceBuilder<'a, 'b> {
     pub fn add_options(&mut self, options: flatbuffers::WIPOffset<flatbuffers::Vector<'b, u8>>) {
         self.fbb_
             .push_slot_always::<flatbuffers::WIPOffset<_>>(Source::VT_OPTIONS, options);
-    }
-    #[inline]
-    pub fn add_schemas(
-        &mut self,
-        schemas: flatbuffers::WIPOffset<
-            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<Schema<'b>>>,
-        >,
-    ) {
-        self.fbb_
-            .push_slot_always::<flatbuffers::WIPOffset<_>>(Source::VT_SCHEMAS, schemas);
     }
     #[inline]
     pub fn add_metadata(&mut self, metadata: flatbuffers::WIPOffset<ObjectId<'b>>) {
@@ -1674,7 +1883,19 @@ impl<'a: 'b, 'b> SourceBuilder<'a, 'b> {
         );
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> SourceBuilder<'a, 'b> {
+    pub fn add_output_schemas(
+        &mut self,
+        output_schemas: flatbuffers::WIPOffset<
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<OutputSchema<'b>>>,
+        >,
+    ) {
+        self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(
+            Source::VT_OUTPUT_SCHEMAS,
+            output_schemas,
+        );
+    }
+    #[inline]
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> SourceBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         SourceBuilder {
             fbb_: _fbb,
@@ -1696,10 +1917,10 @@ impl core::fmt::Debug for Source<'_> {
         ds.field("url", &self.url());
         ds.field("name", &self.name());
         ds.field("options", &self.options());
-        ds.field("schemas", &self.schemas());
         ds.field("metadata", &self.metadata());
         ds.field("metadata_revision", &self.metadata_revision());
         ds.field("named_parameters", &self.named_parameters());
+        ds.field("output_schemas", &self.output_schemas());
         ds.finish()
     }
 }
@@ -1729,8 +1950,8 @@ impl<'a> AttributePair<'a> {
         AttributePair { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args AttributePairArgs<'args>,
     ) -> flatbuffers::WIPOffset<AttributePair<'bldr>> {
         let mut builder = AttributePairBuilder::new(_fbb);
@@ -1813,11 +2034,11 @@ impl Serialize for AttributePair<'_> {
     }
 }
 
-pub struct AttributePairBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct AttributePairBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> AttributePairBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> AttributePairBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_key(&mut self, key: flatbuffers::WIPOffset<&'b str>) {
         self.fbb_
@@ -1829,7 +2050,9 @@ impl<'a: 'b, 'b> AttributePairBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(AttributePair::VT_VALUE, value);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> AttributePairBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> AttributePairBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         AttributePairBuilder {
             fbb_: _fbb,
@@ -1877,8 +2100,8 @@ impl<'a> DirectionAndRoadName<'a> {
         DirectionAndRoadName { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args DirectionAndRoadNameArgs<'args>,
     ) -> flatbuffers::WIPOffset<DirectionAndRoadName<'bldr>> {
         let mut builder = DirectionAndRoadNameBuilder::new(_fbb);
@@ -1963,11 +2186,11 @@ impl Serialize for DirectionAndRoadName<'_> {
     }
 }
 
-pub struct DirectionAndRoadNameBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct DirectionAndRoadNameBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> DirectionAndRoadNameBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> DirectionAndRoadNameBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_direction(&mut self, direction: flatbuffers::WIPOffset<&'b str>) {
         self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(
@@ -1984,8 +2207,8 @@ impl<'a: 'b, 'b> DirectionAndRoadNameBuilder<'a, 'b> {
     }
     #[inline]
     pub fn new(
-        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>,
-    ) -> DirectionAndRoadNameBuilder<'a, 'b> {
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> DirectionAndRoadNameBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         DirectionAndRoadNameBuilder {
             fbb_: _fbb,
@@ -2036,8 +2259,8 @@ impl<'a> DirectionAndRoadNames<'a> {
         DirectionAndRoadNames { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args DirectionAndRoadNamesArgs<'args>,
     ) -> flatbuffers::WIPOffset<DirectionAndRoadNames<'bldr>> {
         let mut builder = DirectionAndRoadNamesBuilder::new(_fbb);
@@ -2113,11 +2336,11 @@ impl Serialize for DirectionAndRoadNames<'_> {
     }
 }
 
-pub struct DirectionAndRoadNamesBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct DirectionAndRoadNamesBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> DirectionAndRoadNamesBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> DirectionAndRoadNamesBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_direction_and_road_names(
         &mut self,
@@ -2132,8 +2355,8 @@ impl<'a: 'b, 'b> DirectionAndRoadNamesBuilder<'a, 'b> {
     }
     #[inline]
     pub fn new(
-        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>,
-    ) -> DirectionAndRoadNamesBuilder<'a, 'b> {
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> DirectionAndRoadNamesBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         DirectionAndRoadNamesBuilder {
             fbb_: _fbb,

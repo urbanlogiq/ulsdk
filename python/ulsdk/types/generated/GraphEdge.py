@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class GraphEdge(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = GraphEdge()
         x.Init(buf, n + offset)
@@ -22,7 +21,7 @@ class GraphEdge(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # GraphEdge
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # GraphEdge
@@ -46,32 +45,32 @@ class GraphEdge(object):
             return self._tab.Get(flatbuffers.number_types.Int64Flags, o + self._tab.Pos)
         return 0
 
-def GraphEdgeStart(builder: flatbuffers.Builder):
+def GraphEdgeStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     GraphEdgeStart(builder)
 
-def GraphEdgeAdd_Kind(builder: flatbuffers.Builder, _Kind: int):
+def GraphEdgeAdd_Kind(builder, _Kind):
     builder.PrependInt32Slot(0, _Kind, 0)
 
-def Add_Kind(builder: flatbuffers.Builder, _Kind: int):
+def Add_Kind(builder, _Kind):
     GraphEdgeAdd_Kind(builder, _Kind)
 
-def GraphEdgeAdd_From(builder: flatbuffers.Builder, _From: int):
+def GraphEdgeAdd_From(builder, _From):
     builder.PrependInt64Slot(1, _From, 0)
 
-def Add_From(builder: flatbuffers.Builder, _From: int):
+def Add_From(builder, _From):
     GraphEdgeAdd_From(builder, _From)
 
-def GraphEdgeAdd_To(builder: flatbuffers.Builder, _To: int):
+def GraphEdgeAdd_To(builder, _To):
     builder.PrependInt64Slot(2, _To, 0)
 
-def Add_To(builder: flatbuffers.Builder, _To: int):
+def Add_To(builder, _To):
     GraphEdgeAdd_To(builder, _To)
 
-def GraphEdgeEnd(builder: flatbuffers.Builder) -> int:
+def GraphEdgeEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return GraphEdgeEnd(builder)

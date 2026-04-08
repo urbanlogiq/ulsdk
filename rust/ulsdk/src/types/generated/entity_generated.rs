@@ -35,13 +35,13 @@ pub const ENUM_MIN_ENTITY_TY: i32 = 0;
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
-pub const ENUM_MAX_ENTITY_TY: i32 = 273;
+pub const ENUM_MAX_ENTITY_TY: i32 = 274;
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_ENTITY_TY: [EntityTy; 274] = [
+pub const ENUM_VALUES_ENTITY_TY: [EntityTy; 275] = [
     EntityTy::T_INVALID,
     EntityTy::T_TFC,
     EntityTy::T_TFC_LOOP,
@@ -316,6 +316,7 @@ pub const ENUM_VALUES_ENTITY_TY: [EntityTy; 274] = [
     EntityTy::T_ROAD_SEGMENT_SAFETY_COUNTS,
     EntityTy::T_HEXAGON_BOUNDARY,
     EntityTy::T_COMPASS_IOT_POINT,
+    EntityTy::T_LANDSLIDE_AREA,
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
@@ -597,9 +598,10 @@ impl EntityTy {
     pub const T_ROAD_SEGMENT_SAFETY_COUNTS: Self = Self(271);
     pub const T_HEXAGON_BOUNDARY: Self = Self(272);
     pub const T_COMPASS_IOT_POINT: Self = Self(273);
+    pub const T_LANDSLIDE_AREA: Self = Self(274);
 
     pub const ENUM_MIN: i32 = 0;
-    pub const ENUM_MAX: i32 = 273;
+    pub const ENUM_MAX: i32 = 274;
     pub const ENUM_VALUES: &'static [Self] = &[
         Self::T_INVALID,
         Self::T_TFC,
@@ -875,6 +877,7 @@ impl EntityTy {
         Self::T_ROAD_SEGMENT_SAFETY_COUNTS,
         Self::T_HEXAGON_BOUNDARY,
         Self::T_COMPASS_IOT_POINT,
+        Self::T_LANDSLIDE_AREA,
     ];
     /// Returns the variant's name or "" if unknown.
     pub fn variant_name(self) -> Option<&'static str> {
@@ -1173,6 +1176,7 @@ impl EntityTy {
             Self::T_ROAD_SEGMENT_SAFETY_COUNTS => Some("T_ROAD_SEGMENT_SAFETY_COUNTS"),
             Self::T_HEXAGON_BOUNDARY => Some("T_HEXAGON_BOUNDARY"),
             Self::T_COMPASS_IOT_POINT => Some("T_COMPASS_IOT_POINT"),
+            Self::T_LANDSLIDE_AREA => Some("T_LANDSLIDE_AREA"),
             _ => None,
         }
     }
@@ -1518,19 +1522,20 @@ pub const ENUM_MIN_GEOMETRY: u8 = 0;
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
-pub const ENUM_MAX_GEOMETRY: u8 = 5;
+pub const ENUM_MAX_GEOMETRY: u8 = 6;
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_GEOMETRY: [Geometry; 6] = [
+pub const ENUM_VALUES_GEOMETRY: [Geometry; 7] = [
     Geometry::NONE,
     Geometry::Point,
     Geometry::Line,
     Geometry::MultiLine,
     Geometry::Polygon,
     Geometry::MultiPolygon,
+    Geometry::MultiPoint,
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
@@ -1544,9 +1549,10 @@ impl Geometry {
     pub const MultiLine: Self = Self(3);
     pub const Polygon: Self = Self(4);
     pub const MultiPolygon: Self = Self(5);
+    pub const MultiPoint: Self = Self(6);
 
     pub const ENUM_MIN: u8 = 0;
-    pub const ENUM_MAX: u8 = 5;
+    pub const ENUM_MAX: u8 = 6;
     pub const ENUM_VALUES: &'static [Self] = &[
         Self::NONE,
         Self::Point,
@@ -1554,6 +1560,7 @@ impl Geometry {
         Self::MultiLine,
         Self::Polygon,
         Self::MultiPolygon,
+        Self::MultiPoint,
     ];
     /// Returns the variant's name or "" if unknown.
     pub fn variant_name(self) -> Option<&'static str> {
@@ -1564,6 +1571,7 @@ impl Geometry {
             Self::MultiLine => Some("MultiLine"),
             Self::Polygon => Some("Polygon"),
             Self::MultiPolygon => Some("MultiPolygon"),
+            Self::MultiPoint => Some("MultiPoint"),
             _ => None,
         }
     }
@@ -1656,8 +1664,8 @@ impl<'a> Point<'a> {
         Point { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args PointArgs<'args>,
     ) -> flatbuffers::WIPOffset<Point<'bldr>> {
         let mut builder = PointBuilder::new(_fbb);
@@ -1723,11 +1731,11 @@ impl Serialize for Point<'_> {
     }
 }
 
-pub struct PointBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct PointBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> PointBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> PointBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_point_geo(
         &mut self,
@@ -1737,7 +1745,7 @@ impl<'a: 'b, 'b> PointBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(Point::VT_POINT_GEO, point_geo);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> PointBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> PointBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         PointBuilder {
             fbb_: _fbb,
@@ -1755,6 +1763,137 @@ impl<'a: 'b, 'b> PointBuilder<'a, 'b> {
 impl core::fmt::Debug for Point<'_> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let mut ds = f.debug_struct("Point");
+        ds.field("point_geo", &self.point_geo());
+        ds.finish()
+    }
+}
+pub enum MultiPointOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct MultiPoint<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for MultiPoint<'a> {
+    type Inner = MultiPoint<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> MultiPoint<'a> {
+    pub const VT_POINT_GEO: flatbuffers::VOffsetT = 4;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        MultiPoint { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args MultiPointArgs<'args>,
+    ) -> flatbuffers::WIPOffset<MultiPoint<'bldr>> {
+        let mut builder = MultiPointBuilder::new(_fbb);
+        if let Some(x) = args.point_geo {
+            builder.add_point_geo(x);
+        }
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn point_geo(&self) -> flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Point<'a>>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<
+                    flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Point>>,
+                >>(MultiPoint::VT_POINT_GEO, None)
+                .unwrap()
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for MultiPoint<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Point>>,
+            >>("point_geo", Self::VT_POINT_GEO, true)?
+            .finish();
+        Ok(())
+    }
+}
+pub struct MultiPointArgs<'a> {
+    pub point_geo: Option<
+        flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Point<'a>>>>,
+    >,
+}
+impl<'a> Default for MultiPointArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        MultiPointArgs {
+            point_geo: None, // required field
+        }
+    }
+}
+
+impl Serialize for MultiPoint<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("MultiPoint", 1)?;
+        s.serialize_field("point_geo", &self.point_geo())?;
+        s.end()
+    }
+}
+
+pub struct MultiPointBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> MultiPointBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_point_geo(
+        &mut self,
+        point_geo: flatbuffers::WIPOffset<
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<Point<'b>>>,
+        >,
+    ) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(MultiPoint::VT_POINT_GEO, point_geo);
+    }
+    #[inline]
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> MultiPointBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        MultiPointBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<MultiPoint<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_.required(o, MultiPoint::VT_POINT_GEO, "point_geo");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for MultiPoint<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("MultiPoint");
         ds.field("point_geo", &self.point_geo());
         ds.finish()
     }
@@ -1784,8 +1923,8 @@ impl<'a> Line<'a> {
         Line { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args LineArgs<'args>,
     ) -> flatbuffers::WIPOffset<Line<'bldr>> {
         let mut builder = LineBuilder::new(_fbb);
@@ -1850,11 +1989,11 @@ impl Serialize for Line<'_> {
     }
 }
 
-pub struct LineBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct LineBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> LineBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> LineBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_line_geo(
         &mut self,
@@ -1866,7 +2005,7 @@ impl<'a: 'b, 'b> LineBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(Line::VT_LINE_GEO, line_geo);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> LineBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> LineBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         LineBuilder {
             fbb_: _fbb,
@@ -1913,8 +2052,8 @@ impl<'a> MultiLine<'a> {
         MultiLine { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args MultiLineArgs<'args>,
     ) -> flatbuffers::WIPOffset<MultiLine<'bldr>> {
         let mut builder = MultiLineBuilder::new(_fbb);
@@ -1979,11 +2118,11 @@ impl Serialize for MultiLine<'_> {
     }
 }
 
-pub struct MultiLineBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct MultiLineBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> MultiLineBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> MultiLineBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_multiline_geo(
         &mut self,
@@ -1997,7 +2136,7 @@ impl<'a: 'b, 'b> MultiLineBuilder<'a, 'b> {
         );
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> MultiLineBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> MultiLineBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         MultiLineBuilder {
             fbb_: _fbb,
@@ -2047,8 +2186,8 @@ impl<'a> Polygon<'a> {
         Polygon { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args PolygonArgs<'args>,
     ) -> flatbuffers::WIPOffset<Polygon<'bldr>> {
         let mut builder = PolygonBuilder::new(_fbb);
@@ -2113,11 +2252,11 @@ impl Serialize for Polygon<'_> {
     }
 }
 
-pub struct PolygonBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct PolygonBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> PolygonBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> PolygonBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_polygon_geo(
         &mut self,
@@ -2129,7 +2268,7 @@ impl<'a: 'b, 'b> PolygonBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(Polygon::VT_POLYGON_GEO, polygon_geo);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> PolygonBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> PolygonBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         PolygonBuilder {
             fbb_: _fbb,
@@ -2177,8 +2316,8 @@ impl<'a> MultiPolygon<'a> {
         MultiPolygon { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args MultiPolygonArgs<'args>,
     ) -> flatbuffers::WIPOffset<MultiPolygon<'bldr>> {
         let mut builder = MultiPolygonBuilder::new(_fbb);
@@ -2245,11 +2384,11 @@ impl Serialize for MultiPolygon<'_> {
     }
 }
 
-pub struct MultiPolygonBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct MultiPolygonBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> MultiPolygonBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> MultiPolygonBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_multipolygon_geo(
         &mut self,
@@ -2263,7 +2402,9 @@ impl<'a: 'b, 'b> MultiPolygonBuilder<'a, 'b> {
         );
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> MultiPolygonBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> MultiPolygonBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         MultiPolygonBuilder {
             fbb_: _fbb,
@@ -2319,8 +2460,8 @@ impl<'a> GraphNode<'a> {
         GraphNode { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args GraphNodeArgs<'args>,
     ) -> flatbuffers::WIPOffset<GraphNode<'bldr>> {
         let mut builder = GraphNodeBuilder::new(_fbb);
@@ -2521,6 +2662,21 @@ impl<'a> GraphNode<'a> {
             None
         }
     }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn _geom_as_multi_point(&self) -> Option<MultiPoint<'a>> {
+        if self._geom_type() == Geometry::MultiPoint {
+            self._geom().map(|t| {
+                // Safety:
+                // Created from a valid Table for this object
+                // Which contains a valid union in this slot
+                unsafe { MultiPoint::init_from_table(t) }
+            })
+        } else {
+            None
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for GraphNode<'_> {
@@ -2577,6 +2733,11 @@ impl flatbuffers::Verifiable for GraphNode<'_> {
                     Geometry::MultiPolygon => v
                         .verify_union_variant::<flatbuffers::ForwardsUOffset<MultiPolygon>>(
                             "Geometry::MultiPolygon",
+                            pos,
+                        ),
+                    Geometry::MultiPoint => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<MultiPoint>>(
+                            "Geometry::MultiPoint",
                             pos,
                         ),
                     _ => Ok(()),
@@ -2676,6 +2837,12 @@ impl Serialize for GraphNode<'_> {
                     .expect("Invalid union table, expected `Geometry::MultiPolygon`.");
                 s.serialize_field("_geom", &f)?;
             }
+            Geometry::MultiPoint => {
+                let f = self
+                    ._geom_as_multi_point()
+                    .expect("Invalid union table, expected `Geometry::MultiPoint`.");
+                s.serialize_field("_geom", &f)?;
+            }
             _ => unimplemented!(),
         }
         if let Some(f) = self._description() {
@@ -2688,11 +2855,11 @@ impl Serialize for GraphNode<'_> {
     }
 }
 
-pub struct GraphNodeBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct GraphNodeBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> GraphNodeBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> GraphNodeBuilder<'a, 'b, A> {
     #[inline]
     pub fn add__entity_type(&mut self, _entity_type: EntityTy) {
         self.fbb_.push_slot::<EntityTy>(
@@ -2746,7 +2913,7 @@ impl<'a: 'b, 'b> GraphNodeBuilder<'a, 'b> {
         self.fbb_.push_slot::<u64>(GraphNode::VT__UID, _uid, 0);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> GraphNodeBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> GraphNodeBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         GraphNodeBuilder {
             fbb_: _fbb,
@@ -2820,6 +2987,16 @@ impl core::fmt::Debug for GraphNode<'_> {
                     )
                 }
             }
+            Geometry::MultiPoint => {
+                if let Some(x) = self._geom_as_multi_point() {
+                    ds.field("_geom", &x)
+                } else {
+                    ds.field(
+                        "_geom",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
             _ => {
                 let x: Option<()> = None;
                 ds.field("_geom", &x)
@@ -2857,8 +3034,8 @@ impl<'a> GraphEdge<'a> {
         GraphEdge { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args GraphEdgeArgs,
     ) -> flatbuffers::WIPOffset<GraphEdge<'bldr>> {
         let mut builder = GraphEdgeBuilder::new(_fbb);
@@ -2939,11 +3116,11 @@ impl Serialize for GraphEdge<'_> {
     }
 }
 
-pub struct GraphEdgeBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct GraphEdgeBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> GraphEdgeBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> GraphEdgeBuilder<'a, 'b, A> {
     #[inline]
     pub fn add__kind(&mut self, _kind: EdgeTy) {
         self.fbb_
@@ -2958,7 +3135,7 @@ impl<'a: 'b, 'b> GraphEdgeBuilder<'a, 'b> {
         self.fbb_.push_slot::<i64>(GraphEdge::VT__TO, _to, 0);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> GraphEdgeBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> GraphEdgeBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         GraphEdgeBuilder {
             fbb_: _fbb,

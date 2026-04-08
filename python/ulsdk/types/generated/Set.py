@@ -4,10 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .GenericId import GenericId
-from .ValueInstance import ValueInstance
-from typing import Optional
 np = import_numpy()
 
 # The Set operation is used to set the value of a cell in a table.
@@ -15,7 +11,7 @@ class Set(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Set()
         x.Init(buf, n + offset)
@@ -26,15 +22,16 @@ class Set(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Set
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # The value of the ul_node_id column, which uniquely identifies the row.
     # Set
-    def Row(self) -> Optional[GenericId]:
+    def Row(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .GenericId import GenericId
             obj = GenericId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -42,7 +39,7 @@ class Set(object):
 
     # Name of the column to set.
     # Set
-    def Col(self) -> Optional[bytes]:
+    def Col(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -50,41 +47,42 @@ class Set(object):
 
     # The value to set.
     # Set
-    def Value(self) -> Optional[ValueInstance]:
+    def Value(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ValueInstance import ValueInstance
             obj = ValueInstance()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def SetStart(builder: flatbuffers.Builder):
+def SetStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     SetStart(builder)
 
-def SetAddRow(builder: flatbuffers.Builder, row: int):
+def SetAddRow(builder, row):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(row), 0)
 
-def AddRow(builder: flatbuffers.Builder, row: int):
+def AddRow(builder, row):
     SetAddRow(builder, row)
 
-def SetAddCol(builder: flatbuffers.Builder, col: int):
+def SetAddCol(builder, col):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(col), 0)
 
-def AddCol(builder: flatbuffers.Builder, col: int):
+def AddCol(builder, col):
     SetAddCol(builder, col)
 
-def SetAddValue(builder: flatbuffers.Builder, value: int):
+def SetAddValue(builder, value):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(value), 0)
 
-def AddValue(builder: flatbuffers.Builder, value: int):
+def AddValue(builder, value):
     SetAddValue(builder, value)
 
-def SetEnd(builder: flatbuffers.Builder) -> int:
+def SetEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return SetEnd(builder)

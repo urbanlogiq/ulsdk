@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .NestedCategoryRelationshipNode import NestedCategoryRelationshipNode
-from typing import Optional
 np = import_numpy()
 
 class NestedCategoryRelationshipData(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = NestedCategoryRelationshipData()
         x.Init(buf, n + offset)
@@ -24,53 +21,54 @@ class NestedCategoryRelationshipData(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # NestedCategoryRelationshipData
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # NestedCategoryRelationshipData
-    def Categories(self, j: int) -> Optional[NestedCategoryRelationshipNode]:
+    def Categories(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .NestedCategoryRelationshipNode import NestedCategoryRelationshipNode
             obj = NestedCategoryRelationshipNode()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # NestedCategoryRelationshipData
-    def CategoriesLength(self) -> int:
+    def CategoriesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # NestedCategoryRelationshipData
-    def CategoriesIsNone(self) -> bool:
+    def CategoriesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def NestedCategoryRelationshipDataStart(builder: flatbuffers.Builder):
+def NestedCategoryRelationshipDataStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     NestedCategoryRelationshipDataStart(builder)
 
-def NestedCategoryRelationshipDataAddCategories(builder: flatbuffers.Builder, categories: int):
+def NestedCategoryRelationshipDataAddCategories(builder, categories):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(categories), 0)
 
-def AddCategories(builder: flatbuffers.Builder, categories: int):
+def AddCategories(builder, categories):
     NestedCategoryRelationshipDataAddCategories(builder, categories)
 
-def NestedCategoryRelationshipDataStartCategoriesVector(builder, numElems: int) -> int:
+def NestedCategoryRelationshipDataStartCategoriesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartCategoriesVector(builder, numElems: int) -> int:
+def StartCategoriesVector(builder, numElems):
     return NestedCategoryRelationshipDataStartCategoriesVector(builder, numElems)
 
-def NestedCategoryRelationshipDataEnd(builder: flatbuffers.Builder) -> int:
+def NestedCategoryRelationshipDataEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return NestedCategoryRelationshipDataEnd(builder)

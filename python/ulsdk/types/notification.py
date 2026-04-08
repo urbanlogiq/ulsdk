@@ -535,17 +535,18 @@ class InboxItem:
 
 @dataclass
 class Notification:
-    notification: Optional["NotificationUnion"]
+    notification: "NotificationUnion"
 
     sender: Optional["B2cId"]
 
     @classmethod
     def from_fbs(cls, o: FbsNotification) -> Self:
-        notification = None
         notification_val = o.Notification()
         if notification_val is not None:
             notification_ty = o.NotificationType()
             notification = NotificationUnion.from_fbs(notification_val, notification_ty)
+        else:
+            raise ValueError("Notification is required")
         sender = None
         sender_obj = o.Sender()
         if sender_obj is not None:
@@ -566,17 +567,14 @@ class Notification:
             AddSender,
             End,
         )
-        notification_offset, notification_ty = (None, None)
-        if self.notification is not None:
-            notification_offset, notification_ty = self.notification.serialize_to(builder)
+        notification_offset, notification_ty = self.notification.serialize_to(builder)
         sender_offset = None
         if self.sender is not None:
             sender_offset = self.sender.serialize_to(builder)
 
         Start(builder)
-        if notification_offset is not None and notification_ty is not None:
-            AddNotification(builder, notification_offset)
-            AddNotificationType(builder, notification_ty)
+        AddNotification(builder, notification_offset)
+        AddNotificationType(builder, notification_ty)
         if sender_offset is not None:
             AddSender(builder, sender_offset)
         return End(builder)

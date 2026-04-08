@@ -388,8 +388,8 @@ impl<'a> Set<'a> {
         Set { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args SetArgs<'args>,
     ) -> flatbuffers::WIPOffset<Set<'bldr>> {
         let mut builder = SetBuilder::new(_fbb);
@@ -491,11 +491,11 @@ impl Serialize for Set<'_> {
     }
 }
 
-pub struct SetBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct SetBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> SetBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> SetBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_row(&mut self, row: flatbuffers::WIPOffset<GenericId<'b>>) {
         self.fbb_
@@ -512,7 +512,7 @@ impl<'a: 'b, 'b> SetBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<ValueInstance>>(Set::VT_VALUE, value);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> SetBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> SetBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         SetBuilder {
             fbb_: _fbb,
@@ -564,8 +564,8 @@ impl<'a> RmRow<'a> {
         RmRow { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args RmRowArgs<'args>,
     ) -> flatbuffers::WIPOffset<RmRow<'bldr>> {
         let mut builder = RmRowBuilder::new(_fbb);
@@ -625,18 +625,18 @@ impl Serialize for RmRow<'_> {
     }
 }
 
-pub struct RmRowBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct RmRowBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> RmRowBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> RmRowBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_row(&mut self, row: flatbuffers::WIPOffset<GenericId<'b>>) {
         self.fbb_
             .push_slot_always::<flatbuffers::WIPOffset<GenericId>>(RmRow::VT_ROW, row);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> RmRowBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> RmRowBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         RmRowBuilder {
             fbb_: _fbb,
@@ -686,8 +686,8 @@ impl<'a> RestoreRow<'a> {
         RestoreRow { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args RestoreRowArgs<'args>,
     ) -> flatbuffers::WIPOffset<RestoreRow<'bldr>> {
         let mut builder = RestoreRowBuilder::new(_fbb);
@@ -747,18 +747,20 @@ impl Serialize for RestoreRow<'_> {
     }
 }
 
-pub struct RestoreRowBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct RestoreRowBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> RestoreRowBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> RestoreRowBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_row(&mut self, row: flatbuffers::WIPOffset<GenericId<'b>>) {
         self.fbb_
             .push_slot_always::<flatbuffers::WIPOffset<GenericId>>(RestoreRow::VT_ROW, row);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> RestoreRowBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> RestoreRowBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         RestoreRowBuilder {
             fbb_: _fbb,
@@ -806,8 +808,8 @@ impl<'a> Append<'a> {
         Append { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args AppendArgs<'args>,
     ) -> flatbuffers::WIPOffset<Append<'bldr>> {
         let mut builder = AppendBuilder::new(_fbb);
@@ -874,18 +876,18 @@ impl Serialize for Append<'_> {
     }
 }
 
-pub struct AppendBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct AppendBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> AppendBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> AppendBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_content(&mut self, content: flatbuffers::WIPOffset<flatbuffers::Vector<'b, u8>>) {
         self.fbb_
             .push_slot_always::<flatbuffers::WIPOffset<_>>(Append::VT_CONTENT, content);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> AppendBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> AppendBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         AppendBuilder {
             fbb_: _fbb,
@@ -933,8 +935,8 @@ impl<'a> OpEntry<'a> {
         OpEntry { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args OpEntryArgs,
     ) -> flatbuffers::WIPOffset<OpEntry<'bldr>> {
         let mut builder = OpEntryBuilder::new(_fbb);
@@ -1115,11 +1117,11 @@ impl Serialize for OpEntry<'_> {
     }
 }
 
-pub struct OpEntryBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct OpEntryBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> OpEntryBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> OpEntryBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_op_type(&mut self, op_type: Op) {
         self.fbb_
@@ -1131,7 +1133,7 @@ impl<'a: 'b, 'b> OpEntryBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(OpEntry::VT_OP, op);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> OpEntryBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> OpEntryBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         OpEntryBuilder {
             fbb_: _fbb,
@@ -1228,8 +1230,8 @@ impl<'a> DiffStream<'a> {
         DiffStream { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args DiffStreamArgs<'args>,
     ) -> flatbuffers::WIPOffset<DiffStream<'bldr>> {
         let mut builder = DiffStreamBuilder::new(_fbb);
@@ -1344,11 +1346,11 @@ impl Serialize for DiffStream<'_> {
     }
 }
 
-pub struct DiffStreamBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct DiffStreamBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> DiffStreamBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> DiffStreamBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_base(&mut self, base: flatbuffers::WIPOffset<ContentId<'b>>) {
         self.fbb_
@@ -1375,7 +1377,9 @@ impl<'a: 'b, 'b> DiffStreamBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(DiffStream::VT_ATTRIBUTES, attributes);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> DiffStreamBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> DiffStreamBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         DiffStreamBuilder {
             fbb_: _fbb,
@@ -1431,8 +1435,8 @@ impl<'a> NewTable<'a> {
         NewTable { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args NewTableArgs<'args>,
     ) -> flatbuffers::WIPOffset<NewTable<'bldr>> {
         let mut builder = NewTableBuilder::new(_fbb);
@@ -1662,11 +1666,11 @@ impl Serialize for NewTable<'_> {
     }
 }
 
-pub struct NewTableBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct NewTableBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> NewTableBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> NewTableBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_name(&mut self, name: flatbuffers::WIPOffset<&'b str>) {
         self.fbb_
@@ -1698,7 +1702,7 @@ impl<'a: 'b, 'b> NewTableBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(NewTable::VT_FROM, from);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> NewTableBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> NewTableBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         NewTableBuilder {
             fbb_: _fbb,
@@ -1778,8 +1782,8 @@ impl<'a> Modify<'a> {
         Modify { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args ModifyArgs<'args>,
     ) -> flatbuffers::WIPOffset<Modify<'bldr>> {
         let mut builder = ModifyBuilder::new(_fbb);
@@ -1903,11 +1907,11 @@ impl Serialize for Modify<'_> {
     }
 }
 
-pub struct ModifyBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct ModifyBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> ModifyBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ModifyBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_col(&mut self, col: flatbuffers::WIPOffset<&'b str>) {
         self.fbb_
@@ -1932,7 +1936,7 @@ impl<'a: 'b, 'b> ModifyBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<GenericId>>(Modify::VT_ROW, row);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ModifyBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> ModifyBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         ModifyBuilder {
             fbb_: _fbb,
@@ -1984,8 +1988,8 @@ impl<'a> Delete<'a> {
         Delete { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args DeleteArgs<'args>,
     ) -> flatbuffers::WIPOffset<Delete<'bldr>> {
         let mut builder = DeleteBuilder::new(_fbb);
@@ -2044,18 +2048,18 @@ impl Serialize for Delete<'_> {
     }
 }
 
-pub struct DeleteBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct DeleteBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> DeleteBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> DeleteBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_row(&mut self, row: flatbuffers::WIPOffset<GenericId<'b>>) {
         self.fbb_
             .push_slot_always::<flatbuffers::WIPOffset<GenericId>>(Delete::VT_ROW, row);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> DeleteBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> DeleteBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         DeleteBuilder {
             fbb_: _fbb,
@@ -2102,8 +2106,8 @@ impl<'a> Restore<'a> {
         Restore { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args RestoreArgs<'args>,
     ) -> flatbuffers::WIPOffset<Restore<'bldr>> {
         let mut builder = RestoreBuilder::new(_fbb);
@@ -2162,18 +2166,18 @@ impl Serialize for Restore<'_> {
     }
 }
 
-pub struct RestoreBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct RestoreBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> RestoreBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> RestoreBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_row(&mut self, row: flatbuffers::WIPOffset<GenericId<'b>>) {
         self.fbb_
             .push_slot_always::<flatbuffers::WIPOffset<GenericId>>(Restore::VT_ROW, row);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> RestoreBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> RestoreBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         RestoreBuilder {
             fbb_: _fbb,
@@ -2221,8 +2225,8 @@ impl<'a> ChangeOpEntry<'a> {
         ChangeOpEntry { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args ChangeOpEntryArgs,
     ) -> flatbuffers::WIPOffset<ChangeOpEntry<'bldr>> {
         let mut builder = ChangeOpEntryBuilder::new(_fbb);
@@ -2385,11 +2389,11 @@ impl Serialize for ChangeOpEntry<'_> {
     }
 }
 
-pub struct ChangeOpEntryBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct ChangeOpEntryBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> ChangeOpEntryBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ChangeOpEntryBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_op_type(&mut self, op_type: ChangeOp) {
         self.fbb_
@@ -2401,7 +2405,9 @@ impl<'a: 'b, 'b> ChangeOpEntryBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(ChangeOpEntry::VT_OP, op);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ChangeOpEntryBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> ChangeOpEntryBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         ChangeOpEntryBuilder {
             fbb_: _fbb,
@@ -2488,8 +2494,8 @@ impl<'a> ChangeSet<'a> {
         ChangeSet { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args ChangeSetArgs<'args>,
     ) -> flatbuffers::WIPOffset<ChangeSet<'bldr>> {
         let mut builder = ChangeSetBuilder::new(_fbb);
@@ -2636,11 +2642,11 @@ impl Serialize for ChangeSet<'_> {
     }
 }
 
-pub struct ChangeSetBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct ChangeSetBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> ChangeSetBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ChangeSetBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_revision(&mut self, revision: flatbuffers::WIPOffset<ContentId<'b>>) {
         self.fbb_
@@ -2679,7 +2685,7 @@ impl<'a: 'b, 'b> ChangeSetBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(ChangeSet::VT_ATTRIBUTES, attributes);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ChangeSetBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> ChangeSetBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         ChangeSetBuilder {
             fbb_: _fbb,
@@ -2733,8 +2739,8 @@ impl<'a> History<'a> {
         History { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args HistoryArgs<'args>,
     ) -> flatbuffers::WIPOffset<History<'bldr>> {
         let mut builder = HistoryBuilder::new(_fbb);
@@ -2826,11 +2832,11 @@ impl Serialize for History<'_> {
     }
 }
 
-pub struct HistoryBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct HistoryBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> HistoryBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> HistoryBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_changes(
         &mut self,
@@ -2850,7 +2856,7 @@ impl<'a: 'b, 'b> HistoryBuilder<'a, 'b> {
             );
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> HistoryBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> HistoryBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         HistoryBuilder {
             fbb_: _fbb,

@@ -9,3 +9,4 @@ class Geometry(object):
     MultiLine = 3
     Polygon = 4
     MultiPolygon = 5
+    MultiPoint = 6

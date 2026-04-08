@@ -4,17 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ChangeSet import ChangeSet
-from .ContentId import ContentId
-from typing import Optional
 np = import_numpy()
 
 class History(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = History()
         x.Init(buf, n + offset)
@@ -25,69 +21,71 @@ class History(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # History
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # History
-    def Changes(self, j: int) -> Optional[ChangeSet]:
+    def Changes(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .ChangeSet import ChangeSet
             obj = ChangeSet()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # History
-    def ChangesLength(self) -> int:
+    def ChangesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # History
-    def ChangesIsNone(self) -> bool:
+    def ChangesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
     # History
-    def ContinuationId(self) -> Optional[ContentId]:
+    def ContinuationId(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ContentId import ContentId
             obj = ContentId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def HistoryStart(builder: flatbuffers.Builder):
+def HistoryStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     HistoryStart(builder)
 
-def HistoryAddChanges(builder: flatbuffers.Builder, changes: int):
+def HistoryAddChanges(builder, changes):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(changes), 0)
 
-def AddChanges(builder: flatbuffers.Builder, changes: int):
+def AddChanges(builder, changes):
     HistoryAddChanges(builder, changes)
 
-def HistoryStartChangesVector(builder, numElems: int) -> int:
+def HistoryStartChangesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartChangesVector(builder, numElems: int) -> int:
+def StartChangesVector(builder, numElems):
     return HistoryStartChangesVector(builder, numElems)
 
-def HistoryAddContinuationId(builder: flatbuffers.Builder, continuationId: int):
+def HistoryAddContinuationId(builder, continuationId):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(continuationId), 0)
 
-def AddContinuationId(builder: flatbuffers.Builder, continuationId: int):
+def AddContinuationId(builder, continuationId):
     HistoryAddContinuationId(builder, continuationId)
 
-def HistoryEnd(builder: flatbuffers.Builder) -> int:
+def HistoryEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return HistoryEnd(builder)

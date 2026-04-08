@@ -7,7 +7,7 @@ import com.urbanlogiq.ulsdk.ApiKeyContext;
 import com.urbanlogiq.ulsdk.Environment;
 import com.urbanlogiq.ulsdk.Region;
 import java.util.UUID;
-import org.junit.Test;
+import org.junitpioneer.jupiter.RetryingTest;
 
 public final class TestApiWorldgraph {
 }

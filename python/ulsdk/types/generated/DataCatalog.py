@@ -4,18 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ContentId import ContentId
-from .ObjectId import ObjectId
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class DataCatalog(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = DataCatalog()
         x.Init(buf, n + offset)
@@ -26,14 +21,15 @@ class DataCatalog(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # DataCatalog
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # DataCatalog
-    def Id(self) -> Optional[ObjectId]:
+    def Id(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -48,56 +44,58 @@ class DataCatalog(object):
 
     # The partition of the table to query; can be null.
     # DataCatalog
-    def Partition(self) -> Optional[flatbuffers.table.Table]:
+    def Partition(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
     # DataCatalog
-    def Revision(self) -> Optional[ContentId]:
+    def Revision(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ContentId import ContentId
             obj = ContentId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def DataCatalogStart(builder: flatbuffers.Builder):
+def DataCatalogStart(builder):
     builder.StartObject(4)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DataCatalogStart(builder)
 
-def DataCatalogAddId(builder: flatbuffers.Builder, id: int):
+def DataCatalogAddId(builder, id):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(id), 0)
 
-def AddId(builder: flatbuffers.Builder, id: int):
+def AddId(builder, id):
     DataCatalogAddId(builder, id)
 
-def DataCatalogAddPartitionType(builder: flatbuffers.Builder, partitionType: int):
+def DataCatalogAddPartitionType(builder, partitionType):
     builder.PrependUint8Slot(1, partitionType, 0)
 
-def AddPartitionType(builder: flatbuffers.Builder, partitionType: int):
+def AddPartitionType(builder, partitionType):
     DataCatalogAddPartitionType(builder, partitionType)
 
-def DataCatalogAddPartition(builder: flatbuffers.Builder, partition: int):
+def DataCatalogAddPartition(builder, partition):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(partition), 0)
 
-def AddPartition(builder: flatbuffers.Builder, partition: int):
+def AddPartition(builder, partition):
     DataCatalogAddPartition(builder, partition)
 
-def DataCatalogAddRevision(builder: flatbuffers.Builder, revision: int):
+def DataCatalogAddRevision(builder, revision):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(revision), 0)
 
-def AddRevision(builder: flatbuffers.Builder, revision: int):
+def AddRevision(builder, revision):
     DataCatalogAddRevision(builder, revision)
 
-def DataCatalogEnd(builder: flatbuffers.Builder) -> int:
+def DataCatalogEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DataCatalogEnd(builder)

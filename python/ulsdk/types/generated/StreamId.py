@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class StreamId(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = StreamId()
         x.Init(buf, n + offset)
@@ -22,11 +21,11 @@ class StreamId(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # StreamId
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # StreamId
-    def B(self, j: int):
+    def B(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             a = self._tab.Vector(o)
@@ -41,37 +40,37 @@ class StreamId(object):
         return 0
 
     # StreamId
-    def BLength(self) -> int:
+    def BLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # StreamId
-    def BIsNone(self) -> bool:
+    def BIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def StreamIdStart(builder: flatbuffers.Builder):
+def StreamIdStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     StreamIdStart(builder)
 
-def StreamIdAddB(builder: flatbuffers.Builder, b: int):
+def StreamIdAddB(builder, b):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(b), 0)
 
-def AddB(builder: flatbuffers.Builder, b: int):
+def AddB(builder, b):
     StreamIdAddB(builder, b)
 
-def StreamIdStartBVector(builder, numElems: int) -> int:
+def StreamIdStartBVector(builder, numElems):
     return builder.StartVector(1, numElems, 1)
 
-def StartBVector(builder, numElems: int) -> int:
+def StartBVector(builder, numElems):
     return StreamIdStartBVector(builder, numElems)
 
-def StreamIdEnd(builder: flatbuffers.Builder) -> int:
+def StreamIdEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return StreamIdEnd(builder)

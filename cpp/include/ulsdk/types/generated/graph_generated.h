@@ -8,9 +8,9 @@
 
 // Ensure the included flatbuffers.h is the same version as when this file was
 // generated, otherwise it may not be compatible.
-static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
-              FLATBUFFERS_VERSION_MINOR == 5 &&
-              FLATBUFFERS_VERSION_REVISION == 26,
+static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
+              FLATBUFFERS_VERSION_MINOR == 2 &&
+              FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
 #include "api_generated.h"
@@ -386,6 +386,9 @@ struct Geom FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const MultiPolygon *geom_as_MultiPolygon() const {
     return geom_type() == Geometry::MultiPolygon ? static_cast<const MultiPolygon *>(geom()) : nullptr;
   }
+  const MultiPoint *geom_as_MultiPoint() const {
+    return geom_type() == Geometry::MultiPoint ? static_cast<const MultiPoint *>(geom()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_GEOM_TYPE, 1) &&
@@ -413,6 +416,10 @@ template<> inline const Polygon *Geom::geom_as<Polygon>() const {
 
 template<> inline const MultiPolygon *Geom::geom_as<MultiPolygon>() const {
   return geom_as_MultiPolygon();
+}
+
+template<> inline const MultiPoint *Geom::geom_as<MultiPoint>() const {
+  return geom_as_MultiPoint();
 }
 
 struct GeomBuilder {
@@ -747,7 +754,8 @@ struct OrderBy FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_SORT = 4,
     VT_FIELD = 6,
-    VT_TRANSFORM = 8
+    VT_TRANSFORM = 8,
+    VT_NULLS_FIRST = 10
   };
   SortOrder sort() const {
     return static_cast<SortOrder>(GetField<uint32_t>(VT_SORT, 0));
@@ -758,12 +766,16 @@ struct OrderBy FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   ValueTransform transform() const {
     return static_cast<ValueTransform>(GetField<int16_t>(VT_TRANSFORM, 0));
   }
+  bool nulls_first() const {
+    return GetField<uint8_t>(VT_NULLS_FIRST, 0) != 0;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_SORT, 4) &&
            VerifyOffsetRequired(verifier, VT_FIELD) &&
            verifier.VerifyString(field()) &&
            VerifyField<int16_t>(verifier, VT_TRANSFORM, 2) &&
+           VerifyField<uint8_t>(verifier, VT_NULLS_FIRST, 1) &&
            verifier.EndTable();
   }
 };
@@ -781,6 +793,9 @@ struct OrderByBuilder {
   void add_transform(ValueTransform transform) {
     fbb_.AddElement<int16_t>(OrderBy::VT_TRANSFORM, static_cast<int16_t>(transform), 0);
   }
+  void add_nulls_first(bool nulls_first) {
+    fbb_.AddElement<uint8_t>(OrderBy::VT_NULLS_FIRST, static_cast<uint8_t>(nulls_first), 0);
+  }
   explicit OrderByBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -797,11 +812,13 @@ inline ::flatbuffers::Offset<OrderBy> CreateOrderBy(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     SortOrder sort = SortOrder::ASC,
     ::flatbuffers::Offset<::flatbuffers::String> field = 0,
-    ValueTransform transform = ValueTransform::NONE) {
+    ValueTransform transform = ValueTransform::NONE,
+    bool nulls_first = false) {
   OrderByBuilder builder_(_fbb);
   builder_.add_field(field);
   builder_.add_sort(sort);
   builder_.add_transform(transform);
+  builder_.add_nulls_first(nulls_first);
   return builder_.Finish();
 }
 
@@ -814,13 +831,15 @@ inline ::flatbuffers::Offset<OrderBy> CreateOrderByDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     SortOrder sort = SortOrder::ASC,
     const char *field = nullptr,
-    ValueTransform transform = ValueTransform::NONE) {
+    ValueTransform transform = ValueTransform::NONE,
+    bool nulls_first = false) {
   auto field__ = field ? _fbb.CreateString(field) : 0;
   return CreateOrderBy(
       _fbb,
       sort,
       field__,
-      transform);
+      transform,
+      nulls_first);
 }
 
 /// The GraphQuery encapsulates the entire world graph query.

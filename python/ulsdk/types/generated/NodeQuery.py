@@ -4,19 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .GeomOp import GeomOp
-from .NodeIdPair import NodeIdPair
-from .ObjectId import ObjectId
-from .Projection import Projection
-from typing import Optional
 np = import_numpy()
 
 class NodeQuery(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = NodeQuery()
         x.Init(buf, n + offset)
@@ -27,35 +21,36 @@ class NodeQuery(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # NodeQuery
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # NodeQuery
-    def StreamIds(self, j: int) -> Optional[ObjectId]:
+    def StreamIds(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # NodeQuery
-    def StreamIdsLength(self) -> int:
+    def StreamIdsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # NodeQuery
-    def StreamIdsIsNone(self) -> bool:
+    def StreamIdsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
     # NodeQuery
-    def EntityTys(self, j: int):
+    def EntityTys(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             a = self._tab.Vector(o)
@@ -70,21 +65,21 @@ class NodeQuery(object):
         return 0
 
     # NodeQuery
-    def EntityTysLength(self) -> int:
+    def EntityTysLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # NodeQuery
-    def EntityTysIsNone(self) -> bool:
+    def EntityTysIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
     # If descriptions are provided here, then results will be ordered by their string similarity to the
     # descriptions here. This ordering is secondary to the any top-level order_by that might be provided.
     # NodeQuery
-    def Descriptions(self, j: int):
+    def Descriptions(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             a = self._tab.Vector(o)
@@ -92,149 +87,152 @@ class NodeQuery(object):
         return ""
 
     # NodeQuery
-    def DescriptionsLength(self) -> int:
+    def DescriptionsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # NodeQuery
-    def DescriptionsIsNone(self) -> bool:
+    def DescriptionsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
     # NodeQuery
-    def NodeIds(self, j: int) -> Optional[NodeIdPair]:
+    def NodeIds(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .NodeIdPair import NodeIdPair
             obj = NodeIdPair()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # NodeQuery
-    def NodeIdsLength(self) -> int:
+    def NodeIdsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # NodeQuery
-    def NodeIdsIsNone(self) -> bool:
+    def NodeIdsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         return o == 0
 
     # NodeQuery
-    def Projections(self, j: int) -> Optional[Projection]:
+    def Projections(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Projection import Projection
             obj = Projection()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # NodeQuery
-    def ProjectionsLength(self) -> int:
+    def ProjectionsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # NodeQuery
-    def ProjectionsIsNone(self) -> bool:
+    def ProjectionsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         return o == 0
 
     # NodeQuery
-    def GeomOp(self) -> Optional[GeomOp]:
+    def GeomOp(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .GeomOp import GeomOp
             obj = GeomOp()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def NodeQueryStart(builder: flatbuffers.Builder):
+def NodeQueryStart(builder):
     builder.StartObject(6)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     NodeQueryStart(builder)
 
-def NodeQueryAddStreamIds(builder: flatbuffers.Builder, streamIds: int):
+def NodeQueryAddStreamIds(builder, streamIds):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(streamIds), 0)
 
-def AddStreamIds(builder: flatbuffers.Builder, streamIds: int):
+def AddStreamIds(builder, streamIds):
     NodeQueryAddStreamIds(builder, streamIds)
 
-def NodeQueryStartStreamIdsVector(builder, numElems: int) -> int:
+def NodeQueryStartStreamIdsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartStreamIdsVector(builder, numElems: int) -> int:
+def StartStreamIdsVector(builder, numElems):
     return NodeQueryStartStreamIdsVector(builder, numElems)
 
-def NodeQueryAddEntityTys(builder: flatbuffers.Builder, entityTys: int):
+def NodeQueryAddEntityTys(builder, entityTys):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(entityTys), 0)
 
-def AddEntityTys(builder: flatbuffers.Builder, entityTys: int):
+def AddEntityTys(builder, entityTys):
     NodeQueryAddEntityTys(builder, entityTys)
 
-def NodeQueryStartEntityTysVector(builder, numElems: int) -> int:
+def NodeQueryStartEntityTysVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartEntityTysVector(builder, numElems: int) -> int:
+def StartEntityTysVector(builder, numElems):
     return NodeQueryStartEntityTysVector(builder, numElems)
 
-def NodeQueryAddDescriptions(builder: flatbuffers.Builder, descriptions: int):
+def NodeQueryAddDescriptions(builder, descriptions):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(descriptions), 0)
 
-def AddDescriptions(builder: flatbuffers.Builder, descriptions: int):
+def AddDescriptions(builder, descriptions):
     NodeQueryAddDescriptions(builder, descriptions)
 
-def NodeQueryStartDescriptionsVector(builder, numElems: int) -> int:
+def NodeQueryStartDescriptionsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartDescriptionsVector(builder, numElems: int) -> int:
+def StartDescriptionsVector(builder, numElems):
     return NodeQueryStartDescriptionsVector(builder, numElems)
 
-def NodeQueryAddNodeIds(builder: flatbuffers.Builder, nodeIds: int):
+def NodeQueryAddNodeIds(builder, nodeIds):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(nodeIds), 0)
 
-def AddNodeIds(builder: flatbuffers.Builder, nodeIds: int):
+def AddNodeIds(builder, nodeIds):
     NodeQueryAddNodeIds(builder, nodeIds)
 
-def NodeQueryStartNodeIdsVector(builder, numElems: int) -> int:
+def NodeQueryStartNodeIdsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartNodeIdsVector(builder, numElems: int) -> int:
+def StartNodeIdsVector(builder, numElems):
     return NodeQueryStartNodeIdsVector(builder, numElems)
 
-def NodeQueryAddProjections(builder: flatbuffers.Builder, projections: int):
+def NodeQueryAddProjections(builder, projections):
     builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(projections), 0)
 
-def AddProjections(builder: flatbuffers.Builder, projections: int):
+def AddProjections(builder, projections):
     NodeQueryAddProjections(builder, projections)
 
-def NodeQueryStartProjectionsVector(builder, numElems: int) -> int:
+def NodeQueryStartProjectionsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartProjectionsVector(builder, numElems: int) -> int:
+def StartProjectionsVector(builder, numElems):
     return NodeQueryStartProjectionsVector(builder, numElems)
 
-def NodeQueryAddGeomOp(builder: flatbuffers.Builder, geomOp: int):
+def NodeQueryAddGeomOp(builder, geomOp):
     builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(geomOp), 0)
 
-def AddGeomOp(builder: flatbuffers.Builder, geomOp: int):
+def AddGeomOp(builder, geomOp):
     NodeQueryAddGeomOp(builder, geomOp)
 
-def NodeQueryEnd(builder: flatbuffers.Builder) -> int:
+def NodeQueryEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return NodeQueryEnd(builder)

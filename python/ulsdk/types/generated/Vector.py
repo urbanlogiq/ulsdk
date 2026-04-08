@@ -4,17 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .NullableUint import NullableUint
-from .ObjectId import ObjectId
-from typing import Optional
 np = import_numpy()
 
 class Vector(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Vector()
         x.Init(buf, n + offset)
@@ -25,21 +21,22 @@ class Vector(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Vector
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Vector
-    def Query(self) -> Optional[bytes]:
+    def Query(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # Vector
-    def Limit(self) -> Optional[NullableUint]:
+    def Limit(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .NullableUint import NullableUint
             obj = NullableUint()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -47,26 +44,27 @@ class Vector(object):
 
     # List of vectordbs to query. If this is empty, query all available vectordbs.
     # Vector
-    def Ids(self, j: int) -> Optional[ObjectId]:
+    def Ids(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Vector
-    def IdsLength(self) -> int:
+    def IdsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Vector
-    def IdsIsNone(self) -> bool:
+    def IdsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
@@ -79,44 +77,44 @@ class Vector(object):
             return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
         return 0.0
 
-def VectorStart(builder: flatbuffers.Builder):
+def VectorStart(builder):
     builder.StartObject(4)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     VectorStart(builder)
 
-def VectorAddQuery(builder: flatbuffers.Builder, query: int):
+def VectorAddQuery(builder, query):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(query), 0)
 
-def AddQuery(builder: flatbuffers.Builder, query: int):
+def AddQuery(builder, query):
     VectorAddQuery(builder, query)
 
-def VectorAddLimit(builder: flatbuffers.Builder, limit: int):
+def VectorAddLimit(builder, limit):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(limit), 0)
 
-def AddLimit(builder: flatbuffers.Builder, limit: int):
+def AddLimit(builder, limit):
     VectorAddLimit(builder, limit)
 
-def VectorAddIds(builder: flatbuffers.Builder, ids: int):
+def VectorAddIds(builder, ids):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(ids), 0)
 
-def AddIds(builder: flatbuffers.Builder, ids: int):
+def AddIds(builder, ids):
     VectorAddIds(builder, ids)
 
-def VectorStartIdsVector(builder, numElems: int) -> int:
+def VectorStartIdsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartIdsVector(builder, numElems: int) -> int:
+def StartIdsVector(builder, numElems):
     return VectorStartIdsVector(builder, numElems)
 
-def VectorAddMaxDistance(builder: flatbuffers.Builder, maxDistance: float):
+def VectorAddMaxDistance(builder, maxDistance):
     builder.PrependFloat32Slot(3, maxDistance, 0.0)
 
-def AddMaxDistance(builder: flatbuffers.Builder, maxDistance: float):
+def AddMaxDistance(builder, maxDistance):
     VectorAddMaxDistance(builder, maxDistance)
 
-def VectorEnd(builder: flatbuffers.Builder) -> int:
+def VectorEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return VectorEnd(builder)

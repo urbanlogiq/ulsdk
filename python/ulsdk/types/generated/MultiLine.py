@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Line import Line
-from typing import Optional
 np = import_numpy()
 
 class MultiLine(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = MultiLine()
         x.Init(buf, n + offset)
@@ -24,53 +21,54 @@ class MultiLine(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # MultiLine
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # MultiLine
-    def MultilineGeo(self, j: int) -> Optional[Line]:
+    def MultilineGeo(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Line import Line
             obj = Line()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # MultiLine
-    def MultilineGeoLength(self) -> int:
+    def MultilineGeoLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # MultiLine
-    def MultilineGeoIsNone(self) -> bool:
+    def MultilineGeoIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def MultiLineStart(builder: flatbuffers.Builder):
+def MultiLineStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     MultiLineStart(builder)
 
-def MultiLineAddMultilineGeo(builder: flatbuffers.Builder, multilineGeo: int):
+def MultiLineAddMultilineGeo(builder, multilineGeo):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(multilineGeo), 0)
 
-def AddMultilineGeo(builder: flatbuffers.Builder, multilineGeo: int):
+def AddMultilineGeo(builder, multilineGeo):
     MultiLineAddMultilineGeo(builder, multilineGeo)
 
-def MultiLineStartMultilineGeoVector(builder, numElems: int) -> int:
+def MultiLineStartMultilineGeoVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartMultilineGeoVector(builder, numElems: int) -> int:
+def StartMultilineGeoVector(builder, numElems):
     return MultiLineStartMultilineGeoVector(builder, numElems)
 
-def MultiLineEnd(builder: flatbuffers.Builder) -> int:
+def MultiLineEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return MultiLineEnd(builder)

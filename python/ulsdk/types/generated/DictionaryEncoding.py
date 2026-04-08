@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Int import Int
-from typing import Optional
 np = import_numpy()
 
 class DictionaryEncoding(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = DictionaryEncoding()
         x.Init(buf, n + offset)
@@ -24,7 +21,7 @@ class DictionaryEncoding(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # DictionaryEncoding
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # The known dictionary id in the application where this data is used. In
@@ -43,10 +40,11 @@ class DictionaryEncoding(object):
     # recommended to prefer signed integer types over unsigned integer types
     # and to avoid uint64 indices unless they are required by an application.
     # DictionaryEncoding
-    def IndexType(self) -> Optional[Int]:
+    def IndexType(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Int import Int
             obj = Int()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -70,38 +68,38 @@ class DictionaryEncoding(object):
             return self._tab.Get(flatbuffers.number_types.Int16Flags, o + self._tab.Pos)
         return 0
 
-def DictionaryEncodingStart(builder: flatbuffers.Builder):
+def DictionaryEncodingStart(builder):
     builder.StartObject(4)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DictionaryEncodingStart(builder)
 
-def DictionaryEncodingAddId(builder: flatbuffers.Builder, id: int):
+def DictionaryEncodingAddId(builder, id):
     builder.PrependInt64Slot(0, id, 0)
 
-def AddId(builder: flatbuffers.Builder, id: int):
+def AddId(builder, id):
     DictionaryEncodingAddId(builder, id)
 
-def DictionaryEncodingAddIndexType(builder: flatbuffers.Builder, indexType: int):
+def DictionaryEncodingAddIndexType(builder, indexType):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(indexType), 0)
 
-def AddIndexType(builder: flatbuffers.Builder, indexType: int):
+def AddIndexType(builder, indexType):
     DictionaryEncodingAddIndexType(builder, indexType)
 
-def DictionaryEncodingAddIsOrdered(builder: flatbuffers.Builder, isOrdered: bool):
+def DictionaryEncodingAddIsOrdered(builder, isOrdered):
     builder.PrependBoolSlot(2, isOrdered, 0)
 
-def AddIsOrdered(builder: flatbuffers.Builder, isOrdered: bool):
+def AddIsOrdered(builder, isOrdered):
     DictionaryEncodingAddIsOrdered(builder, isOrdered)
 
-def DictionaryEncodingAddDictionaryKind(builder: flatbuffers.Builder, dictionaryKind: int):
+def DictionaryEncodingAddDictionaryKind(builder, dictionaryKind):
     builder.PrependInt16Slot(3, dictionaryKind, 0)
 
-def AddDictionaryKind(builder: flatbuffers.Builder, dictionaryKind: int):
+def AddDictionaryKind(builder, dictionaryKind):
     DictionaryEncodingAddDictionaryKind(builder, dictionaryKind)
 
-def DictionaryEncodingEnd(builder: flatbuffers.Builder) -> int:
+def DictionaryEncodingEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DictionaryEncodingEnd(builder)

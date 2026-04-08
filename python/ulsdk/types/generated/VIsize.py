@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class VIsize(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = VIsize()
         x.Init(buf, n + offset)
@@ -22,7 +21,7 @@ class VIsize(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # VIsize
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # VIsize
@@ -32,20 +31,20 @@ class VIsize(object):
             return self._tab.Get(flatbuffers.number_types.Int64Flags, o + self._tab.Pos)
         return 0
 
-def VIsizeStart(builder: flatbuffers.Builder):
+def VIsizeStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     VIsizeStart(builder)
 
-def VIsizeAddV(builder: flatbuffers.Builder, v: int):
+def VIsizeAddV(builder, v):
     builder.PrependInt64Slot(0, v, 0)
 
-def AddV(builder: flatbuffers.Builder, v: int):
+def AddV(builder, v):
     VIsizeAddV(builder, v)
 
-def VIsizeEnd(builder: flatbuffers.Builder) -> int:
+def VIsizeEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return VIsizeEnd(builder)

@@ -4,17 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .GraphNodeId import GraphNodeId
-from .ObjectId import ObjectId
-from typing import Optional
 np = import_numpy()
 
 class NodeIdPair(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = NodeIdPair()
         x.Init(buf, n + offset)
@@ -25,49 +21,51 @@ class NodeIdPair(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # NodeIdPair
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # NodeIdPair
-    def StreamId(self) -> Optional[ObjectId]:
+    def StreamId(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # NodeIdPair
-    def NodeId(self) -> Optional[GraphNodeId]:
+    def NodeId(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .GraphNodeId import GraphNodeId
             obj = GraphNodeId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def NodeIdPairStart(builder: flatbuffers.Builder):
+def NodeIdPairStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     NodeIdPairStart(builder)
 
-def NodeIdPairAddStreamId(builder: flatbuffers.Builder, streamId: int):
+def NodeIdPairAddStreamId(builder, streamId):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(streamId), 0)
 
-def AddStreamId(builder: flatbuffers.Builder, streamId: int):
+def AddStreamId(builder, streamId):
     NodeIdPairAddStreamId(builder, streamId)
 
-def NodeIdPairAddNodeId(builder: flatbuffers.Builder, nodeId: int):
+def NodeIdPairAddNodeId(builder, nodeId):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(nodeId), 0)
 
-def AddNodeId(builder: flatbuffers.Builder, nodeId: int):
+def AddNodeId(builder, nodeId):
     NodeIdPairAddNodeId(builder, nodeId)
 
-def NodeIdPairEnd(builder: flatbuffers.Builder) -> int:
+def NodeIdPairEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return NodeIdPairEnd(builder)

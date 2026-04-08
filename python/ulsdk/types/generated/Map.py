@@ -4,7 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 # A Map is a logical nested type that is represented as
@@ -36,7 +35,7 @@ class Map(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Map()
         x.Init(buf, n + offset)
@@ -47,7 +46,7 @@ class Map(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Map
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Set to true if the keys within each value are sorted
@@ -58,20 +57,20 @@ class Map(object):
             return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
         return False
 
-def MapStart(builder: flatbuffers.Builder):
+def MapStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     MapStart(builder)
 
-def MapAddKeysSorted(builder: flatbuffers.Builder, keysSorted: bool):
+def MapAddKeysSorted(builder, keysSorted):
     builder.PrependBoolSlot(0, keysSorted, 0)
 
-def AddKeysSorted(builder: flatbuffers.Builder, keysSorted: bool):
+def AddKeysSorted(builder, keysSorted):
     MapAddKeysSorted(builder, keysSorted)
 
-def MapEnd(builder: flatbuffers.Builder) -> int:
+def MapEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return MapEnd(builder)

@@ -4,7 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 # Logically the same as Binary, but the internal representation uses a view
@@ -18,7 +17,7 @@ class BinaryView(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = BinaryView()
         x.Init(buf, n + offset)
@@ -29,17 +28,17 @@ class BinaryView(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # BinaryView
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
-def BinaryViewStart(builder: flatbuffers.Builder):
+def BinaryViewStart(builder):
     builder.StartObject(0)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     BinaryViewStart(builder)
 
-def BinaryViewEnd(builder: flatbuffers.Builder) -> int:
+def BinaryViewEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return BinaryViewEnd(builder)

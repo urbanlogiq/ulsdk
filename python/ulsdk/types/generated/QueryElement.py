@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class QueryElement(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = QueryElement()
         x.Init(buf, n + offset)
@@ -24,7 +21,7 @@ class QueryElement(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # QueryElement
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # QueryElement
@@ -35,34 +32,35 @@ class QueryElement(object):
         return 0
 
     # QueryElement
-    def Q(self) -> Optional[flatbuffers.table.Table]:
+    def Q(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
-def QueryElementStart(builder: flatbuffers.Builder):
+def QueryElementStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     QueryElementStart(builder)
 
-def QueryElementAddQType(builder: flatbuffers.Builder, qType: int):
+def QueryElementAddQType(builder, qType):
     builder.PrependUint8Slot(0, qType, 0)
 
-def AddQType(builder: flatbuffers.Builder, qType: int):
+def AddQType(builder, qType):
     QueryElementAddQType(builder, qType)
 
-def QueryElementAddQ(builder: flatbuffers.Builder, q: int):
+def QueryElementAddQ(builder, q):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(q), 0)
 
-def AddQ(builder: flatbuffers.Builder, q: int):
+def AddQ(builder, q):
     QueryElementAddQ(builder, q)
 
-def QueryElementEnd(builder: flatbuffers.Builder) -> int:
+def QueryElementEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return QueryElementEnd(builder)

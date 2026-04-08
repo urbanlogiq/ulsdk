@@ -12,7 +12,8 @@ public final class Geometry {
             && !(value instanceof com.urbanlogiq.ulsdk.types.Line)
             && !(value instanceof com.urbanlogiq.ulsdk.types.MultiLine)
             && !(value instanceof com.urbanlogiq.ulsdk.types.Polygon)
-            && !(value instanceof com.urbanlogiq.ulsdk.types.MultiPolygon)) {
+            && !(value instanceof com.urbanlogiq.ulsdk.types.MultiPolygon)
+            && !(value instanceof com.urbanlogiq.ulsdk.types.MultiPoint)) {
             throw new com.urbanlogiq.ulsdk.InvalidVariantException("Geometry", value);
         }
 
@@ -45,6 +46,11 @@ public final class Geometry {
             int offset = o.serializeTo(builder);
             byte ty = com.urbanlogiq.ulsdk.types.generated.Geometry.MultiPolygon;
             return new com.urbanlogiq.ulsdk.Pair<Integer, Byte>(offset, ty);
+        } else if (this._value instanceof com.urbanlogiq.ulsdk.types.MultiPoint) {
+            com.urbanlogiq.ulsdk.types.MultiPoint o = (com.urbanlogiq.ulsdk.types.MultiPoint)this._value;
+            int offset = o.serializeTo(builder);
+            byte ty = com.urbanlogiq.ulsdk.types.generated.Geometry.MultiPoint;
+            return new com.urbanlogiq.ulsdk.Pair<Integer, Byte>(offset, ty);
         } else {
             throw new RuntimeException("unreachable variant");
         }
@@ -65,6 +71,8 @@ public final class Geometry {
             this._value = new com.urbanlogiq.ulsdk.types.Polygon((com.urbanlogiq.ulsdk.types.generated.Polygon)o);
         } else if (ty == com.urbanlogiq.ulsdk.types.generated.Geometry.MultiPolygon) {
             this._value = new com.urbanlogiq.ulsdk.types.MultiPolygon((com.urbanlogiq.ulsdk.types.generated.MultiPolygon)o);
+        } else if (ty == com.urbanlogiq.ulsdk.types.generated.Geometry.MultiPoint) {
+            this._value = new com.urbanlogiq.ulsdk.types.MultiPoint((com.urbanlogiq.ulsdk.types.generated.MultiPoint)o);
         }
     }
 

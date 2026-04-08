@@ -4,18 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .AttributePair import AttributePair
-from .B2cId import B2cId
-from .ContentId import ContentId
-from typing import Optional
 np = import_numpy()
 
 class DataCatalogObject(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = DataCatalogObject()
         x.Init(buf, n + offset)
@@ -26,7 +21,7 @@ class DataCatalogObject(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # DataCatalogObject
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # DataCatalogObject
@@ -41,7 +36,7 @@ class DataCatalogObject(object):
     # an EncryptedObject where the obj field of the EncryptedObject table is
     # the embedded flatbuffer of the object if it is set.
     # DataCatalogObject
-    def Obj(self, j: int):
+    def Obj(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             a = self._tab.Vector(o)
@@ -56,49 +51,51 @@ class DataCatalogObject(object):
         return 0
 
     # DataCatalogObject
-    def ObjLength(self) -> int:
+    def ObjLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # DataCatalogObject
-    def ObjIsNone(self) -> bool:
+    def ObjIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
     # Parent nodes of this commit. To handle the cases of multiple parents (ie:
     # in cases of parallel mutation), this field allows multiple IDs to be specified.
     # DataCatalogObject
-    def Parents(self, j: int) -> Optional[ContentId]:
+    def Parents(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .ContentId import ContentId
             obj = ContentId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # DataCatalogObject
-    def ParentsLength(self) -> int:
+    def ParentsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # DataCatalogObject
-    def ParentsIsNone(self) -> bool:
+    def ParentsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
     # User ID of the person committing the change.
     # DataCatalogObject
-    def User(self) -> Optional[B2cId]:
+    def User(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .B2cId import B2cId
             obj = B2cId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -106,7 +103,7 @@ class DataCatalogObject(object):
 
     # Optional change log comment
     # DataCatalogObject
-    def Comment(self) -> Optional[bytes]:
+    def Comment(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -121,7 +118,7 @@ class DataCatalogObject(object):
         return 0
 
     # DataCatalogObject
-    def Tags(self, j: int):
+    def Tags(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             a = self._tab.Vector(o)
@@ -129,14 +126,14 @@ class DataCatalogObject(object):
         return ""
 
     # DataCatalogObject
-    def TagsLength(self) -> int:
+    def TagsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # DataCatalogObject
-    def TagsIsNone(self) -> bool:
+    def TagsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         return o == 0
 
@@ -148,26 +145,27 @@ class DataCatalogObject(object):
         return 0
 
     # DataCatalogObject
-    def Attributes(self, j: int) -> Optional[AttributePair]:
+    def Attributes(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .AttributePair import AttributePair
             obj = AttributePair()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # DataCatalogObject
-    def AttributesLength(self) -> int:
+    def AttributesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # DataCatalogObject
-    def AttributesIsNone(self) -> bool:
+    def AttributesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
         return o == 0
 
@@ -189,7 +187,7 @@ class DataCatalogObject(object):
         return 0
 
     # DataCatalogObject
-    def Signature(self, j: int):
+    def Signature(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(26))
         if o != 0:
             a = self._tab.Vector(o)
@@ -204,127 +202,127 @@ class DataCatalogObject(object):
         return 0
 
     # DataCatalogObject
-    def SignatureLength(self) -> int:
+    def SignatureLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(26))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # DataCatalogObject
-    def SignatureIsNone(self) -> bool:
+    def SignatureIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(26))
         return o == 0
 
-def DataCatalogObjectStart(builder: flatbuffers.Builder):
+def DataCatalogObjectStart(builder):
     builder.StartObject(12)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DataCatalogObjectStart(builder)
 
-def DataCatalogObjectAddTy(builder: flatbuffers.Builder, ty: int):
+def DataCatalogObjectAddTy(builder, ty):
     builder.PrependInt16Slot(0, ty, 0)
 
-def AddTy(builder: flatbuffers.Builder, ty: int):
+def AddTy(builder, ty):
     DataCatalogObjectAddTy(builder, ty)
 
-def DataCatalogObjectAddObj(builder: flatbuffers.Builder, obj: int):
+def DataCatalogObjectAddObj(builder, obj):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(obj), 0)
 
-def AddObj(builder: flatbuffers.Builder, obj: int):
+def AddObj(builder, obj):
     DataCatalogObjectAddObj(builder, obj)
 
-def DataCatalogObjectStartObjVector(builder, numElems: int) -> int:
+def DataCatalogObjectStartObjVector(builder, numElems):
     return builder.StartVector(1, numElems, 1)
 
-def StartObjVector(builder, numElems: int) -> int:
+def StartObjVector(builder, numElems):
     return DataCatalogObjectStartObjVector(builder, numElems)
 
-def DataCatalogObjectAddParents(builder: flatbuffers.Builder, parents: int):
+def DataCatalogObjectAddParents(builder, parents):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(parents), 0)
 
-def AddParents(builder: flatbuffers.Builder, parents: int):
+def AddParents(builder, parents):
     DataCatalogObjectAddParents(builder, parents)
 
-def DataCatalogObjectStartParentsVector(builder, numElems: int) -> int:
+def DataCatalogObjectStartParentsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartParentsVector(builder, numElems: int) -> int:
+def StartParentsVector(builder, numElems):
     return DataCatalogObjectStartParentsVector(builder, numElems)
 
-def DataCatalogObjectAddUser(builder: flatbuffers.Builder, user: int):
+def DataCatalogObjectAddUser(builder, user):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(user), 0)
 
-def AddUser(builder: flatbuffers.Builder, user: int):
+def AddUser(builder, user):
     DataCatalogObjectAddUser(builder, user)
 
-def DataCatalogObjectAddComment(builder: flatbuffers.Builder, comment: int):
+def DataCatalogObjectAddComment(builder, comment):
     builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(comment), 0)
 
-def AddComment(builder: flatbuffers.Builder, comment: int):
+def AddComment(builder, comment):
     DataCatalogObjectAddComment(builder, comment)
 
-def DataCatalogObjectAddTime(builder: flatbuffers.Builder, time: int):
+def DataCatalogObjectAddTime(builder, time):
     builder.PrependUint64Slot(5, time, 0)
 
-def AddTime(builder: flatbuffers.Builder, time: int):
+def AddTime(builder, time):
     DataCatalogObjectAddTime(builder, time)
 
-def DataCatalogObjectAddTags(builder: flatbuffers.Builder, tags: int):
+def DataCatalogObjectAddTags(builder, tags):
     builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(tags), 0)
 
-def AddTags(builder: flatbuffers.Builder, tags: int):
+def AddTags(builder, tags):
     DataCatalogObjectAddTags(builder, tags)
 
-def DataCatalogObjectStartTagsVector(builder, numElems: int) -> int:
+def DataCatalogObjectStartTagsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartTagsVector(builder, numElems: int) -> int:
+def StartTagsVector(builder, numElems):
     return DataCatalogObjectStartTagsVector(builder, numElems)
 
-def DataCatalogObjectAddFlags(builder: flatbuffers.Builder, flags: int):
+def DataCatalogObjectAddFlags(builder, flags):
     builder.PrependUint32Slot(7, flags, 0)
 
-def AddFlags(builder: flatbuffers.Builder, flags: int):
+def AddFlags(builder, flags):
     DataCatalogObjectAddFlags(builder, flags)
 
-def DataCatalogObjectAddAttributes(builder: flatbuffers.Builder, attributes: int):
+def DataCatalogObjectAddAttributes(builder, attributes):
     builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(attributes), 0)
 
-def AddAttributes(builder: flatbuffers.Builder, attributes: int):
+def AddAttributes(builder, attributes):
     DataCatalogObjectAddAttributes(builder, attributes)
 
-def DataCatalogObjectStartAttributesVector(builder, numElems: int) -> int:
+def DataCatalogObjectStartAttributesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartAttributesVector(builder, numElems: int) -> int:
+def StartAttributesVector(builder, numElems):
     return DataCatalogObjectStartAttributesVector(builder, numElems)
 
-def DataCatalogObjectAddVersion(builder: flatbuffers.Builder, version: int):
+def DataCatalogObjectAddVersion(builder, version):
     builder.PrependUint32Slot(9, version, 0)
 
-def AddVersion(builder: flatbuffers.Builder, version: int):
+def AddVersion(builder, version):
     DataCatalogObjectAddVersion(builder, version)
 
-def DataCatalogObjectAddDefaultMode(builder: flatbuffers.Builder, defaultMode: int):
+def DataCatalogObjectAddDefaultMode(builder, defaultMode):
     builder.PrependUint32Slot(10, defaultMode, 0)
 
-def AddDefaultMode(builder: flatbuffers.Builder, defaultMode: int):
+def AddDefaultMode(builder, defaultMode):
     DataCatalogObjectAddDefaultMode(builder, defaultMode)
 
-def DataCatalogObjectAddSignature(builder: flatbuffers.Builder, signature: int):
+def DataCatalogObjectAddSignature(builder, signature):
     builder.PrependUOffsetTRelativeSlot(11, flatbuffers.number_types.UOffsetTFlags.py_type(signature), 0)
 
-def AddSignature(builder: flatbuffers.Builder, signature: int):
+def AddSignature(builder, signature):
     DataCatalogObjectAddSignature(builder, signature)
 
-def DataCatalogObjectStartSignatureVector(builder, numElems: int) -> int:
+def DataCatalogObjectStartSignatureVector(builder, numElems):
     return builder.StartVector(1, numElems, 1)
 
-def StartSignatureVector(builder, numElems: int) -> int:
+def StartSignatureVector(builder, numElems):
     return DataCatalogObjectStartSignatureVector(builder, numElems)
 
-def DataCatalogObjectEnd(builder: flatbuffers.Builder) -> int:
+def DataCatalogObjectEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DataCatalogObjectEnd(builder)

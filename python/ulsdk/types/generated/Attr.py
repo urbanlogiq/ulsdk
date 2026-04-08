@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class Attr(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Attr()
         x.Init(buf, n + offset)
@@ -24,11 +21,11 @@ class Attr(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Attr
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Attr
-    def Key(self) -> Optional[bytes]:
+    def Key(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -42,40 +39,41 @@ class Attr(object):
         return 0
 
     # Attr
-    def V(self) -> Optional[flatbuffers.table.Table]:
+    def V(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
-def AttrStart(builder: flatbuffers.Builder):
+def AttrStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     AttrStart(builder)
 
-def AttrAddKey(builder: flatbuffers.Builder, key: int):
+def AttrAddKey(builder, key):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(key), 0)
 
-def AddKey(builder: flatbuffers.Builder, key: int):
+def AddKey(builder, key):
     AttrAddKey(builder, key)
 
-def AttrAddVType(builder: flatbuffers.Builder, vType: int):
+def AttrAddVType(builder, vType):
     builder.PrependUint8Slot(1, vType, 0)
 
-def AddVType(builder: flatbuffers.Builder, vType: int):
+def AddVType(builder, vType):
     AttrAddVType(builder, vType)
 
-def AttrAddV(builder: flatbuffers.Builder, v: int):
+def AttrAddV(builder, v):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(v), 0)
 
-def AddV(builder: flatbuffers.Builder, v: int):
+def AddV(builder, v):
     AttrAddV(builder, v)
 
-def AttrEnd(builder: flatbuffers.Builder) -> int:
+def AttrEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return AttrEnd(builder)

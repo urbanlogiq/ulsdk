@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class DataStateId(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = DataStateId()
         x.Init(buf, n + offset)
@@ -22,11 +21,11 @@ class DataStateId(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # DataStateId
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # DataStateId
-    def B(self, j: int):
+    def B(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             a = self._tab.Vector(o)
@@ -41,37 +40,37 @@ class DataStateId(object):
         return 0
 
     # DataStateId
-    def BLength(self) -> int:
+    def BLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # DataStateId
-    def BIsNone(self) -> bool:
+    def BIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def DataStateIdStart(builder: flatbuffers.Builder):
+def DataStateIdStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DataStateIdStart(builder)
 
-def DataStateIdAddB(builder: flatbuffers.Builder, b: int):
+def DataStateIdAddB(builder, b):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(b), 0)
 
-def AddB(builder: flatbuffers.Builder, b: int):
+def AddB(builder, b):
     DataStateIdAddB(builder, b)
 
-def DataStateIdStartBVector(builder, numElems: int) -> int:
+def DataStateIdStartBVector(builder, numElems):
     return builder.StartVector(1, numElems, 1)
 
-def StartBVector(builder, numElems: int) -> int:
+def StartBVector(builder, numElems):
     return DataStateIdStartBVector(builder, numElems)
 
-def DataStateIdEnd(builder: flatbuffers.Builder) -> int:
+def DataStateIdEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DataStateIdEnd(builder)

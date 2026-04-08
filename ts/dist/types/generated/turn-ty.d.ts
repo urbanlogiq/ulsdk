@@ -1,0 +1,16 @@
+export declare enum TurnTy {
+    CW = 0,
+    CCW = 1,
+    NONE = 2,
+    LEFT = 3,
+    RIGHT = 4,
+    THRU = 5,
+    U_TURN = 6,
+    BEAR_RIGHT = 7,
+    BEAR_LEFT = 8,
+    HARD_RIGHT = 9,
+    HARD_LEFT = 10,
+    RIGHT_TURNING_ON_RED = 11,
+    BEAR_RIGHT_ON_RED = 12
+}
+//# sourceMappingURL=turn-ty.d.ts.map

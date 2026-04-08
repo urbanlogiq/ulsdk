@@ -4,17 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .GenericId import GenericId
-from .ValueInstance import ValueInstance
-from typing import Optional
 np = import_numpy()
 
 class Modify(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Modify()
         x.Init(buf, n + offset)
@@ -25,78 +21,81 @@ class Modify(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Modify
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Modify
-    def Col(self) -> Optional[bytes]:
+    def Col(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # Modify
-    def Value(self) -> Optional[ValueInstance]:
+    def Value(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ValueInstance import ValueInstance
             obj = ValueInstance()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Modify
-    def Previous(self) -> Optional[ValueInstance]:
+    def Previous(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ValueInstance import ValueInstance
             obj = ValueInstance()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Modify
-    def Row(self) -> Optional[GenericId]:
+    def Row(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .GenericId import GenericId
             obj = GenericId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def ModifyStart(builder: flatbuffers.Builder):
+def ModifyStart(builder):
     builder.StartObject(4)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ModifyStart(builder)
 
-def ModifyAddCol(builder: flatbuffers.Builder, col: int):
+def ModifyAddCol(builder, col):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(col), 0)
 
-def AddCol(builder: flatbuffers.Builder, col: int):
+def AddCol(builder, col):
     ModifyAddCol(builder, col)
 
-def ModifyAddValue(builder: flatbuffers.Builder, value: int):
+def ModifyAddValue(builder, value):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(value), 0)
 
-def AddValue(builder: flatbuffers.Builder, value: int):
+def AddValue(builder, value):
     ModifyAddValue(builder, value)
 
-def ModifyAddPrevious(builder: flatbuffers.Builder, previous: int):
+def ModifyAddPrevious(builder, previous):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(previous), 0)
 
-def AddPrevious(builder: flatbuffers.Builder, previous: int):
+def AddPrevious(builder, previous):
     ModifyAddPrevious(builder, previous)
 
-def ModifyAddRow(builder: flatbuffers.Builder, row: int):
+def ModifyAddRow(builder, row):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(row), 0)
 
-def AddRow(builder: flatbuffers.Builder, row: int):
+def AddRow(builder, row):
     ModifyAddRow(builder, row)
 
-def ModifyEnd(builder: flatbuffers.Builder) -> int:
+def ModifyEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ModifyEnd(builder)

@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .OrderBy import OrderBy
-from typing import Optional
 np = import_numpy()
 
 class OrderByExpr(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = OrderByExpr()
         x.Init(buf, n + offset)
@@ -24,53 +21,54 @@ class OrderByExpr(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # OrderByExpr
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # OrderByExpr
-    def OrderBy(self, j: int) -> Optional[OrderBy]:
+    def OrderBy(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .OrderBy import OrderBy
             obj = OrderBy()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # OrderByExpr
-    def OrderByLength(self) -> int:
+    def OrderByLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # OrderByExpr
-    def OrderByIsNone(self) -> bool:
+    def OrderByIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def OrderByExprStart(builder: flatbuffers.Builder):
+def OrderByExprStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     OrderByExprStart(builder)
 
-def OrderByExprAddOrderBy(builder: flatbuffers.Builder, orderBy: int):
+def OrderByExprAddOrderBy(builder, orderBy):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(orderBy), 0)
 
-def AddOrderBy(builder: flatbuffers.Builder, orderBy: int):
+def AddOrderBy(builder, orderBy):
     OrderByExprAddOrderBy(builder, orderBy)
 
-def OrderByExprStartOrderByVector(builder, numElems: int) -> int:
+def OrderByExprStartOrderByVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartOrderByVector(builder, numElems: int) -> int:
+def StartOrderByVector(builder, numElems):
     return OrderByExprStartOrderByVector(builder, numElems)
 
-def OrderByExprEnd(builder: flatbuffers.Builder) -> int:
+def OrderByExprEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return OrderByExprEnd(builder)

@@ -4,8 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from typing import Optional
 np = import_numpy()
 
 # Timestamp is a 64-bit signed integer representing an elapsed time since a
@@ -117,7 +115,7 @@ class Timestamp(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Timestamp()
         x.Init(buf, n + offset)
@@ -128,7 +126,7 @@ class Timestamp(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Timestamp
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Timestamp
@@ -149,32 +147,32 @@ class Timestamp(object):
     # Whether a timezone string is present indicates different semantics about
     # the data (see above).
     # Timestamp
-    def Timezone(self) -> Optional[bytes]:
+    def Timezone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def TimestampStart(builder: flatbuffers.Builder):
+def TimestampStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     TimestampStart(builder)
 
-def TimestampAddUnit(builder: flatbuffers.Builder, unit: int):
+def TimestampAddUnit(builder, unit):
     builder.PrependInt16Slot(0, unit, 0)
 
-def AddUnit(builder: flatbuffers.Builder, unit: int):
+def AddUnit(builder, unit):
     TimestampAddUnit(builder, unit)
 
-def TimestampAddTimezone(builder: flatbuffers.Builder, timezone: int):
+def TimestampAddTimezone(builder, timezone):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(timezone), 0)
 
-def AddTimezone(builder: flatbuffers.Builder, timezone: int):
+def AddTimezone(builder, timezone):
     TimestampAddTimezone(builder, timezone)
 
-def TimestampEnd(builder: flatbuffers.Builder) -> int:
+def TimestampEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return TimestampEnd(builder)

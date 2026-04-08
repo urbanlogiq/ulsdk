@@ -4,7 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 # A Struct_ in the flatbuffer metadata is the same as an Arrow Struct
@@ -14,7 +13,7 @@ class Struct_(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Struct_()
         x.Init(buf, n + offset)
@@ -25,17 +24,17 @@ class Struct_(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Struct_
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
-def Struct_Start(builder: flatbuffers.Builder):
+def Struct_Start(builder):
     builder.StartObject(0)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     Struct_Start(builder)
 
-def Struct_End(builder: flatbuffers.Builder) -> int:
+def Struct_End(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return Struct_End(builder)

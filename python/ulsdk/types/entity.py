@@ -35,6 +35,7 @@ from .generated.GraphNode import GraphNode as FbsGraphNode
 from .generated.GraphNodeId import GraphNodeId as FbsGraphNodeId
 from .generated.Line import Line as FbsLine
 from .generated.MultiLine import MultiLine as FbsMultiLine
+from .generated.MultiPoint import MultiPoint as FbsMultiPoint
 from .generated.MultiPolygon import MultiPolygon as FbsMultiPolygon
 from .generated.ObjectId import ObjectId as FbsObjectId
 from .generated.Point import Point as FbsPoint
@@ -334,6 +335,7 @@ class EntityTy(Enum):
     T_ROAD_SEGMENT_SAFETY_COUNTS = 271
     T_HEXAGON_BOUNDARY = 272
     T_COMPASS_IOT_POINT = 273
+    T_LANDSLIDE_AREA = 274
 
 class NodeTy(Enum):
     N_INVALID = 0
@@ -645,6 +647,67 @@ class MultiPolygon:
         return eq
 
 @dataclass
+class MultiPoint:
+    point_geo: "List[Point]"
+
+    @classmethod
+    def from_fbs(cls, o: FbsMultiPoint) -> Self:
+        point_geo = list()
+        if not o.PointGeoIsNone():
+            for i in range(o.PointGeoLength()):
+                point_geo_val = None
+                point_geo_obj = o.PointGeo(i)
+                if point_geo_obj is not None:
+                    point_geo_val = Point.from_fbs(point_geo_obj)
+                point_geo.append(point_geo_val)
+        return cls(point_geo)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsMultiPoint.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.MultiPoint import (
+            Start,
+            AddPointGeo,
+            StartPointGeoVector,
+            End,
+        )
+        point_geo_offsets = list()
+        for value in self.point_geo:
+            point_geo_offsets.append(value.serialize_to(builder))
+        StartPointGeoVector(builder, len(self.point_geo))
+        for i in reversed(range(len(self.point_geo))):
+            builder.PrependUOffsetTRelative(point_geo_offsets[i])
+        point_geo_offset = builder.EndVector()
+
+        Start(builder)
+        AddPointGeo(builder, point_geo_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        point_geo = []
+        return cls(point_geo)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        if len(self.point_geo) != len(other.point_geo):
+            return False
+        for i in range(len(self.point_geo)):
+            eq = eq and self.point_geo[i] == other.point_geo[i]
+
+        return eq
+
+@dataclass
 class Geometry:
     value: Union[
         "Point",
@@ -652,6 +715,7 @@ class Geometry:
         "MultiLine",
         "Polygon",
         "MultiPolygon",
+        "MultiPoint",
     ]
 
     def serialize_to(self, builder: Builder) -> Tuple[int, int]:
@@ -667,6 +731,8 @@ class Geometry:
             return (offset, Geometry().Polygon)
         elif isinstance(self.value, MultiPolygon):
             return (offset, Geometry().MultiPolygon)
+        elif isinstance(self.value, MultiPoint):
+            return (offset, Geometry().MultiPoint)
         raise ValueError("Invalid union type")
 
     @classmethod
@@ -695,6 +761,10 @@ class Geometry:
             val = FbsMultiPolygon();
             val.Init(source, pos)
             return cls(MultiPolygon.from_fbs(val))
+        elif ty == Geometry_ty_instance.MultiPoint:
+            val = FbsMultiPoint();
+            val.Init(source, pos)
+            return cls(MultiPoint.from_fbs(val))
         else:
             raise ValueError("Invalid union type")
 

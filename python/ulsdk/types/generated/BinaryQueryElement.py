@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .QueryElement import QueryElement
-from typing import Optional
 np = import_numpy()
 
 class BinaryQueryElement(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = BinaryQueryElement()
         x.Init(buf, n + offset)
@@ -24,7 +21,7 @@ class BinaryQueryElement(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # BinaryQueryElement
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # BinaryQueryElement
@@ -35,51 +32,53 @@ class BinaryQueryElement(object):
         return 0
 
     # BinaryQueryElement
-    def Lhs(self) -> Optional[QueryElement]:
+    def Lhs(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .QueryElement import QueryElement
             obj = QueryElement()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # BinaryQueryElement
-    def Rhs(self) -> Optional[QueryElement]:
+    def Rhs(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .QueryElement import QueryElement
             obj = QueryElement()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def BinaryQueryElementStart(builder: flatbuffers.Builder):
+def BinaryQueryElementStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     BinaryQueryElementStart(builder)
 
-def BinaryQueryElementAddOp(builder: flatbuffers.Builder, op: int):
+def BinaryQueryElementAddOp(builder, op):
     builder.PrependInt8Slot(0, op, 0)
 
-def AddOp(builder: flatbuffers.Builder, op: int):
+def AddOp(builder, op):
     BinaryQueryElementAddOp(builder, op)
 
-def BinaryQueryElementAddLhs(builder: flatbuffers.Builder, lhs: int):
+def BinaryQueryElementAddLhs(builder, lhs):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(lhs), 0)
 
-def AddLhs(builder: flatbuffers.Builder, lhs: int):
+def AddLhs(builder, lhs):
     BinaryQueryElementAddLhs(builder, lhs)
 
-def BinaryQueryElementAddRhs(builder: flatbuffers.Builder, rhs: int):
+def BinaryQueryElementAddRhs(builder, rhs):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(rhs), 0)
 
-def AddRhs(builder: flatbuffers.Builder, rhs: int):
+def AddRhs(builder, rhs):
     BinaryQueryElementAddRhs(builder, rhs)
 
-def BinaryQueryElementEnd(builder: flatbuffers.Builder) -> int:
+def BinaryQueryElementEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return BinaryQueryElementEnd(builder)

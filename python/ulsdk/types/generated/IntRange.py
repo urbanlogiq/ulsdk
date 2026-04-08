@@ -4,17 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .IntegerDisplayString import IntegerDisplayString
-from .NumericalFieldFormat import NumericalFieldFormat
-from typing import Optional
 np = import_numpy()
 
 class IntRange(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = IntRange()
         x.Init(buf, n + offset)
@@ -25,7 +21,7 @@ class IntRange(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # IntRange
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # IntRange
@@ -43,10 +39,11 @@ class IntRange(object):
         return 0
 
     # IntRange
-    def FieldFormat(self) -> Optional[NumericalFieldFormat]:
+    def FieldFormat(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .NumericalFieldFormat import NumericalFieldFormat
             obj = NumericalFieldFormat()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -60,86 +57,87 @@ class IntRange(object):
         return 0
 
     # IntRange
-    def DisplayStrings(self, j: int) -> Optional[IntegerDisplayString]:
+    def DisplayStrings(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .IntegerDisplayString import IntegerDisplayString
             obj = IntegerDisplayString()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # IntRange
-    def DisplayStringsLength(self) -> int:
+    def DisplayStringsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # IntRange
-    def DisplayStringsIsNone(self) -> bool:
+    def DisplayStringsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         return o == 0
 
     # IntRange
-    def EnumName(self) -> Optional[bytes]:
+    def EnumName(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def IntRangeStart(builder: flatbuffers.Builder):
+def IntRangeStart(builder):
     builder.StartObject(6)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     IntRangeStart(builder)
 
-def IntRangeAddMin(builder: flatbuffers.Builder, min: int):
+def IntRangeAddMin(builder, min):
     builder.PrependInt64Slot(0, min, 0)
 
-def AddMin(builder: flatbuffers.Builder, min: int):
+def AddMin(builder, min):
     IntRangeAddMin(builder, min)
 
-def IntRangeAddMax(builder: flatbuffers.Builder, max: int):
+def IntRangeAddMax(builder, max):
     builder.PrependInt64Slot(1, max, 0)
 
-def AddMax(builder: flatbuffers.Builder, max: int):
+def AddMax(builder, max):
     IntRangeAddMax(builder, max)
 
-def IntRangeAddFieldFormat(builder: flatbuffers.Builder, fieldFormat: int):
+def IntRangeAddFieldFormat(builder, fieldFormat):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(fieldFormat), 0)
 
-def AddFieldFormat(builder: flatbuffers.Builder, fieldFormat: int):
+def AddFieldFormat(builder, fieldFormat):
     IntRangeAddFieldFormat(builder, fieldFormat)
 
-def IntRangeAddAggregationProtocol(builder: flatbuffers.Builder, aggregationProtocol: int):
+def IntRangeAddAggregationProtocol(builder, aggregationProtocol):
     builder.PrependUint32Slot(3, aggregationProtocol, 0)
 
-def AddAggregationProtocol(builder: flatbuffers.Builder, aggregationProtocol: int):
+def AddAggregationProtocol(builder, aggregationProtocol):
     IntRangeAddAggregationProtocol(builder, aggregationProtocol)
 
-def IntRangeAddDisplayStrings(builder: flatbuffers.Builder, displayStrings: int):
+def IntRangeAddDisplayStrings(builder, displayStrings):
     builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(displayStrings), 0)
 
-def AddDisplayStrings(builder: flatbuffers.Builder, displayStrings: int):
+def AddDisplayStrings(builder, displayStrings):
     IntRangeAddDisplayStrings(builder, displayStrings)
 
-def IntRangeStartDisplayStringsVector(builder, numElems: int) -> int:
+def IntRangeStartDisplayStringsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartDisplayStringsVector(builder, numElems: int) -> int:
+def StartDisplayStringsVector(builder, numElems):
     return IntRangeStartDisplayStringsVector(builder, numElems)
 
-def IntRangeAddEnumName(builder: flatbuffers.Builder, enumName: int):
+def IntRangeAddEnumName(builder, enumName):
     builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(enumName), 0)
 
-def AddEnumName(builder: flatbuffers.Builder, enumName: int):
+def AddEnumName(builder, enumName):
     IntRangeAddEnumName(builder, enumName)
 
-def IntRangeEnd(builder: flatbuffers.Builder) -> int:
+def IntRangeEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return IntRangeEnd(builder)

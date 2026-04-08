@@ -23,6 +23,7 @@ struct AttributePair;
 struct DirectionAndRoadName;
 struct DirectionAndRoadNames;
 struct NamedParameter;
+struct OutputSchema;
 struct Source;
 
 using ::BinaryYesNo;
@@ -86,13 +87,26 @@ struct NamedParameter {
     }
 };
 
+struct OutputSchema {
+    std::vector<AttributePair> attributes_;
+    std::vector<Schema> schema_;
+
+    OutputSchema();
+    OutputSchema(const ::OutputSchema *root);
+    OutputSchema(const std::vector<uint8_t> &bytes);
+    bool operator==(const OutputSchema &rhs) const;
+    bool operator!=(const OutputSchema &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
 struct Source {
     std::optional<ObjectId> metadata_;
     std::optional<ContentId> metadata_revision_;
     std::string name_;
     std::optional<std::vector<NamedParameter>> named_parameters_;
     std::optional<std::vector<uint8_t>> options_;
-    std::optional<std::vector<Schema>> schemas_;
+    std::optional<std::vector<OutputSchema>> output_schemas_;
     std::string url_;
 
     Source();
@@ -116,6 +130,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DirectionAndRoadNa
 ::flatbuffers::Offset<::NamedParameter>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NamedParameter &);
 
+::flatbuffers::Offset<::OutputSchema>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const OutputSchema &);
+
 ::flatbuffers::Offset<::Source>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Source &);
 
@@ -131,6 +148,9 @@ to_bytes(const DirectionAndRoadNames &o);
 
 std::vector<uint8_t>
 to_bytes(const NamedParameter &o);
+
+std::vector<uint8_t>
+to_bytes(const OutputSchema &o);
 
 std::vector<uint8_t>
 to_bytes(const Source &o);

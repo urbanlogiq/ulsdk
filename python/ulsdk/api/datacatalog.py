@@ -121,13 +121,16 @@ def update_object(
     ctx: RequestContext,
     id_: "ObjectId",
     object: DataCatalogObject,
-) -> None:
+) -> ContentId:
     """Update the object with the given ID
 
     Arguments:
     ctx: RequestContext -- A request context object
     id_: "ObjectId" -- The ID of the object to update
     object: DataCatalogObject -- Object contents with which to update the specified object
+
+    Returns:
+    The content ID of the updated object
     """
 
     path = "/v1/api/ulv2/datacatalog/object/:id"
@@ -136,8 +139,8 @@ def update_object(
     params = dict()
     headers = dict()
     body = object.to_bytes()
-    ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
-    return
+    res = ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
+    return ContentId.from_bytes(res)
 
 def update_attributes(
     ctx: RequestContext,
@@ -178,7 +181,7 @@ def delete_attribute(
     key: str -- The key of the attribute to delete
     """
 
-    path = "/v1/api/ulv2/datacatalog/object/:id/attributes/:key"
+    path = "/v1/api/ulv2/datacatalog/object/:id/attribute/:key"
     path = path.replace(":id", str(id_), 1)
     path = path.replace(":key", str(key), 1)
 
@@ -207,6 +210,27 @@ def get_object_summaries(
     body = object_ids.to_bytes()
     res = ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
     return ObjectSummaryList.from_bytes(res)
+
+def bulk_fetch_metadata(
+    ctx: RequestContext,
+    stream_ids: ObjectIdList,
+) -> ObjectIdPairList:
+    """Given a list of IDs for stream objects, fetch their metadata in bulk. Note that the returned DataCatalogObject instances only have a valid metadata `obj` field.
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+    stream_ids: ObjectIdList -- A list of IDs of stream objects to fetch metadata for
+
+    Returns:
+    A list of metadata DataCatalogObjects
+    """
+
+    path = "/v1/api/ulv2/datacatalog/stream/metadata_list"
+    params = dict()
+    headers = dict()
+    body = stream_ids.to_bytes()
+    res = ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
+    return ObjectIdPairList.from_bytes(res)
 
 def bulk_fetch_objects(
     ctx: RequestContext,

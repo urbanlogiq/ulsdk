@@ -4,11 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Attr import Attr
-from .ContentId import ContentId
-from .OpEntry import OpEntry
-from typing import Optional
 np = import_numpy()
 
 # A DiffStream encodes a sequence of operations that should be performed on a table.
@@ -17,7 +12,7 @@ class DiffStream(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = DiffStream()
         x.Init(buf, n + offset)
@@ -28,41 +23,43 @@ class DiffStream(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # DiffStream
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # This is the head revision of the directory object that contains the table.
     # DiffStream
-    def Base(self) -> Optional[ContentId]:
+    def Base(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ContentId import ContentId
             obj = ContentId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # DiffStream
-    def Seq(self, j: int) -> Optional[OpEntry]:
+    def Seq(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .OpEntry import OpEntry
             obj = OpEntry()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # DiffStream
-    def SeqLength(self) -> int:
+    def SeqLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # DiffStream
-    def SeqIsNone(self) -> bool:
+    def SeqIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
@@ -70,67 +67,68 @@ class DiffStream(object):
     # When the change history of the table is retrieved, the attributes from the diffstream
     # will be accessible as the `attributes` field on the ChangeSet associated with this diffstream.
     # DiffStream
-    def Attributes(self, j: int) -> Optional[Attr]:
+    def Attributes(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Attr import Attr
             obj = Attr()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # DiffStream
-    def AttributesLength(self) -> int:
+    def AttributesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # DiffStream
-    def AttributesIsNone(self) -> bool:
+    def AttributesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
-def DiffStreamStart(builder: flatbuffers.Builder):
+def DiffStreamStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DiffStreamStart(builder)
 
-def DiffStreamAddBase(builder: flatbuffers.Builder, base: int):
+def DiffStreamAddBase(builder, base):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(base), 0)
 
-def AddBase(builder: flatbuffers.Builder, base: int):
+def AddBase(builder, base):
     DiffStreamAddBase(builder, base)
 
-def DiffStreamAddSeq(builder: flatbuffers.Builder, seq: int):
+def DiffStreamAddSeq(builder, seq):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(seq), 0)
 
-def AddSeq(builder: flatbuffers.Builder, seq: int):
+def AddSeq(builder, seq):
     DiffStreamAddSeq(builder, seq)
 
-def DiffStreamStartSeqVector(builder, numElems: int) -> int:
+def DiffStreamStartSeqVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartSeqVector(builder, numElems: int) -> int:
+def StartSeqVector(builder, numElems):
     return DiffStreamStartSeqVector(builder, numElems)
 
-def DiffStreamAddAttributes(builder: flatbuffers.Builder, attributes: int):
+def DiffStreamAddAttributes(builder, attributes):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(attributes), 0)
 
-def AddAttributes(builder: flatbuffers.Builder, attributes: int):
+def AddAttributes(builder, attributes):
     DiffStreamAddAttributes(builder, attributes)
 
-def DiffStreamStartAttributesVector(builder, numElems: int) -> int:
+def DiffStreamStartAttributesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartAttributesVector(builder, numElems: int) -> int:
+def StartAttributesVector(builder, numElems):
     return DiffStreamStartAttributesVector(builder, numElems)
 
-def DiffStreamEnd(builder: flatbuffers.Builder) -> int:
+def DiffStreamEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DiffStreamEnd(builder)

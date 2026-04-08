@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ObjectId import ObjectId
-from typing import Optional
 np = import_numpy()
 
 class ObjectRef(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = ObjectRef()
         x.Init(buf, n + offset)
@@ -24,14 +21,15 @@ class ObjectRef(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # ObjectRef
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # ObjectRef
-    def Id(self) -> Optional[ObjectId]:
+    def Id(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -44,26 +42,26 @@ class ObjectRef(object):
             return self._tab.Get(flatbuffers.number_types.Int16Flags, o + self._tab.Pos)
         return 0
 
-def ObjectRefStart(builder: flatbuffers.Builder):
+def ObjectRefStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ObjectRefStart(builder)
 
-def ObjectRefAddId(builder: flatbuffers.Builder, id: int):
+def ObjectRefAddId(builder, id):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(id), 0)
 
-def AddId(builder: flatbuffers.Builder, id: int):
+def AddId(builder, id):
     ObjectRefAddId(builder, id)
 
-def ObjectRefAddTy(builder: flatbuffers.Builder, ty: int):
+def ObjectRefAddTy(builder, ty):
     builder.PrependInt16Slot(1, ty, 0)
 
-def AddTy(builder: flatbuffers.Builder, ty: int):
+def AddTy(builder, ty):
     ObjectRefAddTy(builder, ty)
 
-def ObjectRefEnd(builder: flatbuffers.Builder) -> int:
+def ObjectRefEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ObjectRefEnd(builder)

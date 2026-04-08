@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class FixedSizeBinary(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = FixedSizeBinary()
         x.Init(buf, n + offset)
@@ -22,7 +21,7 @@ class FixedSizeBinary(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # FixedSizeBinary
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Number of bytes per value
@@ -33,20 +32,20 @@ class FixedSizeBinary(object):
             return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
         return 0
 
-def FixedSizeBinaryStart(builder: flatbuffers.Builder):
+def FixedSizeBinaryStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     FixedSizeBinaryStart(builder)
 
-def FixedSizeBinaryAddByteWidth(builder: flatbuffers.Builder, byteWidth: int):
+def FixedSizeBinaryAddByteWidth(builder, byteWidth):
     builder.PrependInt32Slot(0, byteWidth, 0)
 
-def AddByteWidth(builder: flatbuffers.Builder, byteWidth: int):
+def AddByteWidth(builder, byteWidth):
     FixedSizeBinaryAddByteWidth(builder, byteWidth)
 
-def FixedSizeBinaryEnd(builder: flatbuffers.Builder) -> int:
+def FixedSizeBinaryEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return FixedSizeBinaryEnd(builder)

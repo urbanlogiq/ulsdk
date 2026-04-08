@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .GraphNode import GraphNode
-from typing import Optional
 np = import_numpy()
 
 class NodeList(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = NodeList()
         x.Init(buf, n + offset)
@@ -24,53 +21,54 @@ class NodeList(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # NodeList
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # NodeList
-    def Nodes(self, j: int) -> Optional[GraphNode]:
+    def Nodes(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .GraphNode import GraphNode
             obj = GraphNode()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # NodeList
-    def NodesLength(self) -> int:
+    def NodesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # NodeList
-    def NodesIsNone(self) -> bool:
+    def NodesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def NodeListStart(builder: flatbuffers.Builder):
+def NodeListStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     NodeListStart(builder)
 
-def NodeListAddNodes(builder: flatbuffers.Builder, nodes: int):
+def NodeListAddNodes(builder, nodes):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(nodes), 0)
 
-def AddNodes(builder: flatbuffers.Builder, nodes: int):
+def AddNodes(builder, nodes):
     NodeListAddNodes(builder, nodes)
 
-def NodeListStartNodesVector(builder, numElems: int) -> int:
+def NodeListStartNodesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartNodesVector(builder, numElems: int) -> int:
+def StartNodesVector(builder, numElems):
     return NodeListStartNodesVector(builder, numElems)
 
-def NodeListEnd(builder: flatbuffers.Builder) -> int:
+def NodeListEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return NodeListEnd(builder)

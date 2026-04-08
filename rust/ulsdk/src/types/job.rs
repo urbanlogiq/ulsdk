@@ -26,8 +26,8 @@ use crate::types::Schema::{
 use crate::types::attr::Attr;
 use crate::types::data::{
     AttributePair, BinaryYesNo, DayOfWeek, DirectionAndRoadName, DirectionAndRoadNames,
-    DirectionTy, NamedParameter, NamedParameterFlags, RoadUserTy, Source, StatisticTy,
-    TimeGranularity, TurnTy,
+    DirectionTy, NamedParameter, NamedParameterFlags, OutputSchema, RoadUserTy, Source,
+    StatisticTy, TimeGranularity, TurnTy,
 };
 use crate::types::generated::Schema_generated::{
     Binary as FbsBinary, BinaryView as FbsBinaryView, Bool as FbsBool, Buffer as FbsBuffer,
@@ -50,8 +50,8 @@ use crate::types::generated::data_generated::{
     DirectionAndRoadName as FbsDirectionAndRoadName,
     DirectionAndRoadNames as FbsDirectionAndRoadNames, DirectionTy as FbsDirectionTy,
     NamedParameter as FbsNamedParameter, NamedParameterFlags as FbsNamedParameterFlags,
-    RoadUserTy as FbsRoadUserTy, Source as FbsSource, StatisticTy as FbsStatisticTy,
-    TimeGranularity as FbsTimeGranularity, TurnTy as FbsTurnTy,
+    OutputSchema as FbsOutputSchema, RoadUserTy as FbsRoadUserTy, Source as FbsSource,
+    StatisticTy as FbsStatisticTy, TimeGranularity as FbsTimeGranularity, TurnTy as FbsTurnTy,
 };
 use crate::types::generated::id_generated::{
     B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,

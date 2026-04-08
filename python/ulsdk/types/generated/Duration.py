@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class Duration(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Duration()
         x.Init(buf, n + offset)
@@ -22,7 +21,7 @@ class Duration(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Duration
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Duration
@@ -32,20 +31,20 @@ class Duration(object):
             return self._tab.Get(flatbuffers.number_types.Int16Flags, o + self._tab.Pos)
         return 1
 
-def DurationStart(builder: flatbuffers.Builder):
+def DurationStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DurationStart(builder)
 
-def DurationAddUnit(builder: flatbuffers.Builder, unit: int):
+def DurationAddUnit(builder, unit):
     builder.PrependInt16Slot(0, unit, 1)
 
-def AddUnit(builder: flatbuffers.Builder, unit: int):
+def AddUnit(builder, unit):
     DurationAddUnit(builder, unit)
 
-def DurationEnd(builder: flatbuffers.Builder) -> int:
+def DurationEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DurationEnd(builder)

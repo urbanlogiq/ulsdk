@@ -11,6 +11,7 @@ import nacl.encoding
 import nacl.signing
 import requests
 from requests import Request, Session
+from websockets.sync.client import ClientConnection, connect
 
 from .keys import Environment, Key, Region
 from .request_context import File, RequestContext, _get_endpoint
@@ -325,3 +326,26 @@ class ApiKeyContext(RequestContext):
         copy_headers(response.headers, headers)
         response.raise_for_status()
         return response.content
+
+    def connect(
+        self,
+        path: str,
+        params: Optional[Dict] = None,
+        headers: Optional[Dict[str, str]] = None,
+    ) -> ClientConnection:
+        if params is None:
+            params = dict()
+
+        if headers is None:
+            headers = dict()
+
+        endpoint = _get_endpoint(self._key.region, self._environment, path).replace(
+            "https", "wss"
+        )
+        headers = _generate_auth_header(self._key, "GET", path, params, headers, None)
+        if params is not None:
+            params_str = canonicalize_query_string(params)
+            endpoint = endpoint + "?" + params_str
+
+        connection = connect(endpoint, additional_headers=headers)
+        return connection

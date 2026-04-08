@@ -23,7 +23,7 @@ import java.nio.ByteOrder;
 
 @SuppressWarnings("unused")
 public final class UpdateQueryElement extends com.google.flatbuffers.Table {
-  public static void ValidateVersion() { Constants.FLATBUFFERS_23_5_26(); }
+  public static void ValidateVersion() { Constants.FLATBUFFERS_25_2_10(); }
   public static UpdateQueryElement getRootAsUpdateQueryElement(ByteBuffer _bb) { return getRootAsUpdateQueryElement(_bb, new UpdateQueryElement()); }
   public static UpdateQueryElement getRootAsUpdateQueryElement(ByteBuffer _bb, UpdateQueryElement obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
   public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }
@@ -38,13 +38,35 @@ public final class UpdateQueryElement extends com.google.flatbuffers.Table {
   public SetExpr._Vector setsVector(SetExpr._Vector obj) { int o = __offset(8); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
   public Function filter() { return filter(new Function()); }
   public Function filter(Function obj) { int o = __offset(10); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
+  /**
+   * Additional table sources from a FROM clause (UPDATE ... FROM ... syntax).
+   * Source indexes: target table is implicitly at index 0, from_sources start at index 1.
+   */
+  public TableSource fromSources(int j) { return fromSources(new TableSource(), j); }
+  public TableSource fromSources(TableSource obj, int j) { int o = __offset(12); return o != 0 ? obj.__assign(__indirect(__vector(o) + j * 4), bb) : null; }
+  public int fromSourcesLength() { int o = __offset(12); return o != 0 ? __vector_len(o) : 0; }
+  public TableSource._Vector fromSourcesVector() { return fromSourcesVector(new TableSource._Vector()); }
+  public TableSource._Vector fromSourcesVector(TableSource._Vector obj) { int o = __offset(12); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
+  /**
+   * Joins within the FROM clause. Indexes reference the combined source list
+   * (0 = target, 1+ = from_sources).
+   */
+  public Join joins(int j) { return joins(new Join(), j); }
+  public Join joins(Join obj, int j) { int o = __offset(14); return o != 0 ? obj.__assign(__indirect(__vector(o) + j * 4), bb) : null; }
+  public int joinsLength() { int o = __offset(14); return o != 0 ? __vector_len(o) : 0; }
+  public Join._Vector joinsVector() { return joinsVector(new Join._Vector()); }
+  public Join._Vector joinsVector(Join._Vector obj) { int o = __offset(14); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
 
   public static int createUpdateQueryElement(FlatBufferBuilder builder,
       byte sourceType,
       int sourceOffset,
       int setsOffset,
-      int filterOffset) {
-    builder.startTable(4);
+      int filterOffset,
+      int fromSourcesOffset,
+      int joinsOffset) {
+    builder.startTable(6);
+    UpdateQueryElement.addJoins(builder, joinsOffset);
+    UpdateQueryElement.addFromSources(builder, fromSourcesOffset);
     UpdateQueryElement.addFilter(builder, filterOffset);
     UpdateQueryElement.addSets(builder, setsOffset);
     UpdateQueryElement.addSource(builder, sourceOffset);
@@ -52,13 +74,19 @@ public final class UpdateQueryElement extends com.google.flatbuffers.Table {
     return UpdateQueryElement.endUpdateQueryElement(builder);
   }
 
-  public static void startUpdateQueryElement(FlatBufferBuilder builder) { builder.startTable(4); }
+  public static void startUpdateQueryElement(FlatBufferBuilder builder) { builder.startTable(6); }
   public static void addSourceType(FlatBufferBuilder builder, byte sourceType) { builder.addByte(0, sourceType, 0); }
   public static void addSource(FlatBufferBuilder builder, int sourceOffset) { builder.addOffset(1, sourceOffset, 0); }
   public static void addSets(FlatBufferBuilder builder, int setsOffset) { builder.addOffset(2, setsOffset, 0); }
   public static int createSetsVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
   public static void startSetsVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
   public static void addFilter(FlatBufferBuilder builder, int filterOffset) { builder.addOffset(3, filterOffset, 0); }
+  public static void addFromSources(FlatBufferBuilder builder, int fromSourcesOffset) { builder.addOffset(4, fromSourcesOffset, 0); }
+  public static int createFromSourcesVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
+  public static void startFromSourcesVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
+  public static void addJoins(FlatBufferBuilder builder, int joinsOffset) { builder.addOffset(5, joinsOffset, 0); }
+  public static int createJoinsVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
+  public static void startJoinsVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
   public static int endUpdateQueryElement(FlatBufferBuilder builder) {
     int o = builder.endTable();
     builder.required(o, 6);  // source

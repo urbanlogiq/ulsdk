@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ObjectId import ObjectId
-from typing import Optional
 np = import_numpy()
 
 class InboxItem(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = InboxItem()
         x.Init(buf, n + offset)
@@ -24,14 +21,15 @@ class InboxItem(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # InboxItem
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # InboxItem
-    def Notification(self) -> Optional[ObjectId]:
+    def Notification(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -51,32 +49,32 @@ class InboxItem(object):
             return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
         return 0
 
-def InboxItemStart(builder: flatbuffers.Builder):
+def InboxItemStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     InboxItemStart(builder)
 
-def InboxItemAddNotification(builder: flatbuffers.Builder, notification: int):
+def InboxItemAddNotification(builder, notification):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(notification), 0)
 
-def AddNotification(builder: flatbuffers.Builder, notification: int):
+def AddNotification(builder, notification):
     InboxItemAddNotification(builder, notification)
 
-def InboxItemAddStatus(builder: flatbuffers.Builder, status: int):
+def InboxItemAddStatus(builder, status):
     builder.PrependUint8Slot(1, status, 0)
 
-def AddStatus(builder: flatbuffers.Builder, status: int):
+def AddStatus(builder, status):
     InboxItemAddStatus(builder, status)
 
-def InboxItemAddTime(builder: flatbuffers.Builder, time: int):
+def InboxItemAddTime(builder, time):
     builder.PrependUint64Slot(2, time, 0)
 
-def AddTime(builder: flatbuffers.Builder, time: int):
+def AddTime(builder, time):
     InboxItemAddTime(builder, time)
 
-def InboxItemEnd(builder: flatbuffers.Builder) -> int:
+def InboxItemEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return InboxItemEnd(builder)

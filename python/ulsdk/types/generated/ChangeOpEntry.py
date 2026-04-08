@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class ChangeOpEntry(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = ChangeOpEntry()
         x.Init(buf, n + offset)
@@ -24,7 +21,7 @@ class ChangeOpEntry(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # ChangeOpEntry
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # ChangeOpEntry
@@ -35,34 +32,35 @@ class ChangeOpEntry(object):
         return 0
 
     # ChangeOpEntry
-    def Op(self) -> Optional[flatbuffers.table.Table]:
+    def Op(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
-def ChangeOpEntryStart(builder: flatbuffers.Builder):
+def ChangeOpEntryStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ChangeOpEntryStart(builder)
 
-def ChangeOpEntryAddOpType(builder: flatbuffers.Builder, opType: int):
+def ChangeOpEntryAddOpType(builder, opType):
     builder.PrependUint8Slot(0, opType, 0)
 
-def AddOpType(builder: flatbuffers.Builder, opType: int):
+def AddOpType(builder, opType):
     ChangeOpEntryAddOpType(builder, opType)
 
-def ChangeOpEntryAddOp(builder: flatbuffers.Builder, op: int):
+def ChangeOpEntryAddOp(builder, op):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(op), 0)
 
-def AddOp(builder: flatbuffers.Builder, op: int):
+def AddOp(builder, op):
     ChangeOpEntryAddOp(builder, op)
 
-def ChangeOpEntryEnd(builder: flatbuffers.Builder) -> int:
+def ChangeOpEntryEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ChangeOpEntryEnd(builder)

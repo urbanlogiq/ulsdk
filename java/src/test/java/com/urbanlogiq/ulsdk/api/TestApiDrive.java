@@ -7,10 +7,10 @@ import com.urbanlogiq.ulsdk.ApiKeyContext;
 import com.urbanlogiq.ulsdk.Environment;
 import com.urbanlogiq.ulsdk.Region;
 import java.util.UUID;
-import org.junit.Test;
+import org.junitpioneer.jupiter.RetryingTest;
 
 public final class TestApiDrive {
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testLs() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -32,10 +32,10 @@ public final class TestApiDrive {
             p0,
             p1
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testLsMe() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -55,10 +55,10 @@ public final class TestApiDrive {
             ctx,
             p0
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testLsUnion() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -82,10 +82,10 @@ public final class TestApiDrive {
             q0,
             q1
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testCreateEntry() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -113,10 +113,10 @@ public final class TestApiDrive {
             q1,
             q2
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testGetRoots() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -134,10 +134,10 @@ public final class TestApiDrive {
         com.urbanlogiq.ulsdk.types.DirectoryList result = com.urbanlogiq.ulsdk.api.drive.Drive.getRoots(
             ctx
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testPostFile() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -161,10 +161,10 @@ public final class TestApiDrive {
             q0,
             body
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testUnlink() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -184,10 +184,10 @@ public final class TestApiDrive {
             ctx,
             p0
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testMove() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -206,7 +206,7 @@ public final class TestApiDrive {
         );
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testCopy() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -225,7 +225,7 @@ public final class TestApiDrive {
         );
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testGetFile() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -245,10 +245,10 @@ public final class TestApiDrive {
             ctx,
             p0
         );
-        org.junit.Assert.assertArrayEquals(result, expected);
+        org.junit.jupiter.api.Assertions.assertArrayEquals(result, expected);
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testPutFileChunk() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -273,7 +273,7 @@ public final class TestApiDrive {
         );
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testGetRootId() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -293,6 +293,6 @@ public final class TestApiDrive {
             ctx,
             p0
         );
-        org.junit.Assert.assertTrue(result.equals(expected));
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 }

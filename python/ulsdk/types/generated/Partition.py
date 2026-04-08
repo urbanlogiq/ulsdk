@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Expr import Expr
-from typing import Optional
 np = import_numpy()
 
 class Partition(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Partition()
         x.Init(buf, n + offset)
@@ -24,33 +21,34 @@ class Partition(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Partition
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Partition
-    def Expr(self) -> Optional[Expr]:
+    def Expr(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Expr import Expr
             obj = Expr()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def PartitionStart(builder: flatbuffers.Builder):
+def PartitionStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     PartitionStart(builder)
 
-def PartitionAddExpr(builder: flatbuffers.Builder, expr: int):
+def PartitionAddExpr(builder, expr):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(expr), 0)
 
-def AddExpr(builder: flatbuffers.Builder, expr: int):
+def AddExpr(builder, expr):
     PartitionAddExpr(builder, expr)
 
-def PartitionEnd(builder: flatbuffers.Builder) -> int:
+def PartitionEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return PartitionEnd(builder)

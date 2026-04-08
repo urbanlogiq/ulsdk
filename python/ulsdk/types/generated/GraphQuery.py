@@ -4,10 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .OrderBy import OrderBy
-from .QueryPathElement import QueryPathElement
-from typing import Optional
 np = import_numpy()
 
 # The GraphQuery encapsulates the entire world graph query.
@@ -15,7 +11,7 @@ class GraphQuery(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = GraphQuery()
         x.Init(buf, n + offset)
@@ -26,30 +22,31 @@ class GraphQuery(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # GraphQuery
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # GraphQuery
-    def Path(self, j: int) -> Optional[QueryPathElement]:
+    def Path(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .QueryPathElement import QueryPathElement
             obj = QueryPathElement()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # GraphQuery
-    def PathLength(self) -> int:
+    def PathLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # GraphQuery
-    def PathIsNone(self) -> bool:
+    def PathIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
@@ -61,67 +58,68 @@ class GraphQuery(object):
         return 0
 
     # GraphQuery
-    def OrderBy(self, j: int) -> Optional[OrderBy]:
+    def OrderBy(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .OrderBy import OrderBy
             obj = OrderBy()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # GraphQuery
-    def OrderByLength(self) -> int:
+    def OrderByLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # GraphQuery
-    def OrderByIsNone(self) -> bool:
+    def OrderByIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
-def GraphQueryStart(builder: flatbuffers.Builder):
+def GraphQueryStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     GraphQueryStart(builder)
 
-def GraphQueryAddPath(builder: flatbuffers.Builder, path: int):
+def GraphQueryAddPath(builder, path):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(path), 0)
 
-def AddPath(builder: flatbuffers.Builder, path: int):
+def AddPath(builder, path):
     GraphQueryAddPath(builder, path)
 
-def GraphQueryStartPathVector(builder, numElems: int) -> int:
+def GraphQueryStartPathVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartPathVector(builder, numElems: int) -> int:
+def StartPathVector(builder, numElems):
     return GraphQueryStartPathVector(builder, numElems)
 
-def GraphQueryAddLimit(builder: flatbuffers.Builder, limit: int):
+def GraphQueryAddLimit(builder, limit):
     builder.PrependUint32Slot(1, limit, 0)
 
-def AddLimit(builder: flatbuffers.Builder, limit: int):
+def AddLimit(builder, limit):
     GraphQueryAddLimit(builder, limit)
 
-def GraphQueryAddOrderBy(builder: flatbuffers.Builder, orderBy: int):
+def GraphQueryAddOrderBy(builder, orderBy):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(orderBy), 0)
 
-def AddOrderBy(builder: flatbuffers.Builder, orderBy: int):
+def AddOrderBy(builder, orderBy):
     GraphQueryAddOrderBy(builder, orderBy)
 
-def GraphQueryStartOrderByVector(builder, numElems: int) -> int:
+def GraphQueryStartOrderByVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartOrderByVector(builder, numElems: int) -> int:
+def StartOrderByVector(builder, numElems):
     return GraphQueryStartOrderByVector(builder, numElems)
 
-def GraphQueryEnd(builder: flatbuffers.Builder) -> int:
+def GraphQueryEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return GraphQueryEnd(builder)

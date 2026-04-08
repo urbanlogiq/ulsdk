@@ -4,7 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 # Same as List, but with 64-bit offsets, allowing to represent
@@ -13,7 +12,7 @@ class LargeList(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = LargeList()
         x.Init(buf, n + offset)
@@ -24,17 +23,17 @@ class LargeList(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # LargeList
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
-def LargeListStart(builder: flatbuffers.Builder):
+def LargeListStart(builder):
     builder.StartObject(0)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     LargeListStart(builder)
 
-def LargeListEnd(builder: flatbuffers.Builder) -> int:
+def LargeListEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return LargeListEnd(builder)

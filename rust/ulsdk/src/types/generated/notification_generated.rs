@@ -488,8 +488,8 @@ impl<'a> Response<'a> {
         Response { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args ResponseArgs<'args>,
     ) -> flatbuffers::WIPOffset<Response<'bldr>> {
         let mut builder = ResponseBuilder::new(_fbb);
@@ -549,18 +549,18 @@ impl Serialize for Response<'_> {
     }
 }
 
-pub struct ResponseBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct ResponseBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> ResponseBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ResponseBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_msg(&mut self, msg: flatbuffers::WIPOffset<&'b str>) {
         self.fbb_
             .push_slot_always::<flatbuffers::WIPOffset<_>>(Response::VT_MSG, msg);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ResponseBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> ResponseBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         ResponseBuilder {
             fbb_: _fbb,
@@ -610,8 +610,8 @@ impl<'a> AccessRequest<'a> {
         AccessRequest { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args AccessRequestArgs<'args>,
     ) -> flatbuffers::WIPOffset<AccessRequest<'bldr>> {
         let mut builder = AccessRequestBuilder::new(_fbb);
@@ -739,11 +739,11 @@ impl Serialize for AccessRequest<'_> {
     }
 }
 
-pub struct AccessRequestBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct AccessRequestBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> AccessRequestBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> AccessRequestBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_object(&mut self, object: flatbuffers::WIPOffset<ObjectId<'b>>) {
         self.fbb_
@@ -776,7 +776,9 @@ impl<'a: 'b, 'b> AccessRequestBuilder<'a, 'b> {
         );
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> AccessRequestBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> AccessRequestBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         AccessRequestBuilder {
             fbb_: _fbb,
@@ -831,8 +833,8 @@ impl<'a> Share<'a> {
         Share { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args ShareArgs<'args>,
     ) -> flatbuffers::WIPOffset<Share<'bldr>> {
         let mut builder = ShareBuilder::new(_fbb);
@@ -965,11 +967,11 @@ impl Serialize for Share<'_> {
     }
 }
 
-pub struct ShareBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct ShareBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> ShareBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ShareBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_object(&mut self, object: flatbuffers::WIPOffset<ObjectId<'b>>) {
         self.fbb_
@@ -996,7 +998,7 @@ impl<'a: 'b, 'b> ShareBuilder<'a, 'b> {
             .push_slot::<PermissionTy>(Share::VT_NEW_PERMS, new_perms, Default::default());
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ShareBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> ShareBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         ShareBuilder {
             fbb_: _fbb,
@@ -1047,8 +1049,8 @@ impl<'a> JobComplete<'a> {
         JobComplete { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args JobCompleteArgs<'args>,
     ) -> flatbuffers::WIPOffset<JobComplete<'bldr>> {
         let mut builder = JobCompleteBuilder::new(_fbb);
@@ -1107,18 +1109,20 @@ impl Serialize for JobComplete<'_> {
     }
 }
 
-pub struct JobCompleteBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct JobCompleteBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> JobCompleteBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> JobCompleteBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_job(&mut self, job: flatbuffers::WIPOffset<ObjectId<'b>>) {
         self.fbb_
             .push_slot_always::<flatbuffers::WIPOffset<ObjectId>>(JobComplete::VT_JOB, job);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> JobCompleteBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> JobCompleteBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         JobCompleteBuilder {
             fbb_: _fbb,
@@ -1167,8 +1171,8 @@ impl<'a> DriveChange<'a> {
         DriveChange { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args DriveChangeArgs<'args>,
     ) -> flatbuffers::WIPOffset<DriveChange<'bldr>> {
         let mut builder = DriveChangeBuilder::new(_fbb);
@@ -1261,11 +1265,11 @@ impl Serialize for DriveChange<'_> {
     }
 }
 
-pub struct DriveChangeBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct DriveChangeBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> DriveChangeBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> DriveChangeBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_root(&mut self, root: flatbuffers::WIPOffset<ObjectId<'b>>) {
         self.fbb_
@@ -1282,7 +1286,9 @@ impl<'a: 'b, 'b> DriveChangeBuilder<'a, 'b> {
             .push_slot::<DriveAction>(DriveChange::VT_ACTION, action, DriveAction::Add);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> DriveChangeBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> DriveChangeBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         DriveChangeBuilder {
             fbb_: _fbb,
@@ -1334,8 +1340,8 @@ impl<'a> Notification<'a> {
         Notification { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args NotificationArgs<'args>,
     ) -> flatbuffers::WIPOffset<Notification<'bldr>> {
         let mut builder = NotificationBuilder::new(_fbb);
@@ -1374,7 +1380,7 @@ impl<'a> Notification<'a> {
         }
     }
     #[inline]
-    pub fn notification(&self) -> Option<flatbuffers::Table<'a>> {
+    pub fn notification(&self) -> flatbuffers::Table<'a> {
         // Safety:
         // Created from valid Table for this object
         // which contains a valid value in this slot
@@ -1384,18 +1390,18 @@ impl<'a> Notification<'a> {
                     Notification::VT_NOTIFICATION,
                     None,
                 )
+                .unwrap()
         }
     }
     #[inline]
     #[allow(non_snake_case)]
     pub fn notification_as_share(&self) -> Option<Share<'a>> {
         if self.notification_type() == NotificationUnion::Share {
-            self.notification().map(|t| {
-                // Safety:
-                // Created from a valid Table for this object
-                // Which contains a valid union in this slot
-                unsafe { Share::init_from_table(t) }
-            })
+            let u = self.notification();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { Share::init_from_table(u) })
         } else {
             None
         }
@@ -1405,12 +1411,11 @@ impl<'a> Notification<'a> {
     #[allow(non_snake_case)]
     pub fn notification_as_job_complete(&self) -> Option<JobComplete<'a>> {
         if self.notification_type() == NotificationUnion::JobComplete {
-            self.notification().map(|t| {
-                // Safety:
-                // Created from a valid Table for this object
-                // Which contains a valid union in this slot
-                unsafe { JobComplete::init_from_table(t) }
-            })
+            let u = self.notification();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { JobComplete::init_from_table(u) })
         } else {
             None
         }
@@ -1420,12 +1425,11 @@ impl<'a> Notification<'a> {
     #[allow(non_snake_case)]
     pub fn notification_as_access_request(&self) -> Option<AccessRequest<'a>> {
         if self.notification_type() == NotificationUnion::AccessRequest {
-            self.notification().map(|t| {
-                // Safety:
-                // Created from a valid Table for this object
-                // Which contains a valid union in this slot
-                unsafe { AccessRequest::init_from_table(t) }
-            })
+            let u = self.notification();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { AccessRequest::init_from_table(u) })
         } else {
             None
         }
@@ -1435,12 +1439,11 @@ impl<'a> Notification<'a> {
     #[allow(non_snake_case)]
     pub fn notification_as_drive_change(&self) -> Option<DriveChange<'a>> {
         if self.notification_type() == NotificationUnion::DriveChange {
-            self.notification().map(|t| {
-                // Safety:
-                // Created from a valid Table for this object
-                // Which contains a valid union in this slot
-                unsafe { DriveChange::init_from_table(t) }
-            })
+            let u = self.notification();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { DriveChange::init_from_table(u) })
         } else {
             None
         }
@@ -1461,7 +1464,7 @@ impl flatbuffers::Verifiable for Notification<'_> {
                 Self::VT_NOTIFICATION_TYPE,
                 "notification",
                 Self::VT_NOTIFICATION,
-                false,
+                true,
                 |key, v, pos| match key {
                     NotificationUnion::Share => v
                         .verify_union_variant::<flatbuffers::ForwardsUOffset<Share>>(
@@ -1501,7 +1504,7 @@ impl<'a> Default for NotificationArgs<'a> {
         NotificationArgs {
             sender: None,
             notification_type: NotificationUnion::NONE,
-            notification: None,
+            notification: None, // required field
         }
     }
 }
@@ -1550,11 +1553,11 @@ impl Serialize for Notification<'_> {
     }
 }
 
-pub struct NotificationBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct NotificationBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> NotificationBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> NotificationBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_sender(&mut self, sender: flatbuffers::WIPOffset<B2cId<'b>>) {
         self.fbb_
@@ -1579,7 +1582,9 @@ impl<'a: 'b, 'b> NotificationBuilder<'a, 'b> {
         );
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> NotificationBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> NotificationBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         NotificationBuilder {
             fbb_: _fbb,
@@ -1589,6 +1594,8 @@ impl<'a: 'b, 'b> NotificationBuilder<'a, 'b> {
     #[inline]
     pub fn finish(self) -> flatbuffers::WIPOffset<Notification<'a>> {
         let o = self.fbb_.end_table(self.start_);
+        self.fbb_
+            .required(o, Notification::VT_NOTIFICATION, "notification");
         flatbuffers::WIPOffset::new(o.value())
     }
 }
@@ -1673,8 +1680,8 @@ impl<'a> ShareDetails<'a> {
         ShareDetails { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args ShareDetailsArgs<'args>,
     ) -> flatbuffers::WIPOffset<ShareDetails<'bldr>> {
         let mut builder = ShareDetailsBuilder::new(_fbb);
@@ -1752,11 +1759,11 @@ impl Serialize for ShareDetails<'_> {
     }
 }
 
-pub struct ShareDetailsBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct ShareDetailsBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> ShareDetailsBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ShareDetailsBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_notify(&mut self, notify: bool) {
         self.fbb_
@@ -1768,7 +1775,9 @@ impl<'a: 'b, 'b> ShareDetailsBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(ShareDetails::VT_MSG, msg);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> ShareDetailsBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> ShareDetailsBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         ShareDetailsBuilder {
             fbb_: _fbb,
@@ -1817,8 +1826,8 @@ impl<'a> InboxItem<'a> {
         InboxItem { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args InboxItemArgs<'args>,
     ) -> flatbuffers::WIPOffset<InboxItem<'bldr>> {
         let mut builder = InboxItemBuilder::new(_fbb);
@@ -1909,11 +1918,11 @@ impl Serialize for InboxItem<'_> {
     }
 }
 
-pub struct InboxItemBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct InboxItemBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> InboxItemBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> InboxItemBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_notification(&mut self, notification: flatbuffers::WIPOffset<ObjectId<'b>>) {
         self.fbb_
@@ -1932,7 +1941,7 @@ impl<'a: 'b, 'b> InboxItemBuilder<'a, 'b> {
         self.fbb_.push_slot::<u64>(InboxItem::VT_TIME, time, 0);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> InboxItemBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> InboxItemBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         InboxItemBuilder {
             fbb_: _fbb,
@@ -1982,8 +1991,8 @@ impl<'a> Inbox<'a> {
         Inbox { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args InboxArgs<'args>,
     ) -> flatbuffers::WIPOffset<Inbox<'bldr>> {
         let mut builder = InboxBuilder::new(_fbb);
@@ -2050,11 +2059,11 @@ impl Serialize for Inbox<'_> {
     }
 }
 
-pub struct InboxBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct InboxBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> InboxBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> InboxBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_items(
         &mut self,
@@ -2066,7 +2075,7 @@ impl<'a: 'b, 'b> InboxBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(Inbox::VT_ITEMS, items);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> InboxBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> InboxBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         InboxBuilder {
             fbb_: _fbb,

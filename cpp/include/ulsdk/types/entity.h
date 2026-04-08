@@ -22,6 +22,7 @@ struct GraphEdge;
 struct GraphNode;
 struct Line;
 struct MultiLine;
+struct MultiPoint;
 struct MultiPolygon;
 struct Point;
 struct Polygon;
@@ -33,7 +34,8 @@ typedef std::variant<
     std::shared_ptr<Line>,
     std::shared_ptr<MultiLine>,
     std::shared_ptr<Polygon>,
-    std::shared_ptr<MultiPolygon>
+    std::shared_ptr<MultiPolygon>,
+    std::shared_ptr<MultiPoint>
 > Geometry;
 
 using ::NodeTy;
@@ -101,6 +103,18 @@ struct MultiPolygon {
     }
 };
 
+struct MultiPoint {
+    std::vector<Point> point_geo_;
+
+    MultiPoint();
+    MultiPoint(const ::MultiPoint *root);
+    MultiPoint(const std::vector<uint8_t> &bytes);
+    bool operator==(const MultiPoint &rhs) const;
+    bool operator!=(const MultiPoint &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
 struct GraphEdge {
     int64_t _from_;
     EdgeTy _kind_;
@@ -151,6 +165,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Polygon &);
 ::flatbuffers::Offset<::MultiPolygon>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const MultiPolygon &);
 
+::flatbuffers::Offset<::MultiPoint>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const MultiPoint &);
+
 ::flatbuffers::Offset<::GraphEdge>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const GraphEdge &);
 
@@ -172,6 +189,9 @@ to_bytes(const Polygon &o);
 
 std::vector<uint8_t>
 to_bytes(const MultiPolygon &o);
+
+std::vector<uint8_t>
+to_bytes(const MultiPoint &o);
 
 std::vector<uint8_t>
 to_bytes(const GraphEdge &o);

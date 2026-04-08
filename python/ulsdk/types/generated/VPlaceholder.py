@@ -4,15 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from typing import Optional
 np = import_numpy()
 
 class VPlaceholder(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = VPlaceholder()
         x.Init(buf, n + offset)
@@ -23,11 +21,11 @@ class VPlaceholder(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # VPlaceholder
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # VPlaceholder
-    def Name(self) -> Optional[bytes]:
+    def Name(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -40,26 +38,26 @@ class VPlaceholder(object):
             return self._tab.Get(flatbuffers.number_types.Uint8Flags, o + self._tab.Pos)
         return 0
 
-def VPlaceholderStart(builder: flatbuffers.Builder):
+def VPlaceholderStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     VPlaceholderStart(builder)
 
-def VPlaceholderAddName(builder: flatbuffers.Builder, name: int):
+def VPlaceholderAddName(builder, name):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
 
-def AddName(builder: flatbuffers.Builder, name: int):
+def AddName(builder, name):
     VPlaceholderAddName(builder, name)
 
-def VPlaceholderAddTy(builder: flatbuffers.Builder, ty: int):
+def VPlaceholderAddTy(builder, ty):
     builder.PrependUint8Slot(1, ty, 0)
 
-def AddTy(builder: flatbuffers.Builder, ty: int):
+def AddTy(builder, ty):
     VPlaceholderAddTy(builder, ty)
 
-def VPlaceholderEnd(builder: flatbuffers.Builder) -> int:
+def VPlaceholderEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return VPlaceholderEnd(builder)

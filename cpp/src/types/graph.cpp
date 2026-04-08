@@ -429,6 +429,12 @@ Geom::Geom(const ::Geom *root)
                 geom_ = geom__shared;
                 break;
             }
+            case ::Geometry::MultiPoint: {
+                const auto geom__local = static_cast<const ::MultiPoint *>(root->geom());
+                std::shared_ptr<MultiPoint> geom__shared = std::make_shared<MultiPoint>(geom__local);
+                geom_ = geom__shared;
+                break;
+            }
             default: throw std::runtime_error("unknown union variant");
         }
     }
@@ -649,6 +655,7 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const OrderBy &o) {
 
     ::OrderByBuilder instance_builder = ::OrderByBuilder(builder);
     instance_builder.add_field(field_offset);
+    instance_builder.add_nulls_first(o.nulls_first_);
     instance_builder.add_sort(o.sort_);
     instance_builder.add_transform(o.transform_);
     return instance_builder.Finish();
@@ -664,6 +671,7 @@ std::vector<uint8_t> to_bytes(const OrderBy &o) {
 
 OrderBy::OrderBy()
     : field_()
+    , nulls_first_(false)
     , sort_(SortOrder(0))
     , transform_(ValueTransform(0)) {
 }
@@ -674,6 +682,7 @@ OrderBy::OrderBy(const std::vector<uint8_t> &bytes)
 
 OrderBy::OrderBy(const ::OrderBy *root) 
     : field_()
+    , nulls_first_(false)
     , sort_(SortOrder(0))
     , transform_(ValueTransform(0)) {
     if (root == nullptr) {
@@ -681,6 +690,7 @@ OrderBy::OrderBy(const ::OrderBy *root)
     }
 
         field_ = std::string(*root->field()->begin(), *root->field()->end());
+    nulls_first_ = root->nulls_first();
     sort_ = root->sort();
     transform_ = root->transform();
 }
@@ -688,6 +698,9 @@ OrderBy::OrderBy(const ::OrderBy *root)
 bool
 OrderBy::operator==(const OrderBy &rhs) const {
     if (this->field_ != rhs.field_) {
+        return false;
+    }
+    if (this->nulls_first_ != rhs.nulls_first_) {
         return false;
     }
     if (this->sort_ != rhs.sort_) {

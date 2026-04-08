@@ -1,0 +1,22 @@
+{
+  "name": "@ul/sdk",
+  "private": true,
+  "version": "0.7.0",
+  "type": "module",
+  "engines": {
+    "yarn": "4.2.2"
+  },
+  "scripts": {
+    "tsc-watch": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "flatbuffers": "25.9.23"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2",
+    "vitest": "^3.1.1"
+  },
+  "packageManager": "yarn@4.2.2"
+}

@@ -4,15 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from typing import Optional
 np = import_numpy()
 
 class Response(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Response()
         x.Init(buf, n + offset)
@@ -23,30 +21,30 @@ class Response(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Response
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Response
-    def Msg(self) -> Optional[bytes]:
+    def Msg(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def ResponseStart(builder: flatbuffers.Builder):
+def ResponseStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ResponseStart(builder)
 
-def ResponseAddMsg(builder: flatbuffers.Builder, msg: int):
+def ResponseAddMsg(builder, msg):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(msg), 0)
 
-def AddMsg(builder: flatbuffers.Builder, msg: int):
+def AddMsg(builder, msg):
     ResponseAddMsg(builder, msg)
 
-def ResponseEnd(builder: flatbuffers.Builder) -> int:
+def ResponseEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ResponseEnd(builder)

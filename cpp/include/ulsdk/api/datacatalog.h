@@ -76,8 +76,9 @@ get_object(
  * Update the object with the given ID
  * @param id The ID of the object to update
  * @param object Object contents with which to update the specified object
+ * @return The content ID of the updated object
  */
-Result<Void>
+Result<::ul::types::ContentId>
 update_object(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
@@ -119,6 +120,17 @@ Result<::ul::types::ObjectSummaryList>
 get_object_summaries(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectIdList &object_ids
+);
+
+/**
+ * Given a list of IDs for stream objects, fetch their metadata in bulk. Note that the returned DataCatalogObject instances only have a valid metadata `obj` field.
+ * @param stream_ids A list of IDs of stream objects to fetch metadata for
+ * @return A list of metadata DataCatalogObjects
+ */
+Result<::ul::types::ObjectIdPairList>
+bulk_fetch_metadata(
+    ul::RequestContext &ctx,
+    const ::ul::types::ObjectIdList &stream_ids
 );
 
 /**

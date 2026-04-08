@@ -1,0 +1,24 @@
+export declare enum DirectionTy {
+    NB = 0,
+    WB = 1,
+    SB = 2,
+    EB = 3,
+    NWB = 4,
+    NEB = 5,
+    SWB = 6,
+    SEB = 7,
+    MINUS_MP = 8,
+    PLUS_MP = 9,
+    IN = 10,
+    OUT = 11,
+    TOTAL = 12,
+    N = 13,
+    W = 14,
+    E = 15,
+    S = 16,
+    NW = 17,
+    NE = 18,
+    SW = 19,
+    SE = 20
+}
+//# sourceMappingURL=direction-ty.d.ts.map

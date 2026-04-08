@@ -4,17 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ObjectId import ObjectId
-from .Role import Role
-from typing import Optional
 np = import_numpy()
 
 class AccessControlList(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = AccessControlList()
         x.Init(buf, n + offset)
@@ -25,30 +21,31 @@ class AccessControlList(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # AccessControlList
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # AccessControlList
-    def Roles(self, j: int) -> Optional[Role]:
+    def Roles(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Role import Role
             obj = Role()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # AccessControlList
-    def RolesLength(self) -> int:
+    def RolesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # AccessControlList
-    def RolesIsNone(self) -> bool:
+    def RolesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
@@ -59,41 +56,42 @@ class AccessControlList(object):
     # permissions. This can also be used to selectively revoke access (by
     # adding an ACL entry with empty permissions) to an object.
     # AccessControlList
-    def Extends(self) -> Optional[ObjectId]:
+    def Extends(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def AccessControlListStart(builder: flatbuffers.Builder):
+def AccessControlListStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     AccessControlListStart(builder)
 
-def AccessControlListAddRoles(builder: flatbuffers.Builder, roles: int):
+def AccessControlListAddRoles(builder, roles):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(roles), 0)
 
-def AddRoles(builder: flatbuffers.Builder, roles: int):
+def AddRoles(builder, roles):
     AccessControlListAddRoles(builder, roles)
 
-def AccessControlListStartRolesVector(builder, numElems: int) -> int:
+def AccessControlListStartRolesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartRolesVector(builder, numElems: int) -> int:
+def StartRolesVector(builder, numElems):
     return AccessControlListStartRolesVector(builder, numElems)
 
-def AccessControlListAddExtends(builder: flatbuffers.Builder, extends: int):
+def AccessControlListAddExtends(builder, extends):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(extends), 0)
 
-def AddExtends(builder: flatbuffers.Builder, extends: int):
+def AddExtends(builder, extends):
     AccessControlListAddExtends(builder, extends)
 
-def AccessControlListEnd(builder: flatbuffers.Builder) -> int:
+def AccessControlListEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return AccessControlListEnd(builder)

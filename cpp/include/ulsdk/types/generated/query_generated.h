@@ -8,16 +8,23 @@
 
 // Ensure the included flatbuffers.h is the same version as when this file was
 // generated, otherwise it may not be compatible.
-static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
-              FLATBUFFERS_VERSION_MINOR == 5 &&
-              FLATBUFFERS_VERSION_REVISION == 26,
+static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
+              FLATBUFFERS_VERSION_MINOR == 2 &&
+              FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
 #include "api_generated.h"
+#include "Schema_generated.h"
 #include "fun_generated.h"
 #include "graph_generated.h"
 #include "id_generated.h"
 #include "value_generated.h"
+
+struct AddCol;
+struct AddColBuilder;
+
+struct DropCol;
+struct DropColBuilder;
 
 struct ValueIndex;
 struct ValueIndexBuilder;
@@ -54,6 +61,9 @@ struct OrderByExprBuilder;
 
 struct Window;
 struct WindowBuilder;
+
+struct AggregateFilter;
+struct AggregateFilterBuilder;
 
 struct Expr;
 struct ExprBuilder;
@@ -133,6 +143,12 @@ struct OnConflictBuilder;
 struct InsertQueryElement;
 struct InsertQueryElementBuilder;
 
+struct AlterTableOperation;
+struct AlterTableOperationBuilder;
+
+struct AlterTableElement;
+struct AlterTableElementBuilder;
+
 struct QueryElement;
 struct QueryElementBuilder;
 
@@ -193,11 +209,12 @@ enum class ExprUnion : uint8_t {
   UnsetArgument = 8,
   Window = 9,
   ValueName = 10,
+  AggregateFilter = 11,
   MIN = NONE,
-  MAX = ValueName
+  MAX = AggregateFilter
 };
 
-inline const ExprUnion (&EnumValuesExprUnion())[11] {
+inline const ExprUnion (&EnumValuesExprUnion())[12] {
   static const ExprUnion values[] = {
     ExprUnion::NONE,
     ExprUnion::ValueIndex,
@@ -209,13 +226,14 @@ inline const ExprUnion (&EnumValuesExprUnion())[11] {
     ExprUnion::Partition,
     ExprUnion::UnsetArgument,
     ExprUnion::Window,
-    ExprUnion::ValueName
+    ExprUnion::ValueName,
+    ExprUnion::AggregateFilter
   };
   return values;
 }
 
 inline const char * const *EnumNamesExprUnion() {
-  static const char * const names[12] = {
+  static const char * const names[13] = {
     "NONE",
     "ValueIndex",
     "Column",
@@ -227,13 +245,14 @@ inline const char * const *EnumNamesExprUnion() {
     "UnsetArgument",
     "Window",
     "ValueName",
+    "AggregateFilter",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameExprUnion(ExprUnion e) {
-  if (::flatbuffers::IsOutRange(e, ExprUnion::NONE, ExprUnion::ValueName)) return "";
+  if (::flatbuffers::IsOutRange(e, ExprUnion::NONE, ExprUnion::AggregateFilter)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesExprUnion()[index];
 }
@@ -280,6 +299,10 @@ template<> struct ExprUnionTraits<Window> {
 
 template<> struct ExprUnionTraits<ValueName> {
   static const ExprUnion enum_value = ExprUnion::ValueName;
+};
+
+template<> struct ExprUnionTraits<AggregateFilter> {
+  static const ExprUnion enum_value = ExprUnion::AggregateFilter;
 };
 
 bool VerifyExprUnion(::flatbuffers::Verifier &verifier, const void *obj, ExprUnion type);
@@ -466,31 +489,34 @@ enum class QueryElementOp : int8_t {
   Union = 0,
   Intersect = 1,
   Except = 2,
+  Minus = 3,
   MIN = Union,
-  MAX = Except
+  MAX = Minus
 };
 
-inline const QueryElementOp (&EnumValuesQueryElementOp())[3] {
+inline const QueryElementOp (&EnumValuesQueryElementOp())[4] {
   static const QueryElementOp values[] = {
     QueryElementOp::Union,
     QueryElementOp::Intersect,
-    QueryElementOp::Except
+    QueryElementOp::Except,
+    QueryElementOp::Minus
   };
   return values;
 }
 
 inline const char * const *EnumNamesQueryElementOp() {
-  static const char * const names[4] = {
+  static const char * const names[5] = {
     "Union",
     "Intersect",
     "Except",
+    "Minus",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameQueryElementOp(QueryElementOp e) {
-  if (::flatbuffers::IsOutRange(e, QueryElementOp::Union, QueryElementOp::Except)) return "";
+  if (::flatbuffers::IsOutRange(e, QueryElementOp::Union, QueryElementOp::Minus)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesQueryElementOp()[index];
 }
@@ -550,6 +576,54 @@ template<> struct ConflictActionTraits<DoUpdate> {
 bool VerifyConflictAction(::flatbuffers::Verifier &verifier, const void *obj, ConflictAction type);
 bool VerifyConflictActionVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<ConflictAction> *types);
 
+enum class AlterTableOperationUnion : uint8_t {
+  NONE = 0,
+  AddCol = 1,
+  DropCol = 2,
+  MIN = NONE,
+  MAX = DropCol
+};
+
+inline const AlterTableOperationUnion (&EnumValuesAlterTableOperationUnion())[3] {
+  static const AlterTableOperationUnion values[] = {
+    AlterTableOperationUnion::NONE,
+    AlterTableOperationUnion::AddCol,
+    AlterTableOperationUnion::DropCol
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesAlterTableOperationUnion() {
+  static const char * const names[4] = {
+    "NONE",
+    "AddCol",
+    "DropCol",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameAlterTableOperationUnion(AlterTableOperationUnion e) {
+  if (::flatbuffers::IsOutRange(e, AlterTableOperationUnion::NONE, AlterTableOperationUnion::DropCol)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesAlterTableOperationUnion()[index];
+}
+
+template<typename T> struct AlterTableOperationUnionTraits {
+  static const AlterTableOperationUnion enum_value = AlterTableOperationUnion::NONE;
+};
+
+template<> struct AlterTableOperationUnionTraits<AddCol> {
+  static const AlterTableOperationUnion enum_value = AlterTableOperationUnion::AddCol;
+};
+
+template<> struct AlterTableOperationUnionTraits<DropCol> {
+  static const AlterTableOperationUnion enum_value = AlterTableOperationUnion::DropCol;
+};
+
+bool VerifyAlterTableOperationUnion(::flatbuffers::Verifier &verifier, const void *obj, AlterTableOperationUnion type);
+bool VerifyAlterTableOperationUnionVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<AlterTableOperationUnion> *types);
+
 enum class QueryElementUnion : uint8_t {
   NONE = 0,
   UnaryQueryElement = 1,
@@ -557,37 +631,40 @@ enum class QueryElementUnion : uint8_t {
   UpdateQueryElement = 3,
   DeleteQueryElement = 4,
   InsertQueryElement = 5,
+  AlterTableElement = 6,
   MIN = NONE,
-  MAX = InsertQueryElement
+  MAX = AlterTableElement
 };
 
-inline const QueryElementUnion (&EnumValuesQueryElementUnion())[6] {
+inline const QueryElementUnion (&EnumValuesQueryElementUnion())[7] {
   static const QueryElementUnion values[] = {
     QueryElementUnion::NONE,
     QueryElementUnion::UnaryQueryElement,
     QueryElementUnion::BinaryQueryElement,
     QueryElementUnion::UpdateQueryElement,
     QueryElementUnion::DeleteQueryElement,
-    QueryElementUnion::InsertQueryElement
+    QueryElementUnion::InsertQueryElement,
+    QueryElementUnion::AlterTableElement
   };
   return values;
 }
 
 inline const char * const *EnumNamesQueryElementUnion() {
-  static const char * const names[7] = {
+  static const char * const names[8] = {
     "NONE",
     "UnaryQueryElement",
     "BinaryQueryElement",
     "UpdateQueryElement",
     "DeleteQueryElement",
     "InsertQueryElement",
+    "AlterTableElement",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameQueryElementUnion(QueryElementUnion e) {
-  if (::flatbuffers::IsOutRange(e, QueryElementUnion::NONE, QueryElementUnion::InsertQueryElement)) return "";
+  if (::flatbuffers::IsOutRange(e, QueryElementUnion::NONE, QueryElementUnion::AlterTableElement)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesQueryElementUnion()[index];
 }
@@ -614,6 +691,10 @@ template<> struct QueryElementUnionTraits<DeleteQueryElement> {
 
 template<> struct QueryElementUnionTraits<InsertQueryElement> {
   static const QueryElementUnion enum_value = QueryElementUnion::InsertQueryElement;
+};
+
+template<> struct QueryElementUnionTraits<AlterTableElement> {
+  static const QueryElementUnion enum_value = QueryElementUnion::AlterTableElement;
 };
 
 bool VerifyQueryElementUnion(::flatbuffers::Verifier &verifier, const void *obj, QueryElementUnion type);
@@ -653,6 +734,124 @@ inline const char *EnumNameExplainFormat(ExplainFormat e) {
   if (::flatbuffers::IsOutRange(e, ExplainFormat::Tree, ExplainFormat::Graphviz)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesExplainFormat()[index];
+}
+
+struct AddCol FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef AddColBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_FIELD = 4,
+    VT_DEFAULT_ = 6
+  };
+  const Field *field() const {
+    return GetPointer<const Field *>(VT_FIELD);
+  }
+  const ValueInstance *default_() const {
+    return GetPointer<const ValueInstance *>(VT_DEFAULT_);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_FIELD) &&
+           verifier.VerifyTable(field()) &&
+           VerifyOffset(verifier, VT_DEFAULT_) &&
+           verifier.VerifyTable(default_()) &&
+           verifier.EndTable();
+  }
+};
+
+struct AddColBuilder {
+  typedef AddCol Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_field(::flatbuffers::Offset<Field> field) {
+    fbb_.AddOffset(AddCol::VT_FIELD, field);
+  }
+  void add_default_(::flatbuffers::Offset<ValueInstance> default_) {
+    fbb_.AddOffset(AddCol::VT_DEFAULT_, default_);
+  }
+  explicit AddColBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<AddCol> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<AddCol>(end);
+    fbb_.Required(o, AddCol::VT_FIELD);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<AddCol> CreateAddCol(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<Field> field = 0,
+    ::flatbuffers::Offset<ValueInstance> default_ = 0) {
+  AddColBuilder builder_(_fbb);
+  builder_.add_default_(default_);
+  builder_.add_field(field);
+  return builder_.Finish();
+}
+
+struct AddCol::Traits {
+  using type = AddCol;
+  static auto constexpr Create = CreateAddCol;
+};
+
+struct DropCol FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef DropColBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_COL = 4
+  };
+  const ::flatbuffers::String *col() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_COL);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_COL) &&
+           verifier.VerifyString(col()) &&
+           verifier.EndTable();
+  }
+};
+
+struct DropColBuilder {
+  typedef DropCol Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_col(::flatbuffers::Offset<::flatbuffers::String> col) {
+    fbb_.AddOffset(DropCol::VT_COL, col);
+  }
+  explicit DropColBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<DropCol> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<DropCol>(end);
+    fbb_.Required(o, DropCol::VT_COL);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<DropCol> CreateDropCol(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::String> col = 0) {
+  DropColBuilder builder_(_fbb);
+  builder_.add_col(col);
+  return builder_.Finish();
+}
+
+struct DropCol::Traits {
+  using type = DropCol;
+  static auto constexpr Create = CreateDropCol;
+};
+
+inline ::flatbuffers::Offset<DropCol> CreateDropColDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const char *col = nullptr) {
+  auto col__ = col ? _fbb.CreateString(col) : 0;
+  return CreateDropCol(
+      _fbb,
+      col__);
 }
 
 struct ValueIndex FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -1372,6 +1571,67 @@ inline ::flatbuffers::Offset<Window> CreateWindowDirect(
       order_by__);
 }
 
+struct AggregateFilter FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef AggregateFilterBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_FUN = 4,
+    VT_CONDITION = 6
+  };
+  const Function *fun() const {
+    return GetPointer<const Function *>(VT_FUN);
+  }
+  const Expr *condition() const {
+    return GetPointer<const Expr *>(VT_CONDITION);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_FUN) &&
+           verifier.VerifyTable(fun()) &&
+           VerifyOffsetRequired(verifier, VT_CONDITION) &&
+           verifier.VerifyTable(condition()) &&
+           verifier.EndTable();
+  }
+};
+
+struct AggregateFilterBuilder {
+  typedef AggregateFilter Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_fun(::flatbuffers::Offset<Function> fun) {
+    fbb_.AddOffset(AggregateFilter::VT_FUN, fun);
+  }
+  void add_condition(::flatbuffers::Offset<Expr> condition) {
+    fbb_.AddOffset(AggregateFilter::VT_CONDITION, condition);
+  }
+  explicit AggregateFilterBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<AggregateFilter> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<AggregateFilter>(end);
+    fbb_.Required(o, AggregateFilter::VT_FUN);
+    fbb_.Required(o, AggregateFilter::VT_CONDITION);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<AggregateFilter> CreateAggregateFilter(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<Function> fun = 0,
+    ::flatbuffers::Offset<Expr> condition = 0) {
+  AggregateFilterBuilder builder_(_fbb);
+  builder_.add_condition(condition);
+  builder_.add_fun(fun);
+  return builder_.Finish();
+}
+
+struct AggregateFilter::Traits {
+  using type = AggregateFilter;
+  static auto constexpr Create = CreateAggregateFilter;
+};
+
 struct Expr FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef ExprBuilder Builder;
   struct Traits;
@@ -1415,6 +1675,9 @@ struct Expr FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   const ValueName *exprs_as_ValueName() const {
     return exprs_type() == ExprUnion::ValueName ? static_cast<const ValueName *>(exprs()) : nullptr;
+  }
+  const AggregateFilter *exprs_as_AggregateFilter() const {
+    return exprs_type() == ExprUnion::AggregateFilter ? static_cast<const AggregateFilter *>(exprs()) : nullptr;
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -1463,6 +1726,10 @@ template<> inline const Window *Expr::exprs_as<Window>() const {
 
 template<> inline const ValueName *Expr::exprs_as<ValueName>() const {
   return exprs_as_ValueName();
+}
+
+template<> inline const AggregateFilter *Expr::exprs_as<AggregateFilter>() const {
+  return exprs_as_AggregateFilter();
 }
 
 struct ExprBuilder {
@@ -2712,7 +2979,8 @@ struct UnaryQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
     VT_ORDER_BY = 12,
     VT_GROUP_BY = 14,
     VT_DISTINCT = 16,
-    VT_LIMIT = 18
+    VT_LIMIT = 18,
+    VT_HAVING = 20
   };
   const ::flatbuffers::Vector<::flatbuffers::Offset<TableSource>> *sources() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<TableSource>> *>(VT_SOURCES);
@@ -2738,6 +3006,9 @@ struct UnaryQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
   uint32_t limit() const {
     return GetField<uint32_t>(VT_LIMIT, 0);
   }
+  const Function *having() const {
+    return GetPointer<const Function *>(VT_HAVING);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_SOURCES) &&
@@ -2760,6 +3031,8 @@ struct UnaryQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
            VerifyOffset(verifier, VT_DISTINCT) &&
            verifier.VerifyTable(distinct()) &&
            VerifyField<uint32_t>(verifier, VT_LIMIT, 4) &&
+           VerifyOffset(verifier, VT_HAVING) &&
+           verifier.VerifyTable(having()) &&
            verifier.EndTable();
   }
 };
@@ -2792,6 +3065,9 @@ struct UnaryQueryElementBuilder {
   void add_limit(uint32_t limit) {
     fbb_.AddElement<uint32_t>(UnaryQueryElement::VT_LIMIT, limit, 0);
   }
+  void add_having(::flatbuffers::Offset<Function> having) {
+    fbb_.AddOffset(UnaryQueryElement::VT_HAVING, having);
+  }
   explicit UnaryQueryElementBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -2813,8 +3089,10 @@ inline ::flatbuffers::Offset<UnaryQueryElement> CreateUnaryQueryElement(
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<TableOrderBy>>> order_by = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Expr>>> group_by = 0,
     ::flatbuffers::Offset<Distinct> distinct = 0,
-    uint32_t limit = 0) {
+    uint32_t limit = 0,
+    ::flatbuffers::Offset<Function> having = 0) {
   UnaryQueryElementBuilder builder_(_fbb);
+  builder_.add_having(having);
   builder_.add_limit(limit);
   builder_.add_distinct(distinct);
   builder_.add_group_by(group_by);
@@ -2840,7 +3118,8 @@ inline ::flatbuffers::Offset<UnaryQueryElement> CreateUnaryQueryElementDirect(
     const std::vector<::flatbuffers::Offset<TableOrderBy>> *order_by = nullptr,
     const std::vector<::flatbuffers::Offset<Expr>> *group_by = nullptr,
     ::flatbuffers::Offset<Distinct> distinct = 0,
-    uint32_t limit = 0) {
+    uint32_t limit = 0,
+    ::flatbuffers::Offset<Function> having = 0) {
   auto sources__ = sources ? _fbb.CreateVector<::flatbuffers::Offset<TableSource>>(*sources) : 0;
   auto joins__ = joins ? _fbb.CreateVector<::flatbuffers::Offset<Join>>(*joins) : 0;
   auto fields__ = fields ? _fbb.CreateVector<::flatbuffers::Offset<Expr>>(*fields) : 0;
@@ -2855,7 +3134,8 @@ inline ::flatbuffers::Offset<UnaryQueryElement> CreateUnaryQueryElementDirect(
       order_by__,
       group_by__,
       distinct,
-      limit);
+      limit,
+      having);
 }
 
 struct BinaryQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -2937,9 +3217,8 @@ struct SetExpr FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_COL = 4,
     VT_EXPR = 6
   };
-  /// Because we cannot refer to multiple tables at once in a single UPDATE
-  /// operation we only need to name the column, we can just a string here
-  /// instead of a Column table.
+  /// The target column name. Since SET targets always refer to the target table,
+  /// we only need to name the column as a string.
   const ::flatbuffers::String *col() const {
     return GetPointer<const ::flatbuffers::String *>(VT_COL);
   }
@@ -3014,7 +3293,9 @@ struct UpdateQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
     VT_SOURCE_TYPE = 4,
     VT_SOURCE = 6,
     VT_SETS = 8,
-    VT_FILTER = 10
+    VT_FILTER = 10,
+    VT_FROM_SOURCES = 12,
+    VT_JOINS = 14
   };
   TableSourceUnion source_type() const {
     return static_cast<TableSourceUnion>(GetField<uint8_t>(VT_SOURCE_TYPE, 0));
@@ -3053,6 +3334,16 @@ struct UpdateQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   const Function *filter() const {
     return GetPointer<const Function *>(VT_FILTER);
   }
+  /// Additional table sources from a FROM clause (UPDATE ... FROM ... syntax).
+  /// Source indexes: target table is implicitly at index 0, from_sources start at index 1.
+  const ::flatbuffers::Vector<::flatbuffers::Offset<TableSource>> *from_sources() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<TableSource>> *>(VT_FROM_SOURCES);
+  }
+  /// Joins within the FROM clause. Indexes reference the combined source list
+  /// (0 = target, 1+ = from_sources).
+  const ::flatbuffers::Vector<::flatbuffers::Offset<Join>> *joins() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Join>> *>(VT_JOINS);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_SOURCE_TYPE, 1) &&
@@ -3063,6 +3354,12 @@ struct UpdateQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
            verifier.VerifyVectorOfTables(sets()) &&
            VerifyOffset(verifier, VT_FILTER) &&
            verifier.VerifyTable(filter()) &&
+           VerifyOffset(verifier, VT_FROM_SOURCES) &&
+           verifier.VerifyVector(from_sources()) &&
+           verifier.VerifyVectorOfTables(from_sources()) &&
+           VerifyOffset(verifier, VT_JOINS) &&
+           verifier.VerifyVector(joins()) &&
+           verifier.VerifyVectorOfTables(joins()) &&
            verifier.EndTable();
   }
 };
@@ -3115,6 +3412,12 @@ struct UpdateQueryElementBuilder {
   void add_filter(::flatbuffers::Offset<Function> filter) {
     fbb_.AddOffset(UpdateQueryElement::VT_FILTER, filter);
   }
+  void add_from_sources(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<TableSource>>> from_sources) {
+    fbb_.AddOffset(UpdateQueryElement::VT_FROM_SOURCES, from_sources);
+  }
+  void add_joins(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Join>>> joins) {
+    fbb_.AddOffset(UpdateQueryElement::VT_JOINS, joins);
+  }
   explicit UpdateQueryElementBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -3133,8 +3436,12 @@ inline ::flatbuffers::Offset<UpdateQueryElement> CreateUpdateQueryElement(
     TableSourceUnion source_type = TableSourceUnion::NONE,
     ::flatbuffers::Offset<void> source = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<SetExpr>>> sets = 0,
-    ::flatbuffers::Offset<Function> filter = 0) {
+    ::flatbuffers::Offset<Function> filter = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<TableSource>>> from_sources = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Join>>> joins = 0) {
   UpdateQueryElementBuilder builder_(_fbb);
+  builder_.add_joins(joins);
+  builder_.add_from_sources(from_sources);
   builder_.add_filter(filter);
   builder_.add_sets(sets);
   builder_.add_source(source);
@@ -3152,14 +3459,20 @@ inline ::flatbuffers::Offset<UpdateQueryElement> CreateUpdateQueryElementDirect(
     TableSourceUnion source_type = TableSourceUnion::NONE,
     ::flatbuffers::Offset<void> source = 0,
     const std::vector<::flatbuffers::Offset<SetExpr>> *sets = nullptr,
-    ::flatbuffers::Offset<Function> filter = 0) {
+    ::flatbuffers::Offset<Function> filter = 0,
+    const std::vector<::flatbuffers::Offset<TableSource>> *from_sources = nullptr,
+    const std::vector<::flatbuffers::Offset<Join>> *joins = nullptr) {
   auto sets__ = sets ? _fbb.CreateVector<::flatbuffers::Offset<SetExpr>>(*sets) : 0;
+  auto from_sources__ = from_sources ? _fbb.CreateVector<::flatbuffers::Offset<TableSource>>(*from_sources) : 0;
+  auto joins__ = joins ? _fbb.CreateVector<::flatbuffers::Offset<Join>>(*joins) : 0;
   return CreateUpdateQueryElement(
       _fbb,
       source_type,
       source,
       sets__,
-      filter);
+      filter,
+      from_sources__,
+      joins__);
 }
 
 struct DeleteQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -3714,6 +4027,153 @@ inline ::flatbuffers::Offset<InsertQueryElement> CreateInsertQueryElementDirect(
       returning__);
 }
 
+struct AlterTableOperation FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef AlterTableOperationBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_OP_TYPE = 4,
+    VT_OP = 6
+  };
+  AlterTableOperationUnion op_type() const {
+    return static_cast<AlterTableOperationUnion>(GetField<uint8_t>(VT_OP_TYPE, 0));
+  }
+  const void *op() const {
+    return GetPointer<const void *>(VT_OP);
+  }
+  template<typename T> const T *op_as() const;
+  const AddCol *op_as_AddCol() const {
+    return op_type() == AlterTableOperationUnion::AddCol ? static_cast<const AddCol *>(op()) : nullptr;
+  }
+  const DropCol *op_as_DropCol() const {
+    return op_type() == AlterTableOperationUnion::DropCol ? static_cast<const DropCol *>(op()) : nullptr;
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_OP_TYPE, 1) &&
+           VerifyOffsetRequired(verifier, VT_OP) &&
+           VerifyAlterTableOperationUnion(verifier, op(), op_type()) &&
+           verifier.EndTable();
+  }
+};
+
+template<> inline const AddCol *AlterTableOperation::op_as<AddCol>() const {
+  return op_as_AddCol();
+}
+
+template<> inline const DropCol *AlterTableOperation::op_as<DropCol>() const {
+  return op_as_DropCol();
+}
+
+struct AlterTableOperationBuilder {
+  typedef AlterTableOperation Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_op_type(AlterTableOperationUnion op_type) {
+    fbb_.AddElement<uint8_t>(AlterTableOperation::VT_OP_TYPE, static_cast<uint8_t>(op_type), 0);
+  }
+  void add_op(::flatbuffers::Offset<void> op) {
+    fbb_.AddOffset(AlterTableOperation::VT_OP, op);
+  }
+  explicit AlterTableOperationBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<AlterTableOperation> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<AlterTableOperation>(end);
+    fbb_.Required(o, AlterTableOperation::VT_OP);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<AlterTableOperation> CreateAlterTableOperation(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    AlterTableOperationUnion op_type = AlterTableOperationUnion::NONE,
+    ::flatbuffers::Offset<void> op = 0) {
+  AlterTableOperationBuilder builder_(_fbb);
+  builder_.add_op(op);
+  builder_.add_op_type(op_type);
+  return builder_.Finish();
+}
+
+struct AlterTableOperation::Traits {
+  using type = AlterTableOperation;
+  static auto constexpr Create = CreateAlterTableOperation;
+};
+
+struct AlterTableElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef AlterTableElementBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_TARGET = 4,
+    VT_OPERATIONS = 6
+  };
+  const ObjectId *target() const {
+    return GetPointer<const ObjectId *>(VT_TARGET);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<AlterTableOperation>> *operations() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<AlterTableOperation>> *>(VT_OPERATIONS);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_TARGET) &&
+           verifier.VerifyTable(target()) &&
+           VerifyOffsetRequired(verifier, VT_OPERATIONS) &&
+           verifier.VerifyVector(operations()) &&
+           verifier.VerifyVectorOfTables(operations()) &&
+           verifier.EndTable();
+  }
+};
+
+struct AlterTableElementBuilder {
+  typedef AlterTableElement Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_target(::flatbuffers::Offset<ObjectId> target) {
+    fbb_.AddOffset(AlterTableElement::VT_TARGET, target);
+  }
+  void add_operations(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<AlterTableOperation>>> operations) {
+    fbb_.AddOffset(AlterTableElement::VT_OPERATIONS, operations);
+  }
+  explicit AlterTableElementBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<AlterTableElement> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<AlterTableElement>(end);
+    fbb_.Required(o, AlterTableElement::VT_TARGET);
+    fbb_.Required(o, AlterTableElement::VT_OPERATIONS);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<AlterTableElement> CreateAlterTableElement(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<ObjectId> target = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<AlterTableOperation>>> operations = 0) {
+  AlterTableElementBuilder builder_(_fbb);
+  builder_.add_operations(operations);
+  builder_.add_target(target);
+  return builder_.Finish();
+}
+
+struct AlterTableElement::Traits {
+  using type = AlterTableElement;
+  static auto constexpr Create = CreateAlterTableElement;
+};
+
+inline ::flatbuffers::Offset<AlterTableElement> CreateAlterTableElementDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<ObjectId> target = 0,
+    const std::vector<::flatbuffers::Offset<AlterTableOperation>> *operations = nullptr) {
+  auto operations__ = operations ? _fbb.CreateVector<::flatbuffers::Offset<AlterTableOperation>>(*operations) : 0;
+  return CreateAlterTableElement(
+      _fbb,
+      target,
+      operations__);
+}
+
 struct QueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef QueryElementBuilder Builder;
   struct Traits;
@@ -3743,10 +4203,13 @@ struct QueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const InsertQueryElement *q_as_InsertQueryElement() const {
     return q_type() == QueryElementUnion::InsertQueryElement ? static_cast<const InsertQueryElement *>(q()) : nullptr;
   }
+  const AlterTableElement *q_as_AlterTableElement() const {
+    return q_type() == QueryElementUnion::AlterTableElement ? static_cast<const AlterTableElement *>(q()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_Q_TYPE, 1) &&
-           VerifyOffset(verifier, VT_Q) &&
+           VerifyOffsetRequired(verifier, VT_Q) &&
            VerifyQueryElementUnion(verifier, q(), q_type()) &&
            verifier.EndTable();
   }
@@ -3772,6 +4235,10 @@ template<> inline const InsertQueryElement *QueryElement::q_as<InsertQueryElemen
   return q_as_InsertQueryElement();
 }
 
+template<> inline const AlterTableElement *QueryElement::q_as<AlterTableElement>() const {
+  return q_as_AlterTableElement();
+}
+
 struct QueryElementBuilder {
   typedef QueryElement Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
@@ -3789,6 +4256,7 @@ struct QueryElementBuilder {
   ::flatbuffers::Offset<QueryElement> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<QueryElement>(end);
+    fbb_.Required(o, QueryElement::VT_Q);
     return o;
   }
 };
@@ -4032,6 +4500,10 @@ inline bool VerifyExprUnion(::flatbuffers::Verifier &verifier, const void *obj, 
       auto ptr = reinterpret_cast<const ValueName *>(obj);
       return verifier.VerifyTable(ptr);
     }
+    case ExprUnion::AggregateFilter: {
+      auto ptr = reinterpret_cast<const AggregateFilter *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
     default: return true;
   }
 }
@@ -4163,6 +4635,35 @@ inline bool VerifyConflictActionVector(::flatbuffers::Verifier &verifier, const 
   return true;
 }
 
+inline bool VerifyAlterTableOperationUnion(::flatbuffers::Verifier &verifier, const void *obj, AlterTableOperationUnion type) {
+  switch (type) {
+    case AlterTableOperationUnion::NONE: {
+      return true;
+    }
+    case AlterTableOperationUnion::AddCol: {
+      auto ptr = reinterpret_cast<const AddCol *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case AlterTableOperationUnion::DropCol: {
+      auto ptr = reinterpret_cast<const DropCol *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    default: return true;
+  }
+}
+
+inline bool VerifyAlterTableOperationUnionVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<AlterTableOperationUnion> *types) {
+  if (!values || !types) return !values && !types;
+  if (values->size() != types->size()) return false;
+  for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
+    if (!VerifyAlterTableOperationUnion(
+        verifier,  values->Get(i), types->GetEnum<AlterTableOperationUnion>(i))) {
+      return false;
+    }
+  }
+  return true;
+}
+
 inline bool VerifyQueryElementUnion(::flatbuffers::Verifier &verifier, const void *obj, QueryElementUnion type) {
   switch (type) {
     case QueryElementUnion::NONE: {
@@ -4186,6 +4687,10 @@ inline bool VerifyQueryElementUnion(::flatbuffers::Verifier &verifier, const voi
     }
     case QueryElementUnion::InsertQueryElement: {
       auto ptr = reinterpret_cast<const InsertQueryElement *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case QueryElementUnion::AlterTableElement: {
+      auto ptr = reinterpret_cast<const AlterTableElement *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

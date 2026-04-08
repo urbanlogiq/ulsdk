@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class ParameterFlags(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = ParameterFlags()
         x.Init(buf, n + offset)
@@ -22,7 +21,7 @@ class ParameterFlags(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # ParameterFlags
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # ParameterFlags
@@ -32,20 +31,20 @@ class ParameterFlags(object):
             return self._tab.Get(flatbuffers.number_types.Int64Flags, o + self._tab.Pos)
         return 0
 
-def ParameterFlagsStart(builder: flatbuffers.Builder):
+def ParameterFlagsStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ParameterFlagsStart(builder)
 
-def ParameterFlagsAddFlags(builder: flatbuffers.Builder, flags: int):
+def ParameterFlagsAddFlags(builder, flags):
     builder.PrependInt64Slot(0, flags, 0)
 
-def AddFlags(builder: flatbuffers.Builder, flags: int):
+def AddFlags(builder, flags):
     ParameterFlagsAddFlags(builder, flags)
 
-def ParameterFlagsEnd(builder: flatbuffers.Builder) -> int:
+def ParameterFlagsEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ParameterFlagsEnd(builder)

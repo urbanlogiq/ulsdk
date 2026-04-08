@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class Type(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Type()
         x.Init(buf, n + offset)
@@ -26,7 +25,7 @@ class Type(object):
         return flatbuffers.util.BufferHasIdentifier(buf, offset, b"\x42\x46\x42\x53", size_prefixed=size_prefixed)
 
     # Type
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Type
@@ -73,50 +72,50 @@ class Type(object):
             return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
         return 0
 
-def TypeStart(builder: flatbuffers.Builder):
+def TypeStart(builder):
     builder.StartObject(6)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     TypeStart(builder)
 
-def TypeAddBaseType(builder: flatbuffers.Builder, baseType: int):
+def TypeAddBaseType(builder, baseType):
     builder.PrependInt8Slot(0, baseType, 0)
 
-def AddBaseType(builder: flatbuffers.Builder, baseType: int):
+def AddBaseType(builder, baseType):
     TypeAddBaseType(builder, baseType)
 
-def TypeAddElement(builder: flatbuffers.Builder, element: int):
+def TypeAddElement(builder, element):
     builder.PrependInt8Slot(1, element, 0)
 
-def AddElement(builder: flatbuffers.Builder, element: int):
+def AddElement(builder, element):
     TypeAddElement(builder, element)
 
-def TypeAddIndex(builder: flatbuffers.Builder, index: int):
+def TypeAddIndex(builder, index):
     builder.PrependInt32Slot(2, index, -1)
 
-def AddIndex(builder: flatbuffers.Builder, index: int):
+def AddIndex(builder, index):
     TypeAddIndex(builder, index)
 
-def TypeAddFixedLength(builder: flatbuffers.Builder, fixedLength: int):
+def TypeAddFixedLength(builder, fixedLength):
     builder.PrependUint16Slot(3, fixedLength, 0)
 
-def AddFixedLength(builder: flatbuffers.Builder, fixedLength: int):
+def AddFixedLength(builder, fixedLength):
     TypeAddFixedLength(builder, fixedLength)
 
-def TypeAddBaseSize(builder: flatbuffers.Builder, baseSize: int):
+def TypeAddBaseSize(builder, baseSize):
     builder.PrependUint32Slot(4, baseSize, 4)
 
-def AddBaseSize(builder: flatbuffers.Builder, baseSize: int):
+def AddBaseSize(builder, baseSize):
     TypeAddBaseSize(builder, baseSize)
 
-def TypeAddElementSize(builder: flatbuffers.Builder, elementSize: int):
+def TypeAddElementSize(builder, elementSize):
     builder.PrependUint32Slot(5, elementSize, 0)
 
-def AddElementSize(builder: flatbuffers.Builder, elementSize: int):
+def AddElementSize(builder, elementSize):
     TypeAddElementSize(builder, elementSize)
 
-def TypeEnd(builder: flatbuffers.Builder) -> int:
+def TypeEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return TypeEnd(builder)

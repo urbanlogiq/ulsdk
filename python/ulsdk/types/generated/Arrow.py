@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class Arrow(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Arrow()
         x.Init(buf, n + offset)
@@ -22,11 +21,11 @@ class Arrow(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Arrow
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Arrow
-    def Value(self, j: int):
+    def Value(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             a = self._tab.Vector(o)
@@ -41,37 +40,37 @@ class Arrow(object):
         return 0
 
     # Arrow
-    def ValueLength(self) -> int:
+    def ValueLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Arrow
-    def ValueIsNone(self) -> bool:
+    def ValueIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def ArrowStart(builder: flatbuffers.Builder):
+def ArrowStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ArrowStart(builder)
 
-def ArrowAddValue(builder: flatbuffers.Builder, value: int):
+def ArrowAddValue(builder, value):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(value), 0)
 
-def AddValue(builder: flatbuffers.Builder, value: int):
+def AddValue(builder, value):
     ArrowAddValue(builder, value)
 
-def ArrowStartValueVector(builder, numElems: int) -> int:
+def ArrowStartValueVector(builder, numElems):
     return builder.StartVector(1, numElems, 1)
 
-def StartValueVector(builder, numElems: int) -> int:
+def StartValueVector(builder, numElems):
     return ArrowStartValueVector(builder, numElems)
 
-def ArrowEnd(builder: flatbuffers.Builder) -> int:
+def ArrowEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ArrowEnd(builder)

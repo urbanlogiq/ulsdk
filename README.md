@@ -116,7 +116,7 @@ The C++ SDK requires a C++17 compliant compiler. It is currently tested with GCC
 * `libcurl` 7.81 or newer
 * `arrow` 17.0.0 or newer
 * `libsodium` 1.0.18 or newer
-* `flatbuffers` 23.5.26
+* `flatbuffers` 25.2.10
 
 ### Python
 

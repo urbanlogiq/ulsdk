@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Expr import Expr
-from typing import Optional
 np = import_numpy()
 
 class Function(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Function()
         x.Init(buf, n + offset)
@@ -24,7 +21,7 @@ class Function(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Function
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Function
@@ -35,55 +32,56 @@ class Function(object):
         return 0
 
     # Function
-    def Parameters(self, j: int) -> Optional[Expr]:
+    def Parameters(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Expr import Expr
             obj = Expr()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Function
-    def ParametersLength(self) -> int:
+    def ParametersLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Function
-    def ParametersIsNone(self) -> bool:
+    def ParametersIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
-def FunctionStart(builder: flatbuffers.Builder):
+def FunctionStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     FunctionStart(builder)
 
-def FunctionAddFn(builder: flatbuffers.Builder, fn: int):
+def FunctionAddFn(builder, fn):
     builder.PrependInt16Slot(0, fn, 0)
 
-def AddFn(builder: flatbuffers.Builder, fn: int):
+def AddFn(builder, fn):
     FunctionAddFn(builder, fn)
 
-def FunctionAddParameters(builder: flatbuffers.Builder, parameters: int):
+def FunctionAddParameters(builder, parameters):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(parameters), 0)
 
-def AddParameters(builder: flatbuffers.Builder, parameters: int):
+def AddParameters(builder, parameters):
     FunctionAddParameters(builder, parameters)
 
-def FunctionStartParametersVector(builder, numElems: int) -> int:
+def FunctionStartParametersVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartParametersVector(builder, numElems: int) -> int:
+def StartParametersVector(builder, numElems):
     return FunctionStartParametersVector(builder, numElems)
 
-def FunctionEnd(builder: flatbuffers.Builder) -> int:
+def FunctionEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return FunctionEnd(builder)

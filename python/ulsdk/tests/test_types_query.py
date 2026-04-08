@@ -4,10 +4,34 @@
 
 from ..types.query import *
 
+def test_add_col():
+    _t0 = AddCol.make_default()
+    _b = _t0.to_bytes()
+    _t1 = AddCol.from_bytes(_b)
+    assert _t0 == _t1
+
+def test_aggregate_filter():
+    _t0 = AggregateFilter.make_default()
+    _b = _t0.to_bytes()
+    _t1 = AggregateFilter.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_all_columns():
     _t0 = AllColumns.make_default()
     _b = _t0.to_bytes()
     _t1 = AllColumns.from_bytes(_b)
+    assert _t0 == _t1
+
+def test_alter_table_element():
+    _t0 = AlterTableElement.make_default()
+    _b = _t0.to_bytes()
+    _t1 = AlterTableElement.from_bytes(_b)
+    assert _t0 == _t1
+
+def test_alter_table_operation():
+    _t0 = AlterTableOperation.make_default()
+    _b = _t0.to_bytes()
+    _t1 = AlterTableOperation.from_bytes(_b)
     assert _t0 == _t1
 
 def test_arrow():
@@ -68,6 +92,12 @@ def test_drive():
     _t0 = Drive.make_default()
     _b = _t0.to_bytes()
     _t1 = Drive.from_bytes(_b)
+    assert _t0 == _t1
+
+def test_drop_col():
+    _t0 = DropCol.make_default()
+    _b = _t0.to_bytes()
+    _t1 = DropCol.from_bytes(_b)
     assert _t0 == _t1
 
 def test_explain():

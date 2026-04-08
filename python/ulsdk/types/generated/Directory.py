@@ -4,10 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .B2cId import B2cId
-from .Slot import Slot
-from typing import Optional
 np = import_numpy()
 
 # This Directory table holds the entries in the actual directory
@@ -15,7 +11,7 @@ class Directory(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Directory()
         x.Init(buf, n + offset)
@@ -26,89 +22,91 @@ class Directory(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Directory
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Directory
-    def Slots(self, j: int) -> Optional[Slot]:
+    def Slots(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Slot import Slot
             obj = Slot()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Directory
-    def SlotsLength(self) -> int:
+    def SlotsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Directory
-    def SlotsIsNone(self) -> bool:
+    def SlotsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
     # Directory
-    def Notifications(self, j: int) -> Optional[B2cId]:
+    def Notifications(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .B2cId import B2cId
             obj = B2cId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Directory
-    def NotificationsLength(self) -> int:
+    def NotificationsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Directory
-    def NotificationsIsNone(self) -> bool:
+    def NotificationsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
-def DirectoryStart(builder: flatbuffers.Builder):
+def DirectoryStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DirectoryStart(builder)
 
-def DirectoryAddSlots(builder: flatbuffers.Builder, slots: int):
+def DirectoryAddSlots(builder, slots):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(slots), 0)
 
-def AddSlots(builder: flatbuffers.Builder, slots: int):
+def AddSlots(builder, slots):
     DirectoryAddSlots(builder, slots)
 
-def DirectoryStartSlotsVector(builder, numElems: int) -> int:
+def DirectoryStartSlotsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartSlotsVector(builder, numElems: int) -> int:
+def StartSlotsVector(builder, numElems):
     return DirectoryStartSlotsVector(builder, numElems)
 
-def DirectoryAddNotifications(builder: flatbuffers.Builder, notifications: int):
+def DirectoryAddNotifications(builder, notifications):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(notifications), 0)
 
-def AddNotifications(builder: flatbuffers.Builder, notifications: int):
+def AddNotifications(builder, notifications):
     DirectoryAddNotifications(builder, notifications)
 
-def DirectoryStartNotificationsVector(builder, numElems: int) -> int:
+def DirectoryStartNotificationsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartNotificationsVector(builder, numElems: int) -> int:
+def StartNotificationsVector(builder, numElems):
     return DirectoryStartNotificationsVector(builder, numElems)
 
-def DirectoryEnd(builder: flatbuffers.Builder) -> int:
+def DirectoryEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DirectoryEnd(builder)

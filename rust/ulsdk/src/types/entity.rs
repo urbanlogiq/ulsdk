@@ -19,8 +19,8 @@ use strum_macros::FromRepr;
 use crate::types::generated::entity_generated::{
     EdgeTy as FbsEdgeTy, EntityTy as FbsEntityTy, Geometry as FbsGeometry,
     GraphEdge as FbsGraphEdge, GraphNode as FbsGraphNode, Line as FbsLine,
-    MultiLine as FbsMultiLine, MultiPolygon as FbsMultiPolygon, NodeTy as FbsNodeTy,
-    Point as FbsPoint, Polygon as FbsPolygon,
+    MultiLine as FbsMultiLine, MultiPoint as FbsMultiPoint, MultiPolygon as FbsMultiPolygon,
+    NodeTy as FbsNodeTy, Point as FbsPoint, Polygon as FbsPolygon,
 };
 use crate::types::generated::id_generated::{
     B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
@@ -406,6 +406,7 @@ pub enum EntityTy {
     T_ROAD_SEGMENT_SAFETY_COUNTS = 271,
     T_HEXAGON_BOUNDARY = 272,
     T_COMPASS_IOT_POINT = 273,
+    T_LANDSLIDE_AREA = 274,
 }
 
 impl TryFrom<i32> for EntityTy {
@@ -712,6 +713,7 @@ impl EntityTy {
             Self::T_ROAD_SEGMENT_SAFETY_COUNTS => Some("T_ROAD_SEGMENT_SAFETY_COUNTS"),
             Self::T_HEXAGON_BOUNDARY => Some("T_HEXAGON_BOUNDARY"),
             Self::T_COMPASS_IOT_POINT => Some("T_COMPASS_IOT_POINT"),
+            Self::T_LANDSLIDE_AREA => Some("T_LANDSLIDE_AREA"),
             _ => None,
         }
     }
@@ -1018,6 +1020,7 @@ impl From<EntityTy> for FbsEntityTy {
             EntityTy::T_ROAD_SEGMENT_SAFETY_COUNTS => FbsEntityTy::T_ROAD_SEGMENT_SAFETY_COUNTS,
             EntityTy::T_HEXAGON_BOUNDARY => FbsEntityTy::T_HEXAGON_BOUNDARY,
             EntityTy::T_COMPASS_IOT_POINT => FbsEntityTy::T_COMPASS_IOT_POINT,
+            EntityTy::T_LANDSLIDE_AREA => FbsEntityTy::T_LANDSLIDE_AREA,
         }
     }
 }
@@ -1299,6 +1302,7 @@ impl From<FbsEntityTy> for EntityTy {
             271 => Self::T_ROAD_SEGMENT_SAFETY_COUNTS,
             272 => Self::T_HEXAGON_BOUNDARY,
             273 => Self::T_COMPASS_IOT_POINT,
+            274 => Self::T_LANDSLIDE_AREA,
             _ => panic!("Invalid value {} when constructing EntityTy", fbs.0),
         }
     }
@@ -1631,6 +1635,60 @@ impl MultiPolygon {
     }
 }
 
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+pub struct MultiPoint {
+    pub point_geo: Vec<Point>,
+}
+
+impl MultiPoint {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsMultiPoint<'a>> {
+        use crate::types::generated::entity_generated::MultiPointBuilder as FbsMultiPointBuilder;
+
+        let mut point_geo_offsets = Vec::with_capacity(self.point_geo.len());
+        for val in self.point_geo.iter() {
+            let offset = val.serialize_to(builder);
+            point_geo_offsets.push(offset);
+        }
+        let point_geo_offset = builder.create_vector(&point_geo_offsets);
+
+        let mut bldr = FbsMultiPointBuilder::new(builder);
+        bldr.add_point_geo(point_geo_offset);
+        bldr.finish()
+    }
+}
+
+impl From<FbsMultiPoint<'_>> for MultiPoint {
+    fn from(fbs: FbsMultiPoint<'_>) -> Self {
+        let mut point_geo = Vec::new();
+        for elem in fbs.point_geo() {
+            point_geo.push(elem.into());
+        }
+
+        Self { point_geo }
+    }
+}
+
+impl MultiPoint {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsMultiPoint>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Hash, Eq)]
 pub enum Geometry {
     Point(Point),
@@ -1638,6 +1696,7 @@ pub enum Geometry {
     MultiLine(MultiLine),
     Polygon(Polygon),
     MultiPolygon(MultiPolygon),
+    MultiPoint(MultiPoint),
 }
 
 impl Default for Geometry {
@@ -1675,6 +1734,11 @@ impl Geometry {
             Self::MultiPolygon(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
                 let ty = FbsGeometry::MultiPolygon;
+                (offset, ty)
+            }
+            Self::MultiPoint(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsGeometry::MultiPoint;
                 (offset, ty)
             }
         }
@@ -1804,6 +1868,9 @@ impl From<FbsGraphNode<'_>> for GraphNode {
                 FbsGeometry::MultiPolygon => Geometry::MultiPolygon(MultiPolygon::from(
                     fbs._geom_as_multi_polygon().unwrap(),
                 )),
+                FbsGeometry::MultiPoint => {
+                    Geometry::MultiPoint(MultiPoint::from(fbs._geom_as_multi_point().unwrap()))
+                }
                 _ => unreachable!(),
             };
 
@@ -1895,6 +1962,21 @@ impl From<&Line> for geo_types::LineString<f64> {
     }
 }
 
+impl From<geo_types::MultiPoint<f64>> for MultiPoint {
+    fn from(l: geo_types::MultiPoint<f64>) -> MultiPoint {
+        MultiPoint {
+            point_geo: l.0.into_iter().map(Point::from).collect(),
+        }
+    }
+}
+
+impl From<&MultiPoint> for geo_types::MultiPoint<f64> {
+    fn from(p: &MultiPoint) -> geo_types::MultiPoint<f64> {
+        let points: Vec<geo_types::Point<f64>> = p.point_geo.iter().map(Into::into).collect();
+        geo_types::MultiPoint(points)
+    }
+}
+
 impl From<geo_types::MultiLineString<f64>> for MultiLine {
     fn from(l: geo_types::MultiLineString<f64>) -> MultiLine {
         MultiLine {
@@ -1953,6 +2035,7 @@ impl From<&Geometry> for geo_types::Geometry<f64> {
             Geometry::MultiLine(p) => geo_types::Geometry::MultiLineString(p.into()),
             Geometry::Polygon(p) => geo_types::Geometry::Polygon(p.into()),
             Geometry::MultiPolygon(p) => geo_types::Geometry::MultiPolygon(p.into()),
+            Geometry::MultiPoint(p) => geo_types::Geometry::MultiPoint(p.into()),
         }
     }
 }
@@ -1990,6 +2073,14 @@ mod tests {
         let t0 = MultiLine::default();
         let buf = t0.to_fbs_bytes();
         let t1 = MultiLine::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_multi_point() {
+        let t0 = MultiPoint::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = MultiPoint::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 

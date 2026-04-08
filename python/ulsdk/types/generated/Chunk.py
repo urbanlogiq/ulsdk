@@ -4,17 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .GenericId import GenericId
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class Chunk(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Chunk()
         x.Init(buf, n + offset)
@@ -25,14 +21,15 @@ class Chunk(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Chunk
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Chunk
-    def Blob(self) -> Optional[GenericId]:
+    def Blob(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .GenericId import GenericId
             obj = GenericId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -46,9 +43,10 @@ class Chunk(object):
         return 0
 
     # Chunk
-    def Digest(self) -> Optional[flatbuffers.table.Table]:
+    def Digest(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
@@ -61,38 +59,38 @@ class Chunk(object):
             return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
         return 0
 
-def ChunkStart(builder: flatbuffers.Builder):
+def ChunkStart(builder):
     builder.StartObject(4)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ChunkStart(builder)
 
-def ChunkAddBlob(builder: flatbuffers.Builder, blob: int):
+def ChunkAddBlob(builder, blob):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(blob), 0)
 
-def AddBlob(builder: flatbuffers.Builder, blob: int):
+def AddBlob(builder, blob):
     ChunkAddBlob(builder, blob)
 
-def ChunkAddDigestType(builder: flatbuffers.Builder, digestType: int):
+def ChunkAddDigestType(builder, digestType):
     builder.PrependUint8Slot(1, digestType, 0)
 
-def AddDigestType(builder: flatbuffers.Builder, digestType: int):
+def AddDigestType(builder, digestType):
     ChunkAddDigestType(builder, digestType)
 
-def ChunkAddDigest(builder: flatbuffers.Builder, digest: int):
+def ChunkAddDigest(builder, digest):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(digest), 0)
 
-def AddDigest(builder: flatbuffers.Builder, digest: int):
+def AddDigest(builder, digest):
     ChunkAddDigest(builder, digest)
 
-def ChunkAddSize(builder: flatbuffers.Builder, size: int):
+def ChunkAddSize(builder, size):
     builder.PrependUint64Slot(3, size, 0)
 
-def AddSize(builder: flatbuffers.Builder, size: int):
+def AddSize(builder, size):
     ChunkAddSize(builder, size)
 
-def ChunkEnd(builder: flatbuffers.Builder) -> int:
+def ChunkEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ChunkEnd(builder)

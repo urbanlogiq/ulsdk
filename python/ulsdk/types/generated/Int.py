@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class Int(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Int()
         x.Init(buf, n + offset)
@@ -22,7 +21,7 @@ class Int(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Int
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Int
@@ -39,26 +38,26 @@ class Int(object):
             return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
         return False
 
-def IntStart(builder: flatbuffers.Builder):
+def IntStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     IntStart(builder)
 
-def IntAddBitWidth(builder: flatbuffers.Builder, bitWidth: int):
+def IntAddBitWidth(builder, bitWidth):
     builder.PrependInt32Slot(0, bitWidth, 0)
 
-def AddBitWidth(builder: flatbuffers.Builder, bitWidth: int):
+def AddBitWidth(builder, bitWidth):
     IntAddBitWidth(builder, bitWidth)
 
-def IntAddIsSigned(builder: flatbuffers.Builder, isSigned: bool):
+def IntAddIsSigned(builder, isSigned):
     builder.PrependBoolSlot(1, isSigned, 0)
 
-def AddIsSigned(builder: flatbuffers.Builder, isSigned: bool):
+def AddIsSigned(builder, isSigned):
     IntAddIsSigned(builder, isSigned)
 
-def IntEnd(builder: flatbuffers.Builder) -> int:
+def IntEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return IntEnd(builder)

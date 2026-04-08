@@ -23,7 +23,7 @@ import java.nio.ByteOrder;
 
 @SuppressWarnings("unused")
 public final class OrderBy extends com.google.flatbuffers.Table {
-  public static void ValidateVersion() { Constants.FLATBUFFERS_23_5_26(); }
+  public static void ValidateVersion() { Constants.FLATBUFFERS_25_2_10(); }
   public static OrderBy getRootAsOrderBy(ByteBuffer _bb) { return getRootAsOrderBy(_bb, new OrderBy()); }
   public static OrderBy getRootAsOrderBy(ByteBuffer _bb, OrderBy obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
   public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }
@@ -34,22 +34,26 @@ public final class OrderBy extends com.google.flatbuffers.Table {
   public ByteBuffer fieldAsByteBuffer() { return __vector_as_bytebuffer(6, 1); }
   public ByteBuffer fieldInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 6, 1); }
   public short transform() { int o = __offset(8); return o != 0 ? bb.getShort(o + bb_pos) : 0; }
+  public boolean nullsFirst() { int o = __offset(10); return o != 0 ? 0!=bb.get(o + bb_pos) : false; }
 
   public static int createOrderBy(FlatBufferBuilder builder,
       long sort,
       int fieldOffset,
-      short transform) {
-    builder.startTable(3);
+      short transform,
+      boolean nullsFirst) {
+    builder.startTable(4);
     OrderBy.addField(builder, fieldOffset);
     OrderBy.addSort(builder, sort);
     OrderBy.addTransform(builder, transform);
+    OrderBy.addNullsFirst(builder, nullsFirst);
     return OrderBy.endOrderBy(builder);
   }
 
-  public static void startOrderBy(FlatBufferBuilder builder) { builder.startTable(3); }
+  public static void startOrderBy(FlatBufferBuilder builder) { builder.startTable(4); }
   public static void addSort(FlatBufferBuilder builder, long sort) { builder.addInt(0, (int) sort, (int) 0L); }
   public static void addField(FlatBufferBuilder builder, int fieldOffset) { builder.addOffset(1, fieldOffset, 0); }
   public static void addTransform(FlatBufferBuilder builder, short transform) { builder.addShort(2, transform, 0); }
+  public static void addNullsFirst(FlatBufferBuilder builder, boolean nullsFirst) { builder.addBoolean(3, nullsFirst, false); }
   public static int endOrderBy(FlatBufferBuilder builder) {
     int o = builder.endTable();
     builder.required(o, 6);  // field

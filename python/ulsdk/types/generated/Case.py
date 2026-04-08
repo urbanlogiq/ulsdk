@@ -4,17 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Expr import Expr
-from .When import When
-from typing import Optional
 np = import_numpy()
 
 class Case(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Case()
         x.Init(buf, n + offset)
@@ -25,69 +21,71 @@ class Case(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Case
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Case
-    def When(self, j: int) -> Optional[When]:
+    def When(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .When import When
             obj = When()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Case
-    def WhenLength(self) -> int:
+    def WhenLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Case
-    def WhenIsNone(self) -> bool:
+    def WhenIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
     # Case
-    def Else_(self) -> Optional[Expr]:
+    def Else(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Expr import Expr
             obj = Expr()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def CaseStart(builder: flatbuffers.Builder):
+def CaseStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     CaseStart(builder)
 
-def CaseAddWhen(builder: flatbuffers.Builder, when: int):
+def CaseAddWhen(builder, when):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(when), 0)
 
-def AddWhen(builder: flatbuffers.Builder, when: int):
+def AddWhen(builder, when):
     CaseAddWhen(builder, when)
 
-def CaseStartWhenVector(builder, numElems: int) -> int:
+def CaseStartWhenVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartWhenVector(builder, numElems: int) -> int:
+def StartWhenVector(builder, numElems):
     return CaseStartWhenVector(builder, numElems)
 
-def CaseAddElse_(builder: flatbuffers.Builder, else_: int):
+def CaseAddElse(builder, else_):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(else_), 0)
 
-def AddElse_(builder: flatbuffers.Builder, else_: int):
-    CaseAddElse_(builder, else_)
+def AddElse(builder, else_):
+    CaseAddElse(builder, else_)
 
-def CaseEnd(builder: flatbuffers.Builder) -> int:
+def CaseEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return CaseEnd(builder)

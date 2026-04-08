@@ -16,18 +16,40 @@ use flatbuffers::{UnionWIPOffset, WIPOffset};
 use ordered_float::OrderedFloat;
 use strum_macros::FromRepr;
 
+use crate::types::Schema::{
+    Binary, BinaryView, Bool, Buffer, Date, DateUnit, Decimal, DictionaryEncoding, DictionaryKind,
+    Duration, Endianness, Feature, Field, FixedSizeBinary, FixedSizeList, FloatingPoint, Int,
+    Interval, IntervalUnit, KeyValue, LargeBinary, LargeList, LargeListView, LargeUtf8, List,
+    ListView, Map, MetadataVersion, Null, Precision, RunEndEncoded, Schema, Struct_, Time,
+    TimeUnit, Timestamp, Type, Union, UnionMode, Utf8, Utf8View,
+};
 use crate::types::api::SortOrder;
 use crate::types::entity::{
-    EdgeTy, EntityTy, Geometry, GraphEdge, GraphNode, Line, MultiLine, MultiPolygon, NodeTy, Point,
-    Polygon,
+    EdgeTy, EntityTy, Geometry, GraphEdge, GraphNode, Line, MultiLine, MultiPoint, MultiPolygon,
+    NodeTy, Point, Polygon,
 };
 use crate::types::fun::Fn_;
+use crate::types::generated::Schema_generated::{
+    Binary as FbsBinary, BinaryView as FbsBinaryView, Bool as FbsBool, Buffer as FbsBuffer,
+    Date as FbsDate, DateUnit as FbsDateUnit, Decimal as FbsDecimal,
+    DictionaryEncoding as FbsDictionaryEncoding, DictionaryKind as FbsDictionaryKind,
+    Duration as FbsDuration, Endianness as FbsEndianness, Feature as FbsFeature, Field as FbsField,
+    FixedSizeBinary as FbsFixedSizeBinary, FixedSizeList as FbsFixedSizeList,
+    FloatingPoint as FbsFloatingPoint, Int as FbsInt, Interval as FbsInterval,
+    IntervalUnit as FbsIntervalUnit, KeyValue as FbsKeyValue, LargeBinary as FbsLargeBinary,
+    LargeList as FbsLargeList, LargeListView as FbsLargeListView, LargeUtf8 as FbsLargeUtf8,
+    List as FbsList, ListView as FbsListView, Map as FbsMap, MetadataVersion as FbsMetadataVersion,
+    Null as FbsNull, Precision as FbsPrecision, RunEndEncoded as FbsRunEndEncoded,
+    Schema as FbsSchema, Struct_ as FbsStruct_, Time as FbsTime, TimeUnit as FbsTimeUnit,
+    Timestamp as FbsTimestamp, Type as FbsType, Union as FbsUnion, UnionMode as FbsUnionMode,
+    Utf8 as FbsUtf8, Utf8View as FbsUtf8View,
+};
 use crate::types::generated::api_generated::SortOrder as FbsSortOrder;
 use crate::types::generated::entity_generated::{
     EdgeTy as FbsEdgeTy, EntityTy as FbsEntityTy, Geometry as FbsGeometry,
     GraphEdge as FbsGraphEdge, GraphNode as FbsGraphNode, Line as FbsLine,
-    MultiLine as FbsMultiLine, MultiPolygon as FbsMultiPolygon, NodeTy as FbsNodeTy,
-    Point as FbsPoint, Polygon as FbsPolygon,
+    MultiLine as FbsMultiLine, MultiPoint as FbsMultiPoint, MultiPolygon as FbsMultiPolygon,
+    NodeTy as FbsNodeTy, Point as FbsPoint, Polygon as FbsPolygon,
 };
 use crate::types::generated::fun_generated::Fn as FbsFn;
 use crate::types::generated::graph_generated::{
@@ -43,10 +65,13 @@ use crate::types::generated::id_generated::{
     ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
 };
 use crate::types::generated::query_generated::{
-    AllColumns as FbsAllColumns, Arrow as FbsArrow, BinaryQueryElement as FbsBinaryQueryElement,
-    Case as FbsCase, Column as FbsColumn, ConflictAction as FbsConflictAction,
-    DataCatalog as FbsDataCatalog, DeleteQueryElement as FbsDeleteQueryElement,
-    Distinct as FbsDistinct, DoNothing as FbsDoNothing, DoUpdate as FbsDoUpdate, Drive as FbsDrive,
+    AddCol as FbsAddCol, AggregateFilter as FbsAggregateFilter, AllColumns as FbsAllColumns,
+    AlterTableElement as FbsAlterTableElement, AlterTableOperation as FbsAlterTableOperation,
+    AlterTableOperationUnion as FbsAlterTableOperationUnion, Arrow as FbsArrow,
+    BinaryQueryElement as FbsBinaryQueryElement, Case as FbsCase, Column as FbsColumn,
+    ConflictAction as FbsConflictAction, DataCatalog as FbsDataCatalog,
+    DeleteQueryElement as FbsDeleteQueryElement, Distinct as FbsDistinct,
+    DoNothing as FbsDoNothing, DoUpdate as FbsDoUpdate, Drive as FbsDrive, DropCol as FbsDropCol,
     Explain as FbsExplain, ExplainFormat as FbsExplainFormat, Expr as FbsExpr,
     ExprUnion as FbsExprUnion, Function as FbsFunction, InsertConflicting as FbsInsertConflicting,
     InsertQueryElement as FbsInsertQueryElement, Join as FbsJoin, JoinTy as FbsJoinTy,
@@ -203,6 +228,7 @@ pub enum QueryElementOp {
     Union = 0,
     Intersect = 1,
     Except = 2,
+    Minus = 3,
 }
 
 impl TryFrom<i8> for QueryElementOp {
@@ -218,6 +244,7 @@ impl QueryElementOp {
             Self::Union => Some("Union"),
             Self::Intersect => Some("Intersect"),
             Self::Except => Some("Except"),
+            Self::Minus => Some("Minus"),
             _ => None,
         }
     }
@@ -229,6 +256,7 @@ impl From<QueryElementOp> for FbsQueryElementOp {
             QueryElementOp::Union => FbsQueryElementOp::Union,
             QueryElementOp::Intersect => FbsQueryElementOp::Intersect,
             QueryElementOp::Except => FbsQueryElementOp::Except,
+            QueryElementOp::Minus => FbsQueryElementOp::Minus,
         }
     }
 }
@@ -239,6 +267,7 @@ impl From<FbsQueryElementOp> for QueryElementOp {
             0 => Self::Union,
             1 => Self::Intersect,
             2 => Self::Except,
+            3 => Self::Minus,
             _ => panic!("Invalid value {} when constructing QueryElementOp", fbs.0),
         }
     }
@@ -296,6 +325,134 @@ impl From<FbsTypeHint> for TypeHint {
             3 => Self::Base64,
             4 => Self::Uuid,
             _ => panic!("Invalid value {} when constructing TypeHint", fbs.0),
+        }
+    }
+}
+
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+pub struct AddCol {
+    pub default: Option<ValueInstance>,
+    pub field: Field,
+}
+
+impl AddCol {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsAddCol<'a>> {
+        use crate::types::generated::query_generated::AddColBuilder as FbsAddColBuilder;
+
+        let default_offset = self.default.as_ref().map(|o| o.serialize_to(builder));
+        let field_offset = self.field.serialize_to(builder);
+
+        let mut bldr = FbsAddColBuilder::new(builder);
+        if let Some(offset) = default_offset {
+            bldr.add_default(offset);
+        }
+        bldr.add_field(field_offset);
+        bldr.finish()
+    }
+}
+
+impl From<FbsAddCol<'_>> for AddCol {
+    fn from(fbs: FbsAddCol<'_>) -> Self {
+        let default = fbs.default().map(ValueInstance::from);
+        let field = Field::from(fbs.field());
+        Self { default, field }
+    }
+}
+
+impl AddCol {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsAddCol>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+pub struct DropCol {
+    pub col: String,
+}
+
+impl DropCol {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDropCol<'a>> {
+        use crate::types::generated::query_generated::DropColBuilder as FbsDropColBuilder;
+
+        let col_offset = builder.create_string(&self.col);
+
+        let mut bldr = FbsDropColBuilder::new(builder);
+        bldr.add_col(col_offset);
+        bldr.finish()
+    }
+}
+
+impl From<FbsDropCol<'_>> for DropCol {
+    fn from(fbs: FbsDropCol<'_>) -> Self {
+        let col = fbs.col().to_owned();
+        Self { col }
+    }
+}
+
+impl DropCol {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsDropCol>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+pub enum AlterTableOperationUnion {
+    AddCol(AddCol),
+    DropCol(DropCol),
+}
+
+impl Default for AlterTableOperationUnion {
+    fn default() -> Self {
+        Self::AddCol(AddCol::default())
+    }
+}
+
+impl AlterTableOperationUnion {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsAlterTableOperationUnion) {
+        match self {
+            Self::AddCol(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsAlterTableOperationUnion::AddCol;
+                (offset, ty)
+            }
+            Self::DropCol(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsAlterTableOperationUnion::DropCol;
+                (offset, ty)
+            }
         }
     }
 }
@@ -772,6 +929,9 @@ impl From<FbsExpr<'_>> for Expr {
             FbsExprUnion::ValueName => {
                 ExprUnion::ValueName(ValueName::from(fbs.exprs_as_value_name().unwrap()))
             }
+            FbsExprUnion::AggregateFilter => ExprUnion::AggregateFilter(AggregateFilter::from(
+                fbs.exprs_as_aggregate_filter().unwrap(),
+            )),
             _ => unreachable!(),
         };
 
@@ -1139,6 +1299,55 @@ impl ValueName {
     }
 }
 
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+pub struct AggregateFilter {
+    pub condition: Expr,
+    pub fun: Function,
+}
+
+impl AggregateFilter {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsAggregateFilter<'a>> {
+        use crate::types::generated::query_generated::AggregateFilterBuilder as FbsAggregateFilterBuilder;
+
+        let condition_offset = self.condition.serialize_to(builder);
+        let fun_offset = self.fun.serialize_to(builder);
+
+        let mut bldr = FbsAggregateFilterBuilder::new(builder);
+        bldr.add_condition(condition_offset);
+        bldr.add_fun(fun_offset);
+        bldr.finish()
+    }
+}
+
+impl From<FbsAggregateFilter<'_>> for AggregateFilter {
+    fn from(fbs: FbsAggregateFilter<'_>) -> Self {
+        let condition = Expr::from(fbs.condition());
+        let fun = Function::from(fbs.fun());
+        Self { condition, fun }
+    }
+}
+
+impl AggregateFilter {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsAggregateFilter>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Hash, Eq)]
 pub enum ExprUnion {
     ValueIndex(ValueIndex),
@@ -1151,6 +1360,7 @@ pub enum ExprUnion {
     UnsetArgument(UnsetArgument),
     Window(Window),
     ValueName(ValueName),
+    AggregateFilter(AggregateFilter),
 }
 
 impl Default for ExprUnion {
@@ -1213,6 +1423,11 @@ impl ExprUnion {
             Self::ValueName(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
                 let ty = FbsExprUnion::ValueName;
+                (offset, ty)
+            }
+            Self::AggregateFilter(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsExprUnion::AggregateFilter;
                 (offset, ty)
             }
         }
@@ -1300,6 +1515,7 @@ pub struct UnaryQueryElement {
     pub fields: Option<Vec<Expr>>,
     pub filter: Option<Function>,
     pub group_by: Option<Vec<Expr>>,
+    pub having: Option<Function>,
     pub joins: Option<Vec<Join>>,
     pub limit: u32,
     pub order_by: Option<Vec<TableOrderBy>>,
@@ -1333,6 +1549,7 @@ impl UnaryQueryElement {
             let group_by_offset = builder.create_vector(&group_by_offsets);
             group_by_offset
         });
+        let having_offset = self.having.as_ref().map(|o| o.serialize_to(builder));
         let joins_offset = self.joins.as_ref().map(|v| {
             let mut joins_offsets = Vec::with_capacity(v.len());
             for val in v.iter() {
@@ -1370,6 +1587,9 @@ impl UnaryQueryElement {
         }
         if let Some(offset) = group_by_offset {
             bldr.add_group_by(offset);
+        }
+        if let Some(offset) = having_offset {
+            bldr.add_having(offset);
         }
         if let Some(offset) = joins_offset {
             bldr.add_joins(offset);
@@ -1409,6 +1629,7 @@ impl From<FbsUnaryQueryElement<'_>> for UnaryQueryElement {
             None
         };
 
+        let having = fbs.having().map(Function::from);
         let joins = if let Some(val) = fbs.joins() {
             let mut joins = Vec::new();
             for elem in val {
@@ -1442,6 +1663,7 @@ impl From<FbsUnaryQueryElement<'_>> for UnaryQueryElement {
             fields,
             filter,
             group_by,
+            having,
             joins,
             limit,
             order_by,
@@ -1470,7 +1692,7 @@ impl UnaryQueryElement {
 
 #[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
 pub struct QueryElement {
-    pub q: Option<Box<QueryElementUnion>>,
+    pub q: Box<QueryElementUnion>,
 }
 
 impl QueryElement {
@@ -1480,45 +1702,40 @@ impl QueryElement {
     ) -> flatbuffers::WIPOffset<FbsQueryElement<'a>> {
         use crate::types::generated::query_generated::QueryElementBuilder as FbsQueryElementBuilder;
 
-        let q_offset = self.q.as_ref().map(|u| u.serialize_to(builder));
+        let (q_offset, q_ty) = self.q.serialize_to(builder);
 
         let mut bldr = FbsQueryElementBuilder::new(builder);
-        if let Some((offset, ty)) = q_offset {
-            bldr.add_q(offset);
-            bldr.add_q_type(ty);
-        }
+        bldr.add_q(q_offset);
+        bldr.add_q_type(q_ty);
         bldr.finish()
     }
 }
 
 impl From<FbsQueryElement<'_>> for QueryElement {
     fn from(fbs: FbsQueryElement<'_>) -> Self {
-        let q = if let Some(val) = fbs.q() {
-            let q = match fbs.q_type() {
-                FbsQueryElementUnion::UnaryQueryElement => QueryElementUnion::UnaryQueryElement(
-                    UnaryQueryElement::from(fbs.q_as_unary_query_element().unwrap()),
-                ),
-                FbsQueryElementUnion::BinaryQueryElement => QueryElementUnion::BinaryQueryElement(
-                    BinaryQueryElement::from(fbs.q_as_binary_query_element().unwrap()),
-                ),
-                FbsQueryElementUnion::UpdateQueryElement => QueryElementUnion::UpdateQueryElement(
-                    UpdateQueryElement::from(fbs.q_as_update_query_element().unwrap()),
-                ),
-                FbsQueryElementUnion::DeleteQueryElement => QueryElementUnion::DeleteQueryElement(
-                    DeleteQueryElement::from(fbs.q_as_delete_query_element().unwrap()),
-                ),
-                FbsQueryElementUnion::InsertQueryElement => QueryElementUnion::InsertQueryElement(
-                    InsertQueryElement::from(fbs.q_as_insert_query_element().unwrap()),
-                ),
-                _ => unreachable!(),
-            };
-
-            Some(q)
-        } else {
-            None
+        let q = match fbs.q_type() {
+            FbsQueryElementUnion::UnaryQueryElement => QueryElementUnion::UnaryQueryElement(
+                UnaryQueryElement::from(fbs.q_as_unary_query_element().unwrap()),
+            ),
+            FbsQueryElementUnion::BinaryQueryElement => QueryElementUnion::BinaryQueryElement(
+                BinaryQueryElement::from(fbs.q_as_binary_query_element().unwrap()),
+            ),
+            FbsQueryElementUnion::UpdateQueryElement => QueryElementUnion::UpdateQueryElement(
+                UpdateQueryElement::from(fbs.q_as_update_query_element().unwrap()),
+            ),
+            FbsQueryElementUnion::DeleteQueryElement => QueryElementUnion::DeleteQueryElement(
+                DeleteQueryElement::from(fbs.q_as_delete_query_element().unwrap()),
+            ),
+            FbsQueryElementUnion::InsertQueryElement => QueryElementUnion::InsertQueryElement(
+                InsertQueryElement::from(fbs.q_as_insert_query_element().unwrap()),
+            ),
+            FbsQueryElementUnion::AlterTableElement => QueryElementUnion::AlterTableElement(
+                AlterTableElement::from(fbs.q_as_alter_table_element().unwrap()),
+            ),
+            _ => unreachable!(),
         };
 
-        Self { q: q.map(Box::new) }
+        Self { q: Box::new(q) }
     }
 }
 
@@ -2343,6 +2560,12 @@ impl TableSourceUnion {
 #[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
 pub struct UpdateQueryElement {
     pub filter: Option<Function>,
+    /// Additional table sources from a FROM clause (UPDATE ... FROM ... syntax).
+    /// Source indexes: target table is implicitly at index 0, from_sources start at index 1.
+    pub from_sources: Option<Vec<TableSource>>,
+    /// Joins within the FROM clause. Indexes reference the combined source list
+    /// (0 = target, 1+ = from_sources).
+    pub joins: Option<Vec<Join>>,
     pub sets: Vec<SetExpr>,
     pub source: TableSourceUnion,
 }
@@ -2355,6 +2578,24 @@ impl UpdateQueryElement {
         use crate::types::generated::query_generated::UpdateQueryElementBuilder as FbsUpdateQueryElementBuilder;
 
         let filter_offset = self.filter.as_ref().map(|o| o.serialize_to(builder));
+        let from_sources_offset = self.from_sources.as_ref().map(|v| {
+            let mut from_sources_offsets = Vec::with_capacity(v.len());
+            for val in v.iter() {
+                let offset = val.serialize_to(builder);
+                from_sources_offsets.push(offset);
+            }
+            let from_sources_offset = builder.create_vector(&from_sources_offsets);
+            from_sources_offset
+        });
+        let joins_offset = self.joins.as_ref().map(|v| {
+            let mut joins_offsets = Vec::with_capacity(v.len());
+            for val in v.iter() {
+                let offset = val.serialize_to(builder);
+                joins_offsets.push(offset);
+            }
+            let joins_offset = builder.create_vector(&joins_offsets);
+            joins_offset
+        });
         let mut sets_offsets = Vec::with_capacity(self.sets.len());
         for val in self.sets.iter() {
             let offset = val.serialize_to(builder);
@@ -2367,6 +2608,12 @@ impl UpdateQueryElement {
         if let Some(offset) = filter_offset {
             bldr.add_filter(offset);
         }
+        if let Some(offset) = from_sources_offset {
+            bldr.add_from_sources(offset);
+        }
+        if let Some(offset) = joins_offset {
+            bldr.add_joins(offset);
+        }
         bldr.add_sets(sets_offset);
         bldr.add_source(source_offset);
         bldr.add_source_type(source_ty);
@@ -2377,6 +2624,28 @@ impl UpdateQueryElement {
 impl From<FbsUpdateQueryElement<'_>> for UpdateQueryElement {
     fn from(fbs: FbsUpdateQueryElement<'_>) -> Self {
         let filter = fbs.filter().map(Function::from);
+        let from_sources = if let Some(val) = fbs.from_sources() {
+            let mut from_sources = Vec::new();
+            for elem in val {
+                from_sources.push(elem.into());
+            }
+
+            Some(from_sources)
+        } else {
+            None
+        };
+
+        let joins = if let Some(val) = fbs.joins() {
+            let mut joins = Vec::new();
+            for elem in val {
+                joins.push(elem.into());
+            }
+
+            Some(joins)
+        } else {
+            None
+        };
+
         let mut sets = Vec::new();
         for elem in fbs.sets() {
             sets.push(elem.into());
@@ -2412,6 +2681,8 @@ impl From<FbsUpdateQueryElement<'_>> for UpdateQueryElement {
 
         Self {
             filter,
+            from_sources,
+            joins,
             sets,
             source,
         }
@@ -2723,6 +2994,64 @@ impl InsertQueryElement {
     }
 }
 
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+pub struct AlterTableElement {
+    pub operations: Vec<AlterTableOperation>,
+    pub target: ObjectId,
+}
+
+impl AlterTableElement {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsAlterTableElement<'a>> {
+        use crate::types::generated::query_generated::AlterTableElementBuilder as FbsAlterTableElementBuilder;
+
+        let mut operations_offsets = Vec::with_capacity(self.operations.len());
+        for val in self.operations.iter() {
+            let offset = val.serialize_to(builder);
+            operations_offsets.push(offset);
+        }
+        let operations_offset = builder.create_vector(&operations_offsets);
+        let target_offset = self.target.serialize_to(builder);
+
+        let mut bldr = FbsAlterTableElementBuilder::new(builder);
+        bldr.add_operations(operations_offset);
+        bldr.add_target(target_offset);
+        bldr.finish()
+    }
+}
+
+impl From<FbsAlterTableElement<'_>> for AlterTableElement {
+    fn from(fbs: FbsAlterTableElement<'_>) -> Self {
+        let mut operations = Vec::new();
+        for elem in fbs.operations() {
+            operations.push(elem.into());
+        }
+
+        let target = ObjectId::from(fbs.target());
+        Self { operations, target }
+    }
+}
+
+impl AlterTableElement {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsAlterTableElement>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Hash, Eq)]
 pub enum QueryElementUnion {
     UnaryQueryElement(UnaryQueryElement),
@@ -2730,6 +3059,7 @@ pub enum QueryElementUnion {
     UpdateQueryElement(UpdateQueryElement),
     DeleteQueryElement(DeleteQueryElement),
     InsertQueryElement(InsertQueryElement),
+    AlterTableElement(AlterTableElement),
 }
 
 impl Default for QueryElementUnion {
@@ -2769,7 +3099,68 @@ impl QueryElementUnion {
                 let ty = FbsQueryElementUnion::InsertQueryElement;
                 (offset, ty)
             }
+            Self::AlterTableElement(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsQueryElementUnion::AlterTableElement;
+                (offset, ty)
+            }
         }
+    }
+}
+
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+pub struct AlterTableOperation {
+    pub op: AlterTableOperationUnion,
+}
+
+impl AlterTableOperation {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsAlterTableOperation<'a>> {
+        use crate::types::generated::query_generated::AlterTableOperationBuilder as FbsAlterTableOperationBuilder;
+
+        let (op_offset, op_ty) = self.op.serialize_to(builder);
+
+        let mut bldr = FbsAlterTableOperationBuilder::new(builder);
+        bldr.add_op(op_offset);
+        bldr.add_op_type(op_ty);
+        bldr.finish()
+    }
+}
+
+impl From<FbsAlterTableOperation<'_>> for AlterTableOperation {
+    fn from(fbs: FbsAlterTableOperation<'_>) -> Self {
+        let op = match fbs.op_type() {
+            FbsAlterTableOperationUnion::AddCol => {
+                AlterTableOperationUnion::AddCol(AddCol::from(fbs.op_as_add_col().unwrap()))
+            }
+            FbsAlterTableOperationUnion::DropCol => {
+                AlterTableOperationUnion::DropCol(DropCol::from(fbs.op_as_drop_col().unwrap()))
+            }
+            _ => unreachable!(),
+        };
+
+        Self { op }
+    }
+}
+
+impl AlterTableOperation {
+    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs =
+            flatbuffers::size_prefixed_root_with_opts::<FbsAlterTableOperation>(&opts, bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -2844,9 +3235,8 @@ impl Join {
 /// SetExprs represent the expressions used as part of an UPDATE-type operation
 #[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
 pub struct SetExpr {
-    /// Because we cannot refer to multiple tables at once in a single UPDATE
-    /// operation we only need to name the column, we can just a string here
-    /// instead of a Column table.
+    /// The target column name. Since SET targets always refer to the target table,
+    /// we only need to name the column as a string.
     pub col: String,
     /// This is the expression that is evaluted to produce the value that is
     /// assigned to the column named in the `col` field.
@@ -3307,10 +3697,42 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_add_col() {
+        let t0 = AddCol::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = AddCol::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_aggregate_filter() {
+        let t0 = AggregateFilter::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = AggregateFilter::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
     fn test_all_columns() {
         let t0 = AllColumns::default();
         let buf = t0.to_fbs_bytes();
         let t1 = AllColumns::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_alter_table_element() {
+        let t0 = AlterTableElement::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = AlterTableElement::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_alter_table_operation() {
+        let t0 = AlterTableOperation::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = AlterTableOperation::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 
@@ -3391,6 +3813,14 @@ mod tests {
         let t0 = Drive::default();
         let buf = t0.to_fbs_bytes();
         let t1 = Drive::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_drop_col() {
+        let t0 = DropCol::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = DropCol::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 

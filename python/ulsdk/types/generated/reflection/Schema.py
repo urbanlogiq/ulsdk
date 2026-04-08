@@ -4,19 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Enum import Enum
-from .Object import Object
-from .SchemaFile import SchemaFile
-from .Service import Service
-from typing import Optional
 np = import_numpy()
 
 class Schema(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Schema()
         x.Init(buf, n + offset)
@@ -31,102 +25,106 @@ class Schema(object):
         return flatbuffers.util.BufferHasIdentifier(buf, offset, b"\x42\x46\x42\x53", size_prefixed=size_prefixed)
 
     # Schema
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Schema
-    def Objects(self, j: int) -> Optional[Object]:
+    def Objects(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Object import Object
             obj = Object()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Schema
-    def ObjectsLength(self) -> int:
+    def ObjectsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Schema
-    def ObjectsIsNone(self) -> bool:
+    def ObjectsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
     # Schema
-    def Enums(self, j: int) -> Optional[Enum]:
+    def Enums(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Enum import Enum
             obj = Enum()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Schema
-    def EnumsLength(self) -> int:
+    def EnumsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Schema
-    def EnumsIsNone(self) -> bool:
+    def EnumsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
     # Schema
-    def FileIdent(self) -> Optional[bytes]:
+    def FileIdent(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # Schema
-    def FileExt(self) -> Optional[bytes]:
+    def FileExt(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # Schema
-    def RootTable(self) -> Optional[Object]:
+    def RootTable(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Object import Object
             obj = Object()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Schema
-    def Services(self, j: int) -> Optional[Service]:
+    def Services(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .Service import Service
             obj = Service()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Schema
-    def ServicesLength(self) -> int:
+    def ServicesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Schema
-    def ServicesIsNone(self) -> bool:
+    def ServicesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         return o == 0
 
@@ -140,109 +138,110 @@ class Schema(object):
     # All the files used in this compilation. Files are relative to where
     # flatc was invoked.
     # Schema
-    def FbsFiles(self, j: int) -> Optional[SchemaFile]:
+    def FbsFiles(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(18))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .SchemaFile import SchemaFile
             obj = SchemaFile()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # Schema
-    def FbsFilesLength(self) -> int:
+    def FbsFilesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(18))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Schema
-    def FbsFilesIsNone(self) -> bool:
+    def FbsFilesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(18))
         return o == 0
 
-def SchemaStart(builder: flatbuffers.Builder):
+def SchemaStart(builder):
     builder.StartObject(8)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     SchemaStart(builder)
 
-def SchemaAddObjects(builder: flatbuffers.Builder, objects: int):
+def SchemaAddObjects(builder, objects):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(objects), 0)
 
-def AddObjects(builder: flatbuffers.Builder, objects: int):
+def AddObjects(builder, objects):
     SchemaAddObjects(builder, objects)
 
-def SchemaStartObjectsVector(builder, numElems: int) -> int:
+def SchemaStartObjectsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartObjectsVector(builder, numElems: int) -> int:
+def StartObjectsVector(builder, numElems):
     return SchemaStartObjectsVector(builder, numElems)
 
-def SchemaAddEnums(builder: flatbuffers.Builder, enums: int):
+def SchemaAddEnums(builder, enums):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(enums), 0)
 
-def AddEnums(builder: flatbuffers.Builder, enums: int):
+def AddEnums(builder, enums):
     SchemaAddEnums(builder, enums)
 
-def SchemaStartEnumsVector(builder, numElems: int) -> int:
+def SchemaStartEnumsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartEnumsVector(builder, numElems: int) -> int:
+def StartEnumsVector(builder, numElems):
     return SchemaStartEnumsVector(builder, numElems)
 
-def SchemaAddFileIdent(builder: flatbuffers.Builder, fileIdent: int):
+def SchemaAddFileIdent(builder, fileIdent):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(fileIdent), 0)
 
-def AddFileIdent(builder: flatbuffers.Builder, fileIdent: int):
+def AddFileIdent(builder, fileIdent):
     SchemaAddFileIdent(builder, fileIdent)
 
-def SchemaAddFileExt(builder: flatbuffers.Builder, fileExt: int):
+def SchemaAddFileExt(builder, fileExt):
     builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(fileExt), 0)
 
-def AddFileExt(builder: flatbuffers.Builder, fileExt: int):
+def AddFileExt(builder, fileExt):
     SchemaAddFileExt(builder, fileExt)
 
-def SchemaAddRootTable(builder: flatbuffers.Builder, rootTable: int):
+def SchemaAddRootTable(builder, rootTable):
     builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(rootTable), 0)
 
-def AddRootTable(builder: flatbuffers.Builder, rootTable: int):
+def AddRootTable(builder, rootTable):
     SchemaAddRootTable(builder, rootTable)
 
-def SchemaAddServices(builder: flatbuffers.Builder, services: int):
+def SchemaAddServices(builder, services):
     builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(services), 0)
 
-def AddServices(builder: flatbuffers.Builder, services: int):
+def AddServices(builder, services):
     SchemaAddServices(builder, services)
 
-def SchemaStartServicesVector(builder, numElems: int) -> int:
+def SchemaStartServicesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartServicesVector(builder, numElems: int) -> int:
+def StartServicesVector(builder, numElems):
     return SchemaStartServicesVector(builder, numElems)
 
-def SchemaAddAdvancedFeatures(builder: flatbuffers.Builder, advancedFeatures: int):
+def SchemaAddAdvancedFeatures(builder, advancedFeatures):
     builder.PrependUint64Slot(6, advancedFeatures, 0)
 
-def AddAdvancedFeatures(builder: flatbuffers.Builder, advancedFeatures: int):
+def AddAdvancedFeatures(builder, advancedFeatures):
     SchemaAddAdvancedFeatures(builder, advancedFeatures)
 
-def SchemaAddFbsFiles(builder: flatbuffers.Builder, fbsFiles: int):
+def SchemaAddFbsFiles(builder, fbsFiles):
     builder.PrependUOffsetTRelativeSlot(7, flatbuffers.number_types.UOffsetTFlags.py_type(fbsFiles), 0)
 
-def AddFbsFiles(builder: flatbuffers.Builder, fbsFiles: int):
+def AddFbsFiles(builder, fbsFiles):
     SchemaAddFbsFiles(builder, fbsFiles)
 
-def SchemaStartFbsFilesVector(builder, numElems: int) -> int:
+def SchemaStartFbsFilesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartFbsFilesVector(builder, numElems: int) -> int:
+def StartFbsFilesVector(builder, numElems):
     return SchemaStartFbsFilesVector(builder, numElems)
 
-def SchemaEnd(builder: flatbuffers.Builder) -> int:
+def SchemaEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return SchemaEnd(builder)

@@ -4,15 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from typing import Optional
 np = import_numpy()
 
 class IntegerDisplayString(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = IntegerDisplayString()
         x.Init(buf, n + offset)
@@ -23,7 +21,7 @@ class IntegerDisplayString(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # IntegerDisplayString
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # IntegerDisplayString
@@ -34,32 +32,32 @@ class IntegerDisplayString(object):
         return 0
 
     # IntegerDisplayString
-    def DisplayName(self) -> Optional[bytes]:
+    def DisplayName(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def IntegerDisplayStringStart(builder: flatbuffers.Builder):
+def IntegerDisplayStringStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     IntegerDisplayStringStart(builder)
 
-def IntegerDisplayStringAddValue(builder: flatbuffers.Builder, value: int):
+def IntegerDisplayStringAddValue(builder, value):
     builder.PrependInt64Slot(0, value, 0)
 
-def AddValue(builder: flatbuffers.Builder, value: int):
+def AddValue(builder, value):
     IntegerDisplayStringAddValue(builder, value)
 
-def IntegerDisplayStringAddDisplayName(builder: flatbuffers.Builder, displayName: int):
+def IntegerDisplayStringAddDisplayName(builder, displayName):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(displayName), 0)
 
-def AddDisplayName(builder: flatbuffers.Builder, displayName: int):
+def AddDisplayName(builder, displayName):
     IntegerDisplayStringAddDisplayName(builder, displayName)
 
-def IntegerDisplayStringEnd(builder: flatbuffers.Builder) -> int:
+def IntegerDisplayStringEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return IntegerDisplayStringEnd(builder)

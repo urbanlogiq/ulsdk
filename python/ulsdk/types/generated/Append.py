@@ -4,7 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 # Append rows to a table. The `content` field is Arrow IPC Stream formatted.
@@ -12,7 +11,7 @@ class Append(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Append()
         x.Init(buf, n + offset)
@@ -23,12 +22,12 @@ class Append(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Append
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # The row content to append in Arrow IPC Stream format.
     # Append
-    def Content(self, j: int):
+    def Content(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             a = self._tab.Vector(o)
@@ -43,37 +42,37 @@ class Append(object):
         return 0
 
     # Append
-    def ContentLength(self) -> int:
+    def ContentLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Append
-    def ContentIsNone(self) -> bool:
+    def ContentIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def AppendStart(builder: flatbuffers.Builder):
+def AppendStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     AppendStart(builder)
 
-def AppendAddContent(builder: flatbuffers.Builder, content: int):
+def AppendAddContent(builder, content):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(content), 0)
 
-def AddContent(builder: flatbuffers.Builder, content: int):
+def AddContent(builder, content):
     AppendAddContent(builder, content)
 
-def AppendStartContentVector(builder, numElems: int) -> int:
+def AppendStartContentVector(builder, numElems):
     return builder.StartVector(1, numElems, 1)
 
-def StartContentVector(builder, numElems: int) -> int:
+def StartContentVector(builder, numElems):
     return AppendStartContentVector(builder, numElems)
 
-def AppendEnd(builder: flatbuffers.Builder) -> int:
+def AppendEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return AppendEnd(builder)

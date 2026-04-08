@@ -4,17 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .Function import Function
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class DeleteQueryElement(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = DeleteQueryElement()
         x.Init(buf, n + offset)
@@ -25,7 +21,7 @@ class DeleteQueryElement(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # DeleteQueryElement
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # DeleteQueryElement
@@ -36,50 +32,52 @@ class DeleteQueryElement(object):
         return 0
 
     # DeleteQueryElement
-    def Source(self) -> Optional[flatbuffers.table.Table]:
+    def Source(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
     # DeleteQueryElement
-    def Filter(self) -> Optional[Function]:
+    def Filter(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .Function import Function
             obj = Function()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def DeleteQueryElementStart(builder: flatbuffers.Builder):
+def DeleteQueryElementStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DeleteQueryElementStart(builder)
 
-def DeleteQueryElementAddSourceType(builder: flatbuffers.Builder, sourceType: int):
+def DeleteQueryElementAddSourceType(builder, sourceType):
     builder.PrependUint8Slot(0, sourceType, 0)
 
-def AddSourceType(builder: flatbuffers.Builder, sourceType: int):
+def AddSourceType(builder, sourceType):
     DeleteQueryElementAddSourceType(builder, sourceType)
 
-def DeleteQueryElementAddSource(builder: flatbuffers.Builder, source: int):
+def DeleteQueryElementAddSource(builder, source):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(source), 0)
 
-def AddSource(builder: flatbuffers.Builder, source: int):
+def AddSource(builder, source):
     DeleteQueryElementAddSource(builder, source)
 
-def DeleteQueryElementAddFilter(builder: flatbuffers.Builder, filter: int):
+def DeleteQueryElementAddFilter(builder, filter):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(filter), 0)
 
-def AddFilter(builder: flatbuffers.Builder, filter: int):
+def AddFilter(builder, filter):
     DeleteQueryElementAddFilter(builder, filter)
 
-def DeleteQueryElementEnd(builder: flatbuffers.Builder) -> int:
+def DeleteQueryElementEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DeleteQueryElementEnd(builder)

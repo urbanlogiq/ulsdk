@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class Layout(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Layout()
         x.Init(buf, n + offset)
@@ -22,7 +21,7 @@ class Layout(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Layout
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # The height of the chart tile in react-grid-layout grid units
@@ -57,38 +56,38 @@ class Layout(object):
             return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
         return 0
 
-def LayoutStart(builder: flatbuffers.Builder):
+def LayoutStart(builder):
     builder.StartObject(4)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     LayoutStart(builder)
 
-def LayoutAddHeight(builder: flatbuffers.Builder, height: int):
+def LayoutAddHeight(builder, height):
     builder.PrependUint32Slot(0, height, 0)
 
-def AddHeight(builder: flatbuffers.Builder, height: int):
+def AddHeight(builder, height):
     LayoutAddHeight(builder, height)
 
-def LayoutAddWidth(builder: flatbuffers.Builder, width: int):
+def LayoutAddWidth(builder, width):
     builder.PrependUint32Slot(1, width, 0)
 
-def AddWidth(builder: flatbuffers.Builder, width: int):
+def AddWidth(builder, width):
     LayoutAddWidth(builder, width)
 
-def LayoutAddX(builder: flatbuffers.Builder, x: int):
+def LayoutAddX(builder, x):
     builder.PrependUint32Slot(2, x, 0)
 
-def AddX(builder: flatbuffers.Builder, x: int):
+def AddX(builder, x):
     LayoutAddX(builder, x)
 
-def LayoutAddY(builder: flatbuffers.Builder, y: int):
+def LayoutAddY(builder, y):
     builder.PrependUint32Slot(3, y, 0)
 
-def AddY(builder: flatbuffers.Builder, y: int):
+def AddY(builder, y):
     LayoutAddY(builder, y)
 
-def LayoutEnd(builder: flatbuffers.Builder) -> int:
+def LayoutEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return LayoutEnd(builder)

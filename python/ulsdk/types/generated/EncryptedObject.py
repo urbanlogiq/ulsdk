@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .CryptHeader import CryptHeader
-from typing import Optional
 np = import_numpy()
 
 class EncryptedObject(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = EncryptedObject()
         x.Init(buf, n + offset)
@@ -24,21 +21,22 @@ class EncryptedObject(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # EncryptedObject
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # EncryptedObject
-    def Header(self) -> Optional[CryptHeader]:
+    def Header(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .CryptHeader import CryptHeader
             obj = CryptHeader()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # EncryptedObject
-    def Obj(self, j: int):
+    def Obj(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             a = self._tab.Vector(o)
@@ -53,43 +51,43 @@ class EncryptedObject(object):
         return 0
 
     # EncryptedObject
-    def ObjLength(self) -> int:
+    def ObjLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # EncryptedObject
-    def ObjIsNone(self) -> bool:
+    def ObjIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
-def EncryptedObjectStart(builder: flatbuffers.Builder):
+def EncryptedObjectStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     EncryptedObjectStart(builder)
 
-def EncryptedObjectAddHeader(builder: flatbuffers.Builder, header: int):
+def EncryptedObjectAddHeader(builder, header):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(header), 0)
 
-def AddHeader(builder: flatbuffers.Builder, header: int):
+def AddHeader(builder, header):
     EncryptedObjectAddHeader(builder, header)
 
-def EncryptedObjectAddObj(builder: flatbuffers.Builder, obj: int):
+def EncryptedObjectAddObj(builder, obj):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(obj), 0)
 
-def AddObj(builder: flatbuffers.Builder, obj: int):
+def AddObj(builder, obj):
     EncryptedObjectAddObj(builder, obj)
 
-def EncryptedObjectStartObjVector(builder, numElems: int) -> int:
+def EncryptedObjectStartObjVector(builder, numElems):
     return builder.StartVector(1, numElems, 1)
 
-def StartObjVector(builder, numElems: int) -> int:
+def StartObjVector(builder, numElems):
     return EncryptedObjectStartObjVector(builder, numElems)
 
-def EncryptedObjectEnd(builder: flatbuffers.Builder) -> int:
+def EncryptedObjectEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return EncryptedObjectEnd(builder)

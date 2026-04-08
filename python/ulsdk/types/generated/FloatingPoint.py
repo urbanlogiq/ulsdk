@@ -4,14 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 class FloatingPoint(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = FloatingPoint()
         x.Init(buf, n + offset)
@@ -22,7 +21,7 @@ class FloatingPoint(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # FloatingPoint
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # FloatingPoint
@@ -32,20 +31,20 @@ class FloatingPoint(object):
             return self._tab.Get(flatbuffers.number_types.Int16Flags, o + self._tab.Pos)
         return 0
 
-def FloatingPointStart(builder: flatbuffers.Builder):
+def FloatingPointStart(builder):
     builder.StartObject(1)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     FloatingPointStart(builder)
 
-def FloatingPointAddPrecision(builder: flatbuffers.Builder, precision: int):
+def FloatingPointAddPrecision(builder, precision):
     builder.PrependInt16Slot(0, precision, 0)
 
-def AddPrecision(builder: flatbuffers.Builder, precision: int):
+def AddPrecision(builder, precision):
     FloatingPointAddPrecision(builder, precision)
 
-def FloatingPointEnd(builder: flatbuffers.Builder) -> int:
+def FloatingPointEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return FloatingPointEnd(builder)

@@ -4,15 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from typing import Optional
 np = import_numpy()
 
 class Signature(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Signature()
         x.Init(buf, n + offset)
@@ -23,18 +21,18 @@ class Signature(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Signature
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Signature
-    def Kid(self) -> Optional[bytes]:
+    def Kid(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # Signature
-    def Sig(self, j: int):
+    def Sig(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             a = self._tab.Vector(o)
@@ -49,43 +47,43 @@ class Signature(object):
         return 0
 
     # Signature
-    def SigLength(self) -> int:
+    def SigLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Signature
-    def SigIsNone(self) -> bool:
+    def SigIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
-def SignatureStart(builder: flatbuffers.Builder):
+def SignatureStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     SignatureStart(builder)
 
-def SignatureAddKid(builder: flatbuffers.Builder, kid: int):
+def SignatureAddKid(builder, kid):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(kid), 0)
 
-def AddKid(builder: flatbuffers.Builder, kid: int):
+def AddKid(builder, kid):
     SignatureAddKid(builder, kid)
 
-def SignatureAddSig(builder: flatbuffers.Builder, sig: int):
+def SignatureAddSig(builder, sig):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(sig), 0)
 
-def AddSig(builder: flatbuffers.Builder, sig: int):
+def AddSig(builder, sig):
     SignatureAddSig(builder, sig)
 
-def SignatureStartSigVector(builder, numElems: int) -> int:
+def SignatureStartSigVector(builder, numElems):
     return builder.StartVector(1, numElems, 1)
 
-def StartSigVector(builder, numElems: int) -> int:
+def StartSigVector(builder, numElems):
     return SignatureStartSigVector(builder, numElems)
 
-def SignatureEnd(builder: flatbuffers.Builder) -> int:
+def SignatureEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return SignatureEnd(builder)

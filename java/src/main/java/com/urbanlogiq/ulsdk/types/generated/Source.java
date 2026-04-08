@@ -23,7 +23,7 @@ import java.nio.ByteOrder;
 
 @SuppressWarnings("unused")
 public final class Source extends com.google.flatbuffers.Table {
-  public static void ValidateVersion() { Constants.FLATBUFFERS_23_5_26(); }
+  public static void ValidateVersion() { Constants.FLATBUFFERS_25_2_10(); }
   public static Source getRootAsSource(ByteBuffer _bb) { return getRootAsSource(_bb, new Source()); }
   public static Source getRootAsSource(ByteBuffer _bb, Source obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
   public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }
@@ -41,11 +41,6 @@ public final class Source extends com.google.flatbuffers.Table {
   public ByteVector optionsVector(ByteVector obj) { int o = __offset(8); return o != 0 ? obj.__assign(__vector(o), bb) : null; }
   public ByteBuffer optionsAsByteBuffer() { return __vector_as_bytebuffer(8, 1); }
   public ByteBuffer optionsInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 8, 1); }
-  public Schema schemas(int j) { return schemas(new Schema(), j); }
-  public Schema schemas(Schema obj, int j) { int o = __offset(10); return o != 0 ? obj.__assign(__indirect(__vector(o) + j * 4), bb) : null; }
-  public int schemasLength() { int o = __offset(10); return o != 0 ? __vector_len(o) : 0; }
-  public Schema._Vector schemasVector() { return schemasVector(new Schema._Vector()); }
-  public Schema._Vector schemasVector(Schema._Vector obj) { int o = __offset(10); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
   public ObjectId metadata() { return metadata(new ObjectId()); }
   public ObjectId metadata(ObjectId obj) { int o = __offset(14); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
   public ContentId metadataRevision() { return metadataRevision(new ContentId()); }
@@ -55,41 +50,46 @@ public final class Source extends com.google.flatbuffers.Table {
   public int namedParametersLength() { int o = __offset(18); return o != 0 ? __vector_len(o) : 0; }
   public NamedParameter._Vector namedParametersVector() { return namedParametersVector(new NamedParameter._Vector()); }
   public NamedParameter._Vector namedParametersVector(NamedParameter._Vector obj) { int o = __offset(18); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
+  public OutputSchema outputSchemas(int j) { return outputSchemas(new OutputSchema(), j); }
+  public OutputSchema outputSchemas(OutputSchema obj, int j) { int o = __offset(20); return o != 0 ? obj.__assign(__indirect(__vector(o) + j * 4), bb) : null; }
+  public int outputSchemasLength() { int o = __offset(20); return o != 0 ? __vector_len(o) : 0; }
+  public OutputSchema._Vector outputSchemasVector() { return outputSchemasVector(new OutputSchema._Vector()); }
+  public OutputSchema._Vector outputSchemasVector(OutputSchema._Vector obj) { int o = __offset(20); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
 
   public static int createSource(FlatBufferBuilder builder,
       int urlOffset,
       int nameOffset,
       int optionsOffset,
-      int schemasOffset,
       int metadataOffset,
       int metadataRevisionOffset,
-      int namedParametersOffset) {
-    builder.startTable(8);
+      int namedParametersOffset,
+      int outputSchemasOffset) {
+    builder.startTable(9);
+    Source.addOutputSchemas(builder, outputSchemasOffset);
     Source.addNamedParameters(builder, namedParametersOffset);
     Source.addMetadataRevision(builder, metadataRevisionOffset);
     Source.addMetadata(builder, metadataOffset);
-    Source.addSchemas(builder, schemasOffset);
     Source.addOptions(builder, optionsOffset);
     Source.addName(builder, nameOffset);
     Source.addUrl(builder, urlOffset);
     return Source.endSource(builder);
   }
 
-  public static void startSource(FlatBufferBuilder builder) { builder.startTable(8); }
+  public static void startSource(FlatBufferBuilder builder) { builder.startTable(9); }
   public static void addUrl(FlatBufferBuilder builder, int urlOffset) { builder.addOffset(0, urlOffset, 0); }
   public static void addName(FlatBufferBuilder builder, int nameOffset) { builder.addOffset(1, nameOffset, 0); }
   public static void addOptions(FlatBufferBuilder builder, int optionsOffset) { builder.addOffset(2, optionsOffset, 0); }
   public static int createOptionsVector(FlatBufferBuilder builder, byte[] data) { return builder.createByteVector(data); }
   public static int createOptionsVector(FlatBufferBuilder builder, ByteBuffer data) { return builder.createByteVector(data); }
   public static void startOptionsVector(FlatBufferBuilder builder, int numElems) { builder.startVector(1, numElems, 1); }
-  public static void addSchemas(FlatBufferBuilder builder, int schemasOffset) { builder.addOffset(3, schemasOffset, 0); }
-  public static int createSchemasVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
-  public static void startSchemasVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
   public static void addMetadata(FlatBufferBuilder builder, int metadataOffset) { builder.addOffset(5, metadataOffset, 0); }
   public static void addMetadataRevision(FlatBufferBuilder builder, int metadataRevisionOffset) { builder.addOffset(6, metadataRevisionOffset, 0); }
   public static void addNamedParameters(FlatBufferBuilder builder, int namedParametersOffset) { builder.addOffset(7, namedParametersOffset, 0); }
   public static int createNamedParametersVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
   public static void startNamedParametersVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
+  public static void addOutputSchemas(FlatBufferBuilder builder, int outputSchemasOffset) { builder.addOffset(8, outputSchemasOffset, 0); }
+  public static int createOutputSchemasVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
+  public static void startOutputSchemasVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
   public static int endSource(FlatBufferBuilder builder) {
     int o = builder.endTable();
     builder.required(o, 4);  // url

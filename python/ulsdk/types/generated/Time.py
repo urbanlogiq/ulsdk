@@ -4,7 +4,6 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
 np = import_numpy()
 
 # Time is either a 32-bit or 64-bit signed integer type representing an
@@ -25,7 +24,7 @@ class Time(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Time()
         x.Init(buf, n + offset)
@@ -36,7 +35,7 @@ class Time(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Time
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Time
@@ -53,26 +52,26 @@ class Time(object):
             return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
         return 32
 
-def TimeStart(builder: flatbuffers.Builder):
+def TimeStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     TimeStart(builder)
 
-def TimeAddUnit(builder: flatbuffers.Builder, unit: int):
+def TimeAddUnit(builder, unit):
     builder.PrependInt16Slot(0, unit, 1)
 
-def AddUnit(builder: flatbuffers.Builder, unit: int):
+def AddUnit(builder, unit):
     TimeAddUnit(builder, unit)
 
-def TimeAddBitWidth(builder: flatbuffers.Builder, bitWidth: int):
+def TimeAddBitWidth(builder, bitWidth):
     builder.PrependInt32Slot(1, bitWidth, 32)
 
-def AddBitWidth(builder: flatbuffers.Builder, bitWidth: int):
+def AddBitWidth(builder, bitWidth):
     TimeAddBitWidth(builder, bitWidth)
 
-def TimeEnd(builder: flatbuffers.Builder) -> int:
+def TimeEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return TimeEnd(builder)

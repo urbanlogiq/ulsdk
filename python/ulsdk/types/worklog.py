@@ -67,6 +67,7 @@ from .data import (
     DirectionTy,
     NamedParameter,
     NamedParameterFlags,
+    OutputSchema,
     RoadUserTy,
     Source,
     StatisticTy,
@@ -179,6 +180,7 @@ from .generated.NamedParameter import NamedParameter as FbsNamedParameter
 from .generated.Node import Node as FbsNode
 from .generated.Null import Null as FbsNull
 from .generated.ObjectId import ObjectId as FbsObjectId
+from .generated.OutputSchema import OutputSchema as FbsOutputSchema
 from .generated.ParamIndices import ParamIndices as FbsParamIndices
 from .generated.ParameterFlags import ParameterFlags as FbsParameterFlags
 from .generated.Point2D import Point2D as FbsPoint2D

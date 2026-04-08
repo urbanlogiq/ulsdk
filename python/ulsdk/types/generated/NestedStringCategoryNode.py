@@ -4,15 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from typing import Optional
 np = import_numpy()
 
 class NestedStringCategoryNode(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = NestedStringCategoryNode()
         x.Init(buf, n + offset)
@@ -23,18 +21,18 @@ class NestedStringCategoryNode(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # NestedStringCategoryNode
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # NestedStringCategoryNode
-    def Value(self) -> Optional[bytes]:
+    def Value(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # NestedStringCategoryNode
-    def ChildValues(self, j: int):
+    def ChildValues(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             a = self._tab.Vector(o)
@@ -42,43 +40,43 @@ class NestedStringCategoryNode(object):
         return ""
 
     # NestedStringCategoryNode
-    def ChildValuesLength(self) -> int:
+    def ChildValuesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # NestedStringCategoryNode
-    def ChildValuesIsNone(self) -> bool:
+    def ChildValuesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
-def NestedStringCategoryNodeStart(builder: flatbuffers.Builder):
+def NestedStringCategoryNodeStart(builder):
     builder.StartObject(2)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     NestedStringCategoryNodeStart(builder)
 
-def NestedStringCategoryNodeAddValue(builder: flatbuffers.Builder, value: int):
+def NestedStringCategoryNodeAddValue(builder, value):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(value), 0)
 
-def AddValue(builder: flatbuffers.Builder, value: int):
+def AddValue(builder, value):
     NestedStringCategoryNodeAddValue(builder, value)
 
-def NestedStringCategoryNodeAddChildValues(builder: flatbuffers.Builder, childValues: int):
+def NestedStringCategoryNodeAddChildValues(builder, childValues):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(childValues), 0)
 
-def AddChildValues(builder: flatbuffers.Builder, childValues: int):
+def AddChildValues(builder, childValues):
     NestedStringCategoryNodeAddChildValues(builder, childValues)
 
-def NestedStringCategoryNodeStartChildValuesVector(builder, numElems: int) -> int:
+def NestedStringCategoryNodeStartChildValuesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartChildValuesVector(builder, numElems: int) -> int:
+def StartChildValuesVector(builder, numElems):
     return NestedStringCategoryNodeStartChildValuesVector(builder, numElems)
 
-def NestedStringCategoryNodeEnd(builder: flatbuffers.Builder) -> int:
+def NestedStringCategoryNodeEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return NestedStringCategoryNodeEnd(builder)

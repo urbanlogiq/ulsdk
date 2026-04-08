@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ObjectId import ObjectId
-from typing import Optional
 np = import_numpy()
 
 class DriveChange(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = DriveChange()
         x.Init(buf, n + offset)
@@ -24,24 +21,26 @@ class DriveChange(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # DriveChange
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # DriveChange
-    def Root(self) -> Optional[ObjectId]:
+    def Root(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # DriveChange
-    def Object(self) -> Optional[ObjectId]:
+    def Object(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -54,32 +53,32 @@ class DriveChange(object):
             return self._tab.Get(flatbuffers.number_types.Uint8Flags, o + self._tab.Pos)
         return 0
 
-def DriveChangeStart(builder: flatbuffers.Builder):
+def DriveChangeStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DriveChangeStart(builder)
 
-def DriveChangeAddRoot(builder: flatbuffers.Builder, root: int):
+def DriveChangeAddRoot(builder, root):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(root), 0)
 
-def AddRoot(builder: flatbuffers.Builder, root: int):
+def AddRoot(builder, root):
     DriveChangeAddRoot(builder, root)
 
-def DriveChangeAddObject(builder: flatbuffers.Builder, object: int):
+def DriveChangeAddObject(builder, object):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(object), 0)
 
-def AddObject(builder: flatbuffers.Builder, object: int):
+def AddObject(builder, object):
     DriveChangeAddObject(builder, object)
 
-def DriveChangeAddAction(builder: flatbuffers.Builder, action: int):
+def DriveChangeAddAction(builder, action):
     builder.PrependUint8Slot(2, action, 0)
 
-def AddAction(builder: flatbuffers.Builder, action: int):
+def AddAction(builder, action):
     DriveChangeAddAction(builder, action)
 
-def DriveChangeEnd(builder: flatbuffers.Builder) -> int:
+def DriveChangeEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DriveChangeEnd(builder)

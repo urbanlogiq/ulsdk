@@ -1,6 +1,7 @@
 // Copyright (c), CommunityLogiq Software
 
 mod api_key_context;
+mod cluster_context;
 #[cfg(test)]
 mod test_context;
 
@@ -13,6 +14,7 @@ use uuid::Uuid;
 
 use crate::error::Error;
 pub use crate::request_context::api_key_context::ApiKeyContext;
+pub use crate::request_context::cluster_context::ClusterContext;
 #[cfg(test)]
 pub(crate) use crate::request_context::test_context::TestContext;
 use crate::{Environment, Region};

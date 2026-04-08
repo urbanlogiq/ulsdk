@@ -4,17 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .ContentId import ContentId
-from .ObjectId import ObjectId
-from typing import Optional
 np = import_numpy()
 
 class ObjectSummary(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = ObjectSummary()
         x.Init(buf, n + offset)
@@ -25,24 +21,26 @@ class ObjectSummary(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # ObjectSummary
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # ObjectSummary
-    def Id(self) -> Optional[ObjectId]:
+    def Id(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # ObjectSummary
-    def HeadRevision(self) -> Optional[ContentId]:
+    def HeadRevision(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ContentId import ContentId
             obj = ContentId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -63,10 +61,11 @@ class ObjectSummary(object):
         return 0
 
     # ObjectSummary
-    def Acl(self) -> Optional[ObjectId]:
+    def Acl(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
             obj = ObjectId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -79,50 +78,50 @@ class ObjectSummary(object):
             return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
         return 0
 
-def ObjectSummaryStart(builder: flatbuffers.Builder):
+def ObjectSummaryStart(builder):
     builder.StartObject(6)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     ObjectSummaryStart(builder)
 
-def ObjectSummaryAddId(builder: flatbuffers.Builder, id: int):
+def ObjectSummaryAddId(builder, id):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(id), 0)
 
-def AddId(builder: flatbuffers.Builder, id: int):
+def AddId(builder, id):
     ObjectSummaryAddId(builder, id)
 
-def ObjectSummaryAddHeadRevision(builder: flatbuffers.Builder, headRevision: int):
+def ObjectSummaryAddHeadRevision(builder, headRevision):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(headRevision), 0)
 
-def AddHeadRevision(builder: flatbuffers.Builder, headRevision: int):
+def AddHeadRevision(builder, headRevision):
     ObjectSummaryAddHeadRevision(builder, headRevision)
 
-def ObjectSummaryAddTy(builder: flatbuffers.Builder, ty: int):
+def ObjectSummaryAddTy(builder, ty):
     builder.PrependInt16Slot(2, ty, 0)
 
-def AddTy(builder: flatbuffers.Builder, ty: int):
+def AddTy(builder, ty):
     ObjectSummaryAddTy(builder, ty)
 
-def ObjectSummaryAddTime(builder: flatbuffers.Builder, time: int):
+def ObjectSummaryAddTime(builder, time):
     builder.PrependUint64Slot(3, time, 0)
 
-def AddTime(builder: flatbuffers.Builder, time: int):
+def AddTime(builder, time):
     ObjectSummaryAddTime(builder, time)
 
-def ObjectSummaryAddAcl(builder: flatbuffers.Builder, acl: int):
+def ObjectSummaryAddAcl(builder, acl):
     builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(acl), 0)
 
-def AddAcl(builder: flatbuffers.Builder, acl: int):
+def AddAcl(builder, acl):
     ObjectSummaryAddAcl(builder, acl)
 
-def ObjectSummaryAddDriveSize(builder: flatbuffers.Builder, driveSize: int):
+def ObjectSummaryAddDriveSize(builder, driveSize):
     builder.PrependUint64Slot(5, driveSize, 0)
 
-def AddDriveSize(builder: flatbuffers.Builder, driveSize: int):
+def AddDriveSize(builder, driveSize):
     ObjectSummaryAddDriveSize(builder, driveSize)
 
-def ObjectSummaryEnd(builder: flatbuffers.Builder) -> int:
+def ObjectSummaryEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return ObjectSummaryEnd(builder)

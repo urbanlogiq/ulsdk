@@ -28,6 +28,12 @@ def test_named_parameter():
     _t1 = NamedParameter.from_bytes(_b)
     assert _t0 == _t1
 
+def test_output_schema():
+    _t0 = OutputSchema.make_default()
+    _b = _t0.to_bytes()
+    _t1 = OutputSchema.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_source():
     _t0 = Source.make_default()
     _b = _t0.to_bytes()

@@ -26,16 +26,15 @@ import java.nio.ByteOrder;
  */
 @SuppressWarnings("unused")
 public final class SetExpr extends com.google.flatbuffers.Table {
-  public static void ValidateVersion() { Constants.FLATBUFFERS_23_5_26(); }
+  public static void ValidateVersion() { Constants.FLATBUFFERS_25_2_10(); }
   public static SetExpr getRootAsSetExpr(ByteBuffer _bb) { return getRootAsSetExpr(_bb, new SetExpr()); }
   public static SetExpr getRootAsSetExpr(ByteBuffer _bb, SetExpr obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
   public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }
   public SetExpr __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   /**
-   * Because we cannot refer to multiple tables at once in a single UPDATE
-   * operation we only need to name the column, we can just a string here
-   * instead of a Column table.
+   * The target column name. Since SET targets always refer to the target table,
+   * we only need to name the column as a string.
    */
   public String col() { int o = __offset(4); return o != 0 ? __string(o + bb_pos) : null; }
   public ByteBuffer colAsByteBuffer() { return __vector_as_bytebuffer(4, 1); }

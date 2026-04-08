@@ -4,17 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .B2cId import B2cId
-from flatbuffers.table import Table
-from typing import Optional
 np = import_numpy()
 
 class Notification(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Notification()
         x.Init(buf, n + offset)
@@ -25,14 +21,15 @@ class Notification(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # Notification
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Notification
-    def Sender(self) -> Optional[B2cId]:
+    def Sender(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
+            from .B2cId import B2cId
             obj = B2cId()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -46,40 +43,41 @@ class Notification(object):
         return 0
 
     # Notification
-    def Notification(self) -> Optional[flatbuffers.table.Table]:
+    def Notification(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
+            from flatbuffers.table import Table
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
-def NotificationStart(builder: flatbuffers.Builder):
+def NotificationStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     NotificationStart(builder)
 
-def NotificationAddSender(builder: flatbuffers.Builder, sender: int):
+def NotificationAddSender(builder, sender):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(sender), 0)
 
-def AddSender(builder: flatbuffers.Builder, sender: int):
+def AddSender(builder, sender):
     NotificationAddSender(builder, sender)
 
-def NotificationAddNotificationType(builder: flatbuffers.Builder, notificationType: int):
+def NotificationAddNotificationType(builder, notificationType):
     builder.PrependUint8Slot(1, notificationType, 0)
 
-def AddNotificationType(builder: flatbuffers.Builder, notificationType: int):
+def AddNotificationType(builder, notificationType):
     NotificationAddNotificationType(builder, notificationType)
 
-def NotificationAddNotification(builder: flatbuffers.Builder, notification: int):
+def NotificationAddNotification(builder, notification):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(notification), 0)
 
-def AddNotification(builder: flatbuffers.Builder, notification: int):
+def AddNotification(builder, notification):
     NotificationAddNotification(builder, notification)
 
-def NotificationEnd(builder: flatbuffers.Builder) -> int:
+def NotificationEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return NotificationEnd(builder)

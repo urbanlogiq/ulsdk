@@ -28,6 +28,12 @@ def test_multi_line():
     _t1 = MultiLine.from_bytes(_b)
     assert _t0 == _t1
 
+def test_multi_point():
+    _t0 = MultiPoint.make_default()
+    _b = _t0.to_bytes()
+    _t1 = MultiPoint.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_multi_polygon():
     _t0 = MultiPolygon.make_default()
     _b = _t0.to_bytes()

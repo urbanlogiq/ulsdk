@@ -151,8 +151,8 @@ impl<'a> Signature<'a> {
         Signature { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args SignatureArgs<'args>,
     ) -> flatbuffers::WIPOffset<Signature<'bldr>> {
         let mut builder = SignatureBuilder::new(_fbb);
@@ -236,11 +236,11 @@ impl Serialize for Signature<'_> {
     }
 }
 
-pub struct SignatureBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct SignatureBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> SignatureBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> SignatureBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_kid(&mut self, kid: flatbuffers::WIPOffset<&'b str>) {
         self.fbb_
@@ -252,7 +252,7 @@ impl<'a: 'b, 'b> SignatureBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(Signature::VT_SIG, sig);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> SignatureBuilder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> SignatureBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         SignatureBuilder {
             fbb_: _fbb,
@@ -303,8 +303,8 @@ impl<'a> CryptHeader<'a> {
         CryptHeader { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args CryptHeaderArgs<'args>,
     ) -> flatbuffers::WIPOffset<CryptHeader<'bldr>> {
         let mut builder = CryptHeaderBuilder::new(_fbb);
@@ -405,11 +405,11 @@ impl Serialize for CryptHeader<'_> {
     }
 }
 
-pub struct CryptHeaderBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct CryptHeaderBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> CryptHeaderBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> CryptHeaderBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_kid(&mut self, kid: flatbuffers::WIPOffset<&'b str>) {
         self.fbb_
@@ -426,7 +426,9 @@ impl<'a: 'b, 'b> CryptHeaderBuilder<'a, 'b> {
             .push_slot::<u32>(CryptHeader::VT_PLAINTEXT_LEN, plaintext_len, 0);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> CryptHeaderBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> CryptHeaderBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         CryptHeaderBuilder {
             fbb_: _fbb,
@@ -477,8 +479,8 @@ impl<'a> EncryptedObject<'a> {
         EncryptedObject { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args EncryptedObjectArgs<'args>,
     ) -> flatbuffers::WIPOffset<EncryptedObject<'bldr>> {
         let mut builder = EncryptedObjectBuilder::new(_fbb);
@@ -566,11 +568,11 @@ impl Serialize for EncryptedObject<'_> {
     }
 }
 
-pub struct EncryptedObjectBuilder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct EncryptedObjectBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> EncryptedObjectBuilder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> EncryptedObjectBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_header(&mut self, header: flatbuffers::WIPOffset<CryptHeader<'b>>) {
         self.fbb_
@@ -585,7 +587,9 @@ impl<'a: 'b, 'b> EncryptedObjectBuilder<'a, 'b> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(EncryptedObject::VT_OBJ, obj);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> EncryptedObjectBuilder<'a, 'b> {
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> EncryptedObjectBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         EncryptedObjectBuilder {
             fbb_: _fbb,
@@ -634,8 +638,8 @@ impl<'a> Sha256<'a> {
         Sha256 { _tab: table }
     }
     #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
         args: &'args Sha256Args<'args>,
     ) -> flatbuffers::WIPOffset<Sha256<'bldr>> {
         let mut builder = Sha256Builder::new(_fbb);
@@ -701,18 +705,18 @@ impl Serialize for Sha256<'_> {
     }
 }
 
-pub struct Sha256Builder<'a: 'b, 'b> {
-    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+pub struct Sha256Builder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b> Sha256Builder<'a, 'b> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> Sha256Builder<'a, 'b, A> {
     #[inline]
     pub fn add_b(&mut self, b: flatbuffers::WIPOffset<flatbuffers::Vector<'b, u8>>) {
         self.fbb_
             .push_slot_always::<flatbuffers::WIPOffset<_>>(Sha256::VT_B, b);
     }
     #[inline]
-    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> Sha256Builder<'a, 'b> {
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> Sha256Builder<'a, 'b, A> {
         let start = _fbb.start_table();
         Sha256Builder {
             fbb_: _fbb,

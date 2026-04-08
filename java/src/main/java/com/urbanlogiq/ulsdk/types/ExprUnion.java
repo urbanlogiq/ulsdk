@@ -17,7 +17,8 @@ public final class ExprUnion {
             && !(value instanceof com.urbanlogiq.ulsdk.types.Partition)
             && !(value instanceof com.urbanlogiq.ulsdk.types.UnsetArgument)
             && !(value instanceof com.urbanlogiq.ulsdk.types.Window)
-            && !(value instanceof com.urbanlogiq.ulsdk.types.ValueName)) {
+            && !(value instanceof com.urbanlogiq.ulsdk.types.ValueName)
+            && !(value instanceof com.urbanlogiq.ulsdk.types.AggregateFilter)) {
             throw new com.urbanlogiq.ulsdk.InvalidVariantException("ExprUnion", value);
         }
 
@@ -75,6 +76,11 @@ public final class ExprUnion {
             int offset = o.serializeTo(builder);
             byte ty = com.urbanlogiq.ulsdk.types.generated.ExprUnion.ValueName;
             return new com.urbanlogiq.ulsdk.Pair<Integer, Byte>(offset, ty);
+        } else if (this._value instanceof com.urbanlogiq.ulsdk.types.AggregateFilter) {
+            com.urbanlogiq.ulsdk.types.AggregateFilter o = (com.urbanlogiq.ulsdk.types.AggregateFilter)this._value;
+            int offset = o.serializeTo(builder);
+            byte ty = com.urbanlogiq.ulsdk.types.generated.ExprUnion.AggregateFilter;
+            return new com.urbanlogiq.ulsdk.Pair<Integer, Byte>(offset, ty);
         } else {
             throw new RuntimeException("unreachable variant");
         }
@@ -105,6 +111,8 @@ public final class ExprUnion {
             this._value = new com.urbanlogiq.ulsdk.types.Window((com.urbanlogiq.ulsdk.types.generated.Window)o);
         } else if (ty == com.urbanlogiq.ulsdk.types.generated.ExprUnion.ValueName) {
             this._value = new com.urbanlogiq.ulsdk.types.ValueName((com.urbanlogiq.ulsdk.types.generated.ValueName)o);
+        } else if (ty == com.urbanlogiq.ulsdk.types.generated.ExprUnion.AggregateFilter) {
+            this._value = new com.urbanlogiq.ulsdk.types.AggregateFilter((com.urbanlogiq.ulsdk.types.generated.AggregateFilter)o);
         }
     }
 

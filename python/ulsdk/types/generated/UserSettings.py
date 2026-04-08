@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .TileData import TileData
-from typing import Optional
 np = import_numpy()
 
 class UserSettings(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = UserSettings()
         x.Init(buf, n + offset)
@@ -24,30 +21,31 @@ class UserSettings(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # UserSettings
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # UserSettings
-    def TileData(self, j: int) -> Optional[TileData]:
+    def TileData(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .TileData import TileData
             obj = TileData()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # UserSettings
-    def TileDataLength(self) -> int:
+    def TileDataLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # UserSettings
-    def TileDataIsNone(self) -> bool:
+    def TileDataIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
@@ -58,32 +56,32 @@ class UserSettings(object):
             return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
         return False
 
-def UserSettingsStart(builder: flatbuffers.Builder):
+def UserSettingsStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     UserSettingsStart(builder)
 
-def UserSettingsAddTileData(builder: flatbuffers.Builder, tileData: int):
+def UserSettingsAddTileData(builder, tileData):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(tileData), 0)
 
-def AddTileData(builder: flatbuffers.Builder, tileData: int):
+def AddTileData(builder, tileData):
     UserSettingsAddTileData(builder, tileData)
 
-def UserSettingsStartTileDataVector(builder, numElems: int) -> int:
+def UserSettingsStartTileDataVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartTileDataVector(builder, numElems: int) -> int:
+def StartTileDataVector(builder, numElems):
     return UserSettingsStartTileDataVector(builder, numElems)
 
-def UserSettingsAddIsTemplate(builder: flatbuffers.Builder, isTemplate: bool):
+def UserSettingsAddIsTemplate(builder, isTemplate):
     builder.PrependBoolSlot(2, isTemplate, 0)
 
-def AddIsTemplate(builder: flatbuffers.Builder, isTemplate: bool):
+def AddIsTemplate(builder, isTemplate):
     UserSettingsAddIsTemplate(builder, isTemplate)
 
-def UserSettingsEnd(builder: flatbuffers.Builder) -> int:
+def UserSettingsEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return UserSettingsEnd(builder)

@@ -4,15 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from typing import Optional
 np = import_numpy()
 
 class NestedHierarchyRelationshipNode(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = NestedHierarchyRelationshipNode()
         x.Init(buf, n + offset)
@@ -23,18 +21,18 @@ class NestedHierarchyRelationshipNode(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # NestedHierarchyRelationshipNode
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # NestedHierarchyRelationshipNode
-    def Label(self) -> Optional[bytes]:
+    def Label(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
     # NestedHierarchyRelationshipNode
-    def ChildNodes(self, j: int):
+    def ChildNodes(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             a = self._tab.Vector(o)
@@ -49,19 +47,19 @@ class NestedHierarchyRelationshipNode(object):
         return 0
 
     # NestedHierarchyRelationshipNode
-    def ChildNodesLength(self) -> int:
+    def ChildNodesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # NestedHierarchyRelationshipNode
-    def ChildNodesIsNone(self) -> bool:
+    def ChildNodesIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
     # NestedHierarchyRelationshipNode
-    def ChildColumns(self, j: int):
+    def ChildColumns(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             a = self._tab.Vector(o)
@@ -76,55 +74,55 @@ class NestedHierarchyRelationshipNode(object):
         return 0
 
     # NestedHierarchyRelationshipNode
-    def ChildColumnsLength(self) -> int:
+    def ChildColumnsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # NestedHierarchyRelationshipNode
-    def ChildColumnsIsNone(self) -> bool:
+    def ChildColumnsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
-def NestedHierarchyRelationshipNodeStart(builder: flatbuffers.Builder):
+def NestedHierarchyRelationshipNodeStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     NestedHierarchyRelationshipNodeStart(builder)
 
-def NestedHierarchyRelationshipNodeAddLabel(builder: flatbuffers.Builder, label: int):
+def NestedHierarchyRelationshipNodeAddLabel(builder, label):
     builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(label), 0)
 
-def AddLabel(builder: flatbuffers.Builder, label: int):
+def AddLabel(builder, label):
     NestedHierarchyRelationshipNodeAddLabel(builder, label)
 
-def NestedHierarchyRelationshipNodeAddChildNodes(builder: flatbuffers.Builder, childNodes: int):
+def NestedHierarchyRelationshipNodeAddChildNodes(builder, childNodes):
     builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(childNodes), 0)
 
-def AddChildNodes(builder: flatbuffers.Builder, childNodes: int):
+def AddChildNodes(builder, childNodes):
     NestedHierarchyRelationshipNodeAddChildNodes(builder, childNodes)
 
-def NestedHierarchyRelationshipNodeStartChildNodesVector(builder, numElems: int) -> int:
+def NestedHierarchyRelationshipNodeStartChildNodesVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartChildNodesVector(builder, numElems: int) -> int:
+def StartChildNodesVector(builder, numElems):
     return NestedHierarchyRelationshipNodeStartChildNodesVector(builder, numElems)
 
-def NestedHierarchyRelationshipNodeAddChildColumns(builder: flatbuffers.Builder, childColumns: int):
+def NestedHierarchyRelationshipNodeAddChildColumns(builder, childColumns):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(childColumns), 0)
 
-def AddChildColumns(builder: flatbuffers.Builder, childColumns: int):
+def AddChildColumns(builder, childColumns):
     NestedHierarchyRelationshipNodeAddChildColumns(builder, childColumns)
 
-def NestedHierarchyRelationshipNodeStartChildColumnsVector(builder, numElems: int) -> int:
+def NestedHierarchyRelationshipNodeStartChildColumnsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartChildColumnsVector(builder, numElems: int) -> int:
+def StartChildColumnsVector(builder, numElems):
     return NestedHierarchyRelationshipNodeStartChildColumnsVector(builder, numElems)
 
-def NestedHierarchyRelationshipNodeEnd(builder: flatbuffers.Builder) -> int:
+def NestedHierarchyRelationshipNodeEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return NestedHierarchyRelationshipNodeEnd(builder)

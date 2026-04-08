@@ -4,16 +4,13 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-from typing import Any
-from .TimeInterval import TimeInterval
-from typing import Optional
 np = import_numpy()
 
 class DatetimeRange(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset: int = 0):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = DatetimeRange()
         x.Init(buf, n + offset)
@@ -24,7 +21,7 @@ class DatetimeRange(object):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
     # DatetimeRange
-    def Init(self, buf: bytes, pos: int):
+    def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # DatetimeRange
@@ -42,61 +39,62 @@ class DatetimeRange(object):
         return 0
 
     # DatetimeRange
-    def Intervals(self, j: int) -> Optional[TimeInterval]:
+    def Intervals(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
+            from .TimeInterval import TimeInterval
             obj = TimeInterval()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
     # DatetimeRange
-    def IntervalsLength(self) -> int:
+    def IntervalsLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # DatetimeRange
-    def IntervalsIsNone(self) -> bool:
+    def IntervalsIsNone(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
-def DatetimeRangeStart(builder: flatbuffers.Builder):
+def DatetimeRangeStart(builder):
     builder.StartObject(3)
 
-def Start(builder: flatbuffers.Builder):
+def Start(builder):
     DatetimeRangeStart(builder)
 
-def DatetimeRangeAddMin(builder: flatbuffers.Builder, min: int):
+def DatetimeRangeAddMin(builder, min):
     builder.PrependInt64Slot(0, min, 0)
 
-def AddMin(builder: flatbuffers.Builder, min: int):
+def AddMin(builder, min):
     DatetimeRangeAddMin(builder, min)
 
-def DatetimeRangeAddMax(builder: flatbuffers.Builder, max: int):
+def DatetimeRangeAddMax(builder, max):
     builder.PrependInt64Slot(1, max, 0)
 
-def AddMax(builder: flatbuffers.Builder, max: int):
+def AddMax(builder, max):
     DatetimeRangeAddMax(builder, max)
 
-def DatetimeRangeAddIntervals(builder: flatbuffers.Builder, intervals: int):
+def DatetimeRangeAddIntervals(builder, intervals):
     builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(intervals), 0)
 
-def AddIntervals(builder: flatbuffers.Builder, intervals: int):
+def AddIntervals(builder, intervals):
     DatetimeRangeAddIntervals(builder, intervals)
 
-def DatetimeRangeStartIntervalsVector(builder, numElems: int) -> int:
+def DatetimeRangeStartIntervalsVector(builder, numElems):
     return builder.StartVector(4, numElems, 4)
 
-def StartIntervalsVector(builder, numElems: int) -> int:
+def StartIntervalsVector(builder, numElems):
     return DatetimeRangeStartIntervalsVector(builder, numElems)
 
-def DatetimeRangeEnd(builder: flatbuffers.Builder) -> int:
+def DatetimeRangeEnd(builder):
     return builder.EndObject()
 
-def End(builder: flatbuffers.Builder) -> int:
+def End(builder):
     return DatetimeRangeEnd(builder)

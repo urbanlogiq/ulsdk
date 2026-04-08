@@ -14,8 +14,9 @@ public final class Geometry {
   public static final byte MultiLine = 3;
   public static final byte Polygon = 4;
   public static final byte MultiPolygon = 5;
+  public static final byte MultiPoint = 6;
 
-  public static final String[] names = { "NONE", "Point", "Line", "MultiLine", "Polygon", "MultiPolygon", };
+  public static final String[] names = { "NONE", "Point", "Line", "MultiLine", "Polygon", "MultiPolygon", "MultiPoint", };
 
   public static String name(int e) { return names[e]; }
 }
