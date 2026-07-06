@@ -23,6 +23,7 @@ from .id import (
     GraphNodeId,
     ObjectId,
     ObjectNamespace,
+    PinnedObjectId,
     StreamId,
 )
 from .permissions import (
@@ -44,6 +45,7 @@ from .generated.InboxItem import InboxItem as FbsInboxItem
 from .generated.JobComplete import JobComplete as FbsJobComplete
 from .generated.Notification import Notification as FbsNotification
 from .generated.ObjectId import ObjectId as FbsObjectId
+from .generated.PinnedObjectId import PinnedObjectId as FbsPinnedObjectId
 from .generated.Response import Response as FbsResponse
 from .generated.Role import Role as FbsRole
 from .generated.Share import Share as FbsShare

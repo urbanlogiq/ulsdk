@@ -10,10 +10,12 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
+use crate::FbsSerde;
 use bitflags::bitflags;
 use core::ops::Deref;
 use flatbuffers::{UnionWIPOffset, WIPOffset};
 use ordered_float::OrderedFloat;
+use serde::{Deserialize, Serialize};
 use strum_macros::FromRepr;
 
 use crate::types::Schema::{
@@ -56,7 +58,8 @@ use crate::types::generated::data_generated::{
 use crate::types::generated::id_generated::{
     B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
     DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace,
+    PinnedObjectId as FbsPinnedObjectId, StreamId as FbsStreamId,
 };
 use crate::types::generated::job_generated::{
     DeprecatedRunSpec as FbsDeprecatedRunSpec,
@@ -80,7 +83,7 @@ use crate::types::generated::value_generated::{
 };
 use crate::types::id::{
     B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
-    ObjectNamespace, StreamId,
+    ObjectNamespace, PinnedObjectId, StreamId,
 };
 use crate::types::value::{
     Point2D, Tri2D, VArray, VBool, VBytes, VChar, VF32, VF64, VFixedSizeBytes, VI8, VI16, VI32,
@@ -88,7 +91,7 @@ use crate::types::value::{
     VTimestampNsUtc, VTri2D, VU8, VU16, VU32, VU64, VUnit, VUsize, Value, ValueInstance, ValueTy,
 };
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i8)]
 pub enum Status {
     #[default]
@@ -144,7 +147,7 @@ impl From<FbsStatus> for Status {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i32)]
 pub enum TaskErrorTy {
     #[default]
@@ -188,7 +191,7 @@ impl From<FbsTaskErrorTy> for TaskErrorTy {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i32)]
 pub enum TaskPriority {
     #[default]
@@ -237,7 +240,7 @@ impl From<FbsTaskPriority> for TaskPriority {
 }
 
 bitflags! {
-    #[derive(Default)]
+    #[derive(Default, Serialize, Deserialize)]
     pub struct TaskRunFlags: u32 {
         const PODLOCKED = 1;
     }
@@ -255,7 +258,7 @@ impl From<FbsTaskRunFlags> for TaskRunFlags {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct EmbeddedTable {
     pub v: Vec<u8>,
 }
@@ -286,15 +289,15 @@ impl From<FbsEmbeddedTable<'_>> for EmbeddedTable {
     }
 }
 
-impl EmbeddedTable {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for EmbeddedTable {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -304,7 +307,7 @@ impl EmbeddedTable {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum TaskParameterValue {
     ObjectId(ObjectId),
     EmbeddedTable(EmbeddedTable),
@@ -342,12 +345,12 @@ impl TaskParameterValue {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct DeprecatedRunSpec {
     pub param_indices: Vec<ParamIndices>,
     pub params: Vec<DeprecatedTaskParameter>,
     pub persist: bool,
-    pub schematic: ObjectId,
+    pub schematic: PinnedObjectId,
 }
 
 impl DeprecatedRunSpec {
@@ -393,7 +396,7 @@ impl From<FbsDeprecatedRunSpec<'_>> for DeprecatedRunSpec {
         }
 
         let persist = fbs.persist();
-        let schematic = ObjectId::from(fbs.schematic());
+        let schematic = PinnedObjectId::from(fbs.schematic());
         Self {
             param_indices,
             params,
@@ -403,15 +406,15 @@ impl From<FbsDeprecatedRunSpec<'_>> for DeprecatedRunSpec {
     }
 }
 
-impl DeprecatedRunSpec {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for DeprecatedRunSpec {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -421,7 +424,7 @@ impl DeprecatedRunSpec {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct DeprecatedTaskParameter {
     pub flags: i64,
     pub key: String,
@@ -481,15 +484,15 @@ impl From<FbsDeprecatedTaskParameter<'_>> for DeprecatedTaskParameter {
     }
 }
 
-impl DeprecatedTaskParameter {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for DeprecatedTaskParameter {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -500,7 +503,7 @@ impl DeprecatedTaskParameter {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Edge {
     pub from: u32,
     pub to: u32,
@@ -528,15 +531,15 @@ impl From<FbsEdge<'_>> for Edge {
     }
 }
 
-impl Edge {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Edge {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -546,7 +549,7 @@ impl Edge {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Job {
     pub attributes: Option<Vec<Attr>>,
     pub error_tys: Option<Vec<TaskErrorTy>>,
@@ -659,15 +662,15 @@ impl From<FbsJob<'_>> for Job {
     }
 }
 
-impl Job {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Job {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -677,7 +680,7 @@ impl Job {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Node {
     pub name: String,
     pub obj: ObjectId,
@@ -708,15 +711,15 @@ impl From<FbsNode<'_>> for Node {
     }
 }
 
-impl Node {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Node {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -726,7 +729,7 @@ impl Node {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct ParamIndices {
     pub idxs: Vec<i32>,
 }
@@ -757,15 +760,15 @@ impl From<FbsParamIndices<'_>> for ParamIndices {
     }
 }
 
-impl ParamIndices {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for ParamIndices {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -782,7 +785,7 @@ impl ParamIndices {
 /// that points to all the parameters in the params array. This lets
 /// us reuse the task parameters across nodes (ie: if we want a shared
 /// start_date / end_date to be used in a number of calculations)
-#[derive(PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct RunSpec {
     pub attributes: Option<Vec<Attr>>,
     pub notify: bool,
@@ -790,7 +793,7 @@ pub struct RunSpec {
     pub params: Vec<TaskParameter>,
     pub persist: bool,
     pub priority: TaskPriority,
-    pub schematic: ObjectId,
+    pub schematic: PinnedObjectId,
 }
 
 impl RunSpec {
@@ -863,7 +866,7 @@ impl From<FbsRunSpec<'_>> for RunSpec {
 
         let persist = fbs.persist();
         let priority = TaskPriority::from(fbs.priority());
-        let schematic = ObjectId::from(fbs.schematic());
+        let schematic = PinnedObjectId::from(fbs.schematic());
         Self {
             attributes,
             notify,
@@ -876,15 +879,15 @@ impl From<FbsRunSpec<'_>> for RunSpec {
     }
 }
 
-impl RunSpec {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for RunSpec {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -903,12 +906,12 @@ impl Default for RunSpec {
             params: Vec::<TaskParameter>::default(),
             persist: bool::default(),
             priority: TaskPriority::default(),
-            schematic: ObjectId::default(),
+            schematic: PinnedObjectId::default(),
         }
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Schematic {
     pub attributes: Vec<AttributePair>,
     pub edges: Vec<Edge>,
@@ -981,15 +984,15 @@ impl From<FbsSchematic<'_>> for Schematic {
     }
 }
 
-impl Schematic {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Schematic {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -999,7 +1002,7 @@ impl Schematic {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Task {
     pub _id: ObjectId,
     pub barrier_count: i32,
@@ -1026,7 +1029,7 @@ pub struct Task {
     /// data stream lookup) this is a blank object where the results will be
     /// written. If it is a lookup of an existing stream, this will be populated
     /// with the stream ID
-    pub output: ObjectId,
+    pub output: PinnedObjectId,
     /// Parameter indices taken from the RunSpec for this particular task step.
     pub params: ParamIndices,
     pub retries: i32,
@@ -1130,7 +1133,7 @@ impl From<FbsTask<'_>> for Task {
         let last_updated_by_pod = fbs.last_updated_by_pod().map(ToOwned::to_owned);
         let message = fbs.message().map(ToOwned::to_owned);
         let name = fbs.name().to_owned();
-        let output = ObjectId::from(fbs.output());
+        let output = PinnedObjectId::from(fbs.output());
         let params = ParamIndices::from(fbs.params());
         let retries = fbs.retries();
         let schematic_id = fbs.schematic_id().map(ObjectId::from);
@@ -1170,15 +1173,15 @@ impl From<FbsTask<'_>> for Task {
     }
 }
 
-impl Task {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Task {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1188,7 +1191,7 @@ impl Task {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct TaskList {
     pub tasks: Vec<Task>,
 }
@@ -1224,15 +1227,15 @@ impl From<FbsTaskList<'_>> for TaskList {
     }
 }
 
-impl TaskList {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for TaskList {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1242,7 +1245,7 @@ impl TaskList {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct TaskParameter {
     pub key: String,
     pub value: TaskParameterValue,
@@ -1286,15 +1289,15 @@ impl From<FbsTaskParameter<'_>> for TaskParameter {
     }
 }
 
-impl TaskParameter {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for TaskParameter {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()

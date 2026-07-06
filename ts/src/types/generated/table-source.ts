@@ -18,6 +18,7 @@ import { OrderBy, OrderByT } from './order-by';
 import { Placeholder, PlaceholderT } from './placeholder';
 import { QueryTableSource, QueryTableSourceT } from './query-table-source';
 import { TableSourceUnion, unionToTableSourceUnion, unionListToTableSourceUnion } from './table-source-union';
+import { TimeSeries, TimeSeriesT } from './time-series';
 import { Values, ValuesT } from './values';
 import { Vector, VectorT } from './vector';
 
@@ -189,7 +190,7 @@ unpackTo(_o: TableSourceT): void {
 export class TableSourceT implements flatbuffers.IGeneratedObject {
 constructor(
   public tType: TableSourceUnion = TableSourceUnion.NONE,
-  public t: ArrowT|DataCatalogT|DriveT|GraphQueryT|PlaceholderT|QueryTableSourceT|ValuesT|VectorT|null = null,
+  public t: ArrowT|DataCatalogT|DriveT|GraphQueryT|PlaceholderT|QueryTableSourceT|TimeSeriesT|ValuesT|VectorT|null = null,
   public fields: (ExprT)[] = [],
   public filter: FunctionT|null = null,
   public orderBy: (OrderByT)[] = [],

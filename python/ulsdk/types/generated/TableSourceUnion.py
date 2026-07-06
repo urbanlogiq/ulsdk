@@ -12,3 +12,4 @@ class TableSourceUnion(object):
     Placeholder = 6
     Drive = 7
     Values = 8
+    TimeSeries = 9

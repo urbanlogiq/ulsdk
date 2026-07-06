@@ -83,6 +83,7 @@ from .id import (
     GraphNodeId,
     ObjectId,
     ObjectNamespace,
+    PinnedObjectId,
     StreamId,
 )
 from .value import (
@@ -161,6 +162,7 @@ from .generated.Null import Null as FbsNull
 from .generated.ObjectId import ObjectId as FbsObjectId
 from .generated.OutputSchema import OutputSchema as FbsOutputSchema
 from .generated.ParamIndices import ParamIndices as FbsParamIndices
+from .generated.PinnedObjectId import PinnedObjectId as FbsPinnedObjectId
 from .generated.Point2D import Point2D as FbsPoint2D
 from .generated.RunEndEncoded import RunEndEncoded as FbsRunEndEncoded
 from .generated.RunSpec import RunSpec as FbsRunSpec
@@ -340,7 +342,7 @@ class DeprecatedRunSpec:
 
     persist: "bool"
 
-    schematic: "ObjectId"
+    schematic: "PinnedObjectId"
 
     @classmethod
     def from_fbs(cls, o: FbsDeprecatedRunSpec) -> Self:
@@ -363,7 +365,7 @@ class DeprecatedRunSpec:
         persist = o.Persist()
         schematic_obj = o.Schematic()
         if schematic_obj is not None:
-            schematic = ObjectId.from_fbs(schematic_obj)
+            schematic = PinnedObjectId.from_fbs(schematic_obj)
         else:
             raise ValueError("Schematic is required")
         return cls(param_indices, params, persist, schematic)
@@ -419,7 +421,7 @@ class DeprecatedRunSpec:
         param_indices = []
         params = []
         persist = False
-        schematic = ObjectId.make_default()
+        schematic = PinnedObjectId.make_default()
         return cls(param_indices, params, persist, schematic)
 
     def __eq__(self, other) -> bool:
@@ -889,7 +891,7 @@ class RunSpec:
 
     priority: "TaskPriority"
 
-    schematic: "ObjectId"
+    schematic: "PinnedObjectId"
 
     @classmethod
     def from_fbs(cls, o: FbsRunSpec) -> Self:
@@ -922,7 +924,7 @@ class RunSpec:
         priority = TaskPriority(o.Priority())
         schematic_obj = o.Schematic()
         if schematic_obj is not None:
-            schematic = ObjectId.from_fbs(schematic_obj)
+            schematic = PinnedObjectId.from_fbs(schematic_obj)
         else:
             raise ValueError("Schematic is required")
         return cls(attributes, notify, param_indices, params, persist, priority, schematic)
@@ -998,7 +1000,7 @@ class RunSpec:
         params = []
         persist = False
         priority = TaskPriority(-256)
-        schematic = ObjectId.make_default()
+        schematic = PinnedObjectId.make_default()
         return cls(attributes, notify, param_indices, params, persist, priority, schematic)
 
     def __eq__(self, other) -> bool:
@@ -1194,7 +1196,7 @@ class Task:
     # data stream lookup) this is a blank object where the results will be
     # written. If it is a lookup of an existing stream, this will be populated
     # with the stream ID
-    output: "ObjectId"
+    output: "PinnedObjectId"
 
     # Parameter indices taken from the RunSpec for this particular task step.
     params: "ParamIndices"
@@ -1260,7 +1262,7 @@ class Task:
         name = name_str.decode('utf-8')
         output_obj = o.Output()
         if output_obj is not None:
-            output = ObjectId.from_fbs(output_obj)
+            output = PinnedObjectId.from_fbs(output_obj)
         else:
             raise ValueError("Output is required")
         params_obj = o.Params()
@@ -1410,7 +1412,7 @@ class Task:
         last_updated_by_pod = ""
         message = ""
         name = ""
-        output = ObjectId.make_default()
+        output = PinnedObjectId.make_default()
         params = ParamIndices.make_default()
         retries = 0
         schematic_id = ObjectId.make_default()

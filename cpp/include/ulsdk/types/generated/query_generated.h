@@ -101,6 +101,9 @@ struct ValueRowBuilder;
 struct Values;
 struct ValuesBuilder;
 
+struct TimeSeries;
+struct TimeSeriesBuilder;
+
 struct TableSourceInstance;
 struct TableSourceInstanceBuilder;
 
@@ -405,11 +408,12 @@ enum class TableSourceUnion : uint8_t {
   Placeholder = 6,
   Drive = 7,
   Values = 8,
+  TimeSeries = 9,
   MIN = NONE,
-  MAX = Values
+  MAX = TimeSeries
 };
 
-inline const TableSourceUnion (&EnumValuesTableSourceUnion())[9] {
+inline const TableSourceUnion (&EnumValuesTableSourceUnion())[10] {
   static const TableSourceUnion values[] = {
     TableSourceUnion::NONE,
     TableSourceUnion::DataCatalog,
@@ -419,13 +423,14 @@ inline const TableSourceUnion (&EnumValuesTableSourceUnion())[9] {
     TableSourceUnion::Vector,
     TableSourceUnion::Placeholder,
     TableSourceUnion::Drive,
-    TableSourceUnion::Values
+    TableSourceUnion::Values,
+    TableSourceUnion::TimeSeries
   };
   return values;
 }
 
 inline const char * const *EnumNamesTableSourceUnion() {
-  static const char * const names[10] = {
+  static const char * const names[11] = {
     "NONE",
     "DataCatalog",
     "Arrow",
@@ -435,13 +440,14 @@ inline const char * const *EnumNamesTableSourceUnion() {
     "Placeholder",
     "Drive",
     "Values",
+    "TimeSeries",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameTableSourceUnion(TableSourceUnion e) {
-  if (::flatbuffers::IsOutRange(e, TableSourceUnion::NONE, TableSourceUnion::Values)) return "";
+  if (::flatbuffers::IsOutRange(e, TableSourceUnion::NONE, TableSourceUnion::TimeSeries)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesTableSourceUnion()[index];
 }
@@ -480,6 +486,10 @@ template<> struct TableSourceUnionTraits<Drive> {
 
 template<> struct TableSourceUnionTraits<Values> {
   static const TableSourceUnion enum_value = TableSourceUnion::Values;
+};
+
+template<> struct TableSourceUnionTraits<TimeSeries> {
+  static const TableSourceUnion enum_value = TableSourceUnion::TimeSeries;
 };
 
 bool VerifyTableSourceUnion(::flatbuffers::Verifier &verifier, const void *obj, TableSourceUnion type);
@@ -2524,6 +2534,167 @@ inline ::flatbuffers::Offset<Values> CreateValuesDirect(
       rows__);
 }
 
+/// Synthetic timestamp series used to fill empty time buckets in metric queries.
+/// Emits one row per bucket between `start_ms` and `end_ms`
+/// (inclusive) at `interval_ms` spacing, in a single column named `output_column`.
+/// All bounds are UTC unix milliseconds - to align with the
+/// time_bucket UDF, callers should pass values that are already snapped to a
+/// bucket boundary in the desired zone.
+/// Timezone-aware generation is not yet supported.
+///
+/// If `infer_bounds` is true, `start_ms` and `end_ms` are ignored and the
+/// catalog planner resolves them from the WHERE filter of whichever source
+/// this series is LEFT JOINed against. The joined source must produce the
+/// join column via `time_bucket(width, ts)` or
+/// `date_trunc(unit, [at_timezone(]ts[, tz)])` and have a closed range
+/// filter on `ts`; otherwise planning errors.
+///
+/// Exactly one of `interval_ms` / `interval_months` is non-zero (or both
+/// zero when `infer_bounds=true` — the planner fills in whichever flavour
+/// the joined source's bucket function dictates). `interval_months` is the
+/// calendar-month count used to step the synthetic series; years are
+/// represented as 12N months.
+///
+/// `tz` is the IANA timezone name (e.g. `"America/Los_Angeles"`) used to
+/// floor bounds and step the series in local calendar time. Empty means
+/// UTC. This is only set when the joined source's bucket expression wraps
+/// the timestamp in `at_timezone(ts, '<tz>')` — bare `date_trunc(unit, ts)`
+/// stays UTC. When `tz` is non-empty, the catalog emits the series as a
+/// precomputed VALUES list rather than a DataFusion `generate_series` call
+/// so the local-calendar boundaries (including DST transitions) are
+/// authoritative at plan time.
+struct TimeSeries FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef TimeSeriesBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_START_MS = 4,
+    VT_END_MS = 6,
+    VT_INTERVAL_MS = 8,
+    VT_OUTPUT_COLUMN = 10,
+    VT_INFER_BOUNDS = 12,
+    VT_INTERVAL_MONTHS = 14,
+    VT_TZ = 16
+  };
+  int64_t start_ms() const {
+    return GetField<int64_t>(VT_START_MS, 0);
+  }
+  int64_t end_ms() const {
+    return GetField<int64_t>(VT_END_MS, 0);
+  }
+  int64_t interval_ms() const {
+    return GetField<int64_t>(VT_INTERVAL_MS, 0);
+  }
+  const ::flatbuffers::String *output_column() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_OUTPUT_COLUMN);
+  }
+  bool infer_bounds() const {
+    return GetField<uint8_t>(VT_INFER_BOUNDS, 0) != 0;
+  }
+  int32_t interval_months() const {
+    return GetField<int32_t>(VT_INTERVAL_MONTHS, 0);
+  }
+  const ::flatbuffers::String *tz() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_TZ);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int64_t>(verifier, VT_START_MS, 8) &&
+           VerifyField<int64_t>(verifier, VT_END_MS, 8) &&
+           VerifyField<int64_t>(verifier, VT_INTERVAL_MS, 8) &&
+           VerifyOffsetRequired(verifier, VT_OUTPUT_COLUMN) &&
+           verifier.VerifyString(output_column()) &&
+           VerifyField<uint8_t>(verifier, VT_INFER_BOUNDS, 1) &&
+           VerifyField<int32_t>(verifier, VT_INTERVAL_MONTHS, 4) &&
+           VerifyOffset(verifier, VT_TZ) &&
+           verifier.VerifyString(tz()) &&
+           verifier.EndTable();
+  }
+};
+
+struct TimeSeriesBuilder {
+  typedef TimeSeries Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_start_ms(int64_t start_ms) {
+    fbb_.AddElement<int64_t>(TimeSeries::VT_START_MS, start_ms, 0);
+  }
+  void add_end_ms(int64_t end_ms) {
+    fbb_.AddElement<int64_t>(TimeSeries::VT_END_MS, end_ms, 0);
+  }
+  void add_interval_ms(int64_t interval_ms) {
+    fbb_.AddElement<int64_t>(TimeSeries::VT_INTERVAL_MS, interval_ms, 0);
+  }
+  void add_output_column(::flatbuffers::Offset<::flatbuffers::String> output_column) {
+    fbb_.AddOffset(TimeSeries::VT_OUTPUT_COLUMN, output_column);
+  }
+  void add_infer_bounds(bool infer_bounds) {
+    fbb_.AddElement<uint8_t>(TimeSeries::VT_INFER_BOUNDS, static_cast<uint8_t>(infer_bounds), 0);
+  }
+  void add_interval_months(int32_t interval_months) {
+    fbb_.AddElement<int32_t>(TimeSeries::VT_INTERVAL_MONTHS, interval_months, 0);
+  }
+  void add_tz(::flatbuffers::Offset<::flatbuffers::String> tz) {
+    fbb_.AddOffset(TimeSeries::VT_TZ, tz);
+  }
+  explicit TimeSeriesBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<TimeSeries> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<TimeSeries>(end);
+    fbb_.Required(o, TimeSeries::VT_OUTPUT_COLUMN);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<TimeSeries> CreateTimeSeries(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    int64_t start_ms = 0,
+    int64_t end_ms = 0,
+    int64_t interval_ms = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> output_column = 0,
+    bool infer_bounds = false,
+    int32_t interval_months = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> tz = 0) {
+  TimeSeriesBuilder builder_(_fbb);
+  builder_.add_interval_ms(interval_ms);
+  builder_.add_end_ms(end_ms);
+  builder_.add_start_ms(start_ms);
+  builder_.add_tz(tz);
+  builder_.add_interval_months(interval_months);
+  builder_.add_output_column(output_column);
+  builder_.add_infer_bounds(infer_bounds);
+  return builder_.Finish();
+}
+
+struct TimeSeries::Traits {
+  using type = TimeSeries;
+  static auto constexpr Create = CreateTimeSeries;
+};
+
+inline ::flatbuffers::Offset<TimeSeries> CreateTimeSeriesDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    int64_t start_ms = 0,
+    int64_t end_ms = 0,
+    int64_t interval_ms = 0,
+    const char *output_column = nullptr,
+    bool infer_bounds = false,
+    int32_t interval_months = 0,
+    const char *tz = nullptr) {
+  auto output_column__ = output_column ? _fbb.CreateString(output_column) : 0;
+  auto tz__ = tz ? _fbb.CreateString(tz) : 0;
+  return CreateTimeSeries(
+      _fbb,
+      start_ms,
+      end_ms,
+      interval_ms,
+      output_column__,
+      infer_bounds,
+      interval_months,
+      tz__);
+}
+
 struct TableSourceInstance FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef TableSourceInstanceBuilder Builder;
   struct Traits;
@@ -2561,6 +2732,9 @@ struct TableSourceInstance FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Tabl
   }
   const Values *t_as_Values() const {
     return t_type() == TableSourceUnion::Values ? static_cast<const Values *>(t()) : nullptr;
+  }
+  const TimeSeries *t_as_TimeSeries() const {
+    return t_type() == TableSourceUnion::TimeSeries ? static_cast<const TimeSeries *>(t()) : nullptr;
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -2601,6 +2775,10 @@ template<> inline const Drive *TableSourceInstance::t_as<Drive>() const {
 
 template<> inline const Values *TableSourceInstance::t_as<Values>() const {
   return t_as_Values();
+}
+
+template<> inline const TimeSeries *TableSourceInstance::t_as<TimeSeries>() const {
+  return t_as_TimeSeries();
 }
 
 struct TableSourceInstanceBuilder {
@@ -2682,6 +2860,9 @@ struct TableSource FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const Values *t_as_Values() const {
     return t_type() == TableSourceUnion::Values ? static_cast<const Values *>(t()) : nullptr;
   }
+  const TimeSeries *t_as_TimeSeries() const {
+    return t_type() == TableSourceUnion::TimeSeries ? static_cast<const TimeSeries *>(t()) : nullptr;
+  }
   const ::flatbuffers::Vector<::flatbuffers::Offset<Expr>> *fields() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Expr>> *>(VT_FIELDS);
   }
@@ -2744,6 +2925,10 @@ template<> inline const Drive *TableSource::t_as<Drive>() const {
 
 template<> inline const Values *TableSource::t_as<Values>() const {
   return t_as_Values();
+}
+
+template<> inline const TimeSeries *TableSource::t_as<TimeSeries>() const {
+  return t_as_TimeSeries();
 }
 
 struct TableSourceBuilder {
@@ -3328,6 +3513,9 @@ struct UpdateQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   const Values *source_as_Values() const {
     return source_type() == TableSourceUnion::Values ? static_cast<const Values *>(source()) : nullptr;
   }
+  const TimeSeries *source_as_TimeSeries() const {
+    return source_type() == TableSourceUnion::TimeSeries ? static_cast<const TimeSeries *>(source()) : nullptr;
+  }
   const ::flatbuffers::Vector<::flatbuffers::Offset<SetExpr>> *sets() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<SetExpr>> *>(VT_SETS);
   }
@@ -3394,6 +3582,10 @@ template<> inline const Drive *UpdateQueryElement::source_as<Drive>() const {
 
 template<> inline const Values *UpdateQueryElement::source_as<Values>() const {
   return source_as_Values();
+}
+
+template<> inline const TimeSeries *UpdateQueryElement::source_as<TimeSeries>() const {
+  return source_as_TimeSeries();
 }
 
 struct UpdateQueryElementBuilder {
@@ -3514,6 +3706,9 @@ struct DeleteQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   const Values *source_as_Values() const {
     return source_type() == TableSourceUnion::Values ? static_cast<const Values *>(source()) : nullptr;
   }
+  const TimeSeries *source_as_TimeSeries() const {
+    return source_type() == TableSourceUnion::TimeSeries ? static_cast<const TimeSeries *>(source()) : nullptr;
+  }
   const Function *filter() const {
     return GetPointer<const Function *>(VT_FILTER);
   }
@@ -3558,6 +3753,10 @@ template<> inline const Drive *DeleteQueryElement::source_as<Drive>() const {
 
 template<> inline const Values *DeleteQueryElement::source_as<Values>() const {
   return source_as_Values();
+}
+
+template<> inline const TimeSeries *DeleteQueryElement::source_as<TimeSeries>() const {
+  return source_as_TimeSeries();
 }
 
 struct DeleteQueryElementBuilder {
@@ -3891,6 +4090,9 @@ struct InsertQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   const Values *dest_as_Values() const {
     return dest_type() == TableSourceUnion::Values ? static_cast<const Values *>(dest()) : nullptr;
   }
+  const TimeSeries *dest_as_TimeSeries() const {
+    return dest_type() == TableSourceUnion::TimeSeries ? static_cast<const TimeSeries *>(dest()) : nullptr;
+  }
   const OnConflict *on_conflict() const {
     return GetPointer<const OnConflict *>(VT_ON_CONFLICT);
   }
@@ -3946,6 +4148,10 @@ template<> inline const Drive *InsertQueryElement::dest_as<Drive>() const {
 
 template<> inline const Values *InsertQueryElement::dest_as<Values>() const {
   return dest_as_Values();
+}
+
+template<> inline const TimeSeries *InsertQueryElement::dest_as<TimeSeries>() const {
+  return dest_as_TimeSeries();
 }
 
 struct InsertQueryElementBuilder {
@@ -4584,6 +4790,10 @@ inline bool VerifyTableSourceUnion(::flatbuffers::Verifier &verifier, const void
     }
     case TableSourceUnion::Values: {
       auto ptr = reinterpret_cast<const Values *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case TableSourceUnion::TimeSeries: {
+      auto ptr = reinterpret_cast<const TimeSeries *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

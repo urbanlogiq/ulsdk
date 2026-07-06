@@ -310,6 +310,7 @@ const (
 	EntityTyT_HEXAGON_BOUNDARY EntityTy = 272
 	EntityTyT_COMPASS_IOT_POINT EntityTy = 273
 	EntityTyT_LANDSLIDE_AREA EntityTy = 274
+	EntityTyT_EXPLORE_MODE_ROAD_SEGMENT EntityTy = 275
 )
 
 type Point struct {

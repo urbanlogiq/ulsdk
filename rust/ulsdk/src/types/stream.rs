@@ -10,10 +10,12 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
+use crate::FbsSerde;
 use bitflags::bitflags;
 use core::ops::Deref;
 use flatbuffers::{UnionWIPOffset, WIPOffset};
 use ordered_float::OrderedFloat;
+use serde::{Deserialize, Serialize};
 use strum_macros::FromRepr;
 
 use crate::types::Schema::{
@@ -41,7 +43,8 @@ use crate::types::generated::Schema_generated::{
 use crate::types::generated::id_generated::{
     B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
     DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace,
+    PinnedObjectId as FbsPinnedObjectId, StreamId as FbsStreamId,
 };
 use crate::types::generated::stream_generated::{
     AxisType as FbsAxisType, FormatFlags as FbsFormatFlags, Stream as FbsStream,
@@ -49,10 +52,10 @@ use crate::types::generated::stream_generated::{
 };
 use crate::types::id::{
     B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
-    ObjectNamespace, StreamId,
+    ObjectNamespace, PinnedObjectId, StreamId,
 };
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum AxisType {
     #[default]
@@ -93,7 +96,7 @@ impl From<FbsAxisType> for AxisType {
 }
 
 bitflags! {
-    #[derive(Default)]
+    #[derive(Default, Serialize, Deserialize)]
     pub struct FormatFlags: u32 {
         const OMITNODEID = 1;
         const WITHDESCRIPTION = 2;
@@ -114,7 +117,7 @@ impl From<FbsFormatFlags> for FormatFlags {
 }
 
 bitflags! {
-    #[derive(Default)]
+    #[derive(Default, Serialize, Deserialize)]
     pub struct StreamFlags: u32 {
         const DYNAMIC = 1;
     }
@@ -139,7 +142,7 @@ impl From<FbsStreamFlags> for StreamFlags {
 /// Code performing the operation on the source will be able to construct a
 /// stream object from this description and downstream code will be able to
 /// read from it.
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Stream {
     pub flags: u32,
     pub metadata: Option<ObjectId>,
@@ -259,15 +262,15 @@ impl From<FbsStream<'_>> for Stream {
     }
 }
 
-impl Stream {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Stream {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()

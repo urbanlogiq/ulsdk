@@ -12,6 +12,7 @@ pub enum Error {
     #[cfg(not(target_arch = "wasm32"))]
     FailedRequest(String, String, reqwest::StatusCode, String),
     SerdeJson(serde_json::error::Error),
+    Serde(String),
     #[cfg(not(target_arch = "wasm32"))]
     Arrow(arrow::error::ArrowError),
     InvalidFlatbuffer(flatbuffers::InvalidFlatbuffer),
@@ -42,12 +43,25 @@ impl Display for Error {
             Error::SerdeJson(err) => {
                 write!(f, "Json deserialization error: {}", err)
             }
+            Error::Serde(err) => {
+                write!(f, "Serde error: {}", err)
+            }
             #[cfg(not(target_arch = "wasm32"))]
             Error::Arrow(err) => write!(f, "Arrow Error: {}", err),
             Error::InvalidFlatbuffer(err) => write!(f, "Invalid Flatbuffer Error: {}", err),
             Error::InvalidId(err) => write!(f, "Invalid ID format: {}", err),
             Error::InvalidEnumValue(v) => write!(f, "Cannot convert value to enumeration: {}", v),
         }
+    }
+}
+
+impl serde::de::Error for Error {
+    fn custom<T>(msg: T) -> Self
+    where
+        T: core::fmt::Display,
+    {
+        let msg = format!("{}", msg);
+        Self::Serde(msg)
     }
 }
 

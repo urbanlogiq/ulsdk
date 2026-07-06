@@ -315,11 +315,12 @@ enum class EntityTy : int32_t {
   T_HEXAGON_BOUNDARY = 272,
   T_COMPASS_IOT_POINT = 273,
   T_LANDSLIDE_AREA = 274,
+  T_EXPLORE_MODE_ROAD_SEGMENT = 275,
   MIN = T_INVALID,
-  MAX = T_LANDSLIDE_AREA
+  MAX = T_EXPLORE_MODE_ROAD_SEGMENT
 };
 
-inline const EntityTy (&EnumValuesEntityTy())[275] {
+inline const EntityTy (&EnumValuesEntityTy())[276] {
   static const EntityTy values[] = {
     EntityTy::T_INVALID,
     EntityTy::T_TFC,
@@ -595,13 +596,14 @@ inline const EntityTy (&EnumValuesEntityTy())[275] {
     EntityTy::T_ROAD_SEGMENT_SAFETY_COUNTS,
     EntityTy::T_HEXAGON_BOUNDARY,
     EntityTy::T_COMPASS_IOT_POINT,
-    EntityTy::T_LANDSLIDE_AREA
+    EntityTy::T_LANDSLIDE_AREA,
+    EntityTy::T_EXPLORE_MODE_ROAD_SEGMENT
   };
   return values;
 }
 
 inline const char * const *EnumNamesEntityTy() {
-  static const char * const names[276] = {
+  static const char * const names[277] = {
     "T_INVALID",
     "T_TFC",
     "T_TFC_LOOP",
@@ -877,13 +879,14 @@ inline const char * const *EnumNamesEntityTy() {
     "T_HEXAGON_BOUNDARY",
     "T_COMPASS_IOT_POINT",
     "T_LANDSLIDE_AREA",
+    "T_EXPLORE_MODE_ROAD_SEGMENT",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameEntityTy(EntityTy e) {
-  if (::flatbuffers::IsOutRange(e, EntityTy::T_INVALID, EntityTy::T_LANDSLIDE_AREA)) return "";
+  if (::flatbuffers::IsOutRange(e, EntityTy::T_INVALID, EntityTy::T_EXPLORE_MODE_ROAD_SEGMENT)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesEntityTy()[index];
 }

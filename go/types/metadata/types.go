@@ -111,6 +111,7 @@ type IntRange struct {
 	DisplayStrings []IntegerDisplayString
 	EnumName *string
 	FieldFormat *NumericalFieldFormat
+	IsBitmaskEnum bool
 	Max int64
 	Min int64
 }
@@ -131,6 +132,7 @@ func IntRangeFromFbs(fbs *generated.IntRange) *IntRange {
 	if fbsVal := fbs.FieldFormat(nil); fbsVal != nil {
 		o.FieldFormat = NumericalFieldFormatFromFbs(fbsVal)
 	}
+	o.IsBitmaskEnum = fbs.IsBitmaskEnum()
 	o.Max = fbs.Max()
 	o.Min = fbs.Min()
 	return o
@@ -174,6 +176,7 @@ func (o *IntRange) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 	generated.IntRangeAddDisplayStrings(builder, displayStringsVecOffset)
 	generated.IntRangeAddEnumName(builder, enumNameOffset)
 	generated.IntRangeAddFieldFormat(builder, fieldFormatOffset)
+	generated.IntRangeAddIsBitmaskEnum(builder, o.IsBitmaskEnum)
 	generated.IntRangeAddMax(builder, o.Max)
 	generated.IntRangeAddMin(builder, o.Min)
 	return generated.IntRangeEnd(builder)
@@ -1341,9 +1344,11 @@ type Metadata struct {
 	Fields []UlField
 	GeometrySource interface{}
 	LocationDescriptionField int32
+	PromotedMetrics []int32
 	Source *DatasetSource
 	Summary []int32
 	UpdateCadence uint32
+	VisualizeInExploreFields []int32
 }
 
 func MetadataFromFbs(fbs *generated.Metadata) *Metadata {
@@ -1373,6 +1378,9 @@ func MetadataFromFbs(fbs *generated.Metadata) *Metadata {
 		}
 	}
 	o.LocationDescriptionField = fbs.LocationDescriptionField()
+	for i := 0; i < fbs.PromotedMetricsLength(); i++ {
+		o.PromotedMetrics = append(o.PromotedMetrics, fbs.PromotedMetrics(i))
+	}
 	if fbsVal := fbs.Source(nil); fbsVal != nil {
 		o.Source = DatasetSourceFromFbs(fbsVal)
 	}
@@ -1380,6 +1388,9 @@ func MetadataFromFbs(fbs *generated.Metadata) *Metadata {
 		o.Summary = append(o.Summary, fbs.Summary(i))
 	}
 	o.UpdateCadence = uint32(fbs.UpdateCadence())
+	for i := 0; i < fbs.VisualizeInExploreFieldsLength(); i++ {
+		o.VisualizeInExploreFields = append(o.VisualizeInExploreFields, fbs.VisualizeInExploreFields(i))
+	}
 	return o
 }
 
@@ -1425,6 +1436,11 @@ func (o *Metadata) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 		builder.PrependUOffsetT(fieldsOffsets[i])
 	}
 	fieldsVecOffset := builder.EndVector(len(o.Fields))
+	generated.MetadataStartPromotedMetricsVector(builder, len(o.PromotedMetrics))
+	for i := len(o.PromotedMetrics) - 1; i >= 0; i-- {
+		builder.PrependInt32(o.PromotedMetrics[i])
+	}
+	promotedMetricsVecOffset := builder.EndVector(len(o.PromotedMetrics))
 	var sourceOffset flatbuffers.UOffsetT
 	if o.Source != nil {
 		sourceOffset = o.Source.SerializeTo(builder)
@@ -1434,6 +1450,11 @@ func (o *Metadata) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 		builder.PrependInt32(o.Summary[i])
 	}
 	summaryVecOffset := builder.EndVector(len(o.Summary))
+	generated.MetadataStartVisualizeInExploreFieldsVector(builder, len(o.VisualizeInExploreFields))
+	for i := len(o.VisualizeInExploreFields) - 1; i >= 0; i-- {
+		builder.PrependInt32(o.VisualizeInExploreFields[i])
+	}
+	visualizeInExploreFieldsVecOffset := builder.EndVector(len(o.VisualizeInExploreFields))
 	generated.MetadataStart(builder)
 	generated.MetadataAddAreaSelection(builder, o.AreaSelection)
 	generated.MetadataAddDatasetCategory(builder, generated.DatasetCategory(o.DatasetCategory))
@@ -1444,9 +1465,11 @@ func (o *Metadata) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 	generated.MetadataAddFieldRelationships(builder, fieldRelationshipsVecOffset)
 	generated.MetadataAddFields(builder, fieldsVecOffset)
 	generated.MetadataAddLocationDescriptionField(builder, o.LocationDescriptionField)
+	generated.MetadataAddPromotedMetrics(builder, promotedMetricsVecOffset)
 	generated.MetadataAddSource(builder, sourceOffset)
 	generated.MetadataAddSummary(builder, summaryVecOffset)
 	generated.MetadataAddUpdateCadence(builder, generated.UpdateCadence(o.UpdateCadence))
+	generated.MetadataAddVisualizeInExploreFields(builder, visualizeInExploreFieldsVecOffset)
 	return generated.MetadataEnd(builder)
 }
 

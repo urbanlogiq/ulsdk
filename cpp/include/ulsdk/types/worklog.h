@@ -24,8 +24,11 @@ namespace ul {
 namespace types {
 
 struct ByteArray;
+struct ContainerRef;
+struct GitRef;
 struct Layout;
 struct ParameterFlags;
+struct Producer;
 struct TileData;
 struct TileSettings;
 struct UserSettings;
@@ -40,6 +43,11 @@ typedef std::variant<
     std::shared_ptr<ParameterFlags>,
     std::shared_ptr<ValueInstance>
 > ParameterValue;
+
+typedef std::variant<
+    std::shared_ptr<ObjectId>,
+    std::shared_ptr<ContainerRef>
+> ProducerRef;
 
 using ::ValuesFormatTy;
 struct ByteArray {
@@ -66,6 +74,31 @@ struct ParameterFlags {
     }
 };
 
+struct ContainerRef {
+    std::string image_;
+
+    ContainerRef();
+    ContainerRef(const ::ContainerRef *root);
+    ContainerRef(const std::vector<uint8_t> &bytes);
+    bool operator==(const ContainerRef &rhs) const;
+    bool operator!=(const ContainerRef &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+struct GitRef {
+    std::string commitish_;
+    std::string repo_;
+
+    GitRef();
+    GitRef(const ::GitRef *root);
+    GitRef(const std::vector<uint8_t> &bytes);
+    bool operator==(const GitRef &rhs) const;
+    bool operator!=(const GitRef &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
 struct Layout {
     uint32_t height_;
     uint32_t width_;
@@ -77,6 +110,20 @@ struct Layout {
     Layout(const std::vector<uint8_t> &bytes);
     bool operator==(const Layout &rhs) const;
     bool operator!=(const Layout &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+struct Producer {
+    std::optional<GitRef> builder_code_ref_;
+    GitRef executor_;
+    std::optional<ProducerRef> model_;
+
+    Producer();
+    Producer(const ::Producer *root);
+    Producer(const std::vector<uint8_t> &bytes);
+    bool operator==(const Producer &rhs) const;
+    bool operator!=(const Producer &rhs) const {
         return !(*this == rhs);
     }
 };
@@ -133,13 +180,14 @@ struct UserSettings {
 };
 
 struct WorkLog {
-    std::optional<std::vector<ObjectId>> input_streams_;
+    std::optional<std::vector<PinnedObjectId>> input_streams_;
     std::optional<ObjectId> job_id_;
     std::optional<std::string> name_;
-    std::vector<ObjectId> output_streams_;
+    std::vector<PinnedObjectId> output_streams_;
     std::vector<WorklogParameter> params_;
     std::optional<ObjectId> parent_;
-    ObjectId schematic_;
+    std::optional<Producer> producer_;
+    PinnedObjectId schematic_;
     std::optional<UserSettings> user_settings_;
 
     WorkLog();
@@ -166,14 +214,25 @@ struct WorklogParameter {
 
 std::pair<::flatbuffers::Offset<void>, ::ParameterValue>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ParameterValue &o);
+std::pair<::flatbuffers::Offset<void>, ::ProducerRef>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ProducerRef &o);
 ::flatbuffers::Offset<::ByteArray>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ByteArray &);
 
 ::flatbuffers::Offset<::ParameterFlags>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ParameterFlags &);
 
+::flatbuffers::Offset<::ContainerRef>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ContainerRef &);
+
+::flatbuffers::Offset<::GitRef>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const GitRef &);
+
 ::flatbuffers::Offset<::Layout>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Layout &);
+
+::flatbuffers::Offset<::Producer>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Producer &);
 
 ::flatbuffers::Offset<::TileSettings>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TileSettings &);
@@ -198,7 +257,16 @@ std::vector<uint8_t>
 to_bytes(const ParameterFlags &o);
 
 std::vector<uint8_t>
+to_bytes(const ContainerRef &o);
+
+std::vector<uint8_t>
+to_bytes(const GitRef &o);
+
+std::vector<uint8_t>
 to_bytes(const Layout &o);
+
+std::vector<uint8_t>
+to_bytes(const Producer &o);
 
 std::vector<uint8_t>
 to_bytes(const TileSettings &o);

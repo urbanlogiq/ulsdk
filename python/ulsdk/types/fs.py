@@ -90,6 +90,7 @@ from .id import (
     GraphNodeId,
     ObjectId,
     ObjectNamespace,
+    PinnedObjectId,
     StreamId,
 )
 from .job import (
@@ -164,9 +165,13 @@ from .worklog import (
     AggregationTy,
     ByteArray,
     ChartTypeTy,
+    ContainerRef,
+    GitRef,
     Layout,
     ParameterFlags,
     ParameterValue,
+    Producer,
+    ProducerRef,
     TileData,
     TileSettings,
     UserSettings,
@@ -184,6 +189,7 @@ from .generated.Buffer import Buffer as FbsBuffer
 from .generated.ByteArray import ByteArray as FbsByteArray
 from .generated.Chunk import Chunk as FbsChunk
 from .generated.ColumnGroupId import ColumnGroupId as FbsColumnGroupId
+from .generated.ContainerRef import ContainerRef as FbsContainerRef
 from .generated.ContentId import ContentId as FbsContentId
 from .generated.CryptHeader import CryptHeader as FbsCryptHeader
 from .generated.DataCatalogObject import DataCatalogObject as FbsDataCatalogObject
@@ -208,6 +214,7 @@ from .generated.FixedSizeBinary import FixedSizeBinary as FbsFixedSizeBinary
 from .generated.FixedSizeList import FixedSizeList as FbsFixedSizeList
 from .generated.FloatingPoint import FloatingPoint as FbsFloatingPoint
 from .generated.GenericId import GenericId as FbsGenericId
+from .generated.GitRef import GitRef as FbsGitRef
 from .generated.GraphNodeId import GraphNodeId as FbsGraphNodeId
 from .generated.Int import Int as FbsInt
 from .generated.Interval import Interval as FbsInterval
@@ -240,7 +247,9 @@ from .generated.ObjectSummaryList import ObjectSummaryList as FbsObjectSummaryLi
 from .generated.OutputSchema import OutputSchema as FbsOutputSchema
 from .generated.ParamIndices import ParamIndices as FbsParamIndices
 from .generated.ParameterFlags import ParameterFlags as FbsParameterFlags
+from .generated.PinnedObjectId import PinnedObjectId as FbsPinnedObjectId
 from .generated.Point2D import Point2D as FbsPoint2D
+from .generated.Producer import Producer as FbsProducer
 from .generated.RunEndEncoded import RunEndEncoded as FbsRunEndEncoded
 from .generated.RunSpec import RunSpec as FbsRunSpec
 from .generated.Schema import Schema as FbsSchema
@@ -298,6 +307,7 @@ from .generated.Digest import Digest as FbsDigest
 from .generated.Entry import Entry as FbsEntry
 from .generated.ListEntry import ListEntry as FbsListEntry
 from .generated.ParameterValue import ParameterValue as FbsParameterValue
+from .generated.ProducerRef import ProducerRef as FbsProducerRef
 from .generated.TaskParameterValue import TaskParameterValue as FbsTaskParameterValue
 from .generated.Type import Type as FbsType
 from .generated.Value import Value as FbsValue

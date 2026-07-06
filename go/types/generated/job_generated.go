@@ -792,12 +792,12 @@ func (rcv *Task) Params(obj *ParamIndices) *ParamIndices {
 /// data stream lookup) this is a blank object where the results will be
 /// written. If it is a lookup of an existing stream, this will be populated
 /// with the stream ID
-func (rcv *Task) Output(obj *ObjectId) *ObjectId {
+func (rcv *Task) Output(obj *PinnedObjectId) *PinnedObjectId {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(20))
 	if o != 0 {
 		x := rcv._tab.Indirect(o + rcv._tab.Pos)
 		if obj == nil {
-			obj = new(ObjectId)
+			obj = new(PinnedObjectId)
 		}
 		obj.Init(rcv._tab.Bytes, x)
 		return obj
@@ -1383,12 +1383,12 @@ func (rcv *RunSpec) MutatePersist(n bool) bool {
 	return rcv._tab.MutateBoolSlot(4, n)
 }
 
-func (rcv *RunSpec) Schematic(obj *ObjectId) *ObjectId {
+func (rcv *RunSpec) Schematic(obj *PinnedObjectId) *PinnedObjectId {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
 	if o != 0 {
 		x := rcv._tab.Indirect(o + rcv._tab.Pos)
 		if obj == nil {
-			obj = new(ObjectId)
+			obj = new(PinnedObjectId)
 		}
 		obj.Init(rcv._tab.Bytes, x)
 		return obj
@@ -1686,12 +1686,12 @@ func (rcv *DeprecatedRunSpec) MutatePersist(n bool) bool {
 	return rcv._tab.MutateBoolSlot(4, n)
 }
 
-func (rcv *DeprecatedRunSpec) Schematic(obj *ObjectId) *ObjectId {
+func (rcv *DeprecatedRunSpec) Schematic(obj *PinnedObjectId) *PinnedObjectId {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
 	if o != 0 {
 		x := rcv._tab.Indirect(o + rcv._tab.Pos)
 		if obj == nil {
-			obj = new(ObjectId)
+			obj = new(PinnedObjectId)
 		}
 		obj.Init(rcv._tab.Bytes, x)
 		return obj

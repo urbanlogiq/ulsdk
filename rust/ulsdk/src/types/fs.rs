@@ -10,10 +10,12 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
+use crate::FbsSerde;
 use bitflags::bitflags;
 use core::ops::Deref;
 use flatbuffers::{UnionWIPOffset, WIPOffset};
 use ordered_float::OrderedFloat;
+use serde::{Deserialize, Serialize};
 use strum_macros::FromRepr;
 
 use crate::types::Schema::{
@@ -69,7 +71,8 @@ use crate::types::generated::fs_generated::{
 use crate::types::generated::id_generated::{
     B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
     DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace,
+    PinnedObjectId as FbsPinnedObjectId, StreamId as FbsStreamId,
 };
 use crate::types::generated::job_generated::{
     DeprecatedRunSpec as FbsDeprecatedRunSpec,
@@ -103,14 +106,16 @@ use crate::types::generated::value_generated::{
 };
 use crate::types::generated::worklog_generated::{
     AggregationTy as FbsAggregationTy, ByteArray as FbsByteArray, ChartTypeTy as FbsChartTypeTy,
-    Layout as FbsLayout, ParameterFlags as FbsParameterFlags, ParameterValue as FbsParameterValue,
-    TileData as FbsTileData, TileSettings as FbsTileSettings, UserSettings as FbsUserSettings,
+    ContainerRef as FbsContainerRef, GitRef as FbsGitRef, Layout as FbsLayout,
+    ParameterFlags as FbsParameterFlags, ParameterValue as FbsParameterValue,
+    Producer as FbsProducer, ProducerRef as FbsProducerRef, TileData as FbsTileData,
+    TileSettings as FbsTileSettings, UserSettings as FbsUserSettings,
     ValuesFormatTy as FbsValuesFormatTy, WorkLog as FbsWorkLog,
     WorklogParameter as FbsWorklogParameter,
 };
 use crate::types::id::{
     B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
-    ObjectNamespace, StreamId,
+    ObjectNamespace, PinnedObjectId, StreamId,
 };
 use crate::types::job::{
     DeprecatedRunSpec, DeprecatedTaskParameter, Edge, EmbeddedTable, Job, Node, ParamIndices,
@@ -128,11 +133,12 @@ use crate::types::value::{
     VTimestampNsUtc, VTri2D, VU8, VU16, VU32, VU64, VUnit, VUsize, Value, ValueInstance, ValueTy,
 };
 use crate::types::worklog::{
-    AggregationTy, ByteArray, ChartTypeTy, Layout, ParameterFlags, ParameterValue, TileData,
-    TileSettings, UserSettings, ValuesFormatTy, WorkLog, WorklogParameter,
+    AggregationTy, ByteArray, ChartTypeTy, ContainerRef, GitRef, Layout, ParameterFlags,
+    ParameterValue, Producer, ProducerRef, TileData, TileSettings, UserSettings, ValuesFormatTy,
+    WorkLog, WorklogParameter,
 };
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum EntryTy {
     #[default]
@@ -184,7 +190,7 @@ impl From<FbsEntryTy> for EntryTy {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i8)]
 pub enum StorageTier {
     #[default]
@@ -236,7 +242,7 @@ impl From<FbsStorageTier> for StorageTier {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct File {
     pub account: String,
     pub blob: Option<GenericId>,
@@ -342,15 +348,15 @@ impl From<FbsFile<'_>> for File {
     }
 }
 
-impl File {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for File {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -361,7 +367,7 @@ impl File {
 }
 
 /// This Directory table holds the entries in the actual directory
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Directory {
     pub notifications: Option<Vec<B2cId>>,
     pub slots: Vec<Slot>,
@@ -424,15 +430,15 @@ impl From<FbsDirectory<'_>> for Directory {
     }
 }
 
-impl Directory {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Directory {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -442,7 +448,7 @@ impl Directory {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct ObjectRef {
     pub id: ObjectId,
     pub ty: DataCatalogObjectTy,
@@ -472,15 +478,15 @@ impl From<FbsObjectRef<'_>> for ObjectRef {
     }
 }
 
-impl ObjectRef {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for ObjectRef {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -490,7 +496,7 @@ impl ObjectRef {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum Entry {
     File(File),
     Directory(Directory),
@@ -528,7 +534,7 @@ impl Entry {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct ListFile {
     pub mime: String,
     pub size: u64,
@@ -564,15 +570,15 @@ impl From<FbsListFile<'_>> for ListFile {
     }
 }
 
-impl ListFile {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for ListFile {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -582,7 +588,7 @@ impl ListFile {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct ListDirectory {}
 
 impl ListDirectory {
@@ -603,15 +609,15 @@ impl From<FbsListDirectory<'_>> for ListDirectory {
     }
 }
 
-impl ListDirectory {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for ListDirectory {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -621,7 +627,7 @@ impl ListDirectory {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct ListObject {
     pub id: ObjectId,
     pub size: u64,
@@ -654,15 +660,15 @@ impl From<FbsListObject<'_>> for ListObject {
     }
 }
 
-impl ListObject {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for ListObject {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -672,7 +678,7 @@ impl ListObject {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct TopLevelDirectory {
     pub b2c_entity: B2cId,
 }
@@ -699,15 +705,15 @@ impl From<FbsTopLevelDirectory<'_>> for TopLevelDirectory {
     }
 }
 
-impl TopLevelDirectory {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for TopLevelDirectory {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -717,7 +723,7 @@ impl TopLevelDirectory {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum ListEntry {
     ListFile(ListFile),
     ListDirectory(ListDirectory),
@@ -761,7 +767,7 @@ impl ListEntry {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Chunk {
     pub blob: GenericId,
     pub digest: Digest,
@@ -800,15 +806,15 @@ impl From<FbsChunk<'_>> for Chunk {
     }
 }
 
-impl Chunk {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Chunk {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -818,7 +824,7 @@ impl Chunk {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct DirectoryEntry {
     pub entry: Entry,
     pub parent: ObjectId,
@@ -860,15 +866,15 @@ impl From<FbsDirectoryEntry<'_>> for DirectoryEntry {
     }
 }
 
-impl DirectoryEntry {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for DirectoryEntry {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -878,7 +884,7 @@ impl DirectoryEntry {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct DirectoryList {
     pub slots: Vec<ListSlot>,
 }
@@ -914,15 +920,15 @@ impl From<FbsDirectoryList<'_>> for DirectoryList {
     }
 }
 
-impl DirectoryList {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for DirectoryList {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -932,7 +938,7 @@ impl DirectoryList {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct ListSlot {
     pub attributes: Option<Vec<Attr>>,
     pub entry: ListEntry,
@@ -1034,15 +1040,15 @@ impl From<FbsListSlot<'_>> for ListSlot {
     }
 }
 
-impl ListSlot {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for ListSlot {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1052,7 +1058,7 @@ impl ListSlot {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct MoveRequest {
     pub dest_name: Option<String>,
     pub dest_root: Option<ObjectId>,
@@ -1099,15 +1105,15 @@ impl From<FbsMoveRequest<'_>> for MoveRequest {
     }
 }
 
-impl MoveRequest {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for MoveRequest {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1118,7 +1124,7 @@ impl MoveRequest {
 }
 
 /// Body parameter for PUT drive/<object>
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct NewLink {
     pub name: String,
     pub obj: ObjectId,
@@ -1149,15 +1155,15 @@ impl From<FbsNewLink<'_>> for NewLink {
     }
 }
 
-impl NewLink {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for NewLink {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1167,7 +1173,7 @@ impl NewLink {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Slot {
     pub attributes: Option<Vec<Attr>>,
     pub id: ObjectId,
@@ -1230,15 +1236,15 @@ impl From<FbsSlot<'_>> for Slot {
     }
 }
 
-impl Slot {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Slot {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()

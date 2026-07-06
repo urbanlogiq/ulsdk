@@ -25,6 +25,22 @@ func TestRoundTripByteArray(t *testing.T) {
 	}
 }
 
+func TestDefaultContainerRef(t *testing.T) {
+	o := &ContainerRef{}
+	if o == nil {
+		t.Fatal("expected non-nil")
+	}
+}
+
+
+func TestDefaultGitRef(t *testing.T) {
+	o := &GitRef{}
+	if o == nil {
+		t.Fatal("expected non-nil")
+	}
+}
+
+
 func TestDefaultLayout(t *testing.T) {
 	o := &Layout{}
 	if o == nil {
@@ -62,6 +78,14 @@ func TestRoundTripParameterFlags(t *testing.T) {
 		t.Fatal("expected non-nil result")
 	}
 }
+
+func TestDefaultProducer(t *testing.T) {
+	o := &Producer{}
+	if o == nil {
+		t.Fatal("expected non-nil")
+	}
+}
+
 
 func TestDefaultTileData(t *testing.T) {
 	o := &TileData{}

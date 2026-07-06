@@ -16,6 +16,7 @@ import { GraphQuery, GraphQueryT } from './graph-query';
 import { Placeholder, PlaceholderT } from './placeholder';
 import { QueryTableSource, QueryTableSourceT } from './query-table-source';
 import { TableSourceUnion, unionToTableSourceUnion, unionListToTableSourceUnion } from './table-source-union';
+import { TimeSeries, TimeSeriesT } from './time-series';
 import { Values, ValuesT } from './values';
 import { Vector, VectorT } from './vector';
 
@@ -103,7 +104,7 @@ unpackTo(_o: DeleteQueryElementT): void {
 export class DeleteQueryElementT implements flatbuffers.IGeneratedObject {
 constructor(
   public sourceType: TableSourceUnion = TableSourceUnion.NONE,
-  public source: ArrowT|DataCatalogT|DriveT|GraphQueryT|PlaceholderT|QueryTableSourceT|ValuesT|VectorT|null = null,
+  public source: ArrowT|DataCatalogT|DriveT|GraphQueryT|PlaceholderT|QueryTableSourceT|TimeSeriesT|ValuesT|VectorT|null = null,
   public filter: FunctionT|null = null
 ){}
 

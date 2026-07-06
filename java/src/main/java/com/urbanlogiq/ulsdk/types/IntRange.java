@@ -37,6 +37,14 @@ public final class IntRange {
         this._fieldFormat = value;
     }
 
+    boolean _isBitmaskEnum;
+    public boolean getIsBitmaskEnum() {
+        return this._isBitmaskEnum;
+    }
+    public void setIsBitmaskEnum(boolean value) {
+        this._isBitmaskEnum = value;
+    }
+
     long _max;
     public long getMax() {
         return this._max;
@@ -72,6 +80,7 @@ public final class IntRange {
         if (o.fieldFormat() != null) {
             this._fieldFormat = new com.urbanlogiq.ulsdk.types.NumericalFieldFormat(o.fieldFormat());
         }
+        this._isBitmaskEnum = o.isBitmaskEnum();
         this._max = o.max();
         this._min = o.min();
     }
@@ -112,6 +121,7 @@ public final class IntRange {
         if (fieldFormatOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.IntRange.addFieldFormat(builder, fieldFormatOffset);
         }
+        com.urbanlogiq.ulsdk.types.generated.IntRange.addIsBitmaskEnum(builder, this._isBitmaskEnum);
         com.urbanlogiq.ulsdk.types.generated.IntRange.addMax(builder, this._max);
         com.urbanlogiq.ulsdk.types.generated.IntRange.addMin(builder, this._min);
         return com.urbanlogiq.ulsdk.types.generated.IntRange.endIntRange(builder);

@@ -56,11 +56,6 @@ acl(obj?:ObjectId):ObjectId|null {
   return offset ? (obj || new ObjectId()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
-driveSize():bigint {
-  const offset = this.bb!.__offset(this.bb_pos, 14);
-  return offset ? this.bb!.readUint64(this.bb_pos + offset) : BigInt('0');
-}
-
 static startObjectSummary(builder:flatbuffers.Builder) {
   builder.startObject(6);
 }
@@ -85,10 +80,6 @@ static addAcl(builder:flatbuffers.Builder, aclOffset:flatbuffers.Offset) {
   builder.addFieldOffset(4, aclOffset, 0);
 }
 
-static addDriveSize(builder:flatbuffers.Builder, driveSize:bigint) {
-  builder.addFieldInt64(5, driveSize, BigInt('0'));
-}
-
 static endObjectSummary(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   builder.requiredField(offset, 4) // id
@@ -104,8 +95,7 @@ unpack(): ObjectSummaryT {
     this.ty(),
     this.time(),
     (this.acl() !== null ? this.acl()!.unpack() : null),
-    this.driveSize()
-  );
+);
 }
 
 
@@ -115,7 +105,6 @@ unpackTo(_o: ObjectSummaryT): void {
   _o.ty = this.ty();
   _o.time = this.time();
   _o.acl = (this.acl() !== null ? this.acl()!.unpack() : null);
-  _o.driveSize = this.driveSize();
 }
 }
 
@@ -126,7 +115,6 @@ constructor(
   public ty: DataCatalogObjectTy = DataCatalogObjectTy.Invalid,
   public time: bigint = BigInt('0'),
   public acl: ObjectIdT|null = null,
-  public driveSize: bigint = BigInt('0')
 ){}
 
 
@@ -134,15 +122,12 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   const id = (this.id !== null ? this.id!.pack(builder) : 0);
   const headRevision = (this.headRevision !== null ? this.headRevision!.pack(builder) : 0);
   const acl = (this.acl !== null ? this.acl!.pack(builder) : 0);
-
   ObjectSummary.startObjectSummary(builder);
   ObjectSummary.addId(builder, id);
   ObjectSummary.addHeadRevision(builder, headRevision);
   ObjectSummary.addTy(builder, this.ty);
   ObjectSummary.addTime(builder, this.time);
   ObjectSummary.addAcl(builder, acl);
-  ObjectSummary.addDriveSize(builder, this.driveSize);
-
-  return ObjectSummary.endObjectSummary(builder);
+return ObjectSummary.endObjectSummary(builder);
 }
 }

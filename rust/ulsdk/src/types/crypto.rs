@@ -10,10 +10,12 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
+use crate::FbsSerde;
 use bitflags::bitflags;
 use core::ops::Deref;
 use flatbuffers::{UnionWIPOffset, WIPOffset};
 use ordered_float::OrderedFloat;
+use serde::{Deserialize, Serialize};
 use strum_macros::FromRepr;
 
 use crate::types::generated::crypto_generated::{
@@ -21,7 +23,7 @@ use crate::types::generated::crypto_generated::{
     Sha256 as FbsSha256, Signature as FbsSignature,
 };
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Sha256 {
     pub b: Vec<u8>,
 }
@@ -52,15 +54,15 @@ impl From<FbsSha256<'_>> for Sha256 {
     }
 }
 
-impl Sha256 {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Sha256 {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -70,7 +72,7 @@ impl Sha256 {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum Digest {
     Sha256(Sha256),
 }
@@ -96,7 +98,7 @@ impl Digest {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct CryptHeader {
     /// An ID for the key used to encrypt this particular encrypted object.
     pub kid: String,
@@ -139,15 +141,15 @@ impl From<FbsCryptHeader<'_>> for CryptHeader {
     }
 }
 
-impl CryptHeader {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for CryptHeader {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -157,7 +159,7 @@ impl CryptHeader {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct EncryptedObject {
     pub header: CryptHeader,
     pub obj: Vec<u8>,
@@ -192,15 +194,15 @@ impl From<FbsEncryptedObject<'_>> for EncryptedObject {
     }
 }
 
-impl EncryptedObject {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for EncryptedObject {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -210,7 +212,7 @@ impl EncryptedObject {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Signature {
     pub kid: String,
     pub sig: Vec<u8>,
@@ -245,15 +247,15 @@ impl From<FbsSignature<'_>> for Signature {
     }
 }
 
-impl Signature {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Signature {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()

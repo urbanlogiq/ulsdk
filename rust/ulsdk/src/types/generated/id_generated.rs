@@ -407,6 +407,161 @@ impl core::fmt::Debug for ContentId<'_> {
         ds.finish()
     }
 }
+pub enum PinnedObjectIdOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct PinnedObjectId<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for PinnedObjectId<'a> {
+    type Inner = PinnedObjectId<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> PinnedObjectId<'a> {
+    pub const VT_B: flatbuffers::VOffsetT = 4;
+    pub const VT_CID: flatbuffers::VOffsetT = 6;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        PinnedObjectId { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args PinnedObjectIdArgs<'args>,
+    ) -> flatbuffers::WIPOffset<PinnedObjectId<'bldr>> {
+        let mut builder = PinnedObjectIdBuilder::new(_fbb);
+        if let Some(x) = args.cid {
+            builder.add_cid(x);
+        }
+        if let Some(x) = args.b {
+            builder.add_b(x);
+        }
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn b(&self) -> flatbuffers::Vector<'a, u8> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, u8>>>(
+                    PinnedObjectId::VT_B,
+                    None,
+                )
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn cid(&self) -> Option<ContentId<'a>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<ContentId>>(PinnedObjectId::VT_CID, None)
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for PinnedObjectId<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, u8>>>(
+                "b",
+                Self::VT_B,
+                true,
+            )?
+            .visit_field::<flatbuffers::ForwardsUOffset<ContentId>>("cid", Self::VT_CID, false)?
+            .finish();
+        Ok(())
+    }
+}
+pub struct PinnedObjectIdArgs<'a> {
+    pub b: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, u8>>>,
+    pub cid: Option<flatbuffers::WIPOffset<ContentId<'a>>>,
+}
+impl<'a> Default for PinnedObjectIdArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        PinnedObjectIdArgs {
+            b: None, // required field
+            cid: None,
+        }
+    }
+}
+
+impl Serialize for PinnedObjectId<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("PinnedObjectId", 2)?;
+        s.serialize_field("b", &self.b())?;
+        if let Some(f) = self.cid() {
+            s.serialize_field("cid", &f)?;
+        } else {
+            s.skip_field("cid")?;
+        }
+        s.end()
+    }
+}
+
+pub struct PinnedObjectIdBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> PinnedObjectIdBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_b(&mut self, b: flatbuffers::WIPOffset<flatbuffers::Vector<'b, u8>>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(PinnedObjectId::VT_B, b);
+    }
+    #[inline]
+    pub fn add_cid(&mut self, cid: flatbuffers::WIPOffset<ContentId<'b>>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<ContentId>>(PinnedObjectId::VT_CID, cid);
+    }
+    #[inline]
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> PinnedObjectIdBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        PinnedObjectIdBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<PinnedObjectId<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_.required(o, PinnedObjectId::VT_B, "b");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for PinnedObjectId<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("PinnedObjectId");
+        ds.field("b", &self.b());
+        ds.field("cid", &self.cid());
+        ds.finish()
+    }
+}
 pub enum B2cIdOffset {}
 #[derive(Copy, Clone, PartialEq)]
 

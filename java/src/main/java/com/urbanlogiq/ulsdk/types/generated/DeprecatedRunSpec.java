@@ -30,8 +30,8 @@ public final class DeprecatedRunSpec extends com.google.flatbuffers.Table {
   public DeprecatedRunSpec __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public boolean persist() { int o = __offset(4); return o != 0 ? 0!=bb.get(o + bb_pos) : false; }
-  public ObjectId schematic() { return schematic(new ObjectId()); }
-  public ObjectId schematic(ObjectId obj) { int o = __offset(6); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
+  public PinnedObjectId schematic() { return schematic(new PinnedObjectId()); }
+  public PinnedObjectId schematic(PinnedObjectId obj) { int o = __offset(6); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
   public ParamIndices paramIndices(int j) { return paramIndices(new ParamIndices(), j); }
   public ParamIndices paramIndices(ParamIndices obj, int j) { int o = __offset(8); return o != 0 ? obj.__assign(__indirect(__vector(o) + j * 4), bb) : null; }
   public int paramIndicesLength() { int o = __offset(8); return o != 0 ? __vector_len(o) : 0; }

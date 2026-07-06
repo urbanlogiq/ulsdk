@@ -17,6 +17,7 @@ import { Placeholder, PlaceholderT } from './placeholder';
 import { QueryElement, QueryElementT } from './query-element';
 import { QueryTableSource, QueryTableSourceT } from './query-table-source';
 import { TableSourceUnion, unionToTableSourceUnion, unionListToTableSourceUnion } from './table-source-union';
+import { TimeSeries, TimeSeriesT } from './time-series';
 import { Values, ValuesT } from './values';
 import { Vector, VectorT } from './vector';
 
@@ -179,7 +180,7 @@ constructor(
   public source: QueryElementT|null = null,
   public columns: (string)[] = [],
   public destType: TableSourceUnion = TableSourceUnion.NONE,
-  public dest: ArrowT|DataCatalogT|DriveT|GraphQueryT|PlaceholderT|QueryTableSourceT|ValuesT|VectorT|null = null,
+  public dest: ArrowT|DataCatalogT|DriveT|GraphQueryT|PlaceholderT|QueryTableSourceT|TimeSeriesT|ValuesT|VectorT|null = null,
   public onConflict: OnConflictT|null = null,
   public returning: (string)[] = []
 ){}

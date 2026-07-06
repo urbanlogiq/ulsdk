@@ -23,6 +23,7 @@ from .id import (
     GraphNodeId,
     ObjectId,
     ObjectNamespace,
+    PinnedObjectId,
     StreamId,
 )
 from .generated.B2cId import B2cId as FbsB2cId
@@ -38,6 +39,7 @@ from .generated.MultiLine import MultiLine as FbsMultiLine
 from .generated.MultiPoint import MultiPoint as FbsMultiPoint
 from .generated.MultiPolygon import MultiPolygon as FbsMultiPolygon
 from .generated.ObjectId import ObjectId as FbsObjectId
+from .generated.PinnedObjectId import PinnedObjectId as FbsPinnedObjectId
 from .generated.Point import Point as FbsPoint
 from .generated.Polygon import Polygon as FbsPolygon
 from .generated.StreamId import StreamId as FbsStreamId
@@ -336,6 +338,7 @@ class EntityTy(Enum):
     T_HEXAGON_BOUNDARY = 272
     T_COMPASS_IOT_POINT = 273
     T_LANDSLIDE_AREA = 274
+    T_EXPLORE_MODE_ROAD_SEGMENT = 275
 
 class NodeTy(Enum):
     N_INVALID = 0

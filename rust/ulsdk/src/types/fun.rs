@@ -10,15 +10,17 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
+use crate::FbsSerde;
 use bitflags::bitflags;
 use core::ops::Deref;
 use flatbuffers::{UnionWIPOffset, WIPOffset};
 use ordered_float::OrderedFloat;
+use serde::{Deserialize, Serialize};
 use strum_macros::FromRepr;
 
 use crate::types::generated::fun_generated::Fn as FbsFn;
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i16)]
 pub enum Fn_ {
     #[default]
@@ -218,6 +220,8 @@ pub enum Fn_ {
     IsDistinctFrom = 193,
     IsNotDistinctFrom = 194,
     GeoFilter = 195,
+    StBuffer = 196,
+    StDistance = 197,
     CorrelationId = 32763,
     UlTimezone = 32764,
     UlArrayContains = 32765,
@@ -430,6 +434,8 @@ impl Fn_ {
             Self::IsDistinctFrom => Some("IsDistinctFrom"),
             Self::IsNotDistinctFrom => Some("IsNotDistinctFrom"),
             Self::GeoFilter => Some("GeoFilter"),
+            Self::StBuffer => Some("StBuffer"),
+            Self::StDistance => Some("StDistance"),
             Self::CorrelationId => Some("CorrelationId"),
             Self::UlTimezone => Some("UlTimezone"),
             Self::UlArrayContains => Some("UlArrayContains"),
@@ -638,6 +644,8 @@ impl From<Fn_> for FbsFn {
             Fn_::IsDistinctFrom => FbsFn::IsDistinctFrom,
             Fn_::IsNotDistinctFrom => FbsFn::IsNotDistinctFrom,
             Fn_::GeoFilter => FbsFn::GeoFilter,
+            Fn_::StBuffer => FbsFn::StBuffer,
+            Fn_::StDistance => FbsFn::StDistance,
             Fn_::CorrelationId => FbsFn::CorrelationId,
             Fn_::UlTimezone => FbsFn::UlTimezone,
             Fn_::UlArrayContains => FbsFn::UlArrayContains,
@@ -845,6 +853,8 @@ impl From<FbsFn> for Fn_ {
             193 => Self::IsDistinctFrom,
             194 => Self::IsNotDistinctFrom,
             195 => Self::GeoFilter,
+            196 => Self::StBuffer,
+            197 => Self::StDistance,
             32763 => Self::CorrelationId,
             32764 => Self::UlTimezone,
             32765 => Self::UlArrayContains,

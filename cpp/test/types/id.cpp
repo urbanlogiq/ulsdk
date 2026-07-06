@@ -77,6 +77,16 @@ test_object_id() {
 TypeTest test_object_id_obj(test_object_id, "ObjectId");
 
 bool
+test_pinned_object_id() {
+    ::ul::types::PinnedObjectId t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::PinnedObjectId deserialized = ::ul::types::PinnedObjectId(bytes);
+    return true;
+}
+
+TypeTest test_pinned_object_id_obj(test_pinned_object_id, "PinnedObjectId");
+
+bool
 test_stream_id() {
     ::ul::types::StreamId t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);

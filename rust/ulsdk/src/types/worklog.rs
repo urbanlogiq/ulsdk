@@ -10,10 +10,12 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
+use crate::FbsSerde;
 use bitflags::bitflags;
 use core::ops::Deref;
 use flatbuffers::{UnionWIPOffset, WIPOffset};
 use ordered_float::OrderedFloat;
+use serde::{Deserialize, Serialize};
 use strum_macros::FromRepr;
 
 use crate::types::Schema::{
@@ -56,7 +58,8 @@ use crate::types::generated::data_generated::{
 use crate::types::generated::id_generated::{
     B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
     DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace,
+    PinnedObjectId as FbsPinnedObjectId, StreamId as FbsStreamId,
 };
 use crate::types::generated::job_generated::{
     DeprecatedRunSpec as FbsDeprecatedRunSpec,
@@ -80,14 +83,16 @@ use crate::types::generated::value_generated::{
 };
 use crate::types::generated::worklog_generated::{
     AggregationTy as FbsAggregationTy, ByteArray as FbsByteArray, ChartTypeTy as FbsChartTypeTy,
-    Layout as FbsLayout, ParameterFlags as FbsParameterFlags, ParameterValue as FbsParameterValue,
-    TileData as FbsTileData, TileSettings as FbsTileSettings, UserSettings as FbsUserSettings,
+    ContainerRef as FbsContainerRef, GitRef as FbsGitRef, Layout as FbsLayout,
+    ParameterFlags as FbsParameterFlags, ParameterValue as FbsParameterValue,
+    Producer as FbsProducer, ProducerRef as FbsProducerRef, TileData as FbsTileData,
+    TileSettings as FbsTileSettings, UserSettings as FbsUserSettings,
     ValuesFormatTy as FbsValuesFormatTy, WorkLog as FbsWorkLog,
     WorklogParameter as FbsWorklogParameter,
 };
 use crate::types::id::{
     B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
-    ObjectNamespace, StreamId,
+    ObjectNamespace, PinnedObjectId, StreamId,
 };
 use crate::types::job::{
     DeprecatedRunSpec, DeprecatedTaskParameter, Edge, EmbeddedTable, Job, Node, ParamIndices,
@@ -102,7 +107,7 @@ use crate::types::value::{
 
 /// In the aggregate data, there are two relevant keys relevant to the user,
 /// sum and average. This stores which to show in the chart
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum AggregationTy {
     #[default]
@@ -151,7 +156,7 @@ impl From<FbsAggregationTy> for AggregationTy {
 }
 
 /// The type of chart to use to display the data
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum ChartTypeTy {
     #[default]
@@ -224,7 +229,7 @@ impl From<FbsChartTypeTy> for ChartTypeTy {
 }
 
 /// Whether do display raw numbers or percentages
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum ValuesFormatTy {
     #[default]
@@ -272,7 +277,7 @@ impl From<FbsValuesFormatTy> for ValuesFormatTy {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct ByteArray {
     pub b: Option<Vec<u8>>,
 }
@@ -314,15 +319,15 @@ impl From<FbsByteArray<'_>> for ByteArray {
     }
 }
 
-impl ByteArray {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for ByteArray {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -332,7 +337,7 @@ impl ByteArray {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct ParameterFlags {
     pub flags: i64,
 }
@@ -357,15 +362,15 @@ impl From<FbsParameterFlags<'_>> for ParameterFlags {
     }
 }
 
-impl ParameterFlags {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for ParameterFlags {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -375,7 +380,7 @@ impl ParameterFlags {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum ParameterValue {
     ByteArray(ByteArray),
     ObjectId(ObjectId),
@@ -419,7 +424,133 @@ impl ParameterValue {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+pub struct ContainerRef {
+    pub image: String,
+}
+
+impl ContainerRef {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsContainerRef<'a>> {
+        use crate::types::generated::worklog_generated::ContainerRefBuilder as FbsContainerRefBuilder;
+
+        let image_offset = builder.create_string(&self.image);
+
+        let mut bldr = FbsContainerRefBuilder::new(builder);
+        bldr.add_image(image_offset);
+        bldr.finish()
+    }
+}
+
+impl From<FbsContainerRef<'_>> for ContainerRef {
+    fn from(fbs: FbsContainerRef<'_>) -> Self {
+        let image = fbs.image().to_owned();
+        Self { image }
+    }
+}
+
+impl crate::FbsSerde for ContainerRef {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsContainerRef>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
+pub enum ProducerRef {
+    ObjectId(ObjectId),
+    ContainerRef(ContainerRef),
+}
+
+impl Default for ProducerRef {
+    fn default() -> Self {
+        Self::ObjectId(ObjectId::default())
+    }
+}
+
+impl ProducerRef {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsProducerRef) {
+        match self {
+            Self::ObjectId(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsProducerRef::ObjectId;
+                (offset, ty)
+            }
+            Self::ContainerRef(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsProducerRef::ContainerRef;
+                (offset, ty)
+            }
+        }
+    }
+}
+
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+pub struct GitRef {
+    pub commitish: String,
+    pub repo: String,
+}
+
+impl GitRef {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsGitRef<'a>> {
+        use crate::types::generated::worklog_generated::GitRefBuilder as FbsGitRefBuilder;
+
+        let commitish_offset = builder.create_string(&self.commitish);
+        let repo_offset = builder.create_string(&self.repo);
+
+        let mut bldr = FbsGitRefBuilder::new(builder);
+        bldr.add_commitish(commitish_offset);
+        bldr.add_repo(repo_offset);
+        bldr.finish()
+    }
+}
+
+impl From<FbsGitRef<'_>> for GitRef {
+    fn from(fbs: FbsGitRef<'_>) -> Self {
+        let commitish = fbs.commitish().to_owned();
+        let repo = fbs.repo().to_owned();
+        Self { commitish, repo }
+    }
+}
+
+impl crate::FbsSerde for GitRef {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsGitRef>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Layout {
     /// The height of the chart tile in react-grid-layout grid units
     pub height: u32,
@@ -462,15 +593,15 @@ impl From<FbsLayout<'_>> for Layout {
     }
 }
 
-impl Layout {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Layout {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -480,7 +611,87 @@ impl Layout {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+pub struct Producer {
+    pub builder_code_ref: Option<GitRef>,
+    pub executor: GitRef,
+    pub model: Option<ProducerRef>,
+}
+
+impl Producer {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsProducer<'a>> {
+        use crate::types::generated::worklog_generated::ProducerBuilder as FbsProducerBuilder;
+
+        let builder_code_ref_offset = self
+            .builder_code_ref
+            .as_ref()
+            .map(|o| o.serialize_to(builder));
+        let executor_offset = self.executor.serialize_to(builder);
+        let model_offset = self.model.as_ref().map(|u| u.serialize_to(builder));
+
+        let mut bldr = FbsProducerBuilder::new(builder);
+        if let Some(offset) = builder_code_ref_offset {
+            bldr.add_builder_code_ref(offset);
+        }
+        bldr.add_executor(executor_offset);
+        if let Some((offset, ty)) = model_offset {
+            bldr.add_model(offset);
+            bldr.add_model_type(ty);
+        }
+        bldr.finish()
+    }
+}
+
+impl From<FbsProducer<'_>> for Producer {
+    fn from(fbs: FbsProducer<'_>) -> Self {
+        let builder_code_ref = fbs.builder_code_ref().map(GitRef::from);
+        let executor = GitRef::from(fbs.executor());
+        let model = if let Some(val) = fbs.model() {
+            let model = match fbs.model_type() {
+                FbsProducerRef::ObjectId => {
+                    ProducerRef::ObjectId(ObjectId::from(fbs.model_as_object_id().unwrap()))
+                }
+                FbsProducerRef::ContainerRef => ProducerRef::ContainerRef(ContainerRef::from(
+                    fbs.model_as_container_ref().unwrap(),
+                )),
+                _ => unreachable!(),
+            };
+
+            Some(model)
+        } else {
+            None
+        };
+
+        Self {
+            builder_code_ref,
+            executor,
+            model,
+        }
+    }
+}
+
+impl crate::FbsSerde for Producer {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsProducer>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct TileSettings {
     /// The column of tbe aggregation dataset to use
     pub aggregation: AggregationTy,
@@ -597,15 +808,15 @@ impl From<FbsTileSettings<'_>> for TileSettings {
     }
 }
 
-impl TileSettings {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for TileSettings {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -615,7 +826,7 @@ impl TileSettings {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct TileData {
     pub layout: Layout,
     pub tile_settings: TileSettings,
@@ -649,15 +860,15 @@ impl From<FbsTileData<'_>> for TileData {
     }
 }
 
-impl TileData {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for TileData {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -667,7 +878,7 @@ impl TileData {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct UserSettings {
     pub is_template: bool,
     pub tile_data: Vec<TileData>,
@@ -709,15 +920,15 @@ impl From<FbsUserSettings<'_>> for UserSettings {
     }
 }
 
-impl UserSettings {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for UserSettings {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -727,10 +938,10 @@ impl UserSettings {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct WorkLog {
     /// Input streams and/or worklogs. These may be either work logs or streams.
-    pub input_streams: Option<Vec<ObjectId>>,
+    pub input_streams: Option<Vec<PinnedObjectId>>,
     pub job_id: Option<ObjectId>,
     /// A human-readable tag.
     pub name: Option<String>,
@@ -738,7 +949,7 @@ pub struct WorkLog {
     /// the results. These documents may expire (ie: if this is a temporary
     /// step) so there should be enough information in the worklog necessary
     /// to reconstruct these output streams.
-    pub output_streams: Vec<ObjectId>,
+    pub output_streams: Vec<PinnedObjectId>,
     /// These are the serialized parameters passed into the task which created
     /// this worklog.
     pub params: Vec<WorklogParameter>,
@@ -751,9 +962,10 @@ pub struct WorkLog {
     /// easier) to organize because we can sort based on "stuff the user requested",
     /// instead of just "stuff the system generated".
     pub parent: Option<ObjectId>,
+    pub producer: Option<Producer>,
     /// The schematic used behind creating the worklog. This may be empty/null
     /// if we are just layering data, for example.
-    pub schematic: ObjectId,
+    pub schematic: PinnedObjectId,
     pub user_settings: Option<UserSettings>,
 }
 
@@ -788,6 +1000,7 @@ impl WorkLog {
         }
         let params_offset = builder.create_vector(&params_offsets);
         let parent_offset = self.parent.as_ref().map(|o| o.serialize_to(builder));
+        let producer_offset = self.producer.as_ref().map(|o| o.serialize_to(builder));
         let schematic_offset = self.schematic.serialize_to(builder);
         let user_settings_offset = self.user_settings.as_ref().map(|o| o.serialize_to(builder));
 
@@ -805,6 +1018,9 @@ impl WorkLog {
         bldr.add_params(params_offset);
         if let Some(offset) = parent_offset {
             bldr.add_parent(offset);
+        }
+        if let Some(offset) = producer_offset {
+            bldr.add_producer(offset);
         }
         bldr.add_schematic(schematic_offset);
         if let Some(offset) = user_settings_offset {
@@ -840,7 +1056,8 @@ impl From<FbsWorkLog<'_>> for WorkLog {
         }
 
         let parent = fbs.parent().map(ObjectId::from);
-        let schematic = ObjectId::from(fbs.schematic());
+        let producer = fbs.producer().map(Producer::from);
+        let schematic = PinnedObjectId::from(fbs.schematic());
         let user_settings = fbs.user_settings().map(UserSettings::from);
         Self {
             input_streams,
@@ -849,21 +1066,22 @@ impl From<FbsWorkLog<'_>> for WorkLog {
             output_streams,
             params,
             parent,
+            producer,
             schematic,
             user_settings,
         }
     }
 }
 
-impl WorkLog {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for WorkLog {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -873,7 +1091,7 @@ impl WorkLog {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct WorklogParameter {
     pub key: String,
     pub value: Option<ParameterValue>,
@@ -928,15 +1146,15 @@ impl From<FbsWorklogParameter<'_>> for WorklogParameter {
     }
 }
 
-impl WorklogParameter {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for WorklogParameter {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -959,6 +1177,22 @@ mod tests {
     }
 
     #[test]
+    fn test_container_ref() {
+        let t0 = ContainerRef::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = ContainerRef::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_git_ref() {
+        let t0 = GitRef::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = GitRef::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
     fn test_layout() {
         let t0 = Layout::default();
         let buf = t0.to_fbs_bytes();
@@ -971,6 +1205,14 @@ mod tests {
         let t0 = ParameterFlags::default();
         let buf = t0.to_fbs_bytes();
         let t1 = ParameterFlags::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_producer() {
+        let t0 = Producer::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = Producer::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 

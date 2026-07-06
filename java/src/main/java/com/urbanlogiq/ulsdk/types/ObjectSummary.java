@@ -13,14 +13,6 @@ public final class ObjectSummary {
         this._acl = value;
     }
 
-    long _driveSize;
-    public long getDriveSize() {
-        return this._driveSize;
-    }
-    public void setDriveSize(long value) {
-        this._driveSize = value;
-    }
-
     com.urbanlogiq.ulsdk.types.ContentId _headRevision;
     public com.urbanlogiq.ulsdk.types.ContentId getHeadRevision() {
         return this._headRevision;
@@ -57,7 +49,6 @@ public final class ObjectSummary {
         if (o.acl() != null) {
             this._acl = new com.urbanlogiq.ulsdk.types.ObjectId(o.acl());
         }
-        this._driveSize = o.driveSize();
         this._headRevision = new com.urbanlogiq.ulsdk.types.ContentId(o.headRevision());
         this._id = new com.urbanlogiq.ulsdk.types.ObjectId(o.id());
         this._time = o.time();
@@ -79,7 +70,6 @@ public final class ObjectSummary {
         if (aclOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.ObjectSummary.addAcl(builder, aclOffset);
         }
-        com.urbanlogiq.ulsdk.types.generated.ObjectSummary.addDriveSize(builder, this._driveSize);
         com.urbanlogiq.ulsdk.types.generated.ObjectSummary.addHeadRevision(builder, headRevisionOffset);
         com.urbanlogiq.ulsdk.types.generated.ObjectSummary.addId(builder, idOffset);
         com.urbanlogiq.ulsdk.types.generated.ObjectSummary.addTime(builder, this._time);

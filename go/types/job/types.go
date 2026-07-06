@@ -89,7 +89,7 @@ type DeprecatedRunSpec struct {
 	ParamIndices []ParamIndices
 	Params []DeprecatedTaskParameter
 	Persist bool
-	Schematic id.ObjectId
+	Schematic id.PinnedObjectId
 }
 
 func DeprecatedRunSpecFromFbs(fbs *generated.DeprecatedRunSpec) *DeprecatedRunSpec {
@@ -108,7 +108,7 @@ func DeprecatedRunSpecFromFbs(fbs *generated.DeprecatedRunSpec) *DeprecatedRunSp
 	}
 	o.Persist = fbs.Persist()
 	if fbsVal := fbs.Schematic(nil); fbsVal != nil {
-		o.Schematic = *id.ObjectIdFromFbs(fbsVal)
+		o.Schematic = *id.PinnedObjectIdFromFbs(fbsVal)
 	}
 	return o
 }
@@ -430,7 +430,7 @@ type RunSpec struct {
 	Params []TaskParameter
 	Persist bool
 	Priority int32
-	Schematic id.ObjectId
+	Schematic id.PinnedObjectId
 }
 
 func RunSpecFromFbs(fbs *generated.RunSpec) *RunSpec {
@@ -457,7 +457,7 @@ func RunSpecFromFbs(fbs *generated.RunSpec) *RunSpec {
 	o.Persist = fbs.Persist()
 	o.Priority = int32(fbs.Priority())
 	if fbsVal := fbs.Schematic(nil); fbsVal != nil {
-		o.Schematic = *id.ObjectIdFromFbs(fbsVal)
+		o.Schematic = *id.PinnedObjectIdFromFbs(fbsVal)
 	}
 	return o
 }
@@ -620,7 +620,7 @@ type Task struct {
 	LastUpdatedByPod *string
 	Message *string
 	Name string
-	Output id.ObjectId
+	Output id.PinnedObjectId
 	Params ParamIndices
 	Retries int32
 	SchematicId *id.ObjectId
@@ -659,7 +659,7 @@ func TaskFromFbs(fbs *generated.Task) *Task {
 	}
 	o.Name = string(fbs.Name())
 	if fbsVal := fbs.Output(nil); fbsVal != nil {
-		o.Output = *id.ObjectIdFromFbs(fbsVal)
+		o.Output = *id.PinnedObjectIdFromFbs(fbsVal)
 	}
 	if fbsVal := fbs.Params(nil); fbsVal != nil {
 		o.Params = *ParamIndicesFromFbs(fbsVal)

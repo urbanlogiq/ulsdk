@@ -10,19 +10,22 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
+use crate::FbsSerde;
 use bitflags::bitflags;
 use core::ops::Deref;
 use flatbuffers::{UnionWIPOffset, WIPOffset};
 use ordered_float::OrderedFloat;
+use serde::{Deserialize, Serialize};
 use strum_macros::FromRepr;
 
 use crate::types::generated::id_generated::{
     B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
     DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace,
+    PinnedObjectId as FbsPinnedObjectId, StreamId as FbsStreamId,
 };
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u16)]
 pub enum ObjectNamespace {
     #[default]
@@ -104,18 +107,6 @@ impl B2cId {
 
     pub fn nil() -> Self {
         Self([0u8; 16])
-    }
-
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
-        let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = self.serialize_to(&mut bldr);
-        bldr.finish_size_prefixed(offset, None);
-        bldr.finished_data().to_vec()
-    }
-
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsB2cId>(bytes)?;
-        Ok(Self::from(fbs))
     }
 
     pub fn serialize_to<'a>(
@@ -239,7 +230,25 @@ impl serde::Serialize for B2cId {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+impl crate::FbsSerde for B2cId {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsB2cId>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct ColumnGroupId {
     pub b: Vec<u8>,
 }
@@ -270,15 +279,15 @@ impl From<FbsColumnGroupId<'_>> for ColumnGroupId {
     }
 }
 
-impl ColumnGroupId {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for ColumnGroupId {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -298,18 +307,6 @@ impl ContentId {
 
     pub fn nil() -> Self {
         Self([0u8; 16])
-    }
-
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
-        let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = self.serialize_to(&mut bldr);
-        bldr.finish_size_prefixed(offset, None);
-        bldr.finished_data().to_vec()
-    }
-
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsContentId>(bytes)?;
-        Ok(Self::from(fbs))
     }
 
     pub fn serialize_to<'a>(
@@ -433,7 +430,25 @@ impl serde::Serialize for ContentId {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+impl crate::FbsSerde for ContentId {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsContentId>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct DataStateId {
     pub b: Vec<u8>,
 }
@@ -464,15 +479,15 @@ impl From<FbsDataStateId<'_>> for DataStateId {
     }
 }
 
-impl DataStateId {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for DataStateId {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -500,18 +515,6 @@ impl GenericId {
 
     pub fn nil() -> Self {
         Self([0u8; 16])
-    }
-
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
-        let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = self.serialize_to(&mut bldr);
-        bldr.finish_size_prefixed(offset, None);
-        bldr.finished_data().to_vec()
-    }
-
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsGenericId>(bytes)?;
-        Ok(Self::from(fbs))
     }
 
     pub fn serialize_to<'a>(
@@ -635,6 +638,24 @@ impl serde::Serialize for GenericId {
     }
 }
 
+impl crate::FbsSerde for GenericId {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsGenericId>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
 #[derive(Copy, Clone, PartialOrd, PartialEq, Eq, Ord, Hash, Default)]
 pub struct GraphNodeId([u8; 16]);
 
@@ -645,18 +666,6 @@ impl GraphNodeId {
 
     pub fn nil() -> Self {
         Self([0u8; 16])
-    }
-
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
-        let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = self.serialize_to(&mut bldr);
-        bldr.finish_size_prefixed(offset, None);
-        bldr.finished_data().to_vec()
-    }
-
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsGraphNodeId>(bytes)?;
-        Ok(Self::from(fbs))
     }
 
     pub fn serialize_to<'a>(
@@ -780,6 +789,24 @@ impl serde::Serialize for GraphNodeId {
     }
 }
 
+impl crate::FbsSerde for GraphNodeId {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsGraphNodeId>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
 #[derive(Copy, Clone, PartialOrd, PartialEq, Eq, Ord, Hash, Default)]
 pub struct ObjectId([u8; 16]);
 
@@ -790,18 +817,6 @@ impl ObjectId {
 
     pub fn nil() -> Self {
         Self([0u8; 16])
-    }
-
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
-        let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = self.serialize_to(&mut bldr);
-        bldr.finish_size_prefixed(offset, None);
-        bldr.finished_data().to_vec()
-    }
-
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
-        let fbs = flatbuffers::size_prefixed_root::<FbsObjectId>(bytes)?;
-        Ok(Self::from(fbs))
     }
 
     pub fn serialize_to<'a>(
@@ -925,7 +940,160 @@ impl serde::Serialize for ObjectId {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+impl crate::FbsSerde for ObjectId {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsObjectId>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+#[derive(Copy, Clone, PartialOrd, PartialEq, Eq, Ord, Hash, Default)]
+pub struct PinnedObjectId {
+    b: [u8; 16],
+    cid: Option<ContentId>,
+}
+
+impl PinnedObjectId {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsPinnedObjectId<'a>> {
+        use crate::types::generated::id_generated::PinnedObjectIdBuilder as FbsPinnedObjectIdBuilder;
+        let b_offset = builder.create_vector(&self.b);
+        let cid_offset = self.cid.map(|id| id.serialize_to(builder));
+        let mut bldr = FbsPinnedObjectIdBuilder::new(builder);
+        bldr.add_b(b_offset);
+        if let Some(offset) = cid_offset {
+            bldr.add_cid(offset);
+        }
+        bldr.finish()
+    }
+
+    pub fn oid(&self) -> ObjectId {
+        ObjectId(self.b)
+    }
+
+    pub fn cid(&self) -> Option<ContentId> {
+        self.cid
+    }
+}
+
+impl From<ObjectId> for PinnedObjectId {
+    fn from(o: ObjectId) -> Self {
+        Self { b: o.0, cid: None }
+    }
+}
+
+impl From<(ObjectId, Option<ContentId>)> for PinnedObjectId {
+    fn from((o, cid): (ObjectId, Option<ContentId>)) -> Self {
+        Self { b: o.0, cid }
+    }
+}
+
+impl From<FbsPinnedObjectId<'_>> for PinnedObjectId {
+    fn from(fbs: FbsPinnedObjectId<'_>) -> Self {
+        let mut b = [0u8; 16];
+        for (dest, src) in b.iter_mut().zip(fbs.b().iter()) {
+            *dest = src;
+        }
+        let cid = fbs.cid().map(ContentId::from);
+        Self { b, cid }
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for PinnedObjectId {
+    fn deserialize<D>(deserializer: D) -> Result<PinnedObjectId, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        deserializer
+            .deserialize_str(crate::PinnedObjectIdVisitor)
+            .map(|(b, cid)| PinnedObjectId {
+                b,
+                cid: cid.map(ContentId::from),
+            })
+    }
+}
+
+impl std::fmt::Display for PinnedObjectId {
+    #[inline]
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        uuid::Uuid::from_slice(&self.b).unwrap().fmt(f)?;
+        if let Some(cid) = self.cid {
+            f.write_str("@")?;
+            cid.fmt(f)?;
+        }
+        Ok(())
+    }
+}
+
+impl std::fmt::Debug for PinnedObjectId {
+    #[inline]
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self, f)
+    }
+}
+
+impl serde::Serialize for PinnedObjectId {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let raw_utf8 = crate::id_to_utf8(&self.b);
+        let mut s = unsafe { std::str::from_utf8_unchecked(&raw_utf8) }.to_owned();
+        if let Some(cid) = self.cid {
+            let raw_utf8 = crate::id_to_utf8(&cid.0);
+            let cid = unsafe { std::str::from_utf8_unchecked(&raw_utf8) };
+            s.push('@');
+            s.push_str(cid);
+        }
+        serializer.serialize_str(&s)
+    }
+}
+
+impl std::str::FromStr for PinnedObjectId {
+    type Err = crate::error::Error;
+    fn from_str(o: &str) -> Result<Self, Self::Err> {
+        use serde::de::Visitor;
+        let mut splits = o.split("@");
+        let visitor = crate::PinnedObjectIdVisitor;
+        let (b, cid) = visitor.visit_str::<Self::Err>(o)?;
+        let cid = cid.map(ContentId::from);
+
+        Ok(Self { b, cid })
+    }
+}
+
+impl crate::FbsSerde for PinnedObjectId {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsPinnedObjectId>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct StreamId {
     pub b: Vec<u8>,
 }
@@ -956,15 +1124,15 @@ impl From<FbsStreamId<'_>> for StreamId {
     }
 }
 
-impl StreamId {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for StreamId {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1031,6 +1199,14 @@ mod tests {
         let t0 = ObjectId::default();
         let buf = t0.to_fbs_bytes();
         let t1 = ObjectId::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_pinned_object_id() {
+        let t0 = PinnedObjectId::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = PinnedObjectId::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 

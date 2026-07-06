@@ -10,10 +10,12 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
+use crate::FbsSerde;
 use bitflags::bitflags;
 use core::ops::Deref;
 use flatbuffers::{UnionWIPOffset, WIPOffset};
 use ordered_float::OrderedFloat;
+use serde::{Deserialize, Serialize};
 use strum_macros::FromRepr;
 
 use crate::types::Schema::{
@@ -62,7 +64,8 @@ use crate::types::generated::graph_generated::{
 use crate::types::generated::id_generated::{
     B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
     DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace,
+    PinnedObjectId as FbsPinnedObjectId, StreamId as FbsStreamId,
 };
 use crate::types::generated::query_generated::{
     AddCol as FbsAddCol, AggregateFilter as FbsAggregateFilter, AllColumns as FbsAllColumns,
@@ -82,7 +85,7 @@ use crate::types::generated::query_generated::{
     QueryTableSource as FbsQueryTableSource, SetExpr as FbsSetExpr,
     TableOrderBy as FbsTableOrderBy, TablePartition as FbsTablePartition,
     TableSource as FbsTableSource, TableSourceInstance as FbsTableSourceInstance,
-    TableSourceUnion as FbsTableSourceUnion, TypeHint as FbsTypeHint,
+    TableSourceUnion as FbsTableSourceUnion, TimeSeries as FbsTimeSeries, TypeHint as FbsTypeHint,
     UnaryQueryElement as FbsUnaryQueryElement, UnsetArgument as FbsUnsetArgument,
     UpdateQueryElement as FbsUpdateQueryElement, ValueIndex as FbsValueIndex,
     ValueName as FbsValueName, ValueRow as FbsValueRow, Values as FbsValues, Vector as FbsVector,
@@ -105,7 +108,7 @@ use crate::types::graph::{
 };
 use crate::types::id::{
     B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
-    ObjectNamespace, StreamId,
+    ObjectNamespace, PinnedObjectId, StreamId,
 };
 use crate::types::value::{
     Point2D, Tri2D, VArray, VBool, VBytes, VChar, VF32, VF64, VFixedSizeBytes, VI8, VI16, VI32,
@@ -113,7 +116,7 @@ use crate::types::value::{
     VTimestampNsUtc, VTri2D, VU8, VU16, VU32, VU64, VUnit, VUsize, Value, ValueInstance, ValueTy,
 };
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u8)]
 pub enum ExplainFormat {
     #[default]
@@ -165,7 +168,7 @@ impl From<FbsExplainFormat> for ExplainFormat {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i8)]
 pub enum JoinTy {
     #[default]
@@ -221,7 +224,7 @@ impl From<FbsJoinTy> for JoinTy {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i8)]
 pub enum QueryElementOp {
     #[default]
@@ -273,7 +276,7 @@ impl From<FbsQueryElementOp> for QueryElementOp {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i8)]
 pub enum TypeHint {
     #[default]
@@ -329,7 +332,7 @@ impl From<FbsTypeHint> for TypeHint {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct AddCol {
     pub default: Option<ValueInstance>,
     pub field: Field,
@@ -362,15 +365,15 @@ impl From<FbsAddCol<'_>> for AddCol {
     }
 }
 
-impl AddCol {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for AddCol {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -380,7 +383,7 @@ impl AddCol {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct DropCol {
     pub col: String,
 }
@@ -407,15 +410,15 @@ impl From<FbsDropCol<'_>> for DropCol {
     }
 }
 
-impl DropCol {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for DropCol {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -425,7 +428,7 @@ impl DropCol {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum AlterTableOperationUnion {
     AddCol(AddCol),
     DropCol(DropCol),
@@ -459,7 +462,7 @@ impl AlterTableOperationUnion {
 
 /// This variant is for selecting the default behavior of an INSERT statement
 /// where there may be conflicts; it inserts the rows if there is a conflict.
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct InsertConflicting {}
 
 impl InsertConflicting {
@@ -480,15 +483,15 @@ impl From<FbsInsertConflicting<'_>> for InsertConflicting {
     }
 }
 
-impl InsertConflicting {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for InsertConflicting {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -500,7 +503,7 @@ impl InsertConflicting {
 
 /// This variant indicates that if there is a conflict, the action is to "do
 /// nothing", or to skip the conflicting rows.
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct DoNothing {}
 
 impl DoNothing {
@@ -521,15 +524,15 @@ impl From<FbsDoNothing<'_>> for DoNothing {
     }
 }
 
-impl DoNothing {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for DoNothing {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -541,7 +544,7 @@ impl DoNothing {
 
 /// On conflict, update values according to the expressions provided; this
 /// is equivalent to an `upsert` operation.
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct DoUpdate {
     pub assignments: Vec<SetExpr>,
 }
@@ -577,15 +580,15 @@ impl From<FbsDoUpdate<'_>> for DoUpdate {
     }
 }
 
-impl DoUpdate {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for DoUpdate {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -595,7 +598,7 @@ impl DoUpdate {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum ConflictAction {
     InsertConflicting(InsertConflicting),
     DoNothing(DoNothing),
@@ -633,7 +636,7 @@ impl ConflictAction {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct ValueIndex {
     pub idx: u32,
 }
@@ -658,15 +661,15 @@ impl From<FbsValueIndex<'_>> for ValueIndex {
     }
 }
 
-impl ValueIndex {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for ValueIndex {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -676,7 +679,7 @@ impl ValueIndex {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct NullableUint {
     pub v: u32,
 }
@@ -701,15 +704,15 @@ impl From<FbsNullableUint<'_>> for NullableUint {
     }
 }
 
-impl NullableUint {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for NullableUint {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -719,7 +722,7 @@ impl NullableUint {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Column {
     pub name: String,
     pub source: Option<NullableUint>,
@@ -759,15 +762,15 @@ impl From<FbsColumn<'_>> for Column {
     }
 }
 
-impl Column {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Column {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -777,7 +780,7 @@ impl Column {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Function {
     pub fn_: Fn_,
     pub parameters: Vec<Expr>,
@@ -816,15 +819,15 @@ impl From<FbsFunction<'_>> for Function {
     }
 }
 
-impl Function {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Function {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -834,7 +837,7 @@ impl Function {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct AllColumns {
     pub source: Option<NullableUint>,
 }
@@ -863,15 +866,15 @@ impl From<FbsAllColumns<'_>> for AllColumns {
     }
 }
 
-impl AllColumns {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for AllColumns {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -881,7 +884,7 @@ impl AllColumns {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Expr {
     pub exprs: Box<ExprUnion>,
 }
@@ -941,15 +944,15 @@ impl From<FbsExpr<'_>> for Expr {
     }
 }
 
-impl Expr {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Expr {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -959,7 +962,7 @@ impl Expr {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Case {
     pub else_: Option<Expr>,
     pub when: Vec<When>,
@@ -1001,15 +1004,15 @@ impl From<FbsCase<'_>> for Case {
     }
 }
 
-impl Case {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Case {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1019,7 +1022,7 @@ impl Case {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct OrderByExpr {
     pub order_by: Vec<OrderBy>,
 }
@@ -1055,15 +1058,15 @@ impl From<FbsOrderByExpr<'_>> for OrderByExpr {
     }
 }
 
-impl OrderByExpr {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for OrderByExpr {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1073,7 +1076,7 @@ impl OrderByExpr {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Partition {
     pub expr: Expr,
 }
@@ -1100,15 +1103,15 @@ impl From<FbsPartition<'_>> for Partition {
     }
 }
 
-impl Partition {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Partition {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1118,7 +1121,7 @@ impl Partition {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct UnsetArgument {}
 
 impl UnsetArgument {
@@ -1139,15 +1142,15 @@ impl From<FbsUnsetArgument<'_>> for UnsetArgument {
     }
 }
 
-impl UnsetArgument {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for UnsetArgument {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1157,7 +1160,7 @@ impl UnsetArgument {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Window {
     pub fun: Function,
     pub order_by: Option<Vec<OrderBy>>,
@@ -1236,15 +1239,15 @@ impl From<FbsWindow<'_>> for Window {
     }
 }
 
-impl Window {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Window {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1254,7 +1257,7 @@ impl Window {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct ValueName {
     pub name: String,
 }
@@ -1281,15 +1284,15 @@ impl From<FbsValueName<'_>> for ValueName {
     }
 }
 
-impl ValueName {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for ValueName {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1299,7 +1302,7 @@ impl ValueName {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct AggregateFilter {
     pub condition: Expr,
     pub fun: Function,
@@ -1330,15 +1333,15 @@ impl From<FbsAggregateFilter<'_>> for AggregateFilter {
     }
 }
 
-impl AggregateFilter {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for AggregateFilter {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1348,7 +1351,7 @@ impl AggregateFilter {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum ExprUnion {
     ValueIndex(ValueIndex),
     Column(Column),
@@ -1440,7 +1443,7 @@ impl ExprUnion {
 /// SELECT DISTINCT * FROM t;
 /// or
 /// SELECT DISTINCT ON (c0, c1) FROM t;
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Distinct {
     /// If `on` is unset or has length 0, then the distinct is:
     /// SELECT DISTINCT * FROM t;
@@ -1491,15 +1494,15 @@ impl From<FbsDistinct<'_>> for Distinct {
     }
 }
 
-impl Distinct {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Distinct {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1509,7 +1512,7 @@ impl Distinct {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct UnaryQueryElement {
     pub distinct: Option<Distinct>,
     pub fields: Option<Vec<Expr>>,
@@ -1672,15 +1675,15 @@ impl From<FbsUnaryQueryElement<'_>> for UnaryQueryElement {
     }
 }
 
-impl UnaryQueryElement {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for UnaryQueryElement {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1690,7 +1693,7 @@ impl UnaryQueryElement {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct QueryElement {
     pub q: Box<QueryElementUnion>,
 }
@@ -1739,15 +1742,15 @@ impl From<FbsQueryElement<'_>> for QueryElement {
     }
 }
 
-impl QueryElement {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for QueryElement {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1757,7 +1760,7 @@ impl QueryElement {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct BinaryQueryElement {
     pub lhs: QueryElement,
     pub op: QueryElementOp,
@@ -1791,15 +1794,15 @@ impl From<FbsBinaryQueryElement<'_>> for BinaryQueryElement {
     }
 }
 
-impl BinaryQueryElement {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for BinaryQueryElement {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1811,7 +1814,7 @@ impl BinaryQueryElement {
 
 /// Some multiverse databases are partitioned, and we need to refer to a specific
 /// partition within the database. This is used for that purpose.
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct MvdbPartition {
     pub partition: String,
 }
@@ -1838,15 +1841,15 @@ impl From<FbsMvdbPartition<'_>> for MvdbPartition {
     }
 }
 
-impl MvdbPartition {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for MvdbPartition {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1856,7 +1859,7 @@ impl MvdbPartition {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct WorklogPartition {
     pub idx: u32,
 }
@@ -1881,15 +1884,15 @@ impl From<FbsWorklogPartition<'_>> for WorklogPartition {
     }
 }
 
-impl WorklogPartition {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for WorklogPartition {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1899,7 +1902,7 @@ impl WorklogPartition {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum TablePartition {
     MvdbPartition(MvdbPartition),
     WorklogPartition(WorklogPartition),
@@ -1931,7 +1934,7 @@ impl TablePartition {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct DataCatalog {
     pub id: ObjectId,
     /// The partition of the table to query; can be null.
@@ -1991,15 +1994,15 @@ impl From<FbsDataCatalog<'_>> for DataCatalog {
     }
 }
 
-impl DataCatalog {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for DataCatalog {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2009,7 +2012,7 @@ impl DataCatalog {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Arrow {
     pub value: Vec<u8>,
 }
@@ -2040,15 +2043,15 @@ impl From<FbsArrow<'_>> for Arrow {
     }
 }
 
-impl Arrow {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Arrow {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2058,7 +2061,7 @@ impl Arrow {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Explain {
     pub analyze: bool,
     pub format: ExplainFormat,
@@ -2093,15 +2096,15 @@ impl From<FbsExplain<'_>> for Explain {
     }
 }
 
-impl Explain {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Explain {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2111,7 +2114,7 @@ impl Explain {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Query {
     pub bound_sources: Option<Vec<TableSourceInstance>>,
     pub explain: Option<Explain>,
@@ -2201,15 +2204,15 @@ impl From<FbsQuery<'_>> for Query {
     }
 }
 
-impl Query {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Query {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2219,7 +2222,7 @@ impl Query {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct QueryTableSource {
     pub q: Query,
 }
@@ -2246,15 +2249,15 @@ impl From<FbsQueryTableSource<'_>> for QueryTableSource {
     }
 }
 
-impl QueryTableSource {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for QueryTableSource {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2264,7 +2267,7 @@ impl QueryTableSource {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Vector {
     /// List of vectordbs to query. If this is empty, query all available vectordbs.
     pub ids: Vec<ObjectId>,
@@ -2321,15 +2324,15 @@ impl From<FbsVector<'_>> for Vector {
     }
 }
 
-impl Vector {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Vector {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2339,7 +2342,7 @@ impl Vector {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Placeholder {
     pub idx: u32,
 }
@@ -2364,15 +2367,15 @@ impl From<FbsPlaceholder<'_>> for Placeholder {
     }
 }
 
-impl Placeholder {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Placeholder {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2382,7 +2385,7 @@ impl Placeholder {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Drive {
     pub path: Option<String>,
     pub root: Option<ObjectId>,
@@ -2417,15 +2420,15 @@ impl From<FbsDrive<'_>> for Drive {
     }
 }
 
-impl Drive {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Drive {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2435,7 +2438,7 @@ impl Drive {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Values {
     pub rows: Vec<ValueRow>,
 }
@@ -2471,15 +2474,15 @@ impl From<FbsValues<'_>> for Values {
     }
 }
 
-impl Values {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Values {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2489,7 +2492,110 @@ impl Values {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+/// Synthetic timestamp series used to fill empty time buckets in metric queries.
+/// Emits one row per bucket between `start_ms` and `end_ms`
+/// (inclusive) at `interval_ms` spacing, in a single column named `output_column`.
+/// All bounds are UTC unix milliseconds - to align with the
+/// time_bucket UDF, callers should pass values that are already snapped to a
+/// bucket boundary in the desired zone.
+/// Timezone-aware generation is not yet supported.
+///
+/// If `infer_bounds` is true, `start_ms` and `end_ms` are ignored and the
+/// catalog planner resolves them from the WHERE filter of whichever source
+/// this series is LEFT JOINed against. The joined source must produce the
+/// join column via `time_bucket(width, ts)` or
+/// `date_trunc(unit, [at_timezone(]ts[, tz)])` and have a closed range
+/// filter on `ts`; otherwise planning errors.
+///
+/// Exactly one of `interval_ms` / `interval_months` is non-zero (or both
+/// zero when `infer_bounds=true` — the planner fills in whichever flavour
+/// the joined source's bucket function dictates). `interval_months` is the
+/// calendar-month count used to step the synthetic series; years are
+/// represented as 12N months.
+///
+/// `tz` is the IANA timezone name (e.g. `"America/Los_Angeles"`) used to
+/// floor bounds and step the series in local calendar time. Empty means
+/// UTC. This is only set when the joined source's bucket expression wraps
+/// the timestamp in `at_timezone(ts, '<tz>')` — bare `date_trunc(unit, ts)`
+/// stays UTC. When `tz` is non-empty, the catalog emits the series as a
+/// precomputed VALUES list rather than a DataFusion `generate_series` call
+/// so the local-calendar boundaries (including DST transitions) are
+/// authoritative at plan time.
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+pub struct TimeSeries {
+    pub end_ms: i64,
+    pub infer_bounds: bool,
+    pub interval_months: i32,
+    pub interval_ms: i64,
+    pub output_column: String,
+    pub start_ms: i64,
+    pub tz: Option<String>,
+}
+
+impl TimeSeries {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsTimeSeries<'a>> {
+        use crate::types::generated::query_generated::TimeSeriesBuilder as FbsTimeSeriesBuilder;
+
+        let output_column_offset = builder.create_string(&self.output_column);
+        let tz_offset = self.tz.as_ref().map(|s| builder.create_string(s));
+
+        let mut bldr = FbsTimeSeriesBuilder::new(builder);
+        bldr.add_end_ms(self.end_ms);
+        bldr.add_infer_bounds(self.infer_bounds);
+        bldr.add_interval_months(self.interval_months);
+        bldr.add_interval_ms(self.interval_ms);
+        bldr.add_output_column(output_column_offset);
+        bldr.add_start_ms(self.start_ms);
+        if let Some(offset) = tz_offset {
+            bldr.add_tz(offset);
+        }
+        bldr.finish()
+    }
+}
+
+impl From<FbsTimeSeries<'_>> for TimeSeries {
+    fn from(fbs: FbsTimeSeries<'_>) -> Self {
+        let end_ms = fbs.end_ms();
+        let infer_bounds = fbs.infer_bounds();
+        let interval_months = fbs.interval_months();
+        let interval_ms = fbs.interval_ms();
+        let output_column = fbs.output_column().to_owned();
+        let start_ms = fbs.start_ms();
+        let tz = fbs.tz().map(ToOwned::to_owned);
+        Self {
+            end_ms,
+            infer_bounds,
+            interval_months,
+            interval_ms,
+            output_column,
+            start_ms,
+            tz,
+        }
+    }
+}
+
+impl crate::FbsSerde for TimeSeries {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsTimeSeries>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum TableSourceUnion {
     DataCatalog(DataCatalog),
     Arrow(Arrow),
@@ -2499,6 +2605,7 @@ pub enum TableSourceUnion {
     Placeholder(Placeholder),
     Drive(Drive),
     Values(Values),
+    TimeSeries(TimeSeries),
 }
 
 impl Default for TableSourceUnion {
@@ -2553,11 +2660,16 @@ impl TableSourceUnion {
                 let ty = FbsTableSourceUnion::Values;
                 (offset, ty)
             }
+            Self::TimeSeries(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsTableSourceUnion::TimeSeries;
+                (offset, ty)
+            }
         }
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct UpdateQueryElement {
     pub filter: Option<Function>,
     /// Additional table sources from a FROM clause (UPDATE ... FROM ... syntax).
@@ -2676,6 +2788,9 @@ impl From<FbsUpdateQueryElement<'_>> for UpdateQueryElement {
             FbsTableSourceUnion::Values => {
                 TableSourceUnion::Values(Values::from(fbs.source_as_values().unwrap()))
             }
+            FbsTableSourceUnion::TimeSeries => {
+                TableSourceUnion::TimeSeries(TimeSeries::from(fbs.source_as_time_series().unwrap()))
+            }
             _ => unreachable!(),
         };
 
@@ -2689,15 +2804,15 @@ impl From<FbsUpdateQueryElement<'_>> for UpdateQueryElement {
     }
 }
 
-impl UpdateQueryElement {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for UpdateQueryElement {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2707,7 +2822,7 @@ impl UpdateQueryElement {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct DeleteQueryElement {
     pub filter: Option<Function>,
     pub source: TableSourceUnion,
@@ -2761,6 +2876,9 @@ impl From<FbsDeleteQueryElement<'_>> for DeleteQueryElement {
             FbsTableSourceUnion::Values => {
                 TableSourceUnion::Values(Values::from(fbs.source_as_values().unwrap()))
             }
+            FbsTableSourceUnion::TimeSeries => {
+                TableSourceUnion::TimeSeries(TimeSeries::from(fbs.source_as_time_series().unwrap()))
+            }
             _ => unreachable!(),
         };
 
@@ -2768,15 +2886,15 @@ impl From<FbsDeleteQueryElement<'_>> for DeleteQueryElement {
     }
 }
 
-impl DeleteQueryElement {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for DeleteQueryElement {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2786,7 +2904,7 @@ impl DeleteQueryElement {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct OnConflict {
     pub action: Option<ConflictAction>,
     pub conflict_target: Vec<String>,
@@ -2850,15 +2968,15 @@ impl From<FbsOnConflict<'_>> for OnConflict {
     }
 }
 
-impl OnConflict {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for OnConflict {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2868,7 +2986,7 @@ impl OnConflict {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct InsertQueryElement {
     pub columns: Vec<String>,
     pub dest: TableSourceUnion,
@@ -2950,6 +3068,9 @@ impl From<FbsInsertQueryElement<'_>> for InsertQueryElement {
             FbsTableSourceUnion::Values => {
                 TableSourceUnion::Values(Values::from(fbs.dest_as_values().unwrap()))
             }
+            FbsTableSourceUnion::TimeSeries => {
+                TableSourceUnion::TimeSeries(TimeSeries::from(fbs.dest_as_time_series().unwrap()))
+            }
             _ => unreachable!(),
         };
 
@@ -2976,15 +3097,15 @@ impl From<FbsInsertQueryElement<'_>> for InsertQueryElement {
     }
 }
 
-impl InsertQueryElement {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for InsertQueryElement {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2994,7 +3115,7 @@ impl InsertQueryElement {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct AlterTableElement {
     pub operations: Vec<AlterTableOperation>,
     pub target: ObjectId,
@@ -3034,15 +3155,15 @@ impl From<FbsAlterTableElement<'_>> for AlterTableElement {
     }
 }
 
-impl AlterTableElement {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for AlterTableElement {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -3052,7 +3173,7 @@ impl AlterTableElement {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum QueryElementUnion {
     UnaryQueryElement(UnaryQueryElement),
     BinaryQueryElement(BinaryQueryElement),
@@ -3108,7 +3229,7 @@ impl QueryElementUnion {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct AlterTableOperation {
     pub op: AlterTableOperationUnion,
 }
@@ -3145,15 +3266,15 @@ impl From<FbsAlterTableOperation<'_>> for AlterTableOperation {
     }
 }
 
-impl AlterTableOperation {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for AlterTableOperation {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -3164,7 +3285,7 @@ impl AlterTableOperation {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Join {
     pub dest_col: Option<String>,
     pub dest_idx: u32,
@@ -3214,15 +3335,15 @@ impl From<FbsJoin<'_>> for Join {
     }
 }
 
-impl Join {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Join {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -3233,7 +3354,7 @@ impl Join {
 }
 
 /// SetExprs represent the expressions used as part of an UPDATE-type operation
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct SetExpr {
     /// The target column name. Since SET targets always refer to the target table,
     /// we only need to name the column as a string.
@@ -3268,15 +3389,15 @@ impl From<FbsSetExpr<'_>> for SetExpr {
     }
 }
 
-impl SetExpr {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for SetExpr {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -3286,7 +3407,7 @@ impl SetExpr {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct TableOrderBy {
     pub order_by: OrderBy,
     pub source: u32,
@@ -3330,15 +3451,15 @@ impl From<FbsTableOrderBy<'_>> for TableOrderBy {
     }
 }
 
-impl TableOrderBy {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for TableOrderBy {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -3358,7 +3479,7 @@ impl Default for TableOrderBy {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct TableSource {
     pub fields: Option<Vec<Expr>>,
     pub filter: Option<Function>,
@@ -3484,6 +3605,9 @@ impl From<FbsTableSource<'_>> for TableSource {
             FbsTableSourceUnion::Values => {
                 TableSourceUnion::Values(Values::from(fbs.t_as_values().unwrap()))
             }
+            FbsTableSourceUnion::TimeSeries => {
+                TableSourceUnion::TimeSeries(TimeSeries::from(fbs.t_as_time_series().unwrap()))
+            }
             _ => unreachable!(),
         };
 
@@ -3497,15 +3621,15 @@ impl From<FbsTableSource<'_>> for TableSource {
     }
 }
 
-impl TableSource {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for TableSource {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -3515,7 +3639,7 @@ impl TableSource {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct TableSourceInstance {
     pub t: TableSourceUnion,
 }
@@ -3563,6 +3687,9 @@ impl From<FbsTableSourceInstance<'_>> for TableSourceInstance {
             FbsTableSourceUnion::Values => {
                 TableSourceUnion::Values(Values::from(fbs.t_as_values().unwrap()))
             }
+            FbsTableSourceUnion::TimeSeries => {
+                TableSourceUnion::TimeSeries(TimeSeries::from(fbs.t_as_time_series().unwrap()))
+            }
             _ => unreachable!(),
         };
 
@@ -3570,15 +3697,15 @@ impl From<FbsTableSourceInstance<'_>> for TableSourceInstance {
     }
 }
 
-impl TableSourceInstance {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for TableSourceInstance {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -3589,7 +3716,7 @@ impl TableSourceInstance {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct ValueRow {
     pub row: Vec<Expr>,
 }
@@ -3625,15 +3752,15 @@ impl From<FbsValueRow<'_>> for ValueRow {
     }
 }
 
-impl ValueRow {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for ValueRow {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -3643,7 +3770,7 @@ impl ValueRow {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct When {
     pub cond: Expr,
     pub value: Expr,
@@ -3674,15 +3801,15 @@ impl From<FbsWhen<'_>> for When {
     }
 }
 
-impl When {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for When {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -3973,6 +4100,14 @@ mod tests {
         let t0 = TableSourceInstance::default();
         let buf = t0.to_fbs_bytes();
         let t1 = TableSourceInstance::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_time_series() {
+        let t0 = TimeSeries::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = TimeSeries::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 

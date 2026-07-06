@@ -71,13 +71,6 @@ class ObjectSummary(object):
             return obj
         return None
 
-    # ObjectSummary
-    def DriveSize(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
-        return 0
-
 def ObjectSummaryStart(builder):
     builder.StartObject(6)
 
@@ -113,12 +106,6 @@ def ObjectSummaryAddAcl(builder, acl):
 
 def AddAcl(builder, acl):
     ObjectSummaryAddAcl(builder, acl)
-
-def ObjectSummaryAddDriveSize(builder, driveSize):
-    builder.PrependUint64Slot(5, driveSize, 0)
-
-def AddDriveSize(builder, driveSize):
-    ObjectSummaryAddDriveSize(builder, driveSize)
 
 def ObjectSummaryEnd(builder):
     return builder.EndObject()

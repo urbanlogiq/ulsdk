@@ -66,6 +66,7 @@ from .id import (
     GraphNodeId,
     ObjectId,
     ObjectNamespace,
+    PinnedObjectId,
     StreamId,
 )
 from .generated.B2cId import B2cId as FbsB2cId
@@ -98,6 +99,7 @@ from .generated.ListView import ListView as FbsListView
 from .generated.Map import Map as FbsMap
 from .generated.Null import Null as FbsNull
 from .generated.ObjectId import ObjectId as FbsObjectId
+from .generated.PinnedObjectId import PinnedObjectId as FbsPinnedObjectId
 from .generated.RunEndEncoded import RunEndEncoded as FbsRunEndEncoded
 from .generated.Schema import Schema as FbsSchema
 from .generated.Stream import Stream as FbsStream

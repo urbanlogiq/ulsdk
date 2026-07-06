@@ -12,7 +12,11 @@
 #![allow(clippy::derivable_impls)]
 #![allow(clippy::doc_lazy_continuation)]
 
+pub mod File_generated;
+pub mod Message_generated;
 pub mod Schema_generated;
+pub mod SparseTensor_generated;
+pub mod Tensor_generated;
 pub mod api_generated;
 pub mod attr_generated;
 pub mod crypto_generated;

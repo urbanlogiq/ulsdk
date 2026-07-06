@@ -35,6 +35,116 @@ use self::flatbuffers::{EndianScalar, Follow};
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
+pub const ENUM_MIN_PRODUCER_REF: u8 = 0;
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+pub const ENUM_MAX_PRODUCER_REF: u8 = 2;
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+#[allow(non_camel_case_types)]
+pub const ENUM_VALUES_PRODUCER_REF: [ProducerRef; 3] = [
+    ProducerRef::NONE,
+    ProducerRef::ObjectId,
+    ProducerRef::ContainerRef,
+];
+
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+#[repr(transparent)]
+pub struct ProducerRef(pub u8);
+#[allow(non_upper_case_globals)]
+impl ProducerRef {
+    pub const NONE: Self = Self(0);
+    pub const ObjectId: Self = Self(1);
+    pub const ContainerRef: Self = Self(2);
+
+    pub const ENUM_MIN: u8 = 0;
+    pub const ENUM_MAX: u8 = 2;
+    pub const ENUM_VALUES: &'static [Self] = &[Self::NONE, Self::ObjectId, Self::ContainerRef];
+    /// Returns the variant's name or "" if unknown.
+    pub fn variant_name(self) -> Option<&'static str> {
+        match self {
+            Self::NONE => Some("NONE"),
+            Self::ObjectId => Some("ObjectId"),
+            Self::ContainerRef => Some("ContainerRef"),
+            _ => None,
+        }
+    }
+}
+impl core::fmt::Debug for ProducerRef {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        if let Some(name) = self.variant_name() {
+            f.write_str(name)
+        } else {
+            f.write_fmt(format_args!("<UNKNOWN {:?}>", self.0))
+        }
+    }
+}
+impl Serialize for ProducerRef {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_unit_variant(
+            "ProducerRef",
+            self.0 as u32,
+            self.variant_name().unwrap(),
+        )
+    }
+}
+
+impl<'a> flatbuffers::Follow<'a> for ProducerRef {
+    type Inner = Self;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        let b = flatbuffers::read_scalar_at::<u8>(buf, loc);
+        Self(b)
+    }
+}
+
+impl flatbuffers::Push for ProducerRef {
+    type Output = ProducerRef;
+    #[inline]
+    unsafe fn push(&self, dst: &mut [u8], _written_len: usize) {
+        flatbuffers::emplace_scalar::<u8>(dst, self.0);
+    }
+}
+
+impl flatbuffers::EndianScalar for ProducerRef {
+    type Scalar = u8;
+    #[inline]
+    fn to_little_endian(self) -> u8 {
+        self.0.to_le()
+    }
+    #[inline]
+    #[allow(clippy::wrong_self_convention)]
+    fn from_little_endian(v: u8) -> Self {
+        let b = u8::from_le(v);
+        Self(b)
+    }
+}
+
+impl<'a> flatbuffers::Verifiable for ProducerRef {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        u8::run_verifier(v, pos)
+    }
+}
+
+impl flatbuffers::SimpleToVerifyInSlice for ProducerRef {}
+pub struct ProducerRefUnionTableOffset {}
+
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
 pub const ENUM_MIN_PARAMETER_VALUE: u8 = 0;
 #[deprecated(
     since = "2.0.0",
@@ -509,6 +619,568 @@ impl<'a> flatbuffers::Verifiable for ValuesFormatTy {
 }
 
 impl flatbuffers::SimpleToVerifyInSlice for ValuesFormatTy {}
+pub enum GitRefOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct GitRef<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for GitRef<'a> {
+    type Inner = GitRef<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> GitRef<'a> {
+    pub const VT_REPO: flatbuffers::VOffsetT = 4;
+    pub const VT_COMMITISH: flatbuffers::VOffsetT = 6;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        GitRef { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args GitRefArgs<'args>,
+    ) -> flatbuffers::WIPOffset<GitRef<'bldr>> {
+        let mut builder = GitRefBuilder::new(_fbb);
+        if let Some(x) = args.commitish {
+            builder.add_commitish(x);
+        }
+        if let Some(x) = args.repo {
+            builder.add_repo(x);
+        }
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn repo(&self) -> &'a str {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<&str>>(GitRef::VT_REPO, None)
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn commitish(&self) -> &'a str {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<&str>>(GitRef::VT_COMMITISH, None)
+                .unwrap()
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for GitRef<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<&str>>("repo", Self::VT_REPO, true)?
+            .visit_field::<flatbuffers::ForwardsUOffset<&str>>(
+                "commitish",
+                Self::VT_COMMITISH,
+                true,
+            )?
+            .finish();
+        Ok(())
+    }
+}
+pub struct GitRefArgs<'a> {
+    pub repo: Option<flatbuffers::WIPOffset<&'a str>>,
+    pub commitish: Option<flatbuffers::WIPOffset<&'a str>>,
+}
+impl<'a> Default for GitRefArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        GitRefArgs {
+            repo: None,      // required field
+            commitish: None, // required field
+        }
+    }
+}
+
+impl Serialize for GitRef<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("GitRef", 2)?;
+        s.serialize_field("repo", &self.repo())?;
+        s.serialize_field("commitish", &self.commitish())?;
+        s.end()
+    }
+}
+
+pub struct GitRefBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> GitRefBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_repo(&mut self, repo: flatbuffers::WIPOffset<&'b str>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(GitRef::VT_REPO, repo);
+    }
+    #[inline]
+    pub fn add_commitish(&mut self, commitish: flatbuffers::WIPOffset<&'b str>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(GitRef::VT_COMMITISH, commitish);
+    }
+    #[inline]
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> GitRefBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        GitRefBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<GitRef<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_.required(o, GitRef::VT_REPO, "repo");
+        self.fbb_.required(o, GitRef::VT_COMMITISH, "commitish");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for GitRef<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("GitRef");
+        ds.field("repo", &self.repo());
+        ds.field("commitish", &self.commitish());
+        ds.finish()
+    }
+}
+pub enum ContainerRefOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct ContainerRef<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for ContainerRef<'a> {
+    type Inner = ContainerRef<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> ContainerRef<'a> {
+    pub const VT_IMAGE: flatbuffers::VOffsetT = 4;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        ContainerRef { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args ContainerRefArgs<'args>,
+    ) -> flatbuffers::WIPOffset<ContainerRef<'bldr>> {
+        let mut builder = ContainerRefBuilder::new(_fbb);
+        if let Some(x) = args.image {
+            builder.add_image(x);
+        }
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn image(&self) -> &'a str {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<&str>>(ContainerRef::VT_IMAGE, None)
+                .unwrap()
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for ContainerRef<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<&str>>("image", Self::VT_IMAGE, true)?
+            .finish();
+        Ok(())
+    }
+}
+pub struct ContainerRefArgs<'a> {
+    pub image: Option<flatbuffers::WIPOffset<&'a str>>,
+}
+impl<'a> Default for ContainerRefArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        ContainerRefArgs {
+            image: None, // required field
+        }
+    }
+}
+
+impl Serialize for ContainerRef<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("ContainerRef", 1)?;
+        s.serialize_field("image", &self.image())?;
+        s.end()
+    }
+}
+
+pub struct ContainerRefBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ContainerRefBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_image(&mut self, image: flatbuffers::WIPOffset<&'b str>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(ContainerRef::VT_IMAGE, image);
+    }
+    #[inline]
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> ContainerRefBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        ContainerRefBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<ContainerRef<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_.required(o, ContainerRef::VT_IMAGE, "image");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for ContainerRef<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("ContainerRef");
+        ds.field("image", &self.image());
+        ds.finish()
+    }
+}
+pub enum ProducerOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct Producer<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for Producer<'a> {
+    type Inner = Producer<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> Producer<'a> {
+    pub const VT_EXECUTOR: flatbuffers::VOffsetT = 4;
+    pub const VT_MODEL_TYPE: flatbuffers::VOffsetT = 6;
+    pub const VT_MODEL: flatbuffers::VOffsetT = 8;
+    pub const VT_BUILDER_CODE_REF: flatbuffers::VOffsetT = 10;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        Producer { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args ProducerArgs<'args>,
+    ) -> flatbuffers::WIPOffset<Producer<'bldr>> {
+        let mut builder = ProducerBuilder::new(_fbb);
+        if let Some(x) = args.builder_code_ref {
+            builder.add_builder_code_ref(x);
+        }
+        if let Some(x) = args.model {
+            builder.add_model(x);
+        }
+        if let Some(x) = args.executor {
+            builder.add_executor(x);
+        }
+        builder.add_model_type(args.model_type);
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn executor(&self) -> GitRef<'a> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<GitRef>>(Producer::VT_EXECUTOR, None)
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn model_type(&self) -> ProducerRef {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<ProducerRef>(Producer::VT_MODEL_TYPE, Some(ProducerRef::NONE))
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn model(&self) -> Option<flatbuffers::Table<'a>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<flatbuffers::Table<'a>>>(
+                    Producer::VT_MODEL,
+                    None,
+                )
+        }
+    }
+    #[inline]
+    pub fn builder_code_ref(&self) -> Option<GitRef<'a>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<GitRef>>(Producer::VT_BUILDER_CODE_REF, None)
+        }
+    }
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn model_as_object_id(&self) -> Option<ObjectId<'a>> {
+        if self.model_type() == ProducerRef::ObjectId {
+            self.model().map(|t| {
+                // Safety:
+                // Created from a valid Table for this object
+                // Which contains a valid union in this slot
+                unsafe { ObjectId::init_from_table(t) }
+            })
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn model_as_container_ref(&self) -> Option<ContainerRef<'a>> {
+        if self.model_type() == ProducerRef::ContainerRef {
+            self.model().map(|t| {
+                // Safety:
+                // Created from a valid Table for this object
+                // Which contains a valid union in this slot
+                unsafe { ContainerRef::init_from_table(t) }
+            })
+        } else {
+            None
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for Producer<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<GitRef>>(
+                "executor",
+                Self::VT_EXECUTOR,
+                true,
+            )?
+            .visit_union::<ProducerRef, _>(
+                "model_type",
+                Self::VT_MODEL_TYPE,
+                "model",
+                Self::VT_MODEL,
+                false,
+                |key, v, pos| match key {
+                    ProducerRef::ObjectId => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<ObjectId>>(
+                            "ProducerRef::ObjectId",
+                            pos,
+                        ),
+                    ProducerRef::ContainerRef => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<ContainerRef>>(
+                            "ProducerRef::ContainerRef",
+                            pos,
+                        ),
+                    _ => Ok(()),
+                },
+            )?
+            .visit_field::<flatbuffers::ForwardsUOffset<GitRef>>(
+                "builder_code_ref",
+                Self::VT_BUILDER_CODE_REF,
+                false,
+            )?
+            .finish();
+        Ok(())
+    }
+}
+pub struct ProducerArgs<'a> {
+    pub executor: Option<flatbuffers::WIPOffset<GitRef<'a>>>,
+    pub model_type: ProducerRef,
+    pub model: Option<flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>>,
+    pub builder_code_ref: Option<flatbuffers::WIPOffset<GitRef<'a>>>,
+}
+impl<'a> Default for ProducerArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        ProducerArgs {
+            executor: None, // required field
+            model_type: ProducerRef::NONE,
+            model: None,
+            builder_code_ref: None,
+        }
+    }
+}
+
+impl Serialize for Producer<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("Producer", 4)?;
+        s.serialize_field("executor", &self.executor())?;
+        s.serialize_field("model_type", &self.model_type())?;
+        match self.model_type() {
+            ProducerRef::NONE => (),
+            ProducerRef::ObjectId => {
+                let f = self
+                    .model_as_object_id()
+                    .expect("Invalid union table, expected `ProducerRef::ObjectId`.");
+                s.serialize_field("model", &f)?;
+            }
+            ProducerRef::ContainerRef => {
+                let f = self
+                    .model_as_container_ref()
+                    .expect("Invalid union table, expected `ProducerRef::ContainerRef`.");
+                s.serialize_field("model", &f)?;
+            }
+            _ => unimplemented!(),
+        }
+        if let Some(f) = self.builder_code_ref() {
+            s.serialize_field("builder_code_ref", &f)?;
+        } else {
+            s.skip_field("builder_code_ref")?;
+        }
+        s.end()
+    }
+}
+
+pub struct ProducerBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ProducerBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_executor(&mut self, executor: flatbuffers::WIPOffset<GitRef<'b>>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<GitRef>>(Producer::VT_EXECUTOR, executor);
+    }
+    #[inline]
+    pub fn add_model_type(&mut self, model_type: ProducerRef) {
+        self.fbb_
+            .push_slot::<ProducerRef>(Producer::VT_MODEL_TYPE, model_type, ProducerRef::NONE);
+    }
+    #[inline]
+    pub fn add_model(&mut self, model: flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(Producer::VT_MODEL, model);
+    }
+    #[inline]
+    pub fn add_builder_code_ref(&mut self, builder_code_ref: flatbuffers::WIPOffset<GitRef<'b>>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<GitRef>>(
+                Producer::VT_BUILDER_CODE_REF,
+                builder_code_ref,
+            );
+    }
+    #[inline]
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> ProducerBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        ProducerBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<Producer<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_.required(o, Producer::VT_EXECUTOR, "executor");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for Producer<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("Producer");
+        ds.field("executor", &self.executor());
+        ds.field("model_type", &self.model_type());
+        match self.model_type() {
+            ProducerRef::ObjectId => {
+                if let Some(x) = self.model_as_object_id() {
+                    ds.field("model", &x)
+                } else {
+                    ds.field(
+                        "model",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            ProducerRef::ContainerRef => {
+                if let Some(x) = self.model_as_container_ref() {
+                    ds.field("model", &x)
+                } else {
+                    ds.field(
+                        "model",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            _ => {
+                let x: Option<()> = None;
+                ds.field("model", &x)
+            }
+        };
+        ds.field("builder_code_ref", &self.builder_code_ref());
+        ds.finish()
+    }
+}
 pub enum ByteArrayOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -1107,6 +1779,7 @@ impl<'a> WorkLog<'a> {
     pub const VT_PARENT: flatbuffers::VOffsetT = 16;
     pub const VT_USER_SETTINGS: flatbuffers::VOffsetT = 18;
     pub const VT_JOB_ID: flatbuffers::VOffsetT = 20;
+    pub const VT_PRODUCER: flatbuffers::VOffsetT = 22;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -1118,6 +1791,9 @@ impl<'a> WorkLog<'a> {
         args: &'args WorkLogArgs<'args>,
     ) -> flatbuffers::WIPOffset<WorkLog<'bldr>> {
         let mut builder = WorkLogBuilder::new(_fbb);
+        if let Some(x) = args.producer {
+            builder.add_producer(x);
+        }
         if let Some(x) = args.job_id {
             builder.add_job_id(x);
         }
@@ -1160,26 +1836,26 @@ impl<'a> WorkLog<'a> {
     #[inline]
     pub fn input_streams(
         &self,
-    ) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ObjectId<'a>>>> {
+    ) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<PinnedObjectId<'a>>>> {
         // Safety:
         // Created from valid Table for this object
         // which contains a valid value in this slot
         unsafe {
             self._tab.get::<flatbuffers::ForwardsUOffset<
-                flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ObjectId>>,
+                flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<PinnedObjectId>>,
             >>(WorkLog::VT_INPUT_STREAMS, None)
         }
     }
     /// The schematic used behind creating the worklog. This may be empty/null
     /// if we are just layering data, for example.
     #[inline]
-    pub fn schematic(&self) -> ObjectId<'a> {
+    pub fn schematic(&self) -> PinnedObjectId<'a> {
         // Safety:
         // Created from valid Table for this object
         // which contains a valid value in this slot
         unsafe {
             self._tab
-                .get::<flatbuffers::ForwardsUOffset<ObjectId>>(WorkLog::VT_SCHEMATIC, None)
+                .get::<flatbuffers::ForwardsUOffset<PinnedObjectId>>(WorkLog::VT_SCHEMATIC, None)
                 .unwrap()
         }
     }
@@ -1190,14 +1866,14 @@ impl<'a> WorkLog<'a> {
     #[inline]
     pub fn output_streams(
         &self,
-    ) -> flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ObjectId<'a>>> {
+    ) -> flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<PinnedObjectId<'a>>> {
         // Safety:
         // Created from valid Table for this object
         // which contains a valid value in this slot
         unsafe {
             self._tab
                 .get::<flatbuffers::ForwardsUOffset<
-                    flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ObjectId>>,
+                    flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<PinnedObjectId>>,
                 >>(WorkLog::VT_OUTPUT_STREAMS, None)
                 .unwrap()
         }
@@ -1257,6 +1933,16 @@ impl<'a> WorkLog<'a> {
                 .get::<flatbuffers::ForwardsUOffset<ObjectId>>(WorkLog::VT_JOB_ID, None)
         }
     }
+    #[inline]
+    pub fn producer(&self) -> Option<Producer<'a>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<Producer>>(WorkLog::VT_PRODUCER, None)
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for WorkLog<'_> {
@@ -1269,15 +1955,15 @@ impl flatbuffers::Verifiable for WorkLog<'_> {
         v.visit_table(pos)?
             .visit_field::<flatbuffers::ForwardsUOffset<&str>>("name", Self::VT_NAME, false)?
             .visit_field::<flatbuffers::ForwardsUOffset<
-                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<ObjectId>>,
+                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<PinnedObjectId>>,
             >>("input_streams", Self::VT_INPUT_STREAMS, false)?
-            .visit_field::<flatbuffers::ForwardsUOffset<ObjectId>>(
+            .visit_field::<flatbuffers::ForwardsUOffset<PinnedObjectId>>(
                 "schematic",
                 Self::VT_SCHEMATIC,
                 true,
             )?
             .visit_field::<flatbuffers::ForwardsUOffset<
-                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<ObjectId>>,
+                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<PinnedObjectId>>,
             >>("output_streams", Self::VT_OUTPUT_STREAMS, true)?
             .visit_field::<flatbuffers::ForwardsUOffset<
                 flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<WorklogParameter>>,
@@ -1297,6 +1983,11 @@ impl flatbuffers::Verifiable for WorkLog<'_> {
                 Self::VT_JOB_ID,
                 false,
             )?
+            .visit_field::<flatbuffers::ForwardsUOffset<Producer>>(
+                "producer",
+                Self::VT_PRODUCER,
+                false,
+            )?
             .finish();
         Ok(())
     }
@@ -1304,11 +1995,15 @@ impl flatbuffers::Verifiable for WorkLog<'_> {
 pub struct WorkLogArgs<'a> {
     pub name: Option<flatbuffers::WIPOffset<&'a str>>,
     pub input_streams: Option<
-        flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ObjectId<'a>>>>,
+        flatbuffers::WIPOffset<
+            flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<PinnedObjectId<'a>>>,
+        >,
     >,
-    pub schematic: Option<flatbuffers::WIPOffset<ObjectId<'a>>>,
+    pub schematic: Option<flatbuffers::WIPOffset<PinnedObjectId<'a>>>,
     pub output_streams: Option<
-        flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ObjectId<'a>>>>,
+        flatbuffers::WIPOffset<
+            flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<PinnedObjectId<'a>>>,
+        >,
     >,
     pub params: Option<
         flatbuffers::WIPOffset<
@@ -1318,6 +2013,7 @@ pub struct WorkLogArgs<'a> {
     pub parent: Option<flatbuffers::WIPOffset<ObjectId<'a>>>,
     pub user_settings: Option<flatbuffers::WIPOffset<UserSettings<'a>>>,
     pub job_id: Option<flatbuffers::WIPOffset<ObjectId<'a>>>,
+    pub producer: Option<flatbuffers::WIPOffset<Producer<'a>>>,
 }
 impl<'a> Default for WorkLogArgs<'a> {
     #[inline]
@@ -1331,6 +2027,7 @@ impl<'a> Default for WorkLogArgs<'a> {
             parent: None,
             user_settings: None,
             job_id: None,
+            producer: None,
         }
     }
 }
@@ -1340,7 +2037,7 @@ impl Serialize for WorkLog<'_> {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("WorkLog", 9)?;
+        let mut s = serializer.serialize_struct("WorkLog", 10)?;
         if let Some(f) = self.name() {
             s.serialize_field("name", &f)?;
         } else {
@@ -1369,6 +2066,11 @@ impl Serialize for WorkLog<'_> {
         } else {
             s.skip_field("job_id")?;
         }
+        if let Some(f) = self.producer() {
+            s.serialize_field("producer", &f)?;
+        } else {
+            s.skip_field("producer")?;
+        }
         s.end()
     }
 }
@@ -1387,7 +2089,7 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> WorkLogBuilder<'a, 'b, A> {
     pub fn add_input_streams(
         &mut self,
         input_streams: flatbuffers::WIPOffset<
-            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<ObjectId<'b>>>,
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<PinnedObjectId<'b>>>,
         >,
     ) {
         self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(
@@ -1396,15 +2098,18 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> WorkLogBuilder<'a, 'b, A> {
         );
     }
     #[inline]
-    pub fn add_schematic(&mut self, schematic: flatbuffers::WIPOffset<ObjectId<'b>>) {
+    pub fn add_schematic(&mut self, schematic: flatbuffers::WIPOffset<PinnedObjectId<'b>>) {
         self.fbb_
-            .push_slot_always::<flatbuffers::WIPOffset<ObjectId>>(WorkLog::VT_SCHEMATIC, schematic);
+            .push_slot_always::<flatbuffers::WIPOffset<PinnedObjectId>>(
+                WorkLog::VT_SCHEMATIC,
+                schematic,
+            );
     }
     #[inline]
     pub fn add_output_streams(
         &mut self,
         output_streams: flatbuffers::WIPOffset<
-            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<ObjectId<'b>>>,
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<PinnedObjectId<'b>>>,
         >,
     ) {
         self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(
@@ -1441,6 +2146,11 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> WorkLogBuilder<'a, 'b, A> {
             .push_slot_always::<flatbuffers::WIPOffset<ObjectId>>(WorkLog::VT_JOB_ID, job_id);
     }
     #[inline]
+    pub fn add_producer(&mut self, producer: flatbuffers::WIPOffset<Producer<'b>>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<Producer>>(WorkLog::VT_PRODUCER, producer);
+    }
+    #[inline]
     pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> WorkLogBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         WorkLogBuilder {
@@ -1470,6 +2180,7 @@ impl core::fmt::Debug for WorkLog<'_> {
         ds.field("parent", &self.parent());
         ds.field("user_settings", &self.user_settings());
         ds.field("job_id", &self.job_id());
+        ds.field("producer", &self.producer());
         ds.finish()
     }
 }

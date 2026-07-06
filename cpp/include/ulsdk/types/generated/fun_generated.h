@@ -210,6 +210,8 @@ enum class Fn : int16_t {
   IsDistinctFrom = 193,
   IsNotDistinctFrom = 194,
   GeoFilter = 195,
+  StBuffer = 196,
+  StDistance = 197,
   CorrelationId = 32763,
   UlTimezone = 32764,
   UlArrayContains = 32765,
@@ -218,7 +220,7 @@ enum class Fn : int16_t {
   MAX = UlArrayAny
 };
 
-inline const Fn (&EnumValuesFn())[200] {
+inline const Fn (&EnumValuesFn())[202] {
   static const Fn values[] = {
     Fn::None,
     Fn::True,
@@ -416,6 +418,8 @@ inline const Fn (&EnumValuesFn())[200] {
     Fn::IsDistinctFrom,
     Fn::IsNotDistinctFrom,
     Fn::GeoFilter,
+    Fn::StBuffer,
+    Fn::StDistance,
     Fn::CorrelationId,
     Fn::UlTimezone,
     Fn::UlArrayContains,
@@ -622,6 +626,8 @@ inline const char *EnumNameFn(Fn e) {
     case Fn::IsDistinctFrom: return "IsDistinctFrom";
     case Fn::IsNotDistinctFrom: return "IsNotDistinctFrom";
     case Fn::GeoFilter: return "GeoFilter";
+    case Fn::StBuffer: return "StBuffer";
+    case Fn::StDistance: return "StDistance";
     case Fn::CorrelationId: return "CorrelationId";
     case Fn::UlTimezone: return "UlTimezone";
     case Fn::UlArrayContains: return "UlArrayContains";

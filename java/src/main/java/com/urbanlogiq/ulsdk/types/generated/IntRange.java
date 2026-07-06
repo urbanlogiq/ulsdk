@@ -42,6 +42,7 @@ public final class IntRange extends com.google.flatbuffers.Table {
   public String enumName() { int o = __offset(14); return o != 0 ? __string(o + bb_pos) : null; }
   public ByteBuffer enumNameAsByteBuffer() { return __vector_as_bytebuffer(14, 1); }
   public ByteBuffer enumNameInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 14, 1); }
+  public boolean isBitmaskEnum() { int o = __offset(16); return o != 0 ? 0!=bb.get(o + bb_pos) : false; }
 
   public static int createIntRange(FlatBufferBuilder builder,
       long min,
@@ -49,18 +50,20 @@ public final class IntRange extends com.google.flatbuffers.Table {
       int fieldFormatOffset,
       long aggregationProtocol,
       int displayStringsOffset,
-      int enumNameOffset) {
-    builder.startTable(6);
+      int enumNameOffset,
+      boolean isBitmaskEnum) {
+    builder.startTable(7);
     IntRange.addMax(builder, max);
     IntRange.addMin(builder, min);
     IntRange.addEnumName(builder, enumNameOffset);
     IntRange.addDisplayStrings(builder, displayStringsOffset);
     IntRange.addAggregationProtocol(builder, aggregationProtocol);
     IntRange.addFieldFormat(builder, fieldFormatOffset);
+    IntRange.addIsBitmaskEnum(builder, isBitmaskEnum);
     return IntRange.endIntRange(builder);
   }
 
-  public static void startIntRange(FlatBufferBuilder builder) { builder.startTable(6); }
+  public static void startIntRange(FlatBufferBuilder builder) { builder.startTable(7); }
   public static void addMin(FlatBufferBuilder builder, long min) { builder.addLong(0, min, 0L); }
   public static void addMax(FlatBufferBuilder builder, long max) { builder.addLong(1, max, 0L); }
   public static void addFieldFormat(FlatBufferBuilder builder, int fieldFormatOffset) { builder.addOffset(2, fieldFormatOffset, 0); }
@@ -69,6 +72,7 @@ public final class IntRange extends com.google.flatbuffers.Table {
   public static int createDisplayStringsVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
   public static void startDisplayStringsVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
   public static void addEnumName(FlatBufferBuilder builder, int enumNameOffset) { builder.addOffset(5, enumNameOffset, 0); }
+  public static void addIsBitmaskEnum(FlatBufferBuilder builder, boolean isBitmaskEnum) { builder.addBoolean(6, isBitmaskEnum, false); }
   public static int endIntRange(FlatBufferBuilder builder) {
     int o = builder.endTable();
     return o;

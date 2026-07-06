@@ -32,6 +32,21 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ParameterValue &o)
     }
 }
 
+std::pair<::flatbuffers::Offset<void>, ::ProducerRef>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ProducerRef &o) {
+    if (std::holds_alternative<std::shared_ptr<ObjectId>>(o)) {
+        const std::shared_ptr<ObjectId> &v = std::get<std::shared_ptr<ObjectId>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::ProducerRef::ObjectId);
+    } else if (std::holds_alternative<std::shared_ptr<ContainerRef>>(o)) {
+        const std::shared_ptr<ContainerRef> &v = std::get<std::shared_ptr<ContainerRef>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::ProducerRef::ContainerRef);
+    } else { 
+        throw std::runtime_error("unreachable");
+    }
+}
+
 ::flatbuffers::Offset<::ByteArray>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ByteArray &o) {
     std::optional<decltype(builder.CreateVector(o.b_.value()))> b_offset = std::nullopt;
@@ -126,6 +141,98 @@ ParameterFlags::operator==(const ParameterFlags &rhs) const {
     return true;
 }
 
+::flatbuffers::Offset<::ContainerRef>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ContainerRef &o) {
+    const ::flatbuffers::Offset<::flatbuffers::String> image_offset = builder.CreateString(o.image_);
+
+    ::ContainerRefBuilder instance_builder = ::ContainerRefBuilder(builder);
+    instance_builder.add_image(image_offset);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const ContainerRef &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+ContainerRef::ContainerRef()
+    : image_() {
+}
+
+ContainerRef::ContainerRef(const std::vector<uint8_t> &bytes)
+    : ContainerRef(::flatbuffers::GetSizePrefixedRoot<::ContainerRef>(bytes.data())) {
+}
+
+ContainerRef::ContainerRef(const ::ContainerRef *root) 
+    : image_() {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+        image_ = std::string(*root->image()->begin(), *root->image()->end());
+}
+
+bool
+ContainerRef::operator==(const ContainerRef &rhs) const {
+    if (this->image_ != rhs.image_) {
+        return false;
+    }
+    return true;
+}
+
+::flatbuffers::Offset<::GitRef>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const GitRef &o) {
+    const ::flatbuffers::Offset<::flatbuffers::String> commitish_offset = builder.CreateString(o.commitish_);
+    const ::flatbuffers::Offset<::flatbuffers::String> repo_offset = builder.CreateString(o.repo_);
+
+    ::GitRefBuilder instance_builder = ::GitRefBuilder(builder);
+    instance_builder.add_commitish(commitish_offset);
+    instance_builder.add_repo(repo_offset);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const GitRef &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+GitRef::GitRef()
+    : commitish_()
+    , repo_() {
+}
+
+GitRef::GitRef(const std::vector<uint8_t> &bytes)
+    : GitRef(::flatbuffers::GetSizePrefixedRoot<::GitRef>(bytes.data())) {
+}
+
+GitRef::GitRef(const ::GitRef *root) 
+    : commitish_()
+    , repo_() {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+        commitish_ = std::string(*root->commitish()->begin(), *root->commitish()->end());
+        repo_ = std::string(*root->repo()->begin(), *root->repo()->end());
+}
+
+bool
+GitRef::operator==(const GitRef &rhs) const {
+    if (this->commitish_ != rhs.commitish_) {
+        return false;
+    }
+    if (this->repo_ != rhs.repo_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Layout>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Layout &o) {
 
@@ -183,6 +290,99 @@ Layout::operator==(const Layout &rhs) const {
         return false;
     }
     if (this->y_ != rhs.y_) {
+        return false;
+    }
+    return true;
+}
+
+::flatbuffers::Offset<::Producer>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Producer &o) {
+    std::optional<::flatbuffers::Offset<::GitRef>> builder_code_ref_offset = std::nullopt;
+    if (o.builder_code_ref_.has_value()) {
+        const ::flatbuffers::Offset<::GitRef> builder_code_ref_offset_val = serialize_to(builder, o.builder_code_ref_.value());
+        builder_code_ref_offset = std::make_optional(builder_code_ref_offset_val);
+    }
+    const ::flatbuffers::Offset<::GitRef> executor_offset = serialize_to(builder, o.executor_);
+    std::optional<std::pair<::flatbuffers::Offset<void>, ::ProducerRef>> model_offset = std::nullopt;
+    if (o.model_.has_value()) {
+        const std::pair<::flatbuffers::Offset<void>, ::ProducerRef> model_offset_val = serialize_to(builder, o.model_.value());
+        model_offset = std::make_optional(model_offset_val);
+    }
+
+    ::ProducerBuilder instance_builder = ::ProducerBuilder(builder);
+    if (builder_code_ref_offset.has_value()) {
+        instance_builder.add_builder_code_ref(builder_code_ref_offset.value());
+    }
+    instance_builder.add_executor(executor_offset);
+    if (model_offset.has_value()) {
+        const auto model_opt = model_offset.value();
+        instance_builder.add_model(model_opt.first);
+        instance_builder.add_model_type(model_opt.second);
+    }
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const Producer &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+Producer::Producer()
+    : builder_code_ref_(std::nullopt)
+    , executor_()
+    , model_(std::nullopt) {
+}
+
+Producer::Producer(const std::vector<uint8_t> &bytes)
+    : Producer(::flatbuffers::GetSizePrefixedRoot<::Producer>(bytes.data())) {
+}
+
+Producer::Producer(const ::Producer *root) 
+    : builder_code_ref_(std::nullopt)
+    , executor_()
+    , model_(std::nullopt) {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    if (root->builder_code_ref() != nullptr) {
+        builder_code_ref_ = decltype(builder_code_ref_)(root->builder_code_ref());
+    }
+    if (root->executor() != nullptr) {
+        executor_ = decltype(executor_)(root->executor());
+    }
+    if (root->model() != nullptr) {
+        switch (root->model_type()) {
+            case ::ProducerRef::NONE: throw std::runtime_error("unexpected none variant");
+            case ::ProducerRef::ObjectId: {
+                const auto model__local = static_cast<const ::ObjectId *>(root->model());
+                std::shared_ptr<ObjectId> model__shared = std::make_shared<ObjectId>(model__local);
+                model_ = model__shared;
+                break;
+            }
+            case ::ProducerRef::ContainerRef: {
+                const auto model__local = static_cast<const ::ContainerRef *>(root->model());
+                std::shared_ptr<ContainerRef> model__shared = std::make_shared<ContainerRef>(model__local);
+                model_ = model__shared;
+                break;
+            }
+            default: throw std::runtime_error("unknown union variant");
+        }
+    }
+}
+
+bool
+Producer::operator==(const Producer &rhs) const {
+    if (this->builder_code_ref_ != rhs.builder_code_ref_) {
+        return false;
+    }
+    if (this->executor_ != rhs.executor_) {
+        return false;
+    }
+    if (this->model_ != rhs.model_) {
         return false;
     }
     return true;
@@ -461,15 +661,15 @@ UserSettings::operator==(const UserSettings &rhs) const {
 
 ::flatbuffers::Offset<::WorkLog>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const WorkLog &o) {
-    std::optional<::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::ObjectId>>>> input_streams_offset = std::nullopt;
+    std::optional<::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::PinnedObjectId>>>> input_streams_offset = std::nullopt;
     if (o.input_streams_.has_value()) {
         const auto &input_streams__var = o.input_streams_.value();
-        std::vector<::flatbuffers::Offset<::ObjectId>> input_streams_offsets = std::vector<::flatbuffers::Offset<::ObjectId>>();
+        std::vector<::flatbuffers::Offset<::PinnedObjectId>> input_streams_offsets = std::vector<::flatbuffers::Offset<::PinnedObjectId>>();
         input_streams_offsets.reserve(input_streams__var.size());
         for (const auto &i: input_streams__var) {
             input_streams_offsets.push_back(serialize_to(builder, i));
         }
-        const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::ObjectId>>> input_streams_offset_val = builder.CreateVector(input_streams_offsets);
+        const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::PinnedObjectId>>> input_streams_offset_val = builder.CreateVector(input_streams_offsets);
         input_streams_offset = std::make_optional(input_streams_offset_val);
     }
     std::optional<::flatbuffers::Offset<::ObjectId>> job_id_offset = std::nullopt;
@@ -482,12 +682,12 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const WorkLog &o) {
         const ::flatbuffers::Offset<::flatbuffers::String> name_offset_val = builder.CreateString(o.name_.value());
         name_offset = std::make_optional(name_offset_val);
     }
-    std::vector<::flatbuffers::Offset<::ObjectId>> output_streams_offsets = std::vector<::flatbuffers::Offset<::ObjectId>>();
+    std::vector<::flatbuffers::Offset<::PinnedObjectId>> output_streams_offsets = std::vector<::flatbuffers::Offset<::PinnedObjectId>>();
     output_streams_offsets.reserve(o.output_streams_.size());
     for (const auto &i: o.output_streams_) {
         output_streams_offsets.push_back(serialize_to(builder, i));
     }
-    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::ObjectId>>> output_streams_offset = builder.CreateVector(output_streams_offsets);
+    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::PinnedObjectId>>> output_streams_offset = builder.CreateVector(output_streams_offsets);
     std::vector<::flatbuffers::Offset<::WorklogParameter>> params_offsets = std::vector<::flatbuffers::Offset<::WorklogParameter>>();
     params_offsets.reserve(o.params_.size());
     for (const auto &i: o.params_) {
@@ -499,7 +699,12 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const WorkLog &o) {
         const ::flatbuffers::Offset<::ObjectId> parent_offset_val = serialize_to(builder, o.parent_.value());
         parent_offset = std::make_optional(parent_offset_val);
     }
-    const ::flatbuffers::Offset<::ObjectId> schematic_offset = serialize_to(builder, o.schematic_);
+    std::optional<::flatbuffers::Offset<::Producer>> producer_offset = std::nullopt;
+    if (o.producer_.has_value()) {
+        const ::flatbuffers::Offset<::Producer> producer_offset_val = serialize_to(builder, o.producer_.value());
+        producer_offset = std::make_optional(producer_offset_val);
+    }
+    const ::flatbuffers::Offset<::PinnedObjectId> schematic_offset = serialize_to(builder, o.schematic_);
     std::optional<::flatbuffers::Offset<::UserSettings>> user_settings_offset = std::nullopt;
     if (o.user_settings_.has_value()) {
         const ::flatbuffers::Offset<::UserSettings> user_settings_offset_val = serialize_to(builder, o.user_settings_.value());
@@ -520,6 +725,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const WorkLog &o) {
     instance_builder.add_params(params_offset);
     if (parent_offset.has_value()) {
         instance_builder.add_parent(parent_offset.value());
+    }
+    if (producer_offset.has_value()) {
+        instance_builder.add_producer(producer_offset.value());
     }
     instance_builder.add_schematic(schematic_offset);
     if (user_settings_offset.has_value()) {
@@ -543,6 +751,7 @@ WorkLog::WorkLog()
     , output_streams_()
     , params_()
     , parent_(std::nullopt)
+    , producer_(std::nullopt)
     , schematic_()
     , user_settings_(std::nullopt) {
 }
@@ -558,6 +767,7 @@ WorkLog::WorkLog(const ::WorkLog *root)
     , output_streams_()
     , params_()
     , parent_(std::nullopt)
+    , producer_(std::nullopt)
     , schematic_()
     , user_settings_(std::nullopt) {
     if (root == nullptr) {
@@ -596,6 +806,9 @@ WorkLog::WorkLog(const ::WorkLog *root)
     if (root->parent() != nullptr) {
         parent_ = decltype(parent_)(root->parent());
     }
+    if (root->producer() != nullptr) {
+        producer_ = decltype(producer_)(root->producer());
+    }
     if (root->schematic() != nullptr) {
         schematic_ = decltype(schematic_)(root->schematic());
     }
@@ -622,6 +835,9 @@ WorkLog::operator==(const WorkLog &rhs) const {
         return false;
     }
     if (this->parent_ != rhs.parent_) {
+        return false;
+    }
+    if (this->producer_ != rhs.producer_) {
         return false;
     }
     if (this->schematic_ != rhs.schematic_) {

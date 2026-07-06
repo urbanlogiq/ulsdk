@@ -270,6 +270,29 @@ to_arrow(const std::vector<uint8_t>& input) {
     return result.ValueOrDie();
 }
 
+static arrow::Result<std::shared_ptr<arrow::Schema>>
+to_arrow_schema_impl(const std::vector<uint8_t>& input) {
+    const std::shared_ptr<arrow::io::InputStream> stream =
+        std::make_shared<VectorInputStream>(input);
+
+    ARROW_ASSIGN_OR_RAISE(
+        auto reader,
+        arrow::ipc::RecordBatchStreamReader::Open(stream)
+    );
+
+    return reader->schema();
+}
+
+std::shared_ptr<arrow::Schema>
+to_arrow_schema(const std::vector<uint8_t>& input) {
+    auto result = to_arrow_schema_impl(input);
+    if (!result.ok()) {
+        throw std::runtime_error(result.status().message());
+    }
+
+    return result.ValueOrDie();
+}
+
 static arrow::Result<std::vector<uint8_t>>
 to_bytes_impl(const std::vector<std::shared_ptr<arrow::RecordBatch>>& input) {
     std::shared_ptr<VectorOutputStream> stream =

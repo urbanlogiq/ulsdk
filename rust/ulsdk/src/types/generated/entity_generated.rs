@@ -35,13 +35,13 @@ pub const ENUM_MIN_ENTITY_TY: i32 = 0;
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
-pub const ENUM_MAX_ENTITY_TY: i32 = 274;
+pub const ENUM_MAX_ENTITY_TY: i32 = 275;
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_ENTITY_TY: [EntityTy; 275] = [
+pub const ENUM_VALUES_ENTITY_TY: [EntityTy; 276] = [
     EntityTy::T_INVALID,
     EntityTy::T_TFC,
     EntityTy::T_TFC_LOOP,
@@ -317,6 +317,7 @@ pub const ENUM_VALUES_ENTITY_TY: [EntityTy; 275] = [
     EntityTy::T_HEXAGON_BOUNDARY,
     EntityTy::T_COMPASS_IOT_POINT,
     EntityTy::T_LANDSLIDE_AREA,
+    EntityTy::T_EXPLORE_MODE_ROAD_SEGMENT,
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
@@ -599,9 +600,10 @@ impl EntityTy {
     pub const T_HEXAGON_BOUNDARY: Self = Self(272);
     pub const T_COMPASS_IOT_POINT: Self = Self(273);
     pub const T_LANDSLIDE_AREA: Self = Self(274);
+    pub const T_EXPLORE_MODE_ROAD_SEGMENT: Self = Self(275);
 
     pub const ENUM_MIN: i32 = 0;
-    pub const ENUM_MAX: i32 = 274;
+    pub const ENUM_MAX: i32 = 275;
     pub const ENUM_VALUES: &'static [Self] = &[
         Self::T_INVALID,
         Self::T_TFC,
@@ -878,6 +880,7 @@ impl EntityTy {
         Self::T_HEXAGON_BOUNDARY,
         Self::T_COMPASS_IOT_POINT,
         Self::T_LANDSLIDE_AREA,
+        Self::T_EXPLORE_MODE_ROAD_SEGMENT,
     ];
     /// Returns the variant's name or "" if unknown.
     pub fn variant_name(self) -> Option<&'static str> {
@@ -1177,6 +1180,7 @@ impl EntityTy {
             Self::T_HEXAGON_BOUNDARY => Some("T_HEXAGON_BOUNDARY"),
             Self::T_COMPASS_IOT_POINT => Some("T_COMPASS_IOT_POINT"),
             Self::T_LANDSLIDE_AREA => Some("T_LANDSLIDE_AREA"),
+            Self::T_EXPLORE_MODE_ROAD_SEGMENT => Some("T_EXPLORE_MODE_ROAD_SEGMENT"),
             _ => None,
         }
     }

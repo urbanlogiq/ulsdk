@@ -214,6 +214,12 @@ def test_table_source_instance():
     _t1 = TableSourceInstance.from_bytes(_b)
     assert _t0 == _t1
 
+def test_time_series():
+    _t0 = TimeSeries.make_default()
+    _b = _t0.to_bytes()
+    _t1 = TimeSeries.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_unary_query_element():
     _t0 = UnaryQueryElement.make_default()
     _b = _t0.to_bytes()

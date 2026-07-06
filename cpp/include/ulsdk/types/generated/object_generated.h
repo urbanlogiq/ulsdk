@@ -375,8 +375,7 @@ struct ObjectSummary FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_HEAD_REVISION = 6,
     VT_TY = 8,
     VT_TIME = 10,
-    VT_ACL = 12,
-    VT_DRIVE_SIZE = 14
+    VT_ACL = 12
   };
   const ObjectId *id() const {
     return GetPointer<const ObjectId *>(VT_ID);
@@ -393,9 +392,6 @@ struct ObjectSummary FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ObjectId *acl() const {
     return GetPointer<const ObjectId *>(VT_ACL);
   }
-  uint64_t drive_size() const {
-    return GetField<uint64_t>(VT_DRIVE_SIZE, 0);
-  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_ID) &&
@@ -406,7 +402,6 @@ struct ObjectSummary FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<uint64_t>(verifier, VT_TIME, 8) &&
            VerifyOffset(verifier, VT_ACL) &&
            verifier.VerifyTable(acl()) &&
-           VerifyField<uint64_t>(verifier, VT_DRIVE_SIZE, 8) &&
            verifier.EndTable();
   }
 };
@@ -430,9 +425,6 @@ struct ObjectSummaryBuilder {
   void add_acl(::flatbuffers::Offset<ObjectId> acl) {
     fbb_.AddOffset(ObjectSummary::VT_ACL, acl);
   }
-  void add_drive_size(uint64_t drive_size) {
-    fbb_.AddElement<uint64_t>(ObjectSummary::VT_DRIVE_SIZE, drive_size, 0);
-  }
   explicit ObjectSummaryBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -452,10 +444,8 @@ inline ::flatbuffers::Offset<ObjectSummary> CreateObjectSummary(
     ::flatbuffers::Offset<ContentId> head_revision = 0,
     DataCatalogObjectTy ty = DataCatalogObjectTy::Invalid,
     uint64_t time = 0,
-    ::flatbuffers::Offset<ObjectId> acl = 0,
-    uint64_t drive_size = 0) {
+    ::flatbuffers::Offset<ObjectId> acl = 0) {
   ObjectSummaryBuilder builder_(_fbb);
-  builder_.add_drive_size(drive_size);
   builder_.add_time(time);
   builder_.add_acl(acl);
   builder_.add_head_revision(head_revision);

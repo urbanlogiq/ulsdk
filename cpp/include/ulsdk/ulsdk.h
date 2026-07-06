@@ -30,6 +30,7 @@
 
 namespace arrow {
 class RecordBatch;
+class Schema;
 }
 
 namespace ul {
@@ -121,6 +122,11 @@ typedef std::variant<int64_t, double, std::string, bool> JsonValue;
 
 std::vector<std::shared_ptr<arrow::RecordBatch>>
 to_arrow(const std::vector<uint8_t>& input);
+
+// Reads the schema of an Arrow IPC stream without consuming its record batches. The stream
+// always leads with a schema message, so this is reliable even for a 0-row result.
+std::shared_ptr<arrow::Schema>
+to_arrow_schema(const std::vector<uint8_t>& input);
 
 std::vector<uint8_t>
 to_bytes(const std::vector<std::shared_ptr<arrow::RecordBatch>>& input);

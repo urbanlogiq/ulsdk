@@ -765,7 +765,6 @@ impl<'a> ObjectSummary<'a> {
     pub const VT_TY: flatbuffers::VOffsetT = 8;
     pub const VT_TIME: flatbuffers::VOffsetT = 10;
     pub const VT_ACL: flatbuffers::VOffsetT = 12;
-    pub const VT_DRIVE_SIZE: flatbuffers::VOffsetT = 14;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -777,7 +776,6 @@ impl<'a> ObjectSummary<'a> {
         args: &'args ObjectSummaryArgs<'args>,
     ) -> flatbuffers::WIPOffset<ObjectSummary<'bldr>> {
         let mut builder = ObjectSummaryBuilder::new(_fbb);
-        builder.add_drive_size(args.drive_size);
         builder.add_time(args.time);
         if let Some(x) = args.acl {
             builder.add_acl(x);
@@ -852,17 +850,6 @@ impl<'a> ObjectSummary<'a> {
                 .get::<flatbuffers::ForwardsUOffset<ObjectId>>(ObjectSummary::VT_ACL, None)
         }
     }
-    #[inline]
-    pub fn drive_size(&self) -> u64 {
-        // Safety:
-        // Created from valid Table for this object
-        // which contains a valid value in this slot
-        unsafe {
-            self._tab
-                .get::<u64>(ObjectSummary::VT_DRIVE_SIZE, Some(0))
-                .unwrap()
-        }
-    }
 }
 
 impl flatbuffers::Verifiable for ObjectSummary<'_> {
@@ -882,7 +869,6 @@ impl flatbuffers::Verifiable for ObjectSummary<'_> {
             .visit_field::<DataCatalogObjectTy>("ty", Self::VT_TY, false)?
             .visit_field::<u64>("time", Self::VT_TIME, false)?
             .visit_field::<flatbuffers::ForwardsUOffset<ObjectId>>("acl", Self::VT_ACL, false)?
-            .visit_field::<u64>("drive_size", Self::VT_DRIVE_SIZE, false)?
             .finish();
         Ok(())
     }
@@ -893,7 +879,6 @@ pub struct ObjectSummaryArgs<'a> {
     pub ty: DataCatalogObjectTy,
     pub time: u64,
     pub acl: Option<flatbuffers::WIPOffset<ObjectId<'a>>>,
-    pub drive_size: u64,
 }
 impl<'a> Default for ObjectSummaryArgs<'a> {
     #[inline]
@@ -904,7 +889,6 @@ impl<'a> Default for ObjectSummaryArgs<'a> {
             ty: DataCatalogObjectTy::Invalid,
             time: 0,
             acl: None,
-            drive_size: 0,
         }
     }
 }
@@ -924,7 +908,6 @@ impl Serialize for ObjectSummary<'_> {
         } else {
             s.skip_field("acl")?;
         }
-        s.serialize_field("drive_size", &self.drive_size())?;
         s.end()
     }
 }
@@ -965,11 +948,6 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ObjectSummaryBuilder<'a, 'b, A>
             .push_slot_always::<flatbuffers::WIPOffset<ObjectId>>(ObjectSummary::VT_ACL, acl);
     }
     #[inline]
-    pub fn add_drive_size(&mut self, drive_size: u64) {
-        self.fbb_
-            .push_slot::<u64>(ObjectSummary::VT_DRIVE_SIZE, drive_size, 0);
-    }
-    #[inline]
     pub fn new(
         _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     ) -> ObjectSummaryBuilder<'a, 'b, A> {
@@ -997,7 +975,6 @@ impl core::fmt::Debug for ObjectSummary<'_> {
         ds.field("ty", &self.ty());
         ds.field("time", &self.time());
         ds.field("acl", &self.acl());
-        ds.field("drive_size", &self.drive_size());
         ds.finish()
     }
 }

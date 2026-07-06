@@ -10,6 +10,7 @@ import * as flatbuffers from 'flatbuffers/js/flatbuffers';
 
 import { ObjectId, ObjectIdT } from './object-id';
 import { ParamIndices, ParamIndicesT } from './param-indices';
+import { PinnedObjectId, PinnedObjectIdT } from './pinned-object-id';
 import { Status } from './status';
 import { TaskErrorTy } from './task-error-ty';
 
@@ -102,9 +103,9 @@ params(obj?:ParamIndices):ParamIndices|null {
  * written. If it is a lookup of an existing stream, this will be populated
  * with the stream ID
  */
-output(obj?:ObjectId):ObjectId|null {
+output(obj?:PinnedObjectId):PinnedObjectId|null {
   const offset = this.bb!.__offset(this.bb_pos, 20);
-  return offset ? (obj || new ObjectId()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
+  return offset ? (obj || new PinnedObjectId()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
 /**
@@ -399,7 +400,7 @@ constructor(
   public status: Status = Status.Pending,
   public message: string|Uint8Array|null = null,
   public params: ParamIndicesT|null = null,
-  public output: ObjectIdT|null = null,
+  public output: PinnedObjectIdT|null = null,
   public discard: boolean = false,
   public upstream: (ObjectIdT)[] = [],
   public downstream: (ObjectIdT)[] = [],

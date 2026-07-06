@@ -12,6 +12,7 @@ import { MetadataT as Metadata } from '../../types/generated/metadata';
 import { NewTableT as NewTable } from '../../types/generated/new-table';
 import { ObjectIdT as ObjectId } from '../../types/generated/object-id';
 import { ObjectIdListT as ObjectIdList } from '../../types/generated/object-id-list';
+import { PinnedObjectIdT as PinnedObjectId } from '../../types/generated/pinned-object-id';
 import { QueryT as Query } from '../../types/generated/query';
 
 describe('getObjectAtRevision', () => {
@@ -277,7 +278,7 @@ describe('queryAggregateRelativeHisto', () => {
 describe('streamGetArrow', () => {
   it('testStreamGetArrow', async () => {
     const ctx = new TestContext();
-    const p0 = new ObjectId();
+    const p0 = new PinnedObjectId();
     ctx.setResponse(new Uint8Array(0));
     try {
           await datacatalog.streamGetArrow(
@@ -293,7 +294,7 @@ describe('streamGetArrow', () => {
 describe('streamGetParquet', () => {
   it('testStreamGetParquet', async () => {
     const ctx = new TestContext();
-    const p0 = new ObjectId();
+    const p0 = new PinnedObjectId();
     ctx.setResponse(new Uint8Array(0));
     try {
           await datacatalog.streamGetParquet(
@@ -309,7 +310,7 @@ describe('streamGetParquet', () => {
 describe('streamGetCsv', () => {
   it('testStreamGetCsv', async () => {
     const ctx = new TestContext();
-    const p0 = new ObjectId();
+    const p0 = new PinnedObjectId();
     ctx.setResponse(new Uint8Array(0));
     try {
           await datacatalog.streamGetCsv(
@@ -325,7 +326,7 @@ describe('streamGetCsv', () => {
 describe('streamGetXlsx', () => {
   it('testStreamGetXlsx', async () => {
     const ctx = new TestContext();
-    const p0 = new ObjectId();
+    const p0 = new PinnedObjectId();
     ctx.setResponse(new Uint8Array(0));
     try {
           await datacatalog.streamGetXlsx(
@@ -341,7 +342,7 @@ describe('streamGetXlsx', () => {
 describe('streamGetJson', () => {
   it('testStreamGetJson', async () => {
     const ctx = new TestContext();
-    const p0 = new ObjectId();
+    const p0 = new PinnedObjectId();
     ctx.setResponse(new Uint8Array(0));
     try {
           await datacatalog.streamGetJson(
@@ -357,7 +358,7 @@ describe('streamGetJson', () => {
 describe('streamGetText', () => {
   it('testStreamGetText', async () => {
     const ctx = new TestContext();
-    const p0 = new ObjectId();
+    const p0 = new PinnedObjectId();
     ctx.setResponse(new Uint8Array(0));
     try {
           await datacatalog.streamGetText(
@@ -373,7 +374,7 @@ describe('streamGetText', () => {
 describe('streamGetHtml', () => {
   it('testStreamGetHtml', async () => {
     const ctx = new TestContext();
-    const p0 = new ObjectId();
+    const p0 = new PinnedObjectId();
     ctx.setResponse(new Uint8Array(0));
     try {
           await datacatalog.streamGetHtml(
@@ -562,6 +563,54 @@ describe('createTable', () => {
     ctx.setResponse(new Uint8Array(0));
     try {
           await datacatalog.createTable(
+        ctx,
+        body
+      );
+    } catch (_) {
+      // Expected for mock tests with empty/invalid responses
+    }
+  });
+});
+
+describe('schemaArrow', () => {
+  it('testSchemaArrow', async () => {
+    const ctx = new TestContext();
+    const body = new Query();
+    ctx.setResponse(new Uint8Array(0));
+    try {
+          await datacatalog.schemaArrow(
+        ctx,
+        body
+      );
+    } catch (_) {
+      // Expected for mock tests with empty/invalid responses
+    }
+  });
+});
+
+describe('schemaRaw', () => {
+  it('testSchemaRaw', async () => {
+    const ctx = new TestContext();
+    const body = new Query();
+    ctx.setResponse(new Uint8Array(0));
+    try {
+          await datacatalog.schemaRaw(
+        ctx,
+        body
+      );
+    } catch (_) {
+      // Expected for mock tests with empty/invalid responses
+    }
+  });
+});
+
+describe('schemaOnly', () => {
+  it('testSchemaOnly', async () => {
+    const ctx = new TestContext();
+    const body = new Query();
+    ctx.setResponse(new Uint8Array(0));
+    try {
+          await datacatalog.schemaOnly(
         ctx,
         body
       );

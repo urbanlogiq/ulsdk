@@ -7,6 +7,33 @@ import (
 	"strconv"
 )
 
+type ProducerRef byte
+
+const (
+	ProducerRefNONE         ProducerRef = 0
+	ProducerRefObjectId     ProducerRef = 1
+	ProducerRefContainerRef ProducerRef = 2
+)
+
+var EnumNamesProducerRef = map[ProducerRef]string{
+	ProducerRefNONE:         "NONE",
+	ProducerRefObjectId:     "ObjectId",
+	ProducerRefContainerRef: "ContainerRef",
+}
+
+var EnumValuesProducerRef = map[string]ProducerRef{
+	"NONE":         ProducerRefNONE,
+	"ObjectId":     ProducerRefObjectId,
+	"ContainerRef": ProducerRefContainerRef,
+}
+
+func (v ProducerRef) String() string {
+	if s, ok := EnumNamesProducerRef[v]; ok {
+		return s
+	}
+	return "ProducerRef(" + strconv.FormatInt(int64(v), 10) + ")"
+}
+
 type ParameterValue byte
 
 const (
@@ -143,6 +170,221 @@ func (v ValuesFormatTy) String() string {
 	return "ValuesFormatTy(" + strconv.FormatInt(int64(v), 10) + ")"
 }
 
+type GitRef struct {
+	_tab flatbuffers.Table
+}
+
+func GetRootAsGitRef(buf []byte, offset flatbuffers.UOffsetT) *GitRef {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &GitRef{}
+	x.Init(buf, n+offset)
+	return x
+}
+
+func FinishGitRefBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.Finish(offset)
+}
+
+func GetSizePrefixedRootAsGitRef(buf []byte, offset flatbuffers.UOffsetT) *GitRef {
+	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
+	x := &GitRef{}
+	x.Init(buf, n+offset+flatbuffers.SizeUint32)
+	return x
+}
+
+func FinishSizePrefixedGitRefBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.FinishSizePrefixed(offset)
+}
+
+func (rcv *GitRef) Init(buf []byte, i flatbuffers.UOffsetT) {
+	rcv._tab.Bytes = buf
+	rcv._tab.Pos = i
+}
+
+func (rcv *GitRef) Table() flatbuffers.Table {
+	return rcv._tab
+}
+
+func (rcv *GitRef) Repo() []byte {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		return rcv._tab.ByteVector(o + rcv._tab.Pos)
+	}
+	return nil
+}
+
+func (rcv *GitRef) Commitish() []byte {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
+	if o != 0 {
+		return rcv._tab.ByteVector(o + rcv._tab.Pos)
+	}
+	return nil
+}
+
+func GitRefStart(builder *flatbuffers.Builder) {
+	builder.StartObject(2)
+}
+func GitRefAddRepo(builder *flatbuffers.Builder, repo flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(repo), 0)
+}
+func GitRefAddCommitish(builder *flatbuffers.Builder, commitish flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(1, flatbuffers.UOffsetT(commitish), 0)
+}
+func GitRefEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return builder.EndObject()
+}
+type ContainerRef struct {
+	_tab flatbuffers.Table
+}
+
+func GetRootAsContainerRef(buf []byte, offset flatbuffers.UOffsetT) *ContainerRef {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &ContainerRef{}
+	x.Init(buf, n+offset)
+	return x
+}
+
+func FinishContainerRefBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.Finish(offset)
+}
+
+func GetSizePrefixedRootAsContainerRef(buf []byte, offset flatbuffers.UOffsetT) *ContainerRef {
+	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
+	x := &ContainerRef{}
+	x.Init(buf, n+offset+flatbuffers.SizeUint32)
+	return x
+}
+
+func FinishSizePrefixedContainerRefBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.FinishSizePrefixed(offset)
+}
+
+func (rcv *ContainerRef) Init(buf []byte, i flatbuffers.UOffsetT) {
+	rcv._tab.Bytes = buf
+	rcv._tab.Pos = i
+}
+
+func (rcv *ContainerRef) Table() flatbuffers.Table {
+	return rcv._tab
+}
+
+func (rcv *ContainerRef) Image() []byte {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		return rcv._tab.ByteVector(o + rcv._tab.Pos)
+	}
+	return nil
+}
+
+func ContainerRefStart(builder *flatbuffers.Builder) {
+	builder.StartObject(1)
+}
+func ContainerRefAddImage(builder *flatbuffers.Builder, image flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(image), 0)
+}
+func ContainerRefEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return builder.EndObject()
+}
+type Producer struct {
+	_tab flatbuffers.Table
+}
+
+func GetRootAsProducer(buf []byte, offset flatbuffers.UOffsetT) *Producer {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &Producer{}
+	x.Init(buf, n+offset)
+	return x
+}
+
+func FinishProducerBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.Finish(offset)
+}
+
+func GetSizePrefixedRootAsProducer(buf []byte, offset flatbuffers.UOffsetT) *Producer {
+	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
+	x := &Producer{}
+	x.Init(buf, n+offset+flatbuffers.SizeUint32)
+	return x
+}
+
+func FinishSizePrefixedProducerBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.FinishSizePrefixed(offset)
+}
+
+func (rcv *Producer) Init(buf []byte, i flatbuffers.UOffsetT) {
+	rcv._tab.Bytes = buf
+	rcv._tab.Pos = i
+}
+
+func (rcv *Producer) Table() flatbuffers.Table {
+	return rcv._tab
+}
+
+func (rcv *Producer) Executor(obj *GitRef) *GitRef {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		x := rcv._tab.Indirect(o + rcv._tab.Pos)
+		if obj == nil {
+			obj = new(GitRef)
+		}
+		obj.Init(rcv._tab.Bytes, x)
+		return obj
+	}
+	return nil
+}
+
+func (rcv *Producer) ModelType() ProducerRef {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
+	if o != 0 {
+		return ProducerRef(rcv._tab.GetByte(o + rcv._tab.Pos))
+	}
+	return 0
+}
+
+func (rcv *Producer) MutateModelType(n ProducerRef) bool {
+	return rcv._tab.MutateByteSlot(6, byte(n))
+}
+
+func (rcv *Producer) Model(obj *flatbuffers.Table) bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
+	if o != 0 {
+		rcv._tab.Union(obj, o)
+		return true
+	}
+	return false
+}
+
+func (rcv *Producer) BuilderCodeRef(obj *GitRef) *GitRef {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
+	if o != 0 {
+		x := rcv._tab.Indirect(o + rcv._tab.Pos)
+		if obj == nil {
+			obj = new(GitRef)
+		}
+		obj.Init(rcv._tab.Bytes, x)
+		return obj
+	}
+	return nil
+}
+
+func ProducerStart(builder *flatbuffers.Builder) {
+	builder.StartObject(4)
+}
+func ProducerAddExecutor(builder *flatbuffers.Builder, executor flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(executor), 0)
+}
+func ProducerAddModelType(builder *flatbuffers.Builder, modelType ProducerRef) {
+	builder.PrependByteSlot(1, byte(modelType), 0)
+}
+func ProducerAddModel(builder *flatbuffers.Builder, model flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(2, flatbuffers.UOffsetT(model), 0)
+}
+func ProducerAddBuilderCodeRef(builder *flatbuffers.Builder, builderCodeRef flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(3, flatbuffers.UOffsetT(builderCodeRef), 0)
+}
+func ProducerEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return builder.EndObject()
+}
 type ByteArray struct {
 	_tab flatbuffers.Table
 }
@@ -405,7 +647,7 @@ func (rcv *WorkLog) Name() []byte {
 
 /// A human-readable tag.
 /// Input streams and/or worklogs. These may be either work logs or streams.
-func (rcv *WorkLog) InputStreams(obj *ObjectId, j int) bool {
+func (rcv *WorkLog) InputStreams(obj *PinnedObjectId, j int) bool {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
 	if o != 0 {
 		x := rcv._tab.Vector(o)
@@ -428,12 +670,12 @@ func (rcv *WorkLog) InputStreamsLength() int {
 /// Input streams and/or worklogs. These may be either work logs or streams.
 /// The schematic used behind creating the worklog. This may be empty/null
 /// if we are just layering data, for example.
-func (rcv *WorkLog) Schematic(obj *ObjectId) *ObjectId {
+func (rcv *WorkLog) Schematic(obj *PinnedObjectId) *PinnedObjectId {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
 	if o != 0 {
 		x := rcv._tab.Indirect(o + rcv._tab.Pos)
 		if obj == nil {
-			obj = new(ObjectId)
+			obj = new(PinnedObjectId)
 		}
 		obj.Init(rcv._tab.Bytes, x)
 		return obj
@@ -447,7 +689,7 @@ func (rcv *WorkLog) Schematic(obj *ObjectId) *ObjectId {
 /// the results. These documents may expire (ie: if this is a temporary
 /// step) so there should be enough information in the worklog necessary
 /// to reconstruct these output streams.
-func (rcv *WorkLog) OutputStreams(obj *ObjectId, j int) bool {
+func (rcv *WorkLog) OutputStreams(obj *PinnedObjectId, j int) bool {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(12))
 	if o != 0 {
 		x := rcv._tab.Vector(o)
@@ -550,8 +792,21 @@ func (rcv *WorkLog) JobId(obj *ObjectId) *ObjectId {
 	return nil
 }
 
+func (rcv *WorkLog) Producer(obj *Producer) *Producer {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(22))
+	if o != 0 {
+		x := rcv._tab.Indirect(o + rcv._tab.Pos)
+		if obj == nil {
+			obj = new(Producer)
+		}
+		obj.Init(rcv._tab.Bytes, x)
+		return obj
+	}
+	return nil
+}
+
 func WorkLogStart(builder *flatbuffers.Builder) {
-	builder.StartObject(9)
+	builder.StartObject(10)
 }
 func WorkLogAddName(builder *flatbuffers.Builder, name flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(name), 0)
@@ -585,6 +840,9 @@ func WorkLogAddUserSettings(builder *flatbuffers.Builder, userSettings flatbuffe
 }
 func WorkLogAddJobId(builder *flatbuffers.Builder, jobId flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(8, flatbuffers.UOffsetT(jobId), 0)
+}
+func WorkLogAddProducer(builder *flatbuffers.Builder, producer flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(9, flatbuffers.UOffsetT(producer), 0)
 }
 func WorkLogEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()

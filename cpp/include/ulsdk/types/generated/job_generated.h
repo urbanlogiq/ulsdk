@@ -754,8 +754,8 @@ struct Task FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   /// data stream lookup) this is a blank object where the results will be
   /// written. If it is a lookup of an existing stream, this will be populated
   /// with the stream ID
-  const ObjectId *output() const {
-    return GetPointer<const ObjectId *>(VT_OUTPUT);
+  const PinnedObjectId *output() const {
+    return GetPointer<const PinnedObjectId *>(VT_OUTPUT);
   }
   /// If false, keep this object if it's a temporary/intermediate after job
   /// creation. This must not be set if the output object above is a provided
@@ -874,7 +874,7 @@ struct TaskBuilder {
   void add_params(::flatbuffers::Offset<ParamIndices> params) {
     fbb_.AddOffset(Task::VT_PARAMS, params);
   }
-  void add_output(::flatbuffers::Offset<ObjectId> output) {
+  void add_output(::flatbuffers::Offset<PinnedObjectId> output) {
     fbb_.AddOffset(Task::VT_OUTPUT, output);
   }
   void add_discard(bool discard) {
@@ -946,7 +946,7 @@ inline ::flatbuffers::Offset<Task> CreateTask(
     Status status = Status::Pending,
     ::flatbuffers::Offset<::flatbuffers::String> message = 0,
     ::flatbuffers::Offset<ParamIndices> params = 0,
-    ::flatbuffers::Offset<ObjectId> output = 0,
+    ::flatbuffers::Offset<PinnedObjectId> output = 0,
     bool discard = false,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>>> upstream = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>>> downstream = 0,
@@ -1001,7 +1001,7 @@ inline ::flatbuffers::Offset<Task> CreateTaskDirect(
     Status status = Status::Pending,
     const char *message = nullptr,
     ::flatbuffers::Offset<ParamIndices> params = 0,
-    ::flatbuffers::Offset<ObjectId> output = 0,
+    ::flatbuffers::Offset<PinnedObjectId> output = 0,
     bool discard = false,
     const std::vector<::flatbuffers::Offset<ObjectId>> *upstream = nullptr,
     const std::vector<::flatbuffers::Offset<ObjectId>> *downstream = nullptr,
@@ -1261,8 +1261,8 @@ struct RunSpec FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   bool persist() const {
     return GetField<uint8_t>(VT_PERSIST, 0) != 0;
   }
-  const ObjectId *schematic() const {
-    return GetPointer<const ObjectId *>(VT_SCHEMATIC);
+  const PinnedObjectId *schematic() const {
+    return GetPointer<const PinnedObjectId *>(VT_SCHEMATIC);
   }
   const ::flatbuffers::Vector<::flatbuffers::Offset<ParamIndices>> *param_indices() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<ParamIndices>> *>(VT_PARAM_INDICES);
@@ -1306,7 +1306,7 @@ struct RunSpecBuilder {
   void add_persist(bool persist) {
     fbb_.AddElement<uint8_t>(RunSpec::VT_PERSIST, static_cast<uint8_t>(persist), 0);
   }
-  void add_schematic(::flatbuffers::Offset<ObjectId> schematic) {
+  void add_schematic(::flatbuffers::Offset<PinnedObjectId> schematic) {
     fbb_.AddOffset(RunSpec::VT_SCHEMATIC, schematic);
   }
   void add_param_indices(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ParamIndices>>> param_indices) {
@@ -1341,7 +1341,7 @@ struct RunSpecBuilder {
 inline ::flatbuffers::Offset<RunSpec> CreateRunSpec(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     bool persist = false,
-    ::flatbuffers::Offset<ObjectId> schematic = 0,
+    ::flatbuffers::Offset<PinnedObjectId> schematic = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ParamIndices>>> param_indices = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<TaskParameter>>> params = 0,
     TaskPriority priority = TaskPriority::Medium,
@@ -1366,7 +1366,7 @@ struct RunSpec::Traits {
 inline ::flatbuffers::Offset<RunSpec> CreateRunSpecDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     bool persist = false,
-    ::flatbuffers::Offset<ObjectId> schematic = 0,
+    ::flatbuffers::Offset<PinnedObjectId> schematic = 0,
     const std::vector<::flatbuffers::Offset<ParamIndices>> *param_indices = nullptr,
     const std::vector<::flatbuffers::Offset<TaskParameter>> *params = nullptr,
     TaskPriority priority = TaskPriority::Medium,
@@ -1495,8 +1495,8 @@ struct DeprecatedRunSpec FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
   bool persist() const {
     return GetField<uint8_t>(VT_PERSIST, 0) != 0;
   }
-  const ObjectId *schematic() const {
-    return GetPointer<const ObjectId *>(VT_SCHEMATIC);
+  const PinnedObjectId *schematic() const {
+    return GetPointer<const PinnedObjectId *>(VT_SCHEMATIC);
   }
   const ::flatbuffers::Vector<::flatbuffers::Offset<ParamIndices>> *param_indices() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<ParamIndices>> *>(VT_PARAM_INDICES);
@@ -1526,7 +1526,7 @@ struct DeprecatedRunSpecBuilder {
   void add_persist(bool persist) {
     fbb_.AddElement<uint8_t>(DeprecatedRunSpec::VT_PERSIST, static_cast<uint8_t>(persist), 0);
   }
-  void add_schematic(::flatbuffers::Offset<ObjectId> schematic) {
+  void add_schematic(::flatbuffers::Offset<PinnedObjectId> schematic) {
     fbb_.AddOffset(DeprecatedRunSpec::VT_SCHEMATIC, schematic);
   }
   void add_param_indices(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ParamIndices>>> param_indices) {
@@ -1552,7 +1552,7 @@ struct DeprecatedRunSpecBuilder {
 inline ::flatbuffers::Offset<DeprecatedRunSpec> CreateDeprecatedRunSpec(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     bool persist = false,
-    ::flatbuffers::Offset<ObjectId> schematic = 0,
+    ::flatbuffers::Offset<PinnedObjectId> schematic = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ParamIndices>>> param_indices = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<DeprecatedTaskParameter>>> params = 0) {
   DeprecatedRunSpecBuilder builder_(_fbb);
@@ -1571,7 +1571,7 @@ struct DeprecatedRunSpec::Traits {
 inline ::flatbuffers::Offset<DeprecatedRunSpec> CreateDeprecatedRunSpecDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     bool persist = false,
-    ::flatbuffers::Offset<ObjectId> schematic = 0,
+    ::flatbuffers::Offset<PinnedObjectId> schematic = 0,
     const std::vector<::flatbuffers::Offset<ParamIndices>> *param_indices = nullptr,
     const std::vector<::flatbuffers::Offset<DeprecatedTaskParameter>> *params = nullptr) {
   auto param_indices__ = param_indices ? _fbb.CreateVector<::flatbuffers::Offset<ParamIndices>>(*param_indices) : 0;

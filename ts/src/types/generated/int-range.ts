@@ -68,8 +68,13 @@ enumName(optionalEncoding?:any):string|Uint8Array|null {
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 }
 
+isBitmaskEnum():boolean {
+  const offset = this.bb!.__offset(this.bb_pos, 16);
+  return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
+}
+
 static startIntRange(builder:flatbuffers.Builder) {
-  builder.startObject(6);
+  builder.startObject(7);
 }
 
 static addMin(builder:flatbuffers.Builder, min:bigint) {
@@ -108,6 +113,10 @@ static addEnumName(builder:flatbuffers.Builder, enumNameOffset:flatbuffers.Offse
   builder.addFieldOffset(5, enumNameOffset, 0);
 }
 
+static addIsBitmaskEnum(builder:flatbuffers.Builder, isBitmaskEnum:boolean) {
+  builder.addFieldInt8(6, +isBitmaskEnum, +false);
+}
+
 static endIntRange(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   return offset;
@@ -121,7 +130,8 @@ unpack(): IntRangeT {
     (this.fieldFormat() !== null ? this.fieldFormat()!.unpack() : null),
     this.aggregationProtocol(),
     this.bb!.createObjList<IntegerDisplayString, IntegerDisplayStringT>(this.displayStrings.bind(this), this.displayStringsLength()),
-    this.enumName()
+    this.enumName(),
+    this.isBitmaskEnum()
   );
 }
 
@@ -133,6 +143,7 @@ unpackTo(_o: IntRangeT): void {
   _o.aggregationProtocol = this.aggregationProtocol();
   _o.displayStrings = this.bb!.createObjList<IntegerDisplayString, IntegerDisplayStringT>(this.displayStrings.bind(this), this.displayStringsLength());
   _o.enumName = this.enumName();
+  _o.isBitmaskEnum = this.isBitmaskEnum();
 }
 }
 
@@ -143,7 +154,8 @@ constructor(
   public fieldFormat: NumericalFieldFormatT|null = null,
   public aggregationProtocol: AggregationFunction = AggregationFunction.Any,
   public displayStrings: (IntegerDisplayStringT)[] = [],
-  public enumName: string|Uint8Array|null = null
+  public enumName: string|Uint8Array|null = null,
+  public isBitmaskEnum: boolean = false
 ){}
 
 
@@ -159,6 +171,7 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   IntRange.addAggregationProtocol(builder, this.aggregationProtocol);
   IntRange.addDisplayStrings(builder, displayStrings);
   IntRange.addEnumName(builder, enumName);
+  IntRange.addIsBitmaskEnum(builder, this.isBitmaskEnum);
 
   return IntRange.endIntRange(builder);
 }

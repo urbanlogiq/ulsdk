@@ -59,6 +59,7 @@ struct SetExpr;
 struct TableOrderBy;
 struct TableSource;
 struct TableSourceInstance;
+struct TimeSeries;
 struct UnaryQueryElement;
 struct UnsetArgument;
 struct UpdateQueryElement;
@@ -121,7 +122,8 @@ typedef std::variant<
     std::shared_ptr<Vector>,
     std::shared_ptr<Placeholder>,
     std::shared_ptr<Drive>,
-    std::shared_ptr<Values>
+    std::shared_ptr<Values>,
+    std::shared_ptr<TimeSeries>
 > TableSourceUnion;
 
 using ::TypeHint;
@@ -572,6 +574,55 @@ struct Values {
     }
 };
 
+///
+/// Synthetic timestamp series used to fill empty time buckets in metric queries.
+/// Emits one row per bucket between `start_ms` and `end_ms`
+/// (inclusive) at `interval_ms` spacing, in a single column named `output_column`.
+/// All bounds are UTC unix milliseconds - to align with the
+/// time_bucket UDF, callers should pass values that are already snapped to a
+/// bucket boundary in the desired zone.
+/// Timezone-aware generation is not yet supported.
+///
+/// If `infer_bounds` is true, `start_ms` and `end_ms` are ignored and the
+/// catalog planner resolves them from the WHERE filter of whichever source
+/// this series is LEFT JOINed against. The joined source must produce the
+/// join column via `time_bucket(width, ts)` or
+/// `date_trunc(unit, [at_timezone(]ts[, tz)])` and have a closed range
+/// filter on `ts`; otherwise planning errors.
+///
+/// Exactly one of `interval_ms` / `interval_months` is non-zero (or both
+/// zero when `infer_bounds=true` — the planner fills in whichever flavour
+/// the joined source's bucket function dictates). `interval_months` is the
+/// calendar-month count used to step the synthetic series; years are
+/// represented as 12N months.
+///
+/// `tz` is the IANA timezone name (e.g. `"America/Los_Angeles"`) used to
+/// floor bounds and step the series in local calendar time. Empty means
+/// UTC. This is only set when the joined source's bucket expression wraps
+/// the timestamp in `at_timezone(ts, '<tz>')` — bare `date_trunc(unit, ts)`
+/// stays UTC. When `tz` is non-empty, the catalog emits the series as a
+/// precomputed VALUES list rather than a DataFusion `generate_series` call
+/// so the local-calendar boundaries (including DST transitions) are
+/// authoritative at plan time.
+///
+struct TimeSeries {
+    int64_t end_ms_;
+    bool infer_bounds_;
+    int32_t interval_months_;
+    int64_t interval_ms_;
+    std::string output_column_;
+    int64_t start_ms_;
+    std::optional<std::string> tz_;
+
+    TimeSeries();
+    TimeSeries(const ::TimeSeries *root);
+    TimeSeries(const std::vector<uint8_t> &bytes);
+    bool operator==(const TimeSeries &rhs) const;
+    bool operator!=(const TimeSeries &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
 struct UpdateQueryElement {
     std::optional<Function> filter_;
     std::optional<std::vector<TableSource>> from_sources_;
@@ -865,6 +916,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Drive &);
 ::flatbuffers::Offset<::Values>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Values &);
 
+::flatbuffers::Offset<::TimeSeries>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TimeSeries &);
+
 ::flatbuffers::Offset<::UpdateQueryElement>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UpdateQueryElement &);
 
@@ -1003,6 +1057,9 @@ to_bytes(const Drive &o);
 
 std::vector<uint8_t>
 to_bytes(const Values &o);
+
+std::vector<uint8_t>
+to_bytes(const TimeSeries &o);
 
 std::vector<uint8_t>
 to_bytes(const UpdateQueryElement &o);

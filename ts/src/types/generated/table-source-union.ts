@@ -12,6 +12,7 @@ import { Drive, DriveT } from './drive';
 import { GraphQuery, GraphQueryT } from './graph-query';
 import { Placeholder, PlaceholderT } from './placeholder';
 import { QueryTableSource, QueryTableSourceT } from './query-table-source';
+import { TimeSeries, TimeSeriesT } from './time-series';
 import { Values, ValuesT } from './values';
 import { Vector, VectorT } from './vector';
 
@@ -25,13 +26,14 @@ export enum TableSourceUnion {
   Vector = 5,
   Placeholder = 6,
   Drive = 7,
-  Values = 8
+  Values = 8,
+  TimeSeries = 9
 }
 
 export function unionToTableSourceUnion(
   type: TableSourceUnion,
-  accessor: (obj:Arrow|DataCatalog|Drive|GraphQuery|Placeholder|QueryTableSource|Values|Vector) => Arrow|DataCatalog|Drive|GraphQuery|Placeholder|QueryTableSource|Values|Vector|null
-): Arrow|DataCatalog|Drive|GraphQuery|Placeholder|QueryTableSource|Values|Vector|null {
+  accessor: (obj:Arrow|DataCatalog|Drive|GraphQuery|Placeholder|QueryTableSource|TimeSeries|Values|Vector) => Arrow|DataCatalog|Drive|GraphQuery|Placeholder|QueryTableSource|TimeSeries|Values|Vector|null
+): Arrow|DataCatalog|Drive|GraphQuery|Placeholder|QueryTableSource|TimeSeries|Values|Vector|null {
   switch(TableSourceUnion[type]) {
     case 'NONE': return null; 
     case 'DataCatalog': return accessor(new DataCatalog())! as DataCatalog;
@@ -42,15 +44,16 @@ export function unionToTableSourceUnion(
     case 'Placeholder': return accessor(new Placeholder())! as Placeholder;
     case 'Drive': return accessor(new Drive())! as Drive;
     case 'Values': return accessor(new Values())! as Values;
+    case 'TimeSeries': return accessor(new TimeSeries())! as TimeSeries;
     default: return null;
   }
 }
 
 export function unionListToTableSourceUnion(
   type: TableSourceUnion, 
-  accessor: (index: number, obj:Arrow|DataCatalog|Drive|GraphQuery|Placeholder|QueryTableSource|Values|Vector) => Arrow|DataCatalog|Drive|GraphQuery|Placeholder|QueryTableSource|Values|Vector|null, 
+  accessor: (index: number, obj:Arrow|DataCatalog|Drive|GraphQuery|Placeholder|QueryTableSource|TimeSeries|Values|Vector) => Arrow|DataCatalog|Drive|GraphQuery|Placeholder|QueryTableSource|TimeSeries|Values|Vector|null, 
   index: number
-): Arrow|DataCatalog|Drive|GraphQuery|Placeholder|QueryTableSource|Values|Vector|null {
+): Arrow|DataCatalog|Drive|GraphQuery|Placeholder|QueryTableSource|TimeSeries|Values|Vector|null {
   switch(TableSourceUnion[type]) {
     case 'NONE': return null; 
     case 'DataCatalog': return accessor(index, new DataCatalog())! as DataCatalog;
@@ -61,6 +64,7 @@ export function unionListToTableSourceUnion(
     case 'Placeholder': return accessor(index, new Placeholder())! as Placeholder;
     case 'Drive': return accessor(index, new Drive())! as Drive;
     case 'Values': return accessor(index, new Values())! as Values;
+    case 'TimeSeries': return accessor(index, new TimeSeries())! as TimeSeries;
     default: return null;
   }
 }

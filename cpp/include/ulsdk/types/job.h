@@ -61,7 +61,7 @@ struct DeprecatedRunSpec {
     std::vector<ParamIndices> param_indices_;
     std::vector<DeprecatedTaskParameter> params_;
     bool persist_;
-    ObjectId schematic_;
+    PinnedObjectId schematic_;
 
     DeprecatedRunSpec();
     DeprecatedRunSpec(const ::DeprecatedRunSpec *root);
@@ -158,7 +158,7 @@ struct RunSpec {
     std::vector<TaskParameter> params_;
     bool persist_;
     TaskPriority priority_;
-    ObjectId schematic_;
+    PinnedObjectId schematic_;
 
     RunSpec();
     RunSpec(const ::RunSpec *root);
@@ -198,7 +198,7 @@ struct Task {
     std::optional<std::string> last_updated_by_pod_;
     std::optional<std::string> message_;
     std::string name_;
-    ObjectId output_;
+    PinnedObjectId output_;
     ParamIndices params_;
     int32_t retries_;
     std::optional<ObjectId> schematic_id_;

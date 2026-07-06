@@ -9,6 +9,8 @@
 import * as flatbuffers from 'flatbuffers/js/flatbuffers';
 
 import { ObjectId, ObjectIdT } from './object-id';
+import { PinnedObjectId, PinnedObjectIdT } from './pinned-object-id';
+import { Producer, ProducerT } from './producer';
 import { UserSettings, UserSettingsT } from './user-settings';
 import { WorklogParameter, WorklogParameterT } from './worklog-parameter';
 
@@ -44,9 +46,9 @@ name(optionalEncoding?:any):string|Uint8Array|null {
 /**
  * Input streams and/or worklogs. These may be either work logs or streams.
  */
-inputStreams(index: number, obj?:ObjectId):ObjectId|null {
+inputStreams(index: number, obj?:PinnedObjectId):PinnedObjectId|null {
   const offset = this.bb!.__offset(this.bb_pos, 8);
-  return offset ? (obj || new ObjectId()).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
+  return offset ? (obj || new PinnedObjectId()).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
 }
 
 inputStreamsLength():number {
@@ -58,9 +60,9 @@ inputStreamsLength():number {
  * The schematic used behind creating the worklog. This may be empty/null
  * if we are just layering data, for example.
  */
-schematic(obj?:ObjectId):ObjectId|null {
+schematic(obj?:PinnedObjectId):PinnedObjectId|null {
   const offset = this.bb!.__offset(this.bb_pos, 10);
-  return offset ? (obj || new ObjectId()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
+  return offset ? (obj || new PinnedObjectId()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
 /**
@@ -69,9 +71,9 @@ schematic(obj?:ObjectId):ObjectId|null {
  * step) so there should be enough information in the worklog necessary
  * to reconstruct these output streams.
  */
-outputStreams(index: number, obj?:ObjectId):ObjectId|null {
+outputStreams(index: number, obj?:PinnedObjectId):PinnedObjectId|null {
   const offset = this.bb!.__offset(this.bb_pos, 12);
-  return offset ? (obj || new ObjectId()).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
+  return offset ? (obj || new PinnedObjectId()).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
 }
 
 outputStreamsLength():number {
@@ -118,8 +120,13 @@ jobId(obj?:ObjectId):ObjectId|null {
   return offset ? (obj || new ObjectId()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
+producer(obj?:Producer):Producer|null {
+  const offset = this.bb!.__offset(this.bb_pos, 22);
+  return offset ? (obj || new Producer()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
+}
+
 static startWorkLog(builder:flatbuffers.Builder) {
-  builder.startObject(9);
+  builder.startObject(10);
 }
 
 static addName(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset) {
@@ -190,6 +197,10 @@ static addJobId(builder:flatbuffers.Builder, jobIdOffset:flatbuffers.Offset) {
   builder.addFieldOffset(8, jobIdOffset, 0);
 }
 
+static addProducer(builder:flatbuffers.Builder, producerOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(9, producerOffset, 0);
+}
+
 static endWorkLog(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   builder.requiredField(offset, 10) // schematic
@@ -210,39 +221,42 @@ static finishSizePrefixedWorkLogBuffer(builder:flatbuffers.Builder, offset:flatb
 unpack(): WorkLogT {
   return new WorkLogT(
     this.name(),
-    this.bb!.createObjList<ObjectId, ObjectIdT>(this.inputStreams.bind(this), this.inputStreamsLength()),
+    this.bb!.createObjList<PinnedObjectId, PinnedObjectIdT>(this.inputStreams.bind(this), this.inputStreamsLength()),
     (this.schematic() !== null ? this.schematic()!.unpack() : null),
-    this.bb!.createObjList<ObjectId, ObjectIdT>(this.outputStreams.bind(this), this.outputStreamsLength()),
+    this.bb!.createObjList<PinnedObjectId, PinnedObjectIdT>(this.outputStreams.bind(this), this.outputStreamsLength()),
     this.bb!.createObjList<WorklogParameter, WorklogParameterT>(this.params.bind(this), this.paramsLength()),
     (this.parent() !== null ? this.parent()!.unpack() : null),
     (this.userSettings() !== null ? this.userSettings()!.unpack() : null),
-    (this.jobId() !== null ? this.jobId()!.unpack() : null)
+    (this.jobId() !== null ? this.jobId()!.unpack() : null),
+    (this.producer() !== null ? this.producer()!.unpack() : null)
   );
 }
 
 
 unpackTo(_o: WorkLogT): void {
   _o.name = this.name();
-  _o.inputStreams = this.bb!.createObjList<ObjectId, ObjectIdT>(this.inputStreams.bind(this), this.inputStreamsLength());
+  _o.inputStreams = this.bb!.createObjList<PinnedObjectId, PinnedObjectIdT>(this.inputStreams.bind(this), this.inputStreamsLength());
   _o.schematic = (this.schematic() !== null ? this.schematic()!.unpack() : null);
-  _o.outputStreams = this.bb!.createObjList<ObjectId, ObjectIdT>(this.outputStreams.bind(this), this.outputStreamsLength());
+  _o.outputStreams = this.bb!.createObjList<PinnedObjectId, PinnedObjectIdT>(this.outputStreams.bind(this), this.outputStreamsLength());
   _o.params = this.bb!.createObjList<WorklogParameter, WorklogParameterT>(this.params.bind(this), this.paramsLength());
   _o.parent = (this.parent() !== null ? this.parent()!.unpack() : null);
   _o.userSettings = (this.userSettings() !== null ? this.userSettings()!.unpack() : null);
   _o.jobId = (this.jobId() !== null ? this.jobId()!.unpack() : null);
+  _o.producer = (this.producer() !== null ? this.producer()!.unpack() : null);
 }
 }
 
 export class WorkLogT implements flatbuffers.IGeneratedObject {
 constructor(
   public name: string|Uint8Array|null = null,
-  public inputStreams: (ObjectIdT)[] = [],
-  public schematic: ObjectIdT|null = null,
-  public outputStreams: (ObjectIdT)[] = [],
+  public inputStreams: (PinnedObjectIdT)[] = [],
+  public schematic: PinnedObjectIdT|null = null,
+  public outputStreams: (PinnedObjectIdT)[] = [],
   public params: (WorklogParameterT)[] = [],
   public parent: ObjectIdT|null = null,
   public userSettings: UserSettingsT|null = null,
-  public jobId: ObjectIdT|null = null
+  public jobId: ObjectIdT|null = null,
+  public producer: ProducerT|null = null
 ){}
 
 
@@ -255,6 +269,7 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   const parent = (this.parent !== null ? this.parent!.pack(builder) : 0);
   const userSettings = (this.userSettings !== null ? this.userSettings!.pack(builder) : 0);
   const jobId = (this.jobId !== null ? this.jobId!.pack(builder) : 0);
+  const producer = (this.producer !== null ? this.producer!.pack(builder) : 0);
 
   WorkLog.startWorkLog(builder);
   WorkLog.addName(builder, name);
@@ -265,6 +280,7 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   WorkLog.addParent(builder, parent);
   WorkLog.addUserSettings(builder, userSettings);
   WorkLog.addJobId(builder, jobId);
+  WorkLog.addProducer(builder, producer);
 
   return WorkLog.endWorkLog(builder);
 }

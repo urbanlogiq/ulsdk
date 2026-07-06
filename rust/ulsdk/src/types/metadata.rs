@@ -10,10 +10,12 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
+use crate::FbsSerde;
 use bitflags::bitflags;
 use core::ops::Deref;
 use flatbuffers::{UnionWIPOffset, WIPOffset};
 use ordered_float::OrderedFloat;
+use serde::{Deserialize, Serialize};
 use strum_macros::FromRepr;
 
 use crate::types::Schema::{
@@ -75,7 +77,8 @@ use crate::types::generated::graph_generated::{
 use crate::types::generated::id_generated::{
     B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
     DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace,
+    PinnedObjectId as FbsPinnedObjectId, StreamId as FbsStreamId,
 };
 use crate::types::generated::metadata_generated::{
     AggregationFunction as FbsAggregationFunction,
@@ -122,7 +125,7 @@ use crate::types::graph::{
 };
 use crate::types::id::{
     B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
-    ObjectNamespace, StreamId,
+    ObjectNamespace, PinnedObjectId, StreamId,
 };
 use crate::types::value::{
     Point2D, Tri2D, VArray, VBool, VBytes, VChar, VF32, VF64, VFixedSizeBytes, VI8, VI16, VI32,
@@ -130,7 +133,7 @@ use crate::types::value::{
     VTimestampNsUtc, VTri2D, VU8, VU16, VU32, VU64, VUnit, VUsize, Value, ValueInstance, ValueTy,
 };
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum AggregationFunction {
     #[default]
@@ -193,7 +196,7 @@ impl From<FbsAggregationFunction> for AggregationFunction {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum DatasetCategory {
     #[default]
@@ -274,7 +277,7 @@ impl From<FbsDatasetCategory> for DatasetCategory {
 }
 
 bitflags! {
-    #[derive(Default)]
+    #[derive(Default, Serialize, Deserialize)]
     pub struct FieldFlags: u32 {
         const FILTERABLE = 1;
         const CATEGORY = 2;
@@ -309,7 +312,7 @@ impl From<FbsFieldFlags> for FieldFlags {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum FieldUnit {
     #[default]
@@ -402,7 +405,7 @@ impl From<FbsFieldUnit> for FieldUnit {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum NumericalFieldValueType {
     #[default]
@@ -453,7 +456,7 @@ impl From<FbsNumericalFieldValueType> for NumericalFieldValueType {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum UlFieldType {
     #[default]
@@ -595,7 +598,7 @@ impl From<FbsUlFieldType> for UlFieldType {
 
 /// The update cadence of the dataset. This looks at the maximum timestamp/observation date in the data,
 /// and not when the pipeline ran because we can run a pipeline today that only ingests data from 2020.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum UpdateCadence {
     #[default]
@@ -659,7 +662,7 @@ impl From<FbsUpdateCadence> for UpdateCadence {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct StringCategories {
     pub categories: Option<Vec<String>>,
 }
@@ -706,15 +709,15 @@ impl From<FbsStringCategories<'_>> for StringCategories {
     }
 }
 
-impl StringCategories {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for StringCategories {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -724,7 +727,7 @@ impl StringCategories {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct NumericalFieldFormat {
     pub decimal_places: u32,
     pub offset: OrderedFloat<f64>,
@@ -763,15 +766,15 @@ impl From<FbsNumericalFieldFormat<'_>> for NumericalFieldFormat {
     }
 }
 
-impl NumericalFieldFormat {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for NumericalFieldFormat {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -782,12 +785,13 @@ impl NumericalFieldFormat {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct IntRange {
     pub aggregation_protocol: AggregationFunction,
     pub display_strings: Option<Vec<IntegerDisplayString>>,
     pub enum_name: Option<String>,
     pub field_format: Option<NumericalFieldFormat>,
+    pub is_bitmask_enum: bool,
     pub max: i64,
     pub min: i64,
 }
@@ -822,6 +826,7 @@ impl IntRange {
         if let Some(offset) = field_format_offset {
             bldr.add_field_format(offset);
         }
+        bldr.add_is_bitmask_enum(self.is_bitmask_enum);
         bldr.add_max(self.max);
         bldr.add_min(self.min);
         bldr.finish()
@@ -844,6 +849,7 @@ impl From<FbsIntRange<'_>> for IntRange {
 
         let enum_name = fbs.enum_name().map(ToOwned::to_owned);
         let field_format = fbs.field_format().map(NumericalFieldFormat::from);
+        let is_bitmask_enum = fbs.is_bitmask_enum();
         let max = fbs.max();
         let min = fbs.min();
         Self {
@@ -851,21 +857,22 @@ impl From<FbsIntRange<'_>> for IntRange {
             display_strings,
             enum_name,
             field_format,
+            is_bitmask_enum,
             max,
             min,
         }
     }
 }
 
-impl IntRange {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for IntRange {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -875,7 +882,7 @@ impl IntRange {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct FloatRange {
     pub aggregation_protocol: AggregationFunction,
     pub field_format: Option<NumericalFieldFormat>,
@@ -918,15 +925,15 @@ impl From<FbsFloatRange<'_>> for FloatRange {
     }
 }
 
-impl FloatRange {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for FloatRange {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -936,7 +943,7 @@ impl FloatRange {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct DatetimeRange {
     pub intervals: Option<Vec<TimeInterval>>,
     pub max: i64,
@@ -993,15 +1000,15 @@ impl From<FbsDatetimeRange<'_>> for DatetimeRange {
     }
 }
 
-impl DatetimeRange {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for DatetimeRange {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1011,7 +1018,7 @@ impl DatetimeRange {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Dates {
     pub max: i64,
     pub min: i64,
@@ -1083,15 +1090,15 @@ impl From<FbsDates<'_>> for Dates {
     }
 }
 
-impl Dates {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Dates {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1101,7 +1108,7 @@ impl Dates {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct NestedStringCategories {
     pub nesting_tree: Vec<NestedStringCategoryNode>,
 }
@@ -1137,15 +1144,15 @@ impl From<FbsNestedStringCategories<'_>> for NestedStringCategories {
     }
 }
 
-impl NestedStringCategories {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for NestedStringCategories {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1156,7 +1163,7 @@ impl NestedStringCategories {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum ComponentData {
     StringCategories(StringCategories),
     IntRange(IntRange),
@@ -1212,7 +1219,7 @@ impl ComponentData {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct RawGeom {
     pub geom: Vec<u8>,
 }
@@ -1243,15 +1250,15 @@ impl From<FbsRawGeom<'_>> for RawGeom {
     }
 }
 
-impl RawGeom {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for RawGeom {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1261,7 +1268,7 @@ impl RawGeom {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum GeometryDataUnion {
     RawGeom(RawGeom),
     NodeIdPair(NodeIdPair),
@@ -1293,7 +1300,7 @@ impl GeometryDataUnion {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct NoGeometry {}
 
 impl NoGeometry {
@@ -1314,15 +1321,15 @@ impl From<FbsNoGeometry<'_>> for NoGeometry {
     }
 }
 
-impl NoGeometry {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for NoGeometry {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1332,7 +1339,7 @@ impl NoGeometry {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct DatacatalogGeometry {
     pub column: String,
 }
@@ -1359,15 +1366,15 @@ impl From<FbsDatacatalogGeometry<'_>> for DatacatalogGeometry {
     }
 }
 
-impl DatacatalogGeometry {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for DatacatalogGeometry {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1393,7 +1400,7 @@ impl DatacatalogGeometry {
 ///
 /// If edge_path is empty and start_stream_id is set: Just query for nodes with
 /// streamId == start_stream_id.
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct WorldGraphGeometry {
     /// Edges to follow to reach the nodes with geometry.
     pub edge_path: Vec<EdgeTy>,
@@ -1455,15 +1462,15 @@ impl From<FbsWorldGraphGeometry<'_>> for WorldGraphGeometry {
     }
 }
 
-impl WorldGraphGeometry {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for WorldGraphGeometry {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1473,7 +1480,7 @@ impl WorldGraphGeometry {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum GeometrySource {
     NoGeometry(NoGeometry),
     DatacatalogGeometry(DatacatalogGeometry),
@@ -1511,7 +1518,7 @@ impl GeometrySource {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct HierarchyRelationshipData {
     pub hierarchy: Option<Vec<HierarchicalRelationship>>,
 }
@@ -1558,15 +1565,15 @@ impl From<FbsHierarchyRelationshipData<'_>> for HierarchyRelationshipData {
     }
 }
 
-impl HierarchyRelationshipData {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for HierarchyRelationshipData {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1578,7 +1585,7 @@ impl HierarchyRelationshipData {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct CategoryRelationshipData {
     pub associated_fields: Option<Vec<i32>>,
     pub categories: Option<Vec<i32>>,
@@ -1642,15 +1649,15 @@ impl From<FbsCategoryRelationshipData<'_>> for CategoryRelationshipData {
     }
 }
 
-impl CategoryRelationshipData {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for CategoryRelationshipData {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1661,7 +1668,7 @@ impl CategoryRelationshipData {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct NestedCategoryRelationshipData {
     pub categories: Option<Vec<NestedCategoryRelationshipNode>>,
 }
@@ -1708,15 +1715,15 @@ impl From<FbsNestedCategoryRelationshipData<'_>> for NestedCategoryRelationshipD
     }
 }
 
-impl NestedCategoryRelationshipData {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for NestedCategoryRelationshipData {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1728,7 +1735,7 @@ impl NestedCategoryRelationshipData {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct NestedHierarchyRelationshipData {
     pub nodes: Option<Vec<NestedHierarchyRelationshipNode>>,
 }
@@ -1775,15 +1782,15 @@ impl From<FbsNestedHierarchyRelationshipData<'_>> for NestedHierarchyRelationshi
     }
 }
 
-impl NestedHierarchyRelationshipData {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for NestedHierarchyRelationshipData {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1795,7 +1802,7 @@ impl NestedHierarchyRelationshipData {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum UlFieldRelationshipData {
     HierarchyRelationshipData(HierarchyRelationshipData),
     CategoryRelationshipData(CategoryRelationshipData),
@@ -1839,7 +1846,7 @@ impl UlFieldRelationshipData {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct ContactInfo {
     pub address: Option<String>,
     pub email: Option<String>,
@@ -1898,15 +1905,15 @@ impl From<FbsContactInfo<'_>> for ContactInfo {
     }
 }
 
-impl ContactInfo {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for ContactInfo {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1916,7 +1923,7 @@ impl ContactInfo {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct DatasetSource {
     /// Date information about the data source, such as the year it was generated.
     /// This is a free-form text field that isn't interpreted in any means by the
@@ -1962,15 +1969,15 @@ impl From<FbsDatasetSource<'_>> for DatasetSource {
     }
 }
 
-impl DatasetSource {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for DatasetSource {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1980,7 +1987,7 @@ impl DatasetSource {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Document {
     pub display_name: Option<String>,
     pub filename: Option<String>,
@@ -2032,15 +2039,15 @@ impl From<FbsDocument<'_>> for Document {
     }
 }
 
-impl Document {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Document {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2050,7 +2057,7 @@ impl Document {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Documents {
     pub documents: Option<Vec<Document>>,
 }
@@ -2097,15 +2104,15 @@ impl From<FbsDocuments<'_>> for Documents {
     }
 }
 
-impl Documents {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Documents {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2115,7 +2122,7 @@ impl Documents {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct FloatAggregate {
     pub count: u64,
     pub histo: Option<Vec<FloatBucket>>,
@@ -2184,15 +2191,15 @@ impl From<FbsFloatAggregate<'_>> for FloatAggregate {
     }
 }
 
-impl FloatAggregate {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for FloatAggregate {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2202,7 +2209,7 @@ impl FloatAggregate {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct FloatBucket {
     pub count: u64,
     pub max: OrderedFloat<f64>,
@@ -2226,7 +2233,7 @@ impl From<&FbsFloatBucket> for FloatBucket {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct GeometryData {
     pub data: GeometryDataUnion,
 }
@@ -2263,15 +2270,15 @@ impl From<FbsGeometryData<'_>> for GeometryData {
     }
 }
 
-impl GeometryData {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for GeometryData {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2281,7 +2288,7 @@ impl GeometryData {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct HierarchicalRelationship {
     pub children: Option<Vec<i32>>,
     pub parent: i32,
@@ -2326,15 +2333,15 @@ impl From<FbsHierarchicalRelationship<'_>> for HierarchicalRelationship {
     }
 }
 
-impl HierarchicalRelationship {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for HierarchicalRelationship {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2345,7 +2352,7 @@ impl HierarchicalRelationship {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct IntAggregate {
     pub count: u64,
     pub histo: Option<Vec<UIntBucket>>,
@@ -2414,15 +2421,15 @@ impl From<FbsIntAggregate<'_>> for IntAggregate {
     }
 }
 
-impl IntAggregate {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for IntAggregate {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2432,7 +2439,7 @@ impl IntAggregate {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct IntBucket {
     pub count: u64,
     pub max: i64,
@@ -2456,7 +2463,7 @@ impl From<&FbsIntBucket> for IntBucket {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct IntegerDisplayString {
     pub display_name: String,
     pub value: i64,
@@ -2489,15 +2496,15 @@ impl From<FbsIntegerDisplayString<'_>> for IntegerDisplayString {
     }
 }
 
-impl IntegerDisplayString {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for IntegerDisplayString {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2508,7 +2515,7 @@ impl IntegerDisplayString {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Metadata {
     /// is to be included in the boundary selection modal
     pub area_selection: bool,
@@ -2531,11 +2538,17 @@ pub struct Metadata {
     /// This attribute holds the index of the field in the dataset that should be
     /// used as the location description.
     pub location_description_field: i32,
+    /// Indices of fields that are "promoted to metrics"
+    pub promoted_metrics: Option<Vec<i32>>,
     /// An optional field that is meant to provide information to the user on
     /// where the data has come from
     pub source: Option<DatasetSource>,
     pub summary: Option<Vec<i32>>,
     pub update_cadence: UpdateCadence,
+    /// Indices of non-numeric fields that are "visualized in Explore" — they
+    /// appear as a categorical color visualization on Generic layers but, unlike
+    /// promoted_metrics, do NOT create an entry in the metric catalog.
+    pub visualize_in_explore_fields: Option<Vec<i32>>,
 }
 
 impl Metadata {
@@ -2569,11 +2582,20 @@ impl Metadata {
             .geometry_source
             .as_ref()
             .map(|u| u.serialize_to(builder));
+        let promoted_metrics_offset = self.promoted_metrics.as_ref().map(|v| {
+            let promoted_metrics_offset = builder.create_vector(&v);
+            promoted_metrics_offset
+        });
         let source_offset = self.source.as_ref().map(|o| o.serialize_to(builder));
         let summary_offset = self.summary.as_ref().map(|v| {
             let summary_offset = builder.create_vector(&v);
             summary_offset
         });
+        let visualize_in_explore_fields_offset =
+            self.visualize_in_explore_fields.as_ref().map(|v| {
+                let visualize_in_explore_fields_offset = builder.create_vector(&v);
+                visualize_in_explore_fields_offset
+            });
 
         let mut bldr = FbsMetadataBuilder::new(builder);
         bldr.add_area_selection(self.area_selection);
@@ -2597,6 +2619,9 @@ impl Metadata {
             bldr.add_geometry_source_type(ty);
         }
         bldr.add_location_description_field(self.location_description_field);
+        if let Some(offset) = promoted_metrics_offset {
+            bldr.add_promoted_metrics(offset);
+        }
         if let Some(offset) = source_offset {
             bldr.add_source(offset);
         }
@@ -2604,6 +2629,9 @@ impl Metadata {
             bldr.add_summary(offset);
         }
         bldr.add_update_cadence(FbsUpdateCadence::from(self.update_cadence));
+        if let Some(offset) = visualize_in_explore_fields_offset {
+            bldr.add_visualize_in_explore_fields(offset);
+        }
         bldr.finish()
     }
 }
@@ -2662,6 +2690,17 @@ impl From<FbsMetadata<'_>> for Metadata {
         };
 
         let location_description_field = fbs.location_description_field();
+        let promoted_metrics = if let Some(val) = fbs.promoted_metrics() {
+            let mut promoted_metrics = Vec::new();
+            for elem in val {
+                promoted_metrics.push(elem.into());
+            }
+
+            Some(promoted_metrics)
+        } else {
+            None
+        };
+
         let source = fbs.source().map(DatasetSource::from);
         let summary = if let Some(val) = fbs.summary() {
             let mut summary = Vec::new();
@@ -2675,6 +2714,17 @@ impl From<FbsMetadata<'_>> for Metadata {
         };
 
         let update_cadence = UpdateCadence::from(fbs.update_cadence());
+        let visualize_in_explore_fields = if let Some(val) = fbs.visualize_in_explore_fields() {
+            let mut visualize_in_explore_fields = Vec::new();
+            for elem in val {
+                visualize_in_explore_fields.push(elem.into());
+            }
+
+            Some(visualize_in_explore_fields)
+        } else {
+            None
+        };
+
         Self {
             area_selection,
             dataset_category,
@@ -2686,22 +2736,24 @@ impl From<FbsMetadata<'_>> for Metadata {
             fields,
             geometry_source,
             location_description_field,
+            promoted_metrics,
             source,
             summary,
             update_cadence,
+            visualize_in_explore_fields,
         }
     }
 }
 
-impl Metadata {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Metadata {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2724,14 +2776,16 @@ impl Default for Metadata {
             fields: None,
             geometry_source: None,
             location_description_field: -1,
+            promoted_metrics: None,
             source: None,
             summary: None,
             update_cadence: UpdateCadence::default(),
+            visualize_in_explore_fields: None,
         }
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct NestedCategoryRelationshipNode {
     pub child_columns: Option<Vec<i32>>,
     pub column: i32,
@@ -2779,15 +2833,15 @@ impl From<FbsNestedCategoryRelationshipNode<'_>> for NestedCategoryRelationshipN
     }
 }
 
-impl NestedCategoryRelationshipNode {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for NestedCategoryRelationshipNode {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2799,7 +2853,7 @@ impl NestedCategoryRelationshipNode {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct NestedHierarchyRelationshipNode {
     pub child_columns: Option<Vec<i32>>,
     pub child_nodes: Option<Vec<i32>>,
@@ -2870,15 +2924,15 @@ impl From<FbsNestedHierarchyRelationshipNode<'_>> for NestedHierarchyRelationshi
     }
 }
 
-impl NestedHierarchyRelationshipNode {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for NestedHierarchyRelationshipNode {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2890,7 +2944,7 @@ impl NestedHierarchyRelationshipNode {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct NestedStringCategoryNode {
     pub child_values: Vec<String>,
     pub value: Option<String>,
@@ -2935,15 +2989,15 @@ impl From<FbsNestedStringCategoryNode<'_>> for NestedStringCategoryNode {
     }
 }
 
-impl NestedStringCategoryNode {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for NestedStringCategoryNode {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -2954,7 +3008,7 @@ impl NestedStringCategoryNode {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct StringAggregate {
     pub count: u64,
     pub str: Option<String>,
@@ -2986,15 +3040,15 @@ impl From<FbsStringAggregate<'_>> for StringAggregate {
     }
 }
 
-impl StringAggregate {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for StringAggregate {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -3004,7 +3058,7 @@ impl StringAggregate {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct TimeInterval {
     pub max: i64,
     pub min: i64,
@@ -3032,15 +3086,15 @@ impl From<FbsTimeInterval<'_>> for TimeInterval {
     }
 }
 
-impl TimeInterval {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for TimeInterval {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -3050,7 +3104,7 @@ impl TimeInterval {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct UIntAggregate {
     pub count: u64,
     pub histo: Option<Vec<UIntBucket>>,
@@ -3119,15 +3173,15 @@ impl From<FbsUIntAggregate<'_>> for UIntAggregate {
     }
 }
 
-impl UIntAggregate {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for UIntAggregate {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -3137,7 +3191,7 @@ impl UIntAggregate {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct UIntBucket {
     pub count: u64,
     pub max: u64,
@@ -3161,7 +3215,7 @@ impl From<&FbsUIntBucket> for UIntBucket {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct UlField {
     pub breakdown_display_name: Option<String>,
     pub component_data: Option<ComponentData>,
@@ -3352,15 +3406,15 @@ impl From<FbsUlField<'_>> for UlField {
     }
 }
 
-impl UlField {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for UlField {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -3370,7 +3424,7 @@ impl UlField {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct UlFieldRelationship {
     pub relationship_data: Option<UlFieldRelationshipData>,
     pub relationship_display_name: Option<String>,
@@ -3456,15 +3510,15 @@ impl From<FbsUlFieldRelationship<'_>> for UlFieldRelationship {
     }
 }
 
-impl UlFieldRelationship {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for UlFieldRelationship {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()

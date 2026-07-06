@@ -83,6 +83,7 @@ from .id import (
     GraphNodeId,
     ObjectId,
     ObjectNamespace,
+    PinnedObjectId,
     StreamId,
 )
 from .job import (
@@ -147,9 +148,13 @@ from .worklog import (
     AggregationTy,
     ByteArray,
     ChartTypeTy,
+    ContainerRef,
+    GitRef,
     Layout,
     ParameterFlags,
     ParameterValue,
+    Producer,
+    ProducerRef,
     TileData,
     TileSettings,
     UserSettings,
@@ -166,6 +171,7 @@ from .generated.Bool import Bool as FbsBool
 from .generated.Buffer import Buffer as FbsBuffer
 from .generated.ByteArray import ByteArray as FbsByteArray
 from .generated.ColumnGroupId import ColumnGroupId as FbsColumnGroupId
+from .generated.ContainerRef import ContainerRef as FbsContainerRef
 from .generated.ContentId import ContentId as FbsContentId
 from .generated.DataCatalogObject import DataCatalogObject as FbsDataCatalogObject
 from .generated.DataStateId import DataStateId as FbsDataStateId
@@ -184,6 +190,7 @@ from .generated.FixedSizeBinary import FixedSizeBinary as FbsFixedSizeBinary
 from .generated.FixedSizeList import FixedSizeList as FbsFixedSizeList
 from .generated.FloatingPoint import FloatingPoint as FbsFloatingPoint
 from .generated.GenericId import GenericId as FbsGenericId
+from .generated.GitRef import GitRef as FbsGitRef
 from .generated.GraphNodeId import GraphNodeId as FbsGraphNodeId
 from .generated.Int import Int as FbsInt
 from .generated.Interval import Interval as FbsInterval
@@ -209,7 +216,9 @@ from .generated.ObjectSummaryList import ObjectSummaryList as FbsObjectSummaryLi
 from .generated.OutputSchema import OutputSchema as FbsOutputSchema
 from .generated.ParamIndices import ParamIndices as FbsParamIndices
 from .generated.ParameterFlags import ParameterFlags as FbsParameterFlags
+from .generated.PinnedObjectId import PinnedObjectId as FbsPinnedObjectId
 from .generated.Point2D import Point2D as FbsPoint2D
+from .generated.Producer import Producer as FbsProducer
 from .generated.RunEndEncoded import RunEndEncoded as FbsRunEndEncoded
 from .generated.RunSpec import RunSpec as FbsRunSpec
 from .generated.Schema import Schema as FbsSchema
@@ -260,6 +269,7 @@ from .generated.ValueInstance import ValueInstance as FbsValueInstance
 from .generated.WorkLog import WorkLog as FbsWorkLog
 from .generated.WorklogParameter import WorklogParameter as FbsWorklogParameter
 from .generated.ParameterValue import ParameterValue as FbsParameterValue
+from .generated.ProducerRef import ProducerRef as FbsProducerRef
 from .generated.TaskParameterValue import TaskParameterValue as FbsTaskParameterValue
 from .generated.Type import Type as FbsType
 from .generated.Value import Value as FbsValue
@@ -736,8 +746,6 @@ class ObjectIdPairList:
 class ObjectSummary:
     acl: Optional["ObjectId"]
 
-    drive_size: "int"
-
     head_revision: "ContentId"
 
     id: "ObjectId"
@@ -752,7 +760,6 @@ class ObjectSummary:
         acl_obj = o.Acl()
         if acl_obj is not None:
             acl = ObjectId.from_fbs(acl_obj)
-        drive_size = o.DriveSize()
         head_revision_obj = o.HeadRevision()
         if head_revision_obj is not None:
             head_revision = ContentId.from_fbs(head_revision_obj)
@@ -765,7 +772,7 @@ class ObjectSummary:
             raise ValueError("Id is required")
         time = o.Time()
         ty = DataCatalogObjectTy(o.Ty())
-        return cls(acl, drive_size, head_revision, id, time, ty)
+        return cls(acl, head_revision, id, time, ty)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -777,7 +784,6 @@ class ObjectSummary:
         from .generated.ObjectSummary import (
             Start,
             AddAcl,
-            AddDriveSize,
             AddHeadRevision,
             AddId,
             AddTime,
@@ -793,7 +799,6 @@ class ObjectSummary:
         Start(builder)
         if acl_offset is not None:
             AddAcl(builder, acl_offset)
-        AddDriveSize(builder, self.drive_size)
         AddHeadRevision(builder, head_revision_offset)
         AddId(builder, id_offset)
         AddTime(builder, self.time)
@@ -809,17 +814,15 @@ class ObjectSummary:
     @classmethod
     def make_default(cls) -> Self:
         acl = ObjectId.make_default()
-        drive_size = 0
         head_revision = ContentId.make_default()
         id = ObjectId.make_default()
         time = 0
         ty = DataCatalogObjectTy(0)
-        return cls(acl, drive_size, head_revision, id, time, ty)
+        return cls(acl, head_revision, id, time, ty)
 
     def __eq__(self, other) -> bool:
         eq = True
         eq = eq and self.acl == other.acl
-        eq = eq and self.drive_size == other.drive_size
         eq = eq and self.head_revision == other.head_revision
         eq = eq and self.id == other.id
         eq = eq and self.time == other.time

@@ -1581,7 +1581,8 @@ struct IntRange FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_FIELD_FORMAT = 8,
     VT_AGGREGATION_PROTOCOL = 10,
     VT_DISPLAY_STRINGS = 12,
-    VT_ENUM_NAME = 14
+    VT_ENUM_NAME = 14,
+    VT_IS_BITMASK_ENUM = 16
   };
   int64_t min() const {
     return GetField<int64_t>(VT_MIN, 0);
@@ -1601,6 +1602,9 @@ struct IntRange FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::String *enum_name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_ENUM_NAME);
   }
+  bool is_bitmask_enum() const {
+    return GetField<uint8_t>(VT_IS_BITMASK_ENUM, 0) != 0;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int64_t>(verifier, VT_MIN, 8) &&
@@ -1613,6 +1617,7 @@ struct IntRange FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyVectorOfTables(display_strings()) &&
            VerifyOffset(verifier, VT_ENUM_NAME) &&
            verifier.VerifyString(enum_name()) &&
+           VerifyField<uint8_t>(verifier, VT_IS_BITMASK_ENUM, 1) &&
            verifier.EndTable();
   }
 };
@@ -1639,6 +1644,9 @@ struct IntRangeBuilder {
   void add_enum_name(::flatbuffers::Offset<::flatbuffers::String> enum_name) {
     fbb_.AddOffset(IntRange::VT_ENUM_NAME, enum_name);
   }
+  void add_is_bitmask_enum(bool is_bitmask_enum) {
+    fbb_.AddElement<uint8_t>(IntRange::VT_IS_BITMASK_ENUM, static_cast<uint8_t>(is_bitmask_enum), 0);
+  }
   explicit IntRangeBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1657,7 +1665,8 @@ inline ::flatbuffers::Offset<IntRange> CreateIntRange(
     ::flatbuffers::Offset<NumericalFieldFormat> field_format = 0,
     AggregationFunction aggregation_protocol = AggregationFunction::Any,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<IntegerDisplayString>>> display_strings = 0,
-    ::flatbuffers::Offset<::flatbuffers::String> enum_name = 0) {
+    ::flatbuffers::Offset<::flatbuffers::String> enum_name = 0,
+    bool is_bitmask_enum = false) {
   IntRangeBuilder builder_(_fbb);
   builder_.add_max(max);
   builder_.add_min(min);
@@ -1665,6 +1674,7 @@ inline ::flatbuffers::Offset<IntRange> CreateIntRange(
   builder_.add_display_strings(display_strings);
   builder_.add_aggregation_protocol(aggregation_protocol);
   builder_.add_field_format(field_format);
+  builder_.add_is_bitmask_enum(is_bitmask_enum);
   return builder_.Finish();
 }
 
@@ -1680,7 +1690,8 @@ inline ::flatbuffers::Offset<IntRange> CreateIntRangeDirect(
     ::flatbuffers::Offset<NumericalFieldFormat> field_format = 0,
     AggregationFunction aggregation_protocol = AggregationFunction::Any,
     const std::vector<::flatbuffers::Offset<IntegerDisplayString>> *display_strings = nullptr,
-    const char *enum_name = nullptr) {
+    const char *enum_name = nullptr,
+    bool is_bitmask_enum = false) {
   auto display_strings__ = display_strings ? _fbb.CreateVector<::flatbuffers::Offset<IntegerDisplayString>>(*display_strings) : 0;
   auto enum_name__ = enum_name ? _fbb.CreateString(enum_name) : 0;
   return CreateIntRange(
@@ -1690,7 +1701,8 @@ inline ::flatbuffers::Offset<IntRange> CreateIntRangeDirect(
       field_format,
       aggregation_protocol,
       display_strings__,
-      enum_name__);
+      enum_name__,
+      is_bitmask_enum);
 }
 
 struct IntegerDisplayString FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -3768,7 +3780,9 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_DO_NOT_FILTER_GEOMETRY_BY_VIEWPORT = 24,
     VT_ENTITY_TY = 26,
     VT_UPDATE_CADENCE = 28,
-    VT_LOCATION_DESCRIPTION_FIELD = 30
+    VT_LOCATION_DESCRIPTION_FIELD = 30,
+    VT_PROMOTED_METRICS = 32,
+    VT_VISUALIZE_IN_EXPLORE_FIELDS = 34
   };
   const ::flatbuffers::String *display_name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_DISPLAY_NAME);
@@ -3835,6 +3849,16 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   int32_t location_description_field() const {
     return GetField<int32_t>(VT_LOCATION_DESCRIPTION_FIELD, -1);
   }
+  /// Indices of fields that are "promoted to metrics"
+  const ::flatbuffers::Vector<int32_t> *promoted_metrics() const {
+    return GetPointer<const ::flatbuffers::Vector<int32_t> *>(VT_PROMOTED_METRICS);
+  }
+  /// Indices of non-numeric fields that are "visualized in Explore" — they
+  /// appear as a categorical color visualization on Generic layers but, unlike
+  /// promoted_metrics, do NOT create an entry in the metric catalog.
+  const ::flatbuffers::Vector<int32_t> *visualize_in_explore_fields() const {
+    return GetPointer<const ::flatbuffers::Vector<int32_t> *>(VT_VISUALIZE_IN_EXPLORE_FIELDS);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_DISPLAY_NAME) &&
@@ -3860,6 +3884,10 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_ENTITY_TY, 4) &&
            VerifyField<uint32_t>(verifier, VT_UPDATE_CADENCE, 4) &&
            VerifyField<int32_t>(verifier, VT_LOCATION_DESCRIPTION_FIELD, 4) &&
+           VerifyOffset(verifier, VT_PROMOTED_METRICS) &&
+           verifier.VerifyVector(promoted_metrics()) &&
+           VerifyOffset(verifier, VT_VISUALIZE_IN_EXPLORE_FIELDS) &&
+           verifier.VerifyVector(visualize_in_explore_fields()) &&
            verifier.EndTable();
   }
 };
@@ -3922,6 +3950,12 @@ struct MetadataBuilder {
   void add_location_description_field(int32_t location_description_field) {
     fbb_.AddElement<int32_t>(Metadata::VT_LOCATION_DESCRIPTION_FIELD, location_description_field, -1);
   }
+  void add_promoted_metrics(::flatbuffers::Offset<::flatbuffers::Vector<int32_t>> promoted_metrics) {
+    fbb_.AddOffset(Metadata::VT_PROMOTED_METRICS, promoted_metrics);
+  }
+  void add_visualize_in_explore_fields(::flatbuffers::Offset<::flatbuffers::Vector<int32_t>> visualize_in_explore_fields) {
+    fbb_.AddOffset(Metadata::VT_VISUALIZE_IN_EXPLORE_FIELDS, visualize_in_explore_fields);
+  }
   explicit MetadataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -3948,8 +3982,12 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadata(
     bool do_not_filter_geometry_by_viewport = false,
     EntityTy entity_ty = EntityTy::T_INVALID,
     UpdateCadence update_cadence = UpdateCadence::UC_UNSET,
-    int32_t location_description_field = -1) {
+    int32_t location_description_field = -1,
+    ::flatbuffers::Offset<::flatbuffers::Vector<int32_t>> promoted_metrics = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<int32_t>> visualize_in_explore_fields = 0) {
   MetadataBuilder builder_(_fbb);
+  builder_.add_visualize_in_explore_fields(visualize_in_explore_fields);
+  builder_.add_promoted_metrics(promoted_metrics);
   builder_.add_location_description_field(location_description_field);
   builder_.add_update_cadence(update_cadence);
   builder_.add_entity_ty(entity_ty);
@@ -3987,12 +4025,16 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadataDirect(
     bool do_not_filter_geometry_by_viewport = false,
     EntityTy entity_ty = EntityTy::T_INVALID,
     UpdateCadence update_cadence = UpdateCadence::UC_UNSET,
-    int32_t location_description_field = -1) {
+    int32_t location_description_field = -1,
+    const std::vector<int32_t> *promoted_metrics = nullptr,
+    const std::vector<int32_t> *visualize_in_explore_fields = nullptr) {
   auto display_name__ = display_name ? _fbb.CreateString(display_name) : 0;
   auto description__ = description ? _fbb.CreateString(description) : 0;
   auto fields__ = fields ? _fbb.CreateVector<::flatbuffers::Offset<UlField>>(*fields) : 0;
   auto summary__ = summary ? _fbb.CreateVector<int32_t>(*summary) : 0;
   auto field_relationships__ = field_relationships ? _fbb.CreateVector<::flatbuffers::Offset<UlFieldRelationship>>(*field_relationships) : 0;
+  auto promoted_metrics__ = promoted_metrics ? _fbb.CreateVector<int32_t>(*promoted_metrics) : 0;
+  auto visualize_in_explore_fields__ = visualize_in_explore_fields ? _fbb.CreateVector<int32_t>(*visualize_in_explore_fields) : 0;
   return CreateMetadata(
       _fbb,
       display_name__,
@@ -4008,7 +4050,9 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadataDirect(
       do_not_filter_geometry_by_viewport,
       entity_ty,
       update_cadence,
-      location_description_field);
+      location_description_field,
+      promoted_metrics__,
+      visualize_in_explore_fields__);
 }
 
 inline bool VerifyComponentData(::flatbuffers::Verifier &verifier, const void *obj, ComponentData type) {

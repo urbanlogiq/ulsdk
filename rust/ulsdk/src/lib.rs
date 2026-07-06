@@ -110,6 +110,13 @@ pub mod native {
         Ok(batches)
     }
 
+    // The IPC stream always leads with a schema message, so the reader carries the schema
+    // even for a 0-row result, unlike collecting the (empty) batches.
+    pub fn read_arrow_schema(bytes: &[u8]) -> Result<arrow::datatypes::SchemaRef, Error> {
+        let reader = arrow::ipc::reader::StreamReader::try_new(bytes, None)?;
+        Ok(reader.schema())
+    }
+
     #[cfg(test)]
     pub(crate) fn make_test_batches() -> (Vec<RecordBatch>, Vec<u8>) {
         use arrow::array::{ArrayRef, Int32Array, StringArray};
@@ -214,6 +221,13 @@ fn id_to_utf8(id: &[u8; 16]) -> [u8; CANONICAL_UUID_LENGTH] {
     buf
 }
 
+pub trait FbsSerde {
+    fn to_fbs_bytes(&self) -> Vec<u8>;
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer>
+    where
+        Self: Sized;
+}
+
 struct IdVisitor;
 
 impl Visitor<'_> for IdVisitor {
@@ -238,5 +252,49 @@ impl Visitor<'_> for IdVisitor {
         E: SerdeError,
     {
         raw_id_from_str(&self, value)
+    }
+}
+
+struct PinnedObjectIdVisitor;
+
+impl Visitor<'_> for PinnedObjectIdVisitor {
+    type Value = ([u8; 16], Option<[u8; 16]>);
+
+    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_str("At least one, at most two 24/32/36 byte strings")
+    }
+
+    fn visit_bytes<E>(self, value: &[u8]) -> Result<Self::Value, E>
+    where
+        E: SerdeError,
+    {
+        let b = match value.len() {
+            16 => value.try_into().unwrap(),
+            len => return Err(SerdeError::invalid_length(len, &self)),
+        };
+
+        Ok((b, None))
+    }
+
+    fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+    where
+        E: SerdeError,
+    {
+        let mut splits = value.split("@");
+        let Some(id_split) = splits.next() else {
+            todo!()
+        };
+
+        let v = IdVisitor;
+
+        let b = raw_id_from_str(&v, id_split)?;
+
+        let cid = if let Some(cid_split) = splits.next() {
+            Some(raw_id_from_str(&v, cid_split)?)
+        } else {
+            None
+        };
+
+        Ok((b, cid))
     }
 }

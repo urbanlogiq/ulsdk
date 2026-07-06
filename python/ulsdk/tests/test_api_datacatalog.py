@@ -520,7 +520,7 @@ def test_stream_get_arrow():
     key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
     key_ctx = ApiKeyContext(key, Environment.Stage)
     ctx = TestContext(key_ctx)
-    p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
+    p0 = PinnedObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
     success = False
     for i in range(5):
         str_array = pa.array([f"test{i}" for i in range(20)], type=pa.string())
@@ -559,7 +559,7 @@ def test_stream_get_parquet():
     key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
     key_ctx = ApiKeyContext(key, Environment.Stage)
     ctx = TestContext(key_ctx)
-    p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
+    p0 = PinnedObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
     success = False
     for i in range(5):
         expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
@@ -589,7 +589,7 @@ def test_stream_get_csv():
     key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
     key_ctx = ApiKeyContext(key, Environment.Stage)
     ctx = TestContext(key_ctx)
-    p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
+    p0 = PinnedObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
     success = False
     for i in range(5):
         expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
@@ -619,7 +619,7 @@ def test_stream_get_xlsx():
     key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
     key_ctx = ApiKeyContext(key, Environment.Stage)
     ctx = TestContext(key_ctx)
-    p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
+    p0 = PinnedObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
     success = False
     for i in range(5):
         expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
@@ -649,7 +649,7 @@ def test_stream_get_json():
     key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
     key_ctx = ApiKeyContext(key, Environment.Stage)
     ctx = TestContext(key_ctx)
-    p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
+    p0 = PinnedObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
     success = False
     for i in range(5):
         expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
@@ -679,7 +679,7 @@ def test_stream_get_text():
     key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
     key_ctx = ApiKeyContext(key, Environment.Stage)
     ctx = TestContext(key_ctx)
-    p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
+    p0 = PinnedObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
     success = False
     for i in range(5):
         expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
@@ -709,7 +709,7 @@ def test_stream_get_html():
     key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
     key_ctx = ApiKeyContext(key, Environment.Stage)
     ctx = TestContext(key_ctx)
-    p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
+    p0 = PinnedObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
     success = False
     for i in range(5):
         expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
@@ -1059,6 +1059,114 @@ def test_create_table():
             time.sleep(i + 1)
             continue
         assert result == expected
+        if success:
+            break
+    assert success, "test was unable to complete with retries"
+
+def test_schema_arrow():
+    user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
+    access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None
+    secret_key = os.environ["CA_SECRET_KEY"] if "CA_SECRET_KEY" in os.environ else None
+
+    if user == None or access_key is None or secret_key is None:
+        raise Exception("cannot run test as no credentials are specified")
+    key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
+    key_ctx = ApiKeyContext(key, Environment.Stage)
+    ctx = TestContext(key_ctx)
+    body = Query.make_default()
+    success = False
+    for i in range(5):
+        str_array = pa.array([f"test{i}" for i in range(20)], type=pa.string())
+        assert isinstance(str_array, pa.Array)
+        int_array = pa.array([i for i in range(20)], type=pa.int32())
+        assert isinstance(int_array, pa.Array)
+        arrays: List[pa.Array] = [str_array, int_array]
+        column_names = ["v", "i"]
+        batch = pa.RecordBatch.from_arrays(arrays, names=column_names)
+        sink = pa.BufferOutputStream()
+        writer = pa.RecordBatchStreamWriter(sink, batch.schema)
+        writer.write_batch(batch)
+        writer.close()
+        expected_bytes = sink.getvalue().to_pybytes()
+        ctx.set_response(expected_bytes);
+        try:
+            result = schema_arrow(
+                ctx,
+                body
+            )
+            success = True
+        except Exception as e:
+            time.sleep(i + 1)
+            continue
+        if success:
+            break
+    assert success, "test was unable to complete with retries"
+
+def test_schema_raw():
+    user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
+    access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None
+    secret_key = os.environ["CA_SECRET_KEY"] if "CA_SECRET_KEY" in os.environ else None
+
+    if user == None or access_key is None or secret_key is None:
+        raise Exception("cannot run test as no credentials are specified")
+    key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
+    key_ctx = ApiKeyContext(key, Environment.Stage)
+    ctx = TestContext(key_ctx)
+    body = Query.make_default()
+    success = False
+    for i in range(5):
+        expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+        expected_bytes = expected
+        ctx.set_response(expected_bytes);
+        try:
+            result = schema_raw(
+                ctx,
+                body
+            )
+            success = True
+        except Exception as e:
+            time.sleep(i + 1)
+            continue
+        assert result == expected
+        if success:
+            break
+    assert success, "test was unable to complete with retries"
+
+def test_schema_only():
+    user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
+    access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None
+    secret_key = os.environ["CA_SECRET_KEY"] if "CA_SECRET_KEY" in os.environ else None
+
+    if user == None or access_key is None or secret_key is None:
+        raise Exception("cannot run test as no credentials are specified")
+    key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
+    key_ctx = ApiKeyContext(key, Environment.Stage)
+    ctx = TestContext(key_ctx)
+    body = Query.make_default()
+    success = False
+    for i in range(5):
+        str_array = pa.array([f"test{i}" for i in range(20)], type=pa.string())
+        assert isinstance(str_array, pa.Array)
+        int_array = pa.array([i for i in range(20)], type=pa.int32())
+        assert isinstance(int_array, pa.Array)
+        arrays: List[pa.Array] = [str_array, int_array]
+        column_names = ["v", "i"]
+        batch = pa.RecordBatch.from_arrays(arrays, names=column_names)
+        sink = pa.BufferOutputStream()
+        writer = pa.RecordBatchStreamWriter(sink, batch.schema)
+        writer.write_batch(batch)
+        writer.close()
+        expected_bytes = sink.getvalue().to_pybytes()
+        ctx.set_response(expected_bytes);
+        try:
+            result = schema_only(
+                ctx,
+                body
+            )
+            success = True
+        except Exception as e:
+            time.sleep(i + 1)
+            continue
         if success:
             break
     assert success, "test was unable to complete with retries"

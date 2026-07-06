@@ -46,6 +46,12 @@ def test_object_id():
     _t1 = ObjectId.from_bytes(_b)
     assert _t0 == _t1
 
+def test_pinned_object_id():
+    _t0 = PinnedObjectId.make_default()
+    _b = _t0.to_bytes()
+    _t1 = PinnedObjectId.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_stream_id():
     _t0 = StreamId.make_default()
     _b = _t0.to_bytes()

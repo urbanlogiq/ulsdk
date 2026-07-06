@@ -219,7 +219,7 @@ query_aggregate_relative_histo(
 Result<std::vector<std::shared_ptr<::arrow::RecordBatch>>>
 stream_get_arrow(
     ul::RequestContext &ctx,
-    const ::ul::types::ObjectId &id
+    const ::ul::types::PinnedObjectId &id
 );
 
 /**
@@ -230,7 +230,7 @@ stream_get_arrow(
 Result<std::vector<uint8_t>>
 stream_get_parquet(
     ul::RequestContext &ctx,
-    const ::ul::types::ObjectId &id
+    const ::ul::types::PinnedObjectId &id
 );
 
 /**
@@ -241,7 +241,7 @@ stream_get_parquet(
 Result<std::vector<uint8_t>>
 stream_get_csv(
     ul::RequestContext &ctx,
-    const ::ul::types::ObjectId &id
+    const ::ul::types::PinnedObjectId &id
 );
 
 /**
@@ -252,7 +252,7 @@ stream_get_csv(
 Result<std::vector<uint8_t>>
 stream_get_xlsx(
     ul::RequestContext &ctx,
-    const ::ul::types::ObjectId &id
+    const ::ul::types::PinnedObjectId &id
 );
 
 /**
@@ -263,7 +263,7 @@ stream_get_xlsx(
 Result<std::vector<uint8_t>>
 stream_get_json(
     ul::RequestContext &ctx,
-    const ::ul::types::ObjectId &id
+    const ::ul::types::PinnedObjectId &id
 );
 
 /**
@@ -274,7 +274,7 @@ stream_get_json(
 Result<std::vector<uint8_t>>
 stream_get_text(
     ul::RequestContext &ctx,
-    const ::ul::types::ObjectId &id
+    const ::ul::types::PinnedObjectId &id
 );
 
 /**
@@ -285,7 +285,7 @@ stream_get_text(
 Result<std::vector<uint8_t>>
 stream_get_html(
     ul::RequestContext &ctx,
-    const ::ul::types::ObjectId &id
+    const ::ul::types::PinnedObjectId &id
 );
 
 /**
@@ -421,6 +421,39 @@ Result<::ul::types::ObjectId>
 create_table(
     ul::RequestContext &ctx,
     const ::ul::types::NewTable &new_table
+);
+
+/**
+ * Evaluate the resulting schema of a query, returning an empty Arrow record batch
+ * @param query The query to execute
+ * @return The result of the query
+ */
+Result<std::vector<std::shared_ptr<::arrow::RecordBatch>>>
+schema_arrow(
+    ul::RequestContext &ctx,
+    const ::ul::types::Query &query
+);
+
+/**
+ * Evaluate the resulting schema of a query, returning the raw, unparsed binary record batch
+ * @param query The query to execute
+ * @return The result of the query
+ */
+Result<std::vector<uint8_t>>
+schema_raw(
+    ul::RequestContext &ctx,
+    const ::ul::types::Query &query
+);
+
+/**
+ * Evaluate the resulting Arrow schema of a query, returning it as a parsed Schema (reliable even for a 0-row result)
+ * @param query The query to execute
+ * @return The result of the query
+ */
+Result<std::shared_ptr<::arrow::Schema>>
+schema_only(
+    ul::RequestContext &ctx,
+    const ::ul::types::Query &query
 );
 
 /**

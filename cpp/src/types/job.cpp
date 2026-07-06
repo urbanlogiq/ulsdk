@@ -87,7 +87,7 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DeprecatedRunSpec 
         params_offsets.push_back(serialize_to(builder, i));
     }
     const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::DeprecatedTaskParameter>>> params_offset = builder.CreateVector(params_offsets);
-    const ::flatbuffers::Offset<::ObjectId> schematic_offset = serialize_to(builder, o.schematic_);
+    const ::flatbuffers::Offset<::PinnedObjectId> schematic_offset = serialize_to(builder, o.schematic_);
 
     ::DeprecatedRunSpecBuilder instance_builder = ::DeprecatedRunSpecBuilder(builder);
     instance_builder.add_param_indices(param_indices_offset);
@@ -552,7 +552,7 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const RunSpec &o) {
         params_offsets.push_back(serialize_to(builder, i));
     }
     const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::TaskParameter>>> params_offset = builder.CreateVector(params_offsets);
-    const ::flatbuffers::Offset<::ObjectId> schematic_offset = serialize_to(builder, o.schematic_);
+    const ::flatbuffers::Offset<::PinnedObjectId> schematic_offset = serialize_to(builder, o.schematic_);
 
     ::RunSpecBuilder instance_builder = ::RunSpecBuilder(builder);
     if (attributes_offset.has_value()) {
@@ -786,7 +786,7 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Task &o) {
         message_offset = std::make_optional(message_offset_val);
     }
     const ::flatbuffers::Offset<::flatbuffers::String> name_offset = builder.CreateString(o.name_);
-    const ::flatbuffers::Offset<::ObjectId> output_offset = serialize_to(builder, o.output_);
+    const ::flatbuffers::Offset<::PinnedObjectId> output_offset = serialize_to(builder, o.output_);
     const ::flatbuffers::Offset<::ParamIndices> params_offset = serialize_to(builder, o.params_);
     std::optional<::flatbuffers::Offset<::ObjectId>> schematic_id_offset = std::nullopt;
     if (o.schematic_id_.has_value()) {

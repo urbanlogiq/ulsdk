@@ -377,7 +377,7 @@ query_aggregate_relative_histo(
 Result<std::vector<std::shared_ptr<::arrow::RecordBatch>>>
 stream_get_arrow(
     ul::RequestContext &ctx,
-    const ::ul::types::ObjectId &id
+    const ::ul::types::PinnedObjectId &id
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
     const size_t id_idx = path.find(":id");
@@ -400,7 +400,7 @@ stream_get_arrow(
 Result<std::vector<uint8_t>>
 stream_get_parquet(
     ul::RequestContext &ctx,
-    const ::ul::types::ObjectId &id
+    const ::ul::types::PinnedObjectId &id
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
     const size_t id_idx = path.find(":id");
@@ -417,7 +417,7 @@ stream_get_parquet(
 Result<std::vector<uint8_t>>
 stream_get_csv(
     ul::RequestContext &ctx,
-    const ::ul::types::ObjectId &id
+    const ::ul::types::PinnedObjectId &id
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
     const size_t id_idx = path.find(":id");
@@ -434,7 +434,7 @@ stream_get_csv(
 Result<std::vector<uint8_t>>
 stream_get_xlsx(
     ul::RequestContext &ctx,
-    const ::ul::types::ObjectId &id
+    const ::ul::types::PinnedObjectId &id
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
     const size_t id_idx = path.find(":id");
@@ -451,7 +451,7 @@ stream_get_xlsx(
 Result<std::vector<uint8_t>>
 stream_get_json(
     ul::RequestContext &ctx,
-    const ::ul::types::ObjectId &id
+    const ::ul::types::PinnedObjectId &id
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
     const size_t id_idx = path.find(":id");
@@ -468,7 +468,7 @@ stream_get_json(
 Result<std::vector<uint8_t>>
 stream_get_text(
     ul::RequestContext &ctx,
-    const ::ul::types::ObjectId &id
+    const ::ul::types::PinnedObjectId &id
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
     const size_t id_idx = path.find(":id");
@@ -485,7 +485,7 @@ stream_get_text(
 Result<std::vector<uint8_t>>
 stream_get_html(
     ul::RequestContext &ctx,
-    const ::ul::types::ObjectId &id
+    const ::ul::types::PinnedObjectId &id
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id";
     const size_t id_idx = path.find(":id");
@@ -769,6 +769,66 @@ create_table(
         return Result<::ul::types::ObjectId>(error);
     }
     return ::ul::types::ObjectId(std::get<std::vector<uint8_t>>(res));
+}
+
+Result<std::vector<std::shared_ptr<::arrow::RecordBatch>>>
+schema_arrow(
+    ul::RequestContext &ctx,
+    const ::ul::types::Query &query
+) {
+    std::string path = "/v1/api/ulv2/datacatalog/query/schema";
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+    headers["accept"] = "application/vnd.apache.arrow.stream";
+    const std::vector<uint8_t> body = ::ul::types::to_bytes(query);
+    const Result<std::vector<uint8_t>> res = ctx.post(path, body, "application/octet-stream", params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<std::vector<std::shared_ptr<::arrow::RecordBatch>>>(error);
+    }
+
+    std::vector<uint8_t> data = std::get<std::vector<uint8_t>>(res);
+    return ul::to_arrow(data);
+}
+
+Result<std::vector<uint8_t>>
+schema_raw(
+    ul::RequestContext &ctx,
+    const ::ul::types::Query &query
+) {
+    std::string path = "/v1/api/ulv2/datacatalog/query/schema";
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+    headers["accept"] = "application/vnd.apache.arrow.stream";
+    const std::vector<uint8_t> body = ::ul::types::to_bytes(query);
+    const Result<std::vector<uint8_t>> res = ctx.post(path, body, "application/octet-stream", params, headers);
+    return res;
+}
+
+Result<std::shared_ptr<::arrow::Schema>>
+schema_only(
+    ul::RequestContext &ctx,
+    const ::ul::types::Query &query
+) {
+    std::string path = "/v1/api/ulv2/datacatalog/query/schema";
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+    headers["accept"] = "application/vnd.apache.arrow.stream";
+    const std::vector<uint8_t> body = ::ul::types::to_bytes(query);
+    const Result<std::vector<uint8_t>> res = ctx.post(path, body, "application/octet-stream", params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<std::shared_ptr<::arrow::Schema>>(error);
+    }
+
+    std::vector<uint8_t> data = std::get<std::vector<uint8_t>>(res);
+    return ul::to_arrow_schema(data);
 }
 
 Result<std::vector<std::shared_ptr<::arrow::RecordBatch>>>

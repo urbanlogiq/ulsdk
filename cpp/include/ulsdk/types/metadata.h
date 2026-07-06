@@ -128,6 +128,7 @@ struct IntRange {
     std::optional<std::vector<IntegerDisplayString>> display_strings_;
     std::optional<std::string> enum_name_;
     std::optional<NumericalFieldFormat> field_format_;
+    bool is_bitmask_enum_;
     int64_t max_;
     int64_t min_;
 
@@ -476,9 +477,11 @@ struct Metadata {
     std::optional<std::vector<UlField>> fields_;
     std::optional<GeometrySource> geometry_source_;
     int32_t location_description_field_;
+    std::optional<std::vector<int32_t>> promoted_metrics_;
     std::optional<DatasetSource> source_;
     std::optional<std::vector<int32_t>> summary_;
     UpdateCadence update_cadence_;
+    std::optional<std::vector<int32_t>> visualize_in_explore_fields_;
 
     Metadata();
     Metadata(const ::Metadata *root);

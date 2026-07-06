@@ -1557,8 +1557,20 @@ func (rcv *IntRange) EnumName() []byte {
 	return nil
 }
 
+func (rcv *IntRange) IsBitmaskEnum() bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(16))
+	if o != 0 {
+		return rcv._tab.GetBool(o + rcv._tab.Pos)
+	}
+	return false
+}
+
+func (rcv *IntRange) MutateIsBitmaskEnum(n bool) bool {
+	return rcv._tab.MutateBoolSlot(16, n)
+}
+
 func IntRangeStart(builder *flatbuffers.Builder) {
-	builder.StartObject(6)
+	builder.StartObject(7)
 }
 func IntRangeAddMin(builder *flatbuffers.Builder, min int64) {
 	builder.PrependInt64Slot(0, min, 0)
@@ -1580,6 +1592,9 @@ func IntRangeStartDisplayStringsVector(builder *flatbuffers.Builder, numElems in
 }
 func IntRangeAddEnumName(builder *flatbuffers.Builder, enumName flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(5, flatbuffers.UOffsetT(enumName), 0)
+}
+func IntRangeAddIsBitmaskEnum(builder *flatbuffers.Builder, isBitmaskEnum bool) {
+	builder.PrependBoolSlot(6, isBitmaskEnum, false)
 }
 func IntRangeEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
@@ -3864,8 +3879,68 @@ func (rcv *Metadata) MutateLocationDescriptionField(n int32) bool {
 	return rcv._tab.MutateInt32Slot(30, n)
 }
 
+/// Indices of fields that are "promoted to metrics"
+func (rcv *Metadata) PromotedMetrics(j int) int32 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(32))
+	if o != 0 {
+		a := rcv._tab.Vector(o)
+		return rcv._tab.GetInt32(a + flatbuffers.UOffsetT(j*4))
+	}
+	return 0
+}
+
+func (rcv *Metadata) PromotedMetricsLength() int {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(32))
+	if o != 0 {
+		return rcv._tab.VectorLen(o)
+	}
+	return 0
+}
+
+/// Indices of fields that are "promoted to metrics"
+func (rcv *Metadata) MutatePromotedMetrics(j int, n int32) bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(32))
+	if o != 0 {
+		a := rcv._tab.Vector(o)
+		return rcv._tab.MutateInt32(a+flatbuffers.UOffsetT(j*4), n)
+	}
+	return false
+}
+
+/// Indices of non-numeric fields that are "visualized in Explore" — they
+/// appear as a categorical color visualization on Generic layers but, unlike
+/// promoted_metrics, do NOT create an entry in the metric catalog.
+func (rcv *Metadata) VisualizeInExploreFields(j int) int32 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(34))
+	if o != 0 {
+		a := rcv._tab.Vector(o)
+		return rcv._tab.GetInt32(a + flatbuffers.UOffsetT(j*4))
+	}
+	return 0
+}
+
+func (rcv *Metadata) VisualizeInExploreFieldsLength() int {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(34))
+	if o != 0 {
+		return rcv._tab.VectorLen(o)
+	}
+	return 0
+}
+
+/// Indices of non-numeric fields that are "visualized in Explore" — they
+/// appear as a categorical color visualization on Generic layers but, unlike
+/// promoted_metrics, do NOT create an entry in the metric catalog.
+func (rcv *Metadata) MutateVisualizeInExploreFields(j int, n int32) bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(34))
+	if o != 0 {
+		a := rcv._tab.Vector(o)
+		return rcv._tab.MutateInt32(a+flatbuffers.UOffsetT(j*4), n)
+	}
+	return false
+}
+
 func MetadataStart(builder *flatbuffers.Builder) {
-	builder.StartObject(14)
+	builder.StartObject(16)
 }
 func MetadataAddDisplayName(builder *flatbuffers.Builder, displayName flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(displayName), 0)
@@ -3917,6 +3992,18 @@ func MetadataAddUpdateCadence(builder *flatbuffers.Builder, updateCadence Update
 }
 func MetadataAddLocationDescriptionField(builder *flatbuffers.Builder, locationDescriptionField int32) {
 	builder.PrependInt32Slot(13, locationDescriptionField, -1)
+}
+func MetadataAddPromotedMetrics(builder *flatbuffers.Builder, promotedMetrics flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(14, flatbuffers.UOffsetT(promotedMetrics), 0)
+}
+func MetadataStartPromotedMetricsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+	return builder.StartVector(4, numElems, 4)
+}
+func MetadataAddVisualizeInExploreFields(builder *flatbuffers.Builder, visualizeInExploreFields flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(15, flatbuffers.UOffsetT(visualizeInExploreFields), 0)
+}
+func MetadataStartVisualizeInExploreFieldsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+	return builder.StartVector(4, numElems, 4)
 }
 func MetadataEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()

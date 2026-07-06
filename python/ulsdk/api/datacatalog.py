@@ -4,7 +4,7 @@
 
 from dataclasses import dataclass
 import json
-from pyarrow import RecordBatch, BufferOutputStream, RecordBatchStreamWriter, RecordBatchStreamReader
+from pyarrow import RecordBatch, Schema, BufferOutputStream, RecordBatchStreamWriter, RecordBatchStreamReader
 from typing import Optional, Any, List, Dict
 import sys
 if sys.version_info.minor < 11:
@@ -14,7 +14,12 @@ else:
 from urllib.parse import quote_plus
 from uuid import UUID
 from ..request_context import RequestContext
-from ..types.id import ContentId, GenericId, ObjectId
+from ..types.id import (
+    ContentId,
+    GenericId,
+    ObjectId,
+    PinnedObjectId,
+)
 from ..types.metadata import Metadata
 from ..types.object import (
     DataCatalogObject,
@@ -387,13 +392,13 @@ def query_aggregate_relative_histo(
 
 def stream_get_arrow(
     ctx: RequestContext,
-    id_: "ObjectId",
+    id_: "PinnedObjectId",
 ) -> List[RecordBatch]:
     """Fetch the stream with the given ID
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: "ObjectId" -- The ID of the stream to fetch
+    id_: "PinnedObjectId" -- The ID of the stream to fetch
 
     Returns:
     Stream data as requested
@@ -412,13 +417,13 @@ def stream_get_arrow(
 
 def stream_get_parquet(
     ctx: RequestContext,
-    id_: "ObjectId",
+    id_: "PinnedObjectId",
 ) -> bytes:
     """Fetch the stream with the given ID
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: "ObjectId" -- The ID of the stream to fetch
+    id_: "PinnedObjectId" -- The ID of the stream to fetch
 
     Returns:
     Stream data as requested
@@ -436,13 +441,13 @@ def stream_get_parquet(
 
 def stream_get_csv(
     ctx: RequestContext,
-    id_: "ObjectId",
+    id_: "PinnedObjectId",
 ) -> bytes:
     """Fetch the stream with the given ID
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: "ObjectId" -- The ID of the stream to fetch
+    id_: "PinnedObjectId" -- The ID of the stream to fetch
 
     Returns:
     Stream data as requested
@@ -460,13 +465,13 @@ def stream_get_csv(
 
 def stream_get_xlsx(
     ctx: RequestContext,
-    id_: "ObjectId",
+    id_: "PinnedObjectId",
 ) -> bytes:
     """Fetch the stream with the given ID
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: "ObjectId" -- The ID of the stream to fetch
+    id_: "PinnedObjectId" -- The ID of the stream to fetch
 
     Returns:
     Stream data as requested
@@ -484,13 +489,13 @@ def stream_get_xlsx(
 
 def stream_get_json(
     ctx: RequestContext,
-    id_: "ObjectId",
+    id_: "PinnedObjectId",
 ) -> bytes:
     """Fetch the stream with the given ID
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: "ObjectId" -- The ID of the stream to fetch
+    id_: "PinnedObjectId" -- The ID of the stream to fetch
 
     Returns:
     Stream data as requested
@@ -508,13 +513,13 @@ def stream_get_json(
 
 def stream_get_text(
     ctx: RequestContext,
-    id_: "ObjectId",
+    id_: "PinnedObjectId",
 ) -> bytes:
     """Fetch the stream with the given ID
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: "ObjectId" -- The ID of the stream to fetch
+    id_: "PinnedObjectId" -- The ID of the stream to fetch
 
     Returns:
     Stream data as requested
@@ -532,13 +537,13 @@ def stream_get_text(
 
 def stream_get_html(
     ctx: RequestContext,
-    id_: "ObjectId",
+    id_: "PinnedObjectId",
 ) -> bytes:
     """Fetch the stream with the given ID
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: "ObjectId" -- The ID of the stream to fetch
+    id_: "PinnedObjectId" -- The ID of the stream to fetch
 
     Returns:
     Stream data as requested
@@ -821,6 +826,77 @@ def create_table(
     body = new_table.to_bytes()
     res = ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
     return ObjectId.from_bytes(res)
+
+def schema_arrow(
+    ctx: RequestContext,
+    query: Query,
+) -> List[RecordBatch]:
+    """Evaluate the resulting schema of a query, returning an empty Arrow record batch
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+    query: Query -- The query to execute
+
+    Returns:
+    The result of the query
+    """
+
+    path = "/v1/api/ulv2/datacatalog/query/schema"
+    params = dict()
+    headers = dict()
+    headers["accept"] = "application/vnd.apache.arrow.stream";
+
+    body = query.to_bytes()
+    res = ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
+    reader = RecordBatchStreamReader(res)
+    return reader.read_all().to_batches()
+
+def schema_raw(
+    ctx: RequestContext,
+    query: Query,
+) -> bytes:
+    """Evaluate the resulting schema of a query, returning the raw, unparsed binary record batch
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+    query: Query -- The query to execute
+
+    Returns:
+    The result of the query
+    """
+
+    path = "/v1/api/ulv2/datacatalog/query/schema"
+    params = dict()
+    headers = dict()
+    headers["accept"] = "application/vnd.apache.arrow.stream";
+
+    body = query.to_bytes()
+    res = ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
+    return res
+
+def schema_only(
+    ctx: RequestContext,
+    query: Query,
+) -> Schema:
+    """Evaluate the resulting Arrow schema of a query, returning it as a parsed Schema (reliable even for a 0-row result)
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+    query: Query -- The query to execute
+
+    Returns:
+    The result of the query
+    """
+
+    path = "/v1/api/ulv2/datacatalog/query/schema"
+    params = dict()
+    headers = dict()
+    headers["accept"] = "application/vnd.apache.arrow.stream";
+
+    body = query.to_bytes()
+    res = ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
+    reader = RecordBatchStreamReader(res)
+    return reader.schema
 
 def query_arrow(
     ctx: RequestContext,

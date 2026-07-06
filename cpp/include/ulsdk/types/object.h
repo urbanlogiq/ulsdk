@@ -96,7 +96,6 @@ struct ObjectIdPairList {
 
 struct ObjectSummary {
     std::optional<ObjectId> acl_;
-    uint64_t drive_size_;
     ContentId head_revision_;
     ObjectId id_;
     uint64_t time_;

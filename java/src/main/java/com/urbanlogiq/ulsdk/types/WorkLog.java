@@ -8,11 +8,11 @@ public final class WorkLog {
     /**
      *  Input streams and/or worklogs. These may be either work logs or streams.
      */
-    com.urbanlogiq.ulsdk.types.ObjectId[] _inputStreams;
-    public com.urbanlogiq.ulsdk.types.ObjectId[] getInputStreams() {
+    com.urbanlogiq.ulsdk.types.PinnedObjectId[] _inputStreams;
+    public com.urbanlogiq.ulsdk.types.PinnedObjectId[] getInputStreams() {
         return this._inputStreams;
     }
-    public void setInputStreams(com.urbanlogiq.ulsdk.types.ObjectId[] value) {
+    public void setInputStreams(com.urbanlogiq.ulsdk.types.PinnedObjectId[] value) {
         this._inputStreams = value;
     }
 
@@ -41,11 +41,11 @@ public final class WorkLog {
      *  step) so there should be enough information in the worklog necessary
      *  to reconstruct these output streams.
      */
-    com.urbanlogiq.ulsdk.types.ObjectId[] _outputStreams;
-    public com.urbanlogiq.ulsdk.types.ObjectId[] getOutputStreams() {
+    com.urbanlogiq.ulsdk.types.PinnedObjectId[] _outputStreams;
+    public com.urbanlogiq.ulsdk.types.PinnedObjectId[] getOutputStreams() {
         return this._outputStreams;
     }
-    public void setOutputStreams(com.urbanlogiq.ulsdk.types.ObjectId[] value) {
+    public void setOutputStreams(com.urbanlogiq.ulsdk.types.PinnedObjectId[] value) {
         this._outputStreams = value;
     }
 
@@ -79,15 +79,23 @@ public final class WorkLog {
         this._parent = value;
     }
 
+    com.urbanlogiq.ulsdk.types.Producer _producer;
+    public com.urbanlogiq.ulsdk.types.Producer getProducer() {
+        return this._producer;
+    }
+    public void setProducer(com.urbanlogiq.ulsdk.types.Producer value) {
+        this._producer = value;
+    }
+
     /**
      *  The schematic used behind creating the worklog. This may be empty/null
      *  if we are just layering data, for example.
      */
-    com.urbanlogiq.ulsdk.types.ObjectId _schematic;
-    public com.urbanlogiq.ulsdk.types.ObjectId getSchematic() {
+    com.urbanlogiq.ulsdk.types.PinnedObjectId _schematic;
+    public com.urbanlogiq.ulsdk.types.PinnedObjectId getSchematic() {
         return this._schematic;
     }
-    public void setSchematic(com.urbanlogiq.ulsdk.types.ObjectId value) {
+    public void setSchematic(com.urbanlogiq.ulsdk.types.PinnedObjectId value) {
         this._schematic = value;
     }
 
@@ -101,11 +109,11 @@ public final class WorkLog {
 
     public WorkLog(com.urbanlogiq.ulsdk.types.generated.WorkLog o) {
         if (o.inputStreamsVector() != null) {
-            com.urbanlogiq.ulsdk.types.ObjectId[] inputStreams = new com.urbanlogiq.ulsdk.types.ObjectId[o.inputStreamsLength()];
+            com.urbanlogiq.ulsdk.types.PinnedObjectId[] inputStreams = new com.urbanlogiq.ulsdk.types.PinnedObjectId[o.inputStreamsLength()];
             for (int i = 0; i < o.inputStreamsLength(); i++) {
-                com.urbanlogiq.ulsdk.types.ObjectId inputStreamsValue = null;
+                com.urbanlogiq.ulsdk.types.PinnedObjectId inputStreamsValue = null;
                 if (o.inputStreams(i) != null) {
-                    inputStreamsValue = new com.urbanlogiq.ulsdk.types.ObjectId(o.inputStreams(i));
+                    inputStreamsValue = new com.urbanlogiq.ulsdk.types.PinnedObjectId(o.inputStreams(i));
                 }
                 inputStreams[i] = inputStreamsValue;
             }
@@ -117,11 +125,11 @@ public final class WorkLog {
         if (o.name() != null) {
             this._name = o.name();
         }
-        com.urbanlogiq.ulsdk.types.ObjectId[] outputStreams = new com.urbanlogiq.ulsdk.types.ObjectId[o.outputStreamsLength()];
+        com.urbanlogiq.ulsdk.types.PinnedObjectId[] outputStreams = new com.urbanlogiq.ulsdk.types.PinnedObjectId[o.outputStreamsLength()];
         for (int i = 0; i < o.outputStreamsLength(); i++) {
-            com.urbanlogiq.ulsdk.types.ObjectId outputStreamsValue = null;
+            com.urbanlogiq.ulsdk.types.PinnedObjectId outputStreamsValue = null;
             if (o.outputStreams(i) != null) {
-                outputStreamsValue = new com.urbanlogiq.ulsdk.types.ObjectId(o.outputStreams(i));
+                outputStreamsValue = new com.urbanlogiq.ulsdk.types.PinnedObjectId(o.outputStreams(i));
             }
             outputStreams[i] = outputStreamsValue;
         }
@@ -138,7 +146,10 @@ public final class WorkLog {
         if (o.parent() != null) {
             this._parent = new com.urbanlogiq.ulsdk.types.ObjectId(o.parent());
         }
-        this._schematic = new com.urbanlogiq.ulsdk.types.ObjectId(o.schematic());
+        if (o.producer() != null) {
+            this._producer = new com.urbanlogiq.ulsdk.types.Producer(o.producer());
+        }
+        this._schematic = new com.urbanlogiq.ulsdk.types.PinnedObjectId(o.schematic());
         if (o.userSettings() != null) {
             this._userSettings = new com.urbanlogiq.ulsdk.types.UserSettings(o.userSettings());
         }
@@ -191,6 +202,10 @@ public final class WorkLog {
         if (this._parent != null) {
             parentOffset = this._parent.serializeTo(builder);
         }
+        Integer producerOffset = null;
+        if (this._producer != null) {
+            producerOffset = this._producer.serializeTo(builder);
+        }
         int schematicOffset = this._schematic.serializeTo(builder);
         Integer userSettingsOffset = null;
         if (this._userSettings != null) {
@@ -211,6 +226,9 @@ public final class WorkLog {
         if (parentOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.WorkLog.addParent(builder, parentOffset);
         }
+        if (producerOffset != null) {
+            com.urbanlogiq.ulsdk.types.generated.WorkLog.addProducer(builder, producerOffset);
+        }
         com.urbanlogiq.ulsdk.types.generated.WorkLog.addSchematic(builder, schematicOffset);
         if (userSettingsOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.WorkLog.addUserSettings(builder, userSettingsOffset);
@@ -226,13 +244,14 @@ public final class WorkLog {
     }
 
     public WorkLog() {
-        this._inputStreams = new com.urbanlogiq.ulsdk.types.ObjectId[0];
+        this._inputStreams = new com.urbanlogiq.ulsdk.types.PinnedObjectId[0];
         this._jobId = new com.urbanlogiq.ulsdk.types.ObjectId();
         this._name = new String();
-        this._outputStreams = new com.urbanlogiq.ulsdk.types.ObjectId[0];
+        this._outputStreams = new com.urbanlogiq.ulsdk.types.PinnedObjectId[0];
         this._params = new com.urbanlogiq.ulsdk.types.WorklogParameter[0];
         this._parent = new com.urbanlogiq.ulsdk.types.ObjectId();
-        this._schematic = new com.urbanlogiq.ulsdk.types.ObjectId();
+        this._producer = new com.urbanlogiq.ulsdk.types.Producer();
+        this._schematic = new com.urbanlogiq.ulsdk.types.PinnedObjectId();
         this._userSettings = new com.urbanlogiq.ulsdk.types.UserSettings();
     }
 

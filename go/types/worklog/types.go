@@ -110,6 +110,43 @@ type ParameterValue interface {
 	isParameterValue()
 }
 
+type ContainerRef struct {
+	Image string
+}
+
+func ContainerRefFromFbs(fbs *generated.ContainerRef) *ContainerRef {
+	o := &ContainerRef{}
+	o.Image = string(fbs.Image())
+	return o
+}
+
+// ContainerRefFromBytes deserializes a ContainerRef from size-prefixed FlatBuffer bytes.
+func ContainerRefFromBytes(data []byte) (*ContainerRef, error) {
+	fbs := generated.GetSizePrefixedRootAsContainerRef(data, 0)
+	return ContainerRefFromFbs(fbs), nil
+}
+
+// ToBytes serializes the ContainerRef to size-prefixed FlatBuffer bytes.
+func (o *ContainerRef) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the ContainerRef into a FlatBuffer builder and returns the offset.
+func (o *ContainerRef) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	imageOffset := builder.CreateString(o.Image)
+	generated.ContainerRefStart(builder)
+	generated.ContainerRefAddImage(builder, imageOffset)
+	return generated.ContainerRefEnd(builder)
+}
+
+// ProducerRef is a union type. Possible concrete types: ObjectId, ContainerRef
+type ProducerRef interface {
+	isProducerRef()
+}
+
 // ValuesFormatTy -
 //  Whether do display raw numbers or percentages
 type ValuesFormatTy uint32
@@ -119,6 +156,42 @@ const (
 	ValuesFormatTyRawNumber ValuesFormatTy = 1
 	ValuesFormatTyPercentage ValuesFormatTy = 2
 )
+
+type GitRef struct {
+	Commitish string
+	Repo string
+}
+
+func GitRefFromFbs(fbs *generated.GitRef) *GitRef {
+	o := &GitRef{}
+	o.Commitish = string(fbs.Commitish())
+	o.Repo = string(fbs.Repo())
+	return o
+}
+
+// GitRefFromBytes deserializes a GitRef from size-prefixed FlatBuffer bytes.
+func GitRefFromBytes(data []byte) (*GitRef, error) {
+	fbs := generated.GetSizePrefixedRootAsGitRef(data, 0)
+	return GitRefFromFbs(fbs), nil
+}
+
+// ToBytes serializes the GitRef to size-prefixed FlatBuffer bytes.
+func (o *GitRef) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the GitRef into a FlatBuffer builder and returns the offset.
+func (o *GitRef) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	commitishOffset := builder.CreateString(o.Commitish)
+	repoOffset := builder.CreateString(o.Repo)
+	generated.GitRefStart(builder)
+	generated.GitRefAddCommitish(builder, commitishOffset)
+	generated.GitRefAddRepo(builder, repoOffset)
+	return generated.GitRefEnd(builder)
+}
 
 type Layout struct {
 	Height uint32
@@ -158,6 +231,50 @@ func (o *Layout) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT 
 	generated.LayoutAddX(builder, o.X)
 	generated.LayoutAddY(builder, o.Y)
 	return generated.LayoutEnd(builder)
+}
+
+type Producer struct {
+	BuilderCodeRef *GitRef
+	Executor GitRef
+	Model interface{}
+}
+
+func ProducerFromFbs(fbs *generated.Producer) *Producer {
+	o := &Producer{}
+	if fbsVal := fbs.BuilderCodeRef(nil); fbsVal != nil {
+		o.BuilderCodeRef = GitRefFromFbs(fbsVal)
+	}
+	if fbsVal := fbs.Executor(nil); fbsVal != nil {
+		o.Executor = *GitRefFromFbs(fbsVal)
+	}
+	return o
+}
+
+// ProducerFromBytes deserializes a Producer from size-prefixed FlatBuffer bytes.
+func ProducerFromBytes(data []byte) (*Producer, error) {
+	fbs := generated.GetSizePrefixedRootAsProducer(data, 0)
+	return ProducerFromFbs(fbs), nil
+}
+
+// ToBytes serializes the Producer to size-prefixed FlatBuffer bytes.
+func (o *Producer) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the Producer into a FlatBuffer builder and returns the offset.
+func (o *Producer) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var builderCodeRefOffset flatbuffers.UOffsetT
+	if o.BuilderCodeRef != nil {
+		builderCodeRefOffset = o.BuilderCodeRef.SerializeTo(builder)
+	}
+	executorOffset := o.Executor.SerializeTo(builder)
+	generated.ProducerStart(builder)
+	generated.ProducerAddBuilderCodeRef(builder, builderCodeRefOffset)
+	generated.ProducerAddExecutor(builder, executorOffset)
+	return generated.ProducerEnd(builder)
 }
 
 type TileSettings struct {
@@ -341,22 +458,23 @@ func (o *UserSettings) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOf
 }
 
 type WorkLog struct {
-	InputStreams []id.ObjectId
+	InputStreams []id.PinnedObjectId
 	JobId *id.ObjectId
 	Name *string
-	OutputStreams []id.ObjectId
+	OutputStreams []id.PinnedObjectId
 	Params []WorklogParameter
 	Parent *id.ObjectId
-	Schematic id.ObjectId
+	Producer *Producer
+	Schematic id.PinnedObjectId
 	UserSettings *UserSettings
 }
 
 func WorkLogFromFbs(fbs *generated.WorkLog) *WorkLog {
 	o := &WorkLog{}
 	for i := 0; i < fbs.InputStreamsLength(); i++ {
-		var item generated.ObjectId
+		var item generated.PinnedObjectId
 		if fbs.InputStreams(&item, i) {
-			o.InputStreams = append(o.InputStreams, *id.ObjectIdFromFbs(&item))
+			o.InputStreams = append(o.InputStreams, *id.PinnedObjectIdFromFbs(&item))
 		}
 	}
 	if fbsVal := fbs.JobId(nil); fbsVal != nil {
@@ -367,9 +485,9 @@ func WorkLogFromFbs(fbs *generated.WorkLog) *WorkLog {
 		o.Name = &str
 	}
 	for i := 0; i < fbs.OutputStreamsLength(); i++ {
-		var item generated.ObjectId
+		var item generated.PinnedObjectId
 		if fbs.OutputStreams(&item, i) {
-			o.OutputStreams = append(o.OutputStreams, *id.ObjectIdFromFbs(&item))
+			o.OutputStreams = append(o.OutputStreams, *id.PinnedObjectIdFromFbs(&item))
 		}
 	}
 	for i := 0; i < fbs.ParamsLength(); i++ {
@@ -381,8 +499,11 @@ func WorkLogFromFbs(fbs *generated.WorkLog) *WorkLog {
 	if fbsVal := fbs.Parent(nil); fbsVal != nil {
 		o.Parent = id.ObjectIdFromFbs(fbsVal)
 	}
+	if fbsVal := fbs.Producer(nil); fbsVal != nil {
+		o.Producer = ProducerFromFbs(fbsVal)
+	}
 	if fbsVal := fbs.Schematic(nil); fbsVal != nil {
-		o.Schematic = *id.ObjectIdFromFbs(fbsVal)
+		o.Schematic = *id.PinnedObjectIdFromFbs(fbsVal)
 	}
 	if fbsVal := fbs.UserSettings(nil); fbsVal != nil {
 		o.UserSettings = UserSettingsFromFbs(fbsVal)
@@ -445,6 +566,10 @@ func (o *WorkLog) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT
 	if o.Parent != nil {
 		parentOffset = o.Parent.SerializeTo(builder)
 	}
+	var producerOffset flatbuffers.UOffsetT
+	if o.Producer != nil {
+		producerOffset = o.Producer.SerializeTo(builder)
+	}
 	schematicOffset := o.Schematic.SerializeTo(builder)
 	var userSettingsOffset flatbuffers.UOffsetT
 	if o.UserSettings != nil {
@@ -457,6 +582,7 @@ func (o *WorkLog) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT
 	generated.WorkLogAddOutputStreams(builder, outputStreamsVecOffset)
 	generated.WorkLogAddParams(builder, paramsVecOffset)
 	generated.WorkLogAddParent(builder, parentOffset)
+	generated.WorkLogAddProducer(builder, producerOffset)
 	generated.WorkLogAddSchematic(builder, schematicOffset)
 	generated.WorkLogAddUserSettings(builder, userSettingsOffset)
 	return generated.WorkLogEnd(builder)

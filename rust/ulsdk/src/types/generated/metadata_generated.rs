@@ -3459,6 +3459,7 @@ impl<'a> IntRange<'a> {
     pub const VT_AGGREGATION_PROTOCOL: flatbuffers::VOffsetT = 10;
     pub const VT_DISPLAY_STRINGS: flatbuffers::VOffsetT = 12;
     pub const VT_ENUM_NAME: flatbuffers::VOffsetT = 14;
+    pub const VT_IS_BITMASK_ENUM: flatbuffers::VOffsetT = 16;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -3482,6 +3483,7 @@ impl<'a> IntRange<'a> {
         if let Some(x) = args.field_format {
             builder.add_field_format(x);
         }
+        builder.add_is_bitmask_enum(args.is_bitmask_enum);
         builder.finish()
     }
 
@@ -3550,6 +3552,17 @@ impl<'a> IntRange<'a> {
                 .get::<flatbuffers::ForwardsUOffset<&str>>(IntRange::VT_ENUM_NAME, None)
         }
     }
+    #[inline]
+    pub fn is_bitmask_enum(&self) -> bool {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<bool>(IntRange::VT_IS_BITMASK_ENUM, Some(false))
+                .unwrap()
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for IntRange<'_> {
@@ -3580,6 +3593,7 @@ impl flatbuffers::Verifiable for IntRange<'_> {
                 Self::VT_ENUM_NAME,
                 false,
             )?
+            .visit_field::<bool>("is_bitmask_enum", Self::VT_IS_BITMASK_ENUM, false)?
             .finish();
         Ok(())
     }
@@ -3595,6 +3609,7 @@ pub struct IntRangeArgs<'a> {
         >,
     >,
     pub enum_name: Option<flatbuffers::WIPOffset<&'a str>>,
+    pub is_bitmask_enum: bool,
 }
 impl<'a> Default for IntRangeArgs<'a> {
     #[inline]
@@ -3606,6 +3621,7 @@ impl<'a> Default for IntRangeArgs<'a> {
             aggregation_protocol: AggregationFunction::Any,
             display_strings: None,
             enum_name: None,
+            is_bitmask_enum: false,
         }
     }
 }
@@ -3615,7 +3631,7 @@ impl Serialize for IntRange<'_> {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("IntRange", 6)?;
+        let mut s = serializer.serialize_struct("IntRange", 7)?;
         s.serialize_field("min", &self.min())?;
         s.serialize_field("max", &self.max())?;
         if let Some(f) = self.field_format() {
@@ -3634,6 +3650,7 @@ impl Serialize for IntRange<'_> {
         } else {
             s.skip_field("enum_name")?;
         }
+        s.serialize_field("is_bitmask_enum", &self.is_bitmask_enum())?;
         s.end()
     }
 }
@@ -3688,6 +3705,11 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> IntRangeBuilder<'a, 'b, A> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(IntRange::VT_ENUM_NAME, enum_name);
     }
     #[inline]
+    pub fn add_is_bitmask_enum(&mut self, is_bitmask_enum: bool) {
+        self.fbb_
+            .push_slot::<bool>(IntRange::VT_IS_BITMASK_ENUM, is_bitmask_enum, false);
+    }
+    #[inline]
     pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> IntRangeBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         IntRangeBuilder {
@@ -3711,6 +3733,7 @@ impl core::fmt::Debug for IntRange<'_> {
         ds.field("aggregation_protocol", &self.aggregation_protocol());
         ds.field("display_strings", &self.display_strings());
         ds.field("enum_name", &self.enum_name());
+        ds.field("is_bitmask_enum", &self.is_bitmask_enum());
         ds.finish()
     }
 }
@@ -9063,6 +9086,8 @@ impl<'a> Metadata<'a> {
     pub const VT_ENTITY_TY: flatbuffers::VOffsetT = 26;
     pub const VT_UPDATE_CADENCE: flatbuffers::VOffsetT = 28;
     pub const VT_LOCATION_DESCRIPTION_FIELD: flatbuffers::VOffsetT = 30;
+    pub const VT_PROMOTED_METRICS: flatbuffers::VOffsetT = 32;
+    pub const VT_VISUALIZE_IN_EXPLORE_FIELDS: flatbuffers::VOffsetT = 34;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -9074,6 +9099,12 @@ impl<'a> Metadata<'a> {
         args: &'args MetadataArgs<'args>,
     ) -> flatbuffers::WIPOffset<Metadata<'bldr>> {
         let mut builder = MetadataBuilder::new(_fbb);
+        if let Some(x) = args.visualize_in_explore_fields {
+            builder.add_visualize_in_explore_fields(x);
+        }
+        if let Some(x) = args.promoted_metrics {
+            builder.add_promoted_metrics(x);
+        }
         builder.add_location_description_field(args.location_description_field);
         builder.add_update_cadence(args.update_cadence);
         builder.add_entity_ty(args.entity_ty);
@@ -9284,6 +9315,36 @@ impl<'a> Metadata<'a> {
                 .unwrap()
         }
     }
+    /// Indices of fields that are "promoted to metrics"
+    #[inline]
+    pub fn promoted_metrics(&self) -> Option<flatbuffers::Vector<'a, i32>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, i32>>>(
+                    Metadata::VT_PROMOTED_METRICS,
+                    None,
+                )
+        }
+    }
+    /// Indices of non-numeric fields that are "visualized in Explore" — they
+    /// appear as a categorical color visualization on Generic layers but, unlike
+    /// promoted_metrics, do NOT create an entry in the metric catalog.
+    #[inline]
+    pub fn visualize_in_explore_fields(&self) -> Option<flatbuffers::Vector<'a, i32>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, i32>>>(
+                    Metadata::VT_VISUALIZE_IN_EXPLORE_FIELDS,
+                    None,
+                )
+        }
+    }
     #[inline]
     #[allow(non_snake_case)]
     pub fn geometry_source_as_no_geometry(&self) -> Option<NoGeometry<'a>> {
@@ -9403,6 +9464,16 @@ impl flatbuffers::Verifiable for Metadata<'_> {
                 Self::VT_LOCATION_DESCRIPTION_FIELD,
                 false,
             )?
+            .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, i32>>>(
+                "promoted_metrics",
+                Self::VT_PROMOTED_METRICS,
+                false,
+            )?
+            .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, i32>>>(
+                "visualize_in_explore_fields",
+                Self::VT_VISUALIZE_IN_EXPLORE_FIELDS,
+                false,
+            )?
             .finish();
         Ok(())
     }
@@ -9428,6 +9499,8 @@ pub struct MetadataArgs<'a> {
     pub entity_ty: EntityTy,
     pub update_cadence: UpdateCadence,
     pub location_description_field: i32,
+    pub promoted_metrics: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, i32>>>,
+    pub visualize_in_explore_fields: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, i32>>>,
 }
 impl<'a> Default for MetadataArgs<'a> {
     #[inline]
@@ -9447,6 +9520,8 @@ impl<'a> Default for MetadataArgs<'a> {
             entity_ty: EntityTy::T_INVALID,
             update_cadence: UpdateCadence::UC_UNSET,
             location_description_field: -1,
+            promoted_metrics: None,
+            visualize_in_explore_fields: None,
         }
     }
 }
@@ -9456,7 +9531,7 @@ impl Serialize for Metadata<'_> {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("Metadata", 14)?;
+        let mut s = serializer.serialize_struct("Metadata", 16)?;
         if let Some(f) = self.display_name() {
             s.serialize_field("display_name", &f)?;
         } else {
@@ -9522,6 +9597,16 @@ impl Serialize for Metadata<'_> {
             "location_description_field",
             &self.location_description_field(),
         )?;
+        if let Some(f) = self.promoted_metrics() {
+            s.serialize_field("promoted_metrics", &f)?;
+        } else {
+            s.skip_field("promoted_metrics")?;
+        }
+        if let Some(f) = self.visualize_in_explore_fields() {
+            s.serialize_field("visualize_in_explore_fields", &f)?;
+        } else {
+            s.skip_field("visualize_in_explore_fields")?;
+        }
         s.end()
     }
 }
@@ -9637,6 +9722,26 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> MetadataBuilder<'a, 'b, A> {
         );
     }
     #[inline]
+    pub fn add_promoted_metrics(
+        &mut self,
+        promoted_metrics: flatbuffers::WIPOffset<flatbuffers::Vector<'b, i32>>,
+    ) {
+        self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(
+            Metadata::VT_PROMOTED_METRICS,
+            promoted_metrics,
+        );
+    }
+    #[inline]
+    pub fn add_visualize_in_explore_fields(
+        &mut self,
+        visualize_in_explore_fields: flatbuffers::WIPOffset<flatbuffers::Vector<'b, i32>>,
+    ) {
+        self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(
+            Metadata::VT_VISUALIZE_IN_EXPLORE_FIELDS,
+            visualize_in_explore_fields,
+        );
+    }
+    #[inline]
     pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> MetadataBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         MetadataBuilder {
@@ -9708,6 +9813,11 @@ impl core::fmt::Debug for Metadata<'_> {
         ds.field(
             "location_description_field",
             &self.location_description_field(),
+        );
+        ds.field("promoted_metrics", &self.promoted_metrics());
+        ds.field(
+            "visualize_in_explore_fields",
+            &self.visualize_in_explore_fields(),
         );
         ds.finish()
     }

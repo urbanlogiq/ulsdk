@@ -135,11 +135,11 @@ public final class Task {
      *  written. If it is a lookup of an existing stream, this will be populated
      *  with the stream ID
      */
-    com.urbanlogiq.ulsdk.types.ObjectId _output;
-    public com.urbanlogiq.ulsdk.types.ObjectId getOutput() {
+    com.urbanlogiq.ulsdk.types.PinnedObjectId _output;
+    public com.urbanlogiq.ulsdk.types.PinnedObjectId getOutput() {
         return this._output;
     }
-    public void setOutput(com.urbanlogiq.ulsdk.types.ObjectId value) {
+    public void setOutput(com.urbanlogiq.ulsdk.types.PinnedObjectId value) {
         this._output = value;
     }
 
@@ -253,7 +253,7 @@ public final class Task {
             this._message = o.message();
         }
         this._name = o.name();
-        this._output = new com.urbanlogiq.ulsdk.types.ObjectId(o.output());
+        this._output = new com.urbanlogiq.ulsdk.types.PinnedObjectId(o.output());
         this._params = new com.urbanlogiq.ulsdk.types.ParamIndices(o.params());
         this._retries = o.retries();
         if (o.schematicId() != null) {
@@ -362,7 +362,7 @@ public final class Task {
         this._lastUpdatedByPod = new String();
         this._message = new String();
         this._name = new String();
-        this._output = new com.urbanlogiq.ulsdk.types.ObjectId();
+        this._output = new com.urbanlogiq.ulsdk.types.PinnedObjectId();
         this._params = new com.urbanlogiq.ulsdk.types.ParamIndices();
         this._schematicId = new com.urbanlogiq.ulsdk.types.ObjectId();
         this._task = new com.urbanlogiq.ulsdk.types.ObjectId();

@@ -1792,13 +1792,13 @@ impl<'a> Task<'a> {
     /// written. If it is a lookup of an existing stream, this will be populated
     /// with the stream ID
     #[inline]
-    pub fn output(&self) -> ObjectId<'a> {
+    pub fn output(&self) -> PinnedObjectId<'a> {
         // Safety:
         // Created from valid Table for this object
         // which contains a valid value in this slot
         unsafe {
             self._tab
-                .get::<flatbuffers::ForwardsUOffset<ObjectId>>(Task::VT_OUTPUT, None)
+                .get::<flatbuffers::ForwardsUOffset<PinnedObjectId>>(Task::VT_OUTPUT, None)
                 .unwrap()
         }
     }
@@ -1963,7 +1963,11 @@ impl flatbuffers::Verifiable for Task<'_> {
                 Self::VT_PARAMS,
                 true,
             )?
-            .visit_field::<flatbuffers::ForwardsUOffset<ObjectId>>("output", Self::VT_OUTPUT, true)?
+            .visit_field::<flatbuffers::ForwardsUOffset<PinnedObjectId>>(
+                "output",
+                Self::VT_OUTPUT,
+                true,
+            )?
             .visit_field::<bool>("discard", Self::VT_DISCARD, false)?
             .visit_field::<flatbuffers::ForwardsUOffset<
                 flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<ObjectId>>,
@@ -2002,7 +2006,7 @@ pub struct TaskArgs<'a> {
     pub status: Status,
     pub message: Option<flatbuffers::WIPOffset<&'a str>>,
     pub params: Option<flatbuffers::WIPOffset<ParamIndices<'a>>>,
-    pub output: Option<flatbuffers::WIPOffset<ObjectId<'a>>>,
+    pub output: Option<flatbuffers::WIPOffset<PinnedObjectId<'a>>>,
     pub discard: bool,
     pub upstream: Option<
         flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ObjectId<'a>>>>,
@@ -2141,9 +2145,9 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> TaskBuilder<'a, 'b, A> {
             .push_slot_always::<flatbuffers::WIPOffset<ParamIndices>>(Task::VT_PARAMS, params);
     }
     #[inline]
-    pub fn add_output(&mut self, output: flatbuffers::WIPOffset<ObjectId<'b>>) {
+    pub fn add_output(&mut self, output: flatbuffers::WIPOffset<PinnedObjectId<'b>>) {
         self.fbb_
-            .push_slot_always::<flatbuffers::WIPOffset<ObjectId>>(Task::VT_OUTPUT, output);
+            .push_slot_always::<flatbuffers::WIPOffset<PinnedObjectId>>(Task::VT_OUTPUT, output);
     }
     #[inline]
     pub fn add_discard(&mut self, discard: bool) {
@@ -2782,13 +2786,13 @@ impl<'a> RunSpec<'a> {
         }
     }
     #[inline]
-    pub fn schematic(&self) -> ObjectId<'a> {
+    pub fn schematic(&self) -> PinnedObjectId<'a> {
         // Safety:
         // Created from valid Table for this object
         // which contains a valid value in this slot
         unsafe {
             self._tab
-                .get::<flatbuffers::ForwardsUOffset<ObjectId>>(RunSpec::VT_SCHEMATIC, None)
+                .get::<flatbuffers::ForwardsUOffset<PinnedObjectId>>(RunSpec::VT_SCHEMATIC, None)
                 .unwrap()
         }
     }
@@ -2868,7 +2872,7 @@ impl flatbuffers::Verifiable for RunSpec<'_> {
         use self::flatbuffers::Verifiable;
         v.visit_table(pos)?
             .visit_field::<bool>("persist", Self::VT_PERSIST, false)?
-            .visit_field::<flatbuffers::ForwardsUOffset<ObjectId>>(
+            .visit_field::<flatbuffers::ForwardsUOffset<PinnedObjectId>>(
                 "schematic",
                 Self::VT_SCHEMATIC,
                 true,
@@ -2890,7 +2894,7 @@ impl flatbuffers::Verifiable for RunSpec<'_> {
 }
 pub struct RunSpecArgs<'a> {
     pub persist: bool,
-    pub schematic: Option<flatbuffers::WIPOffset<ObjectId<'a>>>,
+    pub schematic: Option<flatbuffers::WIPOffset<PinnedObjectId<'a>>>,
     pub param_indices: Option<
         flatbuffers::WIPOffset<
             flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ParamIndices<'a>>>,
@@ -2954,9 +2958,12 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> RunSpecBuilder<'a, 'b, A> {
             .push_slot::<bool>(RunSpec::VT_PERSIST, persist, false);
     }
     #[inline]
-    pub fn add_schematic(&mut self, schematic: flatbuffers::WIPOffset<ObjectId<'b>>) {
+    pub fn add_schematic(&mut self, schematic: flatbuffers::WIPOffset<PinnedObjectId<'b>>) {
         self.fbb_
-            .push_slot_always::<flatbuffers::WIPOffset<ObjectId>>(RunSpec::VT_SCHEMATIC, schematic);
+            .push_slot_always::<flatbuffers::WIPOffset<PinnedObjectId>>(
+                RunSpec::VT_SCHEMATIC,
+                schematic,
+            );
     }
     #[inline]
     pub fn add_param_indices(
@@ -3304,13 +3311,13 @@ impl<'a> DeprecatedRunSpec<'a> {
         }
     }
     #[inline]
-    pub fn schematic(&self) -> ObjectId<'a> {
+    pub fn schematic(&self) -> PinnedObjectId<'a> {
         // Safety:
         // Created from valid Table for this object
         // which contains a valid value in this slot
         unsafe {
             self._tab
-                .get::<flatbuffers::ForwardsUOffset<ObjectId>>(
+                .get::<flatbuffers::ForwardsUOffset<PinnedObjectId>>(
                     DeprecatedRunSpec::VT_SCHEMATIC,
                     None,
                 )
@@ -3358,7 +3365,7 @@ impl flatbuffers::Verifiable for DeprecatedRunSpec<'_> {
         use self::flatbuffers::Verifiable;
         v.visit_table(pos)?
             .visit_field::<bool>("persist", Self::VT_PERSIST, false)?
-            .visit_field::<flatbuffers::ForwardsUOffset<ObjectId>>(
+            .visit_field::<flatbuffers::ForwardsUOffset<PinnedObjectId>>(
                 "schematic",
                 Self::VT_SCHEMATIC,
                 true,
@@ -3375,7 +3382,7 @@ impl flatbuffers::Verifiable for DeprecatedRunSpec<'_> {
 }
 pub struct DeprecatedRunSpecArgs<'a> {
     pub persist: bool,
-    pub schematic: Option<flatbuffers::WIPOffset<ObjectId<'a>>>,
+    pub schematic: Option<flatbuffers::WIPOffset<PinnedObjectId<'a>>>,
     pub param_indices: Option<
         flatbuffers::WIPOffset<
             flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ParamIndices<'a>>>,
@@ -3424,9 +3431,9 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> DeprecatedRunSpecBuilder<'a, 'b
             .push_slot::<bool>(DeprecatedRunSpec::VT_PERSIST, persist, false);
     }
     #[inline]
-    pub fn add_schematic(&mut self, schematic: flatbuffers::WIPOffset<ObjectId<'b>>) {
+    pub fn add_schematic(&mut self, schematic: flatbuffers::WIPOffset<PinnedObjectId<'b>>) {
         self.fbb_
-            .push_slot_always::<flatbuffers::WIPOffset<ObjectId>>(
+            .push_slot_always::<flatbuffers::WIPOffset<PinnedObjectId>>(
                 DeprecatedRunSpec::VT_SCHEMATIC,
                 schematic,
             );

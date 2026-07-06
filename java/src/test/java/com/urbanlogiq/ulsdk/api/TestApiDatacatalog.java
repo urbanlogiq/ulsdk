@@ -449,7 +449,7 @@ public final class TestApiDatacatalog {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.PinnedObjectId p0 = new com.urbanlogiq.ulsdk.types.PinnedObjectId("00000000-0000-0000-0000-000000000000");
 
         org.apache.arrow.memory.RootAllocator allocator = new org.apache.arrow.memory.RootAllocator();
         org.apache.arrow.vector.VarCharVector varCharVector = new org.apache.arrow.vector.VarCharVector("v", allocator);
@@ -489,7 +489,7 @@ public final class TestApiDatacatalog {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.PinnedObjectId p0 = new com.urbanlogiq.ulsdk.types.PinnedObjectId("00000000-0000-0000-0000-000000000000");
         byte[] expected = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".getBytes();
         byte[] expectedBytes = expected.clone();
         ctx.setResponse(expectedBytes);
@@ -512,7 +512,7 @@ public final class TestApiDatacatalog {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.PinnedObjectId p0 = new com.urbanlogiq.ulsdk.types.PinnedObjectId("00000000-0000-0000-0000-000000000000");
         byte[] expected = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".getBytes();
         byte[] expectedBytes = expected.clone();
         ctx.setResponse(expectedBytes);
@@ -535,7 +535,7 @@ public final class TestApiDatacatalog {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.PinnedObjectId p0 = new com.urbanlogiq.ulsdk.types.PinnedObjectId("00000000-0000-0000-0000-000000000000");
         byte[] expected = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".getBytes();
         byte[] expectedBytes = expected.clone();
         ctx.setResponse(expectedBytes);
@@ -558,7 +558,7 @@ public final class TestApiDatacatalog {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.PinnedObjectId p0 = new com.urbanlogiq.ulsdk.types.PinnedObjectId("00000000-0000-0000-0000-000000000000");
         byte[] expected = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".getBytes();
         byte[] expectedBytes = expected.clone();
         ctx.setResponse(expectedBytes);
@@ -581,7 +581,7 @@ public final class TestApiDatacatalog {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.PinnedObjectId p0 = new com.urbanlogiq.ulsdk.types.PinnedObjectId("00000000-0000-0000-0000-000000000000");
         byte[] expected = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".getBytes();
         byte[] expectedBytes = expected.clone();
         ctx.setResponse(expectedBytes);
@@ -604,7 +604,7 @@ public final class TestApiDatacatalog {
 
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
-        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.PinnedObjectId p0 = new com.urbanlogiq.ulsdk.types.PinnedObjectId("00000000-0000-0000-0000-000000000000");
         byte[] expected = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".getBytes();
         byte[] expectedBytes = expected.clone();
         ctx.setResponse(expectedBytes);
@@ -880,6 +880,109 @@ public final class TestApiDatacatalog {
             body
         );
         org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
+    }
+
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
+    public void testSchemaArrow() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String caUser = System.getenv("CA_USER");
+        String caAccessKey = System.getenv("CA_ACCESS_KEY");
+        String caSecretKey = System.getenv("CA_SECRET_KEY");
+
+        if (caUser == null || caAccessKey == null || caSecretKey == null) {
+            throw new RuntimeException("user / key not present, cannot run tests");
+        }
+
+        com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
+        com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
+        com.urbanlogiq.ulsdk.types.Query body = new com.urbanlogiq.ulsdk.types.Query();
+
+        org.apache.arrow.memory.RootAllocator allocator = new org.apache.arrow.memory.RootAllocator();
+        org.apache.arrow.vector.VarCharVector varCharVector = new org.apache.arrow.vector.VarCharVector("v", allocator);
+        org.apache.arrow.vector.IntVector intVector = new org.apache.arrow.vector.IntVector("i", allocator);
+        for (int i = 0; i < 20; i++) {
+            intVector.setSafe(i, i);
+            varCharVector.setSafe(i, ("test" + i).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        }
+        varCharVector.setValueCount(20);
+        intVector.setValueCount(20);
+        java.util.List<org.apache.arrow.vector.types.pojo.Field> fields = java.util.Arrays.asList(varCharVector.getField(), intVector.getField());
+        java.util.List<org.apache.arrow.vector.FieldVector> vectors = java.util.Arrays.asList(varCharVector, intVector);
+        org.apache.arrow.vector.VectorSchemaRoot root = new org.apache.arrow.vector.VectorSchemaRoot(fields, vectors);
+        java.io.ByteArrayOutputStream stream = new java.io.ByteArrayOutputStream();
+        org.apache.arrow.vector.ipc.ArrowStreamWriter writer = new org.apache.arrow.vector.ipc.ArrowStreamWriter(root, null, stream);
+        writer.start();
+        writer.writeBatch();
+        writer.end();
+        byte[] expectedBytes = stream.toByteArray();
+
+        ctx.setResponse(expectedBytes);
+        org.apache.arrow.vector.ipc.ArrowStreamReader result = com.urbanlogiq.ulsdk.api.datacatalog.Datacatalog.schemaArrow(
+            ctx,
+            body
+        );
+    }
+
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
+    public void testSchemaRaw() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String caUser = System.getenv("CA_USER");
+        String caAccessKey = System.getenv("CA_ACCESS_KEY");
+        String caSecretKey = System.getenv("CA_SECRET_KEY");
+
+        if (caUser == null || caAccessKey == null || caSecretKey == null) {
+            throw new RuntimeException("user / key not present, cannot run tests");
+        }
+
+        com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
+        com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
+        com.urbanlogiq.ulsdk.types.Query body = new com.urbanlogiq.ulsdk.types.Query();
+        byte[] expected = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".getBytes();
+        byte[] expectedBytes = expected.clone();
+        ctx.setResponse(expectedBytes);
+        byte[] result = com.urbanlogiq.ulsdk.api.datacatalog.Datacatalog.schemaRaw(
+            ctx,
+            body
+        );
+        org.junit.jupiter.api.Assertions.assertArrayEquals(result, expected);
+    }
+
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
+    public void testSchemaOnly() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String caUser = System.getenv("CA_USER");
+        String caAccessKey = System.getenv("CA_ACCESS_KEY");
+        String caSecretKey = System.getenv("CA_SECRET_KEY");
+
+        if (caUser == null || caAccessKey == null || caSecretKey == null) {
+            throw new RuntimeException("user / key not present, cannot run tests");
+        }
+
+        com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
+        com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
+        com.urbanlogiq.ulsdk.types.Query body = new com.urbanlogiq.ulsdk.types.Query();
+
+        org.apache.arrow.memory.RootAllocator allocator = new org.apache.arrow.memory.RootAllocator();
+        org.apache.arrow.vector.VarCharVector varCharVector = new org.apache.arrow.vector.VarCharVector("v", allocator);
+        org.apache.arrow.vector.IntVector intVector = new org.apache.arrow.vector.IntVector("i", allocator);
+        for (int i = 0; i < 20; i++) {
+            intVector.setSafe(i, i);
+            varCharVector.setSafe(i, ("test" + i).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        }
+        varCharVector.setValueCount(20);
+        intVector.setValueCount(20);
+        java.util.List<org.apache.arrow.vector.types.pojo.Field> fields = java.util.Arrays.asList(varCharVector.getField(), intVector.getField());
+        java.util.List<org.apache.arrow.vector.FieldVector> vectors = java.util.Arrays.asList(varCharVector, intVector);
+        org.apache.arrow.vector.VectorSchemaRoot root = new org.apache.arrow.vector.VectorSchemaRoot(fields, vectors);
+        java.io.ByteArrayOutputStream stream = new java.io.ByteArrayOutputStream();
+        org.apache.arrow.vector.ipc.ArrowStreamWriter writer = new org.apache.arrow.vector.ipc.ArrowStreamWriter(root, null, stream);
+        writer.start();
+        writer.writeBatch();
+        writer.end();
+        byte[] expectedBytes = stream.toByteArray();
+
+        ctx.setResponse(expectedBytes);
+        org.apache.arrow.vector.types.pojo.Schema result = com.urbanlogiq.ulsdk.api.datacatalog.Datacatalog.schemaOnly(
+            ctx,
+            body
+        );
     }
 
     @RetryingTest(maxAttempts = 5, suspendForMs = 200)

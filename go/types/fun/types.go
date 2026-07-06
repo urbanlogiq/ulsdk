@@ -203,6 +203,8 @@ const (
 	FnIsDistinctFrom Fn = 193
 	FnIsNotDistinctFrom Fn = 194
 	FnGeoFilter Fn = 195
+	FnStBuffer Fn = 196
+	FnStDistance Fn = 197
 	FnCorrelationId Fn = 32763
 	FnUlTimezone Fn = 32764
 	FnUlArrayContains Fn = 32765

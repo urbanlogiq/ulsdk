@@ -204,6 +204,8 @@ public final class Fn {
   public static final short IsDistinctFrom = 193;
   public static final short IsNotDistinctFrom = 194;
   public static final short GeoFilter = 195;
+  public static final short StBuffer = 196;
+  public static final short StDistance = 197;
   public static final short CorrelationId = 32763;
   public static final short UlTimezone = 32764;
   public static final short UlArrayContains = 32765;

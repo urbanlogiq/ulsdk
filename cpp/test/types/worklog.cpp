@@ -17,6 +17,26 @@ test_byte_array() {
 TypeTest test_byte_array_obj(test_byte_array, "ByteArray");
 
 bool
+test_container_ref() {
+    ::ul::types::ContainerRef t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::ContainerRef deserialized = ::ul::types::ContainerRef(bytes);
+    return true;
+}
+
+TypeTest test_container_ref_obj(test_container_ref, "ContainerRef");
+
+bool
+test_git_ref() {
+    ::ul::types::GitRef t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::GitRef deserialized = ::ul::types::GitRef(bytes);
+    return true;
+}
+
+TypeTest test_git_ref_obj(test_git_ref, "GitRef");
+
+bool
 test_layout() {
     ::ul::types::Layout t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
@@ -35,6 +55,16 @@ test_parameter_flags() {
 }
 
 TypeTest test_parameter_flags_obj(test_parameter_flags, "ParameterFlags");
+
+bool
+test_producer() {
+    ::ul::types::Producer t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::Producer deserialized = ::ul::types::Producer(bytes);
+    return true;
+}
+
+TypeTest test_producer_obj(test_producer, "Producer");
 
 bool
 test_tile_data() {

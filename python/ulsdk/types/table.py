@@ -99,6 +99,7 @@ from .id import (
     GraphNodeId,
     ObjectId,
     ObjectNamespace,
+    PinnedObjectId,
     StreamId,
 )
 from .query import (
@@ -146,6 +147,7 @@ from .query import (
     TableSource,
     TableSourceInstance,
     TableSourceUnion,
+    TimeSeries,
     TypeHint,
     UnaryQueryElement,
     UnsetArgument,
@@ -274,6 +276,7 @@ from .generated.OpEntry import OpEntry as FbsOpEntry
 from .generated.OrderBy import OrderBy as FbsOrderBy
 from .generated.OrderByExpr import OrderByExpr as FbsOrderByExpr
 from .generated.Partition import Partition as FbsPartition
+from .generated.PinnedObjectId import PinnedObjectId as FbsPinnedObjectId
 from .generated.Placeholder import Placeholder as FbsPlaceholder
 from .generated.Point import Point as FbsPoint
 from .generated.Point2D import Point2D as FbsPoint2D
@@ -296,6 +299,7 @@ from .generated.TableOrderBy import TableOrderBy as FbsTableOrderBy
 from .generated.TableSource import TableSource as FbsTableSource
 from .generated.TableSourceInstance import TableSourceInstance as FbsTableSourceInstance
 from .generated.Time import Time as FbsTime
+from .generated.TimeSeries import TimeSeries as FbsTimeSeries
 from .generated.Timestamp import Timestamp as FbsTimestamp
 from .generated.Tri2D import Tri2D as FbsTri2D
 from .generated.UnaryQueryElement import UnaryQueryElement as FbsUnaryQueryElement

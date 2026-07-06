@@ -114,6 +114,7 @@ from .id import (
     GraphNodeId,
     ObjectId,
     ObjectNamespace,
+    PinnedObjectId,
     StreamId,
 )
 from .value import (
@@ -226,6 +227,7 @@ from .generated.NumericalFieldFormat import NumericalFieldFormat as FbsNumerical
 from .generated.ObjectId import ObjectId as FbsObjectId
 from .generated.OrderBy import OrderBy as FbsOrderBy
 from .generated.OutputSchema import OutputSchema as FbsOutputSchema
+from .generated.PinnedObjectId import PinnedObjectId as FbsPinnedObjectId
 from .generated.Point import Point as FbsPoint
 from .generated.Point2D import Point2D as FbsPoint2D
 from .generated.Polygon import Polygon as FbsPolygon
@@ -520,6 +522,8 @@ class IntRange:
 
     field_format: Optional["NumericalFieldFormat"]
 
+    is_bitmask_enum: "bool"
+
     max: "int"
 
     min: "int"
@@ -543,9 +547,10 @@ class IntRange:
         field_format_obj = o.FieldFormat()
         if field_format_obj is not None:
             field_format = NumericalFieldFormat.from_fbs(field_format_obj)
+        is_bitmask_enum = o.IsBitmaskEnum()
         max = o.Max()
         min = o.Min()
-        return cls(aggregation_protocol, display_strings, enum_name, field_format, max, min)
+        return cls(aggregation_protocol, display_strings, enum_name, field_format, is_bitmask_enum, max, min)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -561,6 +566,7 @@ class IntRange:
             StartDisplayStringsVector,
             AddEnumName,
             AddFieldFormat,
+            AddIsBitmaskEnum,
             AddMax,
             AddMin,
             End,
@@ -589,6 +595,7 @@ class IntRange:
             AddEnumName(builder, enum_name_offset)
         if field_format_offset is not None:
             AddFieldFormat(builder, field_format_offset)
+        AddIsBitmaskEnum(builder, self.is_bitmask_enum)
         AddMax(builder, self.max)
         AddMin(builder, self.min)
         return End(builder)
@@ -605,9 +612,10 @@ class IntRange:
         display_strings = []
         enum_name = ""
         field_format = NumericalFieldFormat.make_default()
+        is_bitmask_enum = False
         max = 0
         min = 0
-        return cls(aggregation_protocol, display_strings, enum_name, field_format, max, min)
+        return cls(aggregation_protocol, display_strings, enum_name, field_format, is_bitmask_enum, max, min)
 
     def __eq__(self, other) -> bool:
         eq = True
@@ -625,6 +633,7 @@ class IntRange:
             return False
         eq = eq and self.enum_name == other.enum_name
         eq = eq and self.field_format == other.field_format
+        eq = eq and self.is_bitmask_enum == other.is_bitmask_enum
         eq = eq and self.max == other.max
         eq = eq and self.min == other.min
 
@@ -2546,6 +2555,9 @@ class Metadata:
     # used as the location description.
     location_description_field: "int"
 
+    # Indices of fields that are "promoted to metrics"
+    promoted_metrics: Optional["List[int]"]
+
     # An optional field that is meant to provide information to the user on
     # where the data has come from
     source: Optional["DatasetSource"]
@@ -2553,6 +2565,11 @@ class Metadata:
     summary: Optional["List[int]"]
 
     update_cadence: "UpdateCadence"
+
+    # Indices of non-numeric fields that are "visualized in Explore" — they
+    # appear as a categorical color visualization on Generic layers but, unlike
+    # promoted_metrics, do NOT create an entry in the metric catalog.
+    visualize_in_explore_fields: Optional["List[int]"]
 
     @classmethod
     def from_fbs(cls, o: FbsMetadata) -> Self:
@@ -2590,6 +2607,10 @@ class Metadata:
             geometry_source_ty = o.GeometrySourceType()
             geometry_source = GeometrySource.from_fbs(geometry_source_val, geometry_source_ty)
         location_description_field = o.LocationDescriptionField()
+        promoted_metrics = list()
+        if not o.PromotedMetricsIsNone():
+            for i in range(o.PromotedMetricsLength()):
+                promoted_metrics.append(o.PromotedMetrics(i))
         source = None
         source_obj = o.Source()
         if source_obj is not None:
@@ -2599,7 +2620,11 @@ class Metadata:
             for i in range(o.SummaryLength()):
                 summary.append(o.Summary(i))
         update_cadence = UpdateCadence(o.UpdateCadence())
-        return cls(area_selection, dataset_category, description, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, source, summary, update_cadence)
+        visualize_in_explore_fields = list()
+        if not o.VisualizeInExploreFieldsIsNone():
+            for i in range(o.VisualizeInExploreFieldsLength()):
+                visualize_in_explore_fields.append(o.VisualizeInExploreFields(i))
+        return cls(area_selection, dataset_category, description, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, promoted_metrics, source, summary, update_cadence, visualize_in_explore_fields)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -2623,10 +2648,14 @@ class Metadata:
             AddGeometrySource,
             AddGeometrySourceType,
             AddLocationDescriptionField,
+            AddPromotedMetrics,
+            StartPromotedMetricsVector,
             AddSource,
             AddSummary,
             StartSummaryVector,
             AddUpdateCadence,
+            AddVisualizeInExploreFields,
+            StartVisualizeInExploreFieldsVector,
             End,
         )
         description_offset = None
@@ -2656,6 +2685,12 @@ class Metadata:
         geometry_source_offset, geometry_source_ty = (None, None)
         if self.geometry_source is not None:
             geometry_source_offset, geometry_source_ty = self.geometry_source.serialize_to(builder)
+        promoted_metrics_offset = None
+        if self.promoted_metrics is not None:
+            StartPromotedMetricsVector(builder, len(self.promoted_metrics))
+            for i in reversed(range(len(self.promoted_metrics))):
+                builder.PrependInt32(self.promoted_metrics[i])
+            promoted_metrics_offset = builder.EndVector()
         source_offset = None
         if self.source is not None:
             source_offset = self.source.serialize_to(builder)
@@ -2665,6 +2700,12 @@ class Metadata:
             for i in reversed(range(len(self.summary))):
                 builder.PrependInt32(self.summary[i])
             summary_offset = builder.EndVector()
+        visualize_in_explore_fields_offset = None
+        if self.visualize_in_explore_fields is not None:
+            StartVisualizeInExploreFieldsVector(builder, len(self.visualize_in_explore_fields))
+            for i in reversed(range(len(self.visualize_in_explore_fields))):
+                builder.PrependInt32(self.visualize_in_explore_fields[i])
+            visualize_in_explore_fields_offset = builder.EndVector()
 
         Start(builder)
         AddAreaSelection(builder, self.area_selection)
@@ -2683,11 +2724,15 @@ class Metadata:
             AddGeometrySource(builder, geometry_source_offset)
             AddGeometrySourceType(builder, geometry_source_ty)
         AddLocationDescriptionField(builder, self.location_description_field)
+        if promoted_metrics_offset is not None:
+            AddPromotedMetrics(builder, promoted_metrics_offset)
         if source_offset is not None:
             AddSource(builder, source_offset)
         if summary_offset is not None:
             AddSummary(builder, summary_offset)
         AddUpdateCadence(builder, self.update_cadence.value)
+        if visualize_in_explore_fields_offset is not None:
+            AddVisualizeInExploreFields(builder, visualize_in_explore_fields_offset)
         return End(builder)
 
     def to_bytes(self) -> bytes:
@@ -2708,10 +2753,12 @@ class Metadata:
         fields = []
         geometry_source = GeometrySource.make_default()
         location_description_field = 0
+        promoted_metrics = []
         source = DatasetSource.make_default()
         summary = []
         update_cadence = UpdateCadence(0)
-        return cls(area_selection, dataset_category, description, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, source, summary, update_cadence)
+        visualize_in_explore_fields = []
+        return cls(area_selection, dataset_category, description, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, promoted_metrics, source, summary, update_cadence, visualize_in_explore_fields)
 
     def __eq__(self, other) -> bool:
         eq = True
@@ -2745,6 +2792,17 @@ class Metadata:
             return False
         eq = eq and self.geometry_source == other.geometry_source
         eq = eq and self.location_description_field == other.location_description_field
+        self_promoted_metrics = self.promoted_metrics
+        other_promoted_metrics = other.promoted_metrics
+        if self_promoted_metrics is not None and other_promoted_metrics is not None:
+            if len(self_promoted_metrics) != len(other_promoted_metrics):
+                return False
+            for i in range(len(self_promoted_metrics)):
+                eq = eq and self_promoted_metrics[i] == other_promoted_metrics[i]
+        elif self_promoted_metrics is not None and other_promoted_metrics is None:
+            return False
+        elif self_promoted_metrics is None and other_promoted_metrics is not None:
+            return False
         eq = eq and self.source == other.source
         self_summary = self.summary
         other_summary = other.summary
@@ -2758,6 +2816,17 @@ class Metadata:
         elif self_summary is None and other_summary is not None:
             return False
         eq = eq and self.update_cadence == other.update_cadence
+        self_visualize_in_explore_fields = self.visualize_in_explore_fields
+        other_visualize_in_explore_fields = other.visualize_in_explore_fields
+        if self_visualize_in_explore_fields is not None and other_visualize_in_explore_fields is not None:
+            if len(self_visualize_in_explore_fields) != len(other_visualize_in_explore_fields):
+                return False
+            for i in range(len(self_visualize_in_explore_fields)):
+                eq = eq and self_visualize_in_explore_fields[i] == other_visualize_in_explore_fields[i]
+        elif self_visualize_in_explore_fields is not None and other_visualize_in_explore_fields is None:
+            return False
+        elif self_visualize_in_explore_fields is None and other_visualize_in_explore_fields is not None:
+            return False
 
         return eq
 

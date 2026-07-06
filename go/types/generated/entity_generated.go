@@ -285,6 +285,7 @@ const (
 	EntityTyT_HEXAGON_BOUNDARY                         EntityTy = 272
 	EntityTyT_COMPASS_IOT_POINT                        EntityTy = 273
 	EntityTyT_LANDSLIDE_AREA                           EntityTy = 274
+	EntityTyT_EXPLORE_MODE_ROAD_SEGMENT                EntityTy = 275
 )
 
 var EnumNamesEntityTy = map[EntityTy]string{
@@ -563,6 +564,7 @@ var EnumNamesEntityTy = map[EntityTy]string{
 	EntityTyT_HEXAGON_BOUNDARY:                         "T_HEXAGON_BOUNDARY",
 	EntityTyT_COMPASS_IOT_POINT:                        "T_COMPASS_IOT_POINT",
 	EntityTyT_LANDSLIDE_AREA:                           "T_LANDSLIDE_AREA",
+	EntityTyT_EXPLORE_MODE_ROAD_SEGMENT:                "T_EXPLORE_MODE_ROAD_SEGMENT",
 }
 
 var EnumValuesEntityTy = map[string]EntityTy{
@@ -841,6 +843,7 @@ var EnumValuesEntityTy = map[string]EntityTy{
 	"T_HEXAGON_BOUNDARY":                         EntityTyT_HEXAGON_BOUNDARY,
 	"T_COMPASS_IOT_POINT":                        EntityTyT_COMPASS_IOT_POINT,
 	"T_LANDSLIDE_AREA":                           EntityTyT_LANDSLIDE_AREA,
+	"T_EXPLORE_MODE_ROAD_SEGMENT":                EntityTyT_EXPLORE_MODE_ROAD_SEGMENT,
 }
 
 func (v EntityTy) String() string {

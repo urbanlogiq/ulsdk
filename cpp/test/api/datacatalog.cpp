@@ -395,7 +395,7 @@ ApiTest test_query_aggregate_relative_histo_obj(test_query_aggregate_relative_hi
 ul::Result<ul::Void>
 test_stream_get_arrow(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::PinnedObjectId p0 = ::ul::types::PinnedObjectId("00000000-0000-0000-0000-000000000000");
     std::vector<uint8_t> expected_bytes;
     const auto expected = make_test_arrow_batches(expected_bytes);
     ctx.set_response(expected_bytes);
@@ -417,7 +417,7 @@ ApiTest test_stream_get_arrow_obj(test_stream_get_arrow, "datacatalog::stream_ge
 ul::Result<ul::Void>
 test_stream_get_parquet(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::PinnedObjectId p0 = ::ul::types::PinnedObjectId("00000000-0000-0000-0000-000000000000");
     const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
     const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
     const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
@@ -445,7 +445,7 @@ ApiTest test_stream_get_parquet_obj(test_stream_get_parquet, "datacatalog::strea
 ul::Result<ul::Void>
 test_stream_get_csv(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::PinnedObjectId p0 = ::ul::types::PinnedObjectId("00000000-0000-0000-0000-000000000000");
     const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
     const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
     const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
@@ -473,7 +473,7 @@ ApiTest test_stream_get_csv_obj(test_stream_get_csv, "datacatalog::stream_get_cs
 ul::Result<ul::Void>
 test_stream_get_xlsx(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::PinnedObjectId p0 = ::ul::types::PinnedObjectId("00000000-0000-0000-0000-000000000000");
     const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
     const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
     const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
@@ -501,7 +501,7 @@ ApiTest test_stream_get_xlsx_obj(test_stream_get_xlsx, "datacatalog::stream_get_
 ul::Result<ul::Void>
 test_stream_get_json(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::PinnedObjectId p0 = ::ul::types::PinnedObjectId("00000000-0000-0000-0000-000000000000");
     const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
     const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
     const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
@@ -529,7 +529,7 @@ ApiTest test_stream_get_json_obj(test_stream_get_json, "datacatalog::stream_get_
 ul::Result<ul::Void>
 test_stream_get_text(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::PinnedObjectId p0 = ::ul::types::PinnedObjectId("00000000-0000-0000-0000-000000000000");
     const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
     const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
     const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
@@ -557,7 +557,7 @@ ApiTest test_stream_get_text_obj(test_stream_get_text, "datacatalog::stream_get_
 ul::Result<ul::Void>
 test_stream_get_html(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
-    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::PinnedObjectId p0 = ::ul::types::PinnedObjectId("00000000-0000-0000-0000-000000000000");
     const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
     const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
     const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
@@ -812,6 +812,78 @@ test_create_table(ul::RequestContext &rctx) {
 }
 
 ApiTest test_create_table_obj(test_create_table, "datacatalog::create_table", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
+test_schema_arrow(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    ::ul::types::Query body = ::ul::types::Query();
+    std::vector<uint8_t> expected_bytes;
+    const auto expected = make_test_arrow_batches(expected_bytes);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::schema_arrow(
+        ctx,
+        body
+    );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    return ul::Result<ul::Void>(ul::Void());
+}
+
+ApiTest test_schema_arrow_obj(test_schema_arrow, "datacatalog::schema_arrow", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
+test_schema_raw(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    ::ul::types::Query body = ::ul::types::Query();
+    const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
+    const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
+    const std::vector<uint8_t> expected_bytes = std::vector(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::schema_raw(
+        ctx,
+        body
+    );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const std::vector<uint8_t> result_value = std::get<std::vector<uint8_t>>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
+}
+
+ApiTest test_schema_raw_obj(test_schema_raw, "datacatalog::schema_raw", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
+test_schema_only(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    ::ul::types::Query body = ::ul::types::Query();
+    std::vector<uint8_t> expected_bytes;
+    const auto expected = make_test_arrow_batches(expected_bytes);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::schema_only(
+        ctx,
+        body
+    );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    return ul::Result<ul::Void>(ul::Void());
+}
+
+ApiTest test_schema_only_obj(test_schema_only, "datacatalog::schema_only", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
 test_query_arrow(ul::RequestContext &rctx) {

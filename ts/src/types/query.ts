@@ -45,6 +45,7 @@ import { TablePartition as FbsTablePartition } from './generated/table-partition
 import { TableSource as FbsTableSource, TableSourceT as FbsTableSourceT } from './generated/table-source';
 import { TableSourceInstance as FbsTableSourceInstance, TableSourceInstanceT as FbsTableSourceInstanceT } from './generated/table-source-instance';
 import { TableSourceUnion as FbsTableSourceUnion } from './generated/table-source-union';
+import { TimeSeries as FbsTimeSeries, TimeSeriesT as FbsTimeSeriesT } from './generated/time-series';
 import { UnaryQueryElement as FbsUnaryQueryElement, UnaryQueryElementT as FbsUnaryQueryElementT } from './generated/unary-query-element';
 import { UnsetArgument as FbsUnsetArgument, UnsetArgumentT as FbsUnsetArgumentT } from './generated/unset-argument';
 import { UpdateQueryElement as FbsUpdateQueryElement, UpdateQueryElementT as FbsUpdateQueryElementT } from './generated/update-query-element';
@@ -131,7 +132,7 @@ import { Projection as FbsProjection } from './generated/projection';
 import { QueryPathElement as FbsQueryPathElement } from './generated/query-path-element';
 import { QueryPathElementUnion as FbsQueryPathElementUnion } from './generated/query-path-element-union';
 import { ValueTransform as FbsValueTransform } from './generated/value-transform';
-import { B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId, ObjectNamespace, StreamId } from './id';
+import { B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId, ObjectNamespace, PinnedObjectId, StreamId } from './id';
 import { B2cId as FbsB2cId } from './generated/b2c-id';
 import { ColumnGroupId as FbsColumnGroupId } from './generated/column-group-id';
 import { ContentId as FbsContentId } from './generated/content-id';
@@ -140,6 +141,7 @@ import { GenericId as FbsGenericId } from './generated/generic-id';
 import { GraphNodeId as FbsGraphNodeId } from './generated/graph-node-id';
 import { ObjectId as FbsObjectId } from './generated/object-id';
 import { ObjectNamespace as FbsObjectNamespace } from './generated/object-namespace';
+import { PinnedObjectId as FbsPinnedObjectId } from './generated/pinned-object-id';
 import { StreamId as FbsStreamId } from './generated/stream-id';
 import { Point2D, Tri2D, VArray, VBool, VBytes, VChar, VF32, VF64, VFixedSizeBytes, VI16, VI32, VI64, VI8, VIsize, VNull, VPlaceholder, VStr, VTimestampMs, VTimestampMsUtc, VTimestampNs, VTimestampNsUtc, VTri2D, VU16, VU32, VU64, VU8, VUnit, VUsize, Value, ValueInstance, ValueTy } from './value';
 import { Point2D as FbsPoint2D } from './generated/point2-d';
@@ -2161,7 +2163,157 @@ export class Values {
   }
 }
 
-export type TableSourceUnion = DataCatalog | Arrow | GraphQuery | QueryTableSource | Vector | Placeholder | Drive | Values;
+/**
+ *  Synthetic timestamp series used to fill empty time buckets in metric queries.
+ *  Emits one row per bucket between `start_ms` and `end_ms`
+ *  (inclusive) at `interval_ms` spacing, in a single column named `output_column`.
+ *  All bounds are UTC unix milliseconds - to align with the
+ *  time_bucket UDF, callers should pass values that are already snapped to a
+ *  bucket boundary in the desired zone.
+ *  Timezone-aware generation is not yet supported.
+ *
+ *  If `infer_bounds` is true, `start_ms` and `end_ms` are ignored and the
+ *  catalog planner resolves them from the WHERE filter of whichever source
+ *  this series is LEFT JOINed against. The joined source must produce the
+ *  join column via `time_bucket(width, ts)` or
+ *  `date_trunc(unit, [at_timezone(]ts[, tz)])` and have a closed range
+ *  filter on `ts`; otherwise planning errors.
+ *
+ *  Exactly one of `interval_ms` / `interval_months` is non-zero (or both
+ *  zero when `infer_bounds=true` — the planner fills in whichever flavour
+ *  the joined source's bucket function dictates). `interval_months` is the
+ *  calendar-month count used to step the synthetic series; years are
+ *  represented as 12N months.
+ *
+ *  `tz` is the IANA timezone name (e.g. `"America/Los_Angeles"`) used to
+ *  floor bounds and step the series in local calendar time. Empty means
+ *  UTC. This is only set when the joined source's bucket expression wraps
+ *  the timestamp in `at_timezone(ts, '<tz>')` — bare `date_trunc(unit, ts)`
+ *  stays UTC. When `tz` is non-empty, the catalog emits the series as a
+ *  precomputed VALUES list rather than a DataFusion `generate_series` call
+ *  so the local-calendar boundaries (including DST transitions) are
+ *  authoritative at plan time.
+ */
+export class TimeSeries {
+  private _endMs!: bigint;
+
+  private _inferBounds!: boolean;
+
+  private _intervalMonths!: number;
+
+  private _intervalMs!: bigint;
+
+  private _outputColumn!: string;
+
+  private _startMs!: bigint;
+
+  private _tz!: string | null;
+
+  constructor(arg?: FbsTimeSeries | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsTimeSeries.getSizePrefixedRootAsTimeSeries(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsTimeSeries) {
+      this._initFromFbs(arg);
+    } else {
+      this._endMs = BigInt(0);
+      this._inferBounds = false;
+      this._intervalMonths = 0;
+      this._intervalMs = BigInt(0);
+      this._outputColumn = '';
+      this._startMs = BigInt(0);
+      this._tz = null;
+    }
+  }
+
+  private _initFromFbs(fbs: FbsTimeSeries): void {
+    this._endMs = fbs.endMs();
+    this._inferBounds = fbs.inferBounds();
+    this._intervalMonths = fbs.intervalMonths();
+    this._intervalMs = fbs.intervalMs();
+    this._outputColumn = fbs.outputColumn() ?? '';
+    this._startMs = fbs.startMs();
+    this._tz = fbs.tz();
+  }
+
+  get endMs(): bigint {
+    return this._endMs;
+  }
+
+  set endMs(value: bigint) {
+    this._endMs = value;
+  }
+
+  get inferBounds(): boolean {
+    return this._inferBounds;
+  }
+
+  set inferBounds(value: boolean) {
+    this._inferBounds = value;
+  }
+
+  get intervalMonths(): number {
+    return this._intervalMonths;
+  }
+
+  set intervalMonths(value: number) {
+    this._intervalMonths = value;
+  }
+
+  get intervalMs(): bigint {
+    return this._intervalMs;
+  }
+
+  set intervalMs(value: bigint) {
+    this._intervalMs = value;
+  }
+
+  get outputColumn(): string {
+    return this._outputColumn;
+  }
+
+  set outputColumn(value: string) {
+    this._outputColumn = value;
+  }
+
+  get startMs(): bigint {
+    return this._startMs;
+  }
+
+  set startMs(value: bigint) {
+    this._startMs = value;
+  }
+
+  get tz(): string | null {
+    return this._tz;
+  }
+
+  set tz(value: string | null) {
+    this._tz = value;
+  }
+
+  toFbsT(): FbsTimeSeriesT {
+    const t = new FbsTimeSeriesT();
+    t.endMs = this._endMs;
+    t.inferBounds = this._inferBounds;
+    t.intervalMonths = this._intervalMonths;
+    t.intervalMs = this._intervalMs;
+    t.outputColumn = this._outputColumn;
+    t.startMs = this._startMs;
+    t.tz = this._tz;
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+}
+
+export type TableSourceUnion = DataCatalog | Arrow | GraphQuery | QueryTableSource | Vector | Placeholder | Drive | Values | TimeSeries;
 
 export class UpdateQueryElement {
   private _filter!: Function | null;
@@ -2246,6 +2398,9 @@ export class UpdateQueryElement {
     } else if (sourceTy === FbsTableSourceUnion.Values) {
       const sourceFbsVal = fbs.source(new FbsValues());
       this._source = sourceFbsVal ? new Values(sourceFbsVal) : null;
+    } else if (sourceTy === FbsTableSourceUnion.TimeSeries) {
+      const sourceFbsVal = fbs.source(new FbsTimeSeries());
+      this._source = sourceFbsVal ? new TimeSeries(sourceFbsVal) : null;
     } else {
       this._source = null;
     }
@@ -2321,6 +2476,9 @@ export class UpdateQueryElement {
     } else if (this._source instanceof Values) {
       t.sourceType = FbsTableSourceUnion.Values;
       t.source = this._source.toFbsT();
+    } else if (this._source instanceof TimeSeries) {
+      t.sourceType = FbsTableSourceUnion.TimeSeries;
+      t.source = this._source.toFbsT();
     }
     return t;
   }
@@ -2379,6 +2537,9 @@ export class DeleteQueryElement {
     } else if (sourceTy === FbsTableSourceUnion.Values) {
       const sourceFbsVal = fbs.source(new FbsValues());
       this._source = sourceFbsVal ? new Values(sourceFbsVal) : null;
+    } else if (sourceTy === FbsTableSourceUnion.TimeSeries) {
+      const sourceFbsVal = fbs.source(new FbsTimeSeries());
+      this._source = sourceFbsVal ? new TimeSeries(sourceFbsVal) : null;
     } else {
       this._source = null;
     }
@@ -2426,6 +2587,9 @@ export class DeleteQueryElement {
       t.source = this._source.toFbsT();
     } else if (this._source instanceof Values) {
       t.sourceType = FbsTableSourceUnion.Values;
+      t.source = this._source.toFbsT();
+    } else if (this._source instanceof TimeSeries) {
+      t.sourceType = FbsTableSourceUnion.TimeSeries;
       t.source = this._source.toFbsT();
     }
     return t;
@@ -2568,6 +2732,9 @@ export class InsertQueryElement {
     } else if (destTy === FbsTableSourceUnion.Values) {
       const destFbsVal = fbs.dest(new FbsValues());
       this._dest = destFbsVal ? new Values(destFbsVal) : null;
+    } else if (destTy === FbsTableSourceUnion.TimeSeries) {
+      const destFbsVal = fbs.dest(new FbsTimeSeries());
+      this._dest = destFbsVal ? new TimeSeries(destFbsVal) : null;
     } else {
       this._dest = null;
     }
@@ -2648,6 +2815,9 @@ export class InsertQueryElement {
       t.dest = this._dest.toFbsT();
     } else if (this._dest instanceof Values) {
       t.destType = FbsTableSourceUnion.Values;
+      t.dest = this._dest.toFbsT();
+    } else if (this._dest instanceof TimeSeries) {
+      t.destType = FbsTableSourceUnion.TimeSeries;
       t.dest = this._dest.toFbsT();
     }
     t.onConflict = this._onConflict ? this._onConflict.toFbsT() : null;
@@ -3097,6 +3267,9 @@ export class TableSource {
     } else if (tTy === FbsTableSourceUnion.Values) {
       const tFbsVal = fbs.t(new FbsValues());
       this._t = tFbsVal ? new Values(tFbsVal) : null;
+    } else if (tTy === FbsTableSourceUnion.TimeSeries) {
+      const tFbsVal = fbs.t(new FbsTimeSeries());
+      this._t = tFbsVal ? new TimeSeries(tFbsVal) : null;
     } else {
       this._t = null;
     }
@@ -3172,6 +3345,9 @@ export class TableSource {
     } else if (this._t instanceof Values) {
       t.tType = FbsTableSourceUnion.Values;
       t.t = this._t.toFbsT();
+    } else if (this._t instanceof TimeSeries) {
+      t.tType = FbsTableSourceUnion.TimeSeries;
+      t.t = this._t.toFbsT();
     }
     return t;
   }
@@ -3225,6 +3401,9 @@ export class TableSourceInstance {
     } else if (tTy === FbsTableSourceUnion.Values) {
       const tFbsVal = fbs.t(new FbsValues());
       this._t = tFbsVal ? new Values(tFbsVal) : null;
+    } else if (tTy === FbsTableSourceUnion.TimeSeries) {
+      const tFbsVal = fbs.t(new FbsTimeSeries());
+      this._t = tFbsVal ? new TimeSeries(tFbsVal) : null;
     } else {
       this._t = null;
     }
@@ -3263,6 +3442,9 @@ export class TableSourceInstance {
       t.t = this._t.toFbsT();
     } else if (this._t instanceof Values) {
       t.tType = FbsTableSourceUnion.Values;
+      t.t = this._t.toFbsT();
+    } else if (this._t instanceof TimeSeries) {
+      t.tType = FbsTableSourceUnion.TimeSeries;
       t.t = this._t.toFbsT();
     }
     return t;

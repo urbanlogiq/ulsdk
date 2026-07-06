@@ -5,6 +5,7 @@
 package id
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 )
@@ -59,6 +60,13 @@ func (o *B2cid) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return generated.B2cIdEnd(builder)
 }
 
+func (o B2cid) String() string {
+	if len(o.B) != 16 {
+		return fmt.Sprintf("%x", o.B)
+	}
+	return fmt.Sprintf("%x-%x-%x-%x-%x", o.B[0:4], o.B[4:6], o.B[6:8], o.B[8:10], o.B[10:16])
+}
+
 type ColumnGroupId struct {
 	B []byte
 }
@@ -92,6 +100,13 @@ func (o *ColumnGroupId) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UO
 	generated.ColumnGroupIdStart(builder)
 	generated.ColumnGroupIdAddB(builder, bOffset)
 	return generated.ColumnGroupIdEnd(builder)
+}
+
+func (o ColumnGroupId) String() string {
+	if len(o.B) != 16 {
+		return fmt.Sprintf("%x", o.B)
+	}
+	return fmt.Sprintf("%x-%x-%x-%x-%x", o.B[0:4], o.B[4:6], o.B[6:8], o.B[8:10], o.B[10:16])
 }
 
 type ContentId struct {
@@ -129,6 +144,13 @@ func (o *ContentId) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffse
 	return generated.ContentIdEnd(builder)
 }
 
+func (o ContentId) String() string {
+	if len(o.B) != 16 {
+		return fmt.Sprintf("%x", o.B)
+	}
+	return fmt.Sprintf("%x-%x-%x-%x-%x", o.B[0:4], o.B[4:6], o.B[6:8], o.B[8:10], o.B[10:16])
+}
+
 type DataStateId struct {
 	B []byte
 }
@@ -162,6 +184,13 @@ func (o *DataStateId) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOff
 	generated.DataStateIdStart(builder)
 	generated.DataStateIdAddB(builder, bOffset)
 	return generated.DataStateIdEnd(builder)
+}
+
+func (o DataStateId) String() string {
+	if len(o.B) != 16 {
+		return fmt.Sprintf("%x", o.B)
+	}
+	return fmt.Sprintf("%x-%x-%x-%x-%x", o.B[0:4], o.B[4:6], o.B[6:8], o.B[8:10], o.B[10:16])
 }
 
 type GenericId struct {
@@ -199,6 +228,13 @@ func (o *GenericId) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffse
 	return generated.GenericIdEnd(builder)
 }
 
+func (o GenericId) String() string {
+	if len(o.B) != 16 {
+		return fmt.Sprintf("%x", o.B)
+	}
+	return fmt.Sprintf("%x-%x-%x-%x-%x", o.B[0:4], o.B[4:6], o.B[6:8], o.B[8:10], o.B[10:16])
+}
+
 type GraphNodeId struct {
 	B []byte
 }
@@ -232,6 +268,13 @@ func (o *GraphNodeId) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOff
 	generated.GraphNodeIdStart(builder)
 	generated.GraphNodeIdAddB(builder, bOffset)
 	return generated.GraphNodeIdEnd(builder)
+}
+
+func (o GraphNodeId) String() string {
+	if len(o.B) != 16 {
+		return fmt.Sprintf("%x", o.B)
+	}
+	return fmt.Sprintf("%x-%x-%x-%x-%x", o.B[0:4], o.B[4:6], o.B[6:8], o.B[8:10], o.B[10:16])
 }
 
 type ObjectId struct {
@@ -269,6 +312,57 @@ func (o *ObjectId) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 	return generated.ObjectIdEnd(builder)
 }
 
+func (o ObjectId) String() string {
+	if len(o.B) != 16 {
+		return fmt.Sprintf("%x", o.B)
+	}
+	return fmt.Sprintf("%x-%x-%x-%x-%x", o.B[0:4], o.B[4:6], o.B[6:8], o.B[8:10], o.B[10:16])
+}
+
+type PinnedObjectId struct {
+	B []byte
+	Cid *ContentId
+}
+
+func PinnedObjectIdFromFbs(fbs *generated.PinnedObjectId) *PinnedObjectId {
+	o := &PinnedObjectId{}
+	o.B = make([]byte, fbs.BLength())
+	for i := 0; i < fbs.BLength(); i++ {
+		o.B[i] = fbs.B(i)
+	}
+	if fbsVal := fbs.Cid(nil); fbsVal != nil {
+		o.Cid = ContentIdFromFbs(fbsVal)
+	}
+	return o
+}
+
+// PinnedObjectIdFromBytes deserializes a PinnedObjectId from size-prefixed FlatBuffer bytes.
+func PinnedObjectIdFromBytes(data []byte) (*PinnedObjectId, error) {
+	fbs := generated.GetSizePrefixedRootAsPinnedObjectId(data, 0)
+	return PinnedObjectIdFromFbs(fbs), nil
+}
+
+// ToBytes serializes the PinnedObjectId to size-prefixed FlatBuffer bytes.
+func (o *PinnedObjectId) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the PinnedObjectId into a FlatBuffer builder and returns the offset.
+func (o *PinnedObjectId) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	bOffset := builder.CreateByteVector(o.B)
+	var cidOffset flatbuffers.UOffsetT
+	if o.Cid != nil {
+		cidOffset = o.Cid.SerializeTo(builder)
+	}
+	generated.PinnedObjectIdStart(builder)
+	generated.PinnedObjectIdAddB(builder, bOffset)
+	generated.PinnedObjectIdAddCid(builder, cidOffset)
+	return generated.PinnedObjectIdEnd(builder)
+}
+
 type StreamId struct {
 	B []byte
 }
@@ -302,4 +396,11 @@ func (o *StreamId) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 	generated.StreamIdStart(builder)
 	generated.StreamIdAddB(builder, bOffset)
 	return generated.StreamIdEnd(builder)
+}
+
+func (o StreamId) String() string {
+	if len(o.B) != 16 {
+		return fmt.Sprintf("%x", o.B)
+	}
+	return fmt.Sprintf("%x-%x-%x-%x-%x", o.B[0:4], o.B[4:6], o.B[6:8], o.B[8:10], o.B[10:16])
 }

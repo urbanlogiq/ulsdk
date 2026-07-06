@@ -385,6 +385,14 @@ func TestDefaultTableSourceInstance(t *testing.T) {
 }
 
 
+func TestDefaultTimeSeries(t *testing.T) {
+	o := &TimeSeries{}
+	if o == nil {
+		t.Fatal("expected non-nil")
+	}
+}
+
+
 func TestDefaultUnaryQueryElement(t *testing.T) {
 	o := &UnaryQueryElement{}
 	if o == nil {

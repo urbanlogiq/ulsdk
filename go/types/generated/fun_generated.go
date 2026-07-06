@@ -205,6 +205,8 @@ const (
 	FnIsDistinctFrom       Fn = 193
 	FnIsNotDistinctFrom    Fn = 194
 	FnGeoFilter            Fn = 195
+	FnStBuffer             Fn = 196
+	FnStDistance           Fn = 197
 	FnCorrelationId        Fn = 32763
 	FnUlTimezone           Fn = 32764
 	FnUlArrayContains      Fn = 32765
@@ -408,6 +410,8 @@ var EnumNamesFn = map[Fn]string{
 	FnIsDistinctFrom:       "IsDistinctFrom",
 	FnIsNotDistinctFrom:    "IsNotDistinctFrom",
 	FnGeoFilter:            "GeoFilter",
+	FnStBuffer:             "StBuffer",
+	FnStDistance:           "StDistance",
 	FnCorrelationId:        "CorrelationId",
 	FnUlTimezone:           "UlTimezone",
 	FnUlArrayContains:      "UlArrayContains",
@@ -611,6 +615,8 @@ var EnumValuesFn = map[string]Fn{
 	"IsDistinctFrom":       FnIsDistinctFrom,
 	"IsNotDistinctFrom":    FnIsNotDistinctFrom,
 	"GeoFilter":            FnGeoFilter,
+	"StBuffer":             FnStBuffer,
+	"StDistance":           FnStDistance,
 	"CorrelationId":        FnCorrelationId,
 	"UlTimezone":           FnUlTimezone,
 	"UlArrayContains":      FnUlArrayContains,

@@ -107,6 +107,17 @@ public final class Metadata {
     }
 
     /**
+     *  Indices of fields that are "promoted to metrics"
+     */
+    int[] _promotedMetrics;
+    public int[] getPromotedMetrics() {
+        return this._promotedMetrics;
+    }
+    public void setPromotedMetrics(int[] value) {
+        this._promotedMetrics = value;
+    }
+
+    /**
      *  An optional field that is meant to provide information to the user on
      *  where the data has come from
      */
@@ -132,6 +143,19 @@ public final class Metadata {
     }
     public void setUpdateCadence(long value) {
         this._updateCadence = value;
+    }
+
+    /**
+     *  Indices of non-numeric fields that are "visualized in Explore" — they
+     *  appear as a categorical color visualization on Generic layers but, unlike
+     *  promoted_metrics, do NOT create an entry in the metric catalog.
+     */
+    int[] _visualizeInExploreFields;
+    public int[] getVisualizeInExploreFields() {
+        return this._visualizeInExploreFields;
+    }
+    public void setVisualizeInExploreFields(int[] value) {
+        this._visualizeInExploreFields = value;
     }
 
     public Metadata(com.urbanlogiq.ulsdk.types.generated.Metadata o) {
@@ -186,6 +210,13 @@ public final class Metadata {
             this._geometrySource = new com.urbanlogiq.ulsdk.types.GeometrySource(geometrySourceValue);
         }
         this._locationDescriptionField = o.locationDescriptionField();
+        if (o.promotedMetricsVector() != null) {
+            int[] promotedMetrics = new int[o.promotedMetricsLength()];
+            for (int i = 0; i < o.promotedMetricsLength(); i++) {
+                promotedMetrics[i] = (int)o.promotedMetrics(i);
+            }
+            this._promotedMetrics = promotedMetrics;
+        }
         if (o.source() != null) {
             this._source = new com.urbanlogiq.ulsdk.types.DatasetSource(o.source());
         }
@@ -197,6 +228,13 @@ public final class Metadata {
             this._summary = summary;
         }
         this._updateCadence = o.updateCadence();
+        if (o.visualizeInExploreFieldsVector() != null) {
+            int[] visualizeInExploreFields = new int[o.visualizeInExploreFieldsLength()];
+            for (int i = 0; i < o.visualizeInExploreFieldsLength(); i++) {
+                visualizeInExploreFields[i] = (int)o.visualizeInExploreFields(i);
+            }
+            this._visualizeInExploreFields = visualizeInExploreFields;
+        }
     }
 
     public Metadata(byte[] data) {
@@ -240,6 +278,14 @@ public final class Metadata {
         if (this._geometrySource != null) {
             geometrySourcePair = this._geometrySource.serializeTo(builder);
         }
+        Integer promotedMetricsOffset = null;
+        if (this._promotedMetrics != null) {
+            com.urbanlogiq.ulsdk.types.generated.Metadata.startPromotedMetricsVector(builder, this._promotedMetrics.length);
+            for (int i = this._promotedMetrics.length - 1; i >= 0; i--) {
+                builder.addInt(this._promotedMetrics[i]);
+            }
+            promotedMetricsOffset = builder.endVector();
+        }
         Integer sourceOffset = null;
         if (this._source != null) {
             sourceOffset = this._source.serializeTo(builder);
@@ -251,6 +297,14 @@ public final class Metadata {
                 builder.addInt(this._summary[i]);
             }
             summaryOffset = builder.endVector();
+        }
+        Integer visualizeInExploreFieldsOffset = null;
+        if (this._visualizeInExploreFields != null) {
+            com.urbanlogiq.ulsdk.types.generated.Metadata.startVisualizeInExploreFieldsVector(builder, this._visualizeInExploreFields.length);
+            for (int i = this._visualizeInExploreFields.length - 1; i >= 0; i--) {
+                builder.addInt(this._visualizeInExploreFields[i]);
+            }
+            visualizeInExploreFieldsOffset = builder.endVector();
         }
         com.urbanlogiq.ulsdk.types.generated.Metadata.startMetadata(builder);
         com.urbanlogiq.ulsdk.types.generated.Metadata.addAreaSelection(builder, this._areaSelection);
@@ -274,6 +328,9 @@ public final class Metadata {
             com.urbanlogiq.ulsdk.types.generated.Metadata.addGeometrySourceType(builder, geometrySourcePair.second());
         }
         com.urbanlogiq.ulsdk.types.generated.Metadata.addLocationDescriptionField(builder, this._locationDescriptionField);
+        if (promotedMetricsOffset != null) {
+            com.urbanlogiq.ulsdk.types.generated.Metadata.addPromotedMetrics(builder, promotedMetricsOffset);
+        }
         if (sourceOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.Metadata.addSource(builder, sourceOffset);
         }
@@ -281,6 +338,9 @@ public final class Metadata {
             com.urbanlogiq.ulsdk.types.generated.Metadata.addSummary(builder, summaryOffset);
         }
         com.urbanlogiq.ulsdk.types.generated.Metadata.addUpdateCadence(builder, this._updateCadence);
+        if (visualizeInExploreFieldsOffset != null) {
+            com.urbanlogiq.ulsdk.types.generated.Metadata.addVisualizeInExploreFields(builder, visualizeInExploreFieldsOffset);
+        }
         return com.urbanlogiq.ulsdk.types.generated.Metadata.endMetadata(builder);
     }
 
@@ -297,8 +357,10 @@ public final class Metadata {
         this._fieldRelationships = new com.urbanlogiq.ulsdk.types.UlFieldRelationship[0];
         this._fields = new com.urbanlogiq.ulsdk.types.UlField[0];
         this._geometrySource = new com.urbanlogiq.ulsdk.types.GeometrySource();
+        this._promotedMetrics = new int[0];
         this._source = new com.urbanlogiq.ulsdk.types.DatasetSource();
         this._summary = new int[0];
+        this._visualizeInExploreFields = new int[0];
     }
 
     @Override

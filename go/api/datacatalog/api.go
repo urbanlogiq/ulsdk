@@ -337,7 +337,7 @@ func QueryAggregateRelativeHisto(ctx api.RequestContext, buckets int64, numerato
 
 // StreamGetArrow -
 // Fetch the stream with the given ID
-func StreamGetArrow(ctx api.RequestContext, idParam id.ObjectId) ([]arrow.Record, error) {
+func StreamGetArrow(ctx api.RequestContext, idParam id.PinnedObjectId) ([]arrow.Record, error) {
 	path := "/v1/api/ulv2/datacatalog/stream/:id"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
 
@@ -359,7 +359,7 @@ func StreamGetArrow(ctx api.RequestContext, idParam id.ObjectId) ([]arrow.Record
 
 // StreamGetParquet -
 // Fetch the stream with the given ID
-func StreamGetParquet(ctx api.RequestContext, idParam id.ObjectId) ([]byte, error) {
+func StreamGetParquet(ctx api.RequestContext, idParam id.PinnedObjectId) ([]byte, error) {
 	path := "/v1/api/ulv2/datacatalog/stream/:id"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
 
@@ -377,7 +377,7 @@ func StreamGetParquet(ctx api.RequestContext, idParam id.ObjectId) ([]byte, erro
 
 // StreamGetCsv -
 // Fetch the stream with the given ID
-func StreamGetCsv(ctx api.RequestContext, idParam id.ObjectId) ([]byte, error) {
+func StreamGetCsv(ctx api.RequestContext, idParam id.PinnedObjectId) ([]byte, error) {
 	path := "/v1/api/ulv2/datacatalog/stream/:id"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
 
@@ -395,7 +395,7 @@ func StreamGetCsv(ctx api.RequestContext, idParam id.ObjectId) ([]byte, error) {
 
 // StreamGetXlsx -
 // Fetch the stream with the given ID
-func StreamGetXlsx(ctx api.RequestContext, idParam id.ObjectId) ([]byte, error) {
+func StreamGetXlsx(ctx api.RequestContext, idParam id.PinnedObjectId) ([]byte, error) {
 	path := "/v1/api/ulv2/datacatalog/stream/:id"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
 
@@ -413,7 +413,7 @@ func StreamGetXlsx(ctx api.RequestContext, idParam id.ObjectId) ([]byte, error) 
 
 // StreamGetJson -
 // Fetch the stream with the given ID
-func StreamGetJson(ctx api.RequestContext, idParam id.ObjectId) ([]byte, error) {
+func StreamGetJson(ctx api.RequestContext, idParam id.PinnedObjectId) ([]byte, error) {
 	path := "/v1/api/ulv2/datacatalog/stream/:id"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
 
@@ -431,7 +431,7 @@ func StreamGetJson(ctx api.RequestContext, idParam id.ObjectId) ([]byte, error) 
 
 // StreamGetText -
 // Fetch the stream with the given ID
-func StreamGetText(ctx api.RequestContext, idParam id.ObjectId) ([]byte, error) {
+func StreamGetText(ctx api.RequestContext, idParam id.PinnedObjectId) ([]byte, error) {
 	path := "/v1/api/ulv2/datacatalog/stream/:id"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
 
@@ -449,7 +449,7 @@ func StreamGetText(ctx api.RequestContext, idParam id.ObjectId) ([]byte, error) 
 
 // StreamGetHtml -
 // Fetch the stream with the given ID
-func StreamGetHtml(ctx api.RequestContext, idParam id.ObjectId) ([]byte, error) {
+func StreamGetHtml(ctx api.RequestContext, idParam id.PinnedObjectId) ([]byte, error) {
 	path := "/v1/api/ulv2/datacatalog/stream/:id"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
 
@@ -685,6 +685,68 @@ func CreateTable(ctx api.RequestContext, newTable *table.NewTable) (*id.ObjectId
 		return nil, fmt.Errorf("failed to deserialize response: %w", err)
 	}
 	return result, nil
+}
+
+// SchemaArrow -
+// Evaluate the resulting schema of a query, returning an empty Arrow record batch
+func SchemaArrow(ctx api.RequestContext, query *query.Query) ([]arrow.Record, error) {
+	path := "/v1/api/ulv2/datacatalog/query/schema"
+
+	params := [][2]string{}
+
+	headers := map[string]string{}
+	headers["accept"] = "application/vnd.apache.arrow.stream"
+
+	bodyBytes := query.ToBytes()
+	res, err := ctx.Post(path, bodyBytes, "application/octet-stream", params, headers)
+	if err != nil {
+		return nil, err
+	}
+	records, err := api.ReadArrowIPC(res)
+	if err != nil {
+		return nil, fmt.Errorf("failed to deserialize Arrow IPC response: %w", err)
+	}
+	return records, nil
+}
+
+// SchemaRaw -
+// Evaluate the resulting schema of a query, returning the raw, unparsed binary record batch
+func SchemaRaw(ctx api.RequestContext, query *query.Query) ([]byte, error) {
+	path := "/v1/api/ulv2/datacatalog/query/schema"
+
+	params := [][2]string{}
+
+	headers := map[string]string{}
+	headers["accept"] = "application/vnd.apache.arrow.stream"
+
+	bodyBytes := query.ToBytes()
+	res, err := ctx.Post(path, bodyBytes, "application/octet-stream", params, headers)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+// SchemaOnly -
+// Evaluate the resulting Arrow schema of a query, returning it as a parsed Schema (reliable even for a 0-row result)
+func SchemaOnly(ctx api.RequestContext, query *query.Query) (*arrow.Schema, error) {
+	path := "/v1/api/ulv2/datacatalog/query/schema"
+
+	params := [][2]string{}
+
+	headers := map[string]string{}
+	headers["accept"] = "application/vnd.apache.arrow.stream"
+
+	bodyBytes := query.ToBytes()
+	res, err := ctx.Post(path, bodyBytes, "application/octet-stream", params, headers)
+	if err != nil {
+		return nil, err
+	}
+	schema, err := api.ReadArrowSchema(res)
+	if err != nil {
+		return nil, fmt.Errorf("failed to deserialize Arrow schema response: %w", err)
+	}
+	return schema, nil
 }
 
 // QueryArrow -

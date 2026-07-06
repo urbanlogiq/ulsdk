@@ -21,6 +21,7 @@ from .generated.DataStateId import DataStateId as FbsDataStateId
 from .generated.GenericId import GenericId as FbsGenericId
 from .generated.GraphNodeId import GraphNodeId as FbsGraphNodeId
 from .generated.ObjectId import ObjectId as FbsObjectId
+from .generated.PinnedObjectId import PinnedObjectId as FbsPinnedObjectId
 from .generated.StreamId import StreamId as FbsStreamId
 
 class ObjectNamespace(Enum):
@@ -484,6 +485,98 @@ class ObjectId:
             return cls(id.bytes)
         elif isinstance(o, bytes):
             return cls(o)
+        else:
+            raise Exception(f"cannot create instance of type from variable {o}")
+
+@dataclass
+class PinnedObjectId:
+    b: "bytes"
+
+    cid: Optional["ContentId"]
+
+    @classmethod
+    def from_fbs(cls, o: FbsPinnedObjectId) -> Self:
+        if o.BIsNone():
+            b = b""
+        else:
+            b = bytes(o.BAsNumpy())
+        cid = None
+        cid_obj = o.Cid()
+        if cid_obj is not None:
+            cid = ContentId.from_fbs(cid_obj)
+        return cls(b, cid)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsPinnedObjectId.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.PinnedObjectId import (
+            Start,
+            AddB,
+            StartBVector,
+            AddCid,
+            End,
+        )
+        StartBVector(builder, len(self.b))
+        for i in reversed(range(len(self.b))):
+            builder.PrependUint8(self.b[i])
+        b_offset = builder.EndVector()
+        cid_offset = None
+        if self.cid is not None:
+            cid_offset = self.cid.serialize_to(builder)
+
+        Start(builder)
+        AddB(builder, b_offset)
+        if cid_offset is not None:
+            AddCid(builder, cid_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        b = b""
+        cid = ContentId.make_default()
+        return cls(b, cid)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        if len(self.b) != len(other.b):
+            return False
+        for i in range(len(self.b)):
+            eq = eq and self.b[i] == other.b[i]
+        eq = eq and self.cid == other.cid
+
+        return eq
+
+    def __str__(self):
+        oid = str(uuid.UUID(bytes=self.b))
+        if self.cid is not None:
+            oid = oid + "@" + str(self.cid)
+        return oid
+
+    def oid(self) -> ObjectId:
+        return ObjectId(b=self.b)
+
+    def content_id(self) -> Optional[ContentId]:
+        return self.cid
+
+    @classmethod
+    def from_uuid(cls, o: Union[str, uuid.UUID, bytes], cid: Optional[ContentId] = None) -> Self:
+        if isinstance(o, uuid.UUID):
+            return cls(o.bytes, cid)
+        elif isinstance(o, str):
+            id = uuid.UUID(o)
+            return cls(id.bytes, cid)
+        elif isinstance(o, bytes):
+            return cls(o, cid)
         else:
             raise Exception(f"cannot create instance of type from variable {o}")
 

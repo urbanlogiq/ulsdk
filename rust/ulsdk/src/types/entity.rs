@@ -10,10 +10,12 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
+use crate::FbsSerde;
 use bitflags::bitflags;
 use core::ops::Deref;
 use flatbuffers::{UnionWIPOffset, WIPOffset};
 use ordered_float::OrderedFloat;
+use serde::{Deserialize, Serialize};
 use strum_macros::FromRepr;
 
 use crate::types::generated::entity_generated::{
@@ -25,14 +27,15 @@ use crate::types::generated::entity_generated::{
 use crate::types::generated::id_generated::{
     B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
     DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace,
+    PinnedObjectId as FbsPinnedObjectId, StreamId as FbsStreamId,
 };
 use crate::types::id::{
     B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
-    ObjectNamespace, StreamId,
+    ObjectNamespace, PinnedObjectId, StreamId,
 };
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i32)]
 pub enum EdgeTy {
     #[default]
@@ -128,7 +131,7 @@ impl From<FbsEdgeTy> for EdgeTy {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i32)]
 pub enum EntityTy {
     #[default]
@@ -407,6 +410,7 @@ pub enum EntityTy {
     T_HEXAGON_BOUNDARY = 272,
     T_COMPASS_IOT_POINT = 273,
     T_LANDSLIDE_AREA = 274,
+    T_EXPLORE_MODE_ROAD_SEGMENT = 275,
 }
 
 impl TryFrom<i32> for EntityTy {
@@ -714,6 +718,7 @@ impl EntityTy {
             Self::T_HEXAGON_BOUNDARY => Some("T_HEXAGON_BOUNDARY"),
             Self::T_COMPASS_IOT_POINT => Some("T_COMPASS_IOT_POINT"),
             Self::T_LANDSLIDE_AREA => Some("T_LANDSLIDE_AREA"),
+            Self::T_EXPLORE_MODE_ROAD_SEGMENT => Some("T_EXPLORE_MODE_ROAD_SEGMENT"),
             _ => None,
         }
     }
@@ -1021,6 +1026,7 @@ impl From<EntityTy> for FbsEntityTy {
             EntityTy::T_HEXAGON_BOUNDARY => FbsEntityTy::T_HEXAGON_BOUNDARY,
             EntityTy::T_COMPASS_IOT_POINT => FbsEntityTy::T_COMPASS_IOT_POINT,
             EntityTy::T_LANDSLIDE_AREA => FbsEntityTy::T_LANDSLIDE_AREA,
+            EntityTy::T_EXPLORE_MODE_ROAD_SEGMENT => FbsEntityTy::T_EXPLORE_MODE_ROAD_SEGMENT,
         }
     }
 }
@@ -1303,12 +1309,13 @@ impl From<FbsEntityTy> for EntityTy {
             272 => Self::T_HEXAGON_BOUNDARY,
             273 => Self::T_COMPASS_IOT_POINT,
             274 => Self::T_LANDSLIDE_AREA,
+            275 => Self::T_EXPLORE_MODE_ROAD_SEGMENT,
             _ => panic!("Invalid value {} when constructing EntityTy", fbs.0),
         }
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i32)]
 pub enum NodeTy {
     #[default]
@@ -1363,7 +1370,7 @@ impl From<FbsNodeTy> for NodeTy {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Point {
     pub point_geo: Vec<OrderedFloat<f32>>,
 }
@@ -1399,15 +1406,15 @@ impl From<FbsPoint<'_>> for Point {
     }
 }
 
-impl Point {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Point {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1417,7 +1424,7 @@ impl Point {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Line {
     pub line_geo: Vec<Point>,
 }
@@ -1453,15 +1460,15 @@ impl From<FbsLine<'_>> for Line {
     }
 }
 
-impl Line {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Line {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1471,7 +1478,7 @@ impl Line {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct MultiLine {
     pub multiline_geo: Vec<Line>,
 }
@@ -1507,15 +1514,15 @@ impl From<FbsMultiLine<'_>> for MultiLine {
     }
 }
 
-impl MultiLine {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for MultiLine {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1527,7 +1534,7 @@ impl MultiLine {
 
 /// Polygon is an array of arrays of points.
 /// The first array is exterior coords, following are any interior holes
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Polygon {
     pub polygon_geo: Vec<Line>,
 }
@@ -1563,15 +1570,15 @@ impl From<FbsPolygon<'_>> for Polygon {
     }
 }
 
-impl Polygon {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Polygon {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1581,7 +1588,7 @@ impl Polygon {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct MultiPolygon {
     pub multipolygon_geo: Vec<Polygon>,
 }
@@ -1617,15 +1624,15 @@ impl From<FbsMultiPolygon<'_>> for MultiPolygon {
     }
 }
 
-impl MultiPolygon {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for MultiPolygon {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1635,7 +1642,7 @@ impl MultiPolygon {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct MultiPoint {
     pub point_geo: Vec<Point>,
 }
@@ -1671,15 +1678,15 @@ impl From<FbsMultiPoint<'_>> for MultiPoint {
     }
 }
 
-impl MultiPoint {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for MultiPoint {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1689,7 +1696,7 @@ impl MultiPoint {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum Geometry {
     Point(Point),
     Line(Line),
@@ -1745,7 +1752,7 @@ impl Geometry {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct GraphEdge {
     pub _from: i64,
     pub _kind: EdgeTy,
@@ -1776,15 +1783,15 @@ impl From<FbsGraphEdge<'_>> for GraphEdge {
     }
 }
 
-impl GraphEdge {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for GraphEdge {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1794,7 +1801,7 @@ impl GraphEdge {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct GraphNode {
     /// A human-centric description of this graph node.
     pub _description: Option<String>,
@@ -1897,15 +1904,15 @@ impl From<FbsGraphNode<'_>> for GraphNode {
     }
 }
 
-impl GraphNode {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for GraphNode {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1956,9 +1963,7 @@ impl From<geo_types::LineString<f64>> for Line {
 impl From<&Line> for geo_types::LineString<f64> {
     fn from(p: &Line) -> geo_types::LineString<f64> {
         let points: Vec<geo_types::Coord<f64>> = p.line_geo.iter().map(Into::into).collect();
-        let mut line = geo_types::LineString(points);
-        line.close();
-        line
+        geo_types::LineString(points)
     }
 }
 

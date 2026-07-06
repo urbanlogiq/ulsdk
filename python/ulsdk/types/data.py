@@ -66,6 +66,7 @@ from .id import (
     GraphNodeId,
     ObjectId,
     ObjectNamespace,
+    PinnedObjectId,
     StreamId,
 )
 from .generated.AttributePair import AttributePair as FbsAttributePair
@@ -103,6 +104,7 @@ from .generated.NamedParameter import NamedParameter as FbsNamedParameter
 from .generated.Null import Null as FbsNull
 from .generated.ObjectId import ObjectId as FbsObjectId
 from .generated.OutputSchema import OutputSchema as FbsOutputSchema
+from .generated.PinnedObjectId import PinnedObjectId as FbsPinnedObjectId
 from .generated.RunEndEncoded import RunEndEncoded as FbsRunEndEncoded
 from .generated.Schema import Schema as FbsSchema
 from .generated.Source import Source as FbsSource

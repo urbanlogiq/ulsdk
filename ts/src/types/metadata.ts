@@ -134,7 +134,7 @@ import { Projection as FbsProjection } from './generated/projection';
 import { QueryPathElement as FbsQueryPathElement } from './generated/query-path-element';
 import { QueryPathElementUnion as FbsQueryPathElementUnion } from './generated/query-path-element-union';
 import { ValueTransform as FbsValueTransform } from './generated/value-transform';
-import { B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId, ObjectNamespace, StreamId } from './id';
+import { B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId, ObjectNamespace, PinnedObjectId, StreamId } from './id';
 import { B2cId as FbsB2cId } from './generated/b2c-id';
 import { ColumnGroupId as FbsColumnGroupId } from './generated/column-group-id';
 import { ContentId as FbsContentId } from './generated/content-id';
@@ -143,6 +143,7 @@ import { GenericId as FbsGenericId } from './generated/generic-id';
 import { GraphNodeId as FbsGraphNodeId } from './generated/graph-node-id';
 import { ObjectId as FbsObjectId } from './generated/object-id';
 import { ObjectNamespace as FbsObjectNamespace } from './generated/object-namespace';
+import { PinnedObjectId as FbsPinnedObjectId } from './generated/pinned-object-id';
 import { StreamId as FbsStreamId } from './generated/stream-id';
 import { Point2D, Tri2D, VArray, VBool, VBytes, VChar, VF32, VF64, VFixedSizeBytes, VI16, VI32, VI64, VI8, VIsize, VNull, VPlaceholder, VStr, VTimestampMs, VTimestampMsUtc, VTimestampNs, VTimestampNsUtc, VTri2D, VU16, VU32, VU64, VU8, VUnit, VUsize, Value, ValueInstance, ValueTy } from './value';
 import { Point2D as FbsPoint2D } from './generated/point2-d';
@@ -313,6 +314,8 @@ export class IntRange {
 
   private _fieldFormat!: NumericalFieldFormat | null;
 
+  private _isBitmaskEnum!: boolean;
+
   private _max!: bigint;
 
   private _min!: bigint;
@@ -329,6 +332,7 @@ export class IntRange {
       this._displayStrings = null;
       this._enumName = null;
       this._fieldFormat = null;
+      this._isBitmaskEnum = false;
       this._max = BigInt(0);
       this._min = BigInt(0);
     }
@@ -347,6 +351,7 @@ export class IntRange {
     this._enumName = fbs.enumName();
     const fieldFormatVal = fbs.fieldFormat();
     this._fieldFormat = fieldFormatVal ? new NumericalFieldFormat(fieldFormatVal) : null;
+    this._isBitmaskEnum = fbs.isBitmaskEnum();
     this._max = fbs.max();
     this._min = fbs.min();
   }
@@ -383,6 +388,14 @@ export class IntRange {
     this._fieldFormat = value;
   }
 
+  get isBitmaskEnum(): boolean {
+    return this._isBitmaskEnum;
+  }
+
+  set isBitmaskEnum(value: boolean) {
+    this._isBitmaskEnum = value;
+  }
+
   get max(): bigint {
     return this._max;
   }
@@ -405,6 +418,7 @@ export class IntRange {
     t.displayStrings = this._displayStrings ? this._displayStrings.map(item => item.toFbsT()) : [];
     t.enumName = this._enumName;
     t.fieldFormat = this._fieldFormat ? this._fieldFormat.toFbsT() : null;
+    t.isBitmaskEnum = this._isBitmaskEnum;
     t.max = this._max;
     t.min = this._min;
     return t;
@@ -1974,6 +1988,11 @@ export class Metadata {
   private _locationDescriptionField!: number;
 
 /**
+ *  Indices of fields that are "promoted to metrics"
+ */
+  private _promotedMetrics!: number[] | null;
+
+/**
  *  An optional field that is meant to provide information to the user on
  *  where the data has come from
  */
@@ -1982,6 +2001,13 @@ export class Metadata {
   private _summary!: number[] | null;
 
   private _updateCadence!: number;
+
+/**
+ *  Indices of non-numeric fields that are "visualized in Explore" — they
+ *  appear as a categorical color visualization on Generic layers but, unlike
+ *  promoted_metrics, do NOT create an entry in the metric catalog.
+ */
+  private _visualizeInExploreFields!: number[] | null;
 
   constructor(arg?: FbsMetadata | Uint8Array) {
     if (arg instanceof Uint8Array) {
@@ -2001,9 +2027,11 @@ export class Metadata {
       this._fields = null;
       this._geometrySource = null;
       this._locationDescriptionField = 0;
+      this._promotedMetrics = null;
       this._source = null;
       this._summary = null;
       this._updateCadence = 0;
+      this._visualizeInExploreFields = null;
     }
   }
 
@@ -2044,6 +2072,11 @@ export class Metadata {
       this._geometrySource = null;
     }
     this._locationDescriptionField = fbs.locationDescriptionField();
+    if (fbs.promotedMetricsLength() > 0) {
+      this._promotedMetrics = Array.from({ length: fbs.promotedMetricsLength() }, (_, i) => fbs.promotedMetrics(i)!);
+    } else {
+      this._promotedMetrics = null;
+    }
     const sourceVal = fbs.source();
     this._source = sourceVal ? new DatasetSource(sourceVal) : null;
     if (fbs.summaryLength() > 0) {
@@ -2052,6 +2085,11 @@ export class Metadata {
       this._summary = null;
     }
     this._updateCadence = fbs.updateCadence();
+    if (fbs.visualizeInExploreFieldsLength() > 0) {
+      this._visualizeInExploreFields = Array.from({ length: fbs.visualizeInExploreFieldsLength() }, (_, i) => fbs.visualizeInExploreFields(i)!);
+    } else {
+      this._visualizeInExploreFields = null;
+    }
   }
 
   get areaSelection(): boolean {
@@ -2134,6 +2172,14 @@ export class Metadata {
     this._locationDescriptionField = value;
   }
 
+  get promotedMetrics(): number[] | null {
+    return this._promotedMetrics;
+  }
+
+  set promotedMetrics(value: number[] | null) {
+    this._promotedMetrics = value;
+  }
+
   get source(): DatasetSource | null {
     return this._source;
   }
@@ -2158,6 +2204,14 @@ export class Metadata {
     this._updateCadence = value;
   }
 
+  get visualizeInExploreFields(): number[] | null {
+    return this._visualizeInExploreFields;
+  }
+
+  set visualizeInExploreFields(value: number[] | null) {
+    this._visualizeInExploreFields = value;
+  }
+
   toFbsT(): FbsMetadataT {
     const t = new FbsMetadataT();
     t.areaSelection = this._areaSelection;
@@ -2179,9 +2233,11 @@ export class Metadata {
       t.geometrySource = this._geometrySource.toFbsT();
     }
     t.locationDescriptionField = this._locationDescriptionField;
+    t.promotedMetrics = this._promotedMetrics ?? [];
     t.source = this._source ? this._source.toFbsT() : null;
     t.summary = this._summary ?? [];
     t.updateCadence = this._updateCadence;
+    t.visualizeInExploreFields = this._visualizeInExploreFields ?? [];
     return t;
   }
 

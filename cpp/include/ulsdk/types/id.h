@@ -24,6 +24,7 @@ struct DataStateId;
 struct GenericId;
 struct GraphNodeId;
 struct ObjectId;
+struct PinnedObjectId;
 struct StreamId;
 
 using ::ObjectNamespace;
@@ -141,6 +142,34 @@ struct ObjectId {
     }
 };
 
+struct PinnedObjectId {
+    std::vector<uint8_t> b_;
+    std::optional<ContentId> cid_;
+
+    PinnedObjectId();
+    PinnedObjectId(const ::PinnedObjectId *root);
+    PinnedObjectId(const std::vector<uint8_t> &bytes);
+    bool operator==(const PinnedObjectId &rhs) const;
+    bool operator!=(const PinnedObjectId &rhs) const {
+        return !(*this == rhs);
+    }
+    PinnedObjectId(const ul::Uuid &o) : b_(o.to_vec()), cid_(std::nullopt) {}
+    PinnedObjectId(const ul::Uuid &o, const std::optional<ContentId> &cid) : b_(o.to_vec()), cid_(cid) {}
+    PinnedObjectId(const std::string &o) : b_(ul::Uuid(o).to_vec()), cid_(std::nullopt) {}
+    PinnedObjectId(const std::string &o, const std::optional<ContentId> &cid) : b_(ul::Uuid(o).to_vec()), cid_(cid) {}
+    ObjectId oid() const {
+        return ObjectId(ul::Uuid(this->b_.data()));
+    }
+    std::string to_string() const {
+        ul::Uuid u = ul::Uuid(&this->b_[0]);
+        std::string s = u.to_string();
+        if (this->cid_.has_value()) {
+            s += "@" + this->cid_.value().to_string();
+        }
+        return s;
+    }
+};
+
 struct StreamId {
     std::vector<uint8_t> b_;
 
@@ -174,6 +203,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const GraphNodeId &);
 ::flatbuffers::Offset<::ObjectId>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ObjectId &);
 
+::flatbuffers::Offset<::PinnedObjectId>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const PinnedObjectId &);
+
 ::flatbuffers::Offset<::StreamId>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const StreamId &);
 
@@ -198,6 +230,9 @@ to_bytes(const GraphNodeId &o);
 
 std::vector<uint8_t>
 to_bytes(const ObjectId &o);
+
+std::vector<uint8_t>
+to_bytes(const PinnedObjectId &o);
 
 std::vector<uint8_t>
 to_bytes(const StreamId &o);

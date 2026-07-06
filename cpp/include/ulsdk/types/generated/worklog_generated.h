@@ -19,6 +19,15 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 #include "id_generated.h"
 #include "job_generated.h"
 
+struct GitRef;
+struct GitRefBuilder;
+
+struct ContainerRef;
+struct ContainerRefBuilder;
+
+struct Producer;
+struct ProducerBuilder;
+
 struct ByteArray;
 struct ByteArrayBuilder;
 
@@ -42,6 +51,54 @@ struct LayoutBuilder;
 
 struct TileSettings;
 struct TileSettingsBuilder;
+
+enum class ProducerRef : uint8_t {
+  NONE = 0,
+  ObjectId = 1,
+  ContainerRef = 2,
+  MIN = NONE,
+  MAX = ContainerRef
+};
+
+inline const ProducerRef (&EnumValuesProducerRef())[3] {
+  static const ProducerRef values[] = {
+    ProducerRef::NONE,
+    ProducerRef::ObjectId,
+    ProducerRef::ContainerRef
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesProducerRef() {
+  static const char * const names[4] = {
+    "NONE",
+    "ObjectId",
+    "ContainerRef",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameProducerRef(ProducerRef e) {
+  if (::flatbuffers::IsOutRange(e, ProducerRef::NONE, ProducerRef::ContainerRef)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesProducerRef()[index];
+}
+
+template<typename T> struct ProducerRefTraits {
+  static const ProducerRef enum_value = ProducerRef::NONE;
+};
+
+template<> struct ProducerRefTraits<ObjectId> {
+  static const ProducerRef enum_value = ProducerRef::ObjectId;
+};
+
+template<> struct ProducerRefTraits<ContainerRef> {
+  static const ProducerRef enum_value = ProducerRef::ContainerRef;
+};
+
+bool VerifyProducerRef(::flatbuffers::Verifier &verifier, const void *obj, ProducerRef type);
+bool VerifyProducerRefVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<ProducerRef> *types);
 
 enum class ParameterValue : uint8_t {
   NONE = 0,
@@ -225,6 +282,233 @@ inline const char *EnumNameValuesFormatTy(ValuesFormatTy e) {
   const size_t index = static_cast<size_t>(e);
   return EnumNamesValuesFormatTy()[index];
 }
+
+struct GitRef FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef GitRefBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_REPO = 4,
+    VT_COMMITISH = 6
+  };
+  const ::flatbuffers::String *repo() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_REPO);
+  }
+  const ::flatbuffers::String *commitish() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_COMMITISH);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_REPO) &&
+           verifier.VerifyString(repo()) &&
+           VerifyOffsetRequired(verifier, VT_COMMITISH) &&
+           verifier.VerifyString(commitish()) &&
+           verifier.EndTable();
+  }
+};
+
+struct GitRefBuilder {
+  typedef GitRef Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_repo(::flatbuffers::Offset<::flatbuffers::String> repo) {
+    fbb_.AddOffset(GitRef::VT_REPO, repo);
+  }
+  void add_commitish(::flatbuffers::Offset<::flatbuffers::String> commitish) {
+    fbb_.AddOffset(GitRef::VT_COMMITISH, commitish);
+  }
+  explicit GitRefBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<GitRef> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<GitRef>(end);
+    fbb_.Required(o, GitRef::VT_REPO);
+    fbb_.Required(o, GitRef::VT_COMMITISH);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<GitRef> CreateGitRef(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::String> repo = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> commitish = 0) {
+  GitRefBuilder builder_(_fbb);
+  builder_.add_commitish(commitish);
+  builder_.add_repo(repo);
+  return builder_.Finish();
+}
+
+struct GitRef::Traits {
+  using type = GitRef;
+  static auto constexpr Create = CreateGitRef;
+};
+
+inline ::flatbuffers::Offset<GitRef> CreateGitRefDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const char *repo = nullptr,
+    const char *commitish = nullptr) {
+  auto repo__ = repo ? _fbb.CreateString(repo) : 0;
+  auto commitish__ = commitish ? _fbb.CreateString(commitish) : 0;
+  return CreateGitRef(
+      _fbb,
+      repo__,
+      commitish__);
+}
+
+struct ContainerRef FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ContainerRefBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_IMAGE = 4
+  };
+  const ::flatbuffers::String *image() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_IMAGE);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_IMAGE) &&
+           verifier.VerifyString(image()) &&
+           verifier.EndTable();
+  }
+};
+
+struct ContainerRefBuilder {
+  typedef ContainerRef Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_image(::flatbuffers::Offset<::flatbuffers::String> image) {
+    fbb_.AddOffset(ContainerRef::VT_IMAGE, image);
+  }
+  explicit ContainerRefBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<ContainerRef> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<ContainerRef>(end);
+    fbb_.Required(o, ContainerRef::VT_IMAGE);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<ContainerRef> CreateContainerRef(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::String> image = 0) {
+  ContainerRefBuilder builder_(_fbb);
+  builder_.add_image(image);
+  return builder_.Finish();
+}
+
+struct ContainerRef::Traits {
+  using type = ContainerRef;
+  static auto constexpr Create = CreateContainerRef;
+};
+
+inline ::flatbuffers::Offset<ContainerRef> CreateContainerRefDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const char *image = nullptr) {
+  auto image__ = image ? _fbb.CreateString(image) : 0;
+  return CreateContainerRef(
+      _fbb,
+      image__);
+}
+
+struct Producer FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ProducerBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_EXECUTOR = 4,
+    VT_MODEL_TYPE = 6,
+    VT_MODEL = 8,
+    VT_BUILDER_CODE_REF = 10
+  };
+  const GitRef *executor() const {
+    return GetPointer<const GitRef *>(VT_EXECUTOR);
+  }
+  ProducerRef model_type() const {
+    return static_cast<ProducerRef>(GetField<uint8_t>(VT_MODEL_TYPE, 0));
+  }
+  const void *model() const {
+    return GetPointer<const void *>(VT_MODEL);
+  }
+  template<typename T> const T *model_as() const;
+  const ObjectId *model_as_ObjectId() const {
+    return model_type() == ProducerRef::ObjectId ? static_cast<const ObjectId *>(model()) : nullptr;
+  }
+  const ContainerRef *model_as_ContainerRef() const {
+    return model_type() == ProducerRef::ContainerRef ? static_cast<const ContainerRef *>(model()) : nullptr;
+  }
+  const GitRef *builder_code_ref() const {
+    return GetPointer<const GitRef *>(VT_BUILDER_CODE_REF);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_EXECUTOR) &&
+           verifier.VerifyTable(executor()) &&
+           VerifyField<uint8_t>(verifier, VT_MODEL_TYPE, 1) &&
+           VerifyOffset(verifier, VT_MODEL) &&
+           VerifyProducerRef(verifier, model(), model_type()) &&
+           VerifyOffset(verifier, VT_BUILDER_CODE_REF) &&
+           verifier.VerifyTable(builder_code_ref()) &&
+           verifier.EndTable();
+  }
+};
+
+template<> inline const ObjectId *Producer::model_as<ObjectId>() const {
+  return model_as_ObjectId();
+}
+
+template<> inline const ContainerRef *Producer::model_as<ContainerRef>() const {
+  return model_as_ContainerRef();
+}
+
+struct ProducerBuilder {
+  typedef Producer Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_executor(::flatbuffers::Offset<GitRef> executor) {
+    fbb_.AddOffset(Producer::VT_EXECUTOR, executor);
+  }
+  void add_model_type(ProducerRef model_type) {
+    fbb_.AddElement<uint8_t>(Producer::VT_MODEL_TYPE, static_cast<uint8_t>(model_type), 0);
+  }
+  void add_model(::flatbuffers::Offset<void> model) {
+    fbb_.AddOffset(Producer::VT_MODEL, model);
+  }
+  void add_builder_code_ref(::flatbuffers::Offset<GitRef> builder_code_ref) {
+    fbb_.AddOffset(Producer::VT_BUILDER_CODE_REF, builder_code_ref);
+  }
+  explicit ProducerBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<Producer> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<Producer>(end);
+    fbb_.Required(o, Producer::VT_EXECUTOR);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<Producer> CreateProducer(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<GitRef> executor = 0,
+    ProducerRef model_type = ProducerRef::NONE,
+    ::flatbuffers::Offset<void> model = 0,
+    ::flatbuffers::Offset<GitRef> builder_code_ref = 0) {
+  ProducerBuilder builder_(_fbb);
+  builder_.add_builder_code_ref(builder_code_ref);
+  builder_.add_model(model);
+  builder_.add_executor(executor);
+  builder_.add_model_type(model_type);
+  return builder_.Finish();
+}
+
+struct Producer::Traits {
+  using type = Producer;
+  static auto constexpr Create = CreateProducer;
+};
 
 struct ByteArray FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef ByteArrayBuilder Builder;
@@ -453,27 +737,28 @@ struct WorkLog FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_PARAMS = 14,
     VT_PARENT = 16,
     VT_USER_SETTINGS = 18,
-    VT_JOB_ID = 20
+    VT_JOB_ID = 20,
+    VT_PRODUCER = 22
   };
   /// A human-readable tag.
   const ::flatbuffers::String *name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_NAME);
   }
   /// Input streams and/or worklogs. These may be either work logs or streams.
-  const ::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>> *input_streams() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>> *>(VT_INPUT_STREAMS);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<PinnedObjectId>> *input_streams() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<PinnedObjectId>> *>(VT_INPUT_STREAMS);
   }
   /// The schematic used behind creating the worklog. This may be empty/null
   /// if we are just layering data, for example.
-  const ObjectId *schematic() const {
-    return GetPointer<const ObjectId *>(VT_SCHEMATIC);
+  const PinnedObjectId *schematic() const {
+    return GetPointer<const PinnedObjectId *>(VT_SCHEMATIC);
   }
   /// The output_streams contain a list of Parquet documents that consist of
   /// the results. These documents may expire (ie: if this is a temporary
   /// step) so there should be enough information in the worklog necessary
   /// to reconstruct these output streams.
-  const ::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>> *output_streams() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>> *>(VT_OUTPUT_STREAMS);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<PinnedObjectId>> *output_streams() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<PinnedObjectId>> *>(VT_OUTPUT_STREAMS);
   }
   /// These are the serialized parameters passed into the task which created
   /// this worklog.
@@ -497,6 +782,9 @@ struct WorkLog FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ObjectId *job_id() const {
     return GetPointer<const ObjectId *>(VT_JOB_ID);
   }
+  const Producer *producer() const {
+    return GetPointer<const Producer *>(VT_PRODUCER);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_NAME) &&
@@ -518,6 +806,8 @@ struct WorkLog FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyTable(user_settings()) &&
            VerifyOffset(verifier, VT_JOB_ID) &&
            verifier.VerifyTable(job_id()) &&
+           VerifyOffset(verifier, VT_PRODUCER) &&
+           verifier.VerifyTable(producer()) &&
            verifier.EndTable();
   }
 };
@@ -529,13 +819,13 @@ struct WorkLogBuilder {
   void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
     fbb_.AddOffset(WorkLog::VT_NAME, name);
   }
-  void add_input_streams(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>>> input_streams) {
+  void add_input_streams(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<PinnedObjectId>>> input_streams) {
     fbb_.AddOffset(WorkLog::VT_INPUT_STREAMS, input_streams);
   }
-  void add_schematic(::flatbuffers::Offset<ObjectId> schematic) {
+  void add_schematic(::flatbuffers::Offset<PinnedObjectId> schematic) {
     fbb_.AddOffset(WorkLog::VT_SCHEMATIC, schematic);
   }
-  void add_output_streams(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>>> output_streams) {
+  void add_output_streams(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<PinnedObjectId>>> output_streams) {
     fbb_.AddOffset(WorkLog::VT_OUTPUT_STREAMS, output_streams);
   }
   void add_params(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<WorklogParameter>>> params) {
@@ -549,6 +839,9 @@ struct WorkLogBuilder {
   }
   void add_job_id(::flatbuffers::Offset<ObjectId> job_id) {
     fbb_.AddOffset(WorkLog::VT_JOB_ID, job_id);
+  }
+  void add_producer(::flatbuffers::Offset<Producer> producer) {
+    fbb_.AddOffset(WorkLog::VT_PRODUCER, producer);
   }
   explicit WorkLogBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -567,14 +860,16 @@ struct WorkLogBuilder {
 inline ::flatbuffers::Offset<WorkLog> CreateWorkLog(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> name = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>>> input_streams = 0,
-    ::flatbuffers::Offset<ObjectId> schematic = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ObjectId>>> output_streams = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<PinnedObjectId>>> input_streams = 0,
+    ::flatbuffers::Offset<PinnedObjectId> schematic = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<PinnedObjectId>>> output_streams = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<WorklogParameter>>> params = 0,
     ::flatbuffers::Offset<ObjectId> parent = 0,
     ::flatbuffers::Offset<UserSettings> user_settings = 0,
-    ::flatbuffers::Offset<ObjectId> job_id = 0) {
+    ::flatbuffers::Offset<ObjectId> job_id = 0,
+    ::flatbuffers::Offset<Producer> producer = 0) {
   WorkLogBuilder builder_(_fbb);
+  builder_.add_producer(producer);
   builder_.add_job_id(job_id);
   builder_.add_user_settings(user_settings);
   builder_.add_parent(parent);
@@ -594,16 +889,17 @@ struct WorkLog::Traits {
 inline ::flatbuffers::Offset<WorkLog> CreateWorkLogDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *name = nullptr,
-    const std::vector<::flatbuffers::Offset<ObjectId>> *input_streams = nullptr,
-    ::flatbuffers::Offset<ObjectId> schematic = 0,
-    const std::vector<::flatbuffers::Offset<ObjectId>> *output_streams = nullptr,
+    const std::vector<::flatbuffers::Offset<PinnedObjectId>> *input_streams = nullptr,
+    ::flatbuffers::Offset<PinnedObjectId> schematic = 0,
+    const std::vector<::flatbuffers::Offset<PinnedObjectId>> *output_streams = nullptr,
     const std::vector<::flatbuffers::Offset<WorklogParameter>> *params = nullptr,
     ::flatbuffers::Offset<ObjectId> parent = 0,
     ::flatbuffers::Offset<UserSettings> user_settings = 0,
-    ::flatbuffers::Offset<ObjectId> job_id = 0) {
+    ::flatbuffers::Offset<ObjectId> job_id = 0,
+    ::flatbuffers::Offset<Producer> producer = 0) {
   auto name__ = name ? _fbb.CreateString(name) : 0;
-  auto input_streams__ = input_streams ? _fbb.CreateVector<::flatbuffers::Offset<ObjectId>>(*input_streams) : 0;
-  auto output_streams__ = output_streams ? _fbb.CreateVector<::flatbuffers::Offset<ObjectId>>(*output_streams) : 0;
+  auto input_streams__ = input_streams ? _fbb.CreateVector<::flatbuffers::Offset<PinnedObjectId>>(*input_streams) : 0;
+  auto output_streams__ = output_streams ? _fbb.CreateVector<::flatbuffers::Offset<PinnedObjectId>>(*output_streams) : 0;
   auto params__ = params ? _fbb.CreateVector<::flatbuffers::Offset<WorklogParameter>>(*params) : 0;
   return CreateWorkLog(
       _fbb,
@@ -614,7 +910,8 @@ inline ::flatbuffers::Offset<WorkLog> CreateWorkLogDirect(
       params__,
       parent,
       user_settings,
-      job_id);
+      job_id,
+      producer);
 }
 
 struct UserSettings FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -1070,6 +1367,35 @@ inline ::flatbuffers::Offset<TileSettings> CreateTileSettingsDirect(
       is_record_count_tile,
       text_tile_font_size,
       record_count_stream_id);
+}
+
+inline bool VerifyProducerRef(::flatbuffers::Verifier &verifier, const void *obj, ProducerRef type) {
+  switch (type) {
+    case ProducerRef::NONE: {
+      return true;
+    }
+    case ProducerRef::ObjectId: {
+      auto ptr = reinterpret_cast<const ObjectId *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case ProducerRef::ContainerRef: {
+      auto ptr = reinterpret_cast<const ContainerRef *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    default: return true;
+  }
+}
+
+inline bool VerifyProducerRefVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<ProducerRef> *types) {
+  if (!values || !types) return !values && !types;
+  if (values->size() != types->size()) return false;
+  for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
+    if (!VerifyProducerRef(
+        verifier,  values->Get(i), types->GetEnum<ProducerRef>(i))) {
+      return false;
+    }
+  }
+  return true;
 }
 
 inline bool VerifyParameterValue(::flatbuffers::Verifier &verifier, const void *obj, ParameterValue type) {

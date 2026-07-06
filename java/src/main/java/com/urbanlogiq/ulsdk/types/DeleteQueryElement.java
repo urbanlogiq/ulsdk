@@ -59,6 +59,10 @@ public final class DeleteQueryElement {
             com.google.flatbuffers.Table sourceFbsTable = o.source(new com.urbanlogiq.ulsdk.types.generated.Values());
             com.urbanlogiq.ulsdk.types.generated.Values sourceFbsValue = (com.urbanlogiq.ulsdk.types.generated.Values)sourceFbsTable;
             sourceValue = new com.urbanlogiq.ulsdk.types.Values(sourceFbsValue);
+        } else if (sourceTy == com.urbanlogiq.ulsdk.types.generated.TableSourceUnion.TimeSeries) {
+            com.google.flatbuffers.Table sourceFbsTable = o.source(new com.urbanlogiq.ulsdk.types.generated.TimeSeries());
+            com.urbanlogiq.ulsdk.types.generated.TimeSeries sourceFbsValue = (com.urbanlogiq.ulsdk.types.generated.TimeSeries)sourceFbsTable;
+            sourceValue = new com.urbanlogiq.ulsdk.types.TimeSeries(sourceFbsValue);
         }
         if (sourceValue != null) {
             this._source = new com.urbanlogiq.ulsdk.types.TableSourceUnion(sourceValue);

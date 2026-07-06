@@ -12,7 +12,7 @@ use uuid::Uuid;
 
 use crate::error::Error;
 use crate::request_context::{ParamMap, RequestContext};
-use crate::{read_arrow_ipc, write_arrow_ipc};
+use crate::{FbsSerde, read_arrow_ipc, read_arrow_schema, write_arrow_ipc};
 
 use crate::request_context::File;
 use crate::types::fs::{DirectoryList, MoveRequest};

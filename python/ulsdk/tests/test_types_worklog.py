@@ -10,6 +10,18 @@ def test_byte_array():
     _t1 = ByteArray.from_bytes(_b)
     assert _t0 == _t1
 
+def test_container_ref():
+    _t0 = ContainerRef.make_default()
+    _b = _t0.to_bytes()
+    _t1 = ContainerRef.from_bytes(_b)
+    assert _t0 == _t1
+
+def test_git_ref():
+    _t0 = GitRef.make_default()
+    _b = _t0.to_bytes()
+    _t1 = GitRef.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_layout():
     _t0 = Layout.make_default()
     _b = _t0.to_bytes()
@@ -20,6 +32,12 @@ def test_parameter_flags():
     _t0 = ParameterFlags.make_default()
     _b = _t0.to_bytes()
     _t1 = ParameterFlags.from_bytes(_b)
+    assert _t0 == _t1
+
+def test_producer():
+    _t0 = Producer.make_default()
+    _b = _t0.to_bytes()
+    _t1 = Producer.from_bytes(_b)
     assert _t0 == _t1
 
 def test_tile_data():

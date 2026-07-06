@@ -77,7 +77,7 @@ import { Source as FbsSource } from './generated/source';
 import { StatisticTy as FbsStatisticTy } from './generated/statistic-ty';
 import { TimeGranularity as FbsTimeGranularity } from './generated/time-granularity';
 import { TurnTy as FbsTurnTy } from './generated/turn-ty';
-import { B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId, ObjectNamespace, StreamId } from './id';
+import { B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId, ObjectNamespace, PinnedObjectId, StreamId } from './id';
 import { B2cId as FbsB2cId } from './generated/b2c-id';
 import { ColumnGroupId as FbsColumnGroupId } from './generated/column-group-id';
 import { ContentId as FbsContentId } from './generated/content-id';
@@ -86,6 +86,7 @@ import { GenericId as FbsGenericId } from './generated/generic-id';
 import { GraphNodeId as FbsGraphNodeId } from './generated/graph-node-id';
 import { ObjectId as FbsObjectId } from './generated/object-id';
 import { ObjectNamespace as FbsObjectNamespace } from './generated/object-namespace';
+import { PinnedObjectId as FbsPinnedObjectId } from './generated/pinned-object-id';
 import { StreamId as FbsStreamId } from './generated/stream-id';
 import { Point2D, Tri2D, VArray, VBool, VBytes, VChar, VF32, VF64, VFixedSizeBytes, VI16, VI32, VI64, VI8, VIsize, VNull, VPlaceholder, VStr, VTimestampMs, VTimestampMsUtc, VTimestampNs, VTimestampNsUtc, VTri2D, VU16, VU32, VU64, VU8, VUnit, VUsize, Value, ValueInstance, ValueTy } from './value';
 import { Point2D as FbsPoint2D } from './generated/point2-d';
@@ -179,7 +180,7 @@ export class DeprecatedRunSpec {
 
   private _persist!: boolean;
 
-  private _schematic!: ObjectId;
+  private _schematic!: PinnedObjectId;
 
   constructor(arg?: FbsDeprecatedRunSpec | Uint8Array) {
     if (arg instanceof Uint8Array) {
@@ -192,7 +193,7 @@ export class DeprecatedRunSpec {
       this._paramIndices = [];
       this._params = [];
       this._persist = false;
-      this._schematic = new ObjectId();
+      this._schematic = new PinnedObjectId();
     }
   }
 
@@ -207,7 +208,7 @@ export class DeprecatedRunSpec {
     });
     this._persist = fbs.persist();
     const schematicVal = fbs.schematic();
-    this._schematic = schematicVal ? new ObjectId(schematicVal) : new ObjectId();
+    this._schematic = schematicVal ? new PinnedObjectId(schematicVal) : new PinnedObjectId();
   }
 
   get paramIndices(): ParamIndices[] {
@@ -234,11 +235,11 @@ export class DeprecatedRunSpec {
     this._persist = value;
   }
 
-  get schematic(): ObjectId {
+  get schematic(): PinnedObjectId {
     return this._schematic;
   }
 
-  set schematic(value: ObjectId) {
+  set schematic(value: PinnedObjectId) {
     this._schematic = value;
   }
 
@@ -653,7 +654,7 @@ export class RunSpec {
 
   private _priority!: number;
 
-  private _schematic!: ObjectId;
+  private _schematic!: PinnedObjectId;
 
   constructor(arg?: FbsRunSpec | Uint8Array) {
     if (arg instanceof Uint8Array) {
@@ -669,7 +670,7 @@ export class RunSpec {
       this._params = [];
       this._persist = false;
       this._priority = 0;
-      this._schematic = new ObjectId();
+      this._schematic = new PinnedObjectId();
     }
   }
 
@@ -694,7 +695,7 @@ export class RunSpec {
     this._persist = fbs.persist();
     this._priority = fbs.priority();
     const schematicVal = fbs.schematic();
-    this._schematic = schematicVal ? new ObjectId(schematicVal) : new ObjectId();
+    this._schematic = schematicVal ? new PinnedObjectId(schematicVal) : new PinnedObjectId();
   }
 
   get attributes(): Attr[] | null {
@@ -745,11 +746,11 @@ export class RunSpec {
     this._priority = value;
   }
 
-  get schematic(): ObjectId {
+  get schematic(): PinnedObjectId {
     return this._schematic;
   }
 
-  set schematic(value: ObjectId) {
+  set schematic(value: PinnedObjectId) {
     this._schematic = value;
   }
 
@@ -915,7 +916,7 @@ export class Task {
  *  written. If it is a lookup of an existing stream, this will be populated
  *  with the stream ID
  */
-  private _output!: ObjectId;
+  private _output!: PinnedObjectId;
 
 /**
  *  Parameter indices taken from the RunSpec for this particular task step.
@@ -974,7 +975,7 @@ export class Task {
       this._lastUpdatedByPod = null;
       this._message = null;
       this._name = '';
-      this._output = new ObjectId();
+      this._output = new PinnedObjectId();
       this._params = new ParamIndices();
       this._retries = 0;
       this._schematicId = null;
@@ -1006,7 +1007,7 @@ export class Task {
     this._message = fbs.message();
     this._name = fbs.name() ?? '';
     const outputVal = fbs.output();
-    this._output = outputVal ? new ObjectId(outputVal) : new ObjectId();
+    this._output = outputVal ? new PinnedObjectId(outputVal) : new PinnedObjectId();
     const paramsVal = fbs.params();
     this._params = paramsVal ? new ParamIndices(paramsVal) : new ParamIndices();
     this._retries = fbs.retries();
@@ -1128,11 +1129,11 @@ export class Task {
     this._name = value;
   }
 
-  get output(): ObjectId {
+  get output(): PinnedObjectId {
     return this._output;
   }
 
-  set output(value: ObjectId) {
+  set output(value: PinnedObjectId) {
     this._output = value;
   }
 

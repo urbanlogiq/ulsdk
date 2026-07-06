@@ -530,13 +530,13 @@ pub const ENUM_MIN_TABLE_SOURCE_UNION: u8 = 0;
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
-pub const ENUM_MAX_TABLE_SOURCE_UNION: u8 = 8;
+pub const ENUM_MAX_TABLE_SOURCE_UNION: u8 = 9;
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_TABLE_SOURCE_UNION: [TableSourceUnion; 9] = [
+pub const ENUM_VALUES_TABLE_SOURCE_UNION: [TableSourceUnion; 10] = [
     TableSourceUnion::NONE,
     TableSourceUnion::DataCatalog,
     TableSourceUnion::Arrow,
@@ -546,6 +546,7 @@ pub const ENUM_VALUES_TABLE_SOURCE_UNION: [TableSourceUnion; 9] = [
     TableSourceUnion::Placeholder,
     TableSourceUnion::Drive,
     TableSourceUnion::Values,
+    TableSourceUnion::TimeSeries,
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
@@ -562,9 +563,10 @@ impl TableSourceUnion {
     pub const Placeholder: Self = Self(6);
     pub const Drive: Self = Self(7);
     pub const Values: Self = Self(8);
+    pub const TimeSeries: Self = Self(9);
 
     pub const ENUM_MIN: u8 = 0;
-    pub const ENUM_MAX: u8 = 8;
+    pub const ENUM_MAX: u8 = 9;
     pub const ENUM_VALUES: &'static [Self] = &[
         Self::NONE,
         Self::DataCatalog,
@@ -575,6 +577,7 @@ impl TableSourceUnion {
         Self::Placeholder,
         Self::Drive,
         Self::Values,
+        Self::TimeSeries,
     ];
     /// Returns the variant's name or "" if unknown.
     pub fn variant_name(self) -> Option<&'static str> {
@@ -588,6 +591,7 @@ impl TableSourceUnion {
             Self::Placeholder => Some("Placeholder"),
             Self::Drive => Some("Drive"),
             Self::Values => Some("Values"),
+            Self::TimeSeries => Some("TimeSeries"),
             _ => None,
         }
     }
@@ -5554,6 +5558,304 @@ impl core::fmt::Debug for Values<'_> {
         ds.finish()
     }
 }
+pub enum TimeSeriesOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+/// Synthetic timestamp series used to fill empty time buckets in metric queries.
+/// Emits one row per bucket between `start_ms` and `end_ms`
+/// (inclusive) at `interval_ms` spacing, in a single column named `output_column`.
+/// All bounds are UTC unix milliseconds - to align with the
+/// time_bucket UDF, callers should pass values that are already snapped to a
+/// bucket boundary in the desired zone.
+/// Timezone-aware generation is not yet supported.
+///
+/// If `infer_bounds` is true, `start_ms` and `end_ms` are ignored and the
+/// catalog planner resolves them from the WHERE filter of whichever source
+/// this series is LEFT JOINed against. The joined source must produce the
+/// join column via `time_bucket(width, ts)` or
+/// `date_trunc(unit, [at_timezone(]ts[, tz)])` and have a closed range
+/// filter on `ts`; otherwise planning errors.
+///
+/// Exactly one of `interval_ms` / `interval_months` is non-zero (or both
+/// zero when `infer_bounds=true` — the planner fills in whichever flavour
+/// the joined source's bucket function dictates). `interval_months` is the
+/// calendar-month count used to step the synthetic series; years are
+/// represented as 12N months.
+///
+/// `tz` is the IANA timezone name (e.g. `"America/Los_Angeles"`) used to
+/// floor bounds and step the series in local calendar time. Empty means
+/// UTC. This is only set when the joined source's bucket expression wraps
+/// the timestamp in `at_timezone(ts, '<tz>')` — bare `date_trunc(unit, ts)`
+/// stays UTC. When `tz` is non-empty, the catalog emits the series as a
+/// precomputed VALUES list rather than a DataFusion `generate_series` call
+/// so the local-calendar boundaries (including DST transitions) are
+/// authoritative at plan time.
+pub struct TimeSeries<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for TimeSeries<'a> {
+    type Inner = TimeSeries<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> TimeSeries<'a> {
+    pub const VT_START_MS: flatbuffers::VOffsetT = 4;
+    pub const VT_END_MS: flatbuffers::VOffsetT = 6;
+    pub const VT_INTERVAL_MS: flatbuffers::VOffsetT = 8;
+    pub const VT_OUTPUT_COLUMN: flatbuffers::VOffsetT = 10;
+    pub const VT_INFER_BOUNDS: flatbuffers::VOffsetT = 12;
+    pub const VT_INTERVAL_MONTHS: flatbuffers::VOffsetT = 14;
+    pub const VT_TZ: flatbuffers::VOffsetT = 16;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        TimeSeries { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args TimeSeriesArgs<'args>,
+    ) -> flatbuffers::WIPOffset<TimeSeries<'bldr>> {
+        let mut builder = TimeSeriesBuilder::new(_fbb);
+        builder.add_interval_ms(args.interval_ms);
+        builder.add_end_ms(args.end_ms);
+        builder.add_start_ms(args.start_ms);
+        if let Some(x) = args.tz {
+            builder.add_tz(x);
+        }
+        builder.add_interval_months(args.interval_months);
+        if let Some(x) = args.output_column {
+            builder.add_output_column(x);
+        }
+        builder.add_infer_bounds(args.infer_bounds);
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn start_ms(&self) -> i64 {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<i64>(TimeSeries::VT_START_MS, Some(0))
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn end_ms(&self) -> i64 {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<i64>(TimeSeries::VT_END_MS, Some(0))
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn interval_ms(&self) -> i64 {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<i64>(TimeSeries::VT_INTERVAL_MS, Some(0))
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn output_column(&self) -> &'a str {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<&str>>(TimeSeries::VT_OUTPUT_COLUMN, None)
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn infer_bounds(&self) -> bool {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<bool>(TimeSeries::VT_INFER_BOUNDS, Some(false))
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn interval_months(&self) -> i32 {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<i32>(TimeSeries::VT_INTERVAL_MONTHS, Some(0))
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn tz(&self) -> Option<&'a str> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<&str>>(TimeSeries::VT_TZ, None)
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for TimeSeries<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<i64>("start_ms", Self::VT_START_MS, false)?
+            .visit_field::<i64>("end_ms", Self::VT_END_MS, false)?
+            .visit_field::<i64>("interval_ms", Self::VT_INTERVAL_MS, false)?
+            .visit_field::<flatbuffers::ForwardsUOffset<&str>>(
+                "output_column",
+                Self::VT_OUTPUT_COLUMN,
+                true,
+            )?
+            .visit_field::<bool>("infer_bounds", Self::VT_INFER_BOUNDS, false)?
+            .visit_field::<i32>("interval_months", Self::VT_INTERVAL_MONTHS, false)?
+            .visit_field::<flatbuffers::ForwardsUOffset<&str>>("tz", Self::VT_TZ, false)?
+            .finish();
+        Ok(())
+    }
+}
+pub struct TimeSeriesArgs<'a> {
+    pub start_ms: i64,
+    pub end_ms: i64,
+    pub interval_ms: i64,
+    pub output_column: Option<flatbuffers::WIPOffset<&'a str>>,
+    pub infer_bounds: bool,
+    pub interval_months: i32,
+    pub tz: Option<flatbuffers::WIPOffset<&'a str>>,
+}
+impl<'a> Default for TimeSeriesArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        TimeSeriesArgs {
+            start_ms: 0,
+            end_ms: 0,
+            interval_ms: 0,
+            output_column: None, // required field
+            infer_bounds: false,
+            interval_months: 0,
+            tz: None,
+        }
+    }
+}
+
+impl Serialize for TimeSeries<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("TimeSeries", 7)?;
+        s.serialize_field("start_ms", &self.start_ms())?;
+        s.serialize_field("end_ms", &self.end_ms())?;
+        s.serialize_field("interval_ms", &self.interval_ms())?;
+        s.serialize_field("output_column", &self.output_column())?;
+        s.serialize_field("infer_bounds", &self.infer_bounds())?;
+        s.serialize_field("interval_months", &self.interval_months())?;
+        if let Some(f) = self.tz() {
+            s.serialize_field("tz", &f)?;
+        } else {
+            s.skip_field("tz")?;
+        }
+        s.end()
+    }
+}
+
+pub struct TimeSeriesBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> TimeSeriesBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_start_ms(&mut self, start_ms: i64) {
+        self.fbb_
+            .push_slot::<i64>(TimeSeries::VT_START_MS, start_ms, 0);
+    }
+    #[inline]
+    pub fn add_end_ms(&mut self, end_ms: i64) {
+        self.fbb_.push_slot::<i64>(TimeSeries::VT_END_MS, end_ms, 0);
+    }
+    #[inline]
+    pub fn add_interval_ms(&mut self, interval_ms: i64) {
+        self.fbb_
+            .push_slot::<i64>(TimeSeries::VT_INTERVAL_MS, interval_ms, 0);
+    }
+    #[inline]
+    pub fn add_output_column(&mut self, output_column: flatbuffers::WIPOffset<&'b str>) {
+        self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(
+            TimeSeries::VT_OUTPUT_COLUMN,
+            output_column,
+        );
+    }
+    #[inline]
+    pub fn add_infer_bounds(&mut self, infer_bounds: bool) {
+        self.fbb_
+            .push_slot::<bool>(TimeSeries::VT_INFER_BOUNDS, infer_bounds, false);
+    }
+    #[inline]
+    pub fn add_interval_months(&mut self, interval_months: i32) {
+        self.fbb_
+            .push_slot::<i32>(TimeSeries::VT_INTERVAL_MONTHS, interval_months, 0);
+    }
+    #[inline]
+    pub fn add_tz(&mut self, tz: flatbuffers::WIPOffset<&'b str>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(TimeSeries::VT_TZ, tz);
+    }
+    #[inline]
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> TimeSeriesBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        TimeSeriesBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<TimeSeries<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_
+            .required(o, TimeSeries::VT_OUTPUT_COLUMN, "output_column");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for TimeSeries<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("TimeSeries");
+        ds.field("start_ms", &self.start_ms());
+        ds.field("end_ms", &self.end_ms());
+        ds.field("interval_ms", &self.interval_ms());
+        ds.field("output_column", &self.output_column());
+        ds.field("infer_bounds", &self.infer_bounds());
+        ds.field("interval_months", &self.interval_months());
+        ds.field("tz", &self.tz());
+        ds.finish()
+    }
+}
 pub enum TableSourceInstanceOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -5731,6 +6033,20 @@ impl<'a> TableSourceInstance<'a> {
             None
         }
     }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn t_as_time_series(&self) -> Option<TimeSeries<'a>> {
+        if self.t_type() == TableSourceUnion::TimeSeries {
+            let u = self.t();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { TimeSeries::init_from_table(u) })
+        } else {
+            None
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for TableSourceInstance<'_> {
@@ -5786,6 +6102,11 @@ impl flatbuffers::Verifiable for TableSourceInstance<'_> {
                     TableSourceUnion::Values => v
                         .verify_union_variant::<flatbuffers::ForwardsUOffset<Values>>(
                             "TableSourceUnion::Values",
+                            pos,
+                        ),
+                    TableSourceUnion::TimeSeries => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<TimeSeries>>(
+                            "TableSourceUnion::TimeSeries",
                             pos,
                         ),
                     _ => Ok(()),
@@ -5864,6 +6185,12 @@ impl Serialize for TableSourceInstance<'_> {
                 let f = self
                     .t_as_values()
                     .expect("Invalid union table, expected `TableSourceUnion::Values`.");
+                s.serialize_field("t", &f)?;
+            }
+            TableSourceUnion::TimeSeries => {
+                let f = self
+                    .t_as_time_series()
+                    .expect("Invalid union table, expected `TableSourceUnion::TimeSeries`.");
                 s.serialize_field("t", &f)?;
             }
             _ => unimplemented!(),
@@ -5985,6 +6312,16 @@ impl core::fmt::Debug for TableSourceInstance<'_> {
             }
             TableSourceUnion::Values => {
                 if let Some(x) = self.t_as_values() {
+                    ds.field("t", &x)
+                } else {
+                    ds.field(
+                        "t",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            TableSourceUnion::TimeSeries => {
+                if let Some(x) = self.t_as_time_series() {
                     ds.field("t", &x)
                 } else {
                     ds.field(
@@ -6240,6 +6577,20 @@ impl<'a> TableSource<'a> {
             None
         }
     }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn t_as_time_series(&self) -> Option<TimeSeries<'a>> {
+        if self.t_type() == TableSourceUnion::TimeSeries {
+            let u = self.t();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { TimeSeries::init_from_table(u) })
+        } else {
+            None
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for TableSource<'_> {
@@ -6295,6 +6646,11 @@ impl flatbuffers::Verifiable for TableSource<'_> {
                     TableSourceUnion::Values => v
                         .verify_union_variant::<flatbuffers::ForwardsUOffset<Values>>(
                             "TableSourceUnion::Values",
+                            pos,
+                        ),
+                    TableSourceUnion::TimeSeries => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<TimeSeries>>(
+                            "TableSourceUnion::TimeSeries",
                             pos,
                         ),
                     _ => Ok(()),
@@ -6401,6 +6757,12 @@ impl Serialize for TableSource<'_> {
                 let f = self
                     .t_as_values()
                     .expect("Invalid union table, expected `TableSourceUnion::Values`.");
+                s.serialize_field("t", &f)?;
+            }
+            TableSourceUnion::TimeSeries => {
+                let f = self
+                    .t_as_time_series()
+                    .expect("Invalid union table, expected `TableSourceUnion::TimeSeries`.");
                 s.serialize_field("t", &f)?;
             }
             _ => unimplemented!(),
@@ -6577,6 +6939,16 @@ impl core::fmt::Debug for TableSource<'_> {
             }
             TableSourceUnion::Values => {
                 if let Some(x) = self.t_as_values() {
+                    ds.field("t", &x)
+                } else {
+                    ds.field(
+                        "t",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            TableSourceUnion::TimeSeries => {
+                if let Some(x) = self.t_as_time_series() {
                     ds.field("t", &x)
                 } else {
                     ds.field(
@@ -7909,6 +8281,20 @@ impl<'a> UpdateQueryElement<'a> {
             None
         }
     }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn source_as_time_series(&self) -> Option<TimeSeries<'a>> {
+        if self.source_type() == TableSourceUnion::TimeSeries {
+            let u = self.source();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { TimeSeries::init_from_table(u) })
+        } else {
+            None
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for UpdateQueryElement<'_> {
@@ -7964,6 +8350,11 @@ impl flatbuffers::Verifiable for UpdateQueryElement<'_> {
                     TableSourceUnion::Values => v
                         .verify_union_variant::<flatbuffers::ForwardsUOffset<Values>>(
                             "TableSourceUnion::Values",
+                            pos,
+                        ),
+                    TableSourceUnion::TimeSeries => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<TimeSeries>>(
+                            "TableSourceUnion::TimeSeries",
                             pos,
                         ),
                     _ => Ok(()),
@@ -8072,6 +8463,12 @@ impl Serialize for UpdateQueryElement<'_> {
                 let f = self
                     .source_as_values()
                     .expect("Invalid union table, expected `TableSourceUnion::Values`.");
+                s.serialize_field("source", &f)?;
+            }
+            TableSourceUnion::TimeSeries => {
+                let f = self
+                    .source_as_time_series()
+                    .expect("Invalid union table, expected `TableSourceUnion::TimeSeries`.");
                 s.serialize_field("source", &f)?;
             }
             _ => unimplemented!(),
@@ -8251,6 +8648,16 @@ impl core::fmt::Debug for UpdateQueryElement<'_> {
             }
             TableSourceUnion::Values => {
                 if let Some(x) = self.source_as_values() {
+                    ds.field("source", &x)
+                } else {
+                    ds.field(
+                        "source",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            TableSourceUnion::TimeSeries => {
+                if let Some(x) = self.source_as_time_series() {
                     ds.field("source", &x)
                 } else {
                     ds.field(
@@ -8462,6 +8869,20 @@ impl<'a> DeleteQueryElement<'a> {
             None
         }
     }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn source_as_time_series(&self) -> Option<TimeSeries<'a>> {
+        if self.source_type() == TableSourceUnion::TimeSeries {
+            let u = self.source();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { TimeSeries::init_from_table(u) })
+        } else {
+            None
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for DeleteQueryElement<'_> {
@@ -8517,6 +8938,11 @@ impl flatbuffers::Verifiable for DeleteQueryElement<'_> {
                     TableSourceUnion::Values => v
                         .verify_union_variant::<flatbuffers::ForwardsUOffset<Values>>(
                             "TableSourceUnion::Values",
+                            pos,
+                        ),
+                    TableSourceUnion::TimeSeries => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<TimeSeries>>(
+                            "TableSourceUnion::TimeSeries",
                             pos,
                         ),
                     _ => Ok(()),
@@ -8602,6 +9028,12 @@ impl Serialize for DeleteQueryElement<'_> {
                 let f = self
                     .source_as_values()
                     .expect("Invalid union table, expected `TableSourceUnion::Values`.");
+                s.serialize_field("source", &f)?;
+            }
+            TableSourceUnion::TimeSeries => {
+                let f = self
+                    .source_as_time_series()
+                    .expect("Invalid union table, expected `TableSourceUnion::TimeSeries`.");
                 s.serialize_field("source", &f)?;
             }
             _ => unimplemented!(),
@@ -8737,6 +9169,16 @@ impl core::fmt::Debug for DeleteQueryElement<'_> {
             }
             TableSourceUnion::Values => {
                 if let Some(x) = self.source_as_values() {
+                    ds.field("source", &x)
+                } else {
+                    ds.field(
+                        "source",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            TableSourceUnion::TimeSeries => {
+                if let Some(x) = self.source_as_time_series() {
                     ds.field("source", &x)
                 } else {
                     ds.field(
@@ -9625,6 +10067,20 @@ impl<'a> InsertQueryElement<'a> {
             None
         }
     }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn dest_as_time_series(&self) -> Option<TimeSeries<'a>> {
+        if self.dest_type() == TableSourceUnion::TimeSeries {
+            let u = self.dest();
+            // Safety:
+            // Created from a valid Table for this object
+            // Which contains a valid union in this slot
+            Some(unsafe { TimeSeries::init_from_table(u) })
+        } else {
+            None
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for InsertQueryElement<'_> {
@@ -9688,6 +10144,11 @@ impl flatbuffers::Verifiable for InsertQueryElement<'_> {
                     TableSourceUnion::Values => v
                         .verify_union_variant::<flatbuffers::ForwardsUOffset<Values>>(
                             "TableSourceUnion::Values",
+                            pos,
+                        ),
+                    TableSourceUnion::TimeSeries => v
+                        .verify_union_variant::<flatbuffers::ForwardsUOffset<TimeSeries>>(
+                            "TableSourceUnion::TimeSeries",
                             pos,
                         ),
                     _ => Ok(()),
@@ -9788,6 +10249,12 @@ impl Serialize for InsertQueryElement<'_> {
                 let f = self
                     .dest_as_values()
                     .expect("Invalid union table, expected `TableSourceUnion::Values`.");
+                s.serialize_field("dest", &f)?;
+            }
+            TableSourceUnion::TimeSeries => {
+                let f = self
+                    .dest_as_time_series()
+                    .expect("Invalid union table, expected `TableSourceUnion::TimeSeries`.");
                 s.serialize_field("dest", &f)?;
             }
             _ => unimplemented!(),
@@ -9963,6 +10430,16 @@ impl core::fmt::Debug for InsertQueryElement<'_> {
             }
             TableSourceUnion::Values => {
                 if let Some(x) = self.dest_as_values() {
+                    ds.field("dest", &x)
+                } else {
+                    ds.field(
+                        "dest",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            TableSourceUnion::TimeSeries => {
+                if let Some(x) = self.dest_as_time_series() {
                     ds.field("dest", &x)
                 } else {
                     ds.field(

@@ -37,17 +37,14 @@ public final class ObjectSummary extends com.google.flatbuffers.Table {
   public long time() { int o = __offset(10); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
   public ObjectId acl() { return acl(new ObjectId()); }
   public ObjectId acl(ObjectId obj) { int o = __offset(12); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
-  public long driveSize() { int o = __offset(14); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
 
   public static int createObjectSummary(FlatBufferBuilder builder,
       int idOffset,
       int headRevisionOffset,
       short ty,
       long time,
-      int aclOffset,
-      long driveSize) {
+      int aclOffset) {
     builder.startTable(6);
-    ObjectSummary.addDriveSize(builder, driveSize);
     ObjectSummary.addTime(builder, time);
     ObjectSummary.addAcl(builder, aclOffset);
     ObjectSummary.addHeadRevision(builder, headRevisionOffset);
@@ -62,7 +59,6 @@ public final class ObjectSummary extends com.google.flatbuffers.Table {
   public static void addTy(FlatBufferBuilder builder, short ty) { builder.addShort(2, ty, 0); }
   public static void addTime(FlatBufferBuilder builder, long time) { builder.addLong(3, time, 0L); }
   public static void addAcl(FlatBufferBuilder builder, int aclOffset) { builder.addOffset(4, aclOffset, 0); }
-  public static void addDriveSize(FlatBufferBuilder builder, long driveSize) { builder.addLong(5, driveSize, 0L); }
   public static int endObjectSummary(FlatBufferBuilder builder) {
     int o = builder.endTable();
     builder.required(o, 4);  // id

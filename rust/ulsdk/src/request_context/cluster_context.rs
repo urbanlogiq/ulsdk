@@ -25,11 +25,7 @@ pub struct ClusterContext {
 }
 
 impl ClusterContext {
-    pub fn new(
-        user_id: Uuid,
-        groups: String,
-        correlation_id: String,
-    ) -> Self {
+    pub fn new(user_id: Uuid, groups: String, correlation_id: String) -> Self {
         Self {
             user_id,
             groups,
@@ -59,13 +55,13 @@ impl ClusterContext {
     }
 
     fn route(&self, path: &str) -> Result<String, Error> {
-        let rest = path.strip_prefix(SVC_PREFIX).ok_or_else(|| {
-            Error::Unclassified(format!("invalid path: {}", path).into())
-        })?;
+        let rest = path
+            .strip_prefix(SVC_PREFIX)
+            .ok_or_else(|| Error::Unclassified(format!("invalid path: {}", path).into()))?;
 
-        let (svc, remainder) = rest.split_once('/').ok_or_else(|| {
-            Error::Unclassified(format!("invalid path: {}", path).into())
-        })?;
+        let (svc, remainder) = rest
+            .split_once('/')
+            .ok_or_else(|| Error::Unclassified(format!("invalid path: {}", path).into()))?;
 
         match svc {
             "ulv2" => Ok(format!(
@@ -130,8 +126,8 @@ impl RequestContext for ClusterContext {
             }
         }
 
-        let response = response
-            .ok_or_else(|| Error::Unclassified("No response from endpoint".into()))?;
+        let response =
+            response.ok_or_else(|| Error::Unclassified("No response from endpoint".into()))?;
 
         if !response.status().is_success() {
             let status = response.status();
@@ -187,8 +183,8 @@ impl RequestContext for ClusterContext {
             }
         }
 
-        let response = response
-            .ok_or_else(|| Error::Unclassified("No response from endpoint".into()))?;
+        let response =
+            response.ok_or_else(|| Error::Unclassified("No response from endpoint".into()))?;
 
         if !response.status().is_success() {
             let status = response.status();
@@ -244,8 +240,8 @@ impl RequestContext for ClusterContext {
             }
         }
 
-        let response = response
-            .ok_or_else(|| Error::Unclassified("No response from endpoint".into()))?;
+        let response =
+            response.ok_or_else(|| Error::Unclassified("No response from endpoint".into()))?;
 
         if !response.status().is_success() {
             let status = response.status();
@@ -328,8 +324,8 @@ impl RequestContext for ClusterContext {
             }
         }
 
-        let response = response
-            .ok_or_else(|| Error::Unclassified("No response from endpoint".into()))?;
+        let response =
+            response.ok_or_else(|| Error::Unclassified("No response from endpoint".into()))?;
 
         if !response.status().is_success() {
             let status = response.status();

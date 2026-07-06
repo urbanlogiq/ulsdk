@@ -357,6 +357,16 @@ test_table_source_instance() {
 TypeTest test_table_source_instance_obj(test_table_source_instance, "TableSourceInstance");
 
 bool
+test_time_series() {
+    ::ul::types::TimeSeries t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::TimeSeries deserialized = ::ul::types::TimeSeries(bytes);
+    return true;
+}
+
+TypeTest test_time_series_obj(test_time_series, "TimeSeries");
+
+bool
 test_unary_query_element() {
     ::ul::types::UnaryQueryElement t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);

@@ -3,6 +3,7 @@
 import uuid
 from abc import ABC, abstractmethod
 from typing import Dict, List, NamedTuple, Optional, Union
+from urllib.parse import quote
 from websockets.sync.client import ClientConnection
 
 from .keys import Environment, Region
@@ -22,7 +23,9 @@ def _get_endpoint(region: Region, environment: Environment, api: str) -> str:
         case _:
             raise ValueError(f"Unknown region/environment: {region}/{environment}")
 
-    return f"{base}{api}"
+    # Encode reserved chars (e.g. "#" in a drive entry name) for the wire only;
+    # signatures are computed over the raw path, which the gateway decodes back to.
+    return f"{base}{quote(api, safe='/')}"
 
 
 class File(NamedTuple):
@@ -33,6 +36,7 @@ class File(NamedTuple):
 
 # A RequestContext is a superclass that enables code to use either signed
 # requests-with-api-keys, bearer tokens, or other authentication schemes.
+
 class RequestContext(ABC):
     def user_id(self) -> uuid.UUID:
         """Return the user ID of the context, if available"""

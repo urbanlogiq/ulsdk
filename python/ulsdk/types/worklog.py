@@ -83,6 +83,7 @@ from .id import (
     GraphNodeId,
     ObjectId,
     ObjectNamespace,
+    PinnedObjectId,
     StreamId,
 )
 from .job import (
@@ -146,6 +147,7 @@ from .generated.Bool import Bool as FbsBool
 from .generated.Buffer import Buffer as FbsBuffer
 from .generated.ByteArray import ByteArray as FbsByteArray
 from .generated.ColumnGroupId import ColumnGroupId as FbsColumnGroupId
+from .generated.ContainerRef import ContainerRef as FbsContainerRef
 from .generated.ContentId import ContentId as FbsContentId
 from .generated.DataStateId import DataStateId as FbsDataStateId
 from .generated.Date import Date as FbsDate
@@ -163,6 +165,7 @@ from .generated.FixedSizeBinary import FixedSizeBinary as FbsFixedSizeBinary
 from .generated.FixedSizeList import FixedSizeList as FbsFixedSizeList
 from .generated.FloatingPoint import FloatingPoint as FbsFloatingPoint
 from .generated.GenericId import GenericId as FbsGenericId
+from .generated.GitRef import GitRef as FbsGitRef
 from .generated.GraphNodeId import GraphNodeId as FbsGraphNodeId
 from .generated.Int import Int as FbsInt
 from .generated.Interval import Interval as FbsInterval
@@ -183,7 +186,9 @@ from .generated.ObjectId import ObjectId as FbsObjectId
 from .generated.OutputSchema import OutputSchema as FbsOutputSchema
 from .generated.ParamIndices import ParamIndices as FbsParamIndices
 from .generated.ParameterFlags import ParameterFlags as FbsParameterFlags
+from .generated.PinnedObjectId import PinnedObjectId as FbsPinnedObjectId
 from .generated.Point2D import Point2D as FbsPoint2D
+from .generated.Producer import Producer as FbsProducer
 from .generated.RunEndEncoded import RunEndEncoded as FbsRunEndEncoded
 from .generated.RunSpec import RunSpec as FbsRunSpec
 from .generated.Schema import Schema as FbsSchema
@@ -233,6 +238,7 @@ from .generated.ValueInstance import ValueInstance as FbsValueInstance
 from .generated.WorkLog import WorkLog as FbsWorkLog
 from .generated.WorklogParameter import WorklogParameter as FbsWorklogParameter
 from .generated.ParameterValue import ParameterValue as FbsParameterValue
+from .generated.ProducerRef import ProducerRef as FbsProducerRef
 from .generated.TaskParameterValue import TaskParameterValue as FbsTaskParameterValue
 from .generated.Type import Type as FbsType
 from .generated.Value import Value as FbsValue
@@ -423,6 +429,150 @@ class ParameterValue:
         return self.value == other.value
 
 @dataclass
+class ContainerRef:
+    image: "str"
+
+    @classmethod
+    def from_fbs(cls, o: FbsContainerRef) -> Self:
+        image_str = o.Image()
+        assert image_str is not None
+        image = image_str.decode('utf-8')
+        return cls(image)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsContainerRef.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.ContainerRef import (
+            Start,
+            AddImage,
+            End,
+        )
+        image_offset = builder.CreateString(self.image)
+
+        Start(builder)
+        AddImage(builder, image_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        image = ""
+        return cls(image)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.image == other.image
+
+        return eq
+
+@dataclass
+class ProducerRef:
+    value: Union[
+        "ObjectId",
+        "ContainerRef",
+    ]
+
+    def serialize_to(self, builder: Builder) -> Tuple[int, int]:
+        from .generated.ProducerRef import ProducerRef
+        offset = self.value.serialize_to(builder)
+        if isinstance(self.value, ObjectId):
+            return (offset, ProducerRef().ObjectId)
+        elif isinstance(self.value, ContainerRef):
+            return (offset, ProducerRef().ContainerRef)
+        raise ValueError("Invalid union type")
+
+    @classmethod
+    def from_fbs(cls, o: Optional[Table], ty: int) -> Self:
+        assert o is not None
+        source = o.Bytes
+        pos = o.Pos
+        ProducerRef_ty_instance = FbsProducerRef()
+        if ty == ProducerRef_ty_instance.ObjectId:
+            val = FbsObjectId();
+            val.Init(source, pos)
+            return cls(ObjectId.from_fbs(val))
+        elif ty == ProducerRef_ty_instance.ContainerRef:
+            val = FbsContainerRef();
+            val.Init(source, pos)
+            return cls(ContainerRef.from_fbs(val))
+        else:
+            raise ValueError("Invalid union type")
+
+    @classmethod
+    def make_default(cls) -> Self:
+        return cls(ObjectId.make_default())
+
+    def __eq__(self, other) -> bool:
+        if type(self.value) is not type(other.value):
+            return False
+        return self.value == other.value
+
+@dataclass
+class GitRef:
+    commitish: "str"
+
+    repo: "str"
+
+    @classmethod
+    def from_fbs(cls, o: FbsGitRef) -> Self:
+        commitish_str = o.Commitish()
+        assert commitish_str is not None
+        commitish = commitish_str.decode('utf-8')
+        repo_str = o.Repo()
+        assert repo_str is not None
+        repo = repo_str.decode('utf-8')
+        return cls(commitish, repo)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsGitRef.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.GitRef import (
+            Start,
+            AddCommitish,
+            AddRepo,
+            End,
+        )
+        commitish_offset = builder.CreateString(self.commitish)
+        repo_offset = builder.CreateString(self.repo)
+
+        Start(builder)
+        AddCommitish(builder, commitish_offset)
+        AddRepo(builder, repo_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        commitish = ""
+        repo = ""
+        return cls(commitish, repo)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.commitish == other.commitish
+        eq = eq and self.repo == other.repo
+
+        return eq
+
+@dataclass
 class Layout:
     # The height of the chart tile in react-grid-layout grid units
     height: "int"
@@ -487,6 +637,85 @@ class Layout:
         eq = eq and self.width == other.width
         eq = eq and self.x == other.x
         eq = eq and self.y == other.y
+
+        return eq
+
+@dataclass
+class Producer:
+    builder_code_ref: Optional["GitRef"]
+
+    executor: "GitRef"
+
+    model: Optional["ProducerRef"]
+
+    @classmethod
+    def from_fbs(cls, o: FbsProducer) -> Self:
+        builder_code_ref = None
+        builder_code_ref_obj = o.BuilderCodeRef()
+        if builder_code_ref_obj is not None:
+            builder_code_ref = GitRef.from_fbs(builder_code_ref_obj)
+        executor_obj = o.Executor()
+        if executor_obj is not None:
+            executor = GitRef.from_fbs(executor_obj)
+        else:
+            raise ValueError("Executor is required")
+        model = None
+        model_val = o.Model()
+        if model_val is not None:
+            model_ty = o.ModelType()
+            model = ProducerRef.from_fbs(model_val, model_ty)
+        return cls(builder_code_ref, executor, model)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsProducer.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.Producer import (
+            Start,
+            AddBuilderCodeRef,
+            AddExecutor,
+            AddModel,
+            AddModelType,
+            End,
+        )
+        builder_code_ref_offset = None
+        if self.builder_code_ref is not None:
+            builder_code_ref_offset = self.builder_code_ref.serialize_to(builder)
+        executor_offset = self.executor.serialize_to(builder)
+        model_offset, model_ty = (None, None)
+        if self.model is not None:
+            model_offset, model_ty = self.model.serialize_to(builder)
+
+        Start(builder)
+        if builder_code_ref_offset is not None:
+            AddBuilderCodeRef(builder, builder_code_ref_offset)
+        AddExecutor(builder, executor_offset)
+        if model_offset is not None and model_ty is not None:
+            AddModel(builder, model_offset)
+            AddModelType(builder, model_ty)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        builder_code_ref = GitRef.make_default()
+        executor = GitRef.make_default()
+        model = ProducerRef.make_default()
+        return cls(builder_code_ref, executor, model)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.builder_code_ref == other.builder_code_ref
+        eq = eq and self.executor == other.executor
+        eq = eq and self.model == other.model
 
         return eq
 
@@ -805,7 +1034,7 @@ class UserSettings:
 @dataclass
 class WorkLog:
     # Input streams and/or worklogs. These may be either work logs or streams.
-    input_streams: Optional["List[ObjectId]"]
+    input_streams: Optional["List[PinnedObjectId]"]
 
     job_id: Optional["ObjectId"]
 
@@ -816,7 +1045,7 @@ class WorkLog:
     # the results. These documents may expire (ie: if this is a temporary
     # step) so there should be enough information in the worklog necessary
     # to reconstruct these output streams.
-    output_streams: "List[ObjectId]"
+    output_streams: "List[PinnedObjectId]"
 
     # These are the serialized parameters passed into the task which created
     # this worklog.
@@ -832,9 +1061,11 @@ class WorkLog:
     # instead of just "stuff the system generated".
     parent: Optional["ObjectId"]
 
+    producer: Optional["Producer"]
+
     # The schematic used behind creating the worklog. This may be empty/null
     # if we are just layering data, for example.
-    schematic: "ObjectId"
+    schematic: "PinnedObjectId"
 
     user_settings: Optional["UserSettings"]
 
@@ -846,7 +1077,7 @@ class WorkLog:
                 input_streams_val = None
                 input_streams_obj = o.InputStreams(i)
                 if input_streams_obj is not None:
-                    input_streams_val = ObjectId.from_fbs(input_streams_obj)
+                    input_streams_val = PinnedObjectId.from_fbs(input_streams_obj)
                 input_streams.append(input_streams_val)
         job_id = None
         job_id_obj = o.JobId()
@@ -862,7 +1093,7 @@ class WorkLog:
                 output_streams_val = None
                 output_streams_obj = o.OutputStreams(i)
                 if output_streams_obj is not None:
-                    output_streams_val = ObjectId.from_fbs(output_streams_obj)
+                    output_streams_val = PinnedObjectId.from_fbs(output_streams_obj)
                 output_streams.append(output_streams_val)
         params = list()
         if not o.ParamsIsNone():
@@ -876,16 +1107,20 @@ class WorkLog:
         parent_obj = o.Parent()
         if parent_obj is not None:
             parent = ObjectId.from_fbs(parent_obj)
+        producer = None
+        producer_obj = o.Producer()
+        if producer_obj is not None:
+            producer = Producer.from_fbs(producer_obj)
         schematic_obj = o.Schematic()
         if schematic_obj is not None:
-            schematic = ObjectId.from_fbs(schematic_obj)
+            schematic = PinnedObjectId.from_fbs(schematic_obj)
         else:
             raise ValueError("Schematic is required")
         user_settings = None
         user_settings_obj = o.UserSettings()
         if user_settings_obj is not None:
             user_settings = UserSettings.from_fbs(user_settings_obj)
-        return cls(input_streams, job_id, name, output_streams, params, parent, schematic, user_settings)
+        return cls(input_streams, job_id, name, output_streams, params, parent, producer, schematic, user_settings)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -905,6 +1140,7 @@ class WorkLog:
             AddParams,
             StartParamsVector,
             AddParent,
+            AddProducer,
             AddSchematic,
             AddUserSettings,
             End,
@@ -941,6 +1177,9 @@ class WorkLog:
         parent_offset = None
         if self.parent is not None:
             parent_offset = self.parent.serialize_to(builder)
+        producer_offset = None
+        if self.producer is not None:
+            producer_offset = self.producer.serialize_to(builder)
         schematic_offset = self.schematic.serialize_to(builder)
         user_settings_offset = None
         if self.user_settings is not None:
@@ -957,6 +1196,8 @@ class WorkLog:
         AddParams(builder, params_offset)
         if parent_offset is not None:
             AddParent(builder, parent_offset)
+        if producer_offset is not None:
+            AddProducer(builder, producer_offset)
         AddSchematic(builder, schematic_offset)
         if user_settings_offset is not None:
             AddUserSettings(builder, user_settings_offset)
@@ -976,9 +1217,10 @@ class WorkLog:
         output_streams = []
         params = []
         parent = ObjectId.make_default()
-        schematic = ObjectId.make_default()
+        producer = Producer.make_default()
+        schematic = PinnedObjectId.make_default()
         user_settings = UserSettings.make_default()
-        return cls(input_streams, job_id, name, output_streams, params, parent, schematic, user_settings)
+        return cls(input_streams, job_id, name, output_streams, params, parent, producer, schematic, user_settings)
 
     def __eq__(self, other) -> bool:
         eq = True
@@ -1004,6 +1246,7 @@ class WorkLog:
         for i in range(len(self.params)):
             eq = eq and self.params[i] == other.params[i]
         eq = eq and self.parent == other.parent
+        eq = eq and self.producer == other.producer
         eq = eq and self.schematic == other.schematic
         eq = eq and self.user_settings == other.user_settings
 

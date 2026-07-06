@@ -1516,7 +1516,94 @@ func (o *Values) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT 
 	return generated.ValuesEnd(builder)
 }
 
-// TableSourceUnion is a union type. Possible concrete types: DataCatalog, Arrow, GraphQuery, QueryTableSource, Vector, Placeholder, Drive, Values
+// TimeSeries -
+//  Synthetic timestamp series used to fill empty time buckets in metric queries.
+//  Emits one row per bucket between `start_ms` and `end_ms`
+//  (inclusive) at `interval_ms` spacing, in a single column named `output_column`.
+//  All bounds are UTC unix milliseconds - to align with the
+//  time_bucket UDF, callers should pass values that are already snapped to a
+//  bucket boundary in the desired zone.
+//  Timezone-aware generation is not yet supported.
+//
+//  If `infer_bounds` is true, `start_ms` and `end_ms` are ignored and the
+//  catalog planner resolves them from the WHERE filter of whichever source
+//  this series is LEFT JOINed against. The joined source must produce the
+//  join column via `time_bucket(width, ts)` or
+//  `date_trunc(unit, [at_timezone(]ts[, tz)])` and have a closed range
+//  filter on `ts`; otherwise planning errors.
+//
+//  Exactly one of `interval_ms` / `interval_months` is non-zero (or both
+//  zero when `infer_bounds=true` — the planner fills in whichever flavour
+//  the joined source's bucket function dictates). `interval_months` is the
+//  calendar-month count used to step the synthetic series; years are
+//  represented as 12N months.
+//
+//  `tz` is the IANA timezone name (e.g. `"America/Los_Angeles"`) used to
+//  floor bounds and step the series in local calendar time. Empty means
+//  UTC. This is only set when the joined source's bucket expression wraps
+//  the timestamp in `at_timezone(ts, '<tz>')` — bare `date_trunc(unit, ts)`
+//  stays UTC. When `tz` is non-empty, the catalog emits the series as a
+//  precomputed VALUES list rather than a DataFusion `generate_series` call
+//  so the local-calendar boundaries (including DST transitions) are
+//  authoritative at plan time.
+type TimeSeries struct {
+	EndMs int64
+	InferBounds bool
+	IntervalMonths int32
+	IntervalMs int64
+	OutputColumn string
+	StartMs int64
+	Tz *string
+}
+
+func TimeSeriesFromFbs(fbs *generated.TimeSeries) *TimeSeries {
+	o := &TimeSeries{}
+	o.EndMs = fbs.EndMs()
+	o.InferBounds = fbs.InferBounds()
+	o.IntervalMonths = fbs.IntervalMonths()
+	o.IntervalMs = fbs.IntervalMs()
+	o.OutputColumn = string(fbs.OutputColumn())
+	o.StartMs = fbs.StartMs()
+	if s := fbs.Tz(); s != nil {
+		str := string(s)
+		o.Tz = &str
+	}
+	return o
+}
+
+// TimeSeriesFromBytes deserializes a TimeSeries from size-prefixed FlatBuffer bytes.
+func TimeSeriesFromBytes(data []byte) (*TimeSeries, error) {
+	fbs := generated.GetSizePrefixedRootAsTimeSeries(data, 0)
+	return TimeSeriesFromFbs(fbs), nil
+}
+
+// ToBytes serializes the TimeSeries to size-prefixed FlatBuffer bytes.
+func (o *TimeSeries) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the TimeSeries into a FlatBuffer builder and returns the offset.
+func (o *TimeSeries) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	outputColumnOffset := builder.CreateString(o.OutputColumn)
+	var tzOffset flatbuffers.UOffsetT
+	if o.Tz != nil {
+		tzOffset = builder.CreateString(*o.Tz)
+	}
+	generated.TimeSeriesStart(builder)
+	generated.TimeSeriesAddEndMs(builder, o.EndMs)
+	generated.TimeSeriesAddInferBounds(builder, o.InferBounds)
+	generated.TimeSeriesAddIntervalMonths(builder, o.IntervalMonths)
+	generated.TimeSeriesAddIntervalMs(builder, o.IntervalMs)
+	generated.TimeSeriesAddOutputColumn(builder, outputColumnOffset)
+	generated.TimeSeriesAddStartMs(builder, o.StartMs)
+	generated.TimeSeriesAddTz(builder, tzOffset)
+	return generated.TimeSeriesEnd(builder)
+}
+
+// TableSourceUnion is a union type. Possible concrete types: DataCatalog, Arrow, GraphQuery, QueryTableSource, Vector, Placeholder, Drive, Values, TimeSeries
 type TableSourceUnion interface {
 	isTableSourceUnion()
 }

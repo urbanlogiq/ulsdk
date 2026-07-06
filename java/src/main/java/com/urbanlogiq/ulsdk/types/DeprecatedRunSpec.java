@@ -29,11 +29,11 @@ public final class DeprecatedRunSpec {
         this._persist = value;
     }
 
-    com.urbanlogiq.ulsdk.types.ObjectId _schematic;
-    public com.urbanlogiq.ulsdk.types.ObjectId getSchematic() {
+    com.urbanlogiq.ulsdk.types.PinnedObjectId _schematic;
+    public com.urbanlogiq.ulsdk.types.PinnedObjectId getSchematic() {
         return this._schematic;
     }
-    public void setSchematic(com.urbanlogiq.ulsdk.types.ObjectId value) {
+    public void setSchematic(com.urbanlogiq.ulsdk.types.PinnedObjectId value) {
         this._schematic = value;
     }
 
@@ -57,7 +57,7 @@ public final class DeprecatedRunSpec {
         }
         this._params = params;
         this._persist = o.persist();
-        this._schematic = new com.urbanlogiq.ulsdk.types.ObjectId(o.schematic());
+        this._schematic = new com.urbanlogiq.ulsdk.types.PinnedObjectId(o.schematic());
     }
 
     public DeprecatedRunSpec(byte[] data) {
@@ -102,7 +102,7 @@ public final class DeprecatedRunSpec {
     public DeprecatedRunSpec() {
         this._paramIndices = new com.urbanlogiq.ulsdk.types.ParamIndices[0];
         this._params = new com.urbanlogiq.ulsdk.types.DeprecatedTaskParameter[0];
-        this._schematic = new com.urbanlogiq.ulsdk.types.ObjectId();
+        this._schematic = new com.urbanlogiq.ulsdk.types.PinnedObjectId();
     }
 
     @Override

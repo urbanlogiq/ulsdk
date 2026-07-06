@@ -86,6 +86,26 @@ public final class Metadata extends com.google.flatbuffers.Table {
    * used as the location description.
    */
   public int locationDescriptionField() { int o = __offset(30); return o != 0 ? bb.getInt(o + bb_pos) : -1; }
+  /**
+   * Indices of fields that are "promoted to metrics"
+   */
+  public int promotedMetrics(int j) { int o = __offset(32); return o != 0 ? bb.getInt(__vector(o) + j * 4) : 0; }
+  public int promotedMetricsLength() { int o = __offset(32); return o != 0 ? __vector_len(o) : 0; }
+  public IntVector promotedMetricsVector() { return promotedMetricsVector(new IntVector()); }
+  public IntVector promotedMetricsVector(IntVector obj) { int o = __offset(32); return o != 0 ? obj.__assign(__vector(o), bb) : null; }
+  public ByteBuffer promotedMetricsAsByteBuffer() { return __vector_as_bytebuffer(32, 4); }
+  public ByteBuffer promotedMetricsInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 32, 4); }
+  /**
+   * Indices of non-numeric fields that are "visualized in Explore" — they
+   * appear as a categorical color visualization on Generic layers but, unlike
+   * promoted_metrics, do NOT create an entry in the metric catalog.
+   */
+  public int visualizeInExploreFields(int j) { int o = __offset(34); return o != 0 ? bb.getInt(__vector(o) + j * 4) : 0; }
+  public int visualizeInExploreFieldsLength() { int o = __offset(34); return o != 0 ? __vector_len(o) : 0; }
+  public IntVector visualizeInExploreFieldsVector() { return visualizeInExploreFieldsVector(new IntVector()); }
+  public IntVector visualizeInExploreFieldsVector(IntVector obj) { int o = __offset(34); return o != 0 ? obj.__assign(__vector(o), bb) : null; }
+  public ByteBuffer visualizeInExploreFieldsAsByteBuffer() { return __vector_as_bytebuffer(34, 4); }
+  public ByteBuffer visualizeInExploreFieldsInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 34, 4); }
 
   public static int createMetadata(FlatBufferBuilder builder,
       int displayNameOffset,
@@ -101,8 +121,12 @@ public final class Metadata extends com.google.flatbuffers.Table {
       boolean doNotFilterGeometryByViewport,
       int entityTy,
       long updateCadence,
-      int locationDescriptionField) {
-    builder.startTable(14);
+      int locationDescriptionField,
+      int promotedMetricsOffset,
+      int visualizeInExploreFieldsOffset) {
+    builder.startTable(16);
+    Metadata.addVisualizeInExploreFields(builder, visualizeInExploreFieldsOffset);
+    Metadata.addPromotedMetrics(builder, promotedMetricsOffset);
     Metadata.addLocationDescriptionField(builder, locationDescriptionField);
     Metadata.addUpdateCadence(builder, updateCadence);
     Metadata.addEntityTy(builder, entityTy);
@@ -120,7 +144,7 @@ public final class Metadata extends com.google.flatbuffers.Table {
     return Metadata.endMetadata(builder);
   }
 
-  public static void startMetadata(FlatBufferBuilder builder) { builder.startTable(14); }
+  public static void startMetadata(FlatBufferBuilder builder) { builder.startTable(16); }
   public static void addDisplayName(FlatBufferBuilder builder, int displayNameOffset) { builder.addOffset(0, displayNameOffset, 0); }
   public static void addDescription(FlatBufferBuilder builder, int descriptionOffset) { builder.addOffset(1, descriptionOffset, 0); }
   public static void addFields(FlatBufferBuilder builder, int fieldsOffset) { builder.addOffset(2, fieldsOffset, 0); }
@@ -141,6 +165,12 @@ public final class Metadata extends com.google.flatbuffers.Table {
   public static void addEntityTy(FlatBufferBuilder builder, int entityTy) { builder.addInt(11, entityTy, 0); }
   public static void addUpdateCadence(FlatBufferBuilder builder, long updateCadence) { builder.addInt(12, (int) updateCadence, (int) 0L); }
   public static void addLocationDescriptionField(FlatBufferBuilder builder, int locationDescriptionField) { builder.addInt(13, locationDescriptionField, -1); }
+  public static void addPromotedMetrics(FlatBufferBuilder builder, int promotedMetricsOffset) { builder.addOffset(14, promotedMetricsOffset, 0); }
+  public static int createPromotedMetricsVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addInt(data[i]); return builder.endVector(); }
+  public static void startPromotedMetricsVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
+  public static void addVisualizeInExploreFields(FlatBufferBuilder builder, int visualizeInExploreFieldsOffset) { builder.addOffset(15, visualizeInExploreFieldsOffset, 0); }
+  public static int createVisualizeInExploreFieldsVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addInt(data[i]); return builder.endVector(); }
+  public static void startVisualizeInExploreFieldsVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
   public static int endMetadata(FlatBufferBuilder builder) {
     int o = builder.endTable();
     return o;

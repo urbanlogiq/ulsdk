@@ -16,6 +16,7 @@ import { ObjectIdList as FbsObjectIdList, ObjectIdListT as ObjectIdList } from '
 import { ObjectIdPairList as FbsObjectIdPairList, ObjectIdPairListT as ObjectIdPairList } from '../../types/generated/object-id-pair-list';
 import { ObjectSummary as FbsObjectSummary, ObjectSummaryT as ObjectSummary } from '../../types/generated/object-summary';
 import { ObjectSummaryList as FbsObjectSummaryList, ObjectSummaryListT as ObjectSummaryList } from '../../types/generated/object-summary-list';
+import { PinnedObjectId as FbsPinnedObjectId, PinnedObjectIdT as PinnedObjectId } from '../../types/generated/pinned-object-id';
 import { Query as FbsQuery, QueryT as Query } from '../../types/generated/query';
 
 /**
@@ -428,7 +429,7 @@ export async function queryAggregateRelativeHisto(
  */
 export async function streamGetArrow(
   ctx: RequestContext,
-  id: ObjectId
+  id: PinnedObjectId
 ): Promise<Uint8Array> {
   let path = '/v1/api/ulv2/datacatalog/stream/:id';
   path = path.replace(':id', id.toString());
@@ -450,7 +451,7 @@ export async function streamGetArrow(
  */
 export async function streamGetParquet(
   ctx: RequestContext,
-  id: ObjectId
+  id: PinnedObjectId
 ): Promise<Uint8Array> {
   let path = '/v1/api/ulv2/datacatalog/stream/:id';
   path = path.replace(':id', id.toString());
@@ -472,7 +473,7 @@ export async function streamGetParquet(
  */
 export async function streamGetCsv(
   ctx: RequestContext,
-  id: ObjectId
+  id: PinnedObjectId
 ): Promise<Uint8Array> {
   let path = '/v1/api/ulv2/datacatalog/stream/:id';
   path = path.replace(':id', id.toString());
@@ -494,7 +495,7 @@ export async function streamGetCsv(
  */
 export async function streamGetXlsx(
   ctx: RequestContext,
-  id: ObjectId
+  id: PinnedObjectId
 ): Promise<Uint8Array> {
   let path = '/v1/api/ulv2/datacatalog/stream/:id';
   path = path.replace(':id', id.toString());
@@ -516,7 +517,7 @@ export async function streamGetXlsx(
  */
 export async function streamGetJson(
   ctx: RequestContext,
-  id: ObjectId
+  id: PinnedObjectId
 ): Promise<Uint8Array> {
   let path = '/v1/api/ulv2/datacatalog/stream/:id';
   path = path.replace(':id', id.toString());
@@ -538,7 +539,7 @@ export async function streamGetJson(
  */
 export async function streamGetText(
   ctx: RequestContext,
-  id: ObjectId
+  id: PinnedObjectId
 ): Promise<Uint8Array> {
   let path = '/v1/api/ulv2/datacatalog/stream/:id';
   path = path.replace(':id', id.toString());
@@ -560,7 +561,7 @@ export async function streamGetText(
  */
 export async function streamGetHtml(
   ctx: RequestContext,
-  id: ObjectId
+  id: PinnedObjectId
 ): Promise<Uint8Array> {
   let path = '/v1/api/ulv2/datacatalog/stream/:id';
   path = path.replace(':id', id.toString());
@@ -855,6 +856,81 @@ export async function createTable(
   buf.setPosition(buf.position() + flatbuffers.SIZE_PREFIX_LENGTH);
   const fbs = FbsObjectId.getRootAsObjectId(buf);
   return fbs.unpack();
+}
+
+/**
+ * Evaluate the resulting schema of a query, returning an empty Arrow record batch
+ *
+ * @param ctx - A request context object
+ * @param query - The query to execute
+ * @returns The result of the query
+ */
+export async function schemaArrow(
+  ctx: RequestContext,
+  query: Query
+): Promise<Uint8Array> {
+  let path = '/v1/api/ulv2/datacatalog/query/schema';
+  const params: [string, string][] = [];
+  const headers: Record<string, string> = {};
+  headers['accept'] = 'application/vnd.apache.arrow.stream';
+
+  let body: Uint8Array | null = null;
+  const __builder = new flatbuffers.Builder();
+  const __offset = query.pack(__builder);
+  __builder.finishSizePrefixed(__offset);
+  body = __builder.asUint8Array();
+  const res = await ctx.post(path, body, 'application/octet-stream', params, headers);
+  return res;
+}
+
+/**
+ * Evaluate the resulting schema of a query, returning the raw, unparsed binary record batch
+ *
+ * @param ctx - A request context object
+ * @param query - The query to execute
+ * @returns The result of the query
+ */
+export async function schemaRaw(
+  ctx: RequestContext,
+  query: Query
+): Promise<Uint8Array> {
+  let path = '/v1/api/ulv2/datacatalog/query/schema';
+  const params: [string, string][] = [];
+  const headers: Record<string, string> = {};
+  headers['accept'] = 'application/vnd.apache.arrow.stream';
+
+  let body: Uint8Array | null = null;
+  const __builder = new flatbuffers.Builder();
+  const __offset = query.pack(__builder);
+  __builder.finishSizePrefixed(__offset);
+  body = __builder.asUint8Array();
+  const res = await ctx.post(path, body, 'application/octet-stream', params, headers);
+  return res;
+}
+
+/**
+ * Evaluate the resulting Arrow schema of a query, returning it as a parsed Schema (reliable even for a 0-row result)
+ *
+ * @param ctx - A request context object
+ * @param query - The query to execute
+ * @returns The result of the query
+ */
+export async function schemaOnly(
+  ctx: RequestContext,
+  query: Query
+): Promise<Uint8Array> {
+  let path = '/v1/api/ulv2/datacatalog/query/schema';
+  const params: [string, string][] = [];
+  const headers: Record<string, string> = {};
+  headers['accept'] = 'application/vnd.apache.arrow.stream';
+
+  let body: Uint8Array | null = null;
+  const __builder = new flatbuffers.Builder();
+  const __offset = query.pack(__builder);
+  __builder.finishSizePrefixed(__offset);
+  body = __builder.asUint8Array();
+  const res = await ctx.post(path, body, 'application/octet-stream', params, headers);
+  return res;
 }
 
 /**

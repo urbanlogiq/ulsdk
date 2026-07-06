@@ -324,6 +324,67 @@ ObjectId::operator==(const ObjectId &rhs) const {
     return true;
 }
 
+::flatbuffers::Offset<::PinnedObjectId>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const PinnedObjectId &o) {
+    const decltype(builder.CreateVector(o.b_)) b_offset = builder.CreateVector(o.b_);
+    std::optional<::flatbuffers::Offset<::ContentId>> cid_offset = std::nullopt;
+    if (o.cid_.has_value()) {
+        const ::flatbuffers::Offset<::ContentId> cid_offset_val = serialize_to(builder, o.cid_.value());
+        cid_offset = std::make_optional(cid_offset_val);
+    }
+
+    ::PinnedObjectIdBuilder instance_builder = ::PinnedObjectIdBuilder(builder);
+    instance_builder.add_b(b_offset);
+    if (cid_offset.has_value()) {
+        instance_builder.add_cid(cid_offset.value());
+    }
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const PinnedObjectId &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+PinnedObjectId::PinnedObjectId()
+    : b_()
+    , cid_(std::nullopt) {
+}
+
+PinnedObjectId::PinnedObjectId(const std::vector<uint8_t> &bytes)
+    : PinnedObjectId(::flatbuffers::GetSizePrefixedRoot<::PinnedObjectId>(bytes.data())) {
+}
+
+PinnedObjectId::PinnedObjectId(const ::PinnedObjectId *root) 
+    : b_()
+    , cid_(std::nullopt) {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    const auto &b_vector = root->b();
+    if (b_vector != nullptr) {
+        std::copy(b_vector->begin(), b_vector->end(), std::back_inserter(b_));
+    }
+    if (root->cid() != nullptr) {
+        cid_ = decltype(cid_)(root->cid());
+    }
+}
+
+bool
+PinnedObjectId::operator==(const PinnedObjectId &rhs) const {
+    if (this->b_ != rhs.b_) {
+        return false;
+    }
+    if (this->cid_ != rhs.cid_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::StreamId>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const StreamId &o) {
     const decltype(builder.CreateVector(o.b_)) b_offset = builder.CreateVector(o.b_);

@@ -199,6 +199,8 @@ class Fn(object):
     IsDistinctFrom = 193
     IsNotDistinctFrom = 194
     GeoFilter = 195
+    StBuffer = 196
+    StDistance = 197
     CorrelationId = 32763
     UlTimezone = 32764
     UlArrayContains = 32765

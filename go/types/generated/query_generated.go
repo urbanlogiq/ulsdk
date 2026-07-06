@@ -166,6 +166,7 @@ const (
 	TableSourceUnionPlaceholder      TableSourceUnion = 6
 	TableSourceUnionDrive            TableSourceUnion = 7
 	TableSourceUnionValues           TableSourceUnion = 8
+	TableSourceUnionTimeSeries       TableSourceUnion = 9
 )
 
 var EnumNamesTableSourceUnion = map[TableSourceUnion]string{
@@ -178,6 +179,7 @@ var EnumNamesTableSourceUnion = map[TableSourceUnion]string{
 	TableSourceUnionPlaceholder:      "Placeholder",
 	TableSourceUnionDrive:            "Drive",
 	TableSourceUnionValues:           "Values",
+	TableSourceUnionTimeSeries:       "TimeSeries",
 }
 
 var EnumValuesTableSourceUnion = map[string]TableSourceUnion{
@@ -190,6 +192,7 @@ var EnumValuesTableSourceUnion = map[string]TableSourceUnion{
 	"Placeholder":      TableSourceUnionPlaceholder,
 	"Drive":            TableSourceUnionDrive,
 	"Values":           TableSourceUnionValues,
+	"TimeSeries":       TableSourceUnionTimeSeries,
 }
 
 func (v TableSourceUnion) String() string {
@@ -2266,6 +2269,173 @@ func ValuesStartRowsVector(builder *flatbuffers.Builder, numElems int) flatbuffe
 	return builder.StartVector(4, numElems, 4)
 }
 func ValuesEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return builder.EndObject()
+}
+/// Synthetic timestamp series used to fill empty time buckets in metric queries.
+/// Emits one row per bucket between `start_ms` and `end_ms`
+/// (inclusive) at `interval_ms` spacing, in a single column named `output_column`.
+/// All bounds are UTC unix milliseconds - to align with the
+/// time_bucket UDF, callers should pass values that are already snapped to a
+/// bucket boundary in the desired zone.
+/// Timezone-aware generation is not yet supported.
+///
+/// If `infer_bounds` is true, `start_ms` and `end_ms` are ignored and the
+/// catalog planner resolves them from the WHERE filter of whichever source
+/// this series is LEFT JOINed against. The joined source must produce the
+/// join column via `time_bucket(width, ts)` or
+/// `date_trunc(unit, [at_timezone(]ts[, tz)])` and have a closed range
+/// filter on `ts`; otherwise planning errors.
+///
+/// Exactly one of `interval_ms` / `interval_months` is non-zero (or both
+/// zero when `infer_bounds=true` — the planner fills in whichever flavour
+/// the joined source's bucket function dictates). `interval_months` is the
+/// calendar-month count used to step the synthetic series; years are
+/// represented as 12N months.
+///
+/// `tz` is the IANA timezone name (e.g. `"America/Los_Angeles"`) used to
+/// floor bounds and step the series in local calendar time. Empty means
+/// UTC. This is only set when the joined source's bucket expression wraps
+/// the timestamp in `at_timezone(ts, '<tz>')` — bare `date_trunc(unit, ts)`
+/// stays UTC. When `tz` is non-empty, the catalog emits the series as a
+/// precomputed VALUES list rather than a DataFusion `generate_series` call
+/// so the local-calendar boundaries (including DST transitions) are
+/// authoritative at plan time.
+type TimeSeries struct {
+	_tab flatbuffers.Table
+}
+
+func GetRootAsTimeSeries(buf []byte, offset flatbuffers.UOffsetT) *TimeSeries {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &TimeSeries{}
+	x.Init(buf, n+offset)
+	return x
+}
+
+func FinishTimeSeriesBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.Finish(offset)
+}
+
+func GetSizePrefixedRootAsTimeSeries(buf []byte, offset flatbuffers.UOffsetT) *TimeSeries {
+	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
+	x := &TimeSeries{}
+	x.Init(buf, n+offset+flatbuffers.SizeUint32)
+	return x
+}
+
+func FinishSizePrefixedTimeSeriesBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.FinishSizePrefixed(offset)
+}
+
+func (rcv *TimeSeries) Init(buf []byte, i flatbuffers.UOffsetT) {
+	rcv._tab.Bytes = buf
+	rcv._tab.Pos = i
+}
+
+func (rcv *TimeSeries) Table() flatbuffers.Table {
+	return rcv._tab
+}
+
+func (rcv *TimeSeries) StartMs() int64 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		return rcv._tab.GetInt64(o + rcv._tab.Pos)
+	}
+	return 0
+}
+
+func (rcv *TimeSeries) MutateStartMs(n int64) bool {
+	return rcv._tab.MutateInt64Slot(4, n)
+}
+
+func (rcv *TimeSeries) EndMs() int64 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
+	if o != 0 {
+		return rcv._tab.GetInt64(o + rcv._tab.Pos)
+	}
+	return 0
+}
+
+func (rcv *TimeSeries) MutateEndMs(n int64) bool {
+	return rcv._tab.MutateInt64Slot(6, n)
+}
+
+func (rcv *TimeSeries) IntervalMs() int64 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
+	if o != 0 {
+		return rcv._tab.GetInt64(o + rcv._tab.Pos)
+	}
+	return 0
+}
+
+func (rcv *TimeSeries) MutateIntervalMs(n int64) bool {
+	return rcv._tab.MutateInt64Slot(8, n)
+}
+
+func (rcv *TimeSeries) OutputColumn() []byte {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
+	if o != 0 {
+		return rcv._tab.ByteVector(o + rcv._tab.Pos)
+	}
+	return nil
+}
+
+func (rcv *TimeSeries) InferBounds() bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(12))
+	if o != 0 {
+		return rcv._tab.GetBool(o + rcv._tab.Pos)
+	}
+	return false
+}
+
+func (rcv *TimeSeries) MutateInferBounds(n bool) bool {
+	return rcv._tab.MutateBoolSlot(12, n)
+}
+
+func (rcv *TimeSeries) IntervalMonths() int32 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(14))
+	if o != 0 {
+		return rcv._tab.GetInt32(o + rcv._tab.Pos)
+	}
+	return 0
+}
+
+func (rcv *TimeSeries) MutateIntervalMonths(n int32) bool {
+	return rcv._tab.MutateInt32Slot(14, n)
+}
+
+func (rcv *TimeSeries) Tz() []byte {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(16))
+	if o != 0 {
+		return rcv._tab.ByteVector(o + rcv._tab.Pos)
+	}
+	return nil
+}
+
+func TimeSeriesStart(builder *flatbuffers.Builder) {
+	builder.StartObject(7)
+}
+func TimeSeriesAddStartMs(builder *flatbuffers.Builder, startMs int64) {
+	builder.PrependInt64Slot(0, startMs, 0)
+}
+func TimeSeriesAddEndMs(builder *flatbuffers.Builder, endMs int64) {
+	builder.PrependInt64Slot(1, endMs, 0)
+}
+func TimeSeriesAddIntervalMs(builder *flatbuffers.Builder, intervalMs int64) {
+	builder.PrependInt64Slot(2, intervalMs, 0)
+}
+func TimeSeriesAddOutputColumn(builder *flatbuffers.Builder, outputColumn flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(3, flatbuffers.UOffsetT(outputColumn), 0)
+}
+func TimeSeriesAddInferBounds(builder *flatbuffers.Builder, inferBounds bool) {
+	builder.PrependBoolSlot(4, inferBounds, false)
+}
+func TimeSeriesAddIntervalMonths(builder *flatbuffers.Builder, intervalMonths int32) {
+	builder.PrependInt32Slot(5, intervalMonths, 0)
+}
+func TimeSeriesAddTz(builder *flatbuffers.Builder, tz flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(6, flatbuffers.UOffsetT(tz), 0)
+}
+func TimeSeriesEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
 type TableSourceInstance struct {

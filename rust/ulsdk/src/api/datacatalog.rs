@@ -12,7 +12,7 @@ use uuid::Uuid;
 
 use crate::error::Error;
 use crate::request_context::{ParamMap, RequestContext};
-use crate::{read_arrow_ipc, write_arrow_ipc};
+use crate::{FbsSerde, read_arrow_ipc, read_arrow_schema, write_arrow_ipc};
 
 use crate::types::id::{ContentId, ObjectId};
 use crate::types::metadata::Metadata;
@@ -372,7 +372,7 @@ pub async fn query_aggregate_relative_histo(
 /// * Stream data as requested
 pub async fn stream_get_arrow(
     ctx: &dyn RequestContext,
-    id: crate::types::id::ObjectId,
+    id: crate::types::id::PinnedObjectId,
 ) -> Result<Vec<arrow::record_batch::RecordBatch>, Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
@@ -396,7 +396,7 @@ pub async fn stream_get_arrow(
 /// * Stream data as requested
 pub async fn stream_get_parquet(
     ctx: &dyn RequestContext,
-    id: crate::types::id::ObjectId,
+    id: crate::types::id::PinnedObjectId,
 ) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
@@ -420,7 +420,7 @@ pub async fn stream_get_parquet(
 /// * Stream data as requested
 pub async fn stream_get_csv(
     ctx: &dyn RequestContext,
-    id: crate::types::id::ObjectId,
+    id: crate::types::id::PinnedObjectId,
 ) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
@@ -444,7 +444,7 @@ pub async fn stream_get_csv(
 /// * Stream data as requested
 pub async fn stream_get_xlsx(
     ctx: &dyn RequestContext,
-    id: crate::types::id::ObjectId,
+    id: crate::types::id::PinnedObjectId,
 ) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
@@ -470,7 +470,7 @@ pub async fn stream_get_xlsx(
 /// * Stream data as requested
 pub async fn stream_get_json(
     ctx: &dyn RequestContext,
-    id: crate::types::id::ObjectId,
+    id: crate::types::id::PinnedObjectId,
 ) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
@@ -494,7 +494,7 @@ pub async fn stream_get_json(
 /// * Stream data as requested
 pub async fn stream_get_text(
     ctx: &dyn RequestContext,
-    id: crate::types::id::ObjectId,
+    id: crate::types::id::PinnedObjectId,
 ) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
@@ -518,7 +518,7 @@ pub async fn stream_get_text(
 /// * Stream data as requested
 pub async fn stream_get_html(
     ctx: &dyn RequestContext,
-    id: crate::types::id::ObjectId,
+    id: crate::types::id::PinnedObjectId,
 ) -> Result<Vec<u8>, Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id".replace(":id", &id.to_string());
     let mut headers = HeaderMap::new();
@@ -761,6 +761,84 @@ pub async fn create_table(
         .post(&path, body, "application/octet-stream", None, None)
         .await?;
     crate::types::ObjectId::from_fbs_bytes(res.as_slice()).map_err(Error::from)
+}
+
+/// Evaluate the resulting schema of a query, returning an empty Arrow record batch
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+/// * `query` - The query to execute
+///
+/// Returns
+/// * The result of the query
+pub async fn schema_arrow(
+    ctx: &dyn RequestContext,
+    query: Query,
+) -> Result<Vec<arrow::record_batch::RecordBatch>, Error> {
+    let path = "/v1/api/ulv2/datacatalog/query/schema";
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        HeaderName::from_static("accept"),
+        HeaderValue::from_static("application/vnd.apache.arrow.stream"),
+    );
+
+    let body = Bytes::from(query.to_fbs_bytes());
+    let res = ctx
+        .post(&path, body, "application/octet-stream", None, Some(headers))
+        .await?;
+    read_arrow_ipc(&res)
+}
+
+/// Evaluate the resulting schema of a query, returning the raw, unparsed binary record batch
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+/// * `query` - The query to execute
+///
+/// Returns
+/// * The result of the query
+pub async fn schema_raw(ctx: &dyn RequestContext, query: Query) -> Result<Vec<u8>, Error> {
+    let path = "/v1/api/ulv2/datacatalog/query/schema";
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        HeaderName::from_static("accept"),
+        HeaderValue::from_static("application/vnd.apache.arrow.stream"),
+    );
+
+    let body = Bytes::from(query.to_fbs_bytes());
+    let res = ctx
+        .post(&path, body, "application/octet-stream", None, Some(headers))
+        .await?;
+    Ok(res)
+}
+
+/// Evaluate the resulting Arrow schema of a query, returning it as a parsed Schema (reliable even for a 0-row result)
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+/// * `query` - The query to execute
+///
+/// Returns
+/// * The result of the query
+pub async fn schema_only(
+    ctx: &dyn RequestContext,
+    query: Query,
+) -> Result<arrow::datatypes::SchemaRef, Error> {
+    let path = "/v1/api/ulv2/datacatalog/query/schema";
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        HeaderName::from_static("accept"),
+        HeaderValue::from_static("application/vnd.apache.arrow.stream"),
+    );
+
+    let body = Bytes::from(query.to_fbs_bytes());
+    let res = ctx
+        .post(&path, body, "application/octet-stream", None, Some(headers))
+        .await?;
+    read_arrow_schema(&res)
 }
 
 /// Query the datacatalog, returning data in Apache Arrow IPC Stream format
@@ -1530,8 +1608,8 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
 
         for i in 0..5 {
-            let p0 =
-                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p0 = crate::types::PinnedObjectId::from_str("00000000-0000-0000-0000-000000000000")
+                .unwrap();
             let (expected, expected_bytes) = crate::make_test_batches();
             ctx.set_response(expected_bytes.clone());
             let result = stream_get_arrow(&ctx, p0).await;
@@ -1567,8 +1645,8 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
 
         for i in 0..5 {
-            let p0 =
-                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p0 = crate::types::PinnedObjectId::from_str("00000000-0000-0000-0000-000000000000")
+                .unwrap();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let expected_bytes = expected.clone();
             ctx.set_response(expected_bytes.clone());
@@ -1606,8 +1684,8 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
 
         for i in 0..5 {
-            let p0 =
-                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p0 = crate::types::PinnedObjectId::from_str("00000000-0000-0000-0000-000000000000")
+                .unwrap();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let expected_bytes = expected.clone();
             ctx.set_response(expected_bytes.clone());
@@ -1645,8 +1723,8 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
 
         for i in 0..5 {
-            let p0 =
-                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p0 = crate::types::PinnedObjectId::from_str("00000000-0000-0000-0000-000000000000")
+                .unwrap();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let expected_bytes = expected.clone();
             ctx.set_response(expected_bytes.clone());
@@ -1684,8 +1762,8 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
 
         for i in 0..5 {
-            let p0 =
-                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p0 = crate::types::PinnedObjectId::from_str("00000000-0000-0000-0000-000000000000")
+                .unwrap();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let expected_bytes = expected.clone();
             ctx.set_response(expected_bytes.clone());
@@ -1723,8 +1801,8 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
 
         for i in 0..5 {
-            let p0 =
-                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p0 = crate::types::PinnedObjectId::from_str("00000000-0000-0000-0000-000000000000")
+                .unwrap();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let expected_bytes = expected.clone();
             ctx.set_response(expected_bytes.clone());
@@ -1762,8 +1840,8 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
 
         for i in 0..5 {
-            let p0 =
-                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p0 = crate::types::PinnedObjectId::from_str("00000000-0000-0000-0000-000000000000")
+                .unwrap();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let expected_bytes = expected.clone();
             ctx.set_response(expected_bytes.clone());
@@ -2189,6 +2267,116 @@ mod tests {
                 }
             };
             assert_eq!(result, expected);
+            break;
+        }
+    }
+
+    #[tokio::test]
+    async fn test_schema_arrow() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+
+        for i in 0..5 {
+            let body = crate::types::Query::default();
+            let (expected, expected_bytes) = crate::make_test_batches();
+            ctx.set_response(expected_bytes.clone());
+            let result = schema_arrow(&ctx, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            break;
+        }
+    }
+
+    #[tokio::test]
+    async fn test_schema_raw() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+
+        for i in 0..5 {
+            let body = crate::types::Query::default();
+            let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            let expected_bytes = expected.clone();
+            ctx.set_response(expected_bytes.clone());
+            let result = schema_raw(&ctx, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
+    }
+
+    #[tokio::test]
+    async fn test_schema_only() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+
+        for i in 0..5 {
+            let body = crate::types::Query::default();
+            let (expected, expected_bytes) = crate::make_test_batches();
+            ctx.set_response(expected_bytes.clone());
+            let result = schema_only(&ctx, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
             break;
         }
     }

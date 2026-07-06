@@ -98,6 +98,7 @@ from .id import (
     GraphNodeId,
     ObjectId,
     ObjectNamespace,
+    PinnedObjectId,
     StreamId,
 )
 from .value import (
@@ -205,6 +206,7 @@ from .generated.OnConflict import OnConflict as FbsOnConflict
 from .generated.OrderBy import OrderBy as FbsOrderBy
 from .generated.OrderByExpr import OrderByExpr as FbsOrderByExpr
 from .generated.Partition import Partition as FbsPartition
+from .generated.PinnedObjectId import PinnedObjectId as FbsPinnedObjectId
 from .generated.Placeholder import Placeholder as FbsPlaceholder
 from .generated.Point import Point as FbsPoint
 from .generated.Point2D import Point2D as FbsPoint2D
@@ -223,6 +225,7 @@ from .generated.TableOrderBy import TableOrderBy as FbsTableOrderBy
 from .generated.TableSource import TableSource as FbsTableSource
 from .generated.TableSourceInstance import TableSourceInstance as FbsTableSourceInstance
 from .generated.Time import Time as FbsTime
+from .generated.TimeSeries import TimeSeries as FbsTimeSeries
 from .generated.Timestamp import Timestamp as FbsTimestamp
 from .generated.Tri2D import Tri2D as FbsTri2D
 from .generated.UnaryQueryElement import UnaryQueryElement as FbsUnaryQueryElement
@@ -2747,6 +2750,132 @@ class Values:
         return eq
 
 @dataclass
+class TimeSeries:
+    """ Synthetic timestamp series used to fill empty time buckets in metric queries.
+     Emits one row per bucket between `start_ms` and `end_ms`
+     (inclusive) at `interval_ms` spacing, in a single column named `output_column`.
+     All bounds are UTC unix milliseconds - to align with the
+     time_bucket UDF, callers should pass values that are already snapped to a
+     bucket boundary in the desired zone.
+     Timezone-aware generation is not yet supported.
+
+     If `infer_bounds` is true, `start_ms` and `end_ms` are ignored and the
+     catalog planner resolves them from the WHERE filter of whichever source
+     this series is LEFT JOINed against. The joined source must produce the
+     join column via `time_bucket(width, ts)` or
+     `date_trunc(unit, [at_timezone(]ts[, tz)])` and have a closed range
+     filter on `ts`; otherwise planning errors.
+
+     Exactly one of `interval_ms` / `interval_months` is non-zero (or both
+     zero when `infer_bounds=true` — the planner fills in whichever flavour
+     the joined source's bucket function dictates). `interval_months` is the
+     calendar-month count used to step the synthetic series; years are
+     represented as 12N months.
+
+     `tz` is the IANA timezone name (e.g. `"America/Los_Angeles"`) used to
+     floor bounds and step the series in local calendar time. Empty means
+     UTC. This is only set when the joined source's bucket expression wraps
+     the timestamp in `at_timezone(ts, '<tz>')` — bare `date_trunc(unit, ts)`
+     stays UTC. When `tz` is non-empty, the catalog emits the series as a
+     precomputed VALUES list rather than a DataFusion `generate_series` call
+     so the local-calendar boundaries (including DST transitions) are
+     authoritative at plan time.
+    """
+
+    end_ms: "int"
+
+    infer_bounds: "bool"
+
+    interval_months: "int"
+
+    interval_ms: "int"
+
+    output_column: "str"
+
+    start_ms: "int"
+
+    tz: Optional["str"]
+
+    @classmethod
+    def from_fbs(cls, o: FbsTimeSeries) -> Self:
+        end_ms = o.EndMs()
+        infer_bounds = o.InferBounds()
+        interval_months = o.IntervalMonths()
+        interval_ms = o.IntervalMs()
+        output_column_str = o.OutputColumn()
+        assert output_column_str is not None
+        output_column = output_column_str.decode('utf-8')
+        start_ms = o.StartMs()
+        tz = None
+        tz_str = o.Tz()
+        if tz_str is not None:
+            tz = tz_str.decode('utf-8')
+        return cls(end_ms, infer_bounds, interval_months, interval_ms, output_column, start_ms, tz)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsTimeSeries.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.TimeSeries import (
+            Start,
+            AddEndMs,
+            AddInferBounds,
+            AddIntervalMonths,
+            AddIntervalMs,
+            AddOutputColumn,
+            AddStartMs,
+            AddTz,
+            End,
+        )
+        output_column_offset = builder.CreateString(self.output_column)
+        tz_offset = None
+        if self.tz is not None:
+            tz_offset = builder.CreateString(self.tz)
+
+        Start(builder)
+        AddEndMs(builder, self.end_ms)
+        AddInferBounds(builder, self.infer_bounds)
+        AddIntervalMonths(builder, self.interval_months)
+        AddIntervalMs(builder, self.interval_ms)
+        AddOutputColumn(builder, output_column_offset)
+        AddStartMs(builder, self.start_ms)
+        if tz_offset is not None:
+            AddTz(builder, tz_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        end_ms = 0
+        infer_bounds = False
+        interval_months = 0
+        interval_ms = 0
+        output_column = ""
+        start_ms = 0
+        tz = ""
+        return cls(end_ms, infer_bounds, interval_months, interval_ms, output_column, start_ms, tz)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.end_ms == other.end_ms
+        eq = eq and self.infer_bounds == other.infer_bounds
+        eq = eq and self.interval_months == other.interval_months
+        eq = eq and self.interval_ms == other.interval_ms
+        eq = eq and self.output_column == other.output_column
+        eq = eq and self.start_ms == other.start_ms
+        eq = eq and self.tz == other.tz
+
+        return eq
+
+@dataclass
 class TableSourceUnion:
     value: Union[
         "DataCatalog",
@@ -2757,6 +2886,7 @@ class TableSourceUnion:
         "Placeholder",
         "Drive",
         "Values",
+        "TimeSeries",
     ]
 
     def serialize_to(self, builder: Builder) -> Tuple[int, int]:
@@ -2778,6 +2908,8 @@ class TableSourceUnion:
             return (offset, TableSourceUnion().Drive)
         elif isinstance(self.value, Values):
             return (offset, TableSourceUnion().Values)
+        elif isinstance(self.value, TimeSeries):
+            return (offset, TableSourceUnion().TimeSeries)
         raise ValueError("Invalid union type")
 
     @classmethod
@@ -2818,6 +2950,10 @@ class TableSourceUnion:
             val = FbsValues();
             val.Init(source, pos)
             return cls(Values.from_fbs(val))
+        elif ty == TableSourceUnion_ty_instance.TimeSeries:
+            val = FbsTimeSeries();
+            val.Init(source, pos)
+            return cls(TimeSeries.from_fbs(val))
         else:
             raise ValueError("Invalid union type")
 

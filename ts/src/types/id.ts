@@ -11,6 +11,7 @@ import { DataStateId as FbsDataStateId, DataStateIdT as FbsDataStateIdT } from '
 import { GenericId as FbsGenericId, GenericIdT as FbsGenericIdT } from './generated/generic-id';
 import { GraphNodeId as FbsGraphNodeId, GraphNodeIdT as FbsGraphNodeIdT } from './generated/graph-node-id';
 import { ObjectId as FbsObjectId, ObjectIdT as FbsObjectIdT } from './generated/object-id';
+import { PinnedObjectId as FbsPinnedObjectId, PinnedObjectIdT as FbsPinnedObjectIdT } from './generated/pinned-object-id';
 import { StreamId as FbsStreamId, StreamIdT as FbsStreamIdT } from './generated/stream-id';
 
 export { ObjectNamespace } from './generated/object-namespace';
@@ -454,6 +455,88 @@ export class ObjectId {
   toFbsT(): FbsObjectIdT {
     const t = new FbsObjectIdT();
     t.b = this._b;
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+
+  static fromUuid(uuid: string): ReturnType<typeof Object.create> {
+    const hex = uuid.replace(/-/g, '');
+    const b: number[] = [];
+    for (let i = 0; i < hex.length; i += 2) {
+      b.push(parseInt(hex.substring(i, i + 2), 16));
+    }
+    const instance = new (this as any)();
+    instance._b = b;
+    return instance;
+  }
+
+  toUuid(): string {
+    const hex = (this as any)._b.map((byte: number) => byte.toString(16).padStart(2, '0')).join('');
+    return [
+      hex.substring(0, 8),
+      hex.substring(8, 12),
+      hex.substring(12, 16),
+      hex.substring(16, 20),
+      hex.substring(20, 32),
+    ].join('-');
+  }
+
+  toString(): string {
+    return this.toUuid();
+  }
+}
+
+export class PinnedObjectId {
+  private _b!: number[];
+
+  private _cid!: ContentId | null;
+
+  constructor(arg?: FbsPinnedObjectId | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsPinnedObjectId.getSizePrefixedRootAsPinnedObjectId(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsPinnedObjectId) {
+      this._initFromFbs(arg);
+    } else {
+      this._b = [];
+      this._cid = null;
+    }
+  }
+
+  private _initFromFbs(fbs: FbsPinnedObjectId): void {
+    const bArr = fbs.bArray();
+    this._b = bArr ? Array.from(bArr) : [];
+    const cidVal = fbs.cid();
+    this._cid = cidVal ? new ContentId(cidVal) : null;
+  }
+
+  get b(): number[] {
+    return this._b;
+  }
+
+  set b(value: number[]) {
+    this._b = value;
+  }
+
+  get cid(): ContentId | null {
+    return this._cid;
+  }
+
+  set cid(value: ContentId | null) {
+    this._cid = value;
+  }
+
+  toFbsT(): FbsPinnedObjectIdT {
+    const t = new FbsPinnedObjectIdT();
+    t.b = this._b;
+    t.cid = this._cid ? this._cid.toFbsT() : null;
     return t;
   }
 

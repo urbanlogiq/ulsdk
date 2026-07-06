@@ -19,6 +19,9 @@ struct ObjectIdBuilder;
 struct ContentId;
 struct ContentIdBuilder;
 
+struct PinnedObjectId;
+struct PinnedObjectIdBuilder;
+
 struct B2cId;
 struct B2cIdBuilder;
 
@@ -192,6 +195,77 @@ inline ::flatbuffers::Offset<ContentId> CreateContentIdDirect(
   return CreateContentId(
       _fbb,
       b__);
+}
+
+struct PinnedObjectId FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef PinnedObjectIdBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_B = 4,
+    VT_CID = 6
+  };
+  const ::flatbuffers::Vector<uint8_t> *b() const {
+    return GetPointer<const ::flatbuffers::Vector<uint8_t> *>(VT_B);
+  }
+  const ContentId *cid() const {
+    return GetPointer<const ContentId *>(VT_CID);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_B) &&
+           verifier.VerifyVector(b()) &&
+           VerifyOffset(verifier, VT_CID) &&
+           verifier.VerifyTable(cid()) &&
+           verifier.EndTable();
+  }
+};
+
+struct PinnedObjectIdBuilder {
+  typedef PinnedObjectId Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_b(::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> b) {
+    fbb_.AddOffset(PinnedObjectId::VT_B, b);
+  }
+  void add_cid(::flatbuffers::Offset<ContentId> cid) {
+    fbb_.AddOffset(PinnedObjectId::VT_CID, cid);
+  }
+  explicit PinnedObjectIdBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<PinnedObjectId> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<PinnedObjectId>(end);
+    fbb_.Required(o, PinnedObjectId::VT_B);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<PinnedObjectId> CreatePinnedObjectId(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> b = 0,
+    ::flatbuffers::Offset<ContentId> cid = 0) {
+  PinnedObjectIdBuilder builder_(_fbb);
+  builder_.add_cid(cid);
+  builder_.add_b(b);
+  return builder_.Finish();
+}
+
+struct PinnedObjectId::Traits {
+  using type = PinnedObjectId;
+  static auto constexpr Create = CreatePinnedObjectId;
+};
+
+inline ::flatbuffers::Offset<PinnedObjectId> CreatePinnedObjectIdDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<uint8_t> *b = nullptr,
+    ::flatbuffers::Offset<ContentId> cid = 0) {
+  auto b__ = b ? _fbb.CreateVector<uint8_t>(*b) : 0;
+  return CreatePinnedObjectId(
+      _fbb,
+      b__,
+      cid);
 }
 
 struct B2cId FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

@@ -6,8 +6,16 @@
 pub mod api;
 pub mod generated;
 pub use crate::types::api::*;
+pub mod File;
+pub use crate::types::File::*;
+pub mod Message;
+pub use crate::types::Message::*;
 pub mod Schema;
 pub use crate::types::Schema::*;
+pub mod SparseTensor;
+pub use crate::types::SparseTensor::*;
+pub mod Tensor;
+pub use crate::types::Tensor::*;
 pub mod attr;
 pub use crate::types::attr::*;
 pub mod crypto;

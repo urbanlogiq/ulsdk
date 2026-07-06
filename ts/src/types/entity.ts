@@ -14,7 +14,7 @@ import { MultiPolygon as FbsMultiPolygon, MultiPolygonT as FbsMultiPolygonT } fr
 import { Point as FbsPoint, PointT as FbsPointT } from './generated/point';
 import { Polygon as FbsPolygon, PolygonT as FbsPolygonT } from './generated/polygon';
 
-import { B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId, ObjectNamespace, StreamId } from './id';
+import { B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId, ObjectNamespace, PinnedObjectId, StreamId } from './id';
 import { B2cId as FbsB2cId } from './generated/b2c-id';
 import { ColumnGroupId as FbsColumnGroupId } from './generated/column-group-id';
 import { ContentId as FbsContentId } from './generated/content-id';
@@ -23,6 +23,7 @@ import { GenericId as FbsGenericId } from './generated/generic-id';
 import { GraphNodeId as FbsGraphNodeId } from './generated/graph-node-id';
 import { ObjectId as FbsObjectId } from './generated/object-id';
 import { ObjectNamespace as FbsObjectNamespace } from './generated/object-namespace';
+import { PinnedObjectId as FbsPinnedObjectId } from './generated/pinned-object-id';
 import { StreamId as FbsStreamId } from './generated/stream-id';
 
 export { EdgeTy } from './generated/edge-ty';

@@ -70,7 +70,7 @@ import { Source as FbsSource } from './generated/source';
 import { StatisticTy as FbsStatisticTy } from './generated/statistic-ty';
 import { TimeGranularity as FbsTimeGranularity } from './generated/time-granularity';
 import { TurnTy as FbsTurnTy } from './generated/turn-ty';
-import { B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId, ObjectNamespace, StreamId } from './id';
+import { B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId, ObjectNamespace, PinnedObjectId, StreamId } from './id';
 import { B2cId as FbsB2cId } from './generated/b2c-id';
 import { ColumnGroupId as FbsColumnGroupId } from './generated/column-group-id';
 import { ContentId as FbsContentId } from './generated/content-id';
@@ -79,6 +79,7 @@ import { GenericId as FbsGenericId } from './generated/generic-id';
 import { GraphNodeId as FbsGraphNodeId } from './generated/graph-node-id';
 import { ObjectId as FbsObjectId } from './generated/object-id';
 import { ObjectNamespace as FbsObjectNamespace } from './generated/object-namespace';
+import { PinnedObjectId as FbsPinnedObjectId } from './generated/pinned-object-id';
 import { StreamId as FbsStreamId } from './generated/stream-id';
 import { DeprecatedRunSpec, DeprecatedTaskParameter, Edge, EmbeddedTable, Job, Node, ParamIndices, RunSpec, Schematic, Status, Task, TaskErrorTy, TaskList, TaskParameter, TaskParameterValue, TaskPriority, TaskRunFlags } from './job';
 import { DeprecatedRunSpec as FbsDeprecatedRunSpec } from './generated/deprecated-run-spec';
@@ -135,13 +136,17 @@ import { VUsize as FbsVUsize } from './generated/vusize';
 import { Value as FbsValue } from './generated/value';
 import { ValueInstance as FbsValueInstance } from './generated/value-instance';
 import { ValueTy as FbsValueTy } from './generated/value-ty';
-import { AggregationTy, ByteArray, ChartTypeTy, Layout, ParameterFlags, ParameterValue, TileData, TileSettings, UserSettings, ValuesFormatTy, WorkLog, WorklogParameter } from './worklog';
+import { AggregationTy, ByteArray, ChartTypeTy, ContainerRef, GitRef, Layout, ParameterFlags, ParameterValue, Producer, ProducerRef, TileData, TileSettings, UserSettings, ValuesFormatTy, WorkLog, WorklogParameter } from './worklog';
 import { AggregationTy as FbsAggregationTy } from './generated/aggregation-ty';
 import { ByteArray as FbsByteArray } from './generated/byte-array';
 import { ChartTypeTy as FbsChartTypeTy } from './generated/chart-type-ty';
+import { ContainerRef as FbsContainerRef } from './generated/container-ref';
+import { GitRef as FbsGitRef } from './generated/git-ref';
 import { Layout as FbsLayout } from './generated/layout';
 import { ParameterFlags as FbsParameterFlags } from './generated/parameter-flags';
 import { ParameterValue as FbsParameterValue } from './generated/parameter-value';
+import { Producer as FbsProducer } from './generated/producer';
+import { ProducerRef as FbsProducerRef } from './generated/producer-ref';
 import { TileData as FbsTileData } from './generated/tile-data';
 import { TileSettings as FbsTileSettings } from './generated/tile-settings';
 import { UserSettings as FbsUserSettings } from './generated/user-settings';
@@ -533,8 +538,6 @@ export class ObjectIdPairList {
 export class ObjectSummary {
   private _acl!: ObjectId | null;
 
-  private _driveSize!: bigint;
-
   private _headRevision!: ContentId;
 
   private _id!: ObjectId;
@@ -552,7 +555,6 @@ export class ObjectSummary {
       this._initFromFbs(arg);
     } else {
       this._acl = null;
-      this._driveSize = BigInt(0);
       this._headRevision = new ContentId();
       this._id = new ObjectId();
       this._time = BigInt(0);
@@ -563,7 +565,6 @@ export class ObjectSummary {
   private _initFromFbs(fbs: FbsObjectSummary): void {
     const aclVal = fbs.acl();
     this._acl = aclVal ? new ObjectId(aclVal) : null;
-    this._driveSize = fbs.driveSize();
     const headRevisionVal = fbs.headRevision();
     this._headRevision = headRevisionVal ? new ContentId(headRevisionVal) : new ContentId();
     const idVal = fbs.id();
@@ -578,14 +579,6 @@ export class ObjectSummary {
 
   set acl(value: ObjectId | null) {
     this._acl = value;
-  }
-
-  get driveSize(): bigint {
-    return this._driveSize;
-  }
-
-  set driveSize(value: bigint) {
-    this._driveSize = value;
   }
 
   get headRevision(): ContentId {
@@ -623,7 +616,6 @@ export class ObjectSummary {
   toFbsT(): FbsObjectSummaryT {
     const t = new FbsObjectSummaryT();
     t.acl = this._acl ? this._acl.toFbsT() : null;
-    t.driveSize = this._driveSize;
     t.headRevision = this._headRevision.toFbsT();
     t.id = this._id.toFbsT();
     t.time = this._time;

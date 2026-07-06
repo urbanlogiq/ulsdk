@@ -254,6 +254,7 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const IntRange &o) {
     if (field_format_offset.has_value()) {
         instance_builder.add_field_format(field_format_offset.value());
     }
+    instance_builder.add_is_bitmask_enum(o.is_bitmask_enum_);
     instance_builder.add_max(o.max_);
     instance_builder.add_min(o.min_);
     return instance_builder.Finish();
@@ -272,6 +273,7 @@ IntRange::IntRange()
     , display_strings_(std::nullopt)
     , enum_name_(std::nullopt)
     , field_format_(std::nullopt)
+    , is_bitmask_enum_(false)
     , max_(0)
     , min_(0) {
 }
@@ -285,6 +287,7 @@ IntRange::IntRange(const ::IntRange *root)
     , display_strings_(std::nullopt)
     , enum_name_(std::nullopt)
     , field_format_(std::nullopt)
+    , is_bitmask_enum_(false)
     , max_(0)
     , min_(0) {
     if (root == nullptr) {
@@ -307,6 +310,7 @@ IntRange::IntRange(const ::IntRange *root)
     if (root->field_format() != nullptr) {
         field_format_ = decltype(field_format_)(root->field_format());
     }
+    is_bitmask_enum_ = root->is_bitmask_enum();
     max_ = root->max();
     min_ = root->min();
 }
@@ -323,6 +327,9 @@ IntRange::operator==(const IntRange &rhs) const {
         return false;
     }
     if (this->field_format_ != rhs.field_format_) {
+        return false;
+    }
+    if (this->is_bitmask_enum_ != rhs.is_bitmask_enum_) {
         return false;
     }
     if (this->max_ != rhs.max_) {
@@ -1887,6 +1894,11 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Metadata &o) {
         const std::pair<::flatbuffers::Offset<void>, ::GeometrySource> geometry_source_offset_val = serialize_to(builder, o.geometry_source_.value());
         geometry_source_offset = std::make_optional(geometry_source_offset_val);
     }
+    std::optional<decltype(builder.CreateVector(o.promoted_metrics_.value()))> promoted_metrics_offset = std::nullopt;
+    if (o.promoted_metrics_.has_value()) {
+        const decltype(builder.CreateVector(o.promoted_metrics_.value())) promoted_metrics_offset_val = builder.CreateVector(o.promoted_metrics_.value());
+        promoted_metrics_offset = std::make_optional(promoted_metrics_offset_val);
+    }
     std::optional<::flatbuffers::Offset<::DatasetSource>> source_offset = std::nullopt;
     if (o.source_.has_value()) {
         const ::flatbuffers::Offset<::DatasetSource> source_offset_val = serialize_to(builder, o.source_.value());
@@ -1896,6 +1908,11 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Metadata &o) {
     if (o.summary_.has_value()) {
         const decltype(builder.CreateVector(o.summary_.value())) summary_offset_val = builder.CreateVector(o.summary_.value());
         summary_offset = std::make_optional(summary_offset_val);
+    }
+    std::optional<decltype(builder.CreateVector(o.visualize_in_explore_fields_.value()))> visualize_in_explore_fields_offset = std::nullopt;
+    if (o.visualize_in_explore_fields_.has_value()) {
+        const decltype(builder.CreateVector(o.visualize_in_explore_fields_.value())) visualize_in_explore_fields_offset_val = builder.CreateVector(o.visualize_in_explore_fields_.value());
+        visualize_in_explore_fields_offset = std::make_optional(visualize_in_explore_fields_offset_val);
     }
 
     ::MetadataBuilder instance_builder = ::MetadataBuilder(builder);
@@ -1921,6 +1938,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Metadata &o) {
         instance_builder.add_geometry_source_type(geometry_source_opt.second);
     }
     instance_builder.add_location_description_field(o.location_description_field_);
+    if (promoted_metrics_offset.has_value()) {
+        instance_builder.add_promoted_metrics(promoted_metrics_offset.value());
+    }
     if (source_offset.has_value()) {
         instance_builder.add_source(source_offset.value());
     }
@@ -1928,6 +1948,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Metadata &o) {
         instance_builder.add_summary(summary_offset.value());
     }
     instance_builder.add_update_cadence(o.update_cadence_);
+    if (visualize_in_explore_fields_offset.has_value()) {
+        instance_builder.add_visualize_in_explore_fields(visualize_in_explore_fields_offset.value());
+    }
     return instance_builder.Finish();
 }
 
@@ -1950,9 +1973,11 @@ Metadata::Metadata()
     , fields_(std::nullopt)
     , geometry_source_(std::nullopt)
     , location_description_field_(-1)
+    , promoted_metrics_(std::nullopt)
     , source_(std::nullopt)
     , summary_(std::nullopt)
-    , update_cadence_(UpdateCadence(0)) {
+    , update_cadence_(UpdateCadence(0))
+    , visualize_in_explore_fields_(std::nullopt) {
 }
 
 Metadata::Metadata(const std::vector<uint8_t> &bytes)
@@ -1970,9 +1995,11 @@ Metadata::Metadata(const ::Metadata *root)
     , fields_(std::nullopt)
     , geometry_source_(std::nullopt)
     , location_description_field_(-1)
+    , promoted_metrics_(std::nullopt)
     , source_(std::nullopt)
     , summary_(std::nullopt)
-    , update_cadence_(UpdateCadence(0)) {
+    , update_cadence_(UpdateCadence(0))
+    , visualize_in_explore_fields_(std::nullopt) {
     if (root == nullptr) {
         throw std::runtime_error("cannot deserialize flatbuffer type");
     }
@@ -2030,6 +2057,12 @@ Metadata::Metadata(const ::Metadata *root)
         }
     }
     location_description_field_ = root->location_description_field();
+    const auto &promoted_metrics_vector = root->promoted_metrics();
+    if (promoted_metrics_vector != nullptr) {
+        decltype(promoted_metrics_)::value_type promoted_metrics__target = decltype(promoted_metrics_)::value_type();
+        std::copy(promoted_metrics_vector->begin(), promoted_metrics_vector->end(), std::back_inserter(promoted_metrics__target));
+        promoted_metrics_ = std::make_optional(promoted_metrics__target);
+    }
     if (root->source() != nullptr) {
         source_ = decltype(source_)(root->source());
     }
@@ -2040,6 +2073,12 @@ Metadata::Metadata(const ::Metadata *root)
         summary_ = std::make_optional(summary__target);
     }
     update_cadence_ = root->update_cadence();
+    const auto &visualize_in_explore_fields_vector = root->visualize_in_explore_fields();
+    if (visualize_in_explore_fields_vector != nullptr) {
+        decltype(visualize_in_explore_fields_)::value_type visualize_in_explore_fields__target = decltype(visualize_in_explore_fields_)::value_type();
+        std::copy(visualize_in_explore_fields_vector->begin(), visualize_in_explore_fields_vector->end(), std::back_inserter(visualize_in_explore_fields__target));
+        visualize_in_explore_fields_ = std::make_optional(visualize_in_explore_fields__target);
+    }
 }
 
 bool
@@ -2074,6 +2113,9 @@ Metadata::operator==(const Metadata &rhs) const {
     if (this->location_description_field_ != rhs.location_description_field_) {
         return false;
     }
+    if (this->promoted_metrics_ != rhs.promoted_metrics_) {
+        return false;
+    }
     if (this->source_ != rhs.source_) {
         return false;
     }
@@ -2081,6 +2123,9 @@ Metadata::operator==(const Metadata &rhs) const {
         return false;
     }
     if (this->update_cadence_ != rhs.update_cadence_) {
+        return false;
+    }
+    if (this->visualize_in_explore_fields_ != rhs.visualize_in_explore_fields_) {
         return false;
     }
     return true;

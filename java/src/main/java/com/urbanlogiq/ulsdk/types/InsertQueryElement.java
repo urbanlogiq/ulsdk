@@ -85,6 +85,10 @@ public final class InsertQueryElement {
             com.google.flatbuffers.Table destFbsTable = o.dest(new com.urbanlogiq.ulsdk.types.generated.Values());
             com.urbanlogiq.ulsdk.types.generated.Values destFbsValue = (com.urbanlogiq.ulsdk.types.generated.Values)destFbsTable;
             destValue = new com.urbanlogiq.ulsdk.types.Values(destFbsValue);
+        } else if (destTy == com.urbanlogiq.ulsdk.types.generated.TableSourceUnion.TimeSeries) {
+            com.google.flatbuffers.Table destFbsTable = o.dest(new com.urbanlogiq.ulsdk.types.generated.TimeSeries());
+            com.urbanlogiq.ulsdk.types.generated.TimeSeries destFbsValue = (com.urbanlogiq.ulsdk.types.generated.TimeSeries)destFbsTable;
+            destValue = new com.urbanlogiq.ulsdk.types.TimeSeries(destFbsValue);
         }
         if (destValue != null) {
             this._dest = new com.urbanlogiq.ulsdk.types.TableSourceUnion(destValue);

@@ -280,4 +280,5 @@ public final class EntityTy {
     public static final int T_HEXAGON_BOUNDARY = com.urbanlogiq.ulsdk.types.generated.EntityTy.T_HEXAGON_BOUNDARY;
     public static final int T_COMPASS_IOT_POINT = com.urbanlogiq.ulsdk.types.generated.EntityTy.T_COMPASS_IOT_POINT;
     public static final int T_LANDSLIDE_AREA = com.urbanlogiq.ulsdk.types.generated.EntityTy.T_LANDSLIDE_AREA;
+    public static final int T_EXPLORE_MODE_ROAD_SEGMENT = com.urbanlogiq.ulsdk.types.generated.EntityTy.T_EXPLORE_MODE_ROAD_SEGMENT;
 }

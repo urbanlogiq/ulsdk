@@ -39,6 +39,7 @@ from .id import (
     GraphNodeId,
     ObjectId,
     ObjectNamespace,
+    PinnedObjectId,
     StreamId,
 )
 from .generated.B2cId import B2cId as FbsB2cId
@@ -63,6 +64,7 @@ from .generated.NodeList import NodeList as FbsNodeList
 from .generated.NodeQuery import NodeQuery as FbsNodeQuery
 from .generated.ObjectId import ObjectId as FbsObjectId
 from .generated.OrderBy import OrderBy as FbsOrderBy
+from .generated.PinnedObjectId import PinnedObjectId as FbsPinnedObjectId
 from .generated.Point import Point as FbsPoint
 from .generated.Polygon import Polygon as FbsPolygon
 from .generated.Projection import Projection as FbsProjection

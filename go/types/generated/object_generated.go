@@ -524,18 +524,6 @@ func (rcv *ObjectSummary) Acl(obj *ObjectId) *ObjectId {
 	return nil
 }
 
-func (rcv *ObjectSummary) DriveSize() uint64 {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(14))
-	if o != 0 {
-		return rcv._tab.GetUint64(o + rcv._tab.Pos)
-	}
-	return 0
-}
-
-func (rcv *ObjectSummary) MutateDriveSize(n uint64) bool {
-	return rcv._tab.MutateUint64Slot(14, n)
-}
-
 func ObjectSummaryStart(builder *flatbuffers.Builder) {
 	builder.StartObject(6)
 }
@@ -553,9 +541,6 @@ func ObjectSummaryAddTime(builder *flatbuffers.Builder, time uint64) {
 }
 func ObjectSummaryAddAcl(builder *flatbuffers.Builder, acl flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(4, flatbuffers.UOffsetT(acl), 0)
-}
-func ObjectSummaryAddDriveSize(builder *flatbuffers.Builder, driveSize uint64) {
-	builder.PrependUint64Slot(5, driveSize, 0)
 }
 func ObjectSummaryEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()

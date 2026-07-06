@@ -8,7 +8,7 @@ project("ulsdk" VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} LANGU
 
 include(GNUInstallDirs)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBCURL REQUIRED libcurl)
@@ -19,7 +19,7 @@ pkg_check_modules(LIBARROW REQUIRED arrow)
 file(GLOB_RECURSE sources cpp/src/**/*.cpp cpp/src/*.cpp)
 add_library(ulsdk STATIC ${sources})
 
-set_property(TARGET ulsdk PROPERTY CXX_STANDARD 17)
+set_property(TARGET ulsdk PROPERTY CXX_STANDARD 20)
 
 target_include_directories(ulsdk
     PRIVATE
@@ -59,7 +59,7 @@ install(TARGETS ulsdk
 
 file(GLOB_RECURSE test_sources cpp/test/**/*.cpp cpp/test/*.cpp)
 add_executable(testulsdk ${test_sources})
-set_property(TARGET testulsdk PROPERTY CXX_STANDARD 17)
+set_property(TARGET testulsdk PROPERTY CXX_STANDARD 20)
 target_link_directories(testulsdk
     PRIVATE
         ${LIBCURL_LIBRARY_DIRS}

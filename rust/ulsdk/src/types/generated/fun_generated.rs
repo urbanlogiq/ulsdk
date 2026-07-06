@@ -40,7 +40,7 @@ pub const ENUM_MAX_FN: i16 = 32766;
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_FN: [Fn; 200] = [
+pub const ENUM_VALUES_FN: [Fn; 202] = [
     Fn::None,
     Fn::True,
     Fn::False,
@@ -237,6 +237,8 @@ pub const ENUM_VALUES_FN: [Fn; 200] = [
     Fn::IsDistinctFrom,
     Fn::IsNotDistinctFrom,
     Fn::GeoFilter,
+    Fn::StBuffer,
+    Fn::StDistance,
     Fn::CorrelationId,
     Fn::UlTimezone,
     Fn::UlArrayContains,
@@ -444,6 +446,8 @@ impl Fn {
     pub const IsDistinctFrom: Self = Self(193);
     pub const IsNotDistinctFrom: Self = Self(194);
     pub const GeoFilter: Self = Self(195);
+    pub const StBuffer: Self = Self(196);
+    pub const StDistance: Self = Self(197);
     pub const CorrelationId: Self = Self(32763);
     pub const UlTimezone: Self = Self(32764);
     pub const UlArrayContains: Self = Self(32765);
@@ -648,6 +652,8 @@ impl Fn {
         Self::IsDistinctFrom,
         Self::IsNotDistinctFrom,
         Self::GeoFilter,
+        Self::StBuffer,
+        Self::StDistance,
         Self::CorrelationId,
         Self::UlTimezone,
         Self::UlArrayContains,
@@ -852,6 +858,8 @@ impl Fn {
             Self::IsDistinctFrom => Some("IsDistinctFrom"),
             Self::IsNotDistinctFrom => Some("IsNotDistinctFrom"),
             Self::GeoFilter => Some("GeoFilter"),
+            Self::StBuffer => Some("StBuffer"),
+            Self::StDistance => Some("StDistance"),
             Self::CorrelationId => Some("CorrelationId"),
             Self::UlTimezone => Some("UlTimezone"),
             Self::UlArrayContains => Some("UlArrayContains"),

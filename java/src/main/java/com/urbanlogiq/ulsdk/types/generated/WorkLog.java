@@ -38,28 +38,28 @@ public final class WorkLog extends com.google.flatbuffers.Table {
   /**
    * Input streams and/or worklogs. These may be either work logs or streams.
    */
-  public ObjectId inputStreams(int j) { return inputStreams(new ObjectId(), j); }
-  public ObjectId inputStreams(ObjectId obj, int j) { int o = __offset(8); return o != 0 ? obj.__assign(__indirect(__vector(o) + j * 4), bb) : null; }
+  public PinnedObjectId inputStreams(int j) { return inputStreams(new PinnedObjectId(), j); }
+  public PinnedObjectId inputStreams(PinnedObjectId obj, int j) { int o = __offset(8); return o != 0 ? obj.__assign(__indirect(__vector(o) + j * 4), bb) : null; }
   public int inputStreamsLength() { int o = __offset(8); return o != 0 ? __vector_len(o) : 0; }
-  public ObjectId._Vector inputStreamsVector() { return inputStreamsVector(new ObjectId._Vector()); }
-  public ObjectId._Vector inputStreamsVector(ObjectId._Vector obj) { int o = __offset(8); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
+  public PinnedObjectId._Vector inputStreamsVector() { return inputStreamsVector(new PinnedObjectId._Vector()); }
+  public PinnedObjectId._Vector inputStreamsVector(PinnedObjectId._Vector obj) { int o = __offset(8); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
   /**
    * The schematic used behind creating the worklog. This may be empty/null
    * if we are just layering data, for example.
    */
-  public ObjectId schematic() { return schematic(new ObjectId()); }
-  public ObjectId schematic(ObjectId obj) { int o = __offset(10); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
+  public PinnedObjectId schematic() { return schematic(new PinnedObjectId()); }
+  public PinnedObjectId schematic(PinnedObjectId obj) { int o = __offset(10); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
   /**
    * The output_streams contain a list of Parquet documents that consist of
    * the results. These documents may expire (ie: if this is a temporary
    * step) so there should be enough information in the worklog necessary
    * to reconstruct these output streams.
    */
-  public ObjectId outputStreams(int j) { return outputStreams(new ObjectId(), j); }
-  public ObjectId outputStreams(ObjectId obj, int j) { int o = __offset(12); return o != 0 ? obj.__assign(__indirect(__vector(o) + j * 4), bb) : null; }
+  public PinnedObjectId outputStreams(int j) { return outputStreams(new PinnedObjectId(), j); }
+  public PinnedObjectId outputStreams(PinnedObjectId obj, int j) { int o = __offset(12); return o != 0 ? obj.__assign(__indirect(__vector(o) + j * 4), bb) : null; }
   public int outputStreamsLength() { int o = __offset(12); return o != 0 ? __vector_len(o) : 0; }
-  public ObjectId._Vector outputStreamsVector() { return outputStreamsVector(new ObjectId._Vector()); }
-  public ObjectId._Vector outputStreamsVector(ObjectId._Vector obj) { int o = __offset(12); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
+  public PinnedObjectId._Vector outputStreamsVector() { return outputStreamsVector(new PinnedObjectId._Vector()); }
+  public PinnedObjectId._Vector outputStreamsVector(PinnedObjectId._Vector obj) { int o = __offset(12); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
   /**
    * These are the serialized parameters passed into the task which created
    * this worklog.
@@ -85,6 +85,8 @@ public final class WorkLog extends com.google.flatbuffers.Table {
   public UserSettings userSettings(UserSettings obj) { int o = __offset(18); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
   public ObjectId jobId() { return jobId(new ObjectId()); }
   public ObjectId jobId(ObjectId obj) { int o = __offset(20); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
+  public Producer producer() { return producer(new Producer()); }
+  public Producer producer(Producer obj) { int o = __offset(22); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
 
   public static int createWorkLog(FlatBufferBuilder builder,
       int nameOffset,
@@ -94,8 +96,10 @@ public final class WorkLog extends com.google.flatbuffers.Table {
       int paramsOffset,
       int parentOffset,
       int userSettingsOffset,
-      int jobIdOffset) {
-    builder.startTable(9);
+      int jobIdOffset,
+      int producerOffset) {
+    builder.startTable(10);
+    WorkLog.addProducer(builder, producerOffset);
     WorkLog.addJobId(builder, jobIdOffset);
     WorkLog.addUserSettings(builder, userSettingsOffset);
     WorkLog.addParent(builder, parentOffset);
@@ -107,7 +111,7 @@ public final class WorkLog extends com.google.flatbuffers.Table {
     return WorkLog.endWorkLog(builder);
   }
 
-  public static void startWorkLog(FlatBufferBuilder builder) { builder.startTable(9); }
+  public static void startWorkLog(FlatBufferBuilder builder) { builder.startTable(10); }
   public static void addName(FlatBufferBuilder builder, int nameOffset) { builder.addOffset(0, nameOffset, 0); }
   public static void addInputStreams(FlatBufferBuilder builder, int inputStreamsOffset) { builder.addOffset(2, inputStreamsOffset, 0); }
   public static int createInputStreamsVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
@@ -122,6 +126,7 @@ public final class WorkLog extends com.google.flatbuffers.Table {
   public static void addParent(FlatBufferBuilder builder, int parentOffset) { builder.addOffset(6, parentOffset, 0); }
   public static void addUserSettings(FlatBufferBuilder builder, int userSettingsOffset) { builder.addOffset(7, userSettingsOffset, 0); }
   public static void addJobId(FlatBufferBuilder builder, int jobIdOffset) { builder.addOffset(8, jobIdOffset, 0); }
+  public static void addProducer(FlatBufferBuilder builder, int producerOffset) { builder.addOffset(9, producerOffset, 0); }
   public static int endWorkLog(FlatBufferBuilder builder) {
     int o = builder.endTable();
     builder.required(o, 10);  // schematic

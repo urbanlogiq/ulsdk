@@ -72,8 +72,8 @@ public final class Task extends com.google.flatbuffers.Table {
    * written. If it is a lookup of an existing stream, this will be populated
    * with the stream ID
    */
-  public ObjectId output() { return output(new ObjectId()); }
-  public ObjectId output(ObjectId obj) { int o = __offset(20); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
+  public PinnedObjectId output() { return output(new PinnedObjectId()); }
+  public PinnedObjectId output(PinnedObjectId obj) { int o = __offset(20); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
   /**
    * If false, keep this object if it's a temporary/intermediate after job
    * creation. This must not be set if the output object above is a provided

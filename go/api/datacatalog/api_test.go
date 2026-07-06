@@ -524,7 +524,7 @@ func TestStreamGetArrow(t *testing.T) {
 		t.Skip("credentials not set, skipping API test")
 	}
 
-	p0 := id.ObjectId{}
+	p0 := id.PinnedObjectId{}
 
 	success := false
 	for i := 0; i < 5; i++ {
@@ -554,7 +554,7 @@ func TestStreamGetParquet(t *testing.T) {
 		t.Skip("credentials not set, skipping API test")
 	}
 
-	p0 := id.ObjectId{}
+	p0 := id.PinnedObjectId{}
 
 	success := false
 	for i := 0; i < 5; i++ {
@@ -584,7 +584,7 @@ func TestStreamGetCsv(t *testing.T) {
 		t.Skip("credentials not set, skipping API test")
 	}
 
-	p0 := id.ObjectId{}
+	p0 := id.PinnedObjectId{}
 
 	success := false
 	for i := 0; i < 5; i++ {
@@ -614,7 +614,7 @@ func TestStreamGetXlsx(t *testing.T) {
 		t.Skip("credentials not set, skipping API test")
 	}
 
-	p0 := id.ObjectId{}
+	p0 := id.PinnedObjectId{}
 
 	success := false
 	for i := 0; i < 5; i++ {
@@ -644,7 +644,7 @@ func TestStreamGetJson(t *testing.T) {
 		t.Skip("credentials not set, skipping API test")
 	}
 
-	p0 := id.ObjectId{}
+	p0 := id.PinnedObjectId{}
 
 	success := false
 	for i := 0; i < 5; i++ {
@@ -674,7 +674,7 @@ func TestStreamGetText(t *testing.T) {
 		t.Skip("credentials not set, skipping API test")
 	}
 
-	p0 := id.ObjectId{}
+	p0 := id.PinnedObjectId{}
 
 	success := false
 	for i := 0; i < 5; i++ {
@@ -704,7 +704,7 @@ func TestStreamGetHtml(t *testing.T) {
 		t.Skip("credentials not set, skipping API test")
 	}
 
-	p0 := id.ObjectId{}
+	p0 := id.PinnedObjectId{}
 
 	success := false
 	for i := 0; i < 5; i++ {
@@ -1036,6 +1036,96 @@ func TestCreateTable(t *testing.T) {
 		expectedBytes := expected.ToBytes()
 		ctx.SetResponse(expectedBytes)
 		result, err := CreateTable(
+			ctx,
+			body,
+		)
+		if err != nil {
+			time.Sleep(time.Duration(i+1) * time.Second)
+			continue
+		}
+		_ = result
+		success = true
+		break
+	}
+	if !success {
+		t.Fatal("test was unable to complete with retries")
+	}
+}
+
+func TestSchemaArrow(t *testing.T) {
+	ctx := ulsdk.NewTestContextFromEnv()
+	if ctx == nil {
+		t.Skip("credentials not set, skipping API test")
+	}
+
+	body := &query.Query{}
+
+	success := false
+	for i := 0; i < 5; i++ {
+		expectedBatches, expectedBytes := makeTestBatchesAndBytes(t)
+		_ = expectedBatches
+		ctx.SetResponse(expectedBytes)
+		result, err := SchemaArrow(
+			ctx,
+			body,
+		)
+		if err != nil {
+			time.Sleep(time.Duration(i+1) * time.Second)
+			continue
+		}
+		_ = result
+		success = true
+		break
+	}
+	if !success {
+		t.Fatal("test was unable to complete with retries")
+	}
+}
+
+func TestSchemaRaw(t *testing.T) {
+	ctx := ulsdk.NewTestContextFromEnv()
+	if ctx == nil {
+		t.Skip("credentials not set, skipping API test")
+	}
+
+	body := &query.Query{}
+
+	success := false
+	for i := 0; i < 5; i++ {
+		expected := []byte("Lorem ipsum dolor sit amet, consectetur adipiscing elit")
+		expectedBytes := expected
+		ctx.SetResponse(expectedBytes)
+		result, err := SchemaRaw(
+			ctx,
+			body,
+		)
+		if err != nil {
+			time.Sleep(time.Duration(i+1) * time.Second)
+			continue
+		}
+		_ = result
+		success = true
+		break
+	}
+	if !success {
+		t.Fatal("test was unable to complete with retries")
+	}
+}
+
+func TestSchemaOnly(t *testing.T) {
+	ctx := ulsdk.NewTestContextFromEnv()
+	if ctx == nil {
+		t.Skip("credentials not set, skipping API test")
+	}
+
+	body := &query.Query{}
+
+	success := false
+	for i := 0; i < 5; i++ {
+		expectedBatches, expectedBytes := makeTestBatchesAndBytes(t)
+		_ = expectedBatches
+		ctx.SetResponse(expectedBytes)
+		result, err := SchemaOnly(
 			ctx,
 			body,
 		)

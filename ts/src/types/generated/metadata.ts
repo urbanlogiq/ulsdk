@@ -157,8 +157,46 @@ locationDescriptionField():number {
   return offset ? this.bb!.readInt32(this.bb_pos + offset) : -1;
 }
 
+/**
+ * Indices of fields that are "promoted to metrics"
+ */
+promotedMetrics(index: number):number|null {
+  const offset = this.bb!.__offset(this.bb_pos, 32);
+  return offset ? this.bb!.readInt32(this.bb!.__vector(this.bb_pos + offset) + index * 4) : 0;
+}
+
+promotedMetricsLength():number {
+  const offset = this.bb!.__offset(this.bb_pos, 32);
+  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+}
+
+promotedMetricsArray():Int32Array|null {
+  const offset = this.bb!.__offset(this.bb_pos, 32);
+  return offset ? new Int32Array(this.bb!.bytes().buffer, this.bb!.bytes().byteOffset + this.bb!.__vector(this.bb_pos + offset), this.bb!.__vector_len(this.bb_pos + offset)) : null;
+}
+
+/**
+ * Indices of non-numeric fields that are "visualized in Explore" — they
+ * appear as a categorical color visualization on Generic layers but, unlike
+ * promoted_metrics, do NOT create an entry in the metric catalog.
+ */
+visualizeInExploreFields(index: number):number|null {
+  const offset = this.bb!.__offset(this.bb_pos, 34);
+  return offset ? this.bb!.readInt32(this.bb!.__vector(this.bb_pos + offset) + index * 4) : 0;
+}
+
+visualizeInExploreFieldsLength():number {
+  const offset = this.bb!.__offset(this.bb_pos, 34);
+  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+}
+
+visualizeInExploreFieldsArray():Int32Array|null {
+  const offset = this.bb!.__offset(this.bb_pos, 34);
+  return offset ? new Int32Array(this.bb!.bytes().buffer, this.bb!.bytes().byteOffset + this.bb!.__vector(this.bb_pos + offset), this.bb!.__vector_len(this.bb_pos + offset)) : null;
+}
+
 static startMetadata(builder:flatbuffers.Builder) {
-  builder.startObject(14);
+  builder.startObject(16);
 }
 
 static addDisplayName(builder:flatbuffers.Builder, displayNameOffset:flatbuffers.Offset) {
@@ -258,6 +296,48 @@ static addLocationDescriptionField(builder:flatbuffers.Builder, locationDescript
   builder.addFieldInt32(13, locationDescriptionField, -1);
 }
 
+static addPromotedMetrics(builder:flatbuffers.Builder, promotedMetricsOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(14, promotedMetricsOffset, 0);
+}
+
+static createPromotedMetricsVector(builder:flatbuffers.Builder, data:number[]|Int32Array):flatbuffers.Offset;
+/**
+ * @deprecated This Uint8Array overload will be removed in the future.
+ */
+static createPromotedMetricsVector(builder:flatbuffers.Builder, data:number[]|Uint8Array):flatbuffers.Offset;
+static createPromotedMetricsVector(builder:flatbuffers.Builder, data:number[]|Int32Array|Uint8Array):flatbuffers.Offset {
+  builder.startVector(4, data.length, 4);
+  for (let i = data.length - 1; i >= 0; i--) {
+    builder.addInt32(data[i]!);
+  }
+  return builder.endVector();
+}
+
+static startPromotedMetricsVector(builder:flatbuffers.Builder, numElems:number) {
+  builder.startVector(4, numElems, 4);
+}
+
+static addVisualizeInExploreFields(builder:flatbuffers.Builder, visualizeInExploreFieldsOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(15, visualizeInExploreFieldsOffset, 0);
+}
+
+static createVisualizeInExploreFieldsVector(builder:flatbuffers.Builder, data:number[]|Int32Array):flatbuffers.Offset;
+/**
+ * @deprecated This Uint8Array overload will be removed in the future.
+ */
+static createVisualizeInExploreFieldsVector(builder:flatbuffers.Builder, data:number[]|Uint8Array):flatbuffers.Offset;
+static createVisualizeInExploreFieldsVector(builder:flatbuffers.Builder, data:number[]|Int32Array|Uint8Array):flatbuffers.Offset {
+  builder.startVector(4, data.length, 4);
+  for (let i = data.length - 1; i >= 0; i--) {
+    builder.addInt32(data[i]!);
+  }
+  return builder.endVector();
+}
+
+static startVisualizeInExploreFieldsVector(builder:flatbuffers.Builder, numElems:number) {
+  builder.startVector(4, numElems, 4);
+}
+
 static endMetadata(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   return offset;
@@ -291,7 +371,9 @@ unpack(): MetadataT {
     this.doNotFilterGeometryByViewport(),
     this.entityTy(),
     this.updateCadence(),
-    this.locationDescriptionField()
+    this.locationDescriptionField(),
+    this.bb!.createScalarList<number>(this.promotedMetrics.bind(this), this.promotedMetricsLength()),
+    this.bb!.createScalarList<number>(this.visualizeInExploreFields.bind(this), this.visualizeInExploreFieldsLength())
   );
 }
 
@@ -315,6 +397,8 @@ unpackTo(_o: MetadataT): void {
   _o.entityTy = this.entityTy();
   _o.updateCadence = this.updateCadence();
   _o.locationDescriptionField = this.locationDescriptionField();
+  _o.promotedMetrics = this.bb!.createScalarList<number>(this.promotedMetrics.bind(this), this.promotedMetricsLength());
+  _o.visualizeInExploreFields = this.bb!.createScalarList<number>(this.visualizeInExploreFields.bind(this), this.visualizeInExploreFieldsLength());
 }
 }
 
@@ -333,7 +417,9 @@ constructor(
   public doNotFilterGeometryByViewport: boolean = false,
   public entityTy: EntityTy = EntityTy.T_INVALID,
   public updateCadence: UpdateCadence = UpdateCadence.UC_UNSET,
-  public locationDescriptionField: number = -1
+  public locationDescriptionField: number = -1,
+  public promotedMetrics: (number)[] = [],
+  public visualizeInExploreFields: (number)[] = []
 ){}
 
 
@@ -345,6 +431,8 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   const fieldRelationships = Metadata.createFieldRelationshipsVector(builder, builder.createObjectOffsetList(this.fieldRelationships));
   const source = (this.source !== null ? this.source!.pack(builder) : 0);
   const geometrySource = builder.createObjectOffset(this.geometrySource);
+  const promotedMetrics = Metadata.createPromotedMetricsVector(builder, this.promotedMetrics);
+  const visualizeInExploreFields = Metadata.createVisualizeInExploreFieldsVector(builder, this.visualizeInExploreFields);
 
   Metadata.startMetadata(builder);
   Metadata.addDisplayName(builder, displayName);
@@ -361,6 +449,8 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   Metadata.addEntityTy(builder, this.entityTy);
   Metadata.addUpdateCadence(builder, this.updateCadence);
   Metadata.addLocationDescriptionField(builder, this.locationDescriptionField);
+  Metadata.addPromotedMetrics(builder, promotedMetrics);
+  Metadata.addVisualizeInExploreFields(builder, visualizeInExploreFields);
 
   return Metadata.endMetadata(builder);
 }

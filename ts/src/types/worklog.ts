@@ -5,9 +5,13 @@
 import * as flatbuffers from 'flatbuffers/js/flatbuffers';
 
 import { ByteArray as FbsByteArray, ByteArrayT as FbsByteArrayT } from './generated/byte-array';
+import { ContainerRef as FbsContainerRef, ContainerRefT as FbsContainerRefT } from './generated/container-ref';
+import { GitRef as FbsGitRef, GitRefT as FbsGitRefT } from './generated/git-ref';
 import { Layout as FbsLayout, LayoutT as FbsLayoutT } from './generated/layout';
 import { ParameterFlags as FbsParameterFlags, ParameterFlagsT as FbsParameterFlagsT } from './generated/parameter-flags';
 import { ParameterValue as FbsParameterValue } from './generated/parameter-value';
+import { Producer as FbsProducer, ProducerT as FbsProducerT } from './generated/producer';
+import { ProducerRef as FbsProducerRef } from './generated/producer-ref';
 import { TileData as FbsTileData, TileDataT as FbsTileDataT } from './generated/tile-data';
 import { TileSettings as FbsTileSettings, TileSettingsT as FbsTileSettingsT } from './generated/tile-settings';
 import { UserSettings as FbsUserSettings, UserSettingsT as FbsUserSettingsT } from './generated/user-settings';
@@ -73,7 +77,7 @@ import { Source as FbsSource } from './generated/source';
 import { StatisticTy as FbsStatisticTy } from './generated/statistic-ty';
 import { TimeGranularity as FbsTimeGranularity } from './generated/time-granularity';
 import { TurnTy as FbsTurnTy } from './generated/turn-ty';
-import { B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId, ObjectNamespace, StreamId } from './id';
+import { B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId, ObjectNamespace, PinnedObjectId, StreamId } from './id';
 import { B2cId as FbsB2cId } from './generated/b2c-id';
 import { ColumnGroupId as FbsColumnGroupId } from './generated/column-group-id';
 import { ContentId as FbsContentId } from './generated/content-id';
@@ -82,6 +86,7 @@ import { GenericId as FbsGenericId } from './generated/generic-id';
 import { GraphNodeId as FbsGraphNodeId } from './generated/graph-node-id';
 import { ObjectId as FbsObjectId } from './generated/object-id';
 import { ObjectNamespace as FbsObjectNamespace } from './generated/object-namespace';
+import { PinnedObjectId as FbsPinnedObjectId } from './generated/pinned-object-id';
 import { StreamId as FbsStreamId } from './generated/stream-id';
 import { DeprecatedRunSpec, DeprecatedTaskParameter, Edge, EmbeddedTable, Job, Node, ParamIndices, RunSpec, Schematic, Status, Task, TaskErrorTy, TaskList, TaskParameter, TaskParameterValue, TaskPriority, TaskRunFlags } from './job';
 import { DeprecatedRunSpec as FbsDeprecatedRunSpec } from './generated/deprecated-run-spec';
@@ -234,10 +239,107 @@ export class ParameterFlags {
 
 export type ParameterValue = ByteArray | ObjectId | ParameterFlags | ValueInstance;
 
+export class ContainerRef {
+  private _image!: string;
+
+  constructor(arg?: FbsContainerRef | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsContainerRef.getSizePrefixedRootAsContainerRef(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsContainerRef) {
+      this._initFromFbs(arg);
+    } else {
+      this._image = '';
+    }
+  }
+
+  private _initFromFbs(fbs: FbsContainerRef): void {
+    this._image = fbs.image() ?? '';
+  }
+
+  get image(): string {
+    return this._image;
+  }
+
+  set image(value: string) {
+    this._image = value;
+  }
+
+  toFbsT(): FbsContainerRefT {
+    const t = new FbsContainerRefT();
+    t.image = this._image;
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+}
+
+export type ProducerRef = ObjectId | ContainerRef;
+
 /**
  *  Whether do display raw numbers or percentages
  */
 export { ValuesFormatTy } from './generated/values-format-ty';
+
+export class GitRef {
+  private _commitish!: string;
+
+  private _repo!: string;
+
+  constructor(arg?: FbsGitRef | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsGitRef.getSizePrefixedRootAsGitRef(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsGitRef) {
+      this._initFromFbs(arg);
+    } else {
+      this._commitish = '';
+      this._repo = '';
+    }
+  }
+
+  private _initFromFbs(fbs: FbsGitRef): void {
+    this._commitish = fbs.commitish() ?? '';
+    this._repo = fbs.repo() ?? '';
+  }
+
+  get commitish(): string {
+    return this._commitish;
+  }
+
+  set commitish(value: string) {
+    this._commitish = value;
+  }
+
+  get repo(): string {
+    return this._repo;
+  }
+
+  set repo(value: string) {
+    this._repo = value;
+  }
+
+  toFbsT(): FbsGitRefT {
+    const t = new FbsGitRefT();
+    t.commitish = this._commitish;
+    t.repo = this._repo;
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+}
 
 export class Layout {
 /**
@@ -320,6 +422,90 @@ export class Layout {
     t.width = this._width;
     t.x = this._x;
     t.y = this._y;
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+}
+
+export class Producer {
+  private _builderCodeRef!: GitRef | null;
+
+  private _executor!: GitRef;
+
+  private _model!: ProducerRef | null;
+
+  constructor(arg?: FbsProducer | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsProducer.getSizePrefixedRootAsProducer(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsProducer) {
+      this._initFromFbs(arg);
+    } else {
+      this._builderCodeRef = null;
+      this._executor = new GitRef();
+      this._model = null;
+    }
+  }
+
+  private _initFromFbs(fbs: FbsProducer): void {
+    const builderCodeRefVal = fbs.builderCodeRef();
+    this._builderCodeRef = builderCodeRefVal ? new GitRef(builderCodeRefVal) : null;
+    const executorVal = fbs.executor();
+    this._executor = executorVal ? new GitRef(executorVal) : new GitRef();
+    const modelTy = fbs.modelType();
+    if (modelTy === FbsProducerRef.ObjectId) {
+      const modelFbsVal = fbs.model(new FbsObjectId());
+      this._model = modelFbsVal ? new ObjectId(modelFbsVal) : null;
+    } else if (modelTy === FbsProducerRef.ContainerRef) {
+      const modelFbsVal = fbs.model(new FbsContainerRef());
+      this._model = modelFbsVal ? new ContainerRef(modelFbsVal) : null;
+    } else {
+      this._model = null;
+    }
+  }
+
+  get builderCodeRef(): GitRef | null {
+    return this._builderCodeRef;
+  }
+
+  set builderCodeRef(value: GitRef | null) {
+    this._builderCodeRef = value;
+  }
+
+  get executor(): GitRef {
+    return this._executor;
+  }
+
+  set executor(value: GitRef) {
+    this._executor = value;
+  }
+
+  get model(): ProducerRef | null {
+    return this._model;
+  }
+
+  set model(value: ProducerRef | null) {
+    this._model = value;
+  }
+
+  toFbsT(): FbsProducerT {
+    const t = new FbsProducerT();
+    t.builderCodeRef = this._builderCodeRef ? this._builderCodeRef.toFbsT() : null;
+    t.executor = this._executor.toFbsT();
+    if (this._model instanceof ObjectId) {
+      t.modelType = FbsProducerRef.ObjectId;
+      t.model = this._model.toFbsT();
+    } else if (this._model instanceof ContainerRef) {
+      t.modelType = FbsProducerRef.ContainerRef;
+      t.model = this._model.toFbsT();
+    }
     return t;
   }
 
@@ -704,7 +890,7 @@ export class WorkLog {
 /**
  *  Input streams and/or worklogs. These may be either work logs or streams.
  */
-  private _inputStreams!: ObjectId[] | null;
+  private _inputStreams!: PinnedObjectId[] | null;
 
   private _jobId!: ObjectId | null;
 
@@ -719,7 +905,7 @@ export class WorkLog {
  *  step) so there should be enough information in the worklog necessary
  *  to reconstruct these output streams.
  */
-  private _outputStreams!: ObjectId[];
+  private _outputStreams!: PinnedObjectId[];
 
 /**
  *  These are the serialized parameters passed into the task which created
@@ -739,11 +925,13 @@ export class WorkLog {
  */
   private _parent!: ObjectId | null;
 
+  private _producer!: Producer | null;
+
 /**
  *  The schematic used behind creating the worklog. This may be empty/null
  *  if we are just layering data, for example.
  */
-  private _schematic!: ObjectId;
+  private _schematic!: PinnedObjectId;
 
   private _userSettings!: UserSettings | null;
 
@@ -761,7 +949,8 @@ export class WorkLog {
       this._outputStreams = [];
       this._params = [];
       this._parent = null;
-      this._schematic = new ObjectId();
+      this._producer = null;
+      this._schematic = new PinnedObjectId();
       this._userSettings = null;
     }
   }
@@ -770,7 +959,7 @@ export class WorkLog {
     if (fbs.inputStreamsLength() > 0) {
       this._inputStreams = Array.from({ length: fbs.inputStreamsLength() }, (_, i) => {
         const item = fbs.inputStreams(i);
-        return item ? new ObjectId(item) : new ObjectId();
+        return item ? new PinnedObjectId(item) : new PinnedObjectId();
       });
     } else {
       this._inputStreams = null;
@@ -780,7 +969,7 @@ export class WorkLog {
     this._name = fbs.name();
     this._outputStreams = Array.from({ length: fbs.outputStreamsLength() }, (_, i) => {
       const item = fbs.outputStreams(i);
-      return item ? new ObjectId(item) : new ObjectId();
+      return item ? new PinnedObjectId(item) : new PinnedObjectId();
     });
     this._params = Array.from({ length: fbs.paramsLength() }, (_, i) => {
       const item = fbs.params(i);
@@ -788,17 +977,19 @@ export class WorkLog {
     });
     const parentVal = fbs.parent();
     this._parent = parentVal ? new ObjectId(parentVal) : null;
+    const producerVal = fbs.producer();
+    this._producer = producerVal ? new Producer(producerVal) : null;
     const schematicVal = fbs.schematic();
-    this._schematic = schematicVal ? new ObjectId(schematicVal) : new ObjectId();
+    this._schematic = schematicVal ? new PinnedObjectId(schematicVal) : new PinnedObjectId();
     const userSettingsVal = fbs.userSettings();
     this._userSettings = userSettingsVal ? new UserSettings(userSettingsVal) : null;
   }
 
-  get inputStreams(): ObjectId[] | null {
+  get inputStreams(): PinnedObjectId[] | null {
     return this._inputStreams;
   }
 
-  set inputStreams(value: ObjectId[] | null) {
+  set inputStreams(value: PinnedObjectId[] | null) {
     this._inputStreams = value;
   }
 
@@ -818,11 +1009,11 @@ export class WorkLog {
     this._name = value;
   }
 
-  get outputStreams(): ObjectId[] {
+  get outputStreams(): PinnedObjectId[] {
     return this._outputStreams;
   }
 
-  set outputStreams(value: ObjectId[]) {
+  set outputStreams(value: PinnedObjectId[]) {
     this._outputStreams = value;
   }
 
@@ -842,11 +1033,19 @@ export class WorkLog {
     this._parent = value;
   }
 
-  get schematic(): ObjectId {
+  get producer(): Producer | null {
+    return this._producer;
+  }
+
+  set producer(value: Producer | null) {
+    this._producer = value;
+  }
+
+  get schematic(): PinnedObjectId {
     return this._schematic;
   }
 
-  set schematic(value: ObjectId) {
+  set schematic(value: PinnedObjectId) {
     this._schematic = value;
   }
 
@@ -866,6 +1065,7 @@ export class WorkLog {
     t.outputStreams = this._outputStreams.map(item => item.toFbsT());
     t.params = this._params.map(item => item.toFbsT());
     t.parent = this._parent ? this._parent.toFbsT() : null;
+    t.producer = this._producer ? this._producer.toFbsT() : null;
     t.schematic = this._schematic.toFbsT();
     t.userSettings = this._userSettings ? this._userSettings.toFbsT() : null;
     return t;

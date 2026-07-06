@@ -15,7 +15,7 @@ import { Response as FbsResponse, ResponseT as FbsResponseT } from './generated/
 import { Share as FbsShare, ShareT as FbsShareT } from './generated/share';
 import { ShareDetails as FbsShareDetails, ShareDetailsT as FbsShareDetailsT } from './generated/share-details';
 
-import { B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId, ObjectNamespace, StreamId } from './id';
+import { B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId, ObjectNamespace, PinnedObjectId, StreamId } from './id';
 import { B2cId as FbsB2cId } from './generated/b2c-id';
 import { ColumnGroupId as FbsColumnGroupId } from './generated/column-group-id';
 import { ContentId as FbsContentId } from './generated/content-id';
@@ -24,6 +24,7 @@ import { GenericId as FbsGenericId } from './generated/generic-id';
 import { GraphNodeId as FbsGraphNodeId } from './generated/graph-node-id';
 import { ObjectId as FbsObjectId } from './generated/object-id';
 import { ObjectNamespace as FbsObjectNamespace } from './generated/object-namespace';
+import { PinnedObjectId as FbsPinnedObjectId } from './generated/pinned-object-id';
 import { StreamId as FbsStreamId } from './generated/stream-id';
 import { AccessControlList, PermissionTy, Role } from './permissions';
 import { AccessControlList as FbsAccessControlList } from './generated/access-control-list';

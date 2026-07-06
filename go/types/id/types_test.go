@@ -62,6 +62,14 @@ func TestDefaultObjectId(t *testing.T) {
 }
 
 
+func TestDefaultPinnedObjectId(t *testing.T) {
+	o := &PinnedObjectId{}
+	if o == nil {
+		t.Fatal("expected non-nil")
+	}
+}
+
+
 func TestDefaultStreamId(t *testing.T) {
 	o := &StreamId{}
 	if o == nil {

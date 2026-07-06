@@ -9,8 +9,8 @@
 import * as flatbuffers from 'flatbuffers/js/flatbuffers';
 
 import { DeprecatedTaskParameter, DeprecatedTaskParameterT } from './deprecated-task-parameter';
-import { ObjectId, ObjectIdT } from './object-id';
 import { ParamIndices, ParamIndicesT } from './param-indices';
+import { PinnedObjectId, PinnedObjectIdT } from './pinned-object-id';
 
 
 export class DeprecatedRunSpec implements flatbuffers.IUnpackableObject<DeprecatedRunSpecT> {
@@ -36,9 +36,9 @@ persist():boolean {
   return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
 }
 
-schematic(obj?:ObjectId):ObjectId|null {
+schematic(obj?:PinnedObjectId):PinnedObjectId|null {
   const offset = this.bb!.__offset(this.bb_pos, 6);
-  return offset ? (obj || new ObjectId()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
+  return offset ? (obj || new PinnedObjectId()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
 paramIndices(index: number, obj?:ParamIndices):ParamIndices|null {
@@ -135,7 +135,7 @@ unpackTo(_o: DeprecatedRunSpecT): void {
 export class DeprecatedRunSpecT implements flatbuffers.IGeneratedObject {
 constructor(
   public persist: boolean = false,
-  public schematic: ObjectIdT|null = null,
+  public schematic: PinnedObjectIdT|null = null,
   public paramIndices: (ParamIndicesT)[] = [],
   public params: (DeprecatedTaskParameterT)[] = []
 ){}

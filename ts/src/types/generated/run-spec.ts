@@ -9,8 +9,8 @@
 import * as flatbuffers from 'flatbuffers/js/flatbuffers';
 
 import { Attr, AttrT } from './attr';
-import { ObjectId, ObjectIdT } from './object-id';
 import { ParamIndices, ParamIndicesT } from './param-indices';
+import { PinnedObjectId, PinnedObjectIdT } from './pinned-object-id';
 import { TaskParameter, TaskParameterT } from './task-parameter';
 import { TaskPriority } from './task-priority';
 
@@ -47,9 +47,9 @@ persist():boolean {
   return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
 }
 
-schematic(obj?:ObjectId):ObjectId|null {
+schematic(obj?:PinnedObjectId):PinnedObjectId|null {
   const offset = this.bb!.__offset(this.bb_pos, 6);
-  return offset ? (obj || new ObjectId()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
+  return offset ? (obj || new PinnedObjectId()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
 paramIndices(index: number, obj?:ParamIndices):ParamIndices|null {
@@ -196,7 +196,7 @@ unpackTo(_o: RunSpecT): void {
 export class RunSpecT implements flatbuffers.IGeneratedObject {
 constructor(
   public persist: boolean = false,
-  public schematic: ObjectIdT|null = null,
+  public schematic: PinnedObjectIdT|null = null,
   public paramIndices: (ParamIndicesT)[] = [],
   public params: (TaskParameterT)[] = [],
   public priority: TaskPriority = TaskPriority.Medium,

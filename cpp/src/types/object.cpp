@@ -390,7 +390,6 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ObjectSummary &o) 
     if (acl_offset.has_value()) {
         instance_builder.add_acl(acl_offset.value());
     }
-    instance_builder.add_drive_size(o.drive_size_);
     instance_builder.add_head_revision(head_revision_offset);
     instance_builder.add_id(id_offset);
     instance_builder.add_time(o.time_);
@@ -408,7 +407,6 @@ std::vector<uint8_t> to_bytes(const ObjectSummary &o) {
 
 ObjectSummary::ObjectSummary()
     : acl_(std::nullopt)
-    , drive_size_(0)
     , head_revision_()
     , id_()
     , time_(0)
@@ -421,7 +419,6 @@ ObjectSummary::ObjectSummary(const std::vector<uint8_t> &bytes)
 
 ObjectSummary::ObjectSummary(const ::ObjectSummary *root) 
     : acl_(std::nullopt)
-    , drive_size_(0)
     , head_revision_()
     , id_()
     , time_(0)
@@ -433,7 +430,6 @@ ObjectSummary::ObjectSummary(const ::ObjectSummary *root)
     if (root->acl() != nullptr) {
         acl_ = decltype(acl_)(root->acl());
     }
-    drive_size_ = root->drive_size();
     if (root->head_revision() != nullptr) {
         head_revision_ = decltype(head_revision_)(root->head_revision());
     }
@@ -447,9 +443,6 @@ ObjectSummary::ObjectSummary(const ::ObjectSummary *root)
 bool
 ObjectSummary::operator==(const ObjectSummary &rhs) const {
     if (this->acl_ != rhs.acl_) {
-        return false;
-    }
-    if (this->drive_size_ != rhs.drive_size_) {
         return false;
     }
     if (this->head_revision_ != rhs.head_revision_) {

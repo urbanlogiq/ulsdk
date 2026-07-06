@@ -296,7 +296,6 @@ func (o *ObjectIdPairList) SerializeTo(builder *flatbuffers.Builder) flatbuffers
 
 type ObjectSummary struct {
 	Acl *id.ObjectId
-	DriveSize uint64
 	HeadRevision id.ContentId
 	Id id.ObjectId
 	Time uint64
@@ -308,7 +307,6 @@ func ObjectSummaryFromFbs(fbs *generated.ObjectSummary) *ObjectSummary {
 	if fbsVal := fbs.Acl(nil); fbsVal != nil {
 		o.Acl = id.ObjectIdFromFbs(fbsVal)
 	}
-	o.DriveSize = fbs.DriveSize()
 	if fbsVal := fbs.HeadRevision(nil); fbsVal != nil {
 		o.HeadRevision = *id.ContentIdFromFbs(fbsVal)
 	}
@@ -344,7 +342,6 @@ func (o *ObjectSummary) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UO
 	idOffset := o.Id.SerializeTo(builder)
 	generated.ObjectSummaryStart(builder)
 	generated.ObjectSummaryAddAcl(builder, aclOffset)
-	generated.ObjectSummaryAddDriveSize(builder, o.DriveSize)
 	generated.ObjectSummaryAddHeadRevision(builder, headRevisionOffset)
 	generated.ObjectSummaryAddId(builder, idOffset)
 	generated.ObjectSummaryAddTime(builder, o.Time)

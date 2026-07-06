@@ -10,10 +10,12 @@
 #![allow(clippy::needless_borrow)]
 #![allow(clippy::enum_clike_unportable_variant)]
 
+use crate::FbsSerde;
 use bitflags::bitflags;
 use core::ops::Deref;
 use flatbuffers::{UnionWIPOffset, WIPOffset};
 use ordered_float::OrderedFloat;
+use serde::{Deserialize, Serialize};
 use strum_macros::FromRepr;
 
 use crate::types::Schema::{
@@ -64,7 +66,8 @@ use crate::types::generated::graph_generated::{
 use crate::types::generated::id_generated::{
     B2cId as FbsB2cId, ColumnGroupId as FbsColumnGroupId, ContentId as FbsContentId,
     DataStateId as FbsDataStateId, GenericId as FbsGenericId, GraphNodeId as FbsGraphNodeId,
-    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace, StreamId as FbsStreamId,
+    ObjectId as FbsObjectId, ObjectNamespace as FbsObjectNamespace,
+    PinnedObjectId as FbsPinnedObjectId, StreamId as FbsStreamId,
 };
 use crate::types::generated::query_generated::{
     AddCol as FbsAddCol, AggregateFilter as FbsAggregateFilter, AllColumns as FbsAllColumns,
@@ -84,7 +87,7 @@ use crate::types::generated::query_generated::{
     QueryTableSource as FbsQueryTableSource, SetExpr as FbsSetExpr,
     TableOrderBy as FbsTableOrderBy, TablePartition as FbsTablePartition,
     TableSource as FbsTableSource, TableSourceInstance as FbsTableSourceInstance,
-    TableSourceUnion as FbsTableSourceUnion, TypeHint as FbsTypeHint,
+    TableSourceUnion as FbsTableSourceUnion, TimeSeries as FbsTimeSeries, TypeHint as FbsTypeHint,
     UnaryQueryElement as FbsUnaryQueryElement, UnsetArgument as FbsUnsetArgument,
     UpdateQueryElement as FbsUpdateQueryElement, ValueIndex as FbsValueIndex,
     ValueName as FbsValueName, ValueRow as FbsValueRow, Values as FbsValues, Vector as FbsVector,
@@ -114,7 +117,7 @@ use crate::types::graph::{
 };
 use crate::types::id::{
     B2cId, ColumnGroupId, ContentId, DataStateId, GenericId, GraphNodeId, ObjectId,
-    ObjectNamespace, StreamId,
+    ObjectNamespace, PinnedObjectId, StreamId,
 };
 use crate::types::query::{
     AddCol, AggregateFilter, AllColumns, AlterTableElement, AlterTableOperation,
@@ -123,9 +126,9 @@ use crate::types::query::{
     Expr, ExprUnion, Function, InsertConflicting, InsertQueryElement, Join, JoinTy, MvdbPartition,
     NullableUint, OnConflict, OrderByExpr, Partition, Placeholder, Query, QueryElement,
     QueryElementOp, QueryElementUnion, QueryTableSource, SetExpr, TableOrderBy, TablePartition,
-    TableSource, TableSourceInstance, TableSourceUnion, TypeHint, UnaryQueryElement, UnsetArgument,
-    UpdateQueryElement, ValueIndex, ValueName, ValueRow, Values, Vector, When, Window,
-    WorklogPartition,
+    TableSource, TableSourceInstance, TableSourceUnion, TimeSeries, TypeHint, UnaryQueryElement,
+    UnsetArgument, UpdateQueryElement, ValueIndex, ValueName, ValueRow, Values, Vector, When,
+    Window, WorklogPartition,
 };
 use crate::types::value::{
     Point2D, Tri2D, VArray, VBool, VBytes, VChar, VF32, VF64, VFixedSizeBytes, VI8, VI16, VI32,
@@ -133,7 +136,7 @@ use crate::types::value::{
     VTimestampNsUtc, VTri2D, VU8, VU16, VU32, VU64, VUnit, VUsize, Value, ValueInstance, ValueTy,
 };
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Modify {
     pub col: String,
     pub previous: Option<ValueInstance>,
@@ -179,15 +182,15 @@ impl From<FbsModify<'_>> for Modify {
     }
 }
 
-impl Modify {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Modify {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -197,7 +200,7 @@ impl Modify {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Delete {
     pub row: GenericId,
 }
@@ -224,15 +227,15 @@ impl From<FbsDelete<'_>> for Delete {
     }
 }
 
-impl Delete {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Delete {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -242,7 +245,7 @@ impl Delete {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Restore {
     pub row: GenericId,
 }
@@ -269,15 +272,15 @@ impl From<FbsRestore<'_>> for Restore {
     }
 }
 
-impl Restore {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Restore {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -287,7 +290,7 @@ impl Restore {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum ChangeOp {
     Modify(Modify),
     Delete(Delete),
@@ -326,7 +329,7 @@ impl ChangeOp {
 }
 
 /// The Set operation is used to set the value of a cell in a table.
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Set {
     /// Name of the column to set.
     pub col: String,
@@ -364,15 +367,15 @@ impl From<FbsSet<'_>> for Set {
     }
 }
 
-impl Set {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Set {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -383,7 +386,7 @@ impl Set {
 }
 
 /// The RmRow operation is used to remove a row from a table.
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct RmRow {
     /// The value of the ul_node_id column, which uniquely identifies the row.
     pub row: GenericId,
@@ -411,15 +414,15 @@ impl From<FbsRmRow<'_>> for RmRow {
     }
 }
 
-impl RmRow {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for RmRow {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -432,7 +435,7 @@ impl RmRow {
 /// The RestoreRow operation restore a deleted row in the table
 /// "Restore" is implemented by setting the value of the `ul_keep` system column to true.
 /// This means that formerly "removed" rows are no longer treated as "removed" and will then be returned by queries.
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct RestoreRow {
     /// The value of the ul_node_id column, which uniquely identifies the row.
     pub row: GenericId,
@@ -460,15 +463,15 @@ impl From<FbsRestoreRow<'_>> for RestoreRow {
     }
 }
 
-impl RestoreRow {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for RestoreRow {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -479,7 +482,7 @@ impl RestoreRow {
 }
 
 /// Append rows to a table. The `content` field is Arrow IPC Stream formatted.
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Append {
     /// The row content to append in Arrow IPC Stream format.
     pub content: Vec<u8>,
@@ -511,15 +514,15 @@ impl From<FbsAppend<'_>> for Append {
     }
 }
 
-impl Append {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for Append {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -530,7 +533,7 @@ impl Append {
 }
 
 /// Table Ops are used to modify the contents of a table.
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum Op {
     Set(Set),
     RmRow(RmRow),
@@ -574,7 +577,7 @@ impl Op {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum TableFrom {
     ObjectId(ObjectId),
     Schema(Schema),
@@ -606,7 +609,7 @@ impl TableFrom {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct ChangeOpEntry {
     pub op: ChangeOp,
 }
@@ -640,15 +643,15 @@ impl From<FbsChangeOpEntry<'_>> for ChangeOpEntry {
     }
 }
 
-impl ChangeOpEntry {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for ChangeOpEntry {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -658,7 +661,7 @@ impl ChangeOpEntry {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct ChangeSet {
     pub attributes: Option<Vec<Attr>>,
     pub ops: Vec<ChangeOpEntry>,
@@ -735,15 +738,15 @@ impl From<FbsChangeSet<'_>> for ChangeSet {
     }
 }
 
-impl ChangeSet {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for ChangeSet {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -755,7 +758,7 @@ impl ChangeSet {
 
 /// A DiffStream encodes a sequence of operations that should be performed on a table.
 /// The operations are applied in order to the table, i.e. the ordering of the `seq` field is significant.
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct DiffStream {
     /// We can optionally associate attributes with the diffstream.
     /// When the change history of the table is retrieved, the attributes from the diffstream
@@ -827,15 +830,15 @@ impl From<FbsDiffStream<'_>> for DiffStream {
     }
 }
 
-impl DiffStream {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for DiffStream {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -845,7 +848,7 @@ impl DiffStream {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct History {
     pub changes: Vec<ChangeSet>,
     pub continuation_id: Option<ContentId>,
@@ -893,15 +896,15 @@ impl From<FbsHistory<'_>> for History {
     }
 }
 
-impl History {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for History {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -912,7 +915,7 @@ impl History {
 }
 
 /// Body parameter for POST datacatalog/table
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct NewTable {
     /// The base to use for the table. If an object ID is provided, this will
     /// take the schema from the provided stream or metadata object. If a
@@ -989,15 +992,15 @@ impl From<FbsNewTable<'_>> for NewTable {
     }
 }
 
-impl NewTable {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for NewTable {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()
@@ -1007,7 +1010,7 @@ impl NewTable {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct OpEntry {
     pub op: Op,
 }
@@ -1042,15 +1045,15 @@ impl From<FbsOpEntry<'_>> for OpEntry {
     }
 }
 
-impl OpEntry {
-    pub fn to_fbs_bytes(&self) -> Vec<u8> {
+impl crate::FbsSerde for OpEntry {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
         let mut bldr = flatbuffers::FlatBufferBuilder::new();
         let offset = self.serialize_to(&mut bldr);
         bldr.finish_size_prefixed(offset, None);
         bldr.finished_data().to_vec()
     }
 
-    pub fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
         let opts = flatbuffers::VerifierOptions {
             max_tables: 100_000_000,
             ..Default::default()

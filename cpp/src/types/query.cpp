@@ -174,6 +174,10 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TableSourceUnion &
         const std::shared_ptr<Values> &v = std::get<std::shared_ptr<Values>>(o);
         const auto offset = serialize_to(builder, *v);
         return std::make_pair(offset.Union(), ::TableSourceUnion::Values);
+    } else if (std::holds_alternative<std::shared_ptr<TimeSeries>>(o)) {
+        const std::shared_ptr<TimeSeries> &v = std::get<std::shared_ptr<TimeSeries>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::TableSourceUnion::TimeSeries);
     } else { 
         throw std::runtime_error("unreachable");
     }
@@ -2286,6 +2290,99 @@ Values::operator==(const Values &rhs) const {
     return true;
 }
 
+::flatbuffers::Offset<::TimeSeries>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TimeSeries &o) {
+    const ::flatbuffers::Offset<::flatbuffers::String> output_column_offset = builder.CreateString(o.output_column_);
+    std::optional<::flatbuffers::Offset<::flatbuffers::String>> tz_offset = std::nullopt;
+    if (o.tz_.has_value()) {
+        const ::flatbuffers::Offset<::flatbuffers::String> tz_offset_val = builder.CreateString(o.tz_.value());
+        tz_offset = std::make_optional(tz_offset_val);
+    }
+
+    ::TimeSeriesBuilder instance_builder = ::TimeSeriesBuilder(builder);
+    instance_builder.add_end_ms(o.end_ms_);
+    instance_builder.add_infer_bounds(o.infer_bounds_);
+    instance_builder.add_interval_months(o.interval_months_);
+    instance_builder.add_interval_ms(o.interval_ms_);
+    instance_builder.add_output_column(output_column_offset);
+    instance_builder.add_start_ms(o.start_ms_);
+    if (tz_offset.has_value()) {
+        instance_builder.add_tz(tz_offset.value());
+    }
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const TimeSeries &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+TimeSeries::TimeSeries()
+    : end_ms_(0)
+    , infer_bounds_(false)
+    , interval_months_(0)
+    , interval_ms_(0)
+    , output_column_()
+    , start_ms_(0)
+    , tz_(std::nullopt) {
+}
+
+TimeSeries::TimeSeries(const std::vector<uint8_t> &bytes)
+    : TimeSeries(::flatbuffers::GetSizePrefixedRoot<::TimeSeries>(bytes.data())) {
+}
+
+TimeSeries::TimeSeries(const ::TimeSeries *root) 
+    : end_ms_(0)
+    , infer_bounds_(false)
+    , interval_months_(0)
+    , interval_ms_(0)
+    , output_column_()
+    , start_ms_(0)
+    , tz_(std::nullopt) {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    end_ms_ = root->end_ms();
+    infer_bounds_ = root->infer_bounds();
+    interval_months_ = root->interval_months();
+    interval_ms_ = root->interval_ms();
+        output_column_ = std::string(*root->output_column()->begin(), *root->output_column()->end());
+    start_ms_ = root->start_ms();
+    if (root->tz() != nullptr) {
+        tz_ = std::string(*root->tz()->begin(), *root->tz()->end());
+    }
+}
+
+bool
+TimeSeries::operator==(const TimeSeries &rhs) const {
+    if (this->end_ms_ != rhs.end_ms_) {
+        return false;
+    }
+    if (this->infer_bounds_ != rhs.infer_bounds_) {
+        return false;
+    }
+    if (this->interval_months_ != rhs.interval_months_) {
+        return false;
+    }
+    if (this->interval_ms_ != rhs.interval_ms_) {
+        return false;
+    }
+    if (this->output_column_ != rhs.output_column_) {
+        return false;
+    }
+    if (this->start_ms_ != rhs.start_ms_) {
+        return false;
+    }
+    if (this->tz_ != rhs.tz_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::UpdateQueryElement>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UpdateQueryElement &o) {
     std::optional<::flatbuffers::Offset<::Function>> filter_offset = std::nullopt;
@@ -2448,6 +2545,12 @@ UpdateQueryElement::UpdateQueryElement(const ::UpdateQueryElement *root)
                 source_ = source__shared;
                 break;
             }
+            case ::TableSourceUnion::TimeSeries: {
+                const auto source__local = static_cast<const ::TimeSeries *>(root->source());
+                std::shared_ptr<TimeSeries> source__shared = std::make_shared<TimeSeries>(source__local);
+                source_ = source__shared;
+                break;
+            }
             default: throw std::runtime_error("unknown union variant");
         }
     }
@@ -2566,6 +2669,12 @@ DeleteQueryElement::DeleteQueryElement(const ::DeleteQueryElement *root)
             case ::TableSourceUnion::Values: {
                 const auto source__local = static_cast<const ::Values *>(root->source());
                 std::shared_ptr<Values> source__shared = std::make_shared<Values>(source__local);
+                source_ = source__shared;
+                break;
+            }
+            case ::TableSourceUnion::TimeSeries: {
+                const auto source__local = static_cast<const ::TimeSeries *>(root->source());
+                std::shared_ptr<TimeSeries> source__shared = std::make_shared<TimeSeries>(source__local);
                 source_ = source__shared;
                 break;
             }
@@ -2800,6 +2909,12 @@ InsertQueryElement::InsertQueryElement(const ::InsertQueryElement *root)
             case ::TableSourceUnion::Values: {
                 const auto dest__local = static_cast<const ::Values *>(root->dest());
                 std::shared_ptr<Values> dest__shared = std::make_shared<Values>(dest__local);
+                dest_ = dest__shared;
+                break;
+            }
+            case ::TableSourceUnion::TimeSeries: {
+                const auto dest__local = static_cast<const ::TimeSeries *>(root->dest());
+                std::shared_ptr<TimeSeries> dest__shared = std::make_shared<TimeSeries>(dest__local);
                 dest_ = dest__shared;
                 break;
             }
@@ -3333,6 +3448,12 @@ TableSource::TableSource(const ::TableSource *root)
                 t_ = t__shared;
                 break;
             }
+            case ::TableSourceUnion::TimeSeries: {
+                const auto t__local = static_cast<const ::TimeSeries *>(root->t());
+                std::shared_ptr<TimeSeries> t__shared = std::make_shared<TimeSeries>(t__local);
+                t_ = t__shared;
+                break;
+            }
             default: throw std::runtime_error("unknown union variant");
         }
     }
@@ -3438,6 +3559,12 @@ TableSourceInstance::TableSourceInstance(const ::TableSourceInstance *root)
             case ::TableSourceUnion::Values: {
                 const auto t__local = static_cast<const ::Values *>(root->t());
                 std::shared_ptr<Values> t__shared = std::make_shared<Values>(t__local);
+                t_ = t__shared;
+                break;
+            }
+            case ::TableSourceUnion::TimeSeries: {
+                const auto t__local = static_cast<const ::TimeSeries *>(root->t());
+                std::shared_ptr<TimeSeries> t__shared = std::make_shared<TimeSeries>(t__local);
                 t_ = t__shared;
                 break;
             }

@@ -23,6 +23,7 @@ from .id import (
     GraphNodeId,
     ObjectId,
     ObjectNamespace,
+    PinnedObjectId,
     StreamId,
 )
 from .generated.AccessControlList import AccessControlList as FbsAccessControlList
@@ -33,6 +34,7 @@ from .generated.DataStateId import DataStateId as FbsDataStateId
 from .generated.GenericId import GenericId as FbsGenericId
 from .generated.GraphNodeId import GraphNodeId as FbsGraphNodeId
 from .generated.ObjectId import ObjectId as FbsObjectId
+from .generated.PinnedObjectId import PinnedObjectId as FbsPinnedObjectId
 from .generated.Role import Role as FbsRole
 from .generated.StreamId import StreamId as FbsStreamId
 

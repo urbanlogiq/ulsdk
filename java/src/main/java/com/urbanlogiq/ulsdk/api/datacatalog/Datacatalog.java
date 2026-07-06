@@ -366,7 +366,7 @@ public final class Datacatalog {
      */
     public static org.apache.arrow.vector.ipc.ArrowStreamReader streamGetArrow(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        com.urbanlogiq.ulsdk.types.ObjectId id
+        com.urbanlogiq.ulsdk.types.PinnedObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id";
         path = path.replace(":id", id.toString());
@@ -388,7 +388,7 @@ public final class Datacatalog {
      */
     public static byte[] streamGetParquet(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        com.urbanlogiq.ulsdk.types.ObjectId id
+        com.urbanlogiq.ulsdk.types.PinnedObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id";
         path = path.replace(":id", id.toString());
@@ -410,7 +410,7 @@ public final class Datacatalog {
      */
     public static byte[] streamGetCsv(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        com.urbanlogiq.ulsdk.types.ObjectId id
+        com.urbanlogiq.ulsdk.types.PinnedObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id";
         path = path.replace(":id", id.toString());
@@ -432,7 +432,7 @@ public final class Datacatalog {
      */
     public static byte[] streamGetXlsx(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        com.urbanlogiq.ulsdk.types.ObjectId id
+        com.urbanlogiq.ulsdk.types.PinnedObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id";
         path = path.replace(":id", id.toString());
@@ -454,7 +454,7 @@ public final class Datacatalog {
      */
     public static byte[] streamGetJson(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        com.urbanlogiq.ulsdk.types.ObjectId id
+        com.urbanlogiq.ulsdk.types.PinnedObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id";
         path = path.replace(":id", id.toString());
@@ -476,7 +476,7 @@ public final class Datacatalog {
      */
     public static byte[] streamGetText(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        com.urbanlogiq.ulsdk.types.ObjectId id
+        com.urbanlogiq.ulsdk.types.PinnedObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id";
         path = path.replace(":id", id.toString());
@@ -498,7 +498,7 @@ public final class Datacatalog {
      */
     public static byte[] streamGetHtml(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        com.urbanlogiq.ulsdk.types.ObjectId id
+        com.urbanlogiq.ulsdk.types.PinnedObjectId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id";
         path = path.replace(":id", id.toString());
@@ -785,6 +785,73 @@ public final class Datacatalog {
         body = newTable.toBytes();
         byte[] res = ctx.post(path, body, "application/octet-stream", params, headers);
         return new com.urbanlogiq.ulsdk.types.ObjectId(res);
+    }
+
+    /**
+     * Evaluate the resulting schema of a query, returning an empty Arrow record batch
+     * 
+     * @param ctx A request context object
+     * @param query The query to execute
+     * @return The result of the query
+     */
+    public static org.apache.arrow.vector.ipc.ArrowStreamReader schemaArrow(
+        com.urbanlogiq.ulsdk.RequestContext ctx,
+        com.urbanlogiq.ulsdk.types.Query query
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/datacatalog/query/schema";
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+        headers.put("accept", "application/vnd.apache.arrow.stream");
+
+        byte[] body = null;
+        body = query.toBytes();
+        byte[] res = ctx.post(path, body, "application/octet-stream", params, headers);
+        return new org.apache.arrow.vector.ipc.ArrowStreamReader(new java.io.ByteArrayInputStream(res), new org.apache.arrow.memory.RootAllocator());
+    }
+
+    /**
+     * Evaluate the resulting schema of a query, returning the raw, unparsed binary record batch
+     * 
+     * @param ctx A request context object
+     * @param query The query to execute
+     * @return The result of the query
+     */
+    public static byte[] schemaRaw(
+        com.urbanlogiq.ulsdk.RequestContext ctx,
+        com.urbanlogiq.ulsdk.types.Query query
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/datacatalog/query/schema";
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+        headers.put("accept", "application/vnd.apache.arrow.stream");
+
+        byte[] body = null;
+        body = query.toBytes();
+        byte[] res = ctx.post(path, body, "application/octet-stream", params, headers);
+        return res;
+    }
+
+    /**
+     * Evaluate the resulting Arrow schema of a query, returning it as a parsed Schema (reliable even for a 0-row result)
+     * 
+     * @param ctx A request context object
+     * @param query The query to execute
+     * @return The result of the query
+     */
+    public static org.apache.arrow.vector.types.pojo.Schema schemaOnly(
+        com.urbanlogiq.ulsdk.RequestContext ctx,
+        com.urbanlogiq.ulsdk.types.Query query
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/datacatalog/query/schema";
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+        headers.put("accept", "application/vnd.apache.arrow.stream");
+
+        byte[] body = null;
+        body = query.toBytes();
+        byte[] res = ctx.post(path, body, "application/octet-stream", params, headers);
+        org.apache.arrow.vector.ipc.ArrowStreamReader schemaReader = new org.apache.arrow.vector.ipc.ArrowStreamReader(new java.io.ByteArrayInputStream(res), new org.apache.arrow.memory.RootAllocator());
+        return schemaReader.getVectorSchemaRoot().getSchema();
     }
 
     /**

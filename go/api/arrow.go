@@ -37,6 +37,18 @@ func ReadArrowIPC(data []byte) ([]arrow.Record, error) {
 	return records, nil
 }
 
+// ReadArrowSchema reads the schema of an Arrow IPC stream without consuming its records.
+// The stream always leads with a schema message, so this is reliable even for a 0-row result.
+func ReadArrowSchema(data []byte) (*arrow.Schema, error) {
+	reader, err := ipc.NewReader(bytes.NewReader(data), ipc.WithAllocator(memory.DefaultAllocator))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create Arrow IPC reader: %w", err)
+	}
+	defer reader.Release()
+
+	return reader.Schema(), nil
+}
+
 // WriteArrowIPC serializes a slice of Arrow record batches into IPC stream bytes.
 func WriteArrowIPC(records []arrow.Record) ([]byte, error) {
 	if len(records) == 0 {

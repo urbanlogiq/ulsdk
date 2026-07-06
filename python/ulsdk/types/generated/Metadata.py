@@ -198,8 +198,66 @@ class Metadata(object):
             return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
         return -1
 
+    # Indices of fields that are "promoted to metrics"
+    # Metadata
+    def PromotedMetrics(self, j):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(32))
+        if o != 0:
+            a = self._tab.Vector(o)
+            return self._tab.Get(flatbuffers.number_types.Int32Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4))
+        return 0
+
+    # Metadata
+    def PromotedMetricsAsNumpy(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(32))
+        if o != 0:
+            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Int32Flags, o)
+        return 0
+
+    # Metadata
+    def PromotedMetricsLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(32))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # Metadata
+    def PromotedMetricsIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(32))
+        return o == 0
+
+    # Indices of non-numeric fields that are "visualized in Explore" — they
+    # appear as a categorical color visualization on Generic layers but, unlike
+    # promoted_metrics, do NOT create an entry in the metric catalog.
+    # Metadata
+    def VisualizeInExploreFields(self, j):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(34))
+        if o != 0:
+            a = self._tab.Vector(o)
+            return self._tab.Get(flatbuffers.number_types.Int32Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4))
+        return 0
+
+    # Metadata
+    def VisualizeInExploreFieldsAsNumpy(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(34))
+        if o != 0:
+            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Int32Flags, o)
+        return 0
+
+    # Metadata
+    def VisualizeInExploreFieldsLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(34))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # Metadata
+    def VisualizeInExploreFieldsIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(34))
+        return o == 0
+
 def MetadataStart(builder):
-    builder.StartObject(14)
+    builder.StartObject(16)
 
 def Start(builder):
     MetadataStart(builder)
@@ -305,6 +363,30 @@ def MetadataAddLocationDescriptionField(builder, locationDescriptionField):
 
 def AddLocationDescriptionField(builder, locationDescriptionField):
     MetadataAddLocationDescriptionField(builder, locationDescriptionField)
+
+def MetadataAddPromotedMetrics(builder, promotedMetrics):
+    builder.PrependUOffsetTRelativeSlot(14, flatbuffers.number_types.UOffsetTFlags.py_type(promotedMetrics), 0)
+
+def AddPromotedMetrics(builder, promotedMetrics):
+    MetadataAddPromotedMetrics(builder, promotedMetrics)
+
+def MetadataStartPromotedMetricsVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+def StartPromotedMetricsVector(builder, numElems):
+    return MetadataStartPromotedMetricsVector(builder, numElems)
+
+def MetadataAddVisualizeInExploreFields(builder, visualizeInExploreFields):
+    builder.PrependUOffsetTRelativeSlot(15, flatbuffers.number_types.UOffsetTFlags.py_type(visualizeInExploreFields), 0)
+
+def AddVisualizeInExploreFields(builder, visualizeInExploreFields):
+    MetadataAddVisualizeInExploreFields(builder, visualizeInExploreFields)
+
+def MetadataStartVisualizeInExploreFieldsVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+def StartVisualizeInExploreFieldsVector(builder, numElems):
+    return MetadataStartVisualizeInExploreFieldsVector(builder, numElems)
 
 def MetadataEnd(builder):
     return builder.EndObject()
