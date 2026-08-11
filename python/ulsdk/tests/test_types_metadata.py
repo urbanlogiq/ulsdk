@@ -22,6 +22,12 @@ def test_datacatalog_geometry():
     _t1 = DatacatalogGeometry.from_bytes(_b)
     assert _t0 == _t1
 
+def test_datacatalog_lat_lng_geometry():
+    _t0 = DatacatalogLatLngGeometry.make_default()
+    _b = _t0.to_bytes()
+    _t1 = DatacatalogLatLngGeometry.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_dataset_source():
     _t0 = DatasetSource.make_default()
     _b = _t0.to_bytes()

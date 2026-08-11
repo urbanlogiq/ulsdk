@@ -203,6 +203,10 @@ public final class Fn {
     public static final short GeoFilter = com.urbanlogiq.ulsdk.types.generated.Fn.GeoFilter;
     public static final short StBuffer = com.urbanlogiq.ulsdk.types.generated.Fn.StBuffer;
     public static final short StDistance = com.urbanlogiq.ulsdk.types.generated.Fn.StDistance;
+    public static final short Rank = com.urbanlogiq.ulsdk.types.generated.Fn.Rank;
+    public static final short PercentRank = com.urbanlogiq.ulsdk.types.generated.Fn.PercentRank;
+    public static final short Ntile = com.urbanlogiq.ulsdk.types.generated.Fn.Ntile;
+    public static final short CumeDist = com.urbanlogiq.ulsdk.types.generated.Fn.CumeDist;
     public static final short CorrelationId = com.urbanlogiq.ulsdk.types.generated.Fn.CorrelationId;
     public static final short UlTimezone = com.urbanlogiq.ulsdk.types.generated.Fn.UlTimezone;
     public static final short UlArrayContains = com.urbanlogiq.ulsdk.types.generated.Fn.UlArrayContains;

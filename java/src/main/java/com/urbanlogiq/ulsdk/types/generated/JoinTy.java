@@ -13,8 +13,10 @@ public final class JoinTy {
   public static final byte RightOuter = 2;
   public static final byte Full = 3;
   public static final byte Cross = 4;
+  public static final byte LeftSemi = 5;
+  public static final byte LeftAnti = 6;
 
-  public static final String[] names = { "Inner", "LeftOuter", "RightOuter", "Full", "Cross", };
+  public static final String[] names = { "Inner", "LeftOuter", "RightOuter", "Full", "Cross", "LeftSemi", "LeftAnti", };
 
   public static String name(int e) { return names[e]; }
 }

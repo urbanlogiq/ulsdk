@@ -121,6 +121,9 @@ struct NoGeometryBuilder;
 struct DatacatalogGeometry;
 struct DatacatalogGeometryBuilder;
 
+struct DatacatalogLatLngGeometry;
+struct DatacatalogLatLngGeometryBuilder;
+
 struct WorldGraphGeometry;
 struct WorldGraphGeometryBuilder;
 
@@ -710,38 +713,43 @@ inline const char *EnumNameDatasetCategory(DatasetCategory e) {
   }
 }
 
+/// Append new variants only — a union member's position is its wire value, so
+/// inserting one would silently reinterpret existing stored metadata.
 enum class GeometrySource : uint8_t {
   NONE = 0,
   NoGeometry = 1,
   DatacatalogGeometry = 2,
   WorldGraphGeometry = 3,
+  DatacatalogLatLngGeometry = 4,
   MIN = NONE,
-  MAX = WorldGraphGeometry
+  MAX = DatacatalogLatLngGeometry
 };
 
-inline const GeometrySource (&EnumValuesGeometrySource())[4] {
+inline const GeometrySource (&EnumValuesGeometrySource())[5] {
   static const GeometrySource values[] = {
     GeometrySource::NONE,
     GeometrySource::NoGeometry,
     GeometrySource::DatacatalogGeometry,
-    GeometrySource::WorldGraphGeometry
+    GeometrySource::WorldGraphGeometry,
+    GeometrySource::DatacatalogLatLngGeometry
   };
   return values;
 }
 
 inline const char * const *EnumNamesGeometrySource() {
-  static const char * const names[5] = {
+  static const char * const names[6] = {
     "NONE",
     "NoGeometry",
     "DatacatalogGeometry",
     "WorldGraphGeometry",
+    "DatacatalogLatLngGeometry",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameGeometrySource(GeometrySource e) {
-  if (::flatbuffers::IsOutRange(e, GeometrySource::NONE, GeometrySource::WorldGraphGeometry)) return "";
+  if (::flatbuffers::IsOutRange(e, GeometrySource::NONE, GeometrySource::DatacatalogLatLngGeometry)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesGeometrySource()[index];
 }
@@ -760,6 +768,10 @@ template<> struct GeometrySourceTraits<DatacatalogGeometry> {
 
 template<> struct GeometrySourceTraits<WorldGraphGeometry> {
   static const GeometrySource enum_value = GeometrySource::WorldGraphGeometry;
+};
+
+template<> struct GeometrySourceTraits<DatacatalogLatLngGeometry> {
+  static const GeometrySource enum_value = GeometrySource::DatacatalogLatLngGeometry;
 };
 
 bool VerifyGeometrySource(::flatbuffers::Verifier &verifier, const void *obj, GeometrySource type);
@@ -3675,6 +3687,85 @@ inline ::flatbuffers::Offset<DatacatalogGeometry> CreateDatacatalogGeometryDirec
       column__);
 }
 
+/// Point geometry stored as two scalar coordinate columns rather than one
+/// geometry column. Common for raw/bronze-level ingests, which land as-is
+/// without a transformation step to construct a geom column.
+///
+/// Consumers compose a point from the pair (e.g. st_makepoint(lng, lat))
+/// wherever they would otherwise reference a DatacatalogGeometry column.
+struct DatacatalogLatLngGeometry FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef DatacatalogLatLngGeometryBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_LNG_COLUMN = 4,
+    VT_LAT_COLUMN = 6
+  };
+  const ::flatbuffers::String *lng_column() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_LNG_COLUMN);
+  }
+  const ::flatbuffers::String *lat_column() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_LAT_COLUMN);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_LNG_COLUMN) &&
+           verifier.VerifyString(lng_column()) &&
+           VerifyOffsetRequired(verifier, VT_LAT_COLUMN) &&
+           verifier.VerifyString(lat_column()) &&
+           verifier.EndTable();
+  }
+};
+
+struct DatacatalogLatLngGeometryBuilder {
+  typedef DatacatalogLatLngGeometry Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_lng_column(::flatbuffers::Offset<::flatbuffers::String> lng_column) {
+    fbb_.AddOffset(DatacatalogLatLngGeometry::VT_LNG_COLUMN, lng_column);
+  }
+  void add_lat_column(::flatbuffers::Offset<::flatbuffers::String> lat_column) {
+    fbb_.AddOffset(DatacatalogLatLngGeometry::VT_LAT_COLUMN, lat_column);
+  }
+  explicit DatacatalogLatLngGeometryBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<DatacatalogLatLngGeometry> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<DatacatalogLatLngGeometry>(end);
+    fbb_.Required(o, DatacatalogLatLngGeometry::VT_LNG_COLUMN);
+    fbb_.Required(o, DatacatalogLatLngGeometry::VT_LAT_COLUMN);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<DatacatalogLatLngGeometry> CreateDatacatalogLatLngGeometry(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::String> lng_column = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> lat_column = 0) {
+  DatacatalogLatLngGeometryBuilder builder_(_fbb);
+  builder_.add_lat_column(lat_column);
+  builder_.add_lng_column(lng_column);
+  return builder_.Finish();
+}
+
+struct DatacatalogLatLngGeometry::Traits {
+  using type = DatacatalogLatLngGeometry;
+  static auto constexpr Create = CreateDatacatalogLatLngGeometry;
+};
+
+inline ::flatbuffers::Offset<DatacatalogLatLngGeometry> CreateDatacatalogLatLngGeometryDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const char *lng_column = nullptr,
+    const char *lat_column = nullptr) {
+  auto lng_column__ = lng_column ? _fbb.CreateString(lng_column) : 0;
+  auto lat_column__ = lat_column ? _fbb.CreateString(lat_column) : 0;
+  return CreateDatacatalogLatLngGeometry(
+      _fbb,
+      lng_column__,
+      lat_column__);
+}
+
 /// For most streams with GeometrySourceType==WorldGraphGeometry, edge_path will
 /// be empty and start_stream_id will be unset.
 ///
@@ -3825,6 +3916,9 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const WorldGraphGeometry *geometry_source_as_WorldGraphGeometry() const {
     return geometry_source_type() == GeometrySource::WorldGraphGeometry ? static_cast<const WorldGraphGeometry *>(geometry_source()) : nullptr;
   }
+  const DatacatalogLatLngGeometry *geometry_source_as_DatacatalogLatLngGeometry() const {
+    return geometry_source_type() == GeometrySource::DatacatalogLatLngGeometry ? static_cast<const DatacatalogLatLngGeometry *>(geometry_source()) : nullptr;
+  }
   /// is to be included in the boundary selection modal
   bool area_selection() const {
     return GetField<uint8_t>(VT_AREA_SELECTION, 0) != 0;
@@ -3902,6 +3996,10 @@ template<> inline const DatacatalogGeometry *Metadata::geometry_source_as<Dataca
 
 template<> inline const WorldGraphGeometry *Metadata::geometry_source_as<WorldGraphGeometry>() const {
   return geometry_source_as_WorldGraphGeometry();
+}
+
+template<> inline const DatacatalogLatLngGeometry *Metadata::geometry_source_as<DatacatalogLatLngGeometry>() const {
+  return geometry_source_as_DatacatalogLatLngGeometry();
 }
 
 struct MetadataBuilder {
@@ -4181,6 +4279,10 @@ inline bool VerifyGeometrySource(::flatbuffers::Verifier &verifier, const void *
     }
     case GeometrySource::WorldGraphGeometry: {
       auto ptr = reinterpret_cast<const WorldGraphGeometry *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case GeometrySource::DatacatalogLatLngGeometry: {
+      auto ptr = reinterpret_cast<const DatacatalogLatLngGeometry *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

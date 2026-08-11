@@ -24,6 +24,16 @@ pub struct Principal {
     email: Option<Vec<String>>,
     description: Option<String>,
     department: Option<String>,
+    #[serde(rename = "accountEnabled")]
+    account_enabled: Option<bool>,
+}
+
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct AdGroup {
+    id: String,
+    #[serde(rename = "displayName")]
+    display_name: String,
+    description: Option<String>,
 }
 
 #[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
@@ -38,6 +48,9 @@ pub struct AdUser {
     department: Option<String>,
     #[serde(rename = "createdDateTime")]
     created_date_time: String,
+    groups: Option<Vec<AdGroup>>,
+    #[serde(rename = "accountEnabled")]
+    account_enabled: bool,
 }
 
 #[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
@@ -51,6 +64,8 @@ pub struct DisplayNames {
 pub struct DeviceDetail {
     #[serde(rename = "deviceId")]
     device_id: Option<String>,
+    #[serde(rename = "displayName")]
+    display_name: Option<String>,
     #[serde(rename = "operatingSystem")]
     operating_system: Option<String>,
     browser: Option<String>,
@@ -96,11 +111,6 @@ pub struct AuditLogEntry {
 }
 
 #[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
-pub struct AuditLog {
-    value: Vec<AuditLogEntry>,
-}
-
-#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct AdUserWithAuditLog {
     #[serde(rename = "displayName")]
     display_name: String,
@@ -112,8 +122,11 @@ pub struct AdUserWithAuditLog {
     department: Option<String>,
     #[serde(rename = "createdDateTime")]
     created_date_time: String,
+    groups: Option<Vec<AdGroup>>,
+    #[serde(rename = "accountEnabled")]
+    account_enabled: bool,
     #[serde(rename = "auditLog")]
-    audit_log: Option<AuditLog>,
+    audit_log: Option<Vec<AuditLogEntry>>,
 }
 
 #[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
@@ -147,14 +160,6 @@ pub struct UpdateUser {
 }
 
 #[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
-pub struct AdGroup {
-    id: String,
-    #[serde(rename = "displayName")]
-    display_name: String,
-    description: Option<String>,
-}
-
-#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct CreateGroup {
     #[serde(rename = "displayName")]
     display_name: String,
@@ -168,6 +173,8 @@ pub struct GroupMembership {
     object_type: String,
     #[serde(rename = "displayName")]
     display_name: String,
+    #[serde(rename = "userPrincipalName")]
+    user_principal_name: Option<String>,
     #[serde(rename = "otherMails")]
     other_mails: Option<Vec<String>>,
     department: Option<String>,

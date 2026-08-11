@@ -24,6 +24,7 @@ class Principal:
     email: "Optional[List[str]]"
     description: "Optional[str]"
     department: "Optional[str]"
+    account_enabled: "Optional[bool]"
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -43,6 +44,9 @@ class Principal:
         o["department"] = None
         if self.department is not None:
             o["department"] = self.department
+        o["accountEnabled"] = None
+        if self.account_enabled is not None:
+            o["accountEnabled"] = self.account_enabled
         return o
 
     @classmethod
@@ -53,6 +57,7 @@ class Principal:
         email = None
         description = None
         department = None
+        account_enabled = None
 
         for key in o:
             if key == "principalType":
@@ -93,12 +98,19 @@ class Principal:
                     department = department_var
                 else:
                     department = None
+            elif key == "accountEnabled":
+                if o[key] is not None:
+                    account_enabled_var = o[key]
+                    assert type(account_enabled_var) is bool
+                    account_enabled = account_enabled_var
+                else:
+                    account_enabled = None
 
         assert principal_type is not None
         assert display_name is not None
         assert id_ is not None
 
-        return cls(principal_type, display_name, id_, email, description, department)
+        return cls(principal_type, display_name, id_, email, description, department, account_enabled)
 
     @classmethod
     def make_default(cls) -> Self:
@@ -108,8 +120,60 @@ class Principal:
         email = None
         description = None
         department = None
+        accountEnabled = None
 
-        return cls(principalType, displayName, id, email, description, department)
+        return cls(principalType, displayName, id, email, description, department, accountEnabled)
+
+@dataclass
+class AdGroup:
+    id_: "str"
+    display_name: "str"
+    description: "Optional[str]"
+
+    def to_dict(self) -> Dict[str, Any]:
+        o = dict()
+        o["id"] = self.id_
+        o["displayName"] = self.display_name
+        o["description"] = None
+        if self.description is not None:
+            o["description"] = self.description
+        return o
+
+    @classmethod
+    def from_dict(cls, o: Dict[str, Any]) -> Self:
+        id_ = None
+        display_name = None
+        description = None
+
+        for key in o:
+            if key == "id":
+                id__var = o[key]
+                assert type(id__var) is str
+                id_ = id__var
+            elif key == "displayName":
+                display_name_var = o[key]
+                assert type(display_name_var) is str
+                display_name = display_name_var
+            elif key == "description":
+                if o[key] is not None:
+                    description_var = o[key]
+                    assert type(description_var) is str
+                    description = description_var
+                else:
+                    description = None
+
+        assert id_ is not None
+        assert display_name is not None
+
+        return cls(id_, display_name, description)
+
+    @classmethod
+    def make_default(cls) -> Self:
+        id = ""
+        displayName = ""
+        description = None
+
+        return cls(id, displayName, description)
 
 @dataclass
 class AdUser:
@@ -119,6 +183,8 @@ class AdUser:
     other_mails: "Optional[List[str]]"
     department: "Optional[str]"
     created_date_time: "str"
+    groups: "Optional[List[AdGroup]]"
+    account_enabled: "bool"
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -136,6 +202,14 @@ class AdUser:
         if self.department is not None:
             o["department"] = self.department
         o["createdDateTime"] = self.created_date_time
+        o["groups"] = None
+        if self.groups is not None:
+            groups_list = []
+            for item in self.groups:
+                groups_var = item.to_dict()
+                groups_list.append(groups_var)
+            o["groups"] = groups_list
+        o["accountEnabled"] = self.account_enabled
         return o
 
     @classmethod
@@ -146,6 +220,8 @@ class AdUser:
         other_mails = None
         department = None
         created_date_time = None
+        groups = None
+        account_enabled = None
 
         for key in o:
             if key == "displayName":
@@ -183,13 +259,30 @@ class AdUser:
                 created_date_time_var = o[key]
                 assert type(created_date_time_var) is str
                 created_date_time = created_date_time_var
+            elif key == "groups":
+                if o[key] is not None:
+                    groups_var = o[key]
+                    assert type(groups_var) is list
+                    groups = []
+                    for item in groups_var:
+                        groups_item_var = item
+                        assert type(groups_item_var) is dict
+                        groups_item = AdGroup.from_dict(groups_item_var)
+                        groups.append(groups_item)
+                else:
+                    groups = None
+            elif key == "accountEnabled":
+                account_enabled_var = o[key]
+                assert type(account_enabled_var) is bool
+                account_enabled = account_enabled_var
 
         assert display_name is not None
         assert id_ is not None
         assert user_principal_name is not None
         assert created_date_time is not None
+        assert account_enabled is not None
 
-        return cls(display_name, id_, user_principal_name, other_mails, department, created_date_time)
+        return cls(display_name, id_, user_principal_name, other_mails, department, created_date_time, groups, account_enabled)
 
     @classmethod
     def make_default(cls) -> Self:
@@ -199,8 +292,10 @@ class AdUser:
         otherMails = None
         department = None
         createdDateTime = ""
+        groups = None
+        accountEnabled = True
 
-        return cls(displayName, id, userPrincipalName, otherMails, department, createdDateTime)
+        return cls(displayName, id, userPrincipalName, otherMails, department, createdDateTime, groups, accountEnabled)
 
 @dataclass
 class DisplayNames:
@@ -243,6 +338,7 @@ class DisplayNames:
 @dataclass
 class DeviceDetail:
     device_id: "Optional[str]"
+    display_name: "Optional[str]"
     operating_system: "Optional[str]"
     browser: "Optional[str]"
     is_compliant: "Optional[bool]"
@@ -254,6 +350,9 @@ class DeviceDetail:
         o["deviceId"] = None
         if self.device_id is not None:
             o["deviceId"] = self.device_id
+        o["displayName"] = None
+        if self.display_name is not None:
+            o["displayName"] = self.display_name
         o["operatingSystem"] = None
         if self.operating_system is not None:
             o["operatingSystem"] = self.operating_system
@@ -274,6 +373,7 @@ class DeviceDetail:
     @classmethod
     def from_dict(cls, o: Dict[str, Any]) -> Self:
         device_id = None
+        display_name = None
         operating_system = None
         browser = None
         is_compliant = None
@@ -288,6 +388,13 @@ class DeviceDetail:
                     device_id = device_id_var
                 else:
                     device_id = None
+            elif key == "displayName":
+                if o[key] is not None:
+                    display_name_var = o[key]
+                    assert type(display_name_var) is str
+                    display_name = display_name_var
+                else:
+                    display_name = None
             elif key == "operatingSystem":
                 if o[key] is not None:
                     operating_system_var = o[key]
@@ -325,18 +432,19 @@ class DeviceDetail:
                     trust_type = None
 
 
-        return cls(device_id, operating_system, browser, is_compliant, is_managed, trust_type)
+        return cls(device_id, display_name, operating_system, browser, is_compliant, is_managed, trust_type)
 
     @classmethod
     def make_default(cls) -> Self:
         deviceId = None
+        displayName = None
         operatingSystem = None
         browser = None
         isCompliant = None
         isManaged = None
         trustType = None
 
-        return cls(deviceId, operatingSystem, browser, isCompliant, isManaged, trustType)
+        return cls(deviceId, displayName, operatingSystem, browser, isCompliant, isManaged, trustType)
 
 @dataclass
 class Coordinates:
@@ -581,44 +689,6 @@ class AuditLogEntry:
         return cls(id, userPrincipalName, userId, createdDateTime, ipAddress, deviceDetail, location)
 
 @dataclass
-class AuditLog:
-    value: "List[AuditLogEntry]"
-
-    def to_dict(self) -> Dict[str, Any]:
-        o = dict()
-        value_list = []
-        for item in self.value:
-            value_var = item.to_dict()
-            value_list.append(value_var)
-        o["value"] = value_list
-        return o
-
-    @classmethod
-    def from_dict(cls, o: Dict[str, Any]) -> Self:
-        value = None
-
-        for key in o:
-            if key == "value":
-                value_var = o[key]
-                assert type(value_var) is list
-                value = []
-                for item in value_var:
-                    value_item_var = item
-                    assert type(value_item_var) is dict
-                    value_item = AuditLogEntry.from_dict(value_item_var)
-                    value.append(value_item)
-
-        assert value is not None
-
-        return cls(value)
-
-    @classmethod
-    def make_default(cls) -> Self:
-        value = []
-
-        return cls(value)
-
-@dataclass
 class AdUserWithAuditLog:
     display_name: "str"
     id_: "str"
@@ -626,7 +696,9 @@ class AdUserWithAuditLog:
     other_mails: "Optional[List[str]]"
     department: "Optional[str]"
     created_date_time: "str"
-    audit_log: "Optional[AuditLog]"
+    groups: "Optional[List[AdGroup]]"
+    account_enabled: "bool"
+    audit_log: "Optional[List[AuditLogEntry]]"
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -644,9 +716,21 @@ class AdUserWithAuditLog:
         if self.department is not None:
             o["department"] = self.department
         o["createdDateTime"] = self.created_date_time
+        o["groups"] = None
+        if self.groups is not None:
+            groups_list = []
+            for item in self.groups:
+                groups_var = item.to_dict()
+                groups_list.append(groups_var)
+            o["groups"] = groups_list
+        o["accountEnabled"] = self.account_enabled
         o["auditLog"] = None
         if self.audit_log is not None:
-            o["auditLog"] = self.audit_log.to_dict()
+            audit_log_list = []
+            for item in self.audit_log:
+                audit_log_var = item.to_dict()
+                audit_log_list.append(audit_log_var)
+            o["auditLog"] = audit_log_list
         return o
 
     @classmethod
@@ -657,6 +741,8 @@ class AdUserWithAuditLog:
         other_mails = None
         department = None
         created_date_time = None
+        groups = None
+        account_enabled = None
         audit_log = None
 
         for key in o:
@@ -695,11 +781,32 @@ class AdUserWithAuditLog:
                 created_date_time_var = o[key]
                 assert type(created_date_time_var) is str
                 created_date_time = created_date_time_var
+            elif key == "groups":
+                if o[key] is not None:
+                    groups_var = o[key]
+                    assert type(groups_var) is list
+                    groups = []
+                    for item in groups_var:
+                        groups_item_var = item
+                        assert type(groups_item_var) is dict
+                        groups_item = AdGroup.from_dict(groups_item_var)
+                        groups.append(groups_item)
+                else:
+                    groups = None
+            elif key == "accountEnabled":
+                account_enabled_var = o[key]
+                assert type(account_enabled_var) is bool
+                account_enabled = account_enabled_var
             elif key == "auditLog":
                 if o[key] is not None:
                     audit_log_var = o[key]
-                    assert type(audit_log_var) is dict
-                    audit_log = AuditLog.from_dict(audit_log_var)
+                    assert type(audit_log_var) is list
+                    audit_log = []
+                    for item in audit_log_var:
+                        audit_log_item_var = item
+                        assert type(audit_log_item_var) is dict
+                        audit_log_item = AuditLogEntry.from_dict(audit_log_item_var)
+                        audit_log.append(audit_log_item)
                 else:
                     audit_log = None
 
@@ -707,8 +814,9 @@ class AdUserWithAuditLog:
         assert id_ is not None
         assert user_principal_name is not None
         assert created_date_time is not None
+        assert account_enabled is not None
 
-        return cls(display_name, id_, user_principal_name, other_mails, department, created_date_time, audit_log)
+        return cls(display_name, id_, user_principal_name, other_mails, department, created_date_time, groups, account_enabled, audit_log)
 
     @classmethod
     def make_default(cls) -> Self:
@@ -718,9 +826,11 @@ class AdUserWithAuditLog:
         otherMails = None
         department = None
         createdDateTime = ""
+        groups = None
+        accountEnabled = True
         auditLog = None
 
-        return cls(displayName, id, userPrincipalName, otherMails, department, createdDateTime, auditLog)
+        return cls(displayName, id, userPrincipalName, otherMails, department, createdDateTime, groups, accountEnabled, auditLog)
 
 @dataclass
 class CreateUserRequest:
@@ -917,57 +1027,6 @@ class UpdateUser:
         return cls(displayName, otherMails)
 
 @dataclass
-class AdGroup:
-    id_: "str"
-    display_name: "str"
-    description: "Optional[str]"
-
-    def to_dict(self) -> Dict[str, Any]:
-        o = dict()
-        o["id"] = self.id_
-        o["displayName"] = self.display_name
-        o["description"] = None
-        if self.description is not None:
-            o["description"] = self.description
-        return o
-
-    @classmethod
-    def from_dict(cls, o: Dict[str, Any]) -> Self:
-        id_ = None
-        display_name = None
-        description = None
-
-        for key in o:
-            if key == "id":
-                id__var = o[key]
-                assert type(id__var) is str
-                id_ = id__var
-            elif key == "displayName":
-                display_name_var = o[key]
-                assert type(display_name_var) is str
-                display_name = display_name_var
-            elif key == "description":
-                if o[key] is not None:
-                    description_var = o[key]
-                    assert type(description_var) is str
-                    description = description_var
-                else:
-                    description = None
-
-        assert id_ is not None
-        assert display_name is not None
-
-        return cls(id_, display_name, description)
-
-    @classmethod
-    def make_default(cls) -> Self:
-        id = ""
-        displayName = ""
-        description = None
-
-        return cls(id, displayName, description)
-
-@dataclass
 class CreateGroup:
     display_name: "str"
     description: "Optional[str]"
@@ -1014,6 +1073,7 @@ class GroupMembership:
     id_: "str"
     object_type: "str"
     display_name: "str"
+    user_principal_name: "Optional[str]"
     other_mails: "Optional[List[str]]"
     department: "Optional[str]"
     created_date_time: "Optional[str]"
@@ -1023,6 +1083,9 @@ class GroupMembership:
         o["id"] = self.id_
         o["objectType"] = self.object_type
         o["displayName"] = self.display_name
+        o["userPrincipalName"] = None
+        if self.user_principal_name is not None:
+            o["userPrincipalName"] = self.user_principal_name
         o["otherMails"] = None
         if self.other_mails is not None:
             other_mails_list = []
@@ -1043,6 +1106,7 @@ class GroupMembership:
         id_ = None
         object_type = None
         display_name = None
+        user_principal_name = None
         other_mails = None
         department = None
         created_date_time = None
@@ -1060,6 +1124,13 @@ class GroupMembership:
                 display_name_var = o[key]
                 assert type(display_name_var) is str
                 display_name = display_name_var
+            elif key == "userPrincipalName":
+                if o[key] is not None:
+                    user_principal_name_var = o[key]
+                    assert type(user_principal_name_var) is str
+                    user_principal_name = user_principal_name_var
+                else:
+                    user_principal_name = None
             elif key == "otherMails":
                 if o[key] is not None:
                     other_mails_var = o[key]
@@ -1091,18 +1162,19 @@ class GroupMembership:
         assert object_type is not None
         assert display_name is not None
 
-        return cls(id_, object_type, display_name, other_mails, department, created_date_time)
+        return cls(id_, object_type, display_name, user_principal_name, other_mails, department, created_date_time)
 
     @classmethod
     def make_default(cls) -> Self:
         id = ""
         objectType = ""
         displayName = ""
+        userPrincipalName = None
         otherMails = None
         department = None
         createdDateTime = None
 
-        return cls(id, objectType, displayName, otherMails, department, createdDateTime)
+        return cls(id, objectType, displayName, userPrincipalName, otherMails, department, createdDateTime)
 
 def get_principal(
     ctx: RequestContext,

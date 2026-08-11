@@ -212,6 +212,10 @@ enum class Fn : int16_t {
   GeoFilter = 195,
   StBuffer = 196,
   StDistance = 197,
+  Rank = 198,
+  PercentRank = 199,
+  Ntile = 200,
+  CumeDist = 201,
   CorrelationId = 32763,
   UlTimezone = 32764,
   UlArrayContains = 32765,
@@ -220,7 +224,7 @@ enum class Fn : int16_t {
   MAX = UlArrayAny
 };
 
-inline const Fn (&EnumValuesFn())[202] {
+inline const Fn (&EnumValuesFn())[206] {
   static const Fn values[] = {
     Fn::None,
     Fn::True,
@@ -420,6 +424,10 @@ inline const Fn (&EnumValuesFn())[202] {
     Fn::GeoFilter,
     Fn::StBuffer,
     Fn::StDistance,
+    Fn::Rank,
+    Fn::PercentRank,
+    Fn::Ntile,
+    Fn::CumeDist,
     Fn::CorrelationId,
     Fn::UlTimezone,
     Fn::UlArrayContains,
@@ -628,6 +636,10 @@ inline const char *EnumNameFn(Fn e) {
     case Fn::GeoFilter: return "GeoFilter";
     case Fn::StBuffer: return "StBuffer";
     case Fn::StDistance: return "StDistance";
+    case Fn::Rank: return "Rank";
+    case Fn::PercentRank: return "PercentRank";
+    case Fn::Ntile: return "Ntile";
+    case Fn::CumeDist: return "CumeDist";
     case Fn::CorrelationId: return "CorrelationId";
     case Fn::UlTimezone: return "UlTimezone";
     case Fn::UlArrayContains: return "UlArrayContains";

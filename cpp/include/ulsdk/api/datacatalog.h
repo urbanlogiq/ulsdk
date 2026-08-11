@@ -424,6 +424,17 @@ create_table(
 );
 
 /**
+ * Create many tables in one parent directory with a single directory update
+ * @param new_tables The tables to create; every entry must name the same parent directory
+ * @return Per-entry results, in request order
+ */
+Result<::ul::types::NewTableListResult>
+create_tables(
+    ul::RequestContext &ctx,
+    const ::ul::types::NewTableList &new_tables
+);
+
+/**
  * Evaluate the resulting schema of a query, returning an empty Arrow record batch
  * @param query The query to execute
  * @return The result of the query

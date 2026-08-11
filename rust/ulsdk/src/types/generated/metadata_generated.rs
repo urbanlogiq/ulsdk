@@ -1347,19 +1347,22 @@ pub const ENUM_MIN_GEOMETRY_SOURCE: u8 = 0;
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
-pub const ENUM_MAX_GEOMETRY_SOURCE: u8 = 3;
+pub const ENUM_MAX_GEOMETRY_SOURCE: u8 = 4;
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_GEOMETRY_SOURCE: [GeometrySource; 4] = [
+pub const ENUM_VALUES_GEOMETRY_SOURCE: [GeometrySource; 5] = [
     GeometrySource::NONE,
     GeometrySource::NoGeometry,
     GeometrySource::DatacatalogGeometry,
     GeometrySource::WorldGraphGeometry,
+    GeometrySource::DatacatalogLatLngGeometry,
 ];
 
+/// Append new variants only — a union member's position is its wire value, so
+/// inserting one would silently reinterpret existing stored metadata.
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 #[repr(transparent)]
 pub struct GeometrySource(pub u8);
@@ -1369,14 +1372,16 @@ impl GeometrySource {
     pub const NoGeometry: Self = Self(1);
     pub const DatacatalogGeometry: Self = Self(2);
     pub const WorldGraphGeometry: Self = Self(3);
+    pub const DatacatalogLatLngGeometry: Self = Self(4);
 
     pub const ENUM_MIN: u8 = 0;
-    pub const ENUM_MAX: u8 = 3;
+    pub const ENUM_MAX: u8 = 4;
     pub const ENUM_VALUES: &'static [Self] = &[
         Self::NONE,
         Self::NoGeometry,
         Self::DatacatalogGeometry,
         Self::WorldGraphGeometry,
+        Self::DatacatalogLatLngGeometry,
     ];
     /// Returns the variant's name or "" if unknown.
     pub fn variant_name(self) -> Option<&'static str> {
@@ -1385,6 +1390,7 @@ impl GeometrySource {
             Self::NoGeometry => Some("NoGeometry"),
             Self::DatacatalogGeometry => Some("DatacatalogGeometry"),
             Self::WorldGraphGeometry => Some("WorldGraphGeometry"),
+            Self::DatacatalogLatLngGeometry => Some("DatacatalogLatLngGeometry"),
             _ => None,
         }
     }
@@ -8867,6 +8873,178 @@ impl core::fmt::Debug for DatacatalogGeometry<'_> {
         ds.finish()
     }
 }
+pub enum DatacatalogLatLngGeometryOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+/// Point geometry stored as two scalar coordinate columns rather than one
+/// geometry column. Common for raw/bronze-level ingests, which land as-is
+/// without a transformation step to construct a geom column.
+///
+/// Consumers compose a point from the pair (e.g. st_makepoint(lng, lat))
+/// wherever they would otherwise reference a DatacatalogGeometry column.
+pub struct DatacatalogLatLngGeometry<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for DatacatalogLatLngGeometry<'a> {
+    type Inner = DatacatalogLatLngGeometry<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> DatacatalogLatLngGeometry<'a> {
+    pub const VT_LNG_COLUMN: flatbuffers::VOffsetT = 4;
+    pub const VT_LAT_COLUMN: flatbuffers::VOffsetT = 6;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        DatacatalogLatLngGeometry { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args DatacatalogLatLngGeometryArgs<'args>,
+    ) -> flatbuffers::WIPOffset<DatacatalogLatLngGeometry<'bldr>> {
+        let mut builder = DatacatalogLatLngGeometryBuilder::new(_fbb);
+        if let Some(x) = args.lat_column {
+            builder.add_lat_column(x);
+        }
+        if let Some(x) = args.lng_column {
+            builder.add_lng_column(x);
+        }
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn lng_column(&self) -> &'a str {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<&str>>(
+                    DatacatalogLatLngGeometry::VT_LNG_COLUMN,
+                    None,
+                )
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn lat_column(&self) -> &'a str {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<&str>>(
+                    DatacatalogLatLngGeometry::VT_LAT_COLUMN,
+                    None,
+                )
+                .unwrap()
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for DatacatalogLatLngGeometry<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<&str>>(
+                "lng_column",
+                Self::VT_LNG_COLUMN,
+                true,
+            )?
+            .visit_field::<flatbuffers::ForwardsUOffset<&str>>(
+                "lat_column",
+                Self::VT_LAT_COLUMN,
+                true,
+            )?
+            .finish();
+        Ok(())
+    }
+}
+pub struct DatacatalogLatLngGeometryArgs<'a> {
+    pub lng_column: Option<flatbuffers::WIPOffset<&'a str>>,
+    pub lat_column: Option<flatbuffers::WIPOffset<&'a str>>,
+}
+impl<'a> Default for DatacatalogLatLngGeometryArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        DatacatalogLatLngGeometryArgs {
+            lng_column: None, // required field
+            lat_column: None, // required field
+        }
+    }
+}
+
+impl Serialize for DatacatalogLatLngGeometry<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("DatacatalogLatLngGeometry", 2)?;
+        s.serialize_field("lng_column", &self.lng_column())?;
+        s.serialize_field("lat_column", &self.lat_column())?;
+        s.end()
+    }
+}
+
+pub struct DatacatalogLatLngGeometryBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> DatacatalogLatLngGeometryBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_lng_column(&mut self, lng_column: flatbuffers::WIPOffset<&'b str>) {
+        self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(
+            DatacatalogLatLngGeometry::VT_LNG_COLUMN,
+            lng_column,
+        );
+    }
+    #[inline]
+    pub fn add_lat_column(&mut self, lat_column: flatbuffers::WIPOffset<&'b str>) {
+        self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(
+            DatacatalogLatLngGeometry::VT_LAT_COLUMN,
+            lat_column,
+        );
+    }
+    #[inline]
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> DatacatalogLatLngGeometryBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        DatacatalogLatLngGeometryBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<DatacatalogLatLngGeometry<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_
+            .required(o, DatacatalogLatLngGeometry::VT_LNG_COLUMN, "lng_column");
+        self.fbb_
+            .required(o, DatacatalogLatLngGeometry::VT_LAT_COLUMN, "lat_column");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for DatacatalogLatLngGeometry<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("DatacatalogLatLngGeometry");
+        ds.field("lng_column", &self.lng_column());
+        ds.field("lat_column", &self.lat_column());
+        ds.finish()
+    }
+}
 pub enum WorldGraphGeometryOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -9389,6 +9567,23 @@ impl<'a> Metadata<'a> {
             None
         }
     }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn geometry_source_as_datacatalog_lat_lng_geometry(
+        &self,
+    ) -> Option<DatacatalogLatLngGeometry<'a>> {
+        if self.geometry_source_type() == GeometrySource::DatacatalogLatLngGeometry {
+            self.geometry_source().map(|t| {
+                // Safety:
+                // Created from a valid Table for this object
+                // Which contains a valid union in this slot
+                unsafe { DatacatalogLatLngGeometry::init_from_table(t) }
+            })
+        } else {
+            None
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for Metadata<'_> {
@@ -9399,82 +9594,30 @@ impl flatbuffers::Verifiable for Metadata<'_> {
     ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
         use self::flatbuffers::Verifiable;
         v.visit_table(pos)?
-            .visit_field::<flatbuffers::ForwardsUOffset<&str>>(
-                "display_name",
-                Self::VT_DISPLAY_NAME,
-                false,
-            )?
-            .visit_field::<flatbuffers::ForwardsUOffset<&str>>(
-                "description",
-                Self::VT_DESCRIPTION,
-                false,
-            )?
-            .visit_field::<flatbuffers::ForwardsUOffset<
-                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<UlField>>,
-            >>("fields", Self::VT_FIELDS, false)?
-            .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, i32>>>(
-                "summary",
-                Self::VT_SUMMARY,
-                false,
-            )?
-            .visit_field::<DatasetCategory>("dataset_category", Self::VT_DATASET_CATEGORY, false)?
-            .visit_field::<flatbuffers::ForwardsUOffset<
-                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<UlFieldRelationship>>,
-            >>("field_relationships", Self::VT_FIELD_RELATIONSHIPS, false)?
-            .visit_field::<flatbuffers::ForwardsUOffset<DatasetSource>>(
-                "source",
-                Self::VT_SOURCE,
-                false,
-            )?
-            .visit_union::<GeometrySource, _>(
-                "geometry_source_type",
-                Self::VT_GEOMETRY_SOURCE_TYPE,
-                "geometry_source",
-                Self::VT_GEOMETRY_SOURCE,
-                false,
-                |key, v, pos| match key {
-                    GeometrySource::NoGeometry => v
-                        .verify_union_variant::<flatbuffers::ForwardsUOffset<NoGeometry>>(
-                            "GeometrySource::NoGeometry",
-                            pos,
-                        ),
-                    GeometrySource::DatacatalogGeometry => v
-                        .verify_union_variant::<flatbuffers::ForwardsUOffset<DatacatalogGeometry>>(
-                            "GeometrySource::DatacatalogGeometry",
-                            pos,
-                        ),
-                    GeometrySource::WorldGraphGeometry => v
-                        .verify_union_variant::<flatbuffers::ForwardsUOffset<WorldGraphGeometry>>(
-                            "GeometrySource::WorldGraphGeometry",
-                            pos,
-                        ),
-                    _ => Ok(()),
-                },
-            )?
-            .visit_field::<bool>("area_selection", Self::VT_AREA_SELECTION, false)?
-            .visit_field::<bool>(
-                "do_not_filter_geometry_by_viewport",
-                Self::VT_DO_NOT_FILTER_GEOMETRY_BY_VIEWPORT,
-                false,
-            )?
-            .visit_field::<EntityTy>("entity_ty", Self::VT_ENTITY_TY, false)?
-            .visit_field::<UpdateCadence>("update_cadence", Self::VT_UPDATE_CADENCE, false)?
-            .visit_field::<i32>(
-                "location_description_field",
-                Self::VT_LOCATION_DESCRIPTION_FIELD,
-                false,
-            )?
-            .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, i32>>>(
-                "promoted_metrics",
-                Self::VT_PROMOTED_METRICS,
-                false,
-            )?
-            .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, i32>>>(
-                "visualize_in_explore_fields",
-                Self::VT_VISUALIZE_IN_EXPLORE_FIELDS,
-                false,
-            )?
-            .finish();
+     .visit_field::<flatbuffers::ForwardsUOffset<&str>>("display_name", Self::VT_DISPLAY_NAME, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<&str>>("description", Self::VT_DESCRIPTION, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<UlField>>>>("fields", Self::VT_FIELDS, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, i32>>>("summary", Self::VT_SUMMARY, false)?
+     .visit_field::<DatasetCategory>("dataset_category", Self::VT_DATASET_CATEGORY, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<UlFieldRelationship>>>>("field_relationships", Self::VT_FIELD_RELATIONSHIPS, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<DatasetSource>>("source", Self::VT_SOURCE, false)?
+     .visit_union::<GeometrySource, _>("geometry_source_type", Self::VT_GEOMETRY_SOURCE_TYPE, "geometry_source", Self::VT_GEOMETRY_SOURCE, false, |key, v, pos| {
+        match key {
+          GeometrySource::NoGeometry => v.verify_union_variant::<flatbuffers::ForwardsUOffset<NoGeometry>>("GeometrySource::NoGeometry", pos),
+          GeometrySource::DatacatalogGeometry => v.verify_union_variant::<flatbuffers::ForwardsUOffset<DatacatalogGeometry>>("GeometrySource::DatacatalogGeometry", pos),
+          GeometrySource::WorldGraphGeometry => v.verify_union_variant::<flatbuffers::ForwardsUOffset<WorldGraphGeometry>>("GeometrySource::WorldGraphGeometry", pos),
+          GeometrySource::DatacatalogLatLngGeometry => v.verify_union_variant::<flatbuffers::ForwardsUOffset<DatacatalogLatLngGeometry>>("GeometrySource::DatacatalogLatLngGeometry", pos),
+          _ => Ok(()),
+        }
+     })?
+     .visit_field::<bool>("area_selection", Self::VT_AREA_SELECTION, false)?
+     .visit_field::<bool>("do_not_filter_geometry_by_viewport", Self::VT_DO_NOT_FILTER_GEOMETRY_BY_VIEWPORT, false)?
+     .visit_field::<EntityTy>("entity_ty", Self::VT_ENTITY_TY, false)?
+     .visit_field::<UpdateCadence>("update_cadence", Self::VT_UPDATE_CADENCE, false)?
+     .visit_field::<i32>("location_description_field", Self::VT_LOCATION_DESCRIPTION_FIELD, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, i32>>>("promoted_metrics", Self::VT_PROMOTED_METRICS, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, i32>>>("visualize_in_explore_fields", Self::VT_VISUALIZE_IN_EXPLORE_FIELDS, false)?
+     .finish();
         Ok(())
     }
 }
@@ -9582,6 +9725,11 @@ impl Serialize for Metadata<'_> {
                 let f = self
                     .geometry_source_as_world_graph_geometry()
                     .expect("Invalid union table, expected `GeometrySource::WorldGraphGeometry`.");
+                s.serialize_field("geometry_source", &f)?;
+            }
+            GeometrySource::DatacatalogLatLngGeometry => {
+                let f = self.geometry_source_as_datacatalog_lat_lng_geometry()
+              .expect("Invalid union table, expected `GeometrySource::DatacatalogLatLngGeometry`.");
                 s.serialize_field("geometry_source", &f)?;
             }
             _ => unimplemented!(),
@@ -9790,6 +9938,16 @@ impl core::fmt::Debug for Metadata<'_> {
             }
             GeometrySource::WorldGraphGeometry => {
                 if let Some(x) = self.geometry_source_as_world_graph_geometry() {
+                    ds.field("geometry_source", &x)
+                } else {
+                    ds.field(
+                        "geometry_source",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            GeometrySource::DatacatalogLatLngGeometry => {
+                if let Some(x) = self.geometry_source_as_datacatalog_lat_lng_geometry() {
                     ds.field("geometry_source", &x)
                 } else {
                     ds.field(

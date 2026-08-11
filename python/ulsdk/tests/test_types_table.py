@@ -52,6 +52,24 @@ def test_new_table():
     _t1 = NewTable.from_bytes(_b)
     assert _t0 == _t1
 
+def test_new_table_list():
+    _t0 = NewTableList.make_default()
+    _b = _t0.to_bytes()
+    _t1 = NewTableList.from_bytes(_b)
+    assert _t0 == _t1
+
+def test_new_table_list_result():
+    _t0 = NewTableListResult.make_default()
+    _b = _t0.to_bytes()
+    _t1 = NewTableListResult.from_bytes(_b)
+    assert _t0 == _t1
+
+def test_new_table_result():
+    _t0 = NewTableResult.make_default()
+    _b = _t0.to_bytes()
+    _t1 = NewTableResult.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_op_entry():
     _t0 = OpEntry.make_default()
     _b = _t0.to_bytes()

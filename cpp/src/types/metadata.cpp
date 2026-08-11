@@ -69,6 +69,10 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const GeometrySource &o)
         const std::shared_ptr<WorldGraphGeometry> &v = std::get<std::shared_ptr<WorldGraphGeometry>>(o);
         const auto offset = serialize_to(builder, *v);
         return std::make_pair(offset.Union(), ::GeometrySource::WorldGraphGeometry);
+    } else if (std::holds_alternative<std::shared_ptr<DatacatalogLatLngGeometry>>(o)) {
+        const std::shared_ptr<DatacatalogLatLngGeometry> &v = std::get<std::shared_ptr<DatacatalogLatLngGeometry>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::GeometrySource::DatacatalogLatLngGeometry);
     } else { 
         throw std::runtime_error("unreachable");
     }
@@ -805,6 +809,56 @@ WorldGraphGeometry::operator==(const WorldGraphGeometry &rhs) const {
         return false;
     }
     if (this->start_stream_id_ != rhs.start_stream_id_) {
+        return false;
+    }
+    return true;
+}
+
+::flatbuffers::Offset<::DatacatalogLatLngGeometry>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DatacatalogLatLngGeometry &o) {
+    const ::flatbuffers::Offset<::flatbuffers::String> lat_column_offset = builder.CreateString(o.lat_column_);
+    const ::flatbuffers::Offset<::flatbuffers::String> lng_column_offset = builder.CreateString(o.lng_column_);
+
+    ::DatacatalogLatLngGeometryBuilder instance_builder = ::DatacatalogLatLngGeometryBuilder(builder);
+    instance_builder.add_lat_column(lat_column_offset);
+    instance_builder.add_lng_column(lng_column_offset);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const DatacatalogLatLngGeometry &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+DatacatalogLatLngGeometry::DatacatalogLatLngGeometry()
+    : lat_column_()
+    , lng_column_() {
+}
+
+DatacatalogLatLngGeometry::DatacatalogLatLngGeometry(const std::vector<uint8_t> &bytes)
+    : DatacatalogLatLngGeometry(::flatbuffers::GetSizePrefixedRoot<::DatacatalogLatLngGeometry>(bytes.data())) {
+}
+
+DatacatalogLatLngGeometry::DatacatalogLatLngGeometry(const ::DatacatalogLatLngGeometry *root) 
+    : lat_column_()
+    , lng_column_() {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+        lat_column_ = std::string(*root->lat_column()->begin(), *root->lat_column()->end());
+        lng_column_ = std::string(*root->lng_column()->begin(), *root->lng_column()->end());
+}
+
+bool
+DatacatalogLatLngGeometry::operator==(const DatacatalogLatLngGeometry &rhs) const {
+    if (this->lat_column_ != rhs.lat_column_) {
+        return false;
+    }
+    if (this->lng_column_ != rhs.lng_column_) {
         return false;
     }
     return true;
@@ -2050,6 +2104,12 @@ Metadata::Metadata(const ::Metadata *root)
             case ::GeometrySource::WorldGraphGeometry: {
                 const auto geometry_source__local = static_cast<const ::WorldGraphGeometry *>(root->geometry_source());
                 std::shared_ptr<WorldGraphGeometry> geometry_source__shared = std::make_shared<WorldGraphGeometry>(geometry_source__local);
+                geometry_source_ = geometry_source__shared;
+                break;
+            }
+            case ::GeometrySource::DatacatalogLatLngGeometry: {
+                const auto geometry_source__local = static_cast<const ::DatacatalogLatLngGeometry *>(root->geometry_source());
+                std::shared_ptr<DatacatalogLatLngGeometry> geometry_source__shared = std::make_shared<DatacatalogLatLngGeometry>(geometry_source__local);
                 geometry_source_ = geometry_source__shared;
                 break;
             }

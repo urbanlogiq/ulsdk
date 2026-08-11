@@ -11,5 +11,7 @@ export enum JoinTy {
   LeftOuter = 1,
   RightOuter = 2,
   Full = 3,
-  Cross = 4
+  Cross = 4,
+  LeftSemi = 5,
+  LeftAnti = 6
 }

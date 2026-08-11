@@ -74,7 +74,7 @@ fromType():TableFrom {
 /**
  * The base to use for the table. If an object ID is provided, this will
  * take the schema from the provided stream or metadata object. If a
- * schema is provided, the table will be created, empty, from that.           
+ * schema is provided, the table will be created, empty, from that.
  */
 from<T extends flatbuffers.Table>(obj:any):any|null {
   const offset = this.bb!.__offset(this.bb_pos, 14);

@@ -206,6 +206,10 @@ public final class Fn {
   public static final short GeoFilter = 195;
   public static final short StBuffer = 196;
   public static final short StDistance = 197;
+  public static final short Rank = 198;
+  public static final short PercentRank = 199;
+  public static final short Ntile = 200;
+  public static final short CumeDist = 201;
   public static final short CorrelationId = 32763;
   public static final short UlTimezone = 32764;
   public static final short UlArrayContains = 32765;

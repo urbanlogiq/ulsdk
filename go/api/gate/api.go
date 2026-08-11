@@ -12,6 +12,12 @@ import (
 
 var _ = fmt.Errorf
 
+type AdGroup struct {
+	Id string `json:"id"`
+	DisplayName string `json:"displayName"`
+	Description *string `json:"description,omitempty"`
+}
+
 type AdUser struct {
 	DisplayName string `json:"displayName"`
 	Id string `json:"id"`
@@ -19,12 +25,8 @@ type AdUser struct {
 	OtherMails *[]string `json:"otherMails,omitempty"`
 	Department *string `json:"department,omitempty"`
 	CreatedDateTime string `json:"createdDateTime"`
-}
-
-type AdGroup struct {
-	Id string `json:"id"`
-	DisplayName string `json:"displayName"`
-	Description *string `json:"description,omitempty"`
+	Groups *[]AdGroup `json:"groups,omitempty"`
+	AccountEnabled bool `json:"accountEnabled"`
 }
 
 type BootstrapPayload struct {

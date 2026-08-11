@@ -53,6 +53,22 @@ public final class AdUser {
         this._createdDateTime = value;
     }
 
+    com.urbanlogiq.ulsdk.api.gate.AdGroup[] _groups;
+    public com.urbanlogiq.ulsdk.api.gate.AdGroup[] getGroups() {
+        return this._groups;
+    }
+    public void setGroups(com.urbanlogiq.ulsdk.api.gate.AdGroup[] value) {
+        this._groups = value;
+    }
+
+    boolean _accountEnabled;
+    public boolean getAccountEnabled() {
+        return this._accountEnabled;
+    }
+    public void setAccountEnabled(boolean value) {
+        this._accountEnabled = value;
+    }
+
     public java.util.Map<String, Object> toMap() {
         java.util.Map<String, Object> o = new java.util.HashMap();
         Object displayNameSerialized = null;
@@ -90,6 +106,23 @@ public final class AdUser {
         createdDateTimeSerialized = this._createdDateTime;
         o.put("createdDateTime", createdDateTimeSerialized);
 
+        Object groupsSerialized = null;
+        if (this._groups != null) {
+            java.util.ArrayList<Object> groupsList = new java.util.ArrayList();
+            for (int i0 = 0; i0 < this._groups.length; i0++) {
+                com.urbanlogiq.ulsdk.api.gate.AdGroup item0 = this._groups[i0];
+                Object groupsVar = null;
+                groupsVar = item0.toMap();
+                groupsList.add(groupsVar);
+            }
+            groupsSerialized = groupsList;
+        }
+        o.put("groups", groupsSerialized);
+
+        Object accountEnabledSerialized = null;
+        accountEnabledSerialized = this._accountEnabled;
+        o.put("accountEnabled", accountEnabledSerialized);
+
         return o;
     }
 
@@ -123,6 +156,22 @@ public final class AdUser {
         }
         Object createdDateTimeValue = o.get("createdDateTime");
         this._createdDateTime = (String)createdDateTimeValue;
+        Object groupsValue = null;
+        if (o.has("groups") && !o.isNull("groups")) {
+            groupsValue = o.get("groups");
+        }
+        if (groupsValue != null) {
+            org.json.JSONArray groupsValueArray = (org.json.JSONArray)groupsValue;
+            this._groups = new com.urbanlogiq.ulsdk.api.gate.AdGroup[groupsValueArray.length()];
+            for (int i0 = 0; i0 < groupsValueArray.length(); i0++) {
+                Object item0 = groupsValueArray.get(i0);
+                com.urbanlogiq.ulsdk.api.gate.AdGroup groupsItem = null;
+                groupsItem = new AdGroup((org.json.JSONObject)item0);
+                this._groups[i0] = groupsItem;
+            }
+        }
+        Object accountEnabledValue = o.get("accountEnabled");
+        this._accountEnabled = (boolean)accountEnabledValue;
     }
 
     public AdUser() {
@@ -132,6 +181,8 @@ public final class AdUser {
         this._otherMails = null;
         this._department = null;
         this._createdDateTime = "";
+        this._groups = null;
+        this._accountEnabled = true;
     }
 
     @Override

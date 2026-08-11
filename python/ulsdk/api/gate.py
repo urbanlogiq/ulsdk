@@ -16,97 +16,6 @@ from uuid import UUID
 from ..request_context import RequestContext
 
 @dataclass
-class AdUser:
-    display_name: "str"
-    id_: "str"
-    user_principal_name: "str"
-    other_mails: "Optional[List[str]]"
-    department: "Optional[str]"
-    created_date_time: "str"
-
-    def to_dict(self) -> Dict[str, Any]:
-        o = dict()
-        o["displayName"] = self.display_name
-        o["id"] = self.id_
-        o["userPrincipalName"] = self.user_principal_name
-        o["otherMails"] = None
-        if self.other_mails is not None:
-            other_mails_list = []
-            for item in self.other_mails:
-                other_mails_var = item
-                other_mails_list.append(other_mails_var)
-            o["otherMails"] = other_mails_list
-        o["department"] = None
-        if self.department is not None:
-            o["department"] = self.department
-        o["createdDateTime"] = self.created_date_time
-        return o
-
-    @classmethod
-    def from_dict(cls, o: Dict[str, Any]) -> Self:
-        display_name = None
-        id_ = None
-        user_principal_name = None
-        other_mails = None
-        department = None
-        created_date_time = None
-
-        for key in o:
-            if key == "displayName":
-                display_name_var = o[key]
-                assert type(display_name_var) is str
-                display_name = display_name_var
-            elif key == "id":
-                id__var = o[key]
-                assert type(id__var) is str
-                id_ = id__var
-            elif key == "userPrincipalName":
-                user_principal_name_var = o[key]
-                assert type(user_principal_name_var) is str
-                user_principal_name = user_principal_name_var
-            elif key == "otherMails":
-                if o[key] is not None:
-                    other_mails_var = o[key]
-                    assert type(other_mails_var) is list
-                    other_mails = []
-                    for item in other_mails_var:
-                        other_mails_item_var = item
-                        assert type(other_mails_item_var) is str
-                        other_mails_item = other_mails_item_var
-                        other_mails.append(other_mails_item)
-                else:
-                    other_mails = None
-            elif key == "department":
-                if o[key] is not None:
-                    department_var = o[key]
-                    assert type(department_var) is str
-                    department = department_var
-                else:
-                    department = None
-            elif key == "createdDateTime":
-                created_date_time_var = o[key]
-                assert type(created_date_time_var) is str
-                created_date_time = created_date_time_var
-
-        assert display_name is not None
-        assert id_ is not None
-        assert user_principal_name is not None
-        assert created_date_time is not None
-
-        return cls(display_name, id_, user_principal_name, other_mails, department, created_date_time)
-
-    @classmethod
-    def make_default(cls) -> Self:
-        displayName = ""
-        id = ""
-        userPrincipalName = ""
-        otherMails = None
-        department = None
-        createdDateTime = ""
-
-        return cls(displayName, id, userPrincipalName, otherMails, department, createdDateTime)
-
-@dataclass
 class AdGroup:
     id_: "str"
     display_name: "str"
@@ -156,6 +65,128 @@ class AdGroup:
         description = None
 
         return cls(id, displayName, description)
+
+@dataclass
+class AdUser:
+    display_name: "str"
+    id_: "str"
+    user_principal_name: "str"
+    other_mails: "Optional[List[str]]"
+    department: "Optional[str]"
+    created_date_time: "str"
+    groups: "Optional[List[AdGroup]]"
+    account_enabled: "bool"
+
+    def to_dict(self) -> Dict[str, Any]:
+        o = dict()
+        o["displayName"] = self.display_name
+        o["id"] = self.id_
+        o["userPrincipalName"] = self.user_principal_name
+        o["otherMails"] = None
+        if self.other_mails is not None:
+            other_mails_list = []
+            for item in self.other_mails:
+                other_mails_var = item
+                other_mails_list.append(other_mails_var)
+            o["otherMails"] = other_mails_list
+        o["department"] = None
+        if self.department is not None:
+            o["department"] = self.department
+        o["createdDateTime"] = self.created_date_time
+        o["groups"] = None
+        if self.groups is not None:
+            groups_list = []
+            for item in self.groups:
+                groups_var = item.to_dict()
+                groups_list.append(groups_var)
+            o["groups"] = groups_list
+        o["accountEnabled"] = self.account_enabled
+        return o
+
+    @classmethod
+    def from_dict(cls, o: Dict[str, Any]) -> Self:
+        display_name = None
+        id_ = None
+        user_principal_name = None
+        other_mails = None
+        department = None
+        created_date_time = None
+        groups = None
+        account_enabled = None
+
+        for key in o:
+            if key == "displayName":
+                display_name_var = o[key]
+                assert type(display_name_var) is str
+                display_name = display_name_var
+            elif key == "id":
+                id__var = o[key]
+                assert type(id__var) is str
+                id_ = id__var
+            elif key == "userPrincipalName":
+                user_principal_name_var = o[key]
+                assert type(user_principal_name_var) is str
+                user_principal_name = user_principal_name_var
+            elif key == "otherMails":
+                if o[key] is not None:
+                    other_mails_var = o[key]
+                    assert type(other_mails_var) is list
+                    other_mails = []
+                    for item in other_mails_var:
+                        other_mails_item_var = item
+                        assert type(other_mails_item_var) is str
+                        other_mails_item = other_mails_item_var
+                        other_mails.append(other_mails_item)
+                else:
+                    other_mails = None
+            elif key == "department":
+                if o[key] is not None:
+                    department_var = o[key]
+                    assert type(department_var) is str
+                    department = department_var
+                else:
+                    department = None
+            elif key == "createdDateTime":
+                created_date_time_var = o[key]
+                assert type(created_date_time_var) is str
+                created_date_time = created_date_time_var
+            elif key == "groups":
+                if o[key] is not None:
+                    groups_var = o[key]
+                    assert type(groups_var) is list
+                    groups = []
+                    for item in groups_var:
+                        groups_item_var = item
+                        assert type(groups_item_var) is dict
+                        groups_item = AdGroup.from_dict(groups_item_var)
+                        groups.append(groups_item)
+                else:
+                    groups = None
+            elif key == "accountEnabled":
+                account_enabled_var = o[key]
+                assert type(account_enabled_var) is bool
+                account_enabled = account_enabled_var
+
+        assert display_name is not None
+        assert id_ is not None
+        assert user_principal_name is not None
+        assert created_date_time is not None
+        assert account_enabled is not None
+
+        return cls(display_name, id_, user_principal_name, other_mails, department, created_date_time, groups, account_enabled)
+
+    @classmethod
+    def make_default(cls) -> Self:
+        displayName = ""
+        id = ""
+        userPrincipalName = ""
+        otherMails = None
+        department = None
+        createdDateTime = ""
+        groups = None
+        accountEnabled = True
+
+        return cls(displayName, id, userPrincipalName, otherMails, department, createdDateTime, groups, accountEnabled)
 
 @dataclass
 class Bootstrap:

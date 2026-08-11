@@ -1052,6 +1052,36 @@ func TestCreateTable(t *testing.T) {
 	}
 }
 
+func TestCreateTables(t *testing.T) {
+	ctx := ulsdk.NewTestContextFromEnv()
+	if ctx == nil {
+		t.Skip("credentials not set, skipping API test")
+	}
+
+	body := &table.NewTableList{}
+
+	success := false
+	for i := 0; i < 5; i++ {
+		expected := &table.NewTableListResult{}
+		expectedBytes := expected.ToBytes()
+		ctx.SetResponse(expectedBytes)
+		result, err := CreateTables(
+			ctx,
+			body,
+		)
+		if err != nil {
+			time.Sleep(time.Duration(i+1) * time.Second)
+			continue
+		}
+		_ = result
+		success = true
+		break
+	}
+	if !success {
+		t.Fatal("test was unable to complete with retries")
+	}
+}
+
 func TestSchemaArrow(t *testing.T) {
 	ctx := ulsdk.NewTestContextFromEnv()
 	if ctx == nil {

@@ -8,6 +8,7 @@ import { CategoryRelationshipData as FbsCategoryRelationshipData, CategoryRelati
 import { ComponentData as FbsComponentData } from './generated/component-data';
 import { ContactInfo as FbsContactInfo, ContactInfoT as FbsContactInfoT } from './generated/contact-info';
 import { DatacatalogGeometry as FbsDatacatalogGeometry, DatacatalogGeometryT as FbsDatacatalogGeometryT } from './generated/datacatalog-geometry';
+import { DatacatalogLatLngGeometry as FbsDatacatalogLatLngGeometry, DatacatalogLatLngGeometryT as FbsDatacatalogLatLngGeometryT } from './generated/datacatalog-lat-lng-geometry';
 import { DatasetSource as FbsDatasetSource, DatasetSourceT as FbsDatasetSourceT } from './generated/dataset-source';
 import { Dates as FbsDates, DatesT as FbsDatesT } from './generated/dates';
 import { DatetimeRange as FbsDatetimeRange, DatetimeRangeT as FbsDatetimeRangeT } from './generated/datetime-range';
@@ -918,7 +919,73 @@ export class WorldGraphGeometry {
   }
 }
 
-export type GeometrySource = NoGeometry | DatacatalogGeometry | WorldGraphGeometry;
+/**
+ *  Point geometry stored as two scalar coordinate columns rather than one
+ *  geometry column. Common for raw/bronze-level ingests, which land as-is
+ *  without a transformation step to construct a geom column.
+ *
+ *  Consumers compose a point from the pair (e.g. st_makepoint(lng, lat))
+ *  wherever they would otherwise reference a DatacatalogGeometry column.
+ */
+export class DatacatalogLatLngGeometry {
+  private _latColumn!: string;
+
+  private _lngColumn!: string;
+
+  constructor(arg?: FbsDatacatalogLatLngGeometry | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsDatacatalogLatLngGeometry.getSizePrefixedRootAsDatacatalogLatLngGeometry(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsDatacatalogLatLngGeometry) {
+      this._initFromFbs(arg);
+    } else {
+      this._latColumn = '';
+      this._lngColumn = '';
+    }
+  }
+
+  private _initFromFbs(fbs: FbsDatacatalogLatLngGeometry): void {
+    this._latColumn = fbs.latColumn() ?? '';
+    this._lngColumn = fbs.lngColumn() ?? '';
+  }
+
+  get latColumn(): string {
+    return this._latColumn;
+  }
+
+  set latColumn(value: string) {
+    this._latColumn = value;
+  }
+
+  get lngColumn(): string {
+    return this._lngColumn;
+  }
+
+  set lngColumn(value: string) {
+    this._lngColumn = value;
+  }
+
+  toFbsT(): FbsDatacatalogLatLngGeometryT {
+    const t = new FbsDatacatalogLatLngGeometryT();
+    t.latColumn = this._latColumn;
+    t.lngColumn = this._lngColumn;
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+}
+
+/**
+ *  Append new variants only — a union member's position is its wire value, so
+ *  inserting one would silently reinterpret existing stored metadata.
+ */
+export type GeometrySource = NoGeometry | DatacatalogGeometry | WorldGraphGeometry | DatacatalogLatLngGeometry;
 
 export { NumericalFieldValueType } from './generated/numerical-field-value-type';
 
@@ -2068,6 +2135,9 @@ export class Metadata {
     } else if (geometrySourceTy === FbsGeometrySource.WorldGraphGeometry) {
       const geometrySourceFbsVal = fbs.geometrySource(new FbsWorldGraphGeometry());
       this._geometrySource = geometrySourceFbsVal ? new WorldGraphGeometry(geometrySourceFbsVal) : null;
+    } else if (geometrySourceTy === FbsGeometrySource.DatacatalogLatLngGeometry) {
+      const geometrySourceFbsVal = fbs.geometrySource(new FbsDatacatalogLatLngGeometry());
+      this._geometrySource = geometrySourceFbsVal ? new DatacatalogLatLngGeometry(geometrySourceFbsVal) : null;
     } else {
       this._geometrySource = null;
     }
@@ -2230,6 +2300,9 @@ export class Metadata {
       t.geometrySource = this._geometrySource.toFbsT();
     } else if (this._geometrySource instanceof WorldGraphGeometry) {
       t.geometrySourceType = FbsGeometrySource.WorldGraphGeometry;
+      t.geometrySource = this._geometrySource.toFbsT();
+    } else if (this._geometrySource instanceof DatacatalogLatLngGeometry) {
+      t.geometrySourceType = FbsGeometrySource.DatacatalogLatLngGeometry;
       t.geometrySource = this._geometrySource.toFbsT();
     }
     t.locationDescriptionField = this._locationDescriptionField;

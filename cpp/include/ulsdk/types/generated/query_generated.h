@@ -317,35 +317,41 @@ enum class JoinTy : int8_t {
   RightOuter = 2,
   Full = 3,
   Cross = 4,
+  LeftSemi = 5,
+  LeftAnti = 6,
   MIN = Inner,
-  MAX = Cross
+  MAX = LeftAnti
 };
 
-inline const JoinTy (&EnumValuesJoinTy())[5] {
+inline const JoinTy (&EnumValuesJoinTy())[7] {
   static const JoinTy values[] = {
     JoinTy::Inner,
     JoinTy::LeftOuter,
     JoinTy::RightOuter,
     JoinTy::Full,
-    JoinTy::Cross
+    JoinTy::Cross,
+    JoinTy::LeftSemi,
+    JoinTy::LeftAnti
   };
   return values;
 }
 
 inline const char * const *EnumNamesJoinTy() {
-  static const char * const names[6] = {
+  static const char * const names[8] = {
     "Inner",
     "LeftOuter",
     "RightOuter",
     "Full",
     "Cross",
+    "LeftSemi",
+    "LeftAnti",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameJoinTy(JoinTy e) {
-  if (::flatbuffers::IsOutRange(e, JoinTy::Inner, JoinTy::Cross)) return "";
+  if (::flatbuffers::IsOutRange(e, JoinTy::Inner, JoinTy::LeftAnti)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesJoinTy()[index];
 }

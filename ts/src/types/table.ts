@@ -13,6 +13,9 @@ import { DiffStream as FbsDiffStream, DiffStreamT as FbsDiffStreamT } from './ge
 import { History as FbsHistory, HistoryT as FbsHistoryT } from './generated/history';
 import { Modify as FbsModify, ModifyT as FbsModifyT } from './generated/modify';
 import { NewTable as FbsNewTable, NewTableT as FbsNewTableT } from './generated/new-table';
+import { NewTableList as FbsNewTableList, NewTableListT as FbsNewTableListT } from './generated/new-table-list';
+import { NewTableListResult as FbsNewTableListResult, NewTableListResultT as FbsNewTableListResultT } from './generated/new-table-list-result';
+import { NewTableResult as FbsNewTableResult, NewTableResultT as FbsNewTableResultT } from './generated/new-table-result';
 import { Op as FbsOp } from './generated/op';
 import { OpEntry as FbsOpEntry, OpEntryT as FbsOpEntryT } from './generated/op-entry';
 import { Restore as FbsRestore, RestoreT as FbsRestoreT } from './generated/restore';
@@ -924,7 +927,7 @@ export class NewTable {
 /**
  *  The base to use for the table. If an object ID is provided, this will
  *  take the schema from the provided stream or metadata object. If a
- *  schema is provided, the table will be created, empty, from that.           
+ *  schema is provided, the table will be created, empty, from that.
  */
   private _from!: TableFrom | null;
 
@@ -1034,6 +1037,202 @@ export class NewTable {
     t.name = this._name;
     t.parent = this._parent ? this._parent.toFbsT() : null;
     t.target = this._target ? this._target.toFbsT() : null;
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+}
+
+/**
+ *  Body parameter for POST datacatalog/tables. Creates many tables in the
+ *  same parent drive directory with a single directory update, instead of
+ *  one directory update for each table.
+ */
+export class NewTableList {
+/**
+ *  The tables to create. Every entry must name the same `parent`
+ *  directory; the request is rejected otherwise.
+ */
+  private _tables!: NewTable[];
+
+  constructor(arg?: FbsNewTableList | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsNewTableList.getSizePrefixedRootAsNewTableList(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsNewTableList) {
+      this._initFromFbs(arg);
+    } else {
+      this._tables = [];
+    }
+  }
+
+  private _initFromFbs(fbs: FbsNewTableList): void {
+    this._tables = Array.from({ length: fbs.tablesLength() }, (_, i) => {
+      const item = fbs.tables(i);
+      return item ? new NewTable(item) : new NewTable();
+    });
+  }
+
+  get tables(): NewTable[] {
+    return this._tables;
+  }
+
+  set tables(value: NewTable[]) {
+    this._tables = value;
+  }
+
+  toFbsT(): FbsNewTableListT {
+    const t = new FbsNewTableListT();
+    t.tables = this._tables.map(item => item.toFbsT());
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+}
+
+/**
+ *  Response body for POST datacatalog/tables.
+ */
+export class NewTableListResult {
+  private _results!: NewTableResult[];
+
+  constructor(arg?: FbsNewTableListResult | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsNewTableListResult.getSizePrefixedRootAsNewTableListResult(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsNewTableListResult) {
+      this._initFromFbs(arg);
+    } else {
+      this._results = [];
+    }
+  }
+
+  private _initFromFbs(fbs: FbsNewTableListResult): void {
+    this._results = Array.from({ length: fbs.resultsLength() }, (_, i) => {
+      const item = fbs.results(i);
+      return item ? new NewTableResult(item) : new NewTableResult();
+    });
+  }
+
+  get results(): NewTableResult[] {
+    return this._results;
+  }
+
+  set results(value: NewTableResult[]) {
+    this._results = value;
+  }
+
+  toFbsT(): FbsNewTableListResultT {
+    const t = new FbsNewTableListResultT();
+    t.results = this._results.map(item => item.toFbsT());
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+}
+
+/**
+ *  One entry of the response for POST datacatalog/tables. Entries are in
+ *  the same order as the request.
+ */
+export class NewTableResult {
+/**
+ *  True when a table with this name already existed and was reused.
+ */
+  private _adopted!: boolean;
+
+/**
+ *  The failure reason for this entry. The other entries of the request
+ *  are not affected by one entry's failure.
+ */
+  private _error!: string | null;
+
+/**
+ *  The ID of the table stream. Present on success; not present when
+ *  `error` is set.
+ */
+  private _id!: ObjectId | null;
+
+  private _name!: string;
+
+  constructor(arg?: FbsNewTableResult | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsNewTableResult.getSizePrefixedRootAsNewTableResult(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsNewTableResult) {
+      this._initFromFbs(arg);
+    } else {
+      this._adopted = false;
+      this._error = null;
+      this._id = null;
+      this._name = '';
+    }
+  }
+
+  private _initFromFbs(fbs: FbsNewTableResult): void {
+    this._adopted = fbs.adopted();
+    this._error = fbs.error();
+    const idVal = fbs.id();
+    this._id = idVal ? new ObjectId(idVal) : null;
+    this._name = fbs.name() ?? '';
+  }
+
+  get adopted(): boolean {
+    return this._adopted;
+  }
+
+  set adopted(value: boolean) {
+    this._adopted = value;
+  }
+
+  get error(): string | null {
+    return this._error;
+  }
+
+  set error(value: string | null) {
+    this._error = value;
+  }
+
+  get id(): ObjectId | null {
+    return this._id;
+  }
+
+  set id(value: ObjectId | null) {
+    this._id = value;
+  }
+
+  get name(): string {
+    return this._name;
+  }
+
+  set name(value: string) {
+    this._name = value;
+  }
+
+  toFbsT(): FbsNewTableResultT {
+    const t = new FbsNewTableResultT();
+    t.adopted = this._adopted;
+    t.error = this._error;
+    t.id = this._id ? this._id.toFbsT() : null;
+    t.name = this._name;
     return t;
   }
 

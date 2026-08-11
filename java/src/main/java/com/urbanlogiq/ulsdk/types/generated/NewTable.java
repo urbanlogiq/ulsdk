@@ -54,7 +54,7 @@ public final class NewTable extends com.google.flatbuffers.Table {
   /**
    * The base to use for the table. If an object ID is provided, this will
    * take the schema from the provided stream or metadata object. If a
-   * schema is provided, the table will be created, empty, from that.           
+   * schema is provided, the table will be created, empty, from that.
    */
   public com.google.flatbuffers.Table from(com.google.flatbuffers.Table obj) { int o = __offset(14); return o != 0 ? __union(obj, o + bb_pos) : null; }
 

@@ -162,6 +162,7 @@ from .generated.ContactInfo import ContactInfo as FbsContactInfo
 from .generated.ContentId import ContentId as FbsContentId
 from .generated.DataStateId import DataStateId as FbsDataStateId
 from .generated.DatacatalogGeometry import DatacatalogGeometry as FbsDatacatalogGeometry
+from .generated.DatacatalogLatLngGeometry import DatacatalogLatLngGeometry as FbsDatacatalogLatLngGeometry
 from .generated.DatasetSource import DatasetSource as FbsDatasetSource
 from .generated.Date import Date as FbsDate
 from .generated.Dates import Dates as FbsDates
@@ -1298,11 +1299,80 @@ class WorldGraphGeometry:
         return eq
 
 @dataclass
+class DatacatalogLatLngGeometry:
+    """ Point geometry stored as two scalar coordinate columns rather than one
+     geometry column. Common for raw/bronze-level ingests, which land as-is
+     without a transformation step to construct a geom column.
+
+     Consumers compose a point from the pair (e.g. st_makepoint(lng, lat))
+     wherever they would otherwise reference a DatacatalogGeometry column.
+    """
+
+    lat_column: "str"
+
+    lng_column: "str"
+
+    @classmethod
+    def from_fbs(cls, o: FbsDatacatalogLatLngGeometry) -> Self:
+        lat_column_str = o.LatColumn()
+        assert lat_column_str is not None
+        lat_column = lat_column_str.decode('utf-8')
+        lng_column_str = o.LngColumn()
+        assert lng_column_str is not None
+        lng_column = lng_column_str.decode('utf-8')
+        return cls(lat_column, lng_column)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsDatacatalogLatLngGeometry.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.DatacatalogLatLngGeometry import (
+            Start,
+            AddLatColumn,
+            AddLngColumn,
+            End,
+        )
+        lat_column_offset = builder.CreateString(self.lat_column)
+        lng_column_offset = builder.CreateString(self.lng_column)
+
+        Start(builder)
+        AddLatColumn(builder, lat_column_offset)
+        AddLngColumn(builder, lng_column_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        lat_column = ""
+        lng_column = ""
+        return cls(lat_column, lng_column)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.lat_column == other.lat_column
+        eq = eq and self.lng_column == other.lng_column
+
+        return eq
+
+@dataclass
 class GeometrySource:
+    """ Append new variants only — a union member's position is its wire value, so
+     inserting one would silently reinterpret existing stored metadata.
+    """
+
     value: Union[
         "NoGeometry",
         "DatacatalogGeometry",
         "WorldGraphGeometry",
+        "DatacatalogLatLngGeometry",
     ]
 
     def serialize_to(self, builder: Builder) -> Tuple[int, int]:
@@ -1314,6 +1384,8 @@ class GeometrySource:
             return (offset, GeometrySource().DatacatalogGeometry)
         elif isinstance(self.value, WorldGraphGeometry):
             return (offset, GeometrySource().WorldGraphGeometry)
+        elif isinstance(self.value, DatacatalogLatLngGeometry):
+            return (offset, GeometrySource().DatacatalogLatLngGeometry)
         raise ValueError("Invalid union type")
 
     @classmethod
@@ -1334,6 +1406,10 @@ class GeometrySource:
             val = FbsWorldGraphGeometry();
             val.Init(source, pos)
             return cls(WorldGraphGeometry.from_fbs(val))
+        elif ty == GeometrySource_ty_instance.DatacatalogLatLngGeometry:
+            val = FbsDatacatalogLatLngGeometry();
+            val.Init(source, pos)
+            return cls(DatacatalogLatLngGeometry.from_fbs(val))
         else:
             raise ValueError("Invalid union type")
 

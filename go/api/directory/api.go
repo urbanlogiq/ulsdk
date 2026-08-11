@@ -21,6 +21,13 @@ type Principal struct {
 	Email *[]string `json:"email,omitempty"`
 	Description *string `json:"description,omitempty"`
 	Department *string `json:"department,omitempty"`
+	AccountEnabled *bool `json:"accountEnabled,omitempty"`
+}
+
+type AdGroup struct {
+	Id string `json:"id"`
+	DisplayName string `json:"displayName"`
+	Description *string `json:"description,omitempty"`
 }
 
 type AdUser struct {
@@ -30,6 +37,8 @@ type AdUser struct {
 	OtherMails *[]string `json:"otherMails,omitempty"`
 	Department *string `json:"department,omitempty"`
 	CreatedDateTime string `json:"createdDateTime"`
+	Groups *[]AdGroup `json:"groups,omitempty"`
+	AccountEnabled bool `json:"accountEnabled"`
 }
 
 type DisplayNames struct {
@@ -39,6 +48,7 @@ type DisplayNames struct {
 
 type DeviceDetail struct {
 	DeviceId *string `json:"deviceId,omitempty"`
+	DisplayName *string `json:"displayName,omitempty"`
 	OperatingSystem *string `json:"operatingSystem,omitempty"`
 	Browser *string `json:"browser,omitempty"`
 	IsCompliant *bool `json:"isCompliant,omitempty"`
@@ -69,10 +79,6 @@ type AuditLogEntry struct {
 	Location *Location `json:"location,omitempty"`
 }
 
-type AuditLog struct {
-	Value []AuditLogEntry `json:"value"`
-}
-
 type AdUserWithAuditLog struct {
 	DisplayName string `json:"displayName"`
 	Id string `json:"id"`
@@ -80,7 +86,9 @@ type AdUserWithAuditLog struct {
 	OtherMails *[]string `json:"otherMails,omitempty"`
 	Department *string `json:"department,omitempty"`
 	CreatedDateTime string `json:"createdDateTime"`
-	AuditLog *AuditLog `json:"auditLog,omitempty"`
+	Groups *[]AdGroup `json:"groups,omitempty"`
+	AccountEnabled bool `json:"accountEnabled"`
+	AuditLog *[]AuditLogEntry `json:"auditLog,omitempty"`
 }
 
 type CreateUserRequest struct {
@@ -103,12 +111,6 @@ type UpdateUserPayload struct {
 	OtherMails *[]string `json:"otherMails,omitempty"`
 }
 
-type AdGroup struct {
-	Id string `json:"id"`
-	DisplayName string `json:"displayName"`
-	Description *string `json:"description,omitempty"`
-}
-
 type CreateGroupPayload struct {
 	DisplayName string `json:"displayName"`
 	Description *string `json:"description,omitempty"`
@@ -118,6 +120,7 @@ type GroupMembership struct {
 	Id string `json:"id"`
 	ObjectType string `json:"objectType"`
 	DisplayName string `json:"displayName"`
+	UserPrincipalName *string `json:"userPrincipalName,omitempty"`
 	OtherMails *[]string `json:"otherMails,omitempty"`
 	Department *string `json:"department,omitempty"`
 	CreatedDateTime *string `json:"createdDateTime,omitempty"`

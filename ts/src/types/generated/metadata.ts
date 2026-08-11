@@ -9,6 +9,7 @@
 import * as flatbuffers from 'flatbuffers/js/flatbuffers';
 
 import { DatacatalogGeometry, DatacatalogGeometryT } from './datacatalog-geometry';
+import { DatacatalogLatLngGeometry, DatacatalogLatLngGeometryT } from './datacatalog-lat-lng-geometry';
 import { DatasetCategory } from './dataset-category';
 import { DatasetSource, DatasetSourceT } from './dataset-source';
 import { EntityTy } from './entity-ty';
@@ -412,7 +413,7 @@ constructor(
   public fieldRelationships: (UlFieldRelationshipT)[] = [],
   public source: DatasetSourceT|null = null,
   public geometrySourceType: GeometrySource = GeometrySource.NONE,
-  public geometrySource: DatacatalogGeometryT|NoGeometryT|WorldGraphGeometryT|null = null,
+  public geometrySource: DatacatalogGeometryT|DatacatalogLatLngGeometryT|NoGeometryT|WorldGraphGeometryT|null = null,
   public areaSelection: boolean = false,
   public doNotFilterGeometryByViewport: boolean = false,
   public entityTy: EntityTy = EntityTy.T_INVALID,

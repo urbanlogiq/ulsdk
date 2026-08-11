@@ -17,25 +17,6 @@ namespace ul {
 namespace api {
 namespace gate {
 
-struct AdUser {
-    std::string display_name_;
-    std::string id_;
-    std::string user_principal_name_;
-    std::optional<std::vector<std::string>> other_mails_;
-    std::optional<std::string> department_;
-    std::string created_date_time_;
-
-    AdUser() = default;
-    AdUser(const struct json_value_s *root);
-    bool operator==(const AdUser &rhs) const;
-    bool operator!=(const AdUser &rhs) const {
-        return !(*this == rhs);
-    }
-};
-
-std::vector<uint8_t>
-to_bytes(const AdUser &o);
-
 struct AdGroup {
     std::string id_;
     std::string display_name_;
@@ -51,6 +32,27 @@ struct AdGroup {
 
 std::vector<uint8_t>
 to_bytes(const AdGroup &o);
+
+struct AdUser {
+    std::string display_name_;
+    std::string id_;
+    std::string user_principal_name_;
+    std::optional<std::vector<std::string>> other_mails_;
+    std::optional<std::string> department_;
+    std::string created_date_time_;
+    std::optional<std::vector<AdGroup>> groups_;
+    bool account_enabled_;
+
+    AdUser() = default;
+    AdUser(const struct json_value_s *root);
+    bool operator==(const AdUser &rhs) const;
+    bool operator!=(const AdUser &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+std::vector<uint8_t>
+to_bytes(const AdUser &o);
 
 struct Bootstrap {
     AdUser user_;

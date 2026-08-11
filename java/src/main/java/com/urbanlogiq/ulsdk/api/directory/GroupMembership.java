@@ -29,6 +29,14 @@ public final class GroupMembership {
         this._displayName = value;
     }
 
+    String _userPrincipalName;
+    public String getUserPrincipalName() {
+        return this._userPrincipalName;
+    }
+    public void setUserPrincipalName(String value) {
+        this._userPrincipalName = value;
+    }
+
     String[] _otherMails;
     public String[] getOtherMails() {
         return this._otherMails;
@@ -67,6 +75,12 @@ public final class GroupMembership {
         displayNameSerialized = this._displayName;
         o.put("displayName", displayNameSerialized);
 
+        Object userPrincipalNameSerialized = null;
+        if (this._userPrincipalName != null) {
+            userPrincipalNameSerialized = this._userPrincipalName;
+        }
+        o.put("userPrincipalName", userPrincipalNameSerialized);
+
         Object otherMailsSerialized = null;
         if (this._otherMails != null) {
             java.util.ArrayList<Object> otherMailsList = new java.util.ArrayList();
@@ -102,6 +116,13 @@ public final class GroupMembership {
         this._objectType = (String)objectTypeValue;
         Object displayNameValue = o.get("displayName");
         this._displayName = (String)displayNameValue;
+        Object userPrincipalNameValue = null;
+        if (o.has("userPrincipalName") && !o.isNull("userPrincipalName")) {
+            userPrincipalNameValue = o.get("userPrincipalName");
+        }
+        if (userPrincipalNameValue != null) {
+            this._userPrincipalName = (String)userPrincipalNameValue;
+        }
         Object otherMailsValue = null;
         if (o.has("otherMails") && !o.isNull("otherMails")) {
             otherMailsValue = o.get("otherMails");
@@ -136,6 +157,7 @@ public final class GroupMembership {
         this._id = "";
         this._objectType = "";
         this._displayName = "";
+        this._userPrincipalName = null;
         this._otherMails = null;
         this._department = null;
         this._createdDateTime = null;

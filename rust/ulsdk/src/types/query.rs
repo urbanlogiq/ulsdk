@@ -177,6 +177,8 @@ pub enum JoinTy {
     RightOuter = 2,
     Full = 3,
     Cross = 4,
+    LeftSemi = 5,
+    LeftAnti = 6,
 }
 
 impl TryFrom<i8> for JoinTy {
@@ -194,6 +196,8 @@ impl JoinTy {
             Self::RightOuter => Some("RightOuter"),
             Self::Full => Some("Full"),
             Self::Cross => Some("Cross"),
+            Self::LeftSemi => Some("LeftSemi"),
+            Self::LeftAnti => Some("LeftAnti"),
             _ => None,
         }
     }
@@ -207,6 +211,8 @@ impl From<JoinTy> for FbsJoinTy {
             JoinTy::RightOuter => FbsJoinTy::RightOuter,
             JoinTy::Full => FbsJoinTy::Full,
             JoinTy::Cross => FbsJoinTy::Cross,
+            JoinTy::LeftSemi => FbsJoinTy::LeftSemi,
+            JoinTy::LeftAnti => FbsJoinTy::LeftAnti,
         }
     }
 }
@@ -219,6 +225,8 @@ impl From<FbsJoinTy> for JoinTy {
             2 => Self::RightOuter,
             3 => Self::Full,
             4 => Self::Cross,
+            5 => Self::LeftSemi,
+            6 => Self::LeftAnti,
             _ => panic!("Invalid value {} when constructing JoinTy", fbs.0),
         }
     }

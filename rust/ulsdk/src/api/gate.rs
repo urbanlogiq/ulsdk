@@ -15,6 +15,14 @@ use crate::request_context::{ParamMap, RequestContext};
 use crate::{FbsSerde, read_arrow_ipc, read_arrow_schema, write_arrow_ipc};
 
 #[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct AdGroup {
+    id: String,
+    #[serde(rename = "displayName")]
+    display_name: String,
+    description: Option<String>,
+}
+
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct AdUser {
     #[serde(rename = "displayName")]
     display_name: String,
@@ -26,14 +34,9 @@ pub struct AdUser {
     department: Option<String>,
     #[serde(rename = "createdDateTime")]
     created_date_time: String,
-}
-
-#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
-pub struct AdGroup {
-    id: String,
-    #[serde(rename = "displayName")]
-    display_name: String,
-    description: Option<String>,
+    groups: Option<Vec<AdGroup>>,
+    #[serde(rename = "accountEnabled")]
+    account_enabled: bool,
 }
 
 #[derive(Debug, Default, PartialEq, Serialize, Deserialize)]

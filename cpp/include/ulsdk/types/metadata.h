@@ -28,6 +28,7 @@ namespace types {
 struct CategoryRelationshipData;
 struct ContactInfo;
 struct DatacatalogGeometry;
+struct DatacatalogLatLngGeometry;
 struct DatasetSource;
 struct Dates;
 struct DatetimeRange;
@@ -80,10 +81,15 @@ typedef std::variant<
     std::shared_ptr<NodeIdPair>
 > GeometryDataUnion;
 
+///
+/// Append new variants only — a union member's position is its wire value, so
+/// inserting one would silently reinterpret existing stored metadata.
+///
 typedef std::variant<
     std::shared_ptr<NoGeometry>,
     std::shared_ptr<DatacatalogGeometry>,
-    std::shared_ptr<WorldGraphGeometry>
+    std::shared_ptr<WorldGraphGeometry>,
+    std::shared_ptr<DatacatalogLatLngGeometry>
 > GeometrySource;
 
 using ::NumericalFieldValueType;
@@ -258,6 +264,27 @@ struct WorldGraphGeometry {
     WorldGraphGeometry(const std::vector<uint8_t> &bytes);
     bool operator==(const WorldGraphGeometry &rhs) const;
     bool operator!=(const WorldGraphGeometry &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+///
+/// Point geometry stored as two scalar coordinate columns rather than one
+/// geometry column. Common for raw/bronze-level ingests, which land as-is
+/// without a transformation step to construct a geom column.
+///
+/// Consumers compose a point from the pair (e.g. st_makepoint(lng, lat))
+/// wherever they would otherwise reference a DatacatalogGeometry column.
+///
+struct DatacatalogLatLngGeometry {
+    std::string lat_column_;
+    std::string lng_column_;
+
+    DatacatalogLatLngGeometry();
+    DatacatalogLatLngGeometry(const ::DatacatalogLatLngGeometry *root);
+    DatacatalogLatLngGeometry(const std::vector<uint8_t> &bytes);
+    bool operator==(const DatacatalogLatLngGeometry &rhs) const;
+    bool operator!=(const DatacatalogLatLngGeometry &rhs) const {
         return !(*this == rhs);
     }
 };
@@ -663,6 +690,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DatacatalogGeometr
 ::flatbuffers::Offset<::WorldGraphGeometry>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const WorldGraphGeometry &);
 
+::flatbuffers::Offset<::DatacatalogLatLngGeometry>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DatacatalogLatLngGeometry &);
+
 ::flatbuffers::Offset<::HierarchyRelationshipData>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const HierarchyRelationshipData &);
 
@@ -762,6 +792,9 @@ to_bytes(const DatacatalogGeometry &o);
 
 std::vector<uint8_t>
 to_bytes(const WorldGraphGeometry &o);
+
+std::vector<uint8_t>
+to_bytes(const DatacatalogLatLngGeometry &o);
 
 std::vector<uint8_t>
 to_bytes(const HierarchyRelationshipData &o);

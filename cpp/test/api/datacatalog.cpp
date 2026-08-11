@@ -814,6 +814,32 @@ test_create_table(ul::RequestContext &rctx) {
 ApiTest test_create_table_obj(test_create_table, "datacatalog::create_table", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
+test_create_tables(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    ::ul::types::NewTableList body = ::ul::types::NewTableList();
+    const ::ul::types::NewTableListResult expected = ::ul::types::NewTableListResult();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::datacatalog::create_tables(
+        ctx,
+        body
+    );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::NewTableListResult result_value = std::get<::ul::types::NewTableListResult>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
+}
+
+ApiTest test_create_tables_obj(test_create_tables, "datacatalog::create_tables", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
 test_schema_arrow(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     ::ul::types::Query body = ::ul::types::Query();

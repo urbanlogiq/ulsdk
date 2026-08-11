@@ -292,6 +292,8 @@ class JoinTy(Enum):
     RightOuter = 2
     Full = 3
     Cross = 4
+    LeftSemi = 5
+    LeftAnti = 6
 
 class QueryElementOp(Enum):
     Union_ = 0

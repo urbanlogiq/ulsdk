@@ -771,6 +771,25 @@ create_table(
     return ::ul::types::ObjectId(std::get<std::vector<uint8_t>>(res));
 }
 
+Result<::ul::types::NewTableListResult>
+create_tables(
+    ul::RequestContext &ctx,
+    const ::ul::types::NewTableList &new_tables
+) {
+    std::string path = "/v1/api/ulv2/datacatalog/tables";
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+    const std::vector<uint8_t> body = ::ul::types::to_bytes(new_tables);
+    const Result<std::vector<uint8_t>> res = ctx.post(path, body, "application/octet-stream", params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<::ul::types::NewTableListResult>(error);
+    }
+    return ::ul::types::NewTableListResult(std::get<std::vector<uint8_t>>(res));
+}
+
 Result<std::vector<std::shared_ptr<::arrow::RecordBatch>>>
 schema_arrow(
     ul::RequestContext &ctx,

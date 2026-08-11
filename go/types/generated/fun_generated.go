@@ -207,6 +207,10 @@ const (
 	FnGeoFilter            Fn = 195
 	FnStBuffer             Fn = 196
 	FnStDistance           Fn = 197
+	FnRank                 Fn = 198
+	FnPercentRank          Fn = 199
+	FnNtile                Fn = 200
+	FnCumeDist             Fn = 201
 	FnCorrelationId        Fn = 32763
 	FnUlTimezone           Fn = 32764
 	FnUlArrayContains      Fn = 32765
@@ -412,6 +416,10 @@ var EnumNamesFn = map[Fn]string{
 	FnGeoFilter:            "GeoFilter",
 	FnStBuffer:             "StBuffer",
 	FnStDistance:           "StDistance",
+	FnRank:                 "Rank",
+	FnPercentRank:          "PercentRank",
+	FnNtile:                "Ntile",
+	FnCumeDist:             "CumeDist",
 	FnCorrelationId:        "CorrelationId",
 	FnUlTimezone:           "UlTimezone",
 	FnUlArrayContains:      "UlArrayContains",
@@ -617,6 +625,10 @@ var EnumValuesFn = map[string]Fn{
 	"GeoFilter":            FnGeoFilter,
 	"StBuffer":             FnStBuffer,
 	"StDistance":           FnStDistance,
+	"Rank":                 FnRank,
+	"PercentRank":          FnPercentRank,
+	"Ntile":                FnNtile,
+	"CumeDist":             FnCumeDist,
 	"CorrelationId":        FnCorrelationId,
 	"UlTimezone":           FnUlTimezone,
 	"UlArrayContains":      FnUlArrayContains,

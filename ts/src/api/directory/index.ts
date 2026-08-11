@@ -13,6 +13,13 @@ export interface Principal {
   email?: string[];
   description?: string;
   department?: string;
+  accountEnabled?: boolean;
+}
+
+export interface AdGroup {
+  id: string;
+  displayName: string;
+  description?: string;
 }
 
 export interface AdUser {
@@ -22,6 +29,8 @@ export interface AdUser {
   otherMails?: string[];
   department?: string;
   createdDateTime: string;
+  groups?: AdGroup[];
+  accountEnabled: boolean;
 }
 
 export interface DisplayNames {
@@ -31,6 +40,7 @@ export interface DisplayNames {
 
 export interface DeviceDetail {
   deviceId?: string;
+  displayName?: string;
   operatingSystem?: string;
   browser?: string;
   isCompliant?: boolean;
@@ -61,10 +71,6 @@ export interface AuditLogEntry {
   location?: Location;
 }
 
-export interface AuditLog {
-  value: AuditLogEntry[];
-}
-
 export interface AdUserWithAuditLog {
   displayName: string;
   id: string;
@@ -72,7 +78,9 @@ export interface AdUserWithAuditLog {
   otherMails?: string[];
   department?: string;
   createdDateTime: string;
-  auditLog?: AuditLog;
+  groups?: AdGroup[];
+  accountEnabled: boolean;
+  auditLog?: AuditLogEntry[];
 }
 
 export interface CreateUserRequest {
@@ -95,12 +103,6 @@ export interface UpdateUser {
   otherMails?: string[];
 }
 
-export interface AdGroup {
-  id: string;
-  displayName: string;
-  description?: string;
-}
-
 export interface CreateGroup {
   displayName: string;
   description?: string;
@@ -110,6 +112,7 @@ export interface GroupMembership {
   id: string;
   objectType: string;
   displayName: string;
+  userPrincipalName?: string;
   otherMails?: string[];
   department?: string;
   createdDateTime?: string;

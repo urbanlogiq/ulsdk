@@ -596,7 +596,53 @@ func (o *WorldGraphGeometry) SerializeTo(builder *flatbuffers.Builder) flatbuffe
 	return generated.WorldGraphGeometryEnd(builder)
 }
 
-// GeometrySource is a union type. Possible concrete types: NoGeometry, DatacatalogGeometry, WorldGraphGeometry
+// DatacatalogLatLngGeometry -
+//  Point geometry stored as two scalar coordinate columns rather than one
+//  geometry column. Common for raw/bronze-level ingests, which land as-is
+//  without a transformation step to construct a geom column.
+//
+//  Consumers compose a point from the pair (e.g. st_makepoint(lng, lat))
+//  wherever they would otherwise reference a DatacatalogGeometry column.
+type DatacatalogLatLngGeometry struct {
+	LatColumn string
+	LngColumn string
+}
+
+func DatacatalogLatLngGeometryFromFbs(fbs *generated.DatacatalogLatLngGeometry) *DatacatalogLatLngGeometry {
+	o := &DatacatalogLatLngGeometry{}
+	o.LatColumn = string(fbs.LatColumn())
+	o.LngColumn = string(fbs.LngColumn())
+	return o
+}
+
+// DatacatalogLatLngGeometryFromBytes deserializes a DatacatalogLatLngGeometry from size-prefixed FlatBuffer bytes.
+func DatacatalogLatLngGeometryFromBytes(data []byte) (*DatacatalogLatLngGeometry, error) {
+	fbs := generated.GetSizePrefixedRootAsDatacatalogLatLngGeometry(data, 0)
+	return DatacatalogLatLngGeometryFromFbs(fbs), nil
+}
+
+// ToBytes serializes the DatacatalogLatLngGeometry to size-prefixed FlatBuffer bytes.
+func (o *DatacatalogLatLngGeometry) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the DatacatalogLatLngGeometry into a FlatBuffer builder and returns the offset.
+func (o *DatacatalogLatLngGeometry) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	latColumnOffset := builder.CreateString(o.LatColumn)
+	lngColumnOffset := builder.CreateString(o.LngColumn)
+	generated.DatacatalogLatLngGeometryStart(builder)
+	generated.DatacatalogLatLngGeometryAddLatColumn(builder, latColumnOffset)
+	generated.DatacatalogLatLngGeometryAddLngColumn(builder, lngColumnOffset)
+	return generated.DatacatalogLatLngGeometryEnd(builder)
+}
+
+// GeometrySource -
+//  Append new variants only — a union member's position is its wire value, so
+//  inserting one would silently reinterpret existing stored metadata.
+// GeometrySource is a union type. Possible concrete types: NoGeometry, DatacatalogGeometry, WorldGraphGeometry, DatacatalogLatLngGeometry
 type GeometrySource interface {
 	isGeometrySource()
 }

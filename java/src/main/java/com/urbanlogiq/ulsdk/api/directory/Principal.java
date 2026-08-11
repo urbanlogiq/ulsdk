@@ -53,6 +53,14 @@ public final class Principal {
         this._department = value;
     }
 
+    Boolean _accountEnabled;
+    public Boolean getAccountEnabled() {
+        return this._accountEnabled;
+    }
+    public void setAccountEnabled(Boolean value) {
+        this._accountEnabled = value;
+    }
+
     public java.util.Map<String, Object> toMap() {
         java.util.Map<String, Object> o = new java.util.HashMap();
         Object principalTypeSerialized = null;
@@ -92,6 +100,12 @@ public final class Principal {
         }
         o.put("department", departmentSerialized);
 
+        Object accountEnabledSerialized = null;
+        if (this._accountEnabled != null) {
+            accountEnabledSerialized = this._accountEnabled;
+        }
+        o.put("accountEnabled", accountEnabledSerialized);
+
         return o;
     }
 
@@ -130,6 +144,13 @@ public final class Principal {
         if (departmentValue != null) {
             this._department = (String)departmentValue;
         }
+        Object accountEnabledValue = null;
+        if (o.has("accountEnabled") && !o.isNull("accountEnabled")) {
+            accountEnabledValue = o.get("accountEnabled");
+        }
+        if (accountEnabledValue != null) {
+            this._accountEnabled = (boolean)accountEnabledValue;
+        }
     }
 
     public Principal() {
@@ -139,6 +160,7 @@ public final class Principal {
         this._email = null;
         this._description = null;
         this._department = null;
+        this._accountEnabled = null;
     }
 
     @Override

@@ -883,6 +883,29 @@ public final class TestApiDatacatalog {
     }
 
     @RetryingTest(maxAttempts = 5, suspendForMs = 200)
+    public void testCreateTables() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String caUser = System.getenv("CA_USER");
+        String caAccessKey = System.getenv("CA_ACCESS_KEY");
+        String caSecretKey = System.getenv("CA_SECRET_KEY");
+
+        if (caUser == null || caAccessKey == null || caSecretKey == null) {
+            throw new RuntimeException("user / key not present, cannot run tests");
+        }
+
+        com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
+        com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
+        com.urbanlogiq.ulsdk.types.NewTableList body = new com.urbanlogiq.ulsdk.types.NewTableList();
+        com.urbanlogiq.ulsdk.types.NewTableListResult expected = new com.urbanlogiq.ulsdk.types.NewTableListResult();
+        byte[] expectedBytes = expected.toBytes();
+        ctx.setResponse(expectedBytes);
+        com.urbanlogiq.ulsdk.types.NewTableListResult result = com.urbanlogiq.ulsdk.api.datacatalog.Datacatalog.createTables(
+            ctx,
+            body
+        );
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
+    }
+
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testSchemaArrow() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");

@@ -1516,7 +1516,7 @@ impl<'a> NewTable<'a> {
     }
     /// The base to use for the table. If an object ID is provided, this will
     /// take the schema from the provided stream or metadata object. If a
-    /// schema is provided, the table will be created, empty, from that.           
+    /// schema is provided, the table will be created, empty, from that.
     #[inline]
     pub fn from(&self) -> Option<flatbuffers::Table<'a>> {
         // Safety:
@@ -1751,6 +1751,485 @@ impl core::fmt::Debug for NewTable<'_> {
                 ds.field("from", &x)
             }
         };
+        ds.finish()
+    }
+}
+pub enum NewTableListOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+/// Body parameter for POST datacatalog/tables. Creates many tables in the
+/// same parent drive directory with a single directory update, instead of
+/// one directory update for each table.
+pub struct NewTableList<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for NewTableList<'a> {
+    type Inner = NewTableList<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> NewTableList<'a> {
+    pub const VT_TABLES: flatbuffers::VOffsetT = 4;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        NewTableList { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args NewTableListArgs<'args>,
+    ) -> flatbuffers::WIPOffset<NewTableList<'bldr>> {
+        let mut builder = NewTableListBuilder::new(_fbb);
+        if let Some(x) = args.tables {
+            builder.add_tables(x);
+        }
+        builder.finish()
+    }
+
+    /// The tables to create. Every entry must name the same `parent`
+    /// directory; the request is rejected otherwise.
+    #[inline]
+    pub fn tables(&self) -> flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<NewTable<'a>>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<
+                    flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<NewTable>>,
+                >>(NewTableList::VT_TABLES, None)
+                .unwrap()
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for NewTableList<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<NewTable>>,
+            >>("tables", Self::VT_TABLES, true)?
+            .finish();
+        Ok(())
+    }
+}
+pub struct NewTableListArgs<'a> {
+    pub tables: Option<
+        flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<NewTable<'a>>>>,
+    >,
+}
+impl<'a> Default for NewTableListArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        NewTableListArgs {
+            tables: None, // required field
+        }
+    }
+}
+
+impl Serialize for NewTableList<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("NewTableList", 1)?;
+        s.serialize_field("tables", &self.tables())?;
+        s.end()
+    }
+}
+
+pub struct NewTableListBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> NewTableListBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_tables(
+        &mut self,
+        tables: flatbuffers::WIPOffset<
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<NewTable<'b>>>,
+        >,
+    ) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(NewTableList::VT_TABLES, tables);
+    }
+    #[inline]
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> NewTableListBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        NewTableListBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<NewTableList<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_.required(o, NewTableList::VT_TABLES, "tables");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for NewTableList<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("NewTableList");
+        ds.field("tables", &self.tables());
+        ds.finish()
+    }
+}
+pub enum NewTableResultOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+/// One entry of the response for POST datacatalog/tables. Entries are in
+/// the same order as the request.
+pub struct NewTableResult<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for NewTableResult<'a> {
+    type Inner = NewTableResult<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> NewTableResult<'a> {
+    pub const VT_NAME: flatbuffers::VOffsetT = 4;
+    pub const VT_ID: flatbuffers::VOffsetT = 6;
+    pub const VT_ADOPTED: flatbuffers::VOffsetT = 8;
+    pub const VT_ERROR: flatbuffers::VOffsetT = 10;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        NewTableResult { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args NewTableResultArgs<'args>,
+    ) -> flatbuffers::WIPOffset<NewTableResult<'bldr>> {
+        let mut builder = NewTableResultBuilder::new(_fbb);
+        if let Some(x) = args.error {
+            builder.add_error(x);
+        }
+        if let Some(x) = args.id {
+            builder.add_id(x);
+        }
+        if let Some(x) = args.name {
+            builder.add_name(x);
+        }
+        builder.add_adopted(args.adopted);
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn name(&self) -> &'a str {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<&str>>(NewTableResult::VT_NAME, None)
+                .unwrap()
+        }
+    }
+    /// The ID of the table stream. Present on success; not present when
+    /// `error` is set.
+    #[inline]
+    pub fn id(&self) -> Option<ObjectId<'a>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<ObjectId>>(NewTableResult::VT_ID, None)
+        }
+    }
+    /// True when a table with this name already existed and was reused.
+    #[inline]
+    pub fn adopted(&self) -> bool {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<bool>(NewTableResult::VT_ADOPTED, Some(false))
+                .unwrap()
+        }
+    }
+    /// The failure reason for this entry. The other entries of the request
+    /// are not affected by one entry's failure.
+    #[inline]
+    pub fn error(&self) -> Option<&'a str> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<&str>>(NewTableResult::VT_ERROR, None)
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for NewTableResult<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<&str>>("name", Self::VT_NAME, true)?
+            .visit_field::<flatbuffers::ForwardsUOffset<ObjectId>>("id", Self::VT_ID, false)?
+            .visit_field::<bool>("adopted", Self::VT_ADOPTED, false)?
+            .visit_field::<flatbuffers::ForwardsUOffset<&str>>("error", Self::VT_ERROR, false)?
+            .finish();
+        Ok(())
+    }
+}
+pub struct NewTableResultArgs<'a> {
+    pub name: Option<flatbuffers::WIPOffset<&'a str>>,
+    pub id: Option<flatbuffers::WIPOffset<ObjectId<'a>>>,
+    pub adopted: bool,
+    pub error: Option<flatbuffers::WIPOffset<&'a str>>,
+}
+impl<'a> Default for NewTableResultArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        NewTableResultArgs {
+            name: None, // required field
+            id: None,
+            adopted: false,
+            error: None,
+        }
+    }
+}
+
+impl Serialize for NewTableResult<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("NewTableResult", 4)?;
+        s.serialize_field("name", &self.name())?;
+        if let Some(f) = self.id() {
+            s.serialize_field("id", &f)?;
+        } else {
+            s.skip_field("id")?;
+        }
+        s.serialize_field("adopted", &self.adopted())?;
+        if let Some(f) = self.error() {
+            s.serialize_field("error", &f)?;
+        } else {
+            s.skip_field("error")?;
+        }
+        s.end()
+    }
+}
+
+pub struct NewTableResultBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> NewTableResultBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_name(&mut self, name: flatbuffers::WIPOffset<&'b str>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(NewTableResult::VT_NAME, name);
+    }
+    #[inline]
+    pub fn add_id(&mut self, id: flatbuffers::WIPOffset<ObjectId<'b>>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<ObjectId>>(NewTableResult::VT_ID, id);
+    }
+    #[inline]
+    pub fn add_adopted(&mut self, adopted: bool) {
+        self.fbb_
+            .push_slot::<bool>(NewTableResult::VT_ADOPTED, adopted, false);
+    }
+    #[inline]
+    pub fn add_error(&mut self, error: flatbuffers::WIPOffset<&'b str>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(NewTableResult::VT_ERROR, error);
+    }
+    #[inline]
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> NewTableResultBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        NewTableResultBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<NewTableResult<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_.required(o, NewTableResult::VT_NAME, "name");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for NewTableResult<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("NewTableResult");
+        ds.field("name", &self.name());
+        ds.field("id", &self.id());
+        ds.field("adopted", &self.adopted());
+        ds.field("error", &self.error());
+        ds.finish()
+    }
+}
+pub enum NewTableListResultOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+/// Response body for POST datacatalog/tables.
+pub struct NewTableListResult<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for NewTableListResult<'a> {
+    type Inner = NewTableListResult<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> NewTableListResult<'a> {
+    pub const VT_RESULTS: flatbuffers::VOffsetT = 4;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        NewTableListResult { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args NewTableListResultArgs<'args>,
+    ) -> flatbuffers::WIPOffset<NewTableListResult<'bldr>> {
+        let mut builder = NewTableListResultBuilder::new(_fbb);
+        if let Some(x) = args.results {
+            builder.add_results(x);
+        }
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn results(
+        &self,
+    ) -> flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<NewTableResult<'a>>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<
+                    flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<NewTableResult>>,
+                >>(NewTableListResult::VT_RESULTS, None)
+                .unwrap()
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for NewTableListResult<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<NewTableResult>>,
+            >>("results", Self::VT_RESULTS, true)?
+            .finish();
+        Ok(())
+    }
+}
+pub struct NewTableListResultArgs<'a> {
+    pub results: Option<
+        flatbuffers::WIPOffset<
+            flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<NewTableResult<'a>>>,
+        >,
+    >,
+}
+impl<'a> Default for NewTableListResultArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        NewTableListResultArgs {
+            results: None, // required field
+        }
+    }
+}
+
+impl Serialize for NewTableListResult<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("NewTableListResult", 1)?;
+        s.serialize_field("results", &self.results())?;
+        s.end()
+    }
+}
+
+pub struct NewTableListResultBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> NewTableListResultBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_results(
+        &mut self,
+        results: flatbuffers::WIPOffset<
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<NewTableResult<'b>>>,
+        >,
+    ) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(NewTableListResult::VT_RESULTS, results);
+    }
+    #[inline]
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> NewTableListResultBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        NewTableListResultBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<NewTableListResult<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_
+            .required(o, NewTableListResult::VT_RESULTS, "results");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for NewTableListResult<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("NewTableListResult");
+        ds.field("results", &self.results());
         ds.finish()
     }
 }

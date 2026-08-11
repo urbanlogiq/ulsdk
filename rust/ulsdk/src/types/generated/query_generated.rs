@@ -303,18 +303,20 @@ pub const ENUM_MIN_JOIN_TY: i8 = 0;
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
-pub const ENUM_MAX_JOIN_TY: i8 = 4;
+pub const ENUM_MAX_JOIN_TY: i8 = 6;
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_JOIN_TY: [JoinTy; 5] = [
+pub const ENUM_VALUES_JOIN_TY: [JoinTy; 7] = [
     JoinTy::Inner,
     JoinTy::LeftOuter,
     JoinTy::RightOuter,
     JoinTy::Full,
     JoinTy::Cross,
+    JoinTy::LeftSemi,
+    JoinTy::LeftAnti,
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
@@ -327,15 +329,19 @@ impl JoinTy {
     pub const RightOuter: Self = Self(2);
     pub const Full: Self = Self(3);
     pub const Cross: Self = Self(4);
+    pub const LeftSemi: Self = Self(5);
+    pub const LeftAnti: Self = Self(6);
 
     pub const ENUM_MIN: i8 = 0;
-    pub const ENUM_MAX: i8 = 4;
+    pub const ENUM_MAX: i8 = 6;
     pub const ENUM_VALUES: &'static [Self] = &[
         Self::Inner,
         Self::LeftOuter,
         Self::RightOuter,
         Self::Full,
         Self::Cross,
+        Self::LeftSemi,
+        Self::LeftAnti,
     ];
     /// Returns the variant's name or "" if unknown.
     pub fn variant_name(self) -> Option<&'static str> {
@@ -345,6 +351,8 @@ impl JoinTy {
             Self::RightOuter => Some("RightOuter"),
             Self::Full => Some("Full"),
             Self::Cross => Some("Cross"),
+            Self::LeftSemi => Some("LeftSemi"),
+            Self::LeftAnti => Some("LeftAnti"),
             _ => None,
         }
     }

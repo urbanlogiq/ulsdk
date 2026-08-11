@@ -84,6 +84,7 @@ use crate::types::generated::metadata_generated::{
     AggregationFunction as FbsAggregationFunction,
     CategoryRelationshipData as FbsCategoryRelationshipData, ComponentData as FbsComponentData,
     ContactInfo as FbsContactInfo, DatacatalogGeometry as FbsDatacatalogGeometry,
+    DatacatalogLatLngGeometry as FbsDatacatalogLatLngGeometry,
     DatasetCategory as FbsDatasetCategory, DatasetSource as FbsDatasetSource, Dates as FbsDates,
     DatetimeRange as FbsDatetimeRange, Document as FbsDocument, Documents as FbsDocuments,
     FieldFlags as FbsFieldFlags, FieldUnit as FbsFieldUnit, FloatAggregate as FbsFloatAggregate,
@@ -1480,11 +1481,74 @@ impl crate::FbsSerde for WorldGraphGeometry {
     }
 }
 
+/// Point geometry stored as two scalar coordinate columns rather than one
+/// geometry column. Common for raw/bronze-level ingests, which land as-is
+/// without a transformation step to construct a geom column.
+///
+/// Consumers compose a point from the pair (e.g. st_makepoint(lng, lat))
+/// wherever they would otherwise reference a DatacatalogGeometry column.
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+pub struct DatacatalogLatLngGeometry {
+    pub lat_column: String,
+    pub lng_column: String,
+}
+
+impl DatacatalogLatLngGeometry {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDatacatalogLatLngGeometry<'a>> {
+        use crate::types::generated::metadata_generated::DatacatalogLatLngGeometryBuilder as FbsDatacatalogLatLngGeometryBuilder;
+
+        let lat_column_offset = builder.create_string(&self.lat_column);
+        let lng_column_offset = builder.create_string(&self.lng_column);
+
+        let mut bldr = FbsDatacatalogLatLngGeometryBuilder::new(builder);
+        bldr.add_lat_column(lat_column_offset);
+        bldr.add_lng_column(lng_column_offset);
+        bldr.finish()
+    }
+}
+
+impl From<FbsDatacatalogLatLngGeometry<'_>> for DatacatalogLatLngGeometry {
+    fn from(fbs: FbsDatacatalogLatLngGeometry<'_>) -> Self {
+        let lat_column = fbs.lat_column().to_owned();
+        let lng_column = fbs.lng_column().to_owned();
+        Self {
+            lat_column,
+            lng_column,
+        }
+    }
+}
+
+impl crate::FbsSerde for DatacatalogLatLngGeometry {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsDatacatalogLatLngGeometry>(
+            &opts, bytes,
+        )?;
+        Ok(Self::from(fbs))
+    }
+}
+
+/// Append new variants only — a union member's position is its wire value, so
+/// inserting one would silently reinterpret existing stored metadata.
 #[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum GeometrySource {
     NoGeometry(NoGeometry),
     DatacatalogGeometry(DatacatalogGeometry),
     WorldGraphGeometry(WorldGraphGeometry),
+    DatacatalogLatLngGeometry(DatacatalogLatLngGeometry),
 }
 
 impl Default for GeometrySource {
@@ -1512,6 +1576,11 @@ impl GeometrySource {
             Self::WorldGraphGeometry(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
                 let ty = FbsGeometrySource::WorldGraphGeometry;
+                (offset, ty)
+            }
+            Self::DatacatalogLatLngGeometry(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsGeometrySource::DatacatalogLatLngGeometry;
                 (offset, ty)
             }
         }
@@ -2681,6 +2750,12 @@ impl From<FbsMetadata<'_>> for Metadata {
                         fbs.geometry_source_as_world_graph_geometry().unwrap(),
                     ))
                 }
+                FbsGeometrySource::DatacatalogLatLngGeometry => {
+                    GeometrySource::DatacatalogLatLngGeometry(DatacatalogLatLngGeometry::from(
+                        fbs.geometry_source_as_datacatalog_lat_lng_geometry()
+                            .unwrap(),
+                    ))
+                }
                 _ => unreachable!(),
             };
 
@@ -3554,6 +3629,14 @@ mod tests {
         let t0 = DatacatalogGeometry::default();
         let buf = t0.to_fbs_bytes();
         let t1 = DatacatalogGeometry::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_datacatalog_lat_lng_geometry() {
+        let t0 = DatacatalogLatLngGeometry::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = DatacatalogLatLngGeometry::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 

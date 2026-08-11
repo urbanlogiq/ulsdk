@@ -10,4 +10,6 @@ public final class JoinTy {
     public static final byte RightOuter = com.urbanlogiq.ulsdk.types.generated.JoinTy.RightOuter;
     public static final byte Full = com.urbanlogiq.ulsdk.types.generated.JoinTy.Full;
     public static final byte Cross = com.urbanlogiq.ulsdk.types.generated.JoinTy.Cross;
+    public static final byte LeftSemi = com.urbanlogiq.ulsdk.types.generated.JoinTy.LeftSemi;
+    public static final byte LeftAnti = com.urbanlogiq.ulsdk.types.generated.JoinTy.LeftAnti;
 }

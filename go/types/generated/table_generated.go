@@ -686,7 +686,7 @@ func (rcv *NewTable) MutateFromType(n TableFrom) bool {
 
 /// The base to use for the table. If an object ID is provided, this will
 /// take the schema from the provided stream or metadata object. If a
-/// schema is provided, the table will be created, empty, from that.           
+/// schema is provided, the table will be created, empty, from that.
 func (rcv *NewTable) From(obj *flatbuffers.Table) bool {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(14))
 	if o != 0 {
@@ -698,7 +698,7 @@ func (rcv *NewTable) From(obj *flatbuffers.Table) bool {
 
 /// The base to use for the table. If an object ID is provided, this will
 /// take the schema from the provided stream or metadata object. If a
-/// schema is provided, the table will be created, empty, from that.           
+/// schema is provided, the table will be created, empty, from that.
 func NewTableStart(builder *flatbuffers.Builder) {
 	builder.StartObject(6)
 }
@@ -721,6 +721,254 @@ func NewTableAddFrom(builder *flatbuffers.Builder, from flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(5, flatbuffers.UOffsetT(from), 0)
 }
 func NewTableEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return builder.EndObject()
+}
+/// Body parameter for POST datacatalog/tables. Creates many tables in the
+/// same parent drive directory with a single directory update, instead of
+/// one directory update for each table.
+type NewTableList struct {
+	_tab flatbuffers.Table
+}
+
+func GetRootAsNewTableList(buf []byte, offset flatbuffers.UOffsetT) *NewTableList {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &NewTableList{}
+	x.Init(buf, n+offset)
+	return x
+}
+
+func FinishNewTableListBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.Finish(offset)
+}
+
+func GetSizePrefixedRootAsNewTableList(buf []byte, offset flatbuffers.UOffsetT) *NewTableList {
+	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
+	x := &NewTableList{}
+	x.Init(buf, n+offset+flatbuffers.SizeUint32)
+	return x
+}
+
+func FinishSizePrefixedNewTableListBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.FinishSizePrefixed(offset)
+}
+
+func (rcv *NewTableList) Init(buf []byte, i flatbuffers.UOffsetT) {
+	rcv._tab.Bytes = buf
+	rcv._tab.Pos = i
+}
+
+func (rcv *NewTableList) Table() flatbuffers.Table {
+	return rcv._tab
+}
+
+/// The tables to create. Every entry must name the same `parent`
+/// directory; the request is rejected otherwise.
+func (rcv *NewTableList) Tables(obj *NewTable, j int) bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		x := rcv._tab.Vector(o)
+		x += flatbuffers.UOffsetT(j) * 4
+		x = rcv._tab.Indirect(x)
+		obj.Init(rcv._tab.Bytes, x)
+		return true
+	}
+	return false
+}
+
+func (rcv *NewTableList) TablesLength() int {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		return rcv._tab.VectorLen(o)
+	}
+	return 0
+}
+
+/// The tables to create. Every entry must name the same `parent`
+/// directory; the request is rejected otherwise.
+func NewTableListStart(builder *flatbuffers.Builder) {
+	builder.StartObject(1)
+}
+func NewTableListAddTables(builder *flatbuffers.Builder, tables flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(tables), 0)
+}
+func NewTableListStartTablesVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+	return builder.StartVector(4, numElems, 4)
+}
+func NewTableListEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return builder.EndObject()
+}
+/// One entry of the response for POST datacatalog/tables. Entries are in
+/// the same order as the request.
+type NewTableResult struct {
+	_tab flatbuffers.Table
+}
+
+func GetRootAsNewTableResult(buf []byte, offset flatbuffers.UOffsetT) *NewTableResult {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &NewTableResult{}
+	x.Init(buf, n+offset)
+	return x
+}
+
+func FinishNewTableResultBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.Finish(offset)
+}
+
+func GetSizePrefixedRootAsNewTableResult(buf []byte, offset flatbuffers.UOffsetT) *NewTableResult {
+	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
+	x := &NewTableResult{}
+	x.Init(buf, n+offset+flatbuffers.SizeUint32)
+	return x
+}
+
+func FinishSizePrefixedNewTableResultBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.FinishSizePrefixed(offset)
+}
+
+func (rcv *NewTableResult) Init(buf []byte, i flatbuffers.UOffsetT) {
+	rcv._tab.Bytes = buf
+	rcv._tab.Pos = i
+}
+
+func (rcv *NewTableResult) Table() flatbuffers.Table {
+	return rcv._tab
+}
+
+func (rcv *NewTableResult) Name() []byte {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		return rcv._tab.ByteVector(o + rcv._tab.Pos)
+	}
+	return nil
+}
+
+/// The ID of the table stream. Present on success; not present when
+/// `error` is set.
+func (rcv *NewTableResult) Id(obj *ObjectId) *ObjectId {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
+	if o != 0 {
+		x := rcv._tab.Indirect(o + rcv._tab.Pos)
+		if obj == nil {
+			obj = new(ObjectId)
+		}
+		obj.Init(rcv._tab.Bytes, x)
+		return obj
+	}
+	return nil
+}
+
+/// The ID of the table stream. Present on success; not present when
+/// `error` is set.
+/// True when a table with this name already existed and was reused.
+func (rcv *NewTableResult) Adopted() bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
+	if o != 0 {
+		return rcv._tab.GetBool(o + rcv._tab.Pos)
+	}
+	return false
+}
+
+/// True when a table with this name already existed and was reused.
+func (rcv *NewTableResult) MutateAdopted(n bool) bool {
+	return rcv._tab.MutateBoolSlot(8, n)
+}
+
+/// The failure reason for this entry. The other entries of the request
+/// are not affected by one entry's failure.
+func (rcv *NewTableResult) Error() []byte {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
+	if o != 0 {
+		return rcv._tab.ByteVector(o + rcv._tab.Pos)
+	}
+	return nil
+}
+
+/// The failure reason for this entry. The other entries of the request
+/// are not affected by one entry's failure.
+func NewTableResultStart(builder *flatbuffers.Builder) {
+	builder.StartObject(4)
+}
+func NewTableResultAddName(builder *flatbuffers.Builder, name flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(name), 0)
+}
+func NewTableResultAddId(builder *flatbuffers.Builder, id flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(1, flatbuffers.UOffsetT(id), 0)
+}
+func NewTableResultAddAdopted(builder *flatbuffers.Builder, adopted bool) {
+	builder.PrependBoolSlot(2, adopted, false)
+}
+func NewTableResultAddError(builder *flatbuffers.Builder, error flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(3, flatbuffers.UOffsetT(error), 0)
+}
+func NewTableResultEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return builder.EndObject()
+}
+/// Response body for POST datacatalog/tables.
+type NewTableListResult struct {
+	_tab flatbuffers.Table
+}
+
+func GetRootAsNewTableListResult(buf []byte, offset flatbuffers.UOffsetT) *NewTableListResult {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &NewTableListResult{}
+	x.Init(buf, n+offset)
+	return x
+}
+
+func FinishNewTableListResultBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.Finish(offset)
+}
+
+func GetSizePrefixedRootAsNewTableListResult(buf []byte, offset flatbuffers.UOffsetT) *NewTableListResult {
+	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
+	x := &NewTableListResult{}
+	x.Init(buf, n+offset+flatbuffers.SizeUint32)
+	return x
+}
+
+func FinishSizePrefixedNewTableListResultBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.FinishSizePrefixed(offset)
+}
+
+func (rcv *NewTableListResult) Init(buf []byte, i flatbuffers.UOffsetT) {
+	rcv._tab.Bytes = buf
+	rcv._tab.Pos = i
+}
+
+func (rcv *NewTableListResult) Table() flatbuffers.Table {
+	return rcv._tab
+}
+
+func (rcv *NewTableListResult) Results(obj *NewTableResult, j int) bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		x := rcv._tab.Vector(o)
+		x += flatbuffers.UOffsetT(j) * 4
+		x = rcv._tab.Indirect(x)
+		obj.Init(rcv._tab.Bytes, x)
+		return true
+	}
+	return false
+}
+
+func (rcv *NewTableListResult) ResultsLength() int {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		return rcv._tab.VectorLen(o)
+	}
+	return 0
+}
+
+func NewTableListResultStart(builder *flatbuffers.Builder) {
+	builder.StartObject(1)
+}
+func NewTableListResultAddResults(builder *flatbuffers.Builder, results flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(results), 0)
+}
+func NewTableListResultStartResultsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+	return builder.StartVector(4, numElems, 4)
+}
+func NewTableListResultEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
 type Modify struct {

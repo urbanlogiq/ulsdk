@@ -596,6 +596,159 @@ func (o *NewTable) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 	return generated.NewTableEnd(builder)
 }
 
+// NewTableList -
+//  Body parameter for POST datacatalog/tables. Creates many tables in the
+//  same parent drive directory with a single directory update, instead of
+//  one directory update for each table.
+type NewTableList struct {
+	Tables []NewTable
+}
+
+func NewTableListFromFbs(fbs *generated.NewTableList) *NewTableList {
+	o := &NewTableList{}
+	for i := 0; i < fbs.TablesLength(); i++ {
+		var item generated.NewTable
+		if fbs.Tables(&item, i) {
+			o.Tables = append(o.Tables, *NewTableFromFbs(&item))
+		}
+	}
+	return o
+}
+
+// NewTableListFromBytes deserializes a NewTableList from size-prefixed FlatBuffer bytes.
+func NewTableListFromBytes(data []byte) (*NewTableList, error) {
+	fbs := generated.GetSizePrefixedRootAsNewTableList(data, 0)
+	return NewTableListFromFbs(fbs), nil
+}
+
+// ToBytes serializes the NewTableList to size-prefixed FlatBuffer bytes.
+func (o *NewTableList) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the NewTableList into a FlatBuffer builder and returns the offset.
+func (o *NewTableList) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	tablesOffsets := make([]flatbuffers.UOffsetT, len(o.Tables))
+	for i := range o.Tables {
+		tablesOffsets[i] = o.Tables[i].SerializeTo(builder)
+	}
+	generated.NewTableListStartTablesVector(builder, len(o.Tables))
+	for i := len(tablesOffsets) - 1; i >= 0; i-- {
+		builder.PrependUOffsetT(tablesOffsets[i])
+	}
+	tablesVecOffset := builder.EndVector(len(o.Tables))
+	generated.NewTableListStart(builder)
+	generated.NewTableListAddTables(builder, tablesVecOffset)
+	return generated.NewTableListEnd(builder)
+}
+
+// NewTableListResult -
+//  Response body for POST datacatalog/tables.
+type NewTableListResult struct {
+	Results []NewTableResult
+}
+
+func NewTableListResultFromFbs(fbs *generated.NewTableListResult) *NewTableListResult {
+	o := &NewTableListResult{}
+	for i := 0; i < fbs.ResultsLength(); i++ {
+		var item generated.NewTableResult
+		if fbs.Results(&item, i) {
+			o.Results = append(o.Results, *NewTableResultFromFbs(&item))
+		}
+	}
+	return o
+}
+
+// NewTableListResultFromBytes deserializes a NewTableListResult from size-prefixed FlatBuffer bytes.
+func NewTableListResultFromBytes(data []byte) (*NewTableListResult, error) {
+	fbs := generated.GetSizePrefixedRootAsNewTableListResult(data, 0)
+	return NewTableListResultFromFbs(fbs), nil
+}
+
+// ToBytes serializes the NewTableListResult to size-prefixed FlatBuffer bytes.
+func (o *NewTableListResult) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the NewTableListResult into a FlatBuffer builder and returns the offset.
+func (o *NewTableListResult) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	resultsOffsets := make([]flatbuffers.UOffsetT, len(o.Results))
+	for i := range o.Results {
+		resultsOffsets[i] = o.Results[i].SerializeTo(builder)
+	}
+	generated.NewTableListResultStartResultsVector(builder, len(o.Results))
+	for i := len(resultsOffsets) - 1; i >= 0; i-- {
+		builder.PrependUOffsetT(resultsOffsets[i])
+	}
+	resultsVecOffset := builder.EndVector(len(o.Results))
+	generated.NewTableListResultStart(builder)
+	generated.NewTableListResultAddResults(builder, resultsVecOffset)
+	return generated.NewTableListResultEnd(builder)
+}
+
+// NewTableResult -
+//  One entry of the response for POST datacatalog/tables. Entries are in
+//  the same order as the request.
+type NewTableResult struct {
+	Adopted bool
+	Error *string
+	Id *id.ObjectId
+	Name string
+}
+
+func NewTableResultFromFbs(fbs *generated.NewTableResult) *NewTableResult {
+	o := &NewTableResult{}
+	o.Adopted = fbs.Adopted()
+	if s := fbs.Error(); s != nil {
+		str := string(s)
+		o.Error = &str
+	}
+	if fbsVal := fbs.Id(nil); fbsVal != nil {
+		o.Id = id.ObjectIdFromFbs(fbsVal)
+	}
+	o.Name = string(fbs.Name())
+	return o
+}
+
+// NewTableResultFromBytes deserializes a NewTableResult from size-prefixed FlatBuffer bytes.
+func NewTableResultFromBytes(data []byte) (*NewTableResult, error) {
+	fbs := generated.GetSizePrefixedRootAsNewTableResult(data, 0)
+	return NewTableResultFromFbs(fbs), nil
+}
+
+// ToBytes serializes the NewTableResult to size-prefixed FlatBuffer bytes.
+func (o *NewTableResult) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the NewTableResult into a FlatBuffer builder and returns the offset.
+func (o *NewTableResult) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var errorOffset flatbuffers.UOffsetT
+	if o.Error != nil {
+		errorOffset = builder.CreateString(*o.Error)
+	}
+	var idOffset flatbuffers.UOffsetT
+	if o.Id != nil {
+		idOffset = o.Id.SerializeTo(builder)
+	}
+	nameOffset := builder.CreateString(o.Name)
+	generated.NewTableResultStart(builder)
+	generated.NewTableResultAddAdopted(builder, o.Adopted)
+	generated.NewTableResultAddError(builder, errorOffset)
+	generated.NewTableResultAddId(builder, idOffset)
+	generated.NewTableResultAddName(builder, nameOffset)
+	return generated.NewTableResultEnd(builder)
+}
+
 type OpEntry struct {
 	Op interface{}
 }

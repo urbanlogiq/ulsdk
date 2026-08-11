@@ -37,6 +37,16 @@ test_datacatalog_geometry() {
 TypeTest test_datacatalog_geometry_obj(test_datacatalog_geometry, "DatacatalogGeometry");
 
 bool
+test_datacatalog_lat_lng_geometry() {
+    ::ul::types::DatacatalogLatLngGeometry t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::DatacatalogLatLngGeometry deserialized = ::ul::types::DatacatalogLatLngGeometry(bytes);
+    return true;
+}
+
+TypeTest test_datacatalog_lat_lng_geometry_obj(test_datacatalog_lat_lng_geometry, "DatacatalogLatLngGeometry");
+
+bool
 test_dataset_source() {
     ::ul::types::DatasetSource t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);

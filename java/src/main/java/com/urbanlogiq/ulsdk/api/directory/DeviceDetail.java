@@ -13,6 +13,14 @@ public final class DeviceDetail {
         this._deviceId = value;
     }
 
+    String _displayName;
+    public String getDisplayName() {
+        return this._displayName;
+    }
+    public void setDisplayName(String value) {
+        this._displayName = value;
+    }
+
     String _operatingSystem;
     public String getOperatingSystem() {
         return this._operatingSystem;
@@ -61,6 +69,12 @@ public final class DeviceDetail {
         }
         o.put("deviceId", deviceIdSerialized);
 
+        Object displayNameSerialized = null;
+        if (this._displayName != null) {
+            displayNameSerialized = this._displayName;
+        }
+        o.put("displayName", displayNameSerialized);
+
         Object operatingSystemSerialized = null;
         if (this._operatingSystem != null) {
             operatingSystemSerialized = this._operatingSystem;
@@ -102,6 +116,13 @@ public final class DeviceDetail {
         if (deviceIdValue != null) {
             this._deviceId = (String)deviceIdValue;
         }
+        Object displayNameValue = null;
+        if (o.has("displayName") && !o.isNull("displayName")) {
+            displayNameValue = o.get("displayName");
+        }
+        if (displayNameValue != null) {
+            this._displayName = (String)displayNameValue;
+        }
         Object operatingSystemValue = null;
         if (o.has("operatingSystem") && !o.isNull("operatingSystem")) {
             operatingSystemValue = o.get("operatingSystem");
@@ -141,6 +162,7 @@ public final class DeviceDetail {
 
     public DeviceDetail() {
         this._deviceId = null;
+        this._displayName = null;
         this._operatingSystem = null;
         this._browser = null;
         this._isCompliant = null;

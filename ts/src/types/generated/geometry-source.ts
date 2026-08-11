@@ -7,40 +7,48 @@
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
 
 import { DatacatalogGeometry, DatacatalogGeometryT } from './datacatalog-geometry';
+import { DatacatalogLatLngGeometry, DatacatalogLatLngGeometryT } from './datacatalog-lat-lng-geometry';
 import { NoGeometry, NoGeometryT } from './no-geometry';
 import { WorldGraphGeometry, WorldGraphGeometryT } from './world-graph-geometry';
 
 
+/**
+ * Append new variants only — a union member's position is its wire value, so
+ * inserting one would silently reinterpret existing stored metadata.
+ */
 export enum GeometrySource {
   NONE = 0,
   NoGeometry = 1,
   DatacatalogGeometry = 2,
-  WorldGraphGeometry = 3
+  WorldGraphGeometry = 3,
+  DatacatalogLatLngGeometry = 4
 }
 
 export function unionToGeometrySource(
   type: GeometrySource,
-  accessor: (obj:DatacatalogGeometry|NoGeometry|WorldGraphGeometry) => DatacatalogGeometry|NoGeometry|WorldGraphGeometry|null
-): DatacatalogGeometry|NoGeometry|WorldGraphGeometry|null {
+  accessor: (obj:DatacatalogGeometry|DatacatalogLatLngGeometry|NoGeometry|WorldGraphGeometry) => DatacatalogGeometry|DatacatalogLatLngGeometry|NoGeometry|WorldGraphGeometry|null
+): DatacatalogGeometry|DatacatalogLatLngGeometry|NoGeometry|WorldGraphGeometry|null {
   switch(GeometrySource[type]) {
     case 'NONE': return null; 
     case 'NoGeometry': return accessor(new NoGeometry())! as NoGeometry;
     case 'DatacatalogGeometry': return accessor(new DatacatalogGeometry())! as DatacatalogGeometry;
     case 'WorldGraphGeometry': return accessor(new WorldGraphGeometry())! as WorldGraphGeometry;
+    case 'DatacatalogLatLngGeometry': return accessor(new DatacatalogLatLngGeometry())! as DatacatalogLatLngGeometry;
     default: return null;
   }
 }
 
 export function unionListToGeometrySource(
   type: GeometrySource, 
-  accessor: (index: number, obj:DatacatalogGeometry|NoGeometry|WorldGraphGeometry) => DatacatalogGeometry|NoGeometry|WorldGraphGeometry|null, 
+  accessor: (index: number, obj:DatacatalogGeometry|DatacatalogLatLngGeometry|NoGeometry|WorldGraphGeometry) => DatacatalogGeometry|DatacatalogLatLngGeometry|NoGeometry|WorldGraphGeometry|null, 
   index: number
-): DatacatalogGeometry|NoGeometry|WorldGraphGeometry|null {
+): DatacatalogGeometry|DatacatalogLatLngGeometry|NoGeometry|WorldGraphGeometry|null {
   switch(GeometrySource[type]) {
     case 'NONE': return null; 
     case 'NoGeometry': return accessor(index, new NoGeometry())! as NoGeometry;
     case 'DatacatalogGeometry': return accessor(index, new DatacatalogGeometry())! as DatacatalogGeometry;
     case 'WorldGraphGeometry': return accessor(index, new WorldGraphGeometry())! as WorldGraphGeometry;
+    case 'DatacatalogLatLngGeometry': return accessor(index, new DatacatalogLatLngGeometry())! as DatacatalogLatLngGeometry;
     default: return null;
   }
 }

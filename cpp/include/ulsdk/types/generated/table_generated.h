@@ -40,6 +40,15 @@ struct DiffStreamBuilder;
 struct NewTable;
 struct NewTableBuilder;
 
+struct NewTableList;
+struct NewTableListBuilder;
+
+struct NewTableResult;
+struct NewTableResultBuilder;
+
+struct NewTableListResult;
+struct NewTableListResultBuilder;
+
 struct Modify;
 struct ModifyBuilder;
 
@@ -693,7 +702,7 @@ struct NewTable FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   /// The base to use for the table. If an object ID is provided, this will
   /// take the schema from the provided stream or metadata object. If a
-  /// schema is provided, the table will be created, empty, from that.           
+  /// schema is provided, the table will be created, empty, from that.
   const void *from() const {
     return GetPointer<const void *>(VT_FROM);
   }
@@ -802,6 +811,234 @@ inline ::flatbuffers::Offset<NewTable> CreateNewTableDirect(
       migrate,
       from_type,
       from);
+}
+
+/// Body parameter for POST datacatalog/tables. Creates many tables in the
+/// same parent drive directory with a single directory update, instead of
+/// one directory update for each table.
+struct NewTableList FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef NewTableListBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_TABLES = 4
+  };
+  /// The tables to create. Every entry must name the same `parent`
+  /// directory; the request is rejected otherwise.
+  const ::flatbuffers::Vector<::flatbuffers::Offset<NewTable>> *tables() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<NewTable>> *>(VT_TABLES);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_TABLES) &&
+           verifier.VerifyVector(tables()) &&
+           verifier.VerifyVectorOfTables(tables()) &&
+           verifier.EndTable();
+  }
+};
+
+struct NewTableListBuilder {
+  typedef NewTableList Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_tables(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<NewTable>>> tables) {
+    fbb_.AddOffset(NewTableList::VT_TABLES, tables);
+  }
+  explicit NewTableListBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<NewTableList> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<NewTableList>(end);
+    fbb_.Required(o, NewTableList::VT_TABLES);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<NewTableList> CreateNewTableList(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<NewTable>>> tables = 0) {
+  NewTableListBuilder builder_(_fbb);
+  builder_.add_tables(tables);
+  return builder_.Finish();
+}
+
+struct NewTableList::Traits {
+  using type = NewTableList;
+  static auto constexpr Create = CreateNewTableList;
+};
+
+inline ::flatbuffers::Offset<NewTableList> CreateNewTableListDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<::flatbuffers::Offset<NewTable>> *tables = nullptr) {
+  auto tables__ = tables ? _fbb.CreateVector<::flatbuffers::Offset<NewTable>>(*tables) : 0;
+  return CreateNewTableList(
+      _fbb,
+      tables__);
+}
+
+/// One entry of the response for POST datacatalog/tables. Entries are in
+/// the same order as the request.
+struct NewTableResult FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef NewTableResultBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_NAME = 4,
+    VT_ID = 6,
+    VT_ADOPTED = 8,
+    VT_ERROR = 10
+  };
+  const ::flatbuffers::String *name() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_NAME);
+  }
+  /// The ID of the table stream. Present on success; not present when
+  /// `error` is set.
+  const ObjectId *id() const {
+    return GetPointer<const ObjectId *>(VT_ID);
+  }
+  /// True when a table with this name already existed and was reused.
+  bool adopted() const {
+    return GetField<uint8_t>(VT_ADOPTED, 0) != 0;
+  }
+  /// The failure reason for this entry. The other entries of the request
+  /// are not affected by one entry's failure.
+  const ::flatbuffers::String *error() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_ERROR);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
+           VerifyOffset(verifier, VT_ID) &&
+           verifier.VerifyTable(id()) &&
+           VerifyField<uint8_t>(verifier, VT_ADOPTED, 1) &&
+           VerifyOffset(verifier, VT_ERROR) &&
+           verifier.VerifyString(error()) &&
+           verifier.EndTable();
+  }
+};
+
+struct NewTableResultBuilder {
+  typedef NewTableResult Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
+    fbb_.AddOffset(NewTableResult::VT_NAME, name);
+  }
+  void add_id(::flatbuffers::Offset<ObjectId> id) {
+    fbb_.AddOffset(NewTableResult::VT_ID, id);
+  }
+  void add_adopted(bool adopted) {
+    fbb_.AddElement<uint8_t>(NewTableResult::VT_ADOPTED, static_cast<uint8_t>(adopted), 0);
+  }
+  void add_error(::flatbuffers::Offset<::flatbuffers::String> error) {
+    fbb_.AddOffset(NewTableResult::VT_ERROR, error);
+  }
+  explicit NewTableResultBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<NewTableResult> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<NewTableResult>(end);
+    fbb_.Required(o, NewTableResult::VT_NAME);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<NewTableResult> CreateNewTableResult(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::String> name = 0,
+    ::flatbuffers::Offset<ObjectId> id = 0,
+    bool adopted = false,
+    ::flatbuffers::Offset<::flatbuffers::String> error = 0) {
+  NewTableResultBuilder builder_(_fbb);
+  builder_.add_error(error);
+  builder_.add_id(id);
+  builder_.add_name(name);
+  builder_.add_adopted(adopted);
+  return builder_.Finish();
+}
+
+struct NewTableResult::Traits {
+  using type = NewTableResult;
+  static auto constexpr Create = CreateNewTableResult;
+};
+
+inline ::flatbuffers::Offset<NewTableResult> CreateNewTableResultDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const char *name = nullptr,
+    ::flatbuffers::Offset<ObjectId> id = 0,
+    bool adopted = false,
+    const char *error = nullptr) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  auto error__ = error ? _fbb.CreateString(error) : 0;
+  return CreateNewTableResult(
+      _fbb,
+      name__,
+      id,
+      adopted,
+      error__);
+}
+
+/// Response body for POST datacatalog/tables.
+struct NewTableListResult FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef NewTableListResultBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_RESULTS = 4
+  };
+  const ::flatbuffers::Vector<::flatbuffers::Offset<NewTableResult>> *results() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<NewTableResult>> *>(VT_RESULTS);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_RESULTS) &&
+           verifier.VerifyVector(results()) &&
+           verifier.VerifyVectorOfTables(results()) &&
+           verifier.EndTable();
+  }
+};
+
+struct NewTableListResultBuilder {
+  typedef NewTableListResult Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_results(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<NewTableResult>>> results) {
+    fbb_.AddOffset(NewTableListResult::VT_RESULTS, results);
+  }
+  explicit NewTableListResultBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<NewTableListResult> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<NewTableListResult>(end);
+    fbb_.Required(o, NewTableListResult::VT_RESULTS);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<NewTableListResult> CreateNewTableListResult(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<NewTableResult>>> results = 0) {
+  NewTableListResultBuilder builder_(_fbb);
+  builder_.add_results(results);
+  return builder_.Finish();
+}
+
+struct NewTableListResult::Traits {
+  using type = NewTableListResult;
+  static auto constexpr Create = CreateNewTableListResult;
+};
+
+inline ::flatbuffers::Offset<NewTableListResult> CreateNewTableListResultDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<::flatbuffers::Offset<NewTableResult>> *results = nullptr) {
+  auto results__ = results ? _fbb.CreateVector<::flatbuffers::Offset<NewTableResult>>(*results) : 0;
+  return CreateNewTableListResult(
+      _fbb,
+      results__);
 }
 
 struct Modify FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

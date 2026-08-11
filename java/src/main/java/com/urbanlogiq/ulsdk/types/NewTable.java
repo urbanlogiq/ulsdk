@@ -11,7 +11,7 @@ public final class NewTable {
     /**
      *  The base to use for the table. If an object ID is provided, this will
      *  take the schema from the provided stream or metadata object. If a
-     *  schema is provided, the table will be created, empty, from that.           
+     *  schema is provided, the table will be created, empty, from that.
      */
     com.urbanlogiq.ulsdk.types.TableFrom _from;
     public com.urbanlogiq.ulsdk.types.TableFrom getFrom() {

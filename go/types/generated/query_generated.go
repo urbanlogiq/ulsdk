@@ -102,6 +102,8 @@ const (
 	JoinTyRightOuter JoinTy = 2
 	JoinTyFull       JoinTy = 3
 	JoinTyCross      JoinTy = 4
+	JoinTyLeftSemi   JoinTy = 5
+	JoinTyLeftAnti   JoinTy = 6
 )
 
 var EnumNamesJoinTy = map[JoinTy]string{
@@ -110,6 +112,8 @@ var EnumNamesJoinTy = map[JoinTy]string{
 	JoinTyRightOuter: "RightOuter",
 	JoinTyFull:       "Full",
 	JoinTyCross:      "Cross",
+	JoinTyLeftSemi:   "LeftSemi",
+	JoinTyLeftAnti:   "LeftAnti",
 }
 
 var EnumValuesJoinTy = map[string]JoinTy{
@@ -118,6 +122,8 @@ var EnumValuesJoinTy = map[string]JoinTy{
 	"RightOuter": JoinTyRightOuter,
 	"Full":       JoinTyFull,
 	"Cross":      JoinTyCross,
+	"LeftSemi":   JoinTyLeftSemi,
+	"LeftAnti":   JoinTyLeftAnti,
 }
 
 func (v JoinTy) String() string {

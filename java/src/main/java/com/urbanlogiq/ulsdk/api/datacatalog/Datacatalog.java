@@ -788,6 +788,27 @@ public final class Datacatalog {
     }
 
     /**
+     * Create many tables in one parent directory with a single directory update
+     * 
+     * @param ctx A request context object
+     * @param new_tables The tables to create; every entry must name the same parent directory
+     * @return Per-entry results, in request order
+     */
+    public static com.urbanlogiq.ulsdk.types.NewTableListResult createTables(
+        com.urbanlogiq.ulsdk.RequestContext ctx,
+        com.urbanlogiq.ulsdk.types.NewTableList newTables
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/datacatalog/tables";
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+
+        byte[] body = null;
+        body = newTables.toBytes();
+        byte[] res = ctx.post(path, body, "application/octet-stream", params, headers);
+        return new com.urbanlogiq.ulsdk.types.NewTableListResult(res);
+    }
+
+    /**
      * Evaluate the resulting schema of a query, returning an empty Arrow record batch
      * 
      * @param ctx A request context object

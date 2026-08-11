@@ -875,6 +875,193 @@ NewTable::operator==(const NewTable &rhs) const {
     return true;
 }
 
+::flatbuffers::Offset<::NewTableList>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NewTableList &o) {
+    std::vector<::flatbuffers::Offset<::NewTable>> tables_offsets = std::vector<::flatbuffers::Offset<::NewTable>>();
+    tables_offsets.reserve(o.tables_.size());
+    for (const auto &i: o.tables_) {
+        tables_offsets.push_back(serialize_to(builder, i));
+    }
+    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::NewTable>>> tables_offset = builder.CreateVector(tables_offsets);
+
+    ::NewTableListBuilder instance_builder = ::NewTableListBuilder(builder);
+    instance_builder.add_tables(tables_offset);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const NewTableList &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+NewTableList::NewTableList()
+    : tables_() {
+}
+
+NewTableList::NewTableList(const std::vector<uint8_t> &bytes)
+    : NewTableList(::flatbuffers::GetSizePrefixedRoot<::NewTableList>(bytes.data())) {
+}
+
+NewTableList::NewTableList(const ::NewTableList *root) 
+    : tables_() {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    const auto &tables_vector = root->tables();
+    if (tables_vector != nullptr) {
+        tables_.reserve(tables_vector->size());
+        for (const auto &i: *tables_vector) {
+            tables_.emplace_back(i);
+        }
+    }
+}
+
+bool
+NewTableList::operator==(const NewTableList &rhs) const {
+    if (this->tables_ != rhs.tables_) {
+        return false;
+    }
+    return true;
+}
+
+::flatbuffers::Offset<::NewTableListResult>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NewTableListResult &o) {
+    std::vector<::flatbuffers::Offset<::NewTableResult>> results_offsets = std::vector<::flatbuffers::Offset<::NewTableResult>>();
+    results_offsets.reserve(o.results_.size());
+    for (const auto &i: o.results_) {
+        results_offsets.push_back(serialize_to(builder, i));
+    }
+    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::NewTableResult>>> results_offset = builder.CreateVector(results_offsets);
+
+    ::NewTableListResultBuilder instance_builder = ::NewTableListResultBuilder(builder);
+    instance_builder.add_results(results_offset);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const NewTableListResult &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+NewTableListResult::NewTableListResult()
+    : results_() {
+}
+
+NewTableListResult::NewTableListResult(const std::vector<uint8_t> &bytes)
+    : NewTableListResult(::flatbuffers::GetSizePrefixedRoot<::NewTableListResult>(bytes.data())) {
+}
+
+NewTableListResult::NewTableListResult(const ::NewTableListResult *root) 
+    : results_() {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    const auto &results_vector = root->results();
+    if (results_vector != nullptr) {
+        results_.reserve(results_vector->size());
+        for (const auto &i: *results_vector) {
+            results_.emplace_back(i);
+        }
+    }
+}
+
+bool
+NewTableListResult::operator==(const NewTableListResult &rhs) const {
+    if (this->results_ != rhs.results_) {
+        return false;
+    }
+    return true;
+}
+
+::flatbuffers::Offset<::NewTableResult>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NewTableResult &o) {
+    std::optional<::flatbuffers::Offset<::flatbuffers::String>> error_offset = std::nullopt;
+    if (o.error_.has_value()) {
+        const ::flatbuffers::Offset<::flatbuffers::String> error_offset_val = builder.CreateString(o.error_.value());
+        error_offset = std::make_optional(error_offset_val);
+    }
+    std::optional<::flatbuffers::Offset<::ObjectId>> id_offset = std::nullopt;
+    if (o.id_.has_value()) {
+        const ::flatbuffers::Offset<::ObjectId> id_offset_val = serialize_to(builder, o.id_.value());
+        id_offset = std::make_optional(id_offset_val);
+    }
+    const ::flatbuffers::Offset<::flatbuffers::String> name_offset = builder.CreateString(o.name_);
+
+    ::NewTableResultBuilder instance_builder = ::NewTableResultBuilder(builder);
+    instance_builder.add_adopted(o.adopted_);
+    if (error_offset.has_value()) {
+        instance_builder.add_error(error_offset.value());
+    }
+    if (id_offset.has_value()) {
+        instance_builder.add_id(id_offset.value());
+    }
+    instance_builder.add_name(name_offset);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const NewTableResult &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+NewTableResult::NewTableResult()
+    : adopted_(false)
+    , error_(std::nullopt)
+    , id_(std::nullopt)
+    , name_() {
+}
+
+NewTableResult::NewTableResult(const std::vector<uint8_t> &bytes)
+    : NewTableResult(::flatbuffers::GetSizePrefixedRoot<::NewTableResult>(bytes.data())) {
+}
+
+NewTableResult::NewTableResult(const ::NewTableResult *root) 
+    : adopted_(false)
+    , error_(std::nullopt)
+    , id_(std::nullopt)
+    , name_() {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    adopted_ = root->adopted();
+    if (root->error() != nullptr) {
+        error_ = std::string(*root->error()->begin(), *root->error()->end());
+    }
+    if (root->id() != nullptr) {
+        id_ = decltype(id_)(root->id());
+    }
+        name_ = std::string(*root->name()->begin(), *root->name()->end());
+}
+
+bool
+NewTableResult::operator==(const NewTableResult &rhs) const {
+    if (this->adopted_ != rhs.adopted_) {
+        return false;
+    }
+    if (this->error_ != rhs.error_) {
+        return false;
+    }
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::OpEntry>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const OpEntry &o) {
     const std::pair<::flatbuffers::Offset<void>, ::Op> op_offset = serialize_to(builder, o.op_);

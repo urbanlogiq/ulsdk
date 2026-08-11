@@ -687,6 +687,27 @@ func CreateTable(ctx api.RequestContext, newTable *table.NewTable) (*id.ObjectId
 	return result, nil
 }
 
+// CreateTables -
+// Create many tables in one parent directory with a single directory update
+func CreateTables(ctx api.RequestContext, newTables *table.NewTableList) (*table.NewTableListResult, error) {
+	path := "/v1/api/ulv2/datacatalog/tables"
+
+	params := [][2]string{}
+
+	headers := map[string]string{}
+
+	bodyBytes := newTables.ToBytes()
+	res, err := ctx.Post(path, bodyBytes, "application/octet-stream", params, headers)
+	if err != nil {
+		return nil, err
+	}
+	result, err := table.NewTableListResultFromBytes(res)
+	if err != nil {
+		return nil, fmt.Errorf("failed to deserialize response: %w", err)
+	}
+	return result, nil
+}
+
 // SchemaArrow -
 // Evaluate the resulting schema of a query, returning an empty Arrow record batch
 func SchemaArrow(ctx api.RequestContext, query *query.Query) ([]arrow.Record, error) {

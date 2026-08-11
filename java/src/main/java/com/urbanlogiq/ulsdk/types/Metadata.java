@@ -205,6 +205,10 @@ public final class Metadata {
             com.google.flatbuffers.Table geometrySourceFbsTable = o.geometrySource(new com.urbanlogiq.ulsdk.types.generated.WorldGraphGeometry());
             com.urbanlogiq.ulsdk.types.generated.WorldGraphGeometry geometrySourceFbsValue = (com.urbanlogiq.ulsdk.types.generated.WorldGraphGeometry)geometrySourceFbsTable;
             geometrySourceValue = new com.urbanlogiq.ulsdk.types.WorldGraphGeometry(geometrySourceFbsValue);
+        } else if (geometrySourceTy == com.urbanlogiq.ulsdk.types.generated.GeometrySource.DatacatalogLatLngGeometry) {
+            com.google.flatbuffers.Table geometrySourceFbsTable = o.geometrySource(new com.urbanlogiq.ulsdk.types.generated.DatacatalogLatLngGeometry());
+            com.urbanlogiq.ulsdk.types.generated.DatacatalogLatLngGeometry geometrySourceFbsValue = (com.urbanlogiq.ulsdk.types.generated.DatacatalogLatLngGeometry)geometrySourceFbsTable;
+            geometrySourceValue = new com.urbanlogiq.ulsdk.types.DatacatalogLatLngGeometry(geometrySourceFbsValue);
         }
         if (geometrySourceValue != null) {
             this._geometrySource = new com.urbanlogiq.ulsdk.types.GeometrySource(geometrySourceValue);

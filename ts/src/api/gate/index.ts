@@ -5,6 +5,12 @@
 import * as flatbuffers from 'flatbuffers/js/flatbuffers';
 import { RequestContext } from '../../request_context';
 
+export interface AdGroup {
+  id: string;
+  displayName: string;
+  description?: string;
+}
+
 export interface AdUser {
   displayName: string;
   id: string;
@@ -12,12 +18,8 @@ export interface AdUser {
   otherMails?: string[];
   department?: string;
   createdDateTime: string;
-}
-
-export interface AdGroup {
-  id: string;
-  displayName: string;
-  description?: string;
+  groups?: AdGroup[];
+  accountEnabled: boolean;
 }
 
 export interface Bootstrap {

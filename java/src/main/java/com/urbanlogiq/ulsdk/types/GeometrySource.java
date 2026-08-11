@@ -4,13 +4,18 @@
 
 package com.urbanlogiq.ulsdk.types;
 
+/**
+ *  Append new variants only — a union member's position is its wire value, so
+ *  inserting one would silently reinterpret existing stored metadata.
+ */
 public final class GeometrySource {
     Object _value;
 
     public GeometrySource(Object value) {
         if (!(value instanceof com.urbanlogiq.ulsdk.types.NoGeometry)
             && !(value instanceof com.urbanlogiq.ulsdk.types.DatacatalogGeometry)
-            && !(value instanceof com.urbanlogiq.ulsdk.types.WorldGraphGeometry)) {
+            && !(value instanceof com.urbanlogiq.ulsdk.types.WorldGraphGeometry)
+            && !(value instanceof com.urbanlogiq.ulsdk.types.DatacatalogLatLngGeometry)) {
             throw new com.urbanlogiq.ulsdk.InvalidVariantException("GeometrySource", value);
         }
 
@@ -33,6 +38,11 @@ public final class GeometrySource {
             int offset = o.serializeTo(builder);
             byte ty = com.urbanlogiq.ulsdk.types.generated.GeometrySource.WorldGraphGeometry;
             return new com.urbanlogiq.ulsdk.Pair<Integer, Byte>(offset, ty);
+        } else if (this._value instanceof com.urbanlogiq.ulsdk.types.DatacatalogLatLngGeometry) {
+            com.urbanlogiq.ulsdk.types.DatacatalogLatLngGeometry o = (com.urbanlogiq.ulsdk.types.DatacatalogLatLngGeometry)this._value;
+            int offset = o.serializeTo(builder);
+            byte ty = com.urbanlogiq.ulsdk.types.generated.GeometrySource.DatacatalogLatLngGeometry;
+            return new com.urbanlogiq.ulsdk.Pair<Integer, Byte>(offset, ty);
         } else {
             throw new RuntimeException("unreachable variant");
         }
@@ -49,6 +59,8 @@ public final class GeometrySource {
             this._value = new com.urbanlogiq.ulsdk.types.DatacatalogGeometry((com.urbanlogiq.ulsdk.types.generated.DatacatalogGeometry)o);
         } else if (ty == com.urbanlogiq.ulsdk.types.generated.GeometrySource.WorldGraphGeometry) {
             this._value = new com.urbanlogiq.ulsdk.types.WorldGraphGeometry((com.urbanlogiq.ulsdk.types.generated.WorldGraphGeometry)o);
+        } else if (ty == com.urbanlogiq.ulsdk.types.generated.GeometrySource.DatacatalogLatLngGeometry) {
+            this._value = new com.urbanlogiq.ulsdk.types.DatacatalogLatLngGeometry((com.urbanlogiq.ulsdk.types.generated.DatacatalogLatLngGeometry)o);
         }
     }
 

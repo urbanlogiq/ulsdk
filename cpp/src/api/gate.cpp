@@ -29,13 +29,104 @@ namespace ul {
 namespace api {
 namespace gate {
 
+AdGroup::AdGroup(const struct json_value_s *root)
+    : id_(std::string())
+    , display_name_(std::string())
+    , description_(std::nullopt) {
+    if (root->type != json_type_object) {
+        throw std::runtime_error("expected json value to be of type object");
+    }
+
+    const struct json_object_s *object = static_cast<const struct json_object_s *>(root->payload);
+    const struct json_object_element_s *e = object->start;
+
+    while (e != nullptr) {
+        if (std::strcmp(e->name->string, "id") == 0) {
+            const struct json_value_s *ad_group_value = e->value;
+
+            if (ad_group_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *id__str = static_cast<const struct json_string_s *>(ad_group_value->payload);
+            id_ = std::string(id__str->string);
+        } else if (std::strcmp(e->name->string, "displayName") == 0) {
+            const struct json_value_s *ad_group_value = e->value;
+
+            if (ad_group_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *display_name__str = static_cast<const struct json_string_s *>(ad_group_value->payload);
+            display_name_ = std::string(display_name__str->string);
+        } else if (std::strcmp(e->name->string, "description") == 0) {
+            const struct json_value_s *ad_group_value = e->value;
+
+            if (ad_group_value->type == json_type_null) {
+                description_ = std::nullopt;
+            } else {
+                if (ad_group_value->type != json_type_string) {
+                    throw std::runtime_error("expected field to be of type string");
+                }
+
+                const struct json_string_s *description__str = static_cast<const struct json_string_s *>(ad_group_value->payload);
+                description_ = std::string(description__str->string);
+            }
+        }
+
+        e = e->next;
+    }
+}
+
+bool
+AdGroup::operator==(const AdGroup&rhs) const {
+    if (this->id_ != rhs.id_) {
+        return false;
+    }
+    if (this->display_name_ != rhs.display_name_) {
+        return false;
+    }
+    if (this->description_ != rhs.description_) {
+        return false;
+    }
+    return true;
+}
+
+std::vector<uint8_t>
+to_bytes(const AdGroup &o) {
+    std::stringstream ss;
+    ss << "{";
+    ss << "\"id\":";
+    ss << "\"" << o.id_ << "\"";
+    ss << ",";
+
+    ss << "\"displayName\":";
+    ss << "\"" << o.display_name_ << "\"";
+    ss << ",";
+
+    if (o.description_.has_value()) {
+        ss << "\"description\":";
+        const auto &description__value = o.description_.value();
+        ss << "\"" << description__value << "\"";
+    }
+
+    std::string str = ss.str();
+    if (str.back() == ',') {
+        str.pop_back();
+    }
+    str.push_back('}');
+    return std::vector<uint8_t>(str.begin(), str.end());
+}
+
 AdUser::AdUser(const struct json_value_s *root)
     : display_name_(std::string())
     , id_(std::string())
     , user_principal_name_(std::string())
     , other_mails_(std::nullopt)
     , department_(std::nullopt)
-    , created_date_time_(std::string()) {
+    , created_date_time_(std::string())
+    , groups_(std::nullopt)
+    , account_enabled_(false) {
     if (root->type != json_type_object) {
         throw std::runtime_error("expected json value to be of type object");
     }
@@ -120,6 +211,42 @@ AdUser::AdUser(const struct json_value_s *root)
 
             const struct json_string_s *created_date_time__str = static_cast<const struct json_string_s *>(ad_user_value->payload);
             created_date_time_ = std::string(created_date_time__str->string);
+        } else if (std::strcmp(e->name->string, "groups") == 0) {
+            const struct json_value_s *ad_user_value = e->value;
+
+            if (ad_user_value->type == json_type_null) {
+                groups_ = std::nullopt;
+            } else {
+                if (ad_user_value->type != json_type_array) {
+                    throw std::runtime_error("expected field to be of type array");
+                }
+
+                const struct json_array_s *groups__array = static_cast<const struct json_array_s *>(ad_user_value->payload);
+                const struct json_array_element_s *groups__element = groups__array->start;
+                std::vector<AdGroup> groups__vec = std::vector<AdGroup>();
+                while (groups__element != nullptr) {
+                    const struct json_value_s *ad_user_value_1 = groups__element->value;
+                    AdGroup groups__value;
+                    if (ad_user_value_1->type != json_type_object) {
+                        throw std::runtime_error("expected field to be of type object");
+                    }
+
+                    groups__value = AdGroup(ad_user_value_1);
+                    groups__vec.push_back(groups__value);
+                    groups__element = groups__element->next;
+                }
+                groups_ = groups__vec;
+            }
+        } else if (std::strcmp(e->name->string, "accountEnabled") == 0) {
+            const struct json_value_s *ad_user_value = e->value;
+
+            if (ad_user_value->type == json_type_true) {
+                account_enabled_ = true;
+            } else if (ad_user_value->type == json_type_false) {
+                account_enabled_ = false;
+            } else {
+                throw std::runtime_error("expected field to be of type bool");
+            }
         }
 
         e = e->next;
@@ -144,6 +271,12 @@ AdUser::operator==(const AdUser&rhs) const {
         return false;
     }
     if (this->created_date_time_ != rhs.created_date_time_) {
+        return false;
+    }
+    if (this->groups_ != rhs.groups_) {
+        return false;
+    }
+    if (this->account_enabled_ != rhs.account_enabled_) {
         return false;
     }
     return true;
@@ -189,95 +322,27 @@ to_bytes(const AdUser &o) {
 
     ss << "\"createdDateTime\":";
     ss << "\"" << o.created_date_time_ << "\"";
-    std::string str = ss.str();
-    if (str.back() == ',') {
-        str.pop_back();
-    }
-    str.push_back('}');
-    return std::vector<uint8_t>(str.begin(), str.end());
-}
+    ss << ",";
 
-AdGroup::AdGroup(const struct json_value_s *root)
-    : id_(std::string())
-    , display_name_(std::string())
-    , description_(std::nullopt) {
-    if (root->type != json_type_object) {
-        throw std::runtime_error("expected json value to be of type object");
-    }
-
-    const struct json_object_s *object = static_cast<const struct json_object_s *>(root->payload);
-    const struct json_object_element_s *e = object->start;
-
-    while (e != nullptr) {
-        if (std::strcmp(e->name->string, "id") == 0) {
-            const struct json_value_s *ad_group_value = e->value;
-
-            if (ad_group_value->type != json_type_string) {
-                throw std::runtime_error("expected field to be of type string");
-            }
-
-            const struct json_string_s *id__str = static_cast<const struct json_string_s *>(ad_group_value->payload);
-            id_ = std::string(id__str->string);
-        } else if (std::strcmp(e->name->string, "displayName") == 0) {
-            const struct json_value_s *ad_group_value = e->value;
-
-            if (ad_group_value->type != json_type_string) {
-                throw std::runtime_error("expected field to be of type string");
-            }
-
-            const struct json_string_s *display_name__str = static_cast<const struct json_string_s *>(ad_group_value->payload);
-            display_name_ = std::string(display_name__str->string);
-        } else if (std::strcmp(e->name->string, "description") == 0) {
-            const struct json_value_s *ad_group_value = e->value;
-
-            if (ad_group_value->type == json_type_null) {
-                description_ = std::nullopt;
-            } else {
-                if (ad_group_value->type != json_type_string) {
-                    throw std::runtime_error("expected field to be of type string");
-                }
-
-                const struct json_string_s *description__str = static_cast<const struct json_string_s *>(ad_group_value->payload);
-                description_ = std::string(description__str->string);
-            }
+    if (o.groups_.has_value()) {
+        ss << "\"groups\":";
+        const auto &groups__value = o.groups_.value();
+        ss << "[";
+        for (const auto &i : groups__value) {
+            const std::vector<uint8_t> i_serialized = to_bytes(i);
+            const std::string i_str = std::string(i_serialized.begin(), i_serialized.end());
+            ss << i_str;
+            ss << ",";
         }
-
-        e = e->next;
-    }
-}
-
-bool
-AdGroup::operator==(const AdGroup&rhs) const {
-    if (this->id_ != rhs.id_) {
-        return false;
-    }
-    if (this->display_name_ != rhs.display_name_) {
-        return false;
-    }
-    if (this->description_ != rhs.description_) {
-        return false;
-    }
-    return true;
-}
-
-std::vector<uint8_t>
-to_bytes(const AdGroup &o) {
-    std::stringstream ss;
-    ss << "{";
-    ss << "\"id\":";
-    ss << "\"" << o.id_ << "\"";
-    ss << ",";
-
-    ss << "\"displayName\":";
-    ss << "\"" << o.display_name_ << "\"";
-    ss << ",";
-
-    if (o.description_.has_value()) {
-        ss << "\"description\":";
-        const auto &description__value = o.description_.value();
-        ss << "\"" << description__value << "\"";
+        if (!groups__value.empty()) {
+            ss.seekp(-1, ss.cur);
+        }
+        ss << "]";
+        ss << ",";
     }
 
+    ss << "\"accountEnabled\":";
+    ss << (o.account_enabled_ ? "true" : "false");
     std::string str = ss.str();
     if (str.back() == ',') {
         str.pop_back();

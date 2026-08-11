@@ -87,6 +87,36 @@ test_new_table() {
 TypeTest test_new_table_obj(test_new_table, "NewTable");
 
 bool
+test_new_table_list() {
+    ::ul::types::NewTableList t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::NewTableList deserialized = ::ul::types::NewTableList(bytes);
+    return true;
+}
+
+TypeTest test_new_table_list_obj(test_new_table_list, "NewTableList");
+
+bool
+test_new_table_list_result() {
+    ::ul::types::NewTableListResult t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::NewTableListResult deserialized = ::ul::types::NewTableListResult(bytes);
+    return true;
+}
+
+TypeTest test_new_table_list_result_obj(test_new_table_list_result, "NewTableListResult");
+
+bool
+test_new_table_result() {
+    ::ul::types::NewTableResult t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::NewTableResult deserialized = ::ul::types::NewTableResult(bytes);
+    return true;
+}
+
+TypeTest test_new_table_result_obj(test_new_table_result, "NewTableResult");
+
+bool
 test_op_entry() {
     ::ul::types::OpEntry t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);

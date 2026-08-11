@@ -40,7 +40,7 @@ pub const ENUM_MAX_FN: i16 = 32766;
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_FN: [Fn; 202] = [
+pub const ENUM_VALUES_FN: [Fn; 206] = [
     Fn::None,
     Fn::True,
     Fn::False,
@@ -239,6 +239,10 @@ pub const ENUM_VALUES_FN: [Fn; 202] = [
     Fn::GeoFilter,
     Fn::StBuffer,
     Fn::StDistance,
+    Fn::Rank,
+    Fn::PercentRank,
+    Fn::Ntile,
+    Fn::CumeDist,
     Fn::CorrelationId,
     Fn::UlTimezone,
     Fn::UlArrayContains,
@@ -448,6 +452,10 @@ impl Fn {
     pub const GeoFilter: Self = Self(195);
     pub const StBuffer: Self = Self(196);
     pub const StDistance: Self = Self(197);
+    pub const Rank: Self = Self(198);
+    pub const PercentRank: Self = Self(199);
+    pub const Ntile: Self = Self(200);
+    pub const CumeDist: Self = Self(201);
     pub const CorrelationId: Self = Self(32763);
     pub const UlTimezone: Self = Self(32764);
     pub const UlArrayContains: Self = Self(32765);
@@ -654,6 +662,10 @@ impl Fn {
         Self::GeoFilter,
         Self::StBuffer,
         Self::StDistance,
+        Self::Rank,
+        Self::PercentRank,
+        Self::Ntile,
+        Self::CumeDist,
         Self::CorrelationId,
         Self::UlTimezone,
         Self::UlArrayContains,
@@ -860,6 +872,10 @@ impl Fn {
             Self::GeoFilter => Some("GeoFilter"),
             Self::StBuffer => Some("StBuffer"),
             Self::StDistance => Some("StDistance"),
+            Self::Rank => Some("Rank"),
+            Self::PercentRank => Some("PercentRank"),
+            Self::Ntile => Some("Ntile"),
+            Self::CumeDist => Some("CumeDist"),
             Self::CorrelationId => Some("CorrelationId"),
             Self::UlTimezone => Some("UlTimezone"),
             Self::UlArrayContains => Some("UlArrayContains"),

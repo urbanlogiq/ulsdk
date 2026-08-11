@@ -34,6 +34,9 @@ struct DiffStream;
 struct History;
 struct Modify;
 struct NewTable;
+struct NewTableList;
+struct NewTableListResult;
+struct NewTableResult;
 struct OpEntry;
 struct Restore;
 struct RestoreRow;
@@ -242,6 +245,57 @@ struct NewTable {
     }
 };
 
+///
+/// Body parameter for POST datacatalog/tables. Creates many tables in the
+/// same parent drive directory with a single directory update, instead of
+/// one directory update for each table.
+///
+struct NewTableList {
+    std::vector<NewTable> tables_;
+
+    NewTableList();
+    NewTableList(const ::NewTableList *root);
+    NewTableList(const std::vector<uint8_t> &bytes);
+    bool operator==(const NewTableList &rhs) const;
+    bool operator!=(const NewTableList &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+///
+/// Response body for POST datacatalog/tables.
+///
+struct NewTableListResult {
+    std::vector<NewTableResult> results_;
+
+    NewTableListResult();
+    NewTableListResult(const ::NewTableListResult *root);
+    NewTableListResult(const std::vector<uint8_t> &bytes);
+    bool operator==(const NewTableListResult &rhs) const;
+    bool operator!=(const NewTableListResult &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+///
+/// One entry of the response for POST datacatalog/tables. Entries are in
+/// the same order as the request.
+///
+struct NewTableResult {
+    bool adopted_;
+    std::optional<std::string> error_;
+    std::optional<ObjectId> id_;
+    std::string name_;
+
+    NewTableResult();
+    NewTableResult(const ::NewTableResult *root);
+    NewTableResult(const std::vector<uint8_t> &bytes);
+    bool operator==(const NewTableResult &rhs) const;
+    bool operator!=(const NewTableResult &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
 struct OpEntry {
     Op op_;
 
@@ -296,6 +350,15 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const History &);
 ::flatbuffers::Offset<::NewTable>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NewTable &);
 
+::flatbuffers::Offset<::NewTableList>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NewTableList &);
+
+::flatbuffers::Offset<::NewTableListResult>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NewTableListResult &);
+
+::flatbuffers::Offset<::NewTableResult>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NewTableResult &);
+
 ::flatbuffers::Offset<::OpEntry>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const OpEntry &);
 
@@ -335,6 +398,15 @@ to_bytes(const History &o);
 
 std::vector<uint8_t>
 to_bytes(const NewTable &o);
+
+std::vector<uint8_t>
+to_bytes(const NewTableList &o);
+
+std::vector<uint8_t>
+to_bytes(const NewTableListResult &o);
+
+std::vector<uint8_t>
+to_bytes(const NewTableResult &o);
 
 std::vector<uint8_t>
 to_bytes(const OpEntry &o);

@@ -201,6 +201,10 @@ class Fn(object):
     GeoFilter = 195
     StBuffer = 196
     StDistance = 197
+    Rank = 198
+    PercentRank = 199
+    Ntile = 200
+    CumeDist = 201
     CorrelationId = 32763
     UlTimezone = 32764
     UlArrayContains = 32765

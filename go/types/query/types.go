@@ -753,6 +753,8 @@ const (
 	JoinTyRightOuter JoinTy = 2
 	JoinTyFull JoinTy = 3
 	JoinTyCross JoinTy = 4
+	JoinTyLeftSemi JoinTy = 5
+	JoinTyLeftAnti JoinTy = 6
 )
 
 type QueryElementOp int8

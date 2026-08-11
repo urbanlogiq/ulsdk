@@ -10,6 +10,7 @@ import { DiffStreamT as DiffStream } from '../../types/generated/diff-stream';
 import { GenericIdT as GenericId } from '../../types/generated/generic-id';
 import { MetadataT as Metadata } from '../../types/generated/metadata';
 import { NewTableT as NewTable } from '../../types/generated/new-table';
+import { NewTableListT as NewTableList } from '../../types/generated/new-table-list';
 import { ObjectIdT as ObjectId } from '../../types/generated/object-id';
 import { ObjectIdListT as ObjectIdList } from '../../types/generated/object-id-list';
 import { PinnedObjectIdT as PinnedObjectId } from '../../types/generated/pinned-object-id';
@@ -563,6 +564,22 @@ describe('createTable', () => {
     ctx.setResponse(new Uint8Array(0));
     try {
           await datacatalog.createTable(
+        ctx,
+        body
+      );
+    } catch (_) {
+      // Expected for mock tests with empty/invalid responses
+    }
+  });
+});
+
+describe('createTables', () => {
+  it('testCreateTables', async () => {
+    const ctx = new TestContext();
+    const body = new NewTableList();
+    ctx.setResponse(new Uint8Array(0));
+    try {
+          await datacatalog.createTables(
         ctx,
         body
       );

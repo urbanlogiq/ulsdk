@@ -11,6 +11,8 @@ import { GenericId as FbsGenericId, GenericIdT as GenericId } from '../../types/
 import { History as FbsHistory, HistoryT as History } from '../../types/generated/history';
 import { Metadata as FbsMetadata, MetadataT as Metadata } from '../../types/generated/metadata';
 import { NewTable as FbsNewTable, NewTableT as NewTable } from '../../types/generated/new-table';
+import { NewTableList as FbsNewTableList, NewTableListT as NewTableList } from '../../types/generated/new-table-list';
+import { NewTableListResult as FbsNewTableListResult, NewTableListResultT as NewTableListResult } from '../../types/generated/new-table-list-result';
 import { ObjectId as FbsObjectId, ObjectIdT as ObjectId } from '../../types/generated/object-id';
 import { ObjectIdList as FbsObjectIdList, ObjectIdListT as ObjectIdList } from '../../types/generated/object-id-list';
 import { ObjectIdPairList as FbsObjectIdPairList, ObjectIdPairListT as ObjectIdPairList } from '../../types/generated/object-id-pair-list';
@@ -855,6 +857,33 @@ export async function createTable(
   const buf = new flatbuffers.ByteBuffer(res);
   buf.setPosition(buf.position() + flatbuffers.SIZE_PREFIX_LENGTH);
   const fbs = FbsObjectId.getRootAsObjectId(buf);
+  return fbs.unpack();
+}
+
+/**
+ * Create many tables in one parent directory with a single directory update
+ *
+ * @param ctx - A request context object
+ * @param newTables - The tables to create; every entry must name the same parent directory
+ * @returns Per-entry results, in request order
+ */
+export async function createTables(
+  ctx: RequestContext,
+  newTables: NewTableList
+): Promise<NewTableListResult> {
+  let path = '/v1/api/ulv2/datacatalog/tables';
+  const params: [string, string][] = [];
+  const headers: Record<string, string> = {};
+
+  let body: Uint8Array | null = null;
+  const __builder = new flatbuffers.Builder();
+  const __offset = newTables.pack(__builder);
+  __builder.finishSizePrefixed(__offset);
+  body = __builder.asUint8Array();
+  const res = await ctx.post(path, body, 'application/octet-stream', params, headers);
+  const buf = new flatbuffers.ByteBuffer(res);
+  buf.setPosition(buf.position() + flatbuffers.SIZE_PREFIX_LENGTH);
+  const fbs = FbsNewTableListResult.getRootAsNewTableListResult(buf);
   return fbs.unpack();
 }
 

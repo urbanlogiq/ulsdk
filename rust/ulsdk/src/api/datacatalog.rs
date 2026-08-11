@@ -20,7 +20,7 @@ use crate::types::object::{
     DataCatalogObject, ObjectIdList, ObjectIdPairList, ObjectSummary, ObjectSummaryList,
 };
 use crate::types::query::Query;
-use crate::types::table::{DiffStream, History, NewTable};
+use crate::types::table::{DiffStream, History, NewTable, NewTableList, NewTableListResult};
 
 /// Fetch an object at a given content ID revision
 ///
@@ -761,6 +761,27 @@ pub async fn create_table(
         .post(&path, body, "application/octet-stream", None, None)
         .await?;
     crate::types::ObjectId::from_fbs_bytes(res.as_slice()).map_err(Error::from)
+}
+
+/// Create many tables in one parent directory with a single directory update
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+/// * `new_tables` - The tables to create; every entry must name the same parent directory
+///
+/// Returns
+/// * Per-entry results, in request order
+pub async fn create_tables(
+    ctx: &dyn RequestContext,
+    new_tables: NewTableList,
+) -> Result<NewTableListResult, Error> {
+    let path = "/v1/api/ulv2/datacatalog/tables";
+    let body = Bytes::from(new_tables.to_fbs_bytes());
+    let res = ctx
+        .post(&path, body, "application/octet-stream", None, None)
+        .await?;
+    crate::types::NewTableListResult::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 /// Evaluate the resulting schema of a query, returning an empty Arrow record batch
@@ -2255,6 +2276,44 @@ mod tests {
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
             ctx.set_response(expected_bytes.clone());
             let result = create_table(&ctx, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
+    }
+
+    #[tokio::test]
+    async fn test_create_tables() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+
+        for i in 0..5 {
+            let body = crate::types::NewTableList::default();
+            let expected = NewTableListResult::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = create_tables(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
                 Err(e) => {

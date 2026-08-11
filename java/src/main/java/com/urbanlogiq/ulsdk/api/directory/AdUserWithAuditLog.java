@@ -53,11 +53,27 @@ public final class AdUserWithAuditLog {
         this._createdDateTime = value;
     }
 
-    com.urbanlogiq.ulsdk.api.directory.AuditLog _auditLog;
-    public com.urbanlogiq.ulsdk.api.directory.AuditLog getAuditLog() {
+    com.urbanlogiq.ulsdk.api.directory.AdGroup[] _groups;
+    public com.urbanlogiq.ulsdk.api.directory.AdGroup[] getGroups() {
+        return this._groups;
+    }
+    public void setGroups(com.urbanlogiq.ulsdk.api.directory.AdGroup[] value) {
+        this._groups = value;
+    }
+
+    boolean _accountEnabled;
+    public boolean getAccountEnabled() {
+        return this._accountEnabled;
+    }
+    public void setAccountEnabled(boolean value) {
+        this._accountEnabled = value;
+    }
+
+    com.urbanlogiq.ulsdk.api.directory.AuditLogEntry[] _auditLog;
+    public com.urbanlogiq.ulsdk.api.directory.AuditLogEntry[] getAuditLog() {
         return this._auditLog;
     }
-    public void setAuditLog(com.urbanlogiq.ulsdk.api.directory.AuditLog value) {
+    public void setAuditLog(com.urbanlogiq.ulsdk.api.directory.AuditLogEntry[] value) {
         this._auditLog = value;
     }
 
@@ -98,9 +114,33 @@ public final class AdUserWithAuditLog {
         createdDateTimeSerialized = this._createdDateTime;
         o.put("createdDateTime", createdDateTimeSerialized);
 
+        Object groupsSerialized = null;
+        if (this._groups != null) {
+            java.util.ArrayList<Object> groupsList = new java.util.ArrayList();
+            for (int i0 = 0; i0 < this._groups.length; i0++) {
+                com.urbanlogiq.ulsdk.api.directory.AdGroup item0 = this._groups[i0];
+                Object groupsVar = null;
+                groupsVar = item0.toMap();
+                groupsList.add(groupsVar);
+            }
+            groupsSerialized = groupsList;
+        }
+        o.put("groups", groupsSerialized);
+
+        Object accountEnabledSerialized = null;
+        accountEnabledSerialized = this._accountEnabled;
+        o.put("accountEnabled", accountEnabledSerialized);
+
         Object auditLogSerialized = null;
         if (this._auditLog != null) {
-            auditLogSerialized = this._auditLog.toMap();
+            java.util.ArrayList<Object> auditLogList = new java.util.ArrayList();
+            for (int i0 = 0; i0 < this._auditLog.length; i0++) {
+                com.urbanlogiq.ulsdk.api.directory.AuditLogEntry item0 = this._auditLog[i0];
+                Object auditLogVar = null;
+                auditLogVar = item0.toMap();
+                auditLogList.add(auditLogVar);
+            }
+            auditLogSerialized = auditLogList;
         }
         o.put("auditLog", auditLogSerialized);
 
@@ -137,12 +177,35 @@ public final class AdUserWithAuditLog {
         }
         Object createdDateTimeValue = o.get("createdDateTime");
         this._createdDateTime = (String)createdDateTimeValue;
+        Object groupsValue = null;
+        if (o.has("groups") && !o.isNull("groups")) {
+            groupsValue = o.get("groups");
+        }
+        if (groupsValue != null) {
+            org.json.JSONArray groupsValueArray = (org.json.JSONArray)groupsValue;
+            this._groups = new com.urbanlogiq.ulsdk.api.directory.AdGroup[groupsValueArray.length()];
+            for (int i0 = 0; i0 < groupsValueArray.length(); i0++) {
+                Object item0 = groupsValueArray.get(i0);
+                com.urbanlogiq.ulsdk.api.directory.AdGroup groupsItem = null;
+                groupsItem = new AdGroup((org.json.JSONObject)item0);
+                this._groups[i0] = groupsItem;
+            }
+        }
+        Object accountEnabledValue = o.get("accountEnabled");
+        this._accountEnabled = (boolean)accountEnabledValue;
         Object auditLogValue = null;
         if (o.has("auditLog") && !o.isNull("auditLog")) {
             auditLogValue = o.get("auditLog");
         }
         if (auditLogValue != null) {
-            this._auditLog = new AuditLog((org.json.JSONObject)auditLogValue);
+            org.json.JSONArray auditLogValueArray = (org.json.JSONArray)auditLogValue;
+            this._auditLog = new com.urbanlogiq.ulsdk.api.directory.AuditLogEntry[auditLogValueArray.length()];
+            for (int i0 = 0; i0 < auditLogValueArray.length(); i0++) {
+                Object item0 = auditLogValueArray.get(i0);
+                com.urbanlogiq.ulsdk.api.directory.AuditLogEntry auditLogItem = null;
+                auditLogItem = new AuditLogEntry((org.json.JSONObject)item0);
+                this._auditLog[i0] = auditLogItem;
+            }
         }
     }
 
@@ -153,6 +216,8 @@ public final class AdUserWithAuditLog {
         this._otherMails = null;
         this._department = null;
         this._createdDateTime = "";
+        this._groups = null;
+        this._accountEnabled = true;
         this._auditLog = null;
     }
 

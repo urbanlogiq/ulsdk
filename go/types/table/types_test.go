@@ -70,6 +70,30 @@ func TestDefaultNewTable(t *testing.T) {
 }
 
 
+func TestDefaultNewTableList(t *testing.T) {
+	o := &NewTableList{}
+	if o == nil {
+		t.Fatal("expected non-nil")
+	}
+}
+
+
+func TestDefaultNewTableListResult(t *testing.T) {
+	o := &NewTableListResult{}
+	if o == nil {
+		t.Fatal("expected non-nil")
+	}
+}
+
+
+func TestDefaultNewTableResult(t *testing.T) {
+	o := &NewTableResult{}
+	if o == nil {
+		t.Fatal("expected non-nil")
+	}
+}
+
+
 func TestDefaultOpEntry(t *testing.T) {
 	o := &OpEntry{}
 	if o == nil {

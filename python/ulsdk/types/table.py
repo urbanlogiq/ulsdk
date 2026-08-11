@@ -265,6 +265,9 @@ from .generated.MultiPoint import MultiPoint as FbsMultiPoint
 from .generated.MultiPolygon import MultiPolygon as FbsMultiPolygon
 from .generated.MvdbPartition import MvdbPartition as FbsMvdbPartition
 from .generated.NewTable import NewTable as FbsNewTable
+from .generated.NewTableList import NewTableList as FbsNewTableList
+from .generated.NewTableListResult import NewTableListResult as FbsNewTableListResult
+from .generated.NewTableResult import NewTableResult as FbsNewTableResult
 from .generated.NodeIdPair import NodeIdPair as FbsNodeIdPair
 from .generated.NodeList import NodeList as FbsNodeList
 from .generated.NodeQuery import NodeQuery as FbsNodeQuery
@@ -1304,7 +1307,7 @@ class NewTable:
 
     # The base to use for the table. If an object ID is provided, this will
     # take the schema from the provided stream or metadata object. If a
-    # schema is provided, the table will be created, empty, from that.           
+    # schema is provided, the table will be created, empty, from that.
     from_: Optional["TableFrom"]
 
     # If true, data will be copied into the new table from the source ID
@@ -1402,6 +1405,228 @@ class NewTable:
         eq = eq and self.name == other.name
         eq = eq and self.parent == other.parent
         eq = eq and self.target == other.target
+
+        return eq
+
+@dataclass
+class NewTableList:
+    """ Body parameter for POST datacatalog/tables. Creates many tables in the
+     same parent drive directory with a single directory update, instead of
+     one directory update for each table.
+    """
+
+    # The tables to create. Every entry must name the same `parent`
+    # directory; the request is rejected otherwise.
+    tables: "List[NewTable]"
+
+    @classmethod
+    def from_fbs(cls, o: FbsNewTableList) -> Self:
+        tables = list()
+        if not o.TablesIsNone():
+            for i in range(o.TablesLength()):
+                tables_val = None
+                tables_obj = o.Tables(i)
+                if tables_obj is not None:
+                    tables_val = NewTable.from_fbs(tables_obj)
+                tables.append(tables_val)
+        return cls(tables)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsNewTableList.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.NewTableList import (
+            Start,
+            AddTables,
+            StartTablesVector,
+            End,
+        )
+        tables_offsets = list()
+        for value in self.tables:
+            tables_offsets.append(value.serialize_to(builder))
+        StartTablesVector(builder, len(self.tables))
+        for i in reversed(range(len(self.tables))):
+            builder.PrependUOffsetTRelative(tables_offsets[i])
+        tables_offset = builder.EndVector()
+
+        Start(builder)
+        AddTables(builder, tables_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        tables = []
+        return cls(tables)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        if len(self.tables) != len(other.tables):
+            return False
+        for i in range(len(self.tables)):
+            eq = eq and self.tables[i] == other.tables[i]
+
+        return eq
+
+@dataclass
+class NewTableListResult:
+    """ Response body for POST datacatalog/tables.
+    """
+
+    results: "List[NewTableResult]"
+
+    @classmethod
+    def from_fbs(cls, o: FbsNewTableListResult) -> Self:
+        results = list()
+        if not o.ResultsIsNone():
+            for i in range(o.ResultsLength()):
+                results_val = None
+                results_obj = o.Results(i)
+                if results_obj is not None:
+                    results_val = NewTableResult.from_fbs(results_obj)
+                results.append(results_val)
+        return cls(results)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsNewTableListResult.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.NewTableListResult import (
+            Start,
+            AddResults,
+            StartResultsVector,
+            End,
+        )
+        results_offsets = list()
+        for value in self.results:
+            results_offsets.append(value.serialize_to(builder))
+        StartResultsVector(builder, len(self.results))
+        for i in reversed(range(len(self.results))):
+            builder.PrependUOffsetTRelative(results_offsets[i])
+        results_offset = builder.EndVector()
+
+        Start(builder)
+        AddResults(builder, results_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        results = []
+        return cls(results)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        if len(self.results) != len(other.results):
+            return False
+        for i in range(len(self.results)):
+            eq = eq and self.results[i] == other.results[i]
+
+        return eq
+
+@dataclass
+class NewTableResult:
+    """ One entry of the response for POST datacatalog/tables. Entries are in
+     the same order as the request.
+    """
+
+    # True when a table with this name already existed and was reused.
+    adopted: "bool"
+
+    # The failure reason for this entry. The other entries of the request
+    # are not affected by one entry's failure.
+    error: Optional["str"]
+
+    # The ID of the table stream. Present on success; not present when
+    # `error` is set.
+    id: Optional["ObjectId"]
+
+    name: "str"
+
+    @classmethod
+    def from_fbs(cls, o: FbsNewTableResult) -> Self:
+        adopted = o.Adopted()
+        error = None
+        error_str = o.Error()
+        if error_str is not None:
+            error = error_str.decode('utf-8')
+        id = None
+        id_obj = o.Id()
+        if id_obj is not None:
+            id = ObjectId.from_fbs(id_obj)
+        name_str = o.Name()
+        assert name_str is not None
+        name = name_str.decode('utf-8')
+        return cls(adopted, error, id, name)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsNewTableResult.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.NewTableResult import (
+            Start,
+            AddAdopted,
+            AddError,
+            AddId,
+            AddName,
+            End,
+        )
+        error_offset = None
+        if self.error is not None:
+            error_offset = builder.CreateString(self.error)
+        id_offset = None
+        if self.id is not None:
+            id_offset = self.id.serialize_to(builder)
+        name_offset = builder.CreateString(self.name)
+
+        Start(builder)
+        AddAdopted(builder, self.adopted)
+        if error_offset is not None:
+            AddError(builder, error_offset)
+        if id_offset is not None:
+            AddId(builder, id_offset)
+        AddName(builder, name_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        adopted = False
+        error = ""
+        id = ObjectId.make_default()
+        name = ""
+        return cls(adopted, error, id, name)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.adopted == other.adopted
+        eq = eq and self.error == other.error
+        eq = eq and self.id == other.id
+        eq = eq and self.name == other.name
 
         return eq
 

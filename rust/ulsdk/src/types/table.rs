@@ -96,9 +96,10 @@ use crate::types::generated::query_generated::{
 use crate::types::generated::table_generated::{
     Append as FbsAppend, ChangeOp as FbsChangeOp, ChangeOpEntry as FbsChangeOpEntry,
     ChangeSet as FbsChangeSet, Delete as FbsDelete, DiffStream as FbsDiffStream,
-    History as FbsHistory, Modify as FbsModify, NewTable as FbsNewTable, Op as FbsOp,
-    OpEntry as FbsOpEntry, Restore as FbsRestore, RestoreRow as FbsRestoreRow, RmRow as FbsRmRow,
-    Set as FbsSet, TableFrom as FbsTableFrom,
+    History as FbsHistory, Modify as FbsModify, NewTable as FbsNewTable,
+    NewTableList as FbsNewTableList, NewTableListResult as FbsNewTableListResult,
+    NewTableResult as FbsNewTableResult, Op as FbsOp, OpEntry as FbsOpEntry, Restore as FbsRestore,
+    RestoreRow as FbsRestoreRow, RmRow as FbsRmRow, Set as FbsSet, TableFrom as FbsTableFrom,
 };
 use crate::types::generated::value_generated::{
     Point2D as FbsPoint2D, Tri2D as FbsTri2D, VArray as FbsVArray, VBool as FbsVBool,
@@ -919,7 +920,7 @@ impl crate::FbsSerde for History {
 pub struct NewTable {
     /// The base to use for the table. If an object ID is provided, this will
     /// take the schema from the provided stream or metadata object. If a
-    /// schema is provided, the table will be created, empty, from that.           
+    /// schema is provided, the table will be created, empty, from that.
     pub from: Option<TableFrom>,
     /// If true, data will be copied into the new table from the source ID
     /// provided.
@@ -1006,6 +1007,192 @@ impl crate::FbsSerde for NewTable {
             ..Default::default()
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsNewTable>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+/// Body parameter for POST datacatalog/tables. Creates many tables in the
+/// same parent drive directory with a single directory update, instead of
+/// one directory update for each table.
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+pub struct NewTableList {
+    /// The tables to create. Every entry must name the same `parent`
+    /// directory; the request is rejected otherwise.
+    pub tables: Vec<NewTable>,
+}
+
+impl NewTableList {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNewTableList<'a>> {
+        use crate::types::generated::table_generated::NewTableListBuilder as FbsNewTableListBuilder;
+
+        let mut tables_offsets = Vec::with_capacity(self.tables.len());
+        for val in self.tables.iter() {
+            let offset = val.serialize_to(builder);
+            tables_offsets.push(offset);
+        }
+        let tables_offset = builder.create_vector(&tables_offsets);
+
+        let mut bldr = FbsNewTableListBuilder::new(builder);
+        bldr.add_tables(tables_offset);
+        bldr.finish()
+    }
+}
+
+impl From<FbsNewTableList<'_>> for NewTableList {
+    fn from(fbs: FbsNewTableList<'_>) -> Self {
+        let mut tables = Vec::new();
+        for elem in fbs.tables() {
+            tables.push(elem.into());
+        }
+
+        Self { tables }
+    }
+}
+
+impl crate::FbsSerde for NewTableList {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsNewTableList>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+/// Response body for POST datacatalog/tables.
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+pub struct NewTableListResult {
+    pub results: Vec<NewTableResult>,
+}
+
+impl NewTableListResult {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNewTableListResult<'a>> {
+        use crate::types::generated::table_generated::NewTableListResultBuilder as FbsNewTableListResultBuilder;
+
+        let mut results_offsets = Vec::with_capacity(self.results.len());
+        for val in self.results.iter() {
+            let offset = val.serialize_to(builder);
+            results_offsets.push(offset);
+        }
+        let results_offset = builder.create_vector(&results_offsets);
+
+        let mut bldr = FbsNewTableListResultBuilder::new(builder);
+        bldr.add_results(results_offset);
+        bldr.finish()
+    }
+}
+
+impl From<FbsNewTableListResult<'_>> for NewTableListResult {
+    fn from(fbs: FbsNewTableListResult<'_>) -> Self {
+        let mut results = Vec::new();
+        for elem in fbs.results() {
+            results.push(elem.into());
+        }
+
+        Self { results }
+    }
+}
+
+impl crate::FbsSerde for NewTableListResult {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsNewTableListResult>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+/// One entry of the response for POST datacatalog/tables. Entries are in
+/// the same order as the request.
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+pub struct NewTableResult {
+    /// True when a table with this name already existed and was reused.
+    pub adopted: bool,
+    /// The failure reason for this entry. The other entries of the request
+    /// are not affected by one entry's failure.
+    pub error: Option<String>,
+    /// The ID of the table stream. Present on success; not present when
+    /// `error` is set.
+    pub id: Option<ObjectId>,
+    pub name: String,
+}
+
+impl NewTableResult {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNewTableResult<'a>> {
+        use crate::types::generated::table_generated::NewTableResultBuilder as FbsNewTableResultBuilder;
+
+        let error_offset = self.error.as_ref().map(|s| builder.create_string(s));
+        let id_offset = self.id.as_ref().map(|o| o.serialize_to(builder));
+        let name_offset = builder.create_string(&self.name);
+
+        let mut bldr = FbsNewTableResultBuilder::new(builder);
+        bldr.add_adopted(self.adopted);
+        if let Some(offset) = error_offset {
+            bldr.add_error(offset);
+        }
+        if let Some(offset) = id_offset {
+            bldr.add_id(offset);
+        }
+        bldr.add_name(name_offset);
+        bldr.finish()
+    }
+}
+
+impl From<FbsNewTableResult<'_>> for NewTableResult {
+    fn from(fbs: FbsNewTableResult<'_>) -> Self {
+        let adopted = fbs.adopted();
+        let error = fbs.error().map(ToOwned::to_owned);
+        let id = fbs.id().map(ObjectId::from);
+        let name = fbs.name().to_owned();
+        Self {
+            adopted,
+            error,
+            id,
+            name,
+        }
+    }
+}
+
+impl crate::FbsSerde for NewTableResult {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsNewTableResult>(&opts, bytes)?;
         Ok(Self::from(fbs))
     }
 }
@@ -1128,6 +1315,30 @@ mod tests {
         let t0 = NewTable::default();
         let buf = t0.to_fbs_bytes();
         let t1 = NewTable::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_new_table_list() {
+        let t0 = NewTableList::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = NewTableList::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_new_table_list_result() {
+        let t0 = NewTableListResult::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = NewTableListResult::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_new_table_result() {
+        let t0 = NewTableResult::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = NewTableResult::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 

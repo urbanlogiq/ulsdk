@@ -2,8 +2,11 @@
 
 # namespace: 
 
+# Append new variants only — a union member's position is its wire value, so
+# inserting one would silently reinterpret existing stored metadata.
 class GeometrySource(object):
     NONE = 0
     NoGeometry = 1
     DatacatalogGeometry = 2
     WorldGraphGeometry = 3
+    DatacatalogLatLngGeometry = 4

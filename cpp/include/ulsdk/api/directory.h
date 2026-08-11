@@ -26,6 +26,7 @@ struct Principal {
     std::optional<std::vector<std::string>> email_;
     std::optional<std::string> description_;
     std::optional<std::string> department_;
+    std::optional<bool> account_enabled_;
 
     Principal() = default;
     Principal(const struct json_value_s *root);
@@ -38,6 +39,22 @@ struct Principal {
 std::vector<uint8_t>
 to_bytes(const Principal &o);
 
+struct AdGroup {
+    std::string id_;
+    std::string display_name_;
+    std::optional<std::string> description_;
+
+    AdGroup() = default;
+    AdGroup(const struct json_value_s *root);
+    bool operator==(const AdGroup &rhs) const;
+    bool operator!=(const AdGroup &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+std::vector<uint8_t>
+to_bytes(const AdGroup &o);
+
 struct AdUser {
     std::string display_name_;
     std::string id_;
@@ -45,6 +62,8 @@ struct AdUser {
     std::optional<std::vector<std::string>> other_mails_;
     std::optional<std::string> department_;
     std::string created_date_time_;
+    std::optional<std::vector<AdGroup>> groups_;
+    bool account_enabled_;
 
     AdUser() = default;
     AdUser(const struct json_value_s *root);
@@ -74,6 +93,7 @@ to_bytes(const DisplayNames &o);
 
 struct DeviceDetail {
     std::optional<std::string> device_id_;
+    std::optional<std::string> display_name_;
     std::optional<std::string> operating_system_;
     std::optional<std::string> browser_;
     std::optional<bool> is_compliant_;
@@ -144,20 +164,6 @@ struct AuditLogEntry {
 std::vector<uint8_t>
 to_bytes(const AuditLogEntry &o);
 
-struct AuditLog {
-    std::vector<AuditLogEntry> value_;
-
-    AuditLog() = default;
-    AuditLog(const struct json_value_s *root);
-    bool operator==(const AuditLog &rhs) const;
-    bool operator!=(const AuditLog &rhs) const {
-        return !(*this == rhs);
-    }
-};
-
-std::vector<uint8_t>
-to_bytes(const AuditLog &o);
-
 struct AdUserWithAuditLog {
     std::string display_name_;
     std::string id_;
@@ -165,7 +171,9 @@ struct AdUserWithAuditLog {
     std::optional<std::vector<std::string>> other_mails_;
     std::optional<std::string> department_;
     std::string created_date_time_;
-    std::optional<AuditLog> audit_log_;
+    std::optional<std::vector<AdGroup>> groups_;
+    bool account_enabled_;
+    std::optional<std::vector<AuditLogEntry>> audit_log_;
 
     AdUserWithAuditLog() = default;
     AdUserWithAuditLog(const struct json_value_s *root);
@@ -238,22 +246,6 @@ struct UpdateUser {
 std::vector<uint8_t>
 to_bytes(const UpdateUser &o);
 
-struct AdGroup {
-    std::string id_;
-    std::string display_name_;
-    std::optional<std::string> description_;
-
-    AdGroup() = default;
-    AdGroup(const struct json_value_s *root);
-    bool operator==(const AdGroup &rhs) const;
-    bool operator!=(const AdGroup &rhs) const {
-        return !(*this == rhs);
-    }
-};
-
-std::vector<uint8_t>
-to_bytes(const AdGroup &o);
-
 struct CreateGroup {
     std::string display_name_;
     std::optional<std::string> description_;
@@ -273,6 +265,7 @@ struct GroupMembership {
     std::string id_;
     std::string object_type_;
     std::string display_name_;
+    std::optional<std::string> user_principal_name_;
     std::optional<std::vector<std::string>> other_mails_;
     std::optional<std::string> department_;
     std::optional<std::string> created_date_time_;

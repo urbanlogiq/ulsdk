@@ -474,27 +474,32 @@ func (v DatasetCategory) String() string {
 	return "DatasetCategory(" + strconv.FormatInt(int64(v), 10) + ")"
 }
 
+/// Append new variants only — a union member's position is its wire value, so
+/// inserting one would silently reinterpret existing stored metadata.
 type GeometrySource byte
 
 const (
-	GeometrySourceNONE                GeometrySource = 0
-	GeometrySourceNoGeometry          GeometrySource = 1
-	GeometrySourceDatacatalogGeometry GeometrySource = 2
-	GeometrySourceWorldGraphGeometry  GeometrySource = 3
+	GeometrySourceNONE                      GeometrySource = 0
+	GeometrySourceNoGeometry                GeometrySource = 1
+	GeometrySourceDatacatalogGeometry       GeometrySource = 2
+	GeometrySourceWorldGraphGeometry        GeometrySource = 3
+	GeometrySourceDatacatalogLatLngGeometry GeometrySource = 4
 )
 
 var EnumNamesGeometrySource = map[GeometrySource]string{
-	GeometrySourceNONE:                "NONE",
-	GeometrySourceNoGeometry:          "NoGeometry",
-	GeometrySourceDatacatalogGeometry: "DatacatalogGeometry",
-	GeometrySourceWorldGraphGeometry:  "WorldGraphGeometry",
+	GeometrySourceNONE:                      "NONE",
+	GeometrySourceNoGeometry:                "NoGeometry",
+	GeometrySourceDatacatalogGeometry:       "DatacatalogGeometry",
+	GeometrySourceWorldGraphGeometry:        "WorldGraphGeometry",
+	GeometrySourceDatacatalogLatLngGeometry: "DatacatalogLatLngGeometry",
 }
 
 var EnumValuesGeometrySource = map[string]GeometrySource{
-	"NONE":                GeometrySourceNONE,
-	"NoGeometry":          GeometrySourceNoGeometry,
-	"DatacatalogGeometry": GeometrySourceDatacatalogGeometry,
-	"WorldGraphGeometry":  GeometrySourceWorldGraphGeometry,
+	"NONE":                      GeometrySourceNONE,
+	"NoGeometry":                GeometrySourceNoGeometry,
+	"DatacatalogGeometry":       GeometrySourceDatacatalogGeometry,
+	"WorldGraphGeometry":        GeometrySourceWorldGraphGeometry,
+	"DatacatalogLatLngGeometry": GeometrySourceDatacatalogLatLngGeometry,
 }
 
 func (v GeometrySource) String() string {
@@ -3520,6 +3525,75 @@ func DatacatalogGeometryAddColumn(builder *flatbuffers.Builder, column flatbuffe
 	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(column), 0)
 }
 func DatacatalogGeometryEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return builder.EndObject()
+}
+/// Point geometry stored as two scalar coordinate columns rather than one
+/// geometry column. Common for raw/bronze-level ingests, which land as-is
+/// without a transformation step to construct a geom column.
+///
+/// Consumers compose a point from the pair (e.g. st_makepoint(lng, lat))
+/// wherever they would otherwise reference a DatacatalogGeometry column.
+type DatacatalogLatLngGeometry struct {
+	_tab flatbuffers.Table
+}
+
+func GetRootAsDatacatalogLatLngGeometry(buf []byte, offset flatbuffers.UOffsetT) *DatacatalogLatLngGeometry {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &DatacatalogLatLngGeometry{}
+	x.Init(buf, n+offset)
+	return x
+}
+
+func FinishDatacatalogLatLngGeometryBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.Finish(offset)
+}
+
+func GetSizePrefixedRootAsDatacatalogLatLngGeometry(buf []byte, offset flatbuffers.UOffsetT) *DatacatalogLatLngGeometry {
+	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
+	x := &DatacatalogLatLngGeometry{}
+	x.Init(buf, n+offset+flatbuffers.SizeUint32)
+	return x
+}
+
+func FinishSizePrefixedDatacatalogLatLngGeometryBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.FinishSizePrefixed(offset)
+}
+
+func (rcv *DatacatalogLatLngGeometry) Init(buf []byte, i flatbuffers.UOffsetT) {
+	rcv._tab.Bytes = buf
+	rcv._tab.Pos = i
+}
+
+func (rcv *DatacatalogLatLngGeometry) Table() flatbuffers.Table {
+	return rcv._tab
+}
+
+func (rcv *DatacatalogLatLngGeometry) LngColumn() []byte {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		return rcv._tab.ByteVector(o + rcv._tab.Pos)
+	}
+	return nil
+}
+
+func (rcv *DatacatalogLatLngGeometry) LatColumn() []byte {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
+	if o != 0 {
+		return rcv._tab.ByteVector(o + rcv._tab.Pos)
+	}
+	return nil
+}
+
+func DatacatalogLatLngGeometryStart(builder *flatbuffers.Builder) {
+	builder.StartObject(2)
+}
+func DatacatalogLatLngGeometryAddLngColumn(builder *flatbuffers.Builder, lngColumn flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(lngColumn), 0)
+}
+func DatacatalogLatLngGeometryAddLatColumn(builder *flatbuffers.Builder, latColumn flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(1, flatbuffers.UOffsetT(latColumn), 0)
+}
+func DatacatalogLatLngGeometryEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
 /// For most streams with GeometrySourceType==WorldGraphGeometry, edge_path will

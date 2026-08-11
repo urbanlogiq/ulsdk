@@ -29,7 +29,13 @@ from ..types.object import (
     ObjectSummaryList,
 )
 from ..types.query import Query
-from ..types.table import DiffStream, History, NewTable
+from ..types.table import (
+    DiffStream,
+    History,
+    NewTable,
+    NewTableList,
+    NewTableListResult,
+)
 
 def get_object_at_revision(
     ctx: RequestContext,
@@ -826,6 +832,27 @@ def create_table(
     body = new_table.to_bytes()
     res = ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
     return ObjectId.from_bytes(res)
+
+def create_tables(
+    ctx: RequestContext,
+    new_tables: NewTableList,
+) -> NewTableListResult:
+    """Create many tables in one parent directory with a single directory update
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+    new_tables: NewTableList -- The tables to create; every entry must name the same parent directory
+
+    Returns:
+    Per-entry results, in request order
+    """
+
+    path = "/v1/api/ulv2/datacatalog/tables"
+    params = dict()
+    headers = dict()
+    body = new_tables.to_bytes()
+    res = ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
+    return NewTableListResult.from_bytes(res)
 
 def schema_arrow(
     ctx: RequestContext,

@@ -52,6 +52,14 @@ func TestDefaultDatacatalogGeometry(t *testing.T) {
 }
 
 
+func TestDefaultDatacatalogLatLngGeometry(t *testing.T) {
+	o := &DatacatalogLatLngGeometry{}
+	if o == nil {
+		t.Fatal("expected non-nil")
+	}
+}
+
+
 func TestDefaultDatasetSource(t *testing.T) {
 	o := &DatasetSource{}
 	if o == nil {
