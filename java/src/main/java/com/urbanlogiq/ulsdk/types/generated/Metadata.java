@@ -106,6 +106,16 @@ public final class Metadata extends com.google.flatbuffers.Table {
   public IntVector visualizeInExploreFieldsVector(IntVector obj) { int o = __offset(34); return o != 0 ? obj.__assign(__vector(o), bb) : null; }
   public ByteBuffer visualizeInExploreFieldsAsByteBuffer() { return __vector_as_bytebuffer(34, 4); }
   public ByteBuffer visualizeInExploreFieldsInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 34, 4); }
+  /**
+   * Sections of fields shown in a feature's selected-state details panel, in
+   * display order, where `summary` is the hover-popup list. When absent, the
+   * details panel falls back to the summary fields.
+   */
+  public DetailSection detailSections(int j) { return detailSections(new DetailSection(), j); }
+  public DetailSection detailSections(DetailSection obj, int j) { int o = __offset(36); return o != 0 ? obj.__assign(__indirect(__vector(o) + j * 4), bb) : null; }
+  public int detailSectionsLength() { int o = __offset(36); return o != 0 ? __vector_len(o) : 0; }
+  public DetailSection._Vector detailSectionsVector() { return detailSectionsVector(new DetailSection._Vector()); }
+  public DetailSection._Vector detailSectionsVector(DetailSection._Vector obj) { int o = __offset(36); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
 
   public static int createMetadata(FlatBufferBuilder builder,
       int displayNameOffset,
@@ -123,8 +133,10 @@ public final class Metadata extends com.google.flatbuffers.Table {
       long updateCadence,
       int locationDescriptionField,
       int promotedMetricsOffset,
-      int visualizeInExploreFieldsOffset) {
-    builder.startTable(16);
+      int visualizeInExploreFieldsOffset,
+      int detailSectionsOffset) {
+    builder.startTable(17);
+    Metadata.addDetailSections(builder, detailSectionsOffset);
     Metadata.addVisualizeInExploreFields(builder, visualizeInExploreFieldsOffset);
     Metadata.addPromotedMetrics(builder, promotedMetricsOffset);
     Metadata.addLocationDescriptionField(builder, locationDescriptionField);
@@ -144,7 +156,7 @@ public final class Metadata extends com.google.flatbuffers.Table {
     return Metadata.endMetadata(builder);
   }
 
-  public static void startMetadata(FlatBufferBuilder builder) { builder.startTable(16); }
+  public static void startMetadata(FlatBufferBuilder builder) { builder.startTable(17); }
   public static void addDisplayName(FlatBufferBuilder builder, int displayNameOffset) { builder.addOffset(0, displayNameOffset, 0); }
   public static void addDescription(FlatBufferBuilder builder, int descriptionOffset) { builder.addOffset(1, descriptionOffset, 0); }
   public static void addFields(FlatBufferBuilder builder, int fieldsOffset) { builder.addOffset(2, fieldsOffset, 0); }
@@ -171,6 +183,9 @@ public final class Metadata extends com.google.flatbuffers.Table {
   public static void addVisualizeInExploreFields(FlatBufferBuilder builder, int visualizeInExploreFieldsOffset) { builder.addOffset(15, visualizeInExploreFieldsOffset, 0); }
   public static int createVisualizeInExploreFieldsVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addInt(data[i]); return builder.endVector(); }
   public static void startVisualizeInExploreFieldsVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
+  public static void addDetailSections(FlatBufferBuilder builder, int detailSectionsOffset) { builder.addOffset(16, detailSectionsOffset, 0); }
+  public static int createDetailSectionsVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
+  public static void startDetailSectionsVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
   public static int endMetadata(FlatBufferBuilder builder) {
     int o = builder.endTable();
     return o;

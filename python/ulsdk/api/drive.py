@@ -17,7 +17,7 @@ from ..request_context import RequestContext
 from ..request_context import File
 from ..types.fs import DirectoryList, MoveRequest
 from ..types.id import B2cId, ObjectId
-from ..types.object import ObjectSummary
+from ..types.object import ObjectIdList, ObjectSummary
 
 def ls(
     ctx: RequestContext,
@@ -177,18 +177,33 @@ def post_file(
     res = ctx.upload(path, files, params=params, headers=headers)
     return DirectoryList.from_bytes(res)
 
+def unlink_list(
+    ctx: RequestContext,
+    object_ids: ObjectIdList,
+) -> None:
+    """Removes the specified drive entries from their parent directories.
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+    object_ids: ObjectIdList -- A list of object IDs to delete
+    """
+
+    path = "/v1/api/ulv2/drive/unlink_list"
+    params = dict()
+    headers = dict()
+    body = object_ids.to_bytes()
+    ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
+    return
+
 def unlink(
     ctx: RequestContext,
     entry: "ObjectId",
-) -> DirectoryList:
+) -> None:
     """Removes the specified drive entry from its parent directory.
 
     Arguments:
     ctx: RequestContext -- A request context object
     entry: "ObjectId" -- The ID of the entry to remove
-
-    Returns:
-    An updated list of directory entries
     """
 
     path = "/v1/api/ulv2/drive/:entry"
@@ -196,8 +211,8 @@ def unlink(
 
     params = dict()
     headers = dict()
-    res = ctx.delete(path, params=params, headers=headers)
-    return DirectoryList.from_bytes(res)
+    ctx.delete(path, params=params, headers=headers)
+    return
 
 def move(
     ctx: RequestContext,

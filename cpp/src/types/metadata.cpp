@@ -1318,6 +1318,59 @@ DatasetSource::operator==(const DatasetSource &rhs) const {
     return true;
 }
 
+::flatbuffers::Offset<::DetailSection>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DetailSection &o) {
+    std::optional<decltype(builder.CreateVector(o.fields_.value()))> fields_offset = std::nullopt;
+    if (o.fields_.has_value()) {
+        const decltype(builder.CreateVector(o.fields_.value())) fields_offset_val = builder.CreateVector(o.fields_.value());
+        fields_offset = std::make_optional(fields_offset_val);
+    }
+
+    ::DetailSectionBuilder instance_builder = ::DetailSectionBuilder(builder);
+    if (fields_offset.has_value()) {
+        instance_builder.add_fields(fields_offset.value());
+    }
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const DetailSection &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+DetailSection::DetailSection()
+    : fields_(std::nullopt) {
+}
+
+DetailSection::DetailSection(const std::vector<uint8_t> &bytes)
+    : DetailSection(::flatbuffers::GetSizePrefixedRoot<::DetailSection>(bytes.data())) {
+}
+
+DetailSection::DetailSection(const ::DetailSection *root) 
+    : fields_(std::nullopt) {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    const auto &fields_vector = root->fields();
+    if (fields_vector != nullptr) {
+        decltype(fields_)::value_type fields__target = decltype(fields_)::value_type();
+        std::copy(fields_vector->begin(), fields_vector->end(), std::back_inserter(fields__target));
+        fields_ = std::make_optional(fields__target);
+    }
+}
+
+bool
+DetailSection::operator==(const DetailSection &rhs) const {
+    if (this->fields_ != rhs.fields_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Document>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Document &o) {
     std::optional<::flatbuffers::Offset<::flatbuffers::String>> display_name_offset = std::nullopt;
@@ -1916,6 +1969,17 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Metadata &o) {
         const ::flatbuffers::Offset<::flatbuffers::String> description_offset_val = builder.CreateString(o.description_.value());
         description_offset = std::make_optional(description_offset_val);
     }
+    std::optional<::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::DetailSection>>>> detail_sections_offset = std::nullopt;
+    if (o.detail_sections_.has_value()) {
+        const auto &detail_sections__var = o.detail_sections_.value();
+        std::vector<::flatbuffers::Offset<::DetailSection>> detail_sections_offsets = std::vector<::flatbuffers::Offset<::DetailSection>>();
+        detail_sections_offsets.reserve(detail_sections__var.size());
+        for (const auto &i: detail_sections__var) {
+            detail_sections_offsets.push_back(serialize_to(builder, i));
+        }
+        const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::DetailSection>>> detail_sections_offset_val = builder.CreateVector(detail_sections_offsets);
+        detail_sections_offset = std::make_optional(detail_sections_offset_val);
+    }
     std::optional<::flatbuffers::Offset<::flatbuffers::String>> display_name_offset = std::nullopt;
     if (o.display_name_.has_value()) {
         const ::flatbuffers::Offset<::flatbuffers::String> display_name_offset_val = builder.CreateString(o.display_name_.value());
@@ -1975,6 +2039,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Metadata &o) {
     if (description_offset.has_value()) {
         instance_builder.add_description(description_offset.value());
     }
+    if (detail_sections_offset.has_value()) {
+        instance_builder.add_detail_sections(detail_sections_offset.value());
+    }
     if (display_name_offset.has_value()) {
         instance_builder.add_display_name(display_name_offset.value());
     }
@@ -2020,6 +2087,7 @@ Metadata::Metadata()
     : area_selection_(false)
     , dataset_category_(DatasetCategory(4294967295))
     , description_(std::nullopt)
+    , detail_sections_(std::nullopt)
     , display_name_(std::nullopt)
     , do_not_filter_geometry_by_viewport_(false)
     , entity_ty_(EntityTy(0))
@@ -2042,6 +2110,7 @@ Metadata::Metadata(const ::Metadata *root)
     : area_selection_(false)
     , dataset_category_(DatasetCategory(4294967295))
     , description_(std::nullopt)
+    , detail_sections_(std::nullopt)
     , display_name_(std::nullopt)
     , do_not_filter_geometry_by_viewport_(false)
     , entity_ty_(EntityTy(0))
@@ -2062,6 +2131,15 @@ Metadata::Metadata(const ::Metadata *root)
     dataset_category_ = root->dataset_category();
     if (root->description() != nullptr) {
         description_ = std::string(*root->description()->begin(), *root->description()->end());
+    }
+    const auto &detail_sections_vector = root->detail_sections();
+    if (detail_sections_vector != nullptr) {
+        decltype(detail_sections_)::value_type detail_sections__target = decltype(detail_sections_)::value_type();
+        detail_sections__target.reserve(detail_sections_vector->size());
+        for (const auto &i: *detail_sections_vector) {
+            detail_sections__target.emplace_back(i);
+        }
+        detail_sections_ = std::make_optional(detail_sections__target);
     }
     if (root->display_name() != nullptr) {
         display_name_ = std::string(*root->display_name()->begin(), *root->display_name()->end());
@@ -2150,6 +2228,9 @@ Metadata::operator==(const Metadata &rhs) const {
         return false;
     }
     if (this->description_ != rhs.description_) {
+        return false;
+    }
+    if (this->detail_sections_ != rhs.detail_sections_) {
         return false;
     }
     if (this->display_name_ != rhs.display_name_) {

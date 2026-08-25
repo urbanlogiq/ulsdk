@@ -3704,6 +3704,84 @@ func WorldGraphGeometryAddStartStreamId(builder *flatbuffers.Builder, startStrea
 func WorldGraphGeometryEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
+/// One group of fields in a feature's selected-state details panel. Sections
+/// render in list order, fields in theirs; the panel draws a rule between
+/// sections. Sections have no names; editors identify them by position.
+type DetailSection struct {
+	_tab flatbuffers.Table
+}
+
+func GetRootAsDetailSection(buf []byte, offset flatbuffers.UOffsetT) *DetailSection {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &DetailSection{}
+	x.Init(buf, n+offset)
+	return x
+}
+
+func FinishDetailSectionBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.Finish(offset)
+}
+
+func GetSizePrefixedRootAsDetailSection(buf []byte, offset flatbuffers.UOffsetT) *DetailSection {
+	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
+	x := &DetailSection{}
+	x.Init(buf, n+offset+flatbuffers.SizeUint32)
+	return x
+}
+
+func FinishSizePrefixedDetailSectionBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.FinishSizePrefixed(offset)
+}
+
+func (rcv *DetailSection) Init(buf []byte, i flatbuffers.UOffsetT) {
+	rcv._tab.Bytes = buf
+	rcv._tab.Pos = i
+}
+
+func (rcv *DetailSection) Table() flatbuffers.Table {
+	return rcv._tab
+}
+
+/// Indices of the fields the section shows, in display order.
+func (rcv *DetailSection) Fields(j int) int32 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		a := rcv._tab.Vector(o)
+		return rcv._tab.GetInt32(a + flatbuffers.UOffsetT(j*4))
+	}
+	return 0
+}
+
+func (rcv *DetailSection) FieldsLength() int {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		return rcv._tab.VectorLen(o)
+	}
+	return 0
+}
+
+/// Indices of the fields the section shows, in display order.
+func (rcv *DetailSection) MutateFields(j int, n int32) bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		a := rcv._tab.Vector(o)
+		return rcv._tab.MutateInt32(a+flatbuffers.UOffsetT(j*4), n)
+	}
+	return false
+}
+
+func DetailSectionStart(builder *flatbuffers.Builder) {
+	builder.StartObject(1)
+}
+func DetailSectionAddFields(builder *flatbuffers.Builder, fields flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(fields), 0)
+}
+func DetailSectionStartFieldsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+	return builder.StartVector(4, numElems, 4)
+}
+func DetailSectionEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return builder.EndObject()
+}
 type Metadata struct {
 	_tab flatbuffers.Table
 }
@@ -4013,8 +4091,34 @@ func (rcv *Metadata) MutateVisualizeInExploreFields(j int, n int32) bool {
 	return false
 }
 
+/// Sections of fields shown in a feature's selected-state details panel, in
+/// display order, where `summary` is the hover-popup list. When absent, the
+/// details panel falls back to the summary fields.
+func (rcv *Metadata) DetailSections(obj *DetailSection, j int) bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(36))
+	if o != 0 {
+		x := rcv._tab.Vector(o)
+		x += flatbuffers.UOffsetT(j) * 4
+		x = rcv._tab.Indirect(x)
+		obj.Init(rcv._tab.Bytes, x)
+		return true
+	}
+	return false
+}
+
+func (rcv *Metadata) DetailSectionsLength() int {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(36))
+	if o != 0 {
+		return rcv._tab.VectorLen(o)
+	}
+	return 0
+}
+
+/// Sections of fields shown in a feature's selected-state details panel, in
+/// display order, where `summary` is the hover-popup list. When absent, the
+/// details panel falls back to the summary fields.
 func MetadataStart(builder *flatbuffers.Builder) {
-	builder.StartObject(16)
+	builder.StartObject(17)
 }
 func MetadataAddDisplayName(builder *flatbuffers.Builder, displayName flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(displayName), 0)
@@ -4077,6 +4181,12 @@ func MetadataAddVisualizeInExploreFields(builder *flatbuffers.Builder, visualize
 	builder.PrependUOffsetTSlot(15, flatbuffers.UOffsetT(visualizeInExploreFields), 0)
 }
 func MetadataStartVisualizeInExploreFieldsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+	return builder.StartVector(4, numElems, 4)
+}
+func MetadataAddDetailSections(builder *flatbuffers.Builder, detailSections flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(16, flatbuffers.UOffsetT(detailSections), 0)
+}
+func MetadataStartDetailSectionsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
 	return builder.StartVector(4, numElems, 4)
 }
 func MetadataEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {

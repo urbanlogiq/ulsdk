@@ -171,7 +171,26 @@ post_file(
     return ::ul::types::DirectoryList(std::get<std::vector<uint8_t>>(res));
 }
 
-Result<::ul::types::DirectoryList>
+Result<Void>
+unlink_list(
+    ul::RequestContext &ctx,
+    const ::ul::types::ObjectIdList &object_ids
+) {
+    std::string path = "/v1/api/ulv2/drive/unlink_list";
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+    const std::vector<uint8_t> body = ::ul::types::to_bytes(object_ids);
+    const Result<std::vector<uint8_t>> res = ctx.post(path, body, "application/octet-stream", params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<Void>(error);
+    }
+    return Result<Void>();
+}
+
+Result<Void>
 unlink(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &entry
@@ -186,9 +205,9 @@ unlink(
     const auto res = ctx.del(path, params, headers);
     if (std::holds_alternative<Error>(res)) {
         const auto error = std::get<Error>(res);
-        return Result<::ul::types::DirectoryList>(error);
+        return Result<Void>(error);
     }
-    return ::ul::types::DirectoryList(std::get<std::vector<uint8_t>>(res));
+    return Result<Void>();
 }
 
 Result<Void>

@@ -100,11 +100,20 @@ post_file(
 );
 
 /**
+ * Removes the specified drive entries from their parent directories.
+ * @param object_ids A list of object IDs to delete
+ */
+Result<Void>
+unlink_list(
+    ul::RequestContext &ctx,
+    const ::ul::types::ObjectIdList &object_ids
+);
+
+/**
  * Removes the specified drive entry from its parent directory.
  * @param entry The ID of the entry to remove
- * @return An updated list of directory entries
  */
-Result<::ul::types::DirectoryList>
+Result<Void>
 unlink(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &entry

@@ -117,6 +117,25 @@ func TestRoundTripDatetimeRange(t *testing.T) {
 	}
 }
 
+func TestDefaultDetailSection(t *testing.T) {
+	o := &DetailSection{}
+	if o == nil {
+		t.Fatal("expected non-nil")
+	}
+}
+
+func TestRoundTripDetailSection(t *testing.T) {
+	o := &DetailSection{}
+	data := o.ToBytes()
+	result, err := DetailSectionFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
 func TestDefaultDocument(t *testing.T) {
 	o := &Document{}
 	if o == nil {

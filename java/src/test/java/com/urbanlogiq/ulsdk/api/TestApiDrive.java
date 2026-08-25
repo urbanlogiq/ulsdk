@@ -165,6 +165,25 @@ public final class TestApiDrive {
     }
 
     @RetryingTest(maxAttempts = 5, suspendForMs = 200)
+    public void testUnlinkList() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String caUser = System.getenv("CA_USER");
+        String caAccessKey = System.getenv("CA_ACCESS_KEY");
+        String caSecretKey = System.getenv("CA_SECRET_KEY");
+
+        if (caUser == null || caAccessKey == null || caSecretKey == null) {
+            throw new RuntimeException("user / key not present, cannot run tests");
+        }
+
+        com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
+        com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
+        com.urbanlogiq.ulsdk.types.ObjectIdList body = new com.urbanlogiq.ulsdk.types.ObjectIdList();
+        com.urbanlogiq.ulsdk.api.drive.Drive.unlinkList(
+            ctx,
+            body
+        );
+    }
+
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testUnlink() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");
@@ -177,14 +196,10 @@ public final class TestApiDrive {
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
         com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
-        com.urbanlogiq.ulsdk.types.DirectoryList expected = new com.urbanlogiq.ulsdk.types.DirectoryList();
-        byte[] expectedBytes = expected.toBytes();
-        ctx.setResponse(expectedBytes);
-        com.urbanlogiq.ulsdk.types.DirectoryList result = com.urbanlogiq.ulsdk.api.drive.Drive.unlink(
+        com.urbanlogiq.ulsdk.api.drive.Drive.unlink(
             ctx,
             p0
         );
-        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
     @RetryingTest(maxAttempts = 5, suspendForMs = 200)

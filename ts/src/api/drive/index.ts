@@ -8,6 +8,7 @@ import { B2cId as FbsB2cId, B2cIdT as B2cId } from '../../types/generated/b2c-id
 import { DirectoryList as FbsDirectoryList, DirectoryListT as DirectoryList } from '../../types/generated/directory-list';
 import { MoveRequest as FbsMoveRequest, MoveRequestT as MoveRequest } from '../../types/generated/move-request';
 import { ObjectId as FbsObjectId, ObjectIdT as ObjectId } from '../../types/generated/object-id';
+import { ObjectIdList as FbsObjectIdList, ObjectIdListT as ObjectIdList } from '../../types/generated/object-id-list';
 import { ObjectSummary as FbsObjectSummary, ObjectSummaryT as ObjectSummary } from '../../types/generated/object-summary';
 
 /**
@@ -180,27 +181,44 @@ export async function postFile(
 }
 
 /**
+ * Removes the specified drive entries from their parent directories.
+ *
+ * @param ctx - A request context object
+ * @param objectIds - A list of object IDs to delete
+ */
+export async function unlinkList(
+  ctx: RequestContext,
+  objectIds: ObjectIdList
+): Promise<void> {
+  let path = '/v1/api/ulv2/drive/unlink_list';
+  const params: [string, string][] = [];
+  const headers: Record<string, string> = {};
+
+  let body: Uint8Array | null = null;
+  const __builder = new flatbuffers.Builder();
+  const __offset = objectIds.pack(__builder);
+  __builder.finishSizePrefixed(__offset);
+  body = __builder.asUint8Array();
+  await ctx.post(path, body, 'application/octet-stream', params, headers);
+}
+
+/**
  * Removes the specified drive entry from its parent directory.
  *
  * @param ctx - A request context object
  * @param entry - The ID of the entry to remove
- * @returns An updated list of directory entries
  */
 export async function unlink(
   ctx: RequestContext,
   entry: ObjectId
-): Promise<DirectoryList> {
+): Promise<void> {
   let path = '/v1/api/ulv2/drive/:entry';
   path = path.replace(':entry', entry.toString());
 
   const params: [string, string][] = [];
   const headers: Record<string, string> = {};
 
-  const res = await ctx.delete(path, params, headers);
-  const buf = new flatbuffers.ByteBuffer(res);
-  buf.setPosition(buf.position() + flatbuffers.SIZE_PREFIX_LENGTH);
-  const fbs = FbsDirectoryList.getRootAsDirectoryList(buf);
-  return fbs.unpack();
+  await ctx.delete(path, params, headers);
 }
 
 /**

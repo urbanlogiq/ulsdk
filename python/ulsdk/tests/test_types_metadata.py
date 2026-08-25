@@ -46,6 +46,12 @@ def test_datetime_range():
     _t1 = DatetimeRange.from_bytes(_b)
     assert _t0 == _t1
 
+def test_detail_section():
+    _t0 = DetailSection.make_default()
+    _b = _t0.to_bytes()
+    _t1 = DetailSection.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_document():
     _t0 = Document.make_default()
     _b = _t0.to_bytes()

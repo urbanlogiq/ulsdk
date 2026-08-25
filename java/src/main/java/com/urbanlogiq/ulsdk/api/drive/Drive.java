@@ -157,13 +157,32 @@ public final class Drive {
     }
 
     /**
+     * Removes the specified drive entries from their parent directories.
+     * 
+     * @param ctx A request context object
+     * @param object_ids A list of object IDs to delete
+     */
+    public static void unlinkList(
+        com.urbanlogiq.ulsdk.RequestContext ctx,
+        com.urbanlogiq.ulsdk.types.ObjectIdList objectIds
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/drive/unlink_list";
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+
+        byte[] body = null;
+        body = objectIds.toBytes();
+        ctx.post(path, body, "application/octet-stream", params, headers);
+        return;
+    }
+
+    /**
      * Removes the specified drive entry from its parent directory.
      * 
      * @param ctx A request context object
      * @param entry The ID of the entry to remove
-     * @return An updated list of directory entries
      */
-    public static com.urbanlogiq.ulsdk.types.DirectoryList unlink(
+    public static void unlink(
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.types.ObjectId entry
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
@@ -173,8 +192,8 @@ public final class Drive {
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
 
-        byte[] res = ctx.delete(path, params, headers);
-        return new com.urbanlogiq.ulsdk.types.DirectoryList(res);
+        ctx.delete(path, params, headers);
+        return;
     }
 
     /**

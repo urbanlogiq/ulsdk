@@ -12,6 +12,7 @@ import { DatacatalogGeometry, DatacatalogGeometryT } from './datacatalog-geometr
 import { DatacatalogLatLngGeometry, DatacatalogLatLngGeometryT } from './datacatalog-lat-lng-geometry';
 import { DatasetCategory } from './dataset-category';
 import { DatasetSource, DatasetSourceT } from './dataset-source';
+import { DetailSection, DetailSectionT } from './detail-section';
 import { EntityTy } from './entity-ty';
 import { GeometrySource, unionToGeometrySource, unionListToGeometrySource } from './geometry-source';
 import { NoGeometry, NoGeometryT } from './no-geometry';
@@ -196,8 +197,23 @@ visualizeInExploreFieldsArray():Int32Array|null {
   return offset ? new Int32Array(this.bb!.bytes().buffer, this.bb!.bytes().byteOffset + this.bb!.__vector(this.bb_pos + offset), this.bb!.__vector_len(this.bb_pos + offset)) : null;
 }
 
+/**
+ * Sections of fields shown in a feature's selected-state details panel, in
+ * display order, where `summary` is the hover-popup list. When absent, the
+ * details panel falls back to the summary fields.
+ */
+detailSections(index: number, obj?:DetailSection):DetailSection|null {
+  const offset = this.bb!.__offset(this.bb_pos, 36);
+  return offset ? (obj || new DetailSection()).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
+}
+
+detailSectionsLength():number {
+  const offset = this.bb!.__offset(this.bb_pos, 36);
+  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+}
+
 static startMetadata(builder:flatbuffers.Builder) {
-  builder.startObject(16);
+  builder.startObject(17);
 }
 
 static addDisplayName(builder:flatbuffers.Builder, displayNameOffset:flatbuffers.Offset) {
@@ -339,6 +355,22 @@ static startVisualizeInExploreFieldsVector(builder:flatbuffers.Builder, numElems
   builder.startVector(4, numElems, 4);
 }
 
+static addDetailSections(builder:flatbuffers.Builder, detailSectionsOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(16, detailSectionsOffset, 0);
+}
+
+static createDetailSectionsVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
+  builder.startVector(4, data.length, 4);
+  for (let i = data.length - 1; i >= 0; i--) {
+    builder.addOffset(data[i]!);
+  }
+  return builder.endVector();
+}
+
+static startDetailSectionsVector(builder:flatbuffers.Builder, numElems:number) {
+  builder.startVector(4, numElems, 4);
+}
+
 static endMetadata(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   return offset;
@@ -374,7 +406,8 @@ unpack(): MetadataT {
     this.updateCadence(),
     this.locationDescriptionField(),
     this.bb!.createScalarList<number>(this.promotedMetrics.bind(this), this.promotedMetricsLength()),
-    this.bb!.createScalarList<number>(this.visualizeInExploreFields.bind(this), this.visualizeInExploreFieldsLength())
+    this.bb!.createScalarList<number>(this.visualizeInExploreFields.bind(this), this.visualizeInExploreFieldsLength()),
+    this.bb!.createObjList<DetailSection, DetailSectionT>(this.detailSections.bind(this), this.detailSectionsLength())
   );
 }
 
@@ -400,6 +433,7 @@ unpackTo(_o: MetadataT): void {
   _o.locationDescriptionField = this.locationDescriptionField();
   _o.promotedMetrics = this.bb!.createScalarList<number>(this.promotedMetrics.bind(this), this.promotedMetricsLength());
   _o.visualizeInExploreFields = this.bb!.createScalarList<number>(this.visualizeInExploreFields.bind(this), this.visualizeInExploreFieldsLength());
+  _o.detailSections = this.bb!.createObjList<DetailSection, DetailSectionT>(this.detailSections.bind(this), this.detailSectionsLength());
 }
 }
 
@@ -420,7 +454,8 @@ constructor(
   public updateCadence: UpdateCadence = UpdateCadence.UC_UNSET,
   public locationDescriptionField: number = -1,
   public promotedMetrics: (number)[] = [],
-  public visualizeInExploreFields: (number)[] = []
+  public visualizeInExploreFields: (number)[] = [],
+  public detailSections: (DetailSectionT)[] = []
 ){}
 
 
@@ -434,6 +469,7 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   const geometrySource = builder.createObjectOffset(this.geometrySource);
   const promotedMetrics = Metadata.createPromotedMetricsVector(builder, this.promotedMetrics);
   const visualizeInExploreFields = Metadata.createVisualizeInExploreFieldsVector(builder, this.visualizeInExploreFields);
+  const detailSections = Metadata.createDetailSectionsVector(builder, builder.createObjectOffsetList(this.detailSections));
 
   Metadata.startMetadata(builder);
   Metadata.addDisplayName(builder, displayName);
@@ -452,6 +488,7 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   Metadata.addLocationDescriptionField(builder, this.locationDescriptionField);
   Metadata.addPromotedMetrics(builder, promotedMetrics);
   Metadata.addVisualizeInExploreFields(builder, visualizeInExploreFields);
+  Metadata.addDetailSections(builder, detailSections);
 
   return Metadata.endMetadata(builder);
 }

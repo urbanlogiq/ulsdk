@@ -206,6 +206,32 @@ def test_post_file():
             break
     assert success, "test was unable to complete with retries"
 
+def test_unlink_list():
+    user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
+    access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None
+    secret_key = os.environ["CA_SECRET_KEY"] if "CA_SECRET_KEY" in os.environ else None
+
+    if user == None or access_key is None or secret_key is None:
+        raise Exception("cannot run test as no credentials are specified")
+    key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
+    key_ctx = ApiKeyContext(key, Environment.Stage)
+    ctx = TestContext(key_ctx)
+    body = ObjectIdList.make_default()
+    success = False
+    for i in range(5):
+        try:
+            unlink_list(
+                ctx,
+                body
+            )
+            success = True
+        except Exception as e:
+            time.sleep(i + 1)
+            continue
+        if success:
+            break
+    assert success, "test was unable to complete with retries"
+
 def test_unlink():
     user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
     access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None
@@ -219,11 +245,8 @@ def test_unlink():
     p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
     success = False
     for i in range(5):
-        expected = DirectoryList.make_default();
-        expected_bytes = expected.to_bytes();
-        ctx.set_response(expected_bytes);
         try:
-            result = unlink(
+            unlink(
                 ctx,
                 p0
             )
@@ -231,7 +254,6 @@ def test_unlink():
         except Exception as e:
             time.sleep(i + 1)
             continue
-        assert result == expected
         if success:
             break
     assert success, "test was unable to complete with retries"

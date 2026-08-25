@@ -32,6 +32,7 @@ struct DatacatalogLatLngGeometry;
 struct DatasetSource;
 struct Dates;
 struct DatetimeRange;
+struct DetailSection;
 struct Document;
 struct Documents;
 struct FloatAggregate;
@@ -368,6 +369,23 @@ struct DatasetSource {
     }
 };
 
+///
+/// One group of fields in a feature's selected-state details panel. Sections
+/// render in list order, fields in theirs; the panel draws a rule between
+/// sections. Sections have no names; editors identify them by position.
+///
+struct DetailSection {
+    std::optional<std::vector<int32_t>> fields_;
+
+    DetailSection();
+    DetailSection(const ::DetailSection *root);
+    DetailSection(const std::vector<uint8_t> &bytes);
+    bool operator==(const DetailSection &rhs) const;
+    bool operator!=(const DetailSection &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
 struct Document {
     std::optional<std::string> display_name_;
     std::optional<std::string> filename_;
@@ -497,6 +515,7 @@ struct Metadata {
     bool area_selection_;
     DatasetCategory dataset_category_;
     std::optional<std::string> description_;
+    std::optional<std::vector<DetailSection>> detail_sections_;
     std::optional<std::string> display_name_;
     bool do_not_filter_geometry_by_viewport_;
     EntityTy entity_ty_;
@@ -711,6 +730,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ContactInfo &);
 ::flatbuffers::Offset<::DatasetSource>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DatasetSource &);
 
+::flatbuffers::Offset<::DetailSection>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DetailSection &);
+
 ::flatbuffers::Offset<::Document>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Document &);
 
@@ -813,6 +835,9 @@ to_bytes(const ContactInfo &o);
 
 std::vector<uint8_t>
 to_bytes(const DatasetSource &o);
+
+std::vector<uint8_t>
+to_bytes(const DetailSection &o);
 
 std::vector<uint8_t>
 to_bytes(const Document &o);

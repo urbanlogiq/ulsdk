@@ -7,6 +7,7 @@ import { TestContext } from '../../test_context';
 import { B2cIdT as B2cId } from '../../types/generated/b2c-id';
 import { MoveRequestT as MoveRequest } from '../../types/generated/move-request';
 import { ObjectIdT as ObjectId } from '../../types/generated/object-id';
+import { ObjectIdListT as ObjectIdList } from '../../types/generated/object-id-list';
 
 describe('ls', () => {
   it('testLs', async () => {
@@ -120,11 +121,25 @@ describe('postFile', () => {
   });
 });
 
+describe('unlinkList', () => {
+  it('testUnlinkList', async () => {
+    const ctx = new TestContext();
+    const body = new ObjectIdList();
+    try {
+          await drive.unlinkList(
+        ctx,
+        body
+      );
+    } catch (_) {
+      // Expected for mock tests with empty/invalid responses
+    }
+  });
+});
+
 describe('unlink', () => {
   it('testUnlink', async () => {
     const ctx = new TestContext();
     const p0 = new ObjectId();
-    ctx.setResponse(new Uint8Array(0));
     try {
           await drive.unlink(
         ctx,

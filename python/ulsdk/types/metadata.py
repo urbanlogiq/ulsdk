@@ -168,6 +168,7 @@ from .generated.Date import Date as FbsDate
 from .generated.Dates import Dates as FbsDates
 from .generated.DatetimeRange import DatetimeRange as FbsDatetimeRange
 from .generated.Decimal import Decimal as FbsDecimal
+from .generated.DetailSection import DetailSection as FbsDetailSection
 from .generated.DictionaryEncoding import DictionaryEncoding as FbsDictionaryEncoding
 from .generated.DirectionAndRoadName import DirectionAndRoadName as FbsDirectionAndRoadName
 from .generated.DirectionAndRoadNames import DirectionAndRoadNames as FbsDirectionAndRoadNames
@@ -1973,6 +1974,76 @@ class DatasetSource:
         return eq
 
 @dataclass
+class DetailSection:
+    """ One group of fields in a feature's selected-state details panel. Sections
+     render in list order, fields in theirs; the panel draws a rule between
+     sections. Sections have no names; editors identify them by position.
+    """
+
+    # Indices of the fields the section shows, in display order.
+    fields: Optional["List[int]"]
+
+    @classmethod
+    def from_fbs(cls, o: FbsDetailSection) -> Self:
+        fields = list()
+        if not o.FieldsIsNone():
+            for i in range(o.FieldsLength()):
+                fields.append(o.Fields(i))
+        return cls(fields)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsDetailSection.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.DetailSection import (
+            Start,
+            AddFields,
+            StartFieldsVector,
+            End,
+        )
+        fields_offset = None
+        if self.fields is not None:
+            StartFieldsVector(builder, len(self.fields))
+            for i in reversed(range(len(self.fields))):
+                builder.PrependInt32(self.fields[i])
+            fields_offset = builder.EndVector()
+
+        Start(builder)
+        if fields_offset is not None:
+            AddFields(builder, fields_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        fields = []
+        return cls(fields)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        self_fields = self.fields
+        other_fields = other.fields
+        if self_fields is not None and other_fields is not None:
+            if len(self_fields) != len(other_fields):
+                return False
+            for i in range(len(self_fields)):
+                eq = eq and self_fields[i] == other_fields[i]
+        elif self_fields is not None and other_fields is None:
+            return False
+        elif self_fields is None and other_fields is not None:
+            return False
+
+        return eq
+
+@dataclass
 class Document:
     display_name: Optional["str"]
 
@@ -2608,6 +2679,11 @@ class Metadata:
 
     description: Optional["str"]
 
+    # Sections of fields shown in a feature's selected-state details panel, in
+    # display order, where `summary` is the hover-popup list. When absent, the
+    # details panel falls back to the summary fields.
+    detail_sections: Optional["List[DetailSection]"]
+
     display_name: Optional["str"]
 
     # do not use user's viewport bounding box when fetching this stream's geometry from worldgraph
@@ -2655,6 +2731,14 @@ class Metadata:
         description_str = o.Description()
         if description_str is not None:
             description = description_str.decode('utf-8')
+        detail_sections = list()
+        if not o.DetailSectionsIsNone():
+            for i in range(o.DetailSectionsLength()):
+                detail_sections_val = None
+                detail_sections_obj = o.DetailSections(i)
+                if detail_sections_obj is not None:
+                    detail_sections_val = DetailSection.from_fbs(detail_sections_obj)
+                detail_sections.append(detail_sections_val)
         display_name = None
         display_name_str = o.DisplayName()
         if display_name_str is not None:
@@ -2700,7 +2784,7 @@ class Metadata:
         if not o.VisualizeInExploreFieldsIsNone():
             for i in range(o.VisualizeInExploreFieldsLength()):
                 visualize_in_explore_fields.append(o.VisualizeInExploreFields(i))
-        return cls(area_selection, dataset_category, description, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, promoted_metrics, source, summary, update_cadence, visualize_in_explore_fields)
+        return cls(area_selection, dataset_category, description, detail_sections, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, promoted_metrics, source, summary, update_cadence, visualize_in_explore_fields)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -2714,6 +2798,8 @@ class Metadata:
             AddAreaSelection,
             AddDatasetCategory,
             AddDescription,
+            AddDetailSections,
+            StartDetailSectionsVector,
             AddDisplayName,
             AddDoNotFilterGeometryByViewport,
             AddEntityTy,
@@ -2737,6 +2823,15 @@ class Metadata:
         description_offset = None
         if self.description is not None:
             description_offset = builder.CreateString(self.description)
+        detail_sections_offset = None
+        if self.detail_sections is not None:
+            detail_sections_offsets = list()
+            for value in self.detail_sections:
+                detail_sections_offsets.append(value.serialize_to(builder))
+            StartDetailSectionsVector(builder, len(self.detail_sections))
+            for i in reversed(range(len(self.detail_sections))):
+                builder.PrependUOffsetTRelative(detail_sections_offsets[i])
+            detail_sections_offset = builder.EndVector()
         display_name_offset = None
         if self.display_name is not None:
             display_name_offset = builder.CreateString(self.display_name)
@@ -2788,6 +2883,8 @@ class Metadata:
         AddDatasetCategory(builder, self.dataset_category.value)
         if description_offset is not None:
             AddDescription(builder, description_offset)
+        if detail_sections_offset is not None:
+            AddDetailSections(builder, detail_sections_offset)
         if display_name_offset is not None:
             AddDisplayName(builder, display_name_offset)
         AddDoNotFilterGeometryByViewport(builder, self.do_not_filter_geometry_by_viewport)
@@ -2822,6 +2919,7 @@ class Metadata:
         area_selection = False
         dataset_category = DatasetCategory(0)
         description = ""
+        detail_sections = []
         display_name = ""
         do_not_filter_geometry_by_viewport = False
         entity_ty = EntityTy(0)
@@ -2834,13 +2932,24 @@ class Metadata:
         summary = []
         update_cadence = UpdateCadence(0)
         visualize_in_explore_fields = []
-        return cls(area_selection, dataset_category, description, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, promoted_metrics, source, summary, update_cadence, visualize_in_explore_fields)
+        return cls(area_selection, dataset_category, description, detail_sections, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, promoted_metrics, source, summary, update_cadence, visualize_in_explore_fields)
 
     def __eq__(self, other) -> bool:
         eq = True
         eq = eq and self.area_selection == other.area_selection
         eq = eq and self.dataset_category == other.dataset_category
         eq = eq and self.description == other.description
+        self_detail_sections = self.detail_sections
+        other_detail_sections = other.detail_sections
+        if self_detail_sections is not None and other_detail_sections is not None:
+            if len(self_detail_sections) != len(other_detail_sections):
+                return False
+            for i in range(len(self_detail_sections)):
+                eq = eq and self_detail_sections[i] == other_detail_sections[i]
+        elif self_detail_sections is not None and other_detail_sections is None:
+            return False
+        elif self_detail_sections is None and other_detail_sections is not None:
+            return False
         eq = eq and self.display_name == other.display_name
         eq = eq and self.do_not_filter_geometry_by_viewport == other.do_not_filter_geometry_by_viewport
         eq = eq and self.entity_ty == other.entity_ty

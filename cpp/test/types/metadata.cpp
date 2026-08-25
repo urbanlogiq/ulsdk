@@ -77,6 +77,16 @@ test_datetime_range() {
 TypeTest test_datetime_range_obj(test_datetime_range, "DatetimeRange");
 
 bool
+test_detail_section() {
+    ::ul::types::DetailSection t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::DetailSection deserialized = ::ul::types::DetailSection(bytes);
+    return true;
+}
+
+TypeTest test_detail_section_obj(test_detail_section, "DetailSection");
+
+bool
 test_document() {
     ::ul::types::Document t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);

@@ -35,6 +35,19 @@ public final class Metadata {
         this._description = value;
     }
 
+    /**
+     *  Sections of fields shown in a feature's selected-state details panel, in
+     *  display order, where `summary` is the hover-popup list. When absent, the
+     *  details panel falls back to the summary fields.
+     */
+    com.urbanlogiq.ulsdk.types.DetailSection[] _detailSections;
+    public com.urbanlogiq.ulsdk.types.DetailSection[] getDetailSections() {
+        return this._detailSections;
+    }
+    public void setDetailSections(com.urbanlogiq.ulsdk.types.DetailSection[] value) {
+        this._detailSections = value;
+    }
+
     String _displayName;
     public String getDisplayName() {
         return this._displayName;
@@ -164,6 +177,17 @@ public final class Metadata {
         if (o.description() != null) {
             this._description = o.description();
         }
+        if (o.detailSectionsVector() != null) {
+            com.urbanlogiq.ulsdk.types.DetailSection[] detailSections = new com.urbanlogiq.ulsdk.types.DetailSection[o.detailSectionsLength()];
+            for (int i = 0; i < o.detailSectionsLength(); i++) {
+                com.urbanlogiq.ulsdk.types.DetailSection detailSectionsValue = null;
+                if (o.detailSections(i) != null) {
+                    detailSectionsValue = new com.urbanlogiq.ulsdk.types.DetailSection(o.detailSections(i));
+                }
+                detailSections[i] = detailSectionsValue;
+            }
+            this._detailSections = detailSections;
+        }
         if (o.displayName() != null) {
             this._displayName = o.displayName();
         }
@@ -250,6 +274,18 @@ public final class Metadata {
         if (this._description != null) {
             descriptionOffset = builder.createString(this._description);
         }
+        Integer detailSectionsOffset = null;
+        if (this._detailSections != null) {
+            int[] detailSectionsOffsets = new int[this._detailSections.length];;
+            for (int i = 0; i < this._detailSections.length; i++) {
+                detailSectionsOffsets[i] = this._detailSections[i].serializeTo(builder);
+            }
+            com.urbanlogiq.ulsdk.types.generated.Metadata.startDetailSectionsVector(builder, this._detailSections.length);
+            for (int i = detailSectionsOffsets.length - 1; i >= 0; i--) {
+                builder.addOffset(detailSectionsOffsets[i]);
+            }
+            detailSectionsOffset = builder.endVector();
+        }
         Integer displayNameOffset = null;
         if (this._displayName != null) {
             displayNameOffset = builder.createString(this._displayName);
@@ -316,6 +352,9 @@ public final class Metadata {
         if (descriptionOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.Metadata.addDescription(builder, descriptionOffset);
         }
+        if (detailSectionsOffset != null) {
+            com.urbanlogiq.ulsdk.types.generated.Metadata.addDetailSections(builder, detailSectionsOffset);
+        }
         if (displayNameOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.Metadata.addDisplayName(builder, displayNameOffset);
         }
@@ -357,6 +396,7 @@ public final class Metadata {
 
     public Metadata() {
         this._description = new String();
+        this._detailSections = new com.urbanlogiq.ulsdk.types.DetailSection[0];
         this._displayName = new String();
         this._fieldRelationships = new com.urbanlogiq.ulsdk.types.UlFieldRelationship[0];
         this._fields = new com.urbanlogiq.ulsdk.types.UlField[0];

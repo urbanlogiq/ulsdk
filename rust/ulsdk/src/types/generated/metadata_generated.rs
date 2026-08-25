@@ -9232,6 +9232,137 @@ impl core::fmt::Debug for WorldGraphGeometry<'_> {
         ds.finish()
     }
 }
+pub enum DetailSectionOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+/// One group of fields in a feature's selected-state details panel. Sections
+/// render in list order, fields in theirs; the panel draws a rule between
+/// sections. Sections have no names; editors identify them by position.
+pub struct DetailSection<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for DetailSection<'a> {
+    type Inner = DetailSection<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> DetailSection<'a> {
+    pub const VT_FIELDS: flatbuffers::VOffsetT = 4;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        DetailSection { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args DetailSectionArgs<'args>,
+    ) -> flatbuffers::WIPOffset<DetailSection<'bldr>> {
+        let mut builder = DetailSectionBuilder::new(_fbb);
+        if let Some(x) = args.fields {
+            builder.add_fields(x);
+        }
+        builder.finish()
+    }
+
+    /// Indices of the fields the section shows, in display order.
+    #[inline]
+    pub fn fields(&self) -> Option<flatbuffers::Vector<'a, i32>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, i32>>>(
+                    DetailSection::VT_FIELDS,
+                    None,
+                )
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for DetailSection<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, i32>>>(
+                "fields",
+                Self::VT_FIELDS,
+                false,
+            )?
+            .finish();
+        Ok(())
+    }
+}
+pub struct DetailSectionArgs<'a> {
+    pub fields: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, i32>>>,
+}
+impl<'a> Default for DetailSectionArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        DetailSectionArgs { fields: None }
+    }
+}
+
+impl Serialize for DetailSection<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("DetailSection", 1)?;
+        if let Some(f) = self.fields() {
+            s.serialize_field("fields", &f)?;
+        } else {
+            s.skip_field("fields")?;
+        }
+        s.end()
+    }
+}
+
+pub struct DetailSectionBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> DetailSectionBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_fields(&mut self, fields: flatbuffers::WIPOffset<flatbuffers::Vector<'b, i32>>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(DetailSection::VT_FIELDS, fields);
+    }
+    #[inline]
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> DetailSectionBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        DetailSectionBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<DetailSection<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for DetailSection<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("DetailSection");
+        ds.field("fields", &self.fields());
+        ds.finish()
+    }
+}
 pub enum MetadataOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -9266,6 +9397,7 @@ impl<'a> Metadata<'a> {
     pub const VT_LOCATION_DESCRIPTION_FIELD: flatbuffers::VOffsetT = 30;
     pub const VT_PROMOTED_METRICS: flatbuffers::VOffsetT = 32;
     pub const VT_VISUALIZE_IN_EXPLORE_FIELDS: flatbuffers::VOffsetT = 34;
+    pub const VT_DETAIL_SECTIONS: flatbuffers::VOffsetT = 36;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -9277,6 +9409,9 @@ impl<'a> Metadata<'a> {
         args: &'args MetadataArgs<'args>,
     ) -> flatbuffers::WIPOffset<Metadata<'bldr>> {
         let mut builder = MetadataBuilder::new(_fbb);
+        if let Some(x) = args.detail_sections {
+            builder.add_detail_sections(x);
+        }
         if let Some(x) = args.visualize_in_explore_fields {
             builder.add_visualize_in_explore_fields(x);
         }
@@ -9523,6 +9658,22 @@ impl<'a> Metadata<'a> {
                 )
         }
     }
+    /// Sections of fields shown in a feature's selected-state details panel, in
+    /// display order, where `summary` is the hover-popup list. When absent, the
+    /// details panel falls back to the summary fields.
+    #[inline]
+    pub fn detail_sections(
+        &self,
+    ) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<DetailSection<'a>>>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab.get::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<DetailSection>>,
+            >>(Metadata::VT_DETAIL_SECTIONS, None)
+        }
+    }
     #[inline]
     #[allow(non_snake_case)]
     pub fn geometry_source_as_no_geometry(&self) -> Option<NoGeometry<'a>> {
@@ -9617,6 +9768,7 @@ impl flatbuffers::Verifiable for Metadata<'_> {
      .visit_field::<i32>("location_description_field", Self::VT_LOCATION_DESCRIPTION_FIELD, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, i32>>>("promoted_metrics", Self::VT_PROMOTED_METRICS, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, i32>>>("visualize_in_explore_fields", Self::VT_VISUALIZE_IN_EXPLORE_FIELDS, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<DetailSection>>>>("detail_sections", Self::VT_DETAIL_SECTIONS, false)?
      .finish();
         Ok(())
     }
@@ -9644,6 +9796,11 @@ pub struct MetadataArgs<'a> {
     pub location_description_field: i32,
     pub promoted_metrics: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, i32>>>,
     pub visualize_in_explore_fields: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, i32>>>,
+    pub detail_sections: Option<
+        flatbuffers::WIPOffset<
+            flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<DetailSection<'a>>>,
+        >,
+    >,
 }
 impl<'a> Default for MetadataArgs<'a> {
     #[inline]
@@ -9665,6 +9822,7 @@ impl<'a> Default for MetadataArgs<'a> {
             location_description_field: -1,
             promoted_metrics: None,
             visualize_in_explore_fields: None,
+            detail_sections: None,
         }
     }
 }
@@ -9674,7 +9832,7 @@ impl Serialize for Metadata<'_> {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("Metadata", 16)?;
+        let mut s = serializer.serialize_struct("Metadata", 17)?;
         if let Some(f) = self.display_name() {
             s.serialize_field("display_name", &f)?;
         } else {
@@ -9754,6 +9912,11 @@ impl Serialize for Metadata<'_> {
             s.serialize_field("visualize_in_explore_fields", &f)?;
         } else {
             s.skip_field("visualize_in_explore_fields")?;
+        }
+        if let Some(f) = self.detail_sections() {
+            s.serialize_field("detail_sections", &f)?;
+        } else {
+            s.skip_field("detail_sections")?;
         }
         s.end()
     }
@@ -9890,6 +10053,18 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> MetadataBuilder<'a, 'b, A> {
         );
     }
     #[inline]
+    pub fn add_detail_sections(
+        &mut self,
+        detail_sections: flatbuffers::WIPOffset<
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<DetailSection<'b>>>,
+        >,
+    ) {
+        self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(
+            Metadata::VT_DETAIL_SECTIONS,
+            detail_sections,
+        );
+    }
+    #[inline]
     pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> MetadataBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         MetadataBuilder {
@@ -9977,6 +10152,7 @@ impl core::fmt::Debug for Metadata<'_> {
             "visualize_in_explore_fields",
             &self.visualize_in_explore_fields(),
         );
+        ds.field("detail_sections", &self.detail_sections());
         ds.finish()
     }
 }

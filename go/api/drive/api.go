@@ -149,9 +149,24 @@ func PostFile(ctx api.RequestContext, root id.ObjectId, force bool, files []stri
 	return result, nil
 }
 
+// UnlinkList -
+// Removes the specified drive entries from their parent directories.
+func UnlinkList(ctx api.RequestContext, objectIds *object.ObjectIdList) error {
+	path := "/v1/api/ulv2/drive/unlink_list"
+
+	params := [][2]string{}
+
+	headers := map[string]string{}
+
+	bodyBytes := objectIds.ToBytes()
+	res, err := ctx.Post(path, bodyBytes, "application/octet-stream", params, headers)
+	_ = res
+	return err
+}
+
 // Unlink -
 // Removes the specified drive entry from its parent directory.
-func Unlink(ctx api.RequestContext, entry id.ObjectId) (*fs.DirectoryList, error) {
+func Unlink(ctx api.RequestContext, entry id.ObjectId) error {
 	path := "/v1/api/ulv2/drive/:entry"
 	path = strings.Replace(path, ":entry", fmt.Sprintf("%v", entry), 1)
 
@@ -159,15 +174,8 @@ func Unlink(ctx api.RequestContext, entry id.ObjectId) (*fs.DirectoryList, error
 
 	headers := map[string]string{}
 
-	res, err := ctx.Delete(path, params, headers)
-	if err != nil {
-		return nil, err
-	}
-	result, err := fs.DirectoryListFromBytes(res)
-	if err != nil {
-		return nil, fmt.Errorf("failed to deserialize response: %w", err)
-	}
-	return result, nil
+	_, err := ctx.Delete(path, params, headers)
+	return err
 }
 
 // Move -

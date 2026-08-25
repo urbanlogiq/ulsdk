@@ -12,6 +12,7 @@ import { DatacatalogLatLngGeometry as FbsDatacatalogLatLngGeometry, DatacatalogL
 import { DatasetSource as FbsDatasetSource, DatasetSourceT as FbsDatasetSourceT } from './generated/dataset-source';
 import { Dates as FbsDates, DatesT as FbsDatesT } from './generated/dates';
 import { DatetimeRange as FbsDatetimeRange, DatetimeRangeT as FbsDatetimeRangeT } from './generated/datetime-range';
+import { DetailSection as FbsDetailSection, DetailSectionT as FbsDetailSectionT } from './generated/detail-section';
 import { Document as FbsDocument, DocumentT as FbsDocumentT } from './generated/document';
 import { Documents as FbsDocuments, DocumentsT as FbsDocumentsT } from './generated/documents';
 import { FloatAggregate as FbsFloatAggregate, FloatAggregateT as FbsFloatAggregateT } from './generated/float-aggregate';
@@ -1376,6 +1377,59 @@ export class DatasetSource {
   }
 }
 
+/**
+ *  One group of fields in a feature's selected-state details panel. Sections
+ *  render in list order, fields in theirs; the panel draws a rule between
+ *  sections. Sections have no names; editors identify them by position.
+ */
+export class DetailSection {
+/**
+ *  Indices of the fields the section shows, in display order.
+ */
+  private _fields!: number[] | null;
+
+  constructor(arg?: FbsDetailSection | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsDetailSection.getSizePrefixedRootAsDetailSection(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsDetailSection) {
+      this._initFromFbs(arg);
+    } else {
+      this._fields = null;
+    }
+  }
+
+  private _initFromFbs(fbs: FbsDetailSection): void {
+    if (fbs.fieldsLength() > 0) {
+      this._fields = Array.from({ length: fbs.fieldsLength() }, (_, i) => fbs.fields(i)!);
+    } else {
+      this._fields = null;
+    }
+  }
+
+  get fields(): number[] | null {
+    return this._fields;
+  }
+
+  set fields(value: number[] | null) {
+    this._fields = value;
+  }
+
+  toFbsT(): FbsDetailSectionT {
+    const t = new FbsDetailSectionT();
+    t.fields = this._fields ?? [];
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+}
+
 export class Document {
   private _displayName!: string | null;
 
@@ -2025,6 +2079,13 @@ export class Metadata {
 
   private _description!: string | null;
 
+/**
+ *  Sections of fields shown in a feature's selected-state details panel, in
+ *  display order, where `summary` is the hover-popup list. When absent, the
+ *  details panel falls back to the summary fields.
+ */
+  private _detailSections!: DetailSection[] | null;
+
   private _displayName!: string | null;
 
 /**
@@ -2087,6 +2148,7 @@ export class Metadata {
       this._areaSelection = false;
       this._datasetCategory = 0;
       this._description = null;
+      this._detailSections = null;
       this._displayName = null;
       this._doNotFilterGeometryByViewport = false;
       this._entityTy = 0;
@@ -2106,6 +2168,14 @@ export class Metadata {
     this._areaSelection = fbs.areaSelection();
     this._datasetCategory = fbs.datasetCategory();
     this._description = fbs.description();
+    if (fbs.detailSectionsLength() > 0) {
+      this._detailSections = Array.from({ length: fbs.detailSectionsLength() }, (_, i) => {
+        const item = fbs.detailSections(i);
+        return item ? new DetailSection(item) : new DetailSection();
+      });
+    } else {
+      this._detailSections = null;
+    }
     this._displayName = fbs.displayName();
     this._doNotFilterGeometryByViewport = fbs.doNotFilterGeometryByViewport();
     this._entityTy = fbs.entityTy();
@@ -2184,6 +2254,14 @@ export class Metadata {
 
   set description(value: string | null) {
     this._description = value;
+  }
+
+  get detailSections(): DetailSection[] | null {
+    return this._detailSections;
+  }
+
+  set detailSections(value: DetailSection[] | null) {
+    this._detailSections = value;
   }
 
   get displayName(): string | null {
@@ -2287,6 +2365,7 @@ export class Metadata {
     t.areaSelection = this._areaSelection;
     t.datasetCategory = this._datasetCategory;
     t.description = this._description;
+    t.detailSections = this._detailSections ? this._detailSections.map(item => item.toFbsT()) : [];
     t.displayName = this._displayName;
     t.doNotFilterGeometryByViewport = this._doNotFilterGeometryByViewport;
     t.entityTy = this._entityTy;

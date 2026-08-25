@@ -127,6 +127,9 @@ struct DatacatalogLatLngGeometryBuilder;
 struct WorldGraphGeometry;
 struct WorldGraphGeometryBuilder;
 
+struct DetailSection;
+struct DetailSectionBuilder;
+
 struct Metadata;
 struct MetadataBuilder;
 
@@ -3854,6 +3857,67 @@ inline ::flatbuffers::Offset<WorldGraphGeometry> CreateWorldGraphGeometryDirect(
       start_stream_id);
 }
 
+/// One group of fields in a feature's selected-state details panel. Sections
+/// render in list order, fields in theirs; the panel draws a rule between
+/// sections. Sections have no names; editors identify them by position.
+struct DetailSection FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef DetailSectionBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_FIELDS = 4
+  };
+  /// Indices of the fields the section shows, in display order.
+  const ::flatbuffers::Vector<int32_t> *fields() const {
+    return GetPointer<const ::flatbuffers::Vector<int32_t> *>(VT_FIELDS);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_FIELDS) &&
+           verifier.VerifyVector(fields()) &&
+           verifier.EndTable();
+  }
+};
+
+struct DetailSectionBuilder {
+  typedef DetailSection Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_fields(::flatbuffers::Offset<::flatbuffers::Vector<int32_t>> fields) {
+    fbb_.AddOffset(DetailSection::VT_FIELDS, fields);
+  }
+  explicit DetailSectionBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<DetailSection> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<DetailSection>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<DetailSection> CreateDetailSection(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::Vector<int32_t>> fields = 0) {
+  DetailSectionBuilder builder_(_fbb);
+  builder_.add_fields(fields);
+  return builder_.Finish();
+}
+
+struct DetailSection::Traits {
+  using type = DetailSection;
+  static auto constexpr Create = CreateDetailSection;
+};
+
+inline ::flatbuffers::Offset<DetailSection> CreateDetailSectionDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<int32_t> *fields = nullptr) {
+  auto fields__ = fields ? _fbb.CreateVector<int32_t>(*fields) : 0;
+  return CreateDetailSection(
+      _fbb,
+      fields__);
+}
+
 struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef MetadataBuilder Builder;
   struct Traits;
@@ -3873,7 +3937,8 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_UPDATE_CADENCE = 28,
     VT_LOCATION_DESCRIPTION_FIELD = 30,
     VT_PROMOTED_METRICS = 32,
-    VT_VISUALIZE_IN_EXPLORE_FIELDS = 34
+    VT_VISUALIZE_IN_EXPLORE_FIELDS = 34,
+    VT_DETAIL_SECTIONS = 36
   };
   const ::flatbuffers::String *display_name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_DISPLAY_NAME);
@@ -3953,6 +4018,12 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::Vector<int32_t> *visualize_in_explore_fields() const {
     return GetPointer<const ::flatbuffers::Vector<int32_t> *>(VT_VISUALIZE_IN_EXPLORE_FIELDS);
   }
+  /// Sections of fields shown in a feature's selected-state details panel, in
+  /// display order, where `summary` is the hover-popup list. When absent, the
+  /// details panel falls back to the summary fields.
+  const ::flatbuffers::Vector<::flatbuffers::Offset<DetailSection>> *detail_sections() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<DetailSection>> *>(VT_DETAIL_SECTIONS);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_DISPLAY_NAME) &&
@@ -3982,6 +4053,9 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyVector(promoted_metrics()) &&
            VerifyOffset(verifier, VT_VISUALIZE_IN_EXPLORE_FIELDS) &&
            verifier.VerifyVector(visualize_in_explore_fields()) &&
+           VerifyOffset(verifier, VT_DETAIL_SECTIONS) &&
+           verifier.VerifyVector(detail_sections()) &&
+           verifier.VerifyVectorOfTables(detail_sections()) &&
            verifier.EndTable();
   }
 };
@@ -4054,6 +4128,9 @@ struct MetadataBuilder {
   void add_visualize_in_explore_fields(::flatbuffers::Offset<::flatbuffers::Vector<int32_t>> visualize_in_explore_fields) {
     fbb_.AddOffset(Metadata::VT_VISUALIZE_IN_EXPLORE_FIELDS, visualize_in_explore_fields);
   }
+  void add_detail_sections(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<DetailSection>>> detail_sections) {
+    fbb_.AddOffset(Metadata::VT_DETAIL_SECTIONS, detail_sections);
+  }
   explicit MetadataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -4082,8 +4159,10 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadata(
     UpdateCadence update_cadence = UpdateCadence::UC_UNSET,
     int32_t location_description_field = -1,
     ::flatbuffers::Offset<::flatbuffers::Vector<int32_t>> promoted_metrics = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<int32_t>> visualize_in_explore_fields = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<int32_t>> visualize_in_explore_fields = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<DetailSection>>> detail_sections = 0) {
   MetadataBuilder builder_(_fbb);
+  builder_.add_detail_sections(detail_sections);
   builder_.add_visualize_in_explore_fields(visualize_in_explore_fields);
   builder_.add_promoted_metrics(promoted_metrics);
   builder_.add_location_description_field(location_description_field);
@@ -4125,7 +4204,8 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadataDirect(
     UpdateCadence update_cadence = UpdateCadence::UC_UNSET,
     int32_t location_description_field = -1,
     const std::vector<int32_t> *promoted_metrics = nullptr,
-    const std::vector<int32_t> *visualize_in_explore_fields = nullptr) {
+    const std::vector<int32_t> *visualize_in_explore_fields = nullptr,
+    const std::vector<::flatbuffers::Offset<DetailSection>> *detail_sections = nullptr) {
   auto display_name__ = display_name ? _fbb.CreateString(display_name) : 0;
   auto description__ = description ? _fbb.CreateString(description) : 0;
   auto fields__ = fields ? _fbb.CreateVector<::flatbuffers::Offset<UlField>>(*fields) : 0;
@@ -4133,6 +4213,7 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadataDirect(
   auto field_relationships__ = field_relationships ? _fbb.CreateVector<::flatbuffers::Offset<UlFieldRelationship>>(*field_relationships) : 0;
   auto promoted_metrics__ = promoted_metrics ? _fbb.CreateVector<int32_t>(*promoted_metrics) : 0;
   auto visualize_in_explore_fields__ = visualize_in_explore_fields ? _fbb.CreateVector<int32_t>(*visualize_in_explore_fields) : 0;
+  auto detail_sections__ = detail_sections ? _fbb.CreateVector<::flatbuffers::Offset<DetailSection>>(*detail_sections) : 0;
   return CreateMetadata(
       _fbb,
       display_name__,
@@ -4150,7 +4231,8 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadataDirect(
       update_cadence,
       location_description_field,
       promoted_metrics__,
-      visualize_in_explore_fields__);
+      visualize_in_explore_fields__,
+      detail_sections__);
 }
 
 inline bool VerifyComponentData(::flatbuffers::Verifier &verifier, const void *obj, ComponentData type) {

@@ -1025,6 +1025,48 @@ func (o *DatasetSource) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UO
 	return generated.DatasetSourceEnd(builder)
 }
 
+// DetailSection -
+//  One group of fields in a feature's selected-state details panel. Sections
+//  render in list order, fields in theirs; the panel draws a rule between
+//  sections. Sections have no names; editors identify them by position.
+type DetailSection struct {
+	Fields []int32
+}
+
+func DetailSectionFromFbs(fbs *generated.DetailSection) *DetailSection {
+	o := &DetailSection{}
+	for i := 0; i < fbs.FieldsLength(); i++ {
+		o.Fields = append(o.Fields, fbs.Fields(i))
+	}
+	return o
+}
+
+// DetailSectionFromBytes deserializes a DetailSection from size-prefixed FlatBuffer bytes.
+func DetailSectionFromBytes(data []byte) (*DetailSection, error) {
+	fbs := generated.GetSizePrefixedRootAsDetailSection(data, 0)
+	return DetailSectionFromFbs(fbs), nil
+}
+
+// ToBytes serializes the DetailSection to size-prefixed FlatBuffer bytes.
+func (o *DetailSection) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the DetailSection into a FlatBuffer builder and returns the offset.
+func (o *DetailSection) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	generated.DetailSectionStartFieldsVector(builder, len(o.Fields))
+	for i := len(o.Fields) - 1; i >= 0; i-- {
+		builder.PrependInt32(o.Fields[i])
+	}
+	fieldsVecOffset := builder.EndVector(len(o.Fields))
+	generated.DetailSectionStart(builder)
+	generated.DetailSectionAddFields(builder, fieldsVecOffset)
+	return generated.DetailSectionEnd(builder)
+}
+
 type Document struct {
 	DisplayName *string
 	Filename *string
@@ -1383,6 +1425,7 @@ type Metadata struct {
 	AreaSelection bool
 	DatasetCategory uint32
 	Description *string
+	DetailSections []DetailSection
 	DisplayName *string
 	DoNotFilterGeometryByViewport bool
 	EntityTy int32
@@ -1404,6 +1447,12 @@ func MetadataFromFbs(fbs *generated.Metadata) *Metadata {
 	if s := fbs.Description(); s != nil {
 		str := string(s)
 		o.Description = &str
+	}
+	for i := 0; i < fbs.DetailSectionsLength(); i++ {
+		var item generated.DetailSection
+		if fbs.DetailSections(&item, i) {
+			o.DetailSections = append(o.DetailSections, *DetailSectionFromFbs(&item))
+		}
 	}
 	if s := fbs.DisplayName(); s != nil {
 		str := string(s)
@@ -1460,6 +1509,15 @@ func (o *Metadata) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 	if o.Description != nil {
 		descriptionOffset = builder.CreateString(*o.Description)
 	}
+	detailSectionsOffsets := make([]flatbuffers.UOffsetT, len(o.DetailSections))
+	for i := range o.DetailSections {
+		detailSectionsOffsets[i] = o.DetailSections[i].SerializeTo(builder)
+	}
+	generated.MetadataStartDetailSectionsVector(builder, len(o.DetailSections))
+	for i := len(detailSectionsOffsets) - 1; i >= 0; i-- {
+		builder.PrependUOffsetT(detailSectionsOffsets[i])
+	}
+	detailSectionsVecOffset := builder.EndVector(len(o.DetailSections))
 	var displayNameOffset flatbuffers.UOffsetT
 	if o.DisplayName != nil {
 		displayNameOffset = builder.CreateString(*o.DisplayName)
@@ -1505,6 +1563,7 @@ func (o *Metadata) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 	generated.MetadataAddAreaSelection(builder, o.AreaSelection)
 	generated.MetadataAddDatasetCategory(builder, generated.DatasetCategory(o.DatasetCategory))
 	generated.MetadataAddDescription(builder, descriptionOffset)
+	generated.MetadataAddDetailSections(builder, detailSectionsVecOffset)
 	generated.MetadataAddDisplayName(builder, displayNameOffset)
 	generated.MetadataAddDoNotFilterGeometryByViewport(builder, o.DoNotFilterGeometryByViewport)
 	generated.MetadataAddEntityTy(builder, generated.EntityTy(o.EntityTy))

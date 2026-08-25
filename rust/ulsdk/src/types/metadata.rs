@@ -86,9 +86,10 @@ use crate::types::generated::metadata_generated::{
     ContactInfo as FbsContactInfo, DatacatalogGeometry as FbsDatacatalogGeometry,
     DatacatalogLatLngGeometry as FbsDatacatalogLatLngGeometry,
     DatasetCategory as FbsDatasetCategory, DatasetSource as FbsDatasetSource, Dates as FbsDates,
-    DatetimeRange as FbsDatetimeRange, Document as FbsDocument, Documents as FbsDocuments,
-    FieldFlags as FbsFieldFlags, FieldUnit as FbsFieldUnit, FloatAggregate as FbsFloatAggregate,
-    FloatBucket as FbsFloatBucket, FloatRange as FbsFloatRange, GeometryData as FbsGeometryData,
+    DatetimeRange as FbsDatetimeRange, DetailSection as FbsDetailSection, Document as FbsDocument,
+    Documents as FbsDocuments, FieldFlags as FbsFieldFlags, FieldUnit as FbsFieldUnit,
+    FloatAggregate as FbsFloatAggregate, FloatBucket as FbsFloatBucket,
+    FloatRange as FbsFloatRange, GeometryData as FbsGeometryData,
     GeometryDataUnion as FbsGeometryDataUnion, GeometrySource as FbsGeometrySource,
     HierarchicalRelationship as FbsHierarchicalRelationship,
     HierarchyRelationshipData as FbsHierarchyRelationshipData, IntAggregate as FbsIntAggregate,
@@ -2056,6 +2057,70 @@ impl crate::FbsSerde for DatasetSource {
     }
 }
 
+/// One group of fields in a feature's selected-state details panel. Sections
+/// render in list order, fields in theirs; the panel draws a rule between
+/// sections. Sections have no names; editors identify them by position.
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+pub struct DetailSection {
+    /// Indices of the fields the section shows, in display order.
+    pub fields: Option<Vec<i32>>,
+}
+
+impl DetailSection {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsDetailSection<'a>> {
+        use crate::types::generated::metadata_generated::DetailSectionBuilder as FbsDetailSectionBuilder;
+
+        let fields_offset = self.fields.as_ref().map(|v| {
+            let fields_offset = builder.create_vector(&v);
+            fields_offset
+        });
+
+        let mut bldr = FbsDetailSectionBuilder::new(builder);
+        if let Some(offset) = fields_offset {
+            bldr.add_fields(offset);
+        }
+        bldr.finish()
+    }
+}
+
+impl From<FbsDetailSection<'_>> for DetailSection {
+    fn from(fbs: FbsDetailSection<'_>) -> Self {
+        let fields = if let Some(val) = fbs.fields() {
+            let mut fields = Vec::new();
+            for elem in val {
+                fields.push(elem.into());
+            }
+
+            Some(fields)
+        } else {
+            None
+        };
+
+        Self { fields }
+    }
+}
+
+impl crate::FbsSerde for DetailSection {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsDetailSection>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
 #[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Document {
     pub display_name: Option<String>,
@@ -2591,6 +2656,10 @@ pub struct Metadata {
     /// Organizational category for frontend. Defaults to DC_HIDDEN.
     pub dataset_category: DatasetCategory,
     pub description: Option<String>,
+    /// Sections of fields shown in a feature's selected-state details panel, in
+    /// display order, where `summary` is the hover-popup list. When absent, the
+    /// details panel falls back to the summary fields.
+    pub detail_sections: Option<Vec<DetailSection>>,
     pub display_name: Option<String>,
     /// do not use user's viewport bounding box when fetching this stream's geometry from worldgraph
     pub do_not_filter_geometry_by_viewport: bool,
@@ -2628,6 +2697,15 @@ impl Metadata {
         use crate::types::generated::metadata_generated::MetadataBuilder as FbsMetadataBuilder;
 
         let description_offset = self.description.as_ref().map(|s| builder.create_string(s));
+        let detail_sections_offset = self.detail_sections.as_ref().map(|v| {
+            let mut detail_sections_offsets = Vec::with_capacity(v.len());
+            for val in v.iter() {
+                let offset = val.serialize_to(builder);
+                detail_sections_offsets.push(offset);
+            }
+            let detail_sections_offset = builder.create_vector(&detail_sections_offsets);
+            detail_sections_offset
+        });
         let display_name_offset = self.display_name.as_ref().map(|s| builder.create_string(s));
         let field_relationships_offset = self.field_relationships.as_ref().map(|v| {
             let mut field_relationships_offsets = Vec::with_capacity(v.len());
@@ -2672,6 +2750,9 @@ impl Metadata {
         if let Some(offset) = description_offset {
             bldr.add_description(offset);
         }
+        if let Some(offset) = detail_sections_offset {
+            bldr.add_detail_sections(offset);
+        }
         if let Some(offset) = display_name_offset {
             bldr.add_display_name(offset);
         }
@@ -2710,6 +2791,17 @@ impl From<FbsMetadata<'_>> for Metadata {
         let area_selection = fbs.area_selection();
         let dataset_category = DatasetCategory::from(fbs.dataset_category());
         let description = fbs.description().map(ToOwned::to_owned);
+        let detail_sections = if let Some(val) = fbs.detail_sections() {
+            let mut detail_sections = Vec::new();
+            for elem in val {
+                detail_sections.push(elem.into());
+            }
+
+            Some(detail_sections)
+        } else {
+            None
+        };
+
         let display_name = fbs.display_name().map(ToOwned::to_owned);
         let do_not_filter_geometry_by_viewport = fbs.do_not_filter_geometry_by_viewport();
         let entity_ty = EntityTy::from(fbs.entity_ty());
@@ -2804,6 +2896,7 @@ impl From<FbsMetadata<'_>> for Metadata {
             area_selection,
             dataset_category,
             description,
+            detail_sections,
             display_name,
             do_not_filter_geometry_by_viewport,
             entity_ty,
@@ -2844,6 +2937,7 @@ impl Default for Metadata {
             area_selection: bool::default(),
             dataset_category: DatasetCategory::DC_HIDDEN,
             description: None,
+            detail_sections: None,
             display_name: None,
             do_not_filter_geometry_by_viewport: bool::default(),
             entity_ty: EntityTy::default(),
@@ -3661,6 +3755,14 @@ mod tests {
         let t0 = DatetimeRange::default();
         let buf = t0.to_fbs_bytes();
         let t1 = DatetimeRange::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_detail_section() {
+        let t0 = DetailSection::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = DetailSection::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 

@@ -256,8 +256,36 @@ class Metadata(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(34))
         return o == 0
 
+    # Sections of fields shown in a feature's selected-state details panel, in
+    # display order, where `summary` is the hover-popup list. When absent, the
+    # details panel falls back to the summary fields.
+    # Metadata
+    def DetailSections(self, j):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(36))
+        if o != 0:
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
+            x = self._tab.Indirect(x)
+            from .DetailSection import DetailSection
+            obj = DetailSection()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+    # Metadata
+    def DetailSectionsLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(36))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # Metadata
+    def DetailSectionsIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(36))
+        return o == 0
+
 def MetadataStart(builder):
-    builder.StartObject(16)
+    builder.StartObject(17)
 
 def Start(builder):
     MetadataStart(builder)
@@ -387,6 +415,18 @@ def MetadataStartVisualizeInExploreFieldsVector(builder, numElems):
 
 def StartVisualizeInExploreFieldsVector(builder, numElems):
     return MetadataStartVisualizeInExploreFieldsVector(builder, numElems)
+
+def MetadataAddDetailSections(builder, detailSections):
+    builder.PrependUOffsetTRelativeSlot(16, flatbuffers.number_types.UOffsetTFlags.py_type(detailSections), 0)
+
+def AddDetailSections(builder, detailSections):
+    MetadataAddDetailSections(builder, detailSections)
+
+def MetadataStartDetailSectionsVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+def StartDetailSectionsVector(builder, numElems):
+    return MetadataStartDetailSectionsVector(builder, numElems)
 
 def MetadataEnd(builder):
     return builder.EndObject()

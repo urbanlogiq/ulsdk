@@ -212,6 +212,32 @@ func TestPostFile(t *testing.T) {
 	}
 }
 
+func TestUnlinkList(t *testing.T) {
+	ctx := ulsdk.NewTestContextFromEnv()
+	if ctx == nil {
+		t.Skip("credentials not set, skipping API test")
+	}
+
+	body := &object.ObjectIdList{}
+
+	success := false
+	for i := 0; i < 5; i++ {
+		err := UnlinkList(
+			ctx,
+			body,
+		)
+		if err != nil {
+			time.Sleep(time.Duration(i+1) * time.Second)
+			continue
+		}
+		success = true
+		break
+	}
+	if !success {
+		t.Fatal("test was unable to complete with retries")
+	}
+}
+
 func TestUnlink(t *testing.T) {
 	ctx := ulsdk.NewTestContextFromEnv()
 	if ctx == nil {
@@ -222,10 +248,7 @@ func TestUnlink(t *testing.T) {
 
 	success := false
 	for i := 0; i < 5; i++ {
-		expected := &fs.DirectoryList{}
-		expectedBytes := expected.ToBytes()
-		ctx.SetResponse(expectedBytes)
-		result, err := Unlink(
+		err := Unlink(
 			ctx,
 			p0,
 		)
@@ -233,7 +256,6 @@ func TestUnlink(t *testing.T) {
 			time.Sleep(time.Duration(i+1) * time.Second)
 			continue
 		}
-		_ = result
 		success = true
 		break
 	}

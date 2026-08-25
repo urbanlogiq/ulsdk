@@ -17,7 +17,7 @@ use crate::{FbsSerde, read_arrow_ipc, read_arrow_schema, write_arrow_ipc};
 use crate::request_context::File;
 use crate::types::fs::{DirectoryList, MoveRequest};
 use crate::types::id::ObjectId;
-use crate::types::object::ObjectSummary;
+use crate::types::object::{ObjectIdList, ObjectSummary};
 
 /// Retrieves a directory listing from a unix-style path rooted at `root` where `root` may be the UUID of any drive directory. Paths may include wildcards like `*`.
 ///
@@ -162,22 +162,33 @@ pub async fn post_file(
     crate::types::DirectoryList::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
+/// Removes the specified drive entries from their parent directories.
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+/// * `object_ids` - A list of object IDs to delete
+pub async fn unlink_list(ctx: &dyn RequestContext, object_ids: ObjectIdList) -> Result<(), Error> {
+    let path = "/v1/api/ulv2/drive/unlink_list";
+    let body = Bytes::from(object_ids.to_fbs_bytes());
+    ctx.post(&path, body, "application/octet-stream", None, None)
+        .await?;
+    Ok(())
+}
+
 /// Removes the specified drive entry from its parent directory.
 ///
 /// # Arguments
 ///
 /// * `ctx` - A request context object
 /// * `entry` - The ID of the entry to remove
-///
-/// Returns
-/// * An updated list of directory entries
 pub async fn unlink(
     ctx: &dyn RequestContext,
     entry: crate::types::id::ObjectId,
-) -> Result<DirectoryList, Error> {
+) -> Result<(), Error> {
     let path = "/v1/api/ulv2/drive/:entry".replace(":entry", &entry.to_string());
-    let res = ctx.delete(&path, None, None).await?;
-    crate::types::DirectoryList::from_fbs_bytes(res.as_slice()).map_err(Error::from)
+    ctx.delete(&path, None, None).await?;
+    Ok(())
 }
 
 /// Moves a file or directory to a new location.
@@ -519,6 +530,38 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_unlink_list() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+
+        for i in 0..5 {
+            let body = crate::types::ObjectIdList::default();
+            let result = unlink_list(&ctx, body).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
+    }
+
+    #[tokio::test]
     async fn test_unlink() {
         let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
         let access_key =
@@ -537,23 +580,17 @@ mod tests {
         for i in 0..5 {
             let p0 =
                 crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-            let expected = DirectoryList::default();
-            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
             let result = unlink(&ctx, p0).await;
-            let result = match result {
-                Ok(r) => r,
-                Err(e) => {
-                    if i < 4 {
-                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
-                        continue;
-                    } else {
-                        Err(e).unwrap()
-                    }
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
                 }
-            };
-            assert_eq!(result, expected);
-            break;
+            } else {
+                break;
+            }
         }
     }
 

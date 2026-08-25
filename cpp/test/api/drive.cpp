@@ -197,27 +197,25 @@ test_post_file(ul::RequestContext &rctx) {
 ApiTest test_post_file_obj(test_post_file, "drive::post_file", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
+test_unlink_list(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    ::ul::types::ObjectIdList body = ::ul::types::ObjectIdList();
+    return ul::api::drive::unlink_list(
+        ctx,
+        body
+    );
+}
+
+ApiTest test_unlink_list_obj(test_unlink_list, "drive::unlink_list", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
 test_unlink(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
-    const ::ul::types::DirectoryList expected = ::ul::types::DirectoryList();
-    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
-    ctx.set_response(expected_bytes);
-    auto result = ul::api::drive::unlink(
+    return ul::api::drive::unlink(
         ctx,
         p0
     );
-
-    if (std::holds_alternative<ul::Error>(result)) {
-        ul::Error error = std::get<ul::Error>(result);
-        return ul::Result<ul::Void>(error);
-    }
-
-    const ::ul::types::DirectoryList result_value = std::get<::ul::types::DirectoryList>(result);
-    if (result_value != expected) {
-        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
-    }
-    return ul::Result<ul::Void>(ul::Void());
 }
 
 ApiTest test_unlink_obj(test_unlink, "drive::unlink", &idempotent_api_test_root);
