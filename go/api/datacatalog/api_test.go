@@ -849,6 +849,14 @@ func TestUpdateMetadata(t *testing.T) {
 	}
 
 	p0 := id.ObjectId{}
+	q0_val := true
+	q0 := &q0_val
+	q1_val := "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+	q1 := &q1_val
+	q2_val := id.ContentId{}
+	q2 := &q2_val
+	q3_val := id.ContentId{}
+	q3 := &q3_val
 	body := []byte("Lorem ipsum dolor sit amet, consectetur adipiscing elit")
 
 	success := false
@@ -856,6 +864,10 @@ func TestUpdateMetadata(t *testing.T) {
 		err := UpdateMetadata(
 			ctx,
 			p0,
+			q0,
+			q1,
+			q2,
+			q3,
 			body,
 		)
 		if err != nil {

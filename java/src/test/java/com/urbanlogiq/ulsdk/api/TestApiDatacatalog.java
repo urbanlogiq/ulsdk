@@ -734,10 +734,18 @@ public final class TestApiDatacatalog {
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
         com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        boolean q0 = true;
+        String q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        com.urbanlogiq.ulsdk.types.ContentId q2 = new com.urbanlogiq.ulsdk.types.ContentId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.ContentId q3 = new com.urbanlogiq.ulsdk.types.ContentId("00000000-0000-0000-0000-000000000000");
         com.urbanlogiq.ulsdk.types.Metadata body = new com.urbanlogiq.ulsdk.types.Metadata();
         com.urbanlogiq.ulsdk.api.datacatalog.Datacatalog.updateMetadata(
             ctx,
             p0,
+            q0,
+            q1,
+            q2,
+            q3,
             body
         );
     }

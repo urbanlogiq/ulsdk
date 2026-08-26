@@ -541,17 +541,28 @@ func GenerateMetadata(ctx api.RequestContext, idParam id.ObjectId) (*metadata.Me
 }
 
 // UpdateMetadata -
-// Given a stream ID and metadata, update the stream metadata to a combination of:
-// - the existing metadata
-// - the provided metadata
-// - the generated metadata
+// Given a stream ID and metadata, update the stream metadata and repoint the stream object at the new metadata revision.
 // 
-// Also, update the stream object to point to the updated metadata and to have an updated schema.
-func UpdateMetadata(ctx api.RequestContext, idParam id.ObjectId, metadata []byte) error {
+// The `merge` option selects how the provided metadata is written:
+// - merge=true (the default): coalesce the provided metadata with the existing and the freshly-generated metadata. Fields omitted or left at their default are filled in from generated/previous metadata.
+// - merge=false: write the provided metadata verbatim (no regeneration or coalescing) after enforcing field-flag invariants, so intentional flag-off/false/zero values persist. The whole content is replaced, so a complete payload is required. Callers editing a metadata object read earlier should also pass expected_metadata_revision/expected_stream_revision so a stale write is rejected with 409 rather than overwriting a concurrent change.
+func UpdateMetadata(ctx api.RequestContext, idParam id.ObjectId, merge *bool, comment *string, expectedMetadataRevision *id.ContentId, expectedStreamRevision *id.ContentId, metadata []byte) error {
 	path := "/v1/api/ulv2/datacatalog/stream/:id/metadata"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
 
 	params := [][2]string{}
+	if merge != nil {
+	params = append(params, [2]string{"merge", fmt.Sprintf("%t", *merge)})
+	}
+	if comment != nil {
+	params = append(params, [2]string{"comment", *comment})
+	}
+	if expectedMetadataRevision != nil {
+	params = append(params, [2]string{"expected_metadata_revision", fmt.Sprintf("%s", *expectedMetadataRevision)})
+	}
+	if expectedStreamRevision != nil {
+	params = append(params, [2]string{"expected_stream_revision", fmt.Sprintf("%s", *expectedStreamRevision)})
+	}
 
 	headers := map[string]string{}
 

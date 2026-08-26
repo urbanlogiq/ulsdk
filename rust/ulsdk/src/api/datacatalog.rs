@@ -612,31 +612,55 @@ pub async fn generate_metadata(
     crate::types::Metadata::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
-/// Given a stream ID and metadata, update the stream metadata to a combination of:
-/// - the existing metadata
-/// - the provided metadata
-/// - the generated metadata
+/// Given a stream ID and metadata, update the stream metadata and repoint the stream object at the new metadata revision.
 ///
-/// Also, update the stream object to point to the updated metadata and to have an updated schema.
+/// The `merge` option selects how the provided metadata is written:
+/// - merge=true (the default): coalesce the provided metadata with the existing and the freshly-generated metadata. Fields omitted or left at their default are filled in from generated/previous metadata.
+/// - merge=false: write the provided metadata verbatim (no regeneration or coalescing) after enforcing field-flag invariants, so intentional flag-off/false/zero values persist. The whole content is replaced, so a complete payload is required. Callers editing a metadata object read earlier should also pass expected_metadata_revision/expected_stream_revision so a stale write is rejected with 409 rather than overwriting a concurrent change.
 ///
 /// # Arguments
 ///
 /// * `ctx` - A request context object
 /// * `id` - The ID of the stream to update metadata for
+/// * `merge` - Coalesce with existing/generated metadata (true, the default) or write verbatim (false)
+/// * `comment` - Optional update comment recorded on the new metadata-object revision (verbatim writes only)
+/// * `expected_metadata_revision` - Revision the caller expects the metadata object to be at; a stale value is rejected with 409 (verbatim writes only)
+/// * `expected_stream_revision` - Revision the caller expects the stream object to be at; a stale value is rejected with 409 (verbatim writes only)
 /// * `metadata` - The metadata to update the stream with
 pub async fn update_metadata(
     ctx: &dyn RequestContext,
     id: crate::types::id::ObjectId,
+    merge: Option<bool>,
+    comment: Option<&str>,
+    expected_metadata_revision: Option<crate::types::id::ContentId>,
+    expected_stream_revision: Option<crate::types::id::ContentId>,
     metadata: Option<Metadata>,
 ) -> Result<(), Error> {
     let path = "/v1/api/ulv2/datacatalog/stream/:id/metadata".replace(":id", &id.to_string());
+    let mut params = ParamMap::new();
+    if let Some(val) = merge {
+        params.insert(
+            "merge".to_owned(),
+            if val { "true" } else { "false" }.to_owned(),
+        );
+    }
+    if let Some(val) = comment {
+        params.insert("comment".to_owned(), val.to_owned());
+    }
+    if let Some(val) = expected_metadata_revision {
+        params.insert("expected_metadata_revision".to_owned(), val.to_string());
+    }
+    if let Some(val) = expected_stream_revision {
+        params.insert("expected_stream_revision".to_owned(), val.to_string());
+    }
+
     let body = if let Some(metadata) = metadata {
         let body = Bytes::from(metadata.to_fbs_bytes());
         body
     } else {
         Bytes::new()
     };
-    ctx.post(&path, body, "application/octet-stream", None, None)
+    ctx.post(&path, body, "application/octet-stream", Some(params), None)
         .await?;
     Ok(())
 }
@@ -2043,9 +2067,19 @@ mod tests {
         for i in 0..5 {
             let p0 =
                 crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let q0 = true;
+            let q0 = Some(q0);
+            let q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let q1 = Some(q1);
+            let q2 =
+                crate::types::ContentId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let q2 = Some(q2);
+            let q3 =
+                crate::types::ContentId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let q3 = Some(q3);
             let body = crate::types::Metadata::default();
             let body = Some(body);
-            let result = update_metadata(&ctx, p0, body).await;
+            let result = update_metadata(&ctx, p0, q0, q1, q2, q3, body).await;
             if let Err(e) = result {
                 if i < 4 {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));

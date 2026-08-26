@@ -619,6 +619,10 @@ Result<Void>
 update_metadata(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
+    std::optional<bool> merge,
+    std::optional<std::string> comment,
+    std::optional<::ul::types::ContentId> expected_metadata_revision,
+    std::optional<::ul::types::ContentId> expected_stream_revision,
     const std::optional<::ul::types::Metadata> &metadata
 ) {
     std::string path = "/v1/api/ulv2/datacatalog/stream/:id/metadata";
@@ -626,6 +630,22 @@ update_metadata(
     path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
+    if (merge.has_value()) {
+        const auto merge_value = merge.value();
+        params["merge"] = merge_value ? "true" : "false";
+    }
+    if (comment.has_value()) {
+        const auto comment_value = comment.value();
+        params["comment"] = comment_value;
+    }
+    if (expected_metadata_revision.has_value()) {
+        const auto expected_metadata_revision_value = expected_metadata_revision.value();
+        params["expected_metadata_revision"] = expected_metadata_revision_value.to_string();
+    }
+    if (expected_stream_revision.has_value()) {
+        const auto expected_stream_revision_value = expected_stream_revision.value();
+        params["expected_stream_revision"] = expected_stream_revision_value.to_string();
+    }
 
     std::map<std::string, std::string> headers;
     std::vector<uint8_t> body;

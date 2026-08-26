@@ -459,11 +459,19 @@ describe('updateMetadata', () => {
   it('testUpdateMetadata', async () => {
     const ctx = new TestContext();
     const p0 = new ObjectId();
+    const q0: any = null;
+    const q1: any = null;
+    const q2: any = null;
+    const q3: any = null;
     const body = new Metadata();
     try {
           await datacatalog.updateMetadata(
         ctx,
         p0,
+        q0,
+        q1,
+        q2,
+        q3,
         body
       );
     } catch (_) {

@@ -618,26 +618,46 @@ public final class Datacatalog {
     }
 
     /**
-     * Given a stream ID and metadata, update the stream metadata to a combination of:
-     * - the existing metadata
-     * - the provided metadata
-     * - the generated metadata
+     * Given a stream ID and metadata, update the stream metadata and repoint the stream object at the new metadata revision.
      * 
-     * Also, update the stream object to point to the updated metadata and to have an updated schema.
+     * The `merge` option selects how the provided metadata is written:
+     * - merge=true (the default): coalesce the provided metadata with the existing and the freshly-generated metadata. Fields omitted or left at their default are filled in from generated/previous metadata.
+     * - merge=false: write the provided metadata verbatim (no regeneration or coalescing) after enforcing field-flag invariants, so intentional flag-off/false/zero values persist. The whole content is replaced, so a complete payload is required. Callers editing a metadata object read earlier should also pass expected_metadata_revision/expected_stream_revision so a stale write is rejected with 409 rather than overwriting a concurrent change.
      * 
      * @param ctx A request context object
      * @param id The ID of the stream to update metadata for
+     * @param merge Coalesce with existing/generated metadata (true, the default) or write verbatim (false)
+     * @param comment Optional update comment recorded on the new metadata-object revision (verbatim writes only)
+     * @param expected_metadata_revision Revision the caller expects the metadata object to be at; a stale value is rejected with 409 (verbatim writes only)
+     * @param expected_stream_revision Revision the caller expects the stream object to be at; a stale value is rejected with 409 (verbatim writes only)
      * @param metadata The metadata to update the stream with
      */
     public static void updateMetadata(
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.types.ObjectId id,
+        Boolean merge,
+        String comment,
+        com.urbanlogiq.ulsdk.types.ContentId expectedMetadataRevision,
+        com.urbanlogiq.ulsdk.types.ContentId expectedStreamRevision,
         com.urbanlogiq.ulsdk.types.Metadata metadata
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/datacatalog/stream/:id/metadata";
         path = path.replace(":id", id.toString());
 
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        if (merge != null) {
+            params.add(new com.urbanlogiq.ulsdk.Pair("merge", merge.toString()));
+        }
+        if (comment != null) {
+            params.add(new com.urbanlogiq.ulsdk.Pair("comment", comment));
+        }
+        if (expectedMetadataRevision != null) {
+            params.add(new com.urbanlogiq.ulsdk.Pair("expected_metadata_revision", expectedMetadataRevision.toString()));
+        }
+        if (expectedStreamRevision != null) {
+            params.add(new com.urbanlogiq.ulsdk.Pair("expected_stream_revision", expectedStreamRevision.toString()));
+        }
+
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
 
         byte[] body = null;

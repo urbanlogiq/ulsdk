@@ -864,6 +864,10 @@ def test_update_metadata():
     key_ctx = ApiKeyContext(key, Environment.Stage)
     ctx = TestContext(key_ctx)
     p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
+    q0 = True
+    q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    q2 = ContentId.from_uuid("00000000-0000-0000-0000-000000000000");
+    q3 = ContentId.from_uuid("00000000-0000-0000-0000-000000000000");
     body = Metadata.make_default()
     success = False
     for i in range(5):
@@ -871,6 +875,10 @@ def test_update_metadata():
             update_metadata(
                 ctx,
                 p0,
+                q0,
+                q1,
+                q2,
+                q3,
                 body
             )
             success = True

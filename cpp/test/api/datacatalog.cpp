@@ -655,10 +655,18 @@ ul::Result<ul::Void>
 test_update_metadata(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    bool q0 = true;
+    const std::string q1 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+    const ::ul::types::ContentId q2 = ::ul::types::ContentId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::ContentId q3 = ::ul::types::ContentId("00000000-0000-0000-0000-000000000000");
     ::ul::types::Metadata body = ::ul::types::Metadata();
     return ul::api::datacatalog::update_metadata(
         ctx,
         p0,
+        q0,
+        q1,
+        q2,
+        q3,
         body
     );
 }
