@@ -150,6 +150,20 @@ public final class Metadata {
         this._summary = value;
     }
 
+    /**
+     *  Which of the dataset's columns carries the time its rows are observed;
+     *  see TimeSource. Unset on metadata written before this field existed, in
+     *  which case a consumer falls back to recognising the conventional column
+     *  names.
+     */
+    com.urbanlogiq.ulsdk.types.TimeSource _timeSource;
+    public com.urbanlogiq.ulsdk.types.TimeSource getTimeSource() {
+        return this._timeSource;
+    }
+    public void setTimeSource(com.urbanlogiq.ulsdk.types.TimeSource value) {
+        this._timeSource = value;
+    }
+
     long _updateCadence;
     public long getUpdateCadence() {
         return this._updateCadence;
@@ -255,6 +269,20 @@ public final class Metadata {
             }
             this._summary = summary;
         }
+        Object timeSourceValue = null;
+        var timeSourceTy = o.timeSourceType();
+        if (timeSourceTy == com.urbanlogiq.ulsdk.types.generated.TimeSource.NoTime) {
+            com.google.flatbuffers.Table timeSourceFbsTable = o.timeSource(new com.urbanlogiq.ulsdk.types.generated.NoTime());
+            com.urbanlogiq.ulsdk.types.generated.NoTime timeSourceFbsValue = (com.urbanlogiq.ulsdk.types.generated.NoTime)timeSourceFbsTable;
+            timeSourceValue = new com.urbanlogiq.ulsdk.types.NoTime(timeSourceFbsValue);
+        } else if (timeSourceTy == com.urbanlogiq.ulsdk.types.generated.TimeSource.ColumnTime) {
+            com.google.flatbuffers.Table timeSourceFbsTable = o.timeSource(new com.urbanlogiq.ulsdk.types.generated.ColumnTime());
+            com.urbanlogiq.ulsdk.types.generated.ColumnTime timeSourceFbsValue = (com.urbanlogiq.ulsdk.types.generated.ColumnTime)timeSourceFbsTable;
+            timeSourceValue = new com.urbanlogiq.ulsdk.types.ColumnTime(timeSourceFbsValue);
+        }
+        if (timeSourceValue != null) {
+            this._timeSource = new com.urbanlogiq.ulsdk.types.TimeSource(timeSourceValue);
+        }
         this._updateCadence = o.updateCadence();
         if (o.visualizeInExploreFieldsVector() != null) {
             int[] visualizeInExploreFields = new int[o.visualizeInExploreFieldsLength()];
@@ -338,6 +366,10 @@ public final class Metadata {
             }
             summaryOffset = builder.endVector();
         }
+        com.urbanlogiq.ulsdk.Pair<Integer, Byte> timeSourcePair = null;
+        if (this._timeSource != null) {
+            timeSourcePair = this._timeSource.serializeTo(builder);
+        }
         Integer visualizeInExploreFieldsOffset = null;
         if (this._visualizeInExploreFields != null) {
             com.urbanlogiq.ulsdk.types.generated.Metadata.startVisualizeInExploreFieldsVector(builder, this._visualizeInExploreFields.length);
@@ -380,6 +412,10 @@ public final class Metadata {
         if (summaryOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.Metadata.addSummary(builder, summaryOffset);
         }
+        if (timeSourcePair != null) {
+            com.urbanlogiq.ulsdk.types.generated.Metadata.addTimeSource(builder, timeSourcePair.first());
+            com.urbanlogiq.ulsdk.types.generated.Metadata.addTimeSourceType(builder, timeSourcePair.second());
+        }
         com.urbanlogiq.ulsdk.types.generated.Metadata.addUpdateCadence(builder, this._updateCadence);
         if (visualizeInExploreFieldsOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.Metadata.addVisualizeInExploreFields(builder, visualizeInExploreFieldsOffset);
@@ -404,6 +440,7 @@ public final class Metadata {
         this._promotedMetrics = new int[0];
         this._source = new com.urbanlogiq.ulsdk.types.DatasetSource();
         this._summary = new int[0];
+        this._timeSource = new com.urbanlogiq.ulsdk.types.TimeSource();
         this._visualizeInExploreFields = new int[0];
     }
 

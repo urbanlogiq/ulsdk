@@ -284,8 +284,29 @@ class Metadata(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(36))
         return o == 0
 
+    # Metadata
+    def TimeSourceType(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(38))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Uint8Flags, o + self._tab.Pos)
+        return 0
+
+    # Which of the dataset's columns carries the time its rows are observed;
+    # see TimeSource. Unset on metadata written before this field existed, in
+    # which case a consumer falls back to recognising the conventional column
+    # names.
+    # Metadata
+    def TimeSource(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(40))
+        if o != 0:
+            from flatbuffers.table import Table
+            obj = Table(bytearray(), 0)
+            self._tab.Union(obj, o)
+            return obj
+        return None
+
 def MetadataStart(builder):
-    builder.StartObject(17)
+    builder.StartObject(19)
 
 def Start(builder):
     MetadataStart(builder)
@@ -427,6 +448,18 @@ def MetadataStartDetailSectionsVector(builder, numElems):
 
 def StartDetailSectionsVector(builder, numElems):
     return MetadataStartDetailSectionsVector(builder, numElems)
+
+def MetadataAddTimeSourceType(builder, timeSourceType):
+    builder.PrependUint8Slot(17, timeSourceType, 0)
+
+def AddTimeSourceType(builder, timeSourceType):
+    MetadataAddTimeSourceType(builder, timeSourceType)
+
+def MetadataAddTimeSource(builder, timeSource):
+    builder.PrependUOffsetTRelativeSlot(18, flatbuffers.number_types.UOffsetTFlags.py_type(timeSource), 0)
+
+def AddTimeSource(builder, timeSource):
+    MetadataAddTimeSource(builder, timeSource)
 
 def MetadataEnd(builder):
     return builder.EndObject()

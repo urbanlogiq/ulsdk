@@ -655,6 +655,93 @@ const (
 	NumericalFieldValueTypeRatio NumericalFieldValueType = 2
 )
 
+// NoTime -
+//  The dataset records no observation time, so no consumer should offer time
+//  filtering over it.
+type NoTime struct {
+}
+
+func NoTimeFromFbs(fbs *generated.NoTime) *NoTime {
+	o := &NoTime{}
+	return o
+}
+
+// NoTimeFromBytes deserializes a NoTime from size-prefixed FlatBuffer bytes.
+func NoTimeFromBytes(data []byte) (*NoTime, error) {
+	fbs := generated.GetSizePrefixedRootAsNoTime(data, 0)
+	return NoTimeFromFbs(fbs), nil
+}
+
+// ToBytes serializes the NoTime to size-prefixed FlatBuffer bytes.
+func (o *NoTime) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the NoTime into a FlatBuffer builder and returns the offset.
+func (o *NoTime) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	generated.NoTimeStart(builder)
+	return generated.NoTimeEnd(builder)
+}
+
+// ColumnTime -
+//  Every row is observed at an instant, recorded in this column.
+type ColumnTime struct {
+	Column string
+}
+
+func ColumnTimeFromFbs(fbs *generated.ColumnTime) *ColumnTime {
+	o := &ColumnTime{}
+	o.Column = string(fbs.Column())
+	return o
+}
+
+// ColumnTimeFromBytes deserializes a ColumnTime from size-prefixed FlatBuffer bytes.
+func ColumnTimeFromBytes(data []byte) (*ColumnTime, error) {
+	fbs := generated.GetSizePrefixedRootAsColumnTime(data, 0)
+	return ColumnTimeFromFbs(fbs), nil
+}
+
+// ToBytes serializes the ColumnTime to size-prefixed FlatBuffer bytes.
+func (o *ColumnTime) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the ColumnTime into a FlatBuffer builder and returns the offset.
+func (o *ColumnTime) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	columnOffset := builder.CreateString(o.Column)
+	generated.ColumnTimeStart(builder)
+	generated.ColumnTimeAddColumn(builder, columnOffset)
+	return generated.ColumnTimeEnd(builder)
+}
+
+// TimeSource -
+//  Where a dataset records the time its rows are observed. Declared rather
+//  than inferred: a stream's time axis is not derivable from its schema, since
+//  several of its columns may be datetimes -- a scheduled time, an actual
+//  time, an ingestion stamp -- and only one of them is the axis a consumer
+//  should filter on.
+//
+//  Streams whose rows are valid over a window rather than at an instant
+//  (slowly-changing dimensions, carrying a validity start and end) declare
+//  NoTime. Declaring the window's start as a ColumnTime would be worse than
+//  declaring nothing: a consumer would filter validity starts as though they
+//  were observations, dropping rows whose window covers the requested range
+//  but whose start does not fall inside it. Give those streams their own
+//  variant naming both columns once a consumer needs to filter them properly.
+//
+//  Append new variants only -- a union member's position is its wire value, so
+//  inserting one would silently reinterpret existing stored metadata.
+// TimeSource is a union type. Possible concrete types: NoTime, ColumnTime
+type TimeSource interface {
+	isTimeSource()
+}
+
 type HierarchyRelationshipData struct {
 	Hierarchy []HierarchicalRelationship
 }
@@ -1436,6 +1523,7 @@ type Metadata struct {
 	PromotedMetrics []int32
 	Source *DatasetSource
 	Summary []int32
+	TimeSource interface{}
 	UpdateCadence uint32
 	VisualizeInExploreFields []int32
 }

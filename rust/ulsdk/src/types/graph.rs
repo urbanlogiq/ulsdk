@@ -53,7 +53,6 @@ use crate::types::id::{
 #[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i32)]
 pub enum Predicate {
-    #[default]
     NONE = 0,
     id = 1,
     stream = 2,
@@ -61,6 +60,7 @@ pub enum Predicate {
     entity_ty = 4,
     node_ty = 5,
     description = 6,
+    #[default]
     location = 7,
     geom = 8,
 }

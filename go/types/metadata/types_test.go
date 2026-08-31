@@ -25,6 +25,14 @@ func TestRoundTripCategoryRelationshipData(t *testing.T) {
 	}
 }
 
+func TestDefaultColumnTime(t *testing.T) {
+	o := &ColumnTime{}
+	if o == nil {
+		t.Fatal("expected non-nil")
+	}
+}
+
+
 func TestDefaultContactInfo(t *testing.T) {
 	o := &ContactInfo{}
 	if o == nil {
@@ -426,6 +434,25 @@ func TestRoundTripNoGeometry(t *testing.T) {
 	o := &NoGeometry{}
 	data := o.ToBytes()
 	result, err := NoGeometryFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestDefaultNoTime(t *testing.T) {
+	o := &NoTime{}
+	if o == nil {
+		t.Fatal("expected non-nil")
+	}
+}
+
+func TestRoundTripNoTime(t *testing.T) {
+	o := &NoTime{}
+	data := o.ToBytes()
+	result, err := NoTimeFromBytes(data)
 	if err != nil {
 		t.Fatalf("deserialization failed: %v", err)
 	}

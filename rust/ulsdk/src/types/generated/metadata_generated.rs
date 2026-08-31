@@ -1462,6 +1462,125 @@ impl<'a> flatbuffers::Verifiable for GeometrySource {
 impl flatbuffers::SimpleToVerifyInSlice for GeometrySource {}
 pub struct GeometrySourceUnionTableOffset {}
 
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+pub const ENUM_MIN_TIME_SOURCE: u8 = 0;
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+pub const ENUM_MAX_TIME_SOURCE: u8 = 2;
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+#[allow(non_camel_case_types)]
+pub const ENUM_VALUES_TIME_SOURCE: [TimeSource; 3] =
+    [TimeSource::NONE, TimeSource::NoTime, TimeSource::ColumnTime];
+
+/// Where a dataset records the time its rows are observed. Declared rather
+/// than inferred: a stream's time axis is not derivable from its schema, since
+/// several of its columns may be datetimes -- a scheduled time, an actual
+/// time, an ingestion stamp -- and only one of them is the axis a consumer
+/// should filter on.
+///
+/// Streams whose rows are valid over a window rather than at an instant
+/// (slowly-changing dimensions, carrying a validity start and end) declare
+/// NoTime. Declaring the window's start as a ColumnTime would be worse than
+/// declaring nothing: a consumer would filter validity starts as though they
+/// were observations, dropping rows whose window covers the requested range
+/// but whose start does not fall inside it. Give those streams their own
+/// variant naming both columns once a consumer needs to filter them properly.
+///
+/// Append new variants only -- a union member's position is its wire value, so
+/// inserting one would silently reinterpret existing stored metadata.
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+#[repr(transparent)]
+pub struct TimeSource(pub u8);
+#[allow(non_upper_case_globals)]
+impl TimeSource {
+    pub const NONE: Self = Self(0);
+    pub const NoTime: Self = Self(1);
+    pub const ColumnTime: Self = Self(2);
+
+    pub const ENUM_MIN: u8 = 0;
+    pub const ENUM_MAX: u8 = 2;
+    pub const ENUM_VALUES: &'static [Self] = &[Self::NONE, Self::NoTime, Self::ColumnTime];
+    /// Returns the variant's name or "" if unknown.
+    pub fn variant_name(self) -> Option<&'static str> {
+        match self {
+            Self::NONE => Some("NONE"),
+            Self::NoTime => Some("NoTime"),
+            Self::ColumnTime => Some("ColumnTime"),
+            _ => None,
+        }
+    }
+}
+impl core::fmt::Debug for TimeSource {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        if let Some(name) = self.variant_name() {
+            f.write_str(name)
+        } else {
+            f.write_fmt(format_args!("<UNKNOWN {:?}>", self.0))
+        }
+    }
+}
+impl Serialize for TimeSource {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_unit_variant("TimeSource", self.0 as u32, self.variant_name().unwrap())
+    }
+}
+
+impl<'a> flatbuffers::Follow<'a> for TimeSource {
+    type Inner = Self;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        let b = flatbuffers::read_scalar_at::<u8>(buf, loc);
+        Self(b)
+    }
+}
+
+impl flatbuffers::Push for TimeSource {
+    type Output = TimeSource;
+    #[inline]
+    unsafe fn push(&self, dst: &mut [u8], _written_len: usize) {
+        flatbuffers::emplace_scalar::<u8>(dst, self.0);
+    }
+}
+
+impl flatbuffers::EndianScalar for TimeSource {
+    type Scalar = u8;
+    #[inline]
+    fn to_little_endian(self) -> u8 {
+        self.0.to_le()
+    }
+    #[inline]
+    #[allow(clippy::wrong_self_convention)]
+    fn from_little_endian(v: u8) -> Self {
+        let b = u8::from_le(v);
+        Self(b)
+    }
+}
+
+impl<'a> flatbuffers::Verifiable for TimeSource {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        u8::run_verifier(v, pos)
+    }
+}
+
+impl flatbuffers::SimpleToVerifyInSlice for TimeSource {}
+pub struct TimeSourceUnionTableOffset {}
+
 // struct FloatBucket, aligned to 8
 #[repr(transparent)]
 #[derive(Clone, Copy, PartialEq)]
@@ -9232,6 +9351,216 @@ impl core::fmt::Debug for WorldGraphGeometry<'_> {
         ds.finish()
     }
 }
+pub enum NoTimeOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+/// The dataset records no observation time, so no consumer should offer time
+/// filtering over it.
+pub struct NoTime<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for NoTime<'a> {
+    type Inner = NoTime<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> NoTime<'a> {
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        NoTime { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        _args: &'args NoTimeArgs,
+    ) -> flatbuffers::WIPOffset<NoTime<'bldr>> {
+        let mut builder = NoTimeBuilder::new(_fbb);
+        builder.finish()
+    }
+}
+
+impl flatbuffers::Verifiable for NoTime<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?.finish();
+        Ok(())
+    }
+}
+pub struct NoTimeArgs {}
+impl<'a> Default for NoTimeArgs {
+    #[inline]
+    fn default() -> Self {
+        NoTimeArgs {}
+    }
+}
+
+impl Serialize for NoTime<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let s = serializer.serialize_struct("NoTime", 0)?;
+        s.end()
+    }
+}
+
+pub struct NoTimeBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> NoTimeBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> NoTimeBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        NoTimeBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<NoTime<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for NoTime<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("NoTime");
+        ds.finish()
+    }
+}
+pub enum ColumnTimeOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+/// Every row is observed at an instant, recorded in this column.
+pub struct ColumnTime<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for ColumnTime<'a> {
+    type Inner = ColumnTime<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> ColumnTime<'a> {
+    pub const VT_COLUMN: flatbuffers::VOffsetT = 4;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        ColumnTime { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args ColumnTimeArgs<'args>,
+    ) -> flatbuffers::WIPOffset<ColumnTime<'bldr>> {
+        let mut builder = ColumnTimeBuilder::new(_fbb);
+        if let Some(x) = args.column {
+            builder.add_column(x);
+        }
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn column(&self) -> &'a str {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<&str>>(ColumnTime::VT_COLUMN, None)
+                .unwrap()
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for ColumnTime<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<&str>>("column", Self::VT_COLUMN, true)?
+            .finish();
+        Ok(())
+    }
+}
+pub struct ColumnTimeArgs<'a> {
+    pub column: Option<flatbuffers::WIPOffset<&'a str>>,
+}
+impl<'a> Default for ColumnTimeArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        ColumnTimeArgs {
+            column: None, // required field
+        }
+    }
+}
+
+impl Serialize for ColumnTime<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("ColumnTime", 1)?;
+        s.serialize_field("column", &self.column())?;
+        s.end()
+    }
+}
+
+pub struct ColumnTimeBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ColumnTimeBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_column(&mut self, column: flatbuffers::WIPOffset<&'b str>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(ColumnTime::VT_COLUMN, column);
+    }
+    #[inline]
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> ColumnTimeBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        ColumnTimeBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<ColumnTime<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_.required(o, ColumnTime::VT_COLUMN, "column");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for ColumnTime<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("ColumnTime");
+        ds.field("column", &self.column());
+        ds.finish()
+    }
+}
 pub enum DetailSectionOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -9398,6 +9727,8 @@ impl<'a> Metadata<'a> {
     pub const VT_PROMOTED_METRICS: flatbuffers::VOffsetT = 32;
     pub const VT_VISUALIZE_IN_EXPLORE_FIELDS: flatbuffers::VOffsetT = 34;
     pub const VT_DETAIL_SECTIONS: flatbuffers::VOffsetT = 36;
+    pub const VT_TIME_SOURCE_TYPE: flatbuffers::VOffsetT = 38;
+    pub const VT_TIME_SOURCE: flatbuffers::VOffsetT = 40;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -9409,6 +9740,9 @@ impl<'a> Metadata<'a> {
         args: &'args MetadataArgs<'args>,
     ) -> flatbuffers::WIPOffset<Metadata<'bldr>> {
         let mut builder = MetadataBuilder::new(_fbb);
+        if let Some(x) = args.time_source {
+            builder.add_time_source(x);
+        }
         if let Some(x) = args.detail_sections {
             builder.add_detail_sections(x);
         }
@@ -9443,6 +9777,7 @@ impl<'a> Metadata<'a> {
         if let Some(x) = args.display_name {
             builder.add_display_name(x);
         }
+        builder.add_time_source_type(args.time_source_type);
         builder.add_do_not_filter_geometry_by_viewport(args.do_not_filter_geometry_by_viewport);
         builder.add_area_selection(args.area_selection);
         builder.add_geometry_source_type(args.geometry_source_type);
@@ -9675,6 +10010,34 @@ impl<'a> Metadata<'a> {
         }
     }
     #[inline]
+    pub fn time_source_type(&self) -> TimeSource {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<TimeSource>(Metadata::VT_TIME_SOURCE_TYPE, Some(TimeSource::NONE))
+                .unwrap()
+        }
+    }
+    /// Which of the dataset's columns carries the time its rows are observed;
+    /// see TimeSource. Unset on metadata written before this field existed, in
+    /// which case a consumer falls back to recognising the conventional column
+    /// names.
+    #[inline]
+    pub fn time_source(&self) -> Option<flatbuffers::Table<'a>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<flatbuffers::Table<'a>>>(
+                    Metadata::VT_TIME_SOURCE,
+                    None,
+                )
+        }
+    }
+    #[inline]
     #[allow(non_snake_case)]
     pub fn geometry_source_as_no_geometry(&self) -> Option<NoGeometry<'a>> {
         if self.geometry_source_type() == GeometrySource::NoGeometry {
@@ -9735,6 +10098,36 @@ impl<'a> Metadata<'a> {
             None
         }
     }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn time_source_as_no_time(&self) -> Option<NoTime<'a>> {
+        if self.time_source_type() == TimeSource::NoTime {
+            self.time_source().map(|t| {
+                // Safety:
+                // Created from a valid Table for this object
+                // Which contains a valid union in this slot
+                unsafe { NoTime::init_from_table(t) }
+            })
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn time_source_as_column_time(&self) -> Option<ColumnTime<'a>> {
+        if self.time_source_type() == TimeSource::ColumnTime {
+            self.time_source().map(|t| {
+                // Safety:
+                // Created from a valid Table for this object
+                // Which contains a valid union in this slot
+                unsafe { ColumnTime::init_from_table(t) }
+            })
+        } else {
+            None
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for Metadata<'_> {
@@ -9769,6 +10162,13 @@ impl flatbuffers::Verifiable for Metadata<'_> {
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, i32>>>("promoted_metrics", Self::VT_PROMOTED_METRICS, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, i32>>>("visualize_in_explore_fields", Self::VT_VISUALIZE_IN_EXPLORE_FIELDS, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<DetailSection>>>>("detail_sections", Self::VT_DETAIL_SECTIONS, false)?
+     .visit_union::<TimeSource, _>("time_source_type", Self::VT_TIME_SOURCE_TYPE, "time_source", Self::VT_TIME_SOURCE, false, |key, v, pos| {
+        match key {
+          TimeSource::NoTime => v.verify_union_variant::<flatbuffers::ForwardsUOffset<NoTime>>("TimeSource::NoTime", pos),
+          TimeSource::ColumnTime => v.verify_union_variant::<flatbuffers::ForwardsUOffset<ColumnTime>>("TimeSource::ColumnTime", pos),
+          _ => Ok(()),
+        }
+     })?
      .finish();
         Ok(())
     }
@@ -9801,6 +10201,8 @@ pub struct MetadataArgs<'a> {
             flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<DetailSection<'a>>>,
         >,
     >,
+    pub time_source_type: TimeSource,
+    pub time_source: Option<flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>>,
 }
 impl<'a> Default for MetadataArgs<'a> {
     #[inline]
@@ -9823,6 +10225,8 @@ impl<'a> Default for MetadataArgs<'a> {
             promoted_metrics: None,
             visualize_in_explore_fields: None,
             detail_sections: None,
+            time_source_type: TimeSource::NONE,
+            time_source: None,
         }
     }
 }
@@ -9832,7 +10236,7 @@ impl Serialize for Metadata<'_> {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("Metadata", 17)?;
+        let mut s = serializer.serialize_struct("Metadata", 19)?;
         if let Some(f) = self.display_name() {
             s.serialize_field("display_name", &f)?;
         } else {
@@ -9917,6 +10321,23 @@ impl Serialize for Metadata<'_> {
             s.serialize_field("detail_sections", &f)?;
         } else {
             s.skip_field("detail_sections")?;
+        }
+        s.serialize_field("time_source_type", &self.time_source_type())?;
+        match self.time_source_type() {
+            TimeSource::NONE => (),
+            TimeSource::NoTime => {
+                let f = self
+                    .time_source_as_no_time()
+                    .expect("Invalid union table, expected `TimeSource::NoTime`.");
+                s.serialize_field("time_source", &f)?;
+            }
+            TimeSource::ColumnTime => {
+                let f = self
+                    .time_source_as_column_time()
+                    .expect("Invalid union table, expected `TimeSource::ColumnTime`.");
+                s.serialize_field("time_source", &f)?;
+            }
+            _ => unimplemented!(),
         }
         s.end()
     }
@@ -10065,6 +10486,22 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> MetadataBuilder<'a, 'b, A> {
         );
     }
     #[inline]
+    pub fn add_time_source_type(&mut self, time_source_type: TimeSource) {
+        self.fbb_.push_slot::<TimeSource>(
+            Metadata::VT_TIME_SOURCE_TYPE,
+            time_source_type,
+            TimeSource::NONE,
+        );
+    }
+    #[inline]
+    pub fn add_time_source(
+        &mut self,
+        time_source: flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>,
+    ) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(Metadata::VT_TIME_SOURCE, time_source);
+    }
+    #[inline]
     pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> MetadataBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         MetadataBuilder {
@@ -10153,6 +10590,33 @@ impl core::fmt::Debug for Metadata<'_> {
             &self.visualize_in_explore_fields(),
         );
         ds.field("detail_sections", &self.detail_sections());
+        ds.field("time_source_type", &self.time_source_type());
+        match self.time_source_type() {
+            TimeSource::NoTime => {
+                if let Some(x) = self.time_source_as_no_time() {
+                    ds.field("time_source", &x)
+                } else {
+                    ds.field(
+                        "time_source",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            TimeSource::ColumnTime => {
+                if let Some(x) = self.time_source_as_column_time() {
+                    ds.field("time_source", &x)
+                } else {
+                    ds.field(
+                        "time_source",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            _ => {
+                let x: Option<()> = None;
+                ds.field("time_source", &x)
+            }
+        };
         ds.finish()
     }
 }

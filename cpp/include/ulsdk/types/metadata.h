@@ -26,6 +26,7 @@ namespace ul {
 namespace types {
 
 struct CategoryRelationshipData;
+struct ColumnTime;
 struct ContactInfo;
 struct DatacatalogGeometry;
 struct DatacatalogLatLngGeometry;
@@ -53,6 +54,7 @@ struct NestedHierarchyRelationshipNode;
 struct NestedStringCategories;
 struct NestedStringCategoryNode;
 struct NoGeometry;
+struct NoTime;
 struct NumericalFieldFormat;
 struct RawGeom;
 struct StringAggregate;
@@ -94,6 +96,29 @@ typedef std::variant<
 > GeometrySource;
 
 using ::NumericalFieldValueType;
+///
+/// Where a dataset records the time its rows are observed. Declared rather
+/// than inferred: a stream's time axis is not derivable from its schema, since
+/// several of its columns may be datetimes -- a scheduled time, an actual
+/// time, an ingestion stamp -- and only one of them is the axis a consumer
+/// should filter on.
+///
+/// Streams whose rows are valid over a window rather than at an instant
+/// (slowly-changing dimensions, carrying a validity start and end) declare
+/// NoTime. Declaring the window's start as a ColumnTime would be worse than
+/// declaring nothing: a consumer would filter validity starts as though they
+/// were observations, dropping rows whose window covers the requested range
+/// but whose start does not fall inside it. Give those streams their own
+/// variant naming both columns once a consumer needs to filter them properly.
+///
+/// Append new variants only -- a union member's position is its wire value, so
+/// inserting one would silently reinterpret existing stored metadata.
+///
+typedef std::variant<
+    std::shared_ptr<NoTime>,
+    std::shared_ptr<ColumnTime>
+> TimeSource;
+
 typedef std::variant<
     std::shared_ptr<HierarchyRelationshipData>,
     std::shared_ptr<CategoryRelationshipData>,
@@ -286,6 +311,36 @@ struct DatacatalogLatLngGeometry {
     DatacatalogLatLngGeometry(const std::vector<uint8_t> &bytes);
     bool operator==(const DatacatalogLatLngGeometry &rhs) const;
     bool operator!=(const DatacatalogLatLngGeometry &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+///
+/// The dataset records no observation time, so no consumer should offer time
+/// filtering over it.
+///
+struct NoTime {
+
+    NoTime();
+    NoTime(const ::NoTime *root);
+    NoTime(const std::vector<uint8_t> &bytes);
+    bool operator==(const NoTime &rhs) const;
+    bool operator!=(const NoTime &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+///
+/// Every row is observed at an instant, recorded in this column.
+///
+struct ColumnTime {
+    std::string column_;
+
+    ColumnTime();
+    ColumnTime(const ::ColumnTime *root);
+    ColumnTime(const std::vector<uint8_t> &bytes);
+    bool operator==(const ColumnTime &rhs) const;
+    bool operator!=(const ColumnTime &rhs) const {
         return !(*this == rhs);
     }
 };
@@ -526,6 +581,7 @@ struct Metadata {
     std::optional<std::vector<int32_t>> promoted_metrics_;
     std::optional<DatasetSource> source_;
     std::optional<std::vector<int32_t>> summary_;
+    std::optional<TimeSource> time_source_;
     UpdateCadence update_cadence_;
     std::optional<std::vector<int32_t>> visualize_in_explore_fields_;
 
@@ -674,6 +730,8 @@ std::pair<::flatbuffers::Offset<void>, ::GeometryDataUnion>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const GeometryDataUnion &o);
 std::pair<::flatbuffers::Offset<void>, ::GeometrySource>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const GeometrySource &o);
+std::pair<::flatbuffers::Offset<void>, ::TimeSource>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TimeSource &o);
 std::pair<::flatbuffers::Offset<void>, ::UlFieldRelationshipData>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UlFieldRelationshipData &o);
 ::flatbuffers::Offset<::StringCategories>
@@ -711,6 +769,12 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const WorldGraphGeometry
 
 ::flatbuffers::Offset<::DatacatalogLatLngGeometry>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DatacatalogLatLngGeometry &);
+
+::flatbuffers::Offset<::NoTime>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NoTime &);
+
+::flatbuffers::Offset<::ColumnTime>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ColumnTime &);
 
 ::flatbuffers::Offset<::HierarchyRelationshipData>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const HierarchyRelationshipData &);
@@ -817,6 +881,12 @@ to_bytes(const WorldGraphGeometry &o);
 
 std::vector<uint8_t>
 to_bytes(const DatacatalogLatLngGeometry &o);
+
+std::vector<uint8_t>
+to_bytes(const NoTime &o);
+
+std::vector<uint8_t>
+to_bytes(const ColumnTime &o);
 
 std::vector<uint8_t>
 to_bytes(const HierarchyRelationshipData &o);

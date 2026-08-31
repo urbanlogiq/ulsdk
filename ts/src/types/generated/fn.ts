@@ -209,6 +209,8 @@ export enum Fn {
   PercentRank = 199,
   Ntile = 200,
   CumeDist = 201,
+  StX = 202,
+  StY = 203,
   CorrelationId = 32763,
   UlTimezone = 32764,
   UlArrayContains = 32765,

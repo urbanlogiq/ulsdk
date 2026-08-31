@@ -127,6 +127,12 @@ struct DatacatalogLatLngGeometryBuilder;
 struct WorldGraphGeometry;
 struct WorldGraphGeometryBuilder;
 
+struct NoTime;
+struct NoTimeBuilder;
+
+struct ColumnTime;
+struct ColumnTimeBuilder;
+
 struct DetailSection;
 struct DetailSectionBuilder;
 
@@ -779,6 +785,70 @@ template<> struct GeometrySourceTraits<DatacatalogLatLngGeometry> {
 
 bool VerifyGeometrySource(::flatbuffers::Verifier &verifier, const void *obj, GeometrySource type);
 bool VerifyGeometrySourceVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<GeometrySource> *types);
+
+/// Where a dataset records the time its rows are observed. Declared rather
+/// than inferred: a stream's time axis is not derivable from its schema, since
+/// several of its columns may be datetimes -- a scheduled time, an actual
+/// time, an ingestion stamp -- and only one of them is the axis a consumer
+/// should filter on.
+///
+/// Streams whose rows are valid over a window rather than at an instant
+/// (slowly-changing dimensions, carrying a validity start and end) declare
+/// NoTime. Declaring the window's start as a ColumnTime would be worse than
+/// declaring nothing: a consumer would filter validity starts as though they
+/// were observations, dropping rows whose window covers the requested range
+/// but whose start does not fall inside it. Give those streams their own
+/// variant naming both columns once a consumer needs to filter them properly.
+///
+/// Append new variants only -- a union member's position is its wire value, so
+/// inserting one would silently reinterpret existing stored metadata.
+enum class TimeSource : uint8_t {
+  NONE = 0,
+  NoTime = 1,
+  ColumnTime = 2,
+  MIN = NONE,
+  MAX = ColumnTime
+};
+
+inline const TimeSource (&EnumValuesTimeSource())[3] {
+  static const TimeSource values[] = {
+    TimeSource::NONE,
+    TimeSource::NoTime,
+    TimeSource::ColumnTime
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesTimeSource() {
+  static const char * const names[4] = {
+    "NONE",
+    "NoTime",
+    "ColumnTime",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameTimeSource(TimeSource e) {
+  if (::flatbuffers::IsOutRange(e, TimeSource::NONE, TimeSource::ColumnTime)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesTimeSource()[index];
+}
+
+template<typename T> struct TimeSourceTraits {
+  static const TimeSource enum_value = TimeSource::NONE;
+};
+
+template<> struct TimeSourceTraits<NoTime> {
+  static const TimeSource enum_value = TimeSource::NoTime;
+};
+
+template<> struct TimeSourceTraits<ColumnTime> {
+  static const TimeSource enum_value = TimeSource::ColumnTime;
+};
+
+bool VerifyTimeSource(::flatbuffers::Verifier &verifier, const void *obj, TimeSource type);
+bool VerifyTimeSourceVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<TimeSource> *types);
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) FloatBucket FLATBUFFERS_FINAL_CLASS {
  private:
@@ -3857,6 +3927,102 @@ inline ::flatbuffers::Offset<WorldGraphGeometry> CreateWorldGraphGeometryDirect(
       start_stream_id);
 }
 
+/// The dataset records no observation time, so no consumer should offer time
+/// filtering over it.
+struct NoTime FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef NoTimeBuilder Builder;
+  struct Traits;
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct NoTimeBuilder {
+  typedef NoTime Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  explicit NoTimeBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<NoTime> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<NoTime>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<NoTime> CreateNoTime(
+    ::flatbuffers::FlatBufferBuilder &_fbb) {
+  NoTimeBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
+struct NoTime::Traits {
+  using type = NoTime;
+  static auto constexpr Create = CreateNoTime;
+};
+
+/// Every row is observed at an instant, recorded in this column.
+struct ColumnTime FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ColumnTimeBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_COLUMN = 4
+  };
+  const ::flatbuffers::String *column() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_COLUMN);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_COLUMN) &&
+           verifier.VerifyString(column()) &&
+           verifier.EndTable();
+  }
+};
+
+struct ColumnTimeBuilder {
+  typedef ColumnTime Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_column(::flatbuffers::Offset<::flatbuffers::String> column) {
+    fbb_.AddOffset(ColumnTime::VT_COLUMN, column);
+  }
+  explicit ColumnTimeBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<ColumnTime> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<ColumnTime>(end);
+    fbb_.Required(o, ColumnTime::VT_COLUMN);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<ColumnTime> CreateColumnTime(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::String> column = 0) {
+  ColumnTimeBuilder builder_(_fbb);
+  builder_.add_column(column);
+  return builder_.Finish();
+}
+
+struct ColumnTime::Traits {
+  using type = ColumnTime;
+  static auto constexpr Create = CreateColumnTime;
+};
+
+inline ::flatbuffers::Offset<ColumnTime> CreateColumnTimeDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const char *column = nullptr) {
+  auto column__ = column ? _fbb.CreateString(column) : 0;
+  return CreateColumnTime(
+      _fbb,
+      column__);
+}
+
 /// One group of fields in a feature's selected-state details panel. Sections
 /// render in list order, fields in theirs; the panel draws a rule between
 /// sections. Sections have no names; editors identify them by position.
@@ -3938,7 +4104,9 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_LOCATION_DESCRIPTION_FIELD = 30,
     VT_PROMOTED_METRICS = 32,
     VT_VISUALIZE_IN_EXPLORE_FIELDS = 34,
-    VT_DETAIL_SECTIONS = 36
+    VT_DETAIL_SECTIONS = 36,
+    VT_TIME_SOURCE_TYPE = 38,
+    VT_TIME_SOURCE = 40
   };
   const ::flatbuffers::String *display_name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_DISPLAY_NAME);
@@ -4024,6 +4192,23 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::Vector<::flatbuffers::Offset<DetailSection>> *detail_sections() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<DetailSection>> *>(VT_DETAIL_SECTIONS);
   }
+  TimeSource time_source_type() const {
+    return static_cast<TimeSource>(GetField<uint8_t>(VT_TIME_SOURCE_TYPE, 0));
+  }
+  /// Which of the dataset's columns carries the time its rows are observed;
+  /// see TimeSource. Unset on metadata written before this field existed, in
+  /// which case a consumer falls back to recognising the conventional column
+  /// names.
+  const void *time_source() const {
+    return GetPointer<const void *>(VT_TIME_SOURCE);
+  }
+  template<typename T> const T *time_source_as() const;
+  const NoTime *time_source_as_NoTime() const {
+    return time_source_type() == TimeSource::NoTime ? static_cast<const NoTime *>(time_source()) : nullptr;
+  }
+  const ColumnTime *time_source_as_ColumnTime() const {
+    return time_source_type() == TimeSource::ColumnTime ? static_cast<const ColumnTime *>(time_source()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_DISPLAY_NAME) &&
@@ -4056,6 +4241,9 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_DETAIL_SECTIONS) &&
            verifier.VerifyVector(detail_sections()) &&
            verifier.VerifyVectorOfTables(detail_sections()) &&
+           VerifyField<uint8_t>(verifier, VT_TIME_SOURCE_TYPE, 1) &&
+           VerifyOffset(verifier, VT_TIME_SOURCE) &&
+           VerifyTimeSource(verifier, time_source(), time_source_type()) &&
            verifier.EndTable();
   }
 };
@@ -4074,6 +4262,14 @@ template<> inline const WorldGraphGeometry *Metadata::geometry_source_as<WorldGr
 
 template<> inline const DatacatalogLatLngGeometry *Metadata::geometry_source_as<DatacatalogLatLngGeometry>() const {
   return geometry_source_as_DatacatalogLatLngGeometry();
+}
+
+template<> inline const NoTime *Metadata::time_source_as<NoTime>() const {
+  return time_source_as_NoTime();
+}
+
+template<> inline const ColumnTime *Metadata::time_source_as<ColumnTime>() const {
+  return time_source_as_ColumnTime();
 }
 
 struct MetadataBuilder {
@@ -4131,6 +4327,12 @@ struct MetadataBuilder {
   void add_detail_sections(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<DetailSection>>> detail_sections) {
     fbb_.AddOffset(Metadata::VT_DETAIL_SECTIONS, detail_sections);
   }
+  void add_time_source_type(TimeSource time_source_type) {
+    fbb_.AddElement<uint8_t>(Metadata::VT_TIME_SOURCE_TYPE, static_cast<uint8_t>(time_source_type), 0);
+  }
+  void add_time_source(::flatbuffers::Offset<void> time_source) {
+    fbb_.AddOffset(Metadata::VT_TIME_SOURCE, time_source);
+  }
   explicit MetadataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -4160,8 +4362,11 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadata(
     int32_t location_description_field = -1,
     ::flatbuffers::Offset<::flatbuffers::Vector<int32_t>> promoted_metrics = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<int32_t>> visualize_in_explore_fields = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<DetailSection>>> detail_sections = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<DetailSection>>> detail_sections = 0,
+    TimeSource time_source_type = TimeSource::NONE,
+    ::flatbuffers::Offset<void> time_source = 0) {
   MetadataBuilder builder_(_fbb);
+  builder_.add_time_source(time_source);
   builder_.add_detail_sections(detail_sections);
   builder_.add_visualize_in_explore_fields(visualize_in_explore_fields);
   builder_.add_promoted_metrics(promoted_metrics);
@@ -4176,6 +4381,7 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadata(
   builder_.add_fields(fields);
   builder_.add_description(description);
   builder_.add_display_name(display_name);
+  builder_.add_time_source_type(time_source_type);
   builder_.add_do_not_filter_geometry_by_viewport(do_not_filter_geometry_by_viewport);
   builder_.add_area_selection(area_selection);
   builder_.add_geometry_source_type(geometry_source_type);
@@ -4205,7 +4411,9 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadataDirect(
     int32_t location_description_field = -1,
     const std::vector<int32_t> *promoted_metrics = nullptr,
     const std::vector<int32_t> *visualize_in_explore_fields = nullptr,
-    const std::vector<::flatbuffers::Offset<DetailSection>> *detail_sections = nullptr) {
+    const std::vector<::flatbuffers::Offset<DetailSection>> *detail_sections = nullptr,
+    TimeSource time_source_type = TimeSource::NONE,
+    ::flatbuffers::Offset<void> time_source = 0) {
   auto display_name__ = display_name ? _fbb.CreateString(display_name) : 0;
   auto description__ = description ? _fbb.CreateString(description) : 0;
   auto fields__ = fields ? _fbb.CreateVector<::flatbuffers::Offset<UlField>>(*fields) : 0;
@@ -4232,7 +4440,9 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadataDirect(
       location_description_field,
       promoted_metrics__,
       visualize_in_explore_fields__,
-      detail_sections__);
+      detail_sections__,
+      time_source_type,
+      time_source);
 }
 
 inline bool VerifyComponentData(::flatbuffers::Verifier &verifier, const void *obj, ComponentData type) {
@@ -4377,6 +4587,35 @@ inline bool VerifyGeometrySourceVector(::flatbuffers::Verifier &verifier, const 
   for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
     if (!VerifyGeometrySource(
         verifier,  values->Get(i), types->GetEnum<GeometrySource>(i))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+inline bool VerifyTimeSource(::flatbuffers::Verifier &verifier, const void *obj, TimeSource type) {
+  switch (type) {
+    case TimeSource::NONE: {
+      return true;
+    }
+    case TimeSource::NoTime: {
+      auto ptr = reinterpret_cast<const NoTime *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case TimeSource::ColumnTime: {
+      auto ptr = reinterpret_cast<const ColumnTime *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    default: return true;
+  }
+}
+
+inline bool VerifyTimeSourceVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<TimeSource> *types) {
+  if (!values || !types) return !values && !types;
+  if (values->size() != types->size()) return false;
+  for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
+    if (!VerifyTimeSource(
+        verifier,  values->Get(i), types->GetEnum<TimeSource>(i))) {
       return false;
     }
   }

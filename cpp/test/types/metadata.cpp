@@ -17,6 +17,16 @@ test_category_relationship_data() {
 TypeTest test_category_relationship_data_obj(test_category_relationship_data, "CategoryRelationshipData");
 
 bool
+test_column_time() {
+    ::ul::types::ColumnTime t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::ColumnTime deserialized = ::ul::types::ColumnTime(bytes);
+    return true;
+}
+
+TypeTest test_column_time_obj(test_column_time, "ColumnTime");
+
+bool
 test_contact_info() {
     ::ul::types::ContactInfo t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
@@ -265,6 +275,16 @@ test_no_geometry() {
 }
 
 TypeTest test_no_geometry_obj(test_no_geometry, "NoGeometry");
+
+bool
+test_no_time() {
+    ::ul::types::NoTime t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::NoTime deserialized = ::ul::types::NoTime(bytes);
+    return true;
+}
+
+TypeTest test_no_time_obj(test_no_time, "NoTime");
 
 bool
 test_numerical_field_format() {

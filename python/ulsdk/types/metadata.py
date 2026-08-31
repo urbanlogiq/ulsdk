@@ -158,6 +158,7 @@ from .generated.Bool import Bool as FbsBool
 from .generated.Buffer import Buffer as FbsBuffer
 from .generated.CategoryRelationshipData import CategoryRelationshipData as FbsCategoryRelationshipData
 from .generated.ColumnGroupId import ColumnGroupId as FbsColumnGroupId
+from .generated.ColumnTime import ColumnTime as FbsColumnTime
 from .generated.ContactInfo import ContactInfo as FbsContactInfo
 from .generated.ContentId import ContentId as FbsContentId
 from .generated.DataStateId import DataStateId as FbsDataStateId
@@ -221,6 +222,7 @@ from .generated.NestedHierarchyRelationshipNode import NestedHierarchyRelationsh
 from .generated.NestedStringCategories import NestedStringCategories as FbsNestedStringCategories
 from .generated.NestedStringCategoryNode import NestedStringCategoryNode as FbsNestedStringCategoryNode
 from .generated.NoGeometry import NoGeometry as FbsNoGeometry
+from .generated.NoTime import NoTime as FbsNoTime
 from .generated.NodeIdPair import NodeIdPair as FbsNodeIdPair
 from .generated.NodeList import NodeList as FbsNodeList
 from .generated.NodeQuery import NodeQuery as FbsNodeQuery
@@ -287,6 +289,7 @@ from .generated.Geometry import Geometry as FbsGeometry
 from .generated.GeometryDataUnion import GeometryDataUnion as FbsGeometryDataUnion
 from .generated.GeometrySource import GeometrySource as FbsGeometrySource
 from .generated.QueryPathElementUnion import QueryPathElementUnion as FbsQueryPathElementUnion
+from .generated.TimeSource import TimeSource as FbsTimeSource
 from .generated.Type import Type as FbsType
 from .generated.UlFieldRelationshipData import UlFieldRelationshipData as FbsUlFieldRelationshipData
 from .generated.Value import Value as FbsValue
@@ -1417,6 +1420,155 @@ class GeometrySource:
     @classmethod
     def make_default(cls) -> Self:
         return cls(NoGeometry.make_default())
+
+    def __eq__(self, other) -> bool:
+        if type(self.value) is not type(other.value):
+            return False
+        return self.value == other.value
+
+@dataclass
+class NoTime:
+    """ The dataset records no observation time, so no consumer should offer time
+     filtering over it.
+    """
+
+    @classmethod
+    def from_fbs(cls, o: FbsNoTime) -> Self:
+        return cls()
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsNoTime.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.NoTime import (
+            Start,
+            End,
+        )
+
+        Start(builder)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        return cls()
+
+    def __eq__(self, other) -> bool:
+        eq = True
+
+        return eq
+
+@dataclass
+class ColumnTime:
+    """ Every row is observed at an instant, recorded in this column.
+    """
+
+    column: "str"
+
+    @classmethod
+    def from_fbs(cls, o: FbsColumnTime) -> Self:
+        column_str = o.Column()
+        assert column_str is not None
+        column = column_str.decode('utf-8')
+        return cls(column)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsColumnTime.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.ColumnTime import (
+            Start,
+            AddColumn,
+            End,
+        )
+        column_offset = builder.CreateString(self.column)
+
+        Start(builder)
+        AddColumn(builder, column_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        column = ""
+        return cls(column)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.column == other.column
+
+        return eq
+
+@dataclass
+class TimeSource:
+    """ Where a dataset records the time its rows are observed. Declared rather
+     than inferred: a stream's time axis is not derivable from its schema, since
+     several of its columns may be datetimes -- a scheduled time, an actual
+     time, an ingestion stamp -- and only one of them is the axis a consumer
+     should filter on.
+
+     Streams whose rows are valid over a window rather than at an instant
+     (slowly-changing dimensions, carrying a validity start and end) declare
+     NoTime. Declaring the window's start as a ColumnTime would be worse than
+     declaring nothing: a consumer would filter validity starts as though they
+     were observations, dropping rows whose window covers the requested range
+     but whose start does not fall inside it. Give those streams their own
+     variant naming both columns once a consumer needs to filter them properly.
+
+     Append new variants only -- a union member's position is its wire value, so
+     inserting one would silently reinterpret existing stored metadata.
+    """
+
+    value: Union[
+        "NoTime",
+        "ColumnTime",
+    ]
+
+    def serialize_to(self, builder: Builder) -> Tuple[int, int]:
+        from .generated.TimeSource import TimeSource
+        offset = self.value.serialize_to(builder)
+        if isinstance(self.value, NoTime):
+            return (offset, TimeSource().NoTime)
+        elif isinstance(self.value, ColumnTime):
+            return (offset, TimeSource().ColumnTime)
+        raise ValueError("Invalid union type")
+
+    @classmethod
+    def from_fbs(cls, o: Optional[Table], ty: int) -> Self:
+        assert o is not None
+        source = o.Bytes
+        pos = o.Pos
+        TimeSource_ty_instance = FbsTimeSource()
+        if ty == TimeSource_ty_instance.NoTime:
+            val = FbsNoTime();
+            val.Init(source, pos)
+            return cls(NoTime.from_fbs(val))
+        elif ty == TimeSource_ty_instance.ColumnTime:
+            val = FbsColumnTime();
+            val.Init(source, pos)
+            return cls(ColumnTime.from_fbs(val))
+        else:
+            raise ValueError("Invalid union type")
+
+    @classmethod
+    def make_default(cls) -> Self:
+        return cls(NoTime.make_default())
 
     def __eq__(self, other) -> bool:
         if type(self.value) is not type(other.value):
@@ -2716,6 +2868,12 @@ class Metadata:
 
     summary: Optional["List[int]"]
 
+    # Which of the dataset's columns carries the time its rows are observed;
+    # see TimeSource. Unset on metadata written before this field existed, in
+    # which case a consumer falls back to recognising the conventional column
+    # names.
+    time_source: Optional["TimeSource"]
+
     update_cadence: "UpdateCadence"
 
     # Indices of non-numeric fields that are "visualized in Explore" — they
@@ -2779,12 +2937,17 @@ class Metadata:
         if not o.SummaryIsNone():
             for i in range(o.SummaryLength()):
                 summary.append(o.Summary(i))
+        time_source = None
+        time_source_val = o.TimeSource()
+        if time_source_val is not None:
+            time_source_ty = o.TimeSourceType()
+            time_source = TimeSource.from_fbs(time_source_val, time_source_ty)
         update_cadence = UpdateCadence(o.UpdateCadence())
         visualize_in_explore_fields = list()
         if not o.VisualizeInExploreFieldsIsNone():
             for i in range(o.VisualizeInExploreFieldsLength()):
                 visualize_in_explore_fields.append(o.VisualizeInExploreFields(i))
-        return cls(area_selection, dataset_category, description, detail_sections, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, promoted_metrics, source, summary, update_cadence, visualize_in_explore_fields)
+        return cls(area_selection, dataset_category, description, detail_sections, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, promoted_metrics, source, summary, time_source, update_cadence, visualize_in_explore_fields)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -2815,6 +2978,8 @@ class Metadata:
             AddSource,
             AddSummary,
             StartSummaryVector,
+            AddTimeSource,
+            AddTimeSourceType,
             AddUpdateCadence,
             AddVisualizeInExploreFields,
             StartVisualizeInExploreFieldsVector,
@@ -2871,6 +3036,9 @@ class Metadata:
             for i in reversed(range(len(self.summary))):
                 builder.PrependInt32(self.summary[i])
             summary_offset = builder.EndVector()
+        time_source_offset, time_source_ty = (None, None)
+        if self.time_source is not None:
+            time_source_offset, time_source_ty = self.time_source.serialize_to(builder)
         visualize_in_explore_fields_offset = None
         if self.visualize_in_explore_fields is not None:
             StartVisualizeInExploreFieldsVector(builder, len(self.visualize_in_explore_fields))
@@ -2903,6 +3071,9 @@ class Metadata:
             AddSource(builder, source_offset)
         if summary_offset is not None:
             AddSummary(builder, summary_offset)
+        if time_source_offset is not None and time_source_ty is not None:
+            AddTimeSource(builder, time_source_offset)
+            AddTimeSourceType(builder, time_source_ty)
         AddUpdateCadence(builder, self.update_cadence.value)
         if visualize_in_explore_fields_offset is not None:
             AddVisualizeInExploreFields(builder, visualize_in_explore_fields_offset)
@@ -2930,9 +3101,10 @@ class Metadata:
         promoted_metrics = []
         source = DatasetSource.make_default()
         summary = []
+        time_source = TimeSource.make_default()
         update_cadence = UpdateCadence(0)
         visualize_in_explore_fields = []
-        return cls(area_selection, dataset_category, description, detail_sections, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, promoted_metrics, source, summary, update_cadence, visualize_in_explore_fields)
+        return cls(area_selection, dataset_category, description, detail_sections, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, promoted_metrics, source, summary, time_source, update_cadence, visualize_in_explore_fields)
 
     def __eq__(self, other) -> bool:
         eq = True
@@ -3000,6 +3172,7 @@ class Metadata:
             return False
         elif self_summary is None and other_summary is not None:
             return False
+        eq = eq and self.time_source == other.time_source
         eq = eq and self.update_cadence == other.update_cadence
         self_visualize_in_explore_fields = self.visualize_in_explore_fields
         other_visualize_in_explore_fields = other.visualize_in_explore_fields

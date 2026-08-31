@@ -78,6 +78,21 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const GeometrySource &o)
     }
 }
 
+std::pair<::flatbuffers::Offset<void>, ::TimeSource>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TimeSource &o) {
+    if (std::holds_alternative<std::shared_ptr<NoTime>>(o)) {
+        const std::shared_ptr<NoTime> &v = std::get<std::shared_ptr<NoTime>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::TimeSource::NoTime);
+    } else if (std::holds_alternative<std::shared_ptr<ColumnTime>>(o)) {
+        const std::shared_ptr<ColumnTime> &v = std::get<std::shared_ptr<ColumnTime>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::TimeSource::ColumnTime);
+    } else { 
+        throw std::runtime_error("unreachable");
+    }
+}
+
 std::pair<::flatbuffers::Offset<void>, ::UlFieldRelationshipData>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UlFieldRelationshipData &o) {
     if (std::holds_alternative<std::shared_ptr<HierarchyRelationshipData>>(o)) {
@@ -859,6 +874,83 @@ DatacatalogLatLngGeometry::operator==(const DatacatalogLatLngGeometry &rhs) cons
         return false;
     }
     if (this->lng_column_ != rhs.lng_column_) {
+        return false;
+    }
+    return true;
+}
+
+::flatbuffers::Offset<::NoTime>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NoTime &) {
+
+    ::NoTimeBuilder instance_builder = ::NoTimeBuilder(builder);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const NoTime &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+NoTime::NoTime() {
+}
+
+NoTime::NoTime(const std::vector<uint8_t> &bytes)
+    : NoTime(::flatbuffers::GetSizePrefixedRoot<::NoTime>(bytes.data())) {
+}
+
+NoTime::NoTime(const ::NoTime *root)  {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+}
+
+bool
+NoTime::operator==(const NoTime &rhs) const {
+    (void)rhs;
+    return true;
+}
+
+::flatbuffers::Offset<::ColumnTime>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ColumnTime &o) {
+    const ::flatbuffers::Offset<::flatbuffers::String> column_offset = builder.CreateString(o.column_);
+
+    ::ColumnTimeBuilder instance_builder = ::ColumnTimeBuilder(builder);
+    instance_builder.add_column(column_offset);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const ColumnTime &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+ColumnTime::ColumnTime()
+    : column_() {
+}
+
+ColumnTime::ColumnTime(const std::vector<uint8_t> &bytes)
+    : ColumnTime(::flatbuffers::GetSizePrefixedRoot<::ColumnTime>(bytes.data())) {
+}
+
+ColumnTime::ColumnTime(const ::ColumnTime *root) 
+    : column_() {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+        column_ = std::string(*root->column()->begin(), *root->column()->end());
+}
+
+bool
+ColumnTime::operator==(const ColumnTime &rhs) const {
+    if (this->column_ != rhs.column_) {
         return false;
     }
     return true;
@@ -2027,6 +2119,11 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Metadata &o) {
         const decltype(builder.CreateVector(o.summary_.value())) summary_offset_val = builder.CreateVector(o.summary_.value());
         summary_offset = std::make_optional(summary_offset_val);
     }
+    std::optional<std::pair<::flatbuffers::Offset<void>, ::TimeSource>> time_source_offset = std::nullopt;
+    if (o.time_source_.has_value()) {
+        const std::pair<::flatbuffers::Offset<void>, ::TimeSource> time_source_offset_val = serialize_to(builder, o.time_source_.value());
+        time_source_offset = std::make_optional(time_source_offset_val);
+    }
     std::optional<decltype(builder.CreateVector(o.visualize_in_explore_fields_.value()))> visualize_in_explore_fields_offset = std::nullopt;
     if (o.visualize_in_explore_fields_.has_value()) {
         const decltype(builder.CreateVector(o.visualize_in_explore_fields_.value())) visualize_in_explore_fields_offset_val = builder.CreateVector(o.visualize_in_explore_fields_.value());
@@ -2068,6 +2165,11 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Metadata &o) {
     if (summary_offset.has_value()) {
         instance_builder.add_summary(summary_offset.value());
     }
+    if (time_source_offset.has_value()) {
+        const auto time_source_opt = time_source_offset.value();
+        instance_builder.add_time_source(time_source_opt.first);
+        instance_builder.add_time_source_type(time_source_opt.second);
+    }
     instance_builder.add_update_cadence(o.update_cadence_);
     if (visualize_in_explore_fields_offset.has_value()) {
         instance_builder.add_visualize_in_explore_fields(visualize_in_explore_fields_offset.value());
@@ -2098,6 +2200,7 @@ Metadata::Metadata()
     , promoted_metrics_(std::nullopt)
     , source_(std::nullopt)
     , summary_(std::nullopt)
+    , time_source_(std::nullopt)
     , update_cadence_(UpdateCadence(0))
     , visualize_in_explore_fields_(std::nullopt) {
 }
@@ -2121,6 +2224,7 @@ Metadata::Metadata(const ::Metadata *root)
     , promoted_metrics_(std::nullopt)
     , source_(std::nullopt)
     , summary_(std::nullopt)
+    , time_source_(std::nullopt)
     , update_cadence_(UpdateCadence(0))
     , visualize_in_explore_fields_(std::nullopt) {
     if (root == nullptr) {
@@ -2210,6 +2314,24 @@ Metadata::Metadata(const ::Metadata *root)
         std::copy(summary_vector->begin(), summary_vector->end(), std::back_inserter(summary__target));
         summary_ = std::make_optional(summary__target);
     }
+    if (root->time_source() != nullptr) {
+        switch (root->time_source_type()) {
+            case ::TimeSource::NONE: throw std::runtime_error("unexpected none variant");
+            case ::TimeSource::NoTime: {
+                const auto time_source__local = static_cast<const ::NoTime *>(root->time_source());
+                std::shared_ptr<NoTime> time_source__shared = std::make_shared<NoTime>(time_source__local);
+                time_source_ = time_source__shared;
+                break;
+            }
+            case ::TimeSource::ColumnTime: {
+                const auto time_source__local = static_cast<const ::ColumnTime *>(root->time_source());
+                std::shared_ptr<ColumnTime> time_source__shared = std::make_shared<ColumnTime>(time_source__local);
+                time_source_ = time_source__shared;
+                break;
+            }
+            default: throw std::runtime_error("unknown union variant");
+        }
+    }
     update_cadence_ = root->update_cadence();
     const auto &visualize_in_explore_fields_vector = root->visualize_in_explore_fields();
     if (visualize_in_explore_fields_vector != nullptr) {
@@ -2261,6 +2383,9 @@ Metadata::operator==(const Metadata &rhs) const {
         return false;
     }
     if (this->summary_ != rhs.summary_) {
+        return false;
+    }
+    if (this->time_source_ != rhs.time_source_) {
         return false;
     }
     if (this->update_cadence_ != rhs.update_cadence_) {

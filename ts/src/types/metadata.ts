@@ -5,6 +5,7 @@
 import * as flatbuffers from 'flatbuffers/js/flatbuffers';
 
 import { CategoryRelationshipData as FbsCategoryRelationshipData, CategoryRelationshipDataT as FbsCategoryRelationshipDataT } from './generated/category-relationship-data';
+import { ColumnTime as FbsColumnTime, ColumnTimeT as FbsColumnTimeT } from './generated/column-time';
 import { ComponentData as FbsComponentData } from './generated/component-data';
 import { ContactInfo as FbsContactInfo, ContactInfoT as FbsContactInfoT } from './generated/contact-info';
 import { DatacatalogGeometry as FbsDatacatalogGeometry, DatacatalogGeometryT as FbsDatacatalogGeometryT } from './generated/datacatalog-geometry';
@@ -35,11 +36,13 @@ import { NestedHierarchyRelationshipNode as FbsNestedHierarchyRelationshipNode, 
 import { NestedStringCategories as FbsNestedStringCategories, NestedStringCategoriesT as FbsNestedStringCategoriesT } from './generated/nested-string-categories';
 import { NestedStringCategoryNode as FbsNestedStringCategoryNode, NestedStringCategoryNodeT as FbsNestedStringCategoryNodeT } from './generated/nested-string-category-node';
 import { NoGeometry as FbsNoGeometry, NoGeometryT as FbsNoGeometryT } from './generated/no-geometry';
+import { NoTime as FbsNoTime, NoTimeT as FbsNoTimeT } from './generated/no-time';
 import { NumericalFieldFormat as FbsNumericalFieldFormat, NumericalFieldFormatT as FbsNumericalFieldFormatT } from './generated/numerical-field-format';
 import { RawGeom as FbsRawGeom, RawGeomT as FbsRawGeomT } from './generated/raw-geom';
 import { StringAggregate as FbsStringAggregate, StringAggregateT as FbsStringAggregateT } from './generated/string-aggregate';
 import { StringCategories as FbsStringCategories, StringCategoriesT as FbsStringCategoriesT } from './generated/string-categories';
 import { TimeInterval as FbsTimeInterval, TimeIntervalT as FbsTimeIntervalT } from './generated/time-interval';
+import { TimeSource as FbsTimeSource } from './generated/time-source';
 import { UIntAggregate as FbsUIntAggregate, UIntAggregateT as FbsUIntAggregateT } from './generated/uint-aggregate';
 import { UIntBucket as FbsUIntBucket, UIntBucketT as FbsUIntBucketT } from './generated/uint-bucket';
 import { UlField as FbsUlField, UlFieldT as FbsUlFieldT } from './generated/ul-field';
@@ -989,6 +992,102 @@ export class DatacatalogLatLngGeometry {
 export type GeometrySource = NoGeometry | DatacatalogGeometry | WorldGraphGeometry | DatacatalogLatLngGeometry;
 
 export { NumericalFieldValueType } from './generated/numerical-field-value-type';
+
+/**
+ *  The dataset records no observation time, so no consumer should offer time
+ *  filtering over it.
+ */
+export class NoTime {
+  constructor(arg?: FbsNoTime | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsNoTime.getSizePrefixedRootAsNoTime(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsNoTime) {
+      this._initFromFbs(arg);
+    } else {
+    }
+  }
+
+  private _initFromFbs(fbs: FbsNoTime): void {
+  }
+
+  toFbsT(): FbsNoTimeT {
+    const t = new FbsNoTimeT();
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+}
+
+/**
+ *  Every row is observed at an instant, recorded in this column.
+ */
+export class ColumnTime {
+  private _column!: string;
+
+  constructor(arg?: FbsColumnTime | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsColumnTime.getSizePrefixedRootAsColumnTime(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsColumnTime) {
+      this._initFromFbs(arg);
+    } else {
+      this._column = '';
+    }
+  }
+
+  private _initFromFbs(fbs: FbsColumnTime): void {
+    this._column = fbs.column() ?? '';
+  }
+
+  get column(): string {
+    return this._column;
+  }
+
+  set column(value: string) {
+    this._column = value;
+  }
+
+  toFbsT(): FbsColumnTimeT {
+    const t = new FbsColumnTimeT();
+    t.column = this._column;
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+}
+
+/**
+ *  Where a dataset records the time its rows are observed. Declared rather
+ *  than inferred: a stream's time axis is not derivable from its schema, since
+ *  several of its columns may be datetimes -- a scheduled time, an actual
+ *  time, an ingestion stamp -- and only one of them is the axis a consumer
+ *  should filter on.
+ *
+ *  Streams whose rows are valid over a window rather than at an instant
+ *  (slowly-changing dimensions, carrying a validity start and end) declare
+ *  NoTime. Declaring the window's start as a ColumnTime would be worse than
+ *  declaring nothing: a consumer would filter validity starts as though they
+ *  were observations, dropping rows whose window covers the requested range
+ *  but whose start does not fall inside it. Give those streams their own
+ *  variant naming both columns once a consumer needs to filter them properly.
+ *
+ *  Append new variants only -- a union member's position is its wire value, so
+ *  inserting one would silently reinterpret existing stored metadata.
+ */
+export type TimeSource = NoTime | ColumnTime;
 
 export class HierarchyRelationshipData {
   private _hierarchy!: HierarchicalRelationship[] | null;
@@ -2128,6 +2227,14 @@ export class Metadata {
 
   private _summary!: number[] | null;
 
+/**
+ *  Which of the dataset's columns carries the time its rows are observed;
+ *  see TimeSource. Unset on metadata written before this field existed, in
+ *  which case a consumer falls back to recognising the conventional column
+ *  names.
+ */
+  private _timeSource!: TimeSource | null;
+
   private _updateCadence!: number;
 
 /**
@@ -2159,6 +2266,7 @@ export class Metadata {
       this._promotedMetrics = null;
       this._source = null;
       this._summary = null;
+      this._timeSource = null;
       this._updateCadence = 0;
       this._visualizeInExploreFields = null;
     }
@@ -2223,6 +2331,16 @@ export class Metadata {
       this._summary = Array.from({ length: fbs.summaryLength() }, (_, i) => fbs.summary(i)!);
     } else {
       this._summary = null;
+    }
+    const timeSourceTy = fbs.timeSourceType();
+    if (timeSourceTy === FbsTimeSource.NoTime) {
+      const timeSourceFbsVal = fbs.timeSource(new FbsNoTime());
+      this._timeSource = timeSourceFbsVal ? new NoTime(timeSourceFbsVal) : null;
+    } else if (timeSourceTy === FbsTimeSource.ColumnTime) {
+      const timeSourceFbsVal = fbs.timeSource(new FbsColumnTime());
+      this._timeSource = timeSourceFbsVal ? new ColumnTime(timeSourceFbsVal) : null;
+    } else {
+      this._timeSource = null;
     }
     this._updateCadence = fbs.updateCadence();
     if (fbs.visualizeInExploreFieldsLength() > 0) {
@@ -2344,6 +2462,14 @@ export class Metadata {
     this._summary = value;
   }
 
+  get timeSource(): TimeSource | null {
+    return this._timeSource;
+  }
+
+  set timeSource(value: TimeSource | null) {
+    this._timeSource = value;
+  }
+
   get updateCadence(): number {
     return this._updateCadence;
   }
@@ -2388,6 +2514,13 @@ export class Metadata {
     t.promotedMetrics = this._promotedMetrics ?? [];
     t.source = this._source ? this._source.toFbsT() : null;
     t.summary = this._summary ?? [];
+    if (this._timeSource instanceof NoTime) {
+      t.timeSourceType = FbsTimeSource.NoTime;
+      t.timeSource = this._timeSource.toFbsT();
+    } else if (this._timeSource instanceof ColumnTime) {
+      t.timeSourceType = FbsTimeSource.ColumnTime;
+      t.timeSource = this._timeSource.toFbsT();
+    }
     t.updateCadence = this._updateCadence;
     t.visualizeInExploreFields = this._visualizeInExploreFields ?? [];
     return t;

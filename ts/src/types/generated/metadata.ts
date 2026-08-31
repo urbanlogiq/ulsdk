@@ -8,6 +8,7 @@
 
 import * as flatbuffers from 'flatbuffers/js/flatbuffers';
 
+import { ColumnTime, ColumnTimeT } from './column-time';
 import { DatacatalogGeometry, DatacatalogGeometryT } from './datacatalog-geometry';
 import { DatacatalogLatLngGeometry, DatacatalogLatLngGeometryT } from './datacatalog-lat-lng-geometry';
 import { DatasetCategory } from './dataset-category';
@@ -16,6 +17,8 @@ import { DetailSection, DetailSectionT } from './detail-section';
 import { EntityTy } from './entity-ty';
 import { GeometrySource, unionToGeometrySource, unionListToGeometrySource } from './geometry-source';
 import { NoGeometry, NoGeometryT } from './no-geometry';
+import { NoTime, NoTimeT } from './no-time';
+import { TimeSource, unionToTimeSource, unionListToTimeSource } from './time-source';
 import { UlField, UlFieldT } from './ul-field';
 import { UlFieldRelationship, UlFieldRelationshipT } from './ul-field-relationship';
 import { UpdateCadence } from './update-cadence';
@@ -212,8 +215,24 @@ detailSectionsLength():number {
   return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
 }
 
+timeSourceType():TimeSource {
+  const offset = this.bb!.__offset(this.bb_pos, 38);
+  return offset ? this.bb!.readUint8(this.bb_pos + offset) : TimeSource.NONE;
+}
+
+/**
+ * Which of the dataset's columns carries the time its rows are observed;
+ * see TimeSource. Unset on metadata written before this field existed, in
+ * which case a consumer falls back to recognising the conventional column
+ * names.
+ */
+timeSource<T extends flatbuffers.Table>(obj:any):any|null {
+  const offset = this.bb!.__offset(this.bb_pos, 40);
+  return offset ? this.bb!.__union(obj, this.bb_pos + offset) : null;
+}
+
 static startMetadata(builder:flatbuffers.Builder) {
-  builder.startObject(17);
+  builder.startObject(19);
 }
 
 static addDisplayName(builder:flatbuffers.Builder, displayNameOffset:flatbuffers.Offset) {
@@ -371,6 +390,14 @@ static startDetailSectionsVector(builder:flatbuffers.Builder, numElems:number) {
   builder.startVector(4, numElems, 4);
 }
 
+static addTimeSourceType(builder:flatbuffers.Builder, timeSourceType:TimeSource) {
+  builder.addFieldInt8(17, timeSourceType, TimeSource.NONE);
+}
+
+static addTimeSource(builder:flatbuffers.Builder, timeSourceOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(18, timeSourceOffset, 0);
+}
+
 static endMetadata(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   return offset;
@@ -407,7 +434,13 @@ unpack(): MetadataT {
     this.locationDescriptionField(),
     this.bb!.createScalarList<number>(this.promotedMetrics.bind(this), this.promotedMetricsLength()),
     this.bb!.createScalarList<number>(this.visualizeInExploreFields.bind(this), this.visualizeInExploreFieldsLength()),
-    this.bb!.createObjList<DetailSection, DetailSectionT>(this.detailSections.bind(this), this.detailSectionsLength())
+    this.bb!.createObjList<DetailSection, DetailSectionT>(this.detailSections.bind(this), this.detailSectionsLength()),
+    this.timeSourceType(),
+    (() => {
+      const temp = unionToTimeSource(this.timeSourceType(), this.timeSource.bind(this));
+      if(temp === null) { return null; }
+      return temp.unpack()
+  })()
   );
 }
 
@@ -434,6 +467,12 @@ unpackTo(_o: MetadataT): void {
   _o.promotedMetrics = this.bb!.createScalarList<number>(this.promotedMetrics.bind(this), this.promotedMetricsLength());
   _o.visualizeInExploreFields = this.bb!.createScalarList<number>(this.visualizeInExploreFields.bind(this), this.visualizeInExploreFieldsLength());
   _o.detailSections = this.bb!.createObjList<DetailSection, DetailSectionT>(this.detailSections.bind(this), this.detailSectionsLength());
+  _o.timeSourceType = this.timeSourceType();
+  _o.timeSource = (() => {
+      const temp = unionToTimeSource(this.timeSourceType(), this.timeSource.bind(this));
+      if(temp === null) { return null; }
+      return temp.unpack()
+  })();
 }
 }
 
@@ -455,7 +494,9 @@ constructor(
   public locationDescriptionField: number = -1,
   public promotedMetrics: (number)[] = [],
   public visualizeInExploreFields: (number)[] = [],
-  public detailSections: (DetailSectionT)[] = []
+  public detailSections: (DetailSectionT)[] = [],
+  public timeSourceType: TimeSource = TimeSource.NONE,
+  public timeSource: ColumnTimeT|NoTimeT|null = null
 ){}
 
 
@@ -470,6 +511,7 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   const promotedMetrics = Metadata.createPromotedMetricsVector(builder, this.promotedMetrics);
   const visualizeInExploreFields = Metadata.createVisualizeInExploreFieldsVector(builder, this.visualizeInExploreFields);
   const detailSections = Metadata.createDetailSectionsVector(builder, builder.createObjectOffsetList(this.detailSections));
+  const timeSource = builder.createObjectOffset(this.timeSource);
 
   Metadata.startMetadata(builder);
   Metadata.addDisplayName(builder, displayName);
@@ -489,6 +531,8 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   Metadata.addPromotedMetrics(builder, promotedMetrics);
   Metadata.addVisualizeInExploreFields(builder, visualizeInExploreFields);
   Metadata.addDetailSections(builder, detailSections);
+  Metadata.addTimeSourceType(builder, this.timeSourceType);
+  Metadata.addTimeSource(builder, timeSource);
 
   return Metadata.endMetadata(builder);
 }

@@ -82,8 +82,9 @@ use crate::types::generated::id_generated::{
 };
 use crate::types::generated::metadata_generated::{
     AggregationFunction as FbsAggregationFunction,
-    CategoryRelationshipData as FbsCategoryRelationshipData, ComponentData as FbsComponentData,
-    ContactInfo as FbsContactInfo, DatacatalogGeometry as FbsDatacatalogGeometry,
+    CategoryRelationshipData as FbsCategoryRelationshipData, ColumnTime as FbsColumnTime,
+    ComponentData as FbsComponentData, ContactInfo as FbsContactInfo,
+    DatacatalogGeometry as FbsDatacatalogGeometry,
     DatacatalogLatLngGeometry as FbsDatacatalogLatLngGeometry,
     DatasetCategory as FbsDatasetCategory, DatasetSource as FbsDatasetSource, Dates as FbsDates,
     DatetimeRange as FbsDatetimeRange, DetailSection as FbsDetailSection, Document as FbsDocument,
@@ -101,11 +102,11 @@ use crate::types::generated::metadata_generated::{
     NestedHierarchyRelationshipNode as FbsNestedHierarchyRelationshipNode,
     NestedStringCategories as FbsNestedStringCategories,
     NestedStringCategoryNode as FbsNestedStringCategoryNode, NoGeometry as FbsNoGeometry,
-    NumericalFieldFormat as FbsNumericalFieldFormat,
+    NoTime as FbsNoTime, NumericalFieldFormat as FbsNumericalFieldFormat,
     NumericalFieldValueType as FbsNumericalFieldValueType, RawGeom as FbsRawGeom,
     StringAggregate as FbsStringAggregate, StringCategories as FbsStringCategories,
-    TimeInterval as FbsTimeInterval, UIntAggregate as FbsUIntAggregate,
-    UIntBucket as FbsUIntBucket, UlField as FbsUlField,
+    TimeInterval as FbsTimeInterval, TimeSource as FbsTimeSource,
+    UIntAggregate as FbsUIntAggregate, UIntBucket as FbsUIntBucket, UlField as FbsUlField,
     UlFieldRelationship as FbsUlFieldRelationship,
     UlFieldRelationshipData as FbsUlFieldRelationshipData, UlFieldType as FbsUlFieldType,
     UpdateCadence as FbsUpdateCadence, WorldGraphGeometry as FbsWorldGraphGeometry,
@@ -201,7 +202,6 @@ impl From<FbsAggregationFunction> for AggregationFunction {
 #[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum DatasetCategory {
-    #[default]
     DC_BUSINESSES = 0,
     DC_DEMOGRAPHICS = 1,
     DC_ECONOMICS = 2,
@@ -212,6 +212,7 @@ pub enum DatasetCategory {
     DC_WEATHER = 7,
     DC_BOUNDARY = 8,
     DC_HEALTH = 9,
+    #[default]
     DC_HIDDEN = 4294967295,
 }
 
@@ -1588,6 +1589,141 @@ impl GeometrySource {
     }
 }
 
+/// The dataset records no observation time, so no consumer should offer time
+/// filtering over it.
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+pub struct NoTime {}
+
+impl NoTime {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsNoTime<'a>> {
+        use crate::types::generated::metadata_generated::NoTimeBuilder as FbsNoTimeBuilder;
+
+        let mut bldr = FbsNoTimeBuilder::new(builder);
+        bldr.finish()
+    }
+}
+
+impl From<FbsNoTime<'_>> for NoTime {
+    fn from(fbs: FbsNoTime<'_>) -> Self {
+        Self {}
+    }
+}
+
+impl crate::FbsSerde for NoTime {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsNoTime>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+/// Every row is observed at an instant, recorded in this column.
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+pub struct ColumnTime {
+    pub column: String,
+}
+
+impl ColumnTime {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsColumnTime<'a>> {
+        use crate::types::generated::metadata_generated::ColumnTimeBuilder as FbsColumnTimeBuilder;
+
+        let column_offset = builder.create_string(&self.column);
+
+        let mut bldr = FbsColumnTimeBuilder::new(builder);
+        bldr.add_column(column_offset);
+        bldr.finish()
+    }
+}
+
+impl From<FbsColumnTime<'_>> for ColumnTime {
+    fn from(fbs: FbsColumnTime<'_>) -> Self {
+        let column = fbs.column().to_owned();
+        Self { column }
+    }
+}
+
+impl crate::FbsSerde for ColumnTime {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsColumnTime>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+/// Where a dataset records the time its rows are observed. Declared rather
+/// than inferred: a stream's time axis is not derivable from its schema, since
+/// several of its columns may be datetimes -- a scheduled time, an actual
+/// time, an ingestion stamp -- and only one of them is the axis a consumer
+/// should filter on.
+///
+/// Streams whose rows are valid over a window rather than at an instant
+/// (slowly-changing dimensions, carrying a validity start and end) declare
+/// NoTime. Declaring the window's start as a ColumnTime would be worse than
+/// declaring nothing: a consumer would filter validity starts as though they
+/// were observations, dropping rows whose window covers the requested range
+/// but whose start does not fall inside it. Give those streams their own
+/// variant naming both columns once a consumer needs to filter them properly.
+///
+/// Append new variants only -- a union member's position is its wire value, so
+/// inserting one would silently reinterpret existing stored metadata.
+#[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
+pub enum TimeSource {
+    NoTime(NoTime),
+    ColumnTime(ColumnTime),
+}
+
+impl Default for TimeSource {
+    fn default() -> Self {
+        Self::NoTime(NoTime::default())
+    }
+}
+
+impl TimeSource {
+    pub fn serialize_to(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder,
+    ) -> (WIPOffset<UnionWIPOffset>, FbsTimeSource) {
+        match self {
+            Self::NoTime(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsTimeSource::NoTime;
+                (offset, ty)
+            }
+            Self::ColumnTime(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsTimeSource::ColumnTime;
+                (offset, ty)
+            }
+        }
+    }
+}
+
 #[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct HierarchyRelationshipData {
     pub hierarchy: Option<Vec<HierarchicalRelationship>>,
@@ -2682,6 +2818,11 @@ pub struct Metadata {
     /// where the data has come from
     pub source: Option<DatasetSource>,
     pub summary: Option<Vec<i32>>,
+    /// Which of the dataset's columns carries the time its rows are observed;
+    /// see TimeSource. Unset on metadata written before this field existed, in
+    /// which case a consumer falls back to recognising the conventional column
+    /// names.
+    pub time_source: Option<TimeSource>,
     pub update_cadence: UpdateCadence,
     /// Indices of non-numeric fields that are "visualized in Explore" — they
     /// appear as a categorical color visualization on Generic layers but, unlike
@@ -2738,6 +2879,7 @@ impl Metadata {
             let summary_offset = builder.create_vector(&v);
             summary_offset
         });
+        let time_source_offset = self.time_source.as_ref().map(|u| u.serialize_to(builder));
         let visualize_in_explore_fields_offset =
             self.visualize_in_explore_fields.as_ref().map(|v| {
                 let visualize_in_explore_fields_offset = builder.create_vector(&v);
@@ -2777,6 +2919,10 @@ impl Metadata {
         }
         if let Some(offset) = summary_offset {
             bldr.add_summary(offset);
+        }
+        if let Some((offset, ty)) = time_source_offset {
+            bldr.add_time_source(offset);
+            bldr.add_time_source_type(ty);
         }
         bldr.add_update_cadence(FbsUpdateCadence::from(self.update_cadence));
         if let Some(offset) = visualize_in_explore_fields_offset {
@@ -2880,6 +3026,22 @@ impl From<FbsMetadata<'_>> for Metadata {
             None
         };
 
+        let time_source = if let Some(val) = fbs.time_source() {
+            let time_source = match fbs.time_source_type() {
+                FbsTimeSource::NoTime => {
+                    TimeSource::NoTime(NoTime::from(fbs.time_source_as_no_time().unwrap()))
+                }
+                FbsTimeSource::ColumnTime => TimeSource::ColumnTime(ColumnTime::from(
+                    fbs.time_source_as_column_time().unwrap(),
+                )),
+                _ => unreachable!(),
+            };
+
+            Some(time_source)
+        } else {
+            None
+        };
+
         let update_cadence = UpdateCadence::from(fbs.update_cadence());
         let visualize_in_explore_fields = if let Some(val) = fbs.visualize_in_explore_fields() {
             let mut visualize_in_explore_fields = Vec::new();
@@ -2907,6 +3069,7 @@ impl From<FbsMetadata<'_>> for Metadata {
             promoted_metrics,
             source,
             summary,
+            time_source,
             update_cadence,
             visualize_in_explore_fields,
         }
@@ -2948,6 +3111,7 @@ impl Default for Metadata {
             promoted_metrics: None,
             source: None,
             summary: None,
+            time_source: None,
             update_cadence: UpdateCadence::default(),
             visualize_in_explore_fields: None,
         }
@@ -3711,6 +3875,14 @@ mod tests {
     }
 
     #[test]
+    fn test_column_time() {
+        let t0 = ColumnTime::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = ColumnTime::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
     fn test_contact_info() {
         let t0 = ContactInfo::default();
         let buf = t0.to_fbs_bytes();
@@ -3907,6 +4079,14 @@ mod tests {
         let t0 = NoGeometry::default();
         let buf = t0.to_fbs_bytes();
         let t1 = NoGeometry::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_no_time() {
+        let t0 = NoTime::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = NoTime::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 

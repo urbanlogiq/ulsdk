@@ -211,6 +211,8 @@ const (
 	FnPercentRank          Fn = 199
 	FnNtile                Fn = 200
 	FnCumeDist             Fn = 201
+	FnStX                  Fn = 202
+	FnStY                  Fn = 203
 	FnCorrelationId        Fn = 32763
 	FnUlTimezone           Fn = 32764
 	FnUlArrayContains      Fn = 32765
@@ -420,6 +422,8 @@ var EnumNamesFn = map[Fn]string{
 	FnPercentRank:          "PercentRank",
 	FnNtile:                "Ntile",
 	FnCumeDist:             "CumeDist",
+	FnStX:                  "StX",
+	FnStY:                  "StY",
 	FnCorrelationId:        "CorrelationId",
 	FnUlTimezone:           "UlTimezone",
 	FnUlArrayContains:      "UlArrayContains",
@@ -629,6 +633,8 @@ var EnumValuesFn = map[string]Fn{
 	"PercentRank":          FnPercentRank,
 	"Ntile":                FnNtile,
 	"CumeDist":             FnCumeDist,
+	"StX":                  FnStX,
+	"StY":                  FnStY,
 	"CorrelationId":        FnCorrelationId,
 	"UlTimezone":           FnUlTimezone,
 	"UlArrayContains":      FnUlArrayContains,

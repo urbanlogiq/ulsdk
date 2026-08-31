@@ -10,6 +10,12 @@ def test_category_relationship_data():
     _t1 = CategoryRelationshipData.from_bytes(_b)
     assert _t0 == _t1
 
+def test_column_time():
+    _t0 = ColumnTime.make_default()
+    _b = _t0.to_bytes()
+    _t1 = ColumnTime.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_contact_info():
     _t0 = ContactInfo.make_default()
     _b = _t0.to_bytes()
@@ -158,6 +164,12 @@ def test_no_geometry():
     _t0 = NoGeometry.make_default()
     _b = _t0.to_bytes()
     _t1 = NoGeometry.from_bytes(_b)
+    assert _t0 == _t1
+
+def test_no_time():
+    _t0 = NoTime.make_default()
+    _b = _t0.to_bytes()
+    _t1 = NoTime.from_bytes(_b)
     assert _t0 == _t1
 
 def test_numerical_field_format():

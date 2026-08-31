@@ -116,6 +116,14 @@ public final class Metadata extends com.google.flatbuffers.Table {
   public int detailSectionsLength() { int o = __offset(36); return o != 0 ? __vector_len(o) : 0; }
   public DetailSection._Vector detailSectionsVector() { return detailSectionsVector(new DetailSection._Vector()); }
   public DetailSection._Vector detailSectionsVector(DetailSection._Vector obj) { int o = __offset(36); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
+  public byte timeSourceType() { int o = __offset(38); return o != 0 ? bb.get(o + bb_pos) : 0; }
+  /**
+   * Which of the dataset's columns carries the time its rows are observed;
+   * see TimeSource. Unset on metadata written before this field existed, in
+   * which case a consumer falls back to recognising the conventional column
+   * names.
+   */
+  public com.google.flatbuffers.Table timeSource(com.google.flatbuffers.Table obj) { int o = __offset(40); return o != 0 ? __union(obj, o + bb_pos) : null; }
 
   public static int createMetadata(FlatBufferBuilder builder,
       int displayNameOffset,
@@ -134,8 +142,11 @@ public final class Metadata extends com.google.flatbuffers.Table {
       int locationDescriptionField,
       int promotedMetricsOffset,
       int visualizeInExploreFieldsOffset,
-      int detailSectionsOffset) {
-    builder.startTable(17);
+      int detailSectionsOffset,
+      byte timeSourceType,
+      int timeSourceOffset) {
+    builder.startTable(19);
+    Metadata.addTimeSource(builder, timeSourceOffset);
     Metadata.addDetailSections(builder, detailSectionsOffset);
     Metadata.addVisualizeInExploreFields(builder, visualizeInExploreFieldsOffset);
     Metadata.addPromotedMetrics(builder, promotedMetricsOffset);
@@ -150,13 +161,14 @@ public final class Metadata extends com.google.flatbuffers.Table {
     Metadata.addFields(builder, fieldsOffset);
     Metadata.addDescription(builder, descriptionOffset);
     Metadata.addDisplayName(builder, displayNameOffset);
+    Metadata.addTimeSourceType(builder, timeSourceType);
     Metadata.addDoNotFilterGeometryByViewport(builder, doNotFilterGeometryByViewport);
     Metadata.addAreaSelection(builder, areaSelection);
     Metadata.addGeometrySourceType(builder, geometrySourceType);
     return Metadata.endMetadata(builder);
   }
 
-  public static void startMetadata(FlatBufferBuilder builder) { builder.startTable(17); }
+  public static void startMetadata(FlatBufferBuilder builder) { builder.startTable(19); }
   public static void addDisplayName(FlatBufferBuilder builder, int displayNameOffset) { builder.addOffset(0, displayNameOffset, 0); }
   public static void addDescription(FlatBufferBuilder builder, int descriptionOffset) { builder.addOffset(1, descriptionOffset, 0); }
   public static void addFields(FlatBufferBuilder builder, int fieldsOffset) { builder.addOffset(2, fieldsOffset, 0); }
@@ -186,6 +198,8 @@ public final class Metadata extends com.google.flatbuffers.Table {
   public static void addDetailSections(FlatBufferBuilder builder, int detailSectionsOffset) { builder.addOffset(16, detailSectionsOffset, 0); }
   public static int createDetailSectionsVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
   public static void startDetailSectionsVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
+  public static void addTimeSourceType(FlatBufferBuilder builder, byte timeSourceType) { builder.addByte(17, timeSourceType, 0); }
+  public static void addTimeSource(FlatBufferBuilder builder, int timeSourceOffset) { builder.addOffset(18, timeSourceOffset, 0); }
   public static int endMetadata(FlatBufferBuilder builder) {
     int o = builder.endTable();
     return o;

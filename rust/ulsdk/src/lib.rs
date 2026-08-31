@@ -298,3 +298,23 @@ impl Visitor<'_> for PinnedObjectIdVisitor {
         Ok((b, cid))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    /// FlatBuffers declares defaults on fields, so the generator has to derive
+    /// each enum's `#[default]` from the fields typed as it. These are every
+    /// enum in the schema whose declared default is not its first variant --
+    /// the case the generator used to get wrong, silently substituting a real
+    /// value (`DC_BUSINESSES`, `Predicate::NONE`) for the intended one.
+    #[test]
+    fn enum_defaults_match_the_schema() {
+        use crate::types::graph::Predicate;
+        use crate::types::metadata::DatasetCategory;
+        use crate::types::Schema::{DateUnit, TimeUnit};
+
+        assert_eq!(DatasetCategory::default(), DatasetCategory::DC_HIDDEN);
+        assert_eq!(Predicate::default(), Predicate::location);
+        assert_eq!(DateUnit::default(), DateUnit::MILLISECOND);
+        assert_eq!(TimeUnit::default(), TimeUnit::MILLISECOND);
+    }
+}

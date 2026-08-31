@@ -509,6 +509,49 @@ func (v GeometrySource) String() string {
 	return "GeometrySource(" + strconv.FormatInt(int64(v), 10) + ")"
 }
 
+/// Where a dataset records the time its rows are observed. Declared rather
+/// than inferred: a stream's time axis is not derivable from its schema, since
+/// several of its columns may be datetimes -- a scheduled time, an actual
+/// time, an ingestion stamp -- and only one of them is the axis a consumer
+/// should filter on.
+///
+/// Streams whose rows are valid over a window rather than at an instant
+/// (slowly-changing dimensions, carrying a validity start and end) declare
+/// NoTime. Declaring the window's start as a ColumnTime would be worse than
+/// declaring nothing: a consumer would filter validity starts as though they
+/// were observations, dropping rows whose window covers the requested range
+/// but whose start does not fall inside it. Give those streams their own
+/// variant naming both columns once a consumer needs to filter them properly.
+///
+/// Append new variants only -- a union member's position is its wire value, so
+/// inserting one would silently reinterpret existing stored metadata.
+type TimeSource byte
+
+const (
+	TimeSourceNONE       TimeSource = 0
+	TimeSourceNoTime     TimeSource = 1
+	TimeSourceColumnTime TimeSource = 2
+)
+
+var EnumNamesTimeSource = map[TimeSource]string{
+	TimeSourceNONE:       "NONE",
+	TimeSourceNoTime:     "NoTime",
+	TimeSourceColumnTime: "ColumnTime",
+}
+
+var EnumValuesTimeSource = map[string]TimeSource{
+	"NONE":       TimeSourceNONE,
+	"NoTime":     TimeSourceNoTime,
+	"ColumnTime": TimeSourceColumnTime,
+}
+
+func (v TimeSource) String() string {
+	if s, ok := EnumNamesTimeSource[v]; ok {
+		return s
+	}
+	return "TimeSource(" + strconv.FormatInt(int64(v), 10) + ")"
+}
+
 type FloatBucket struct {
 	_tab flatbuffers.Struct
 }
@@ -3704,6 +3747,102 @@ func WorldGraphGeometryAddStartStreamId(builder *flatbuffers.Builder, startStrea
 func WorldGraphGeometryEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
+/// The dataset records no observation time, so no consumer should offer time
+/// filtering over it.
+type NoTime struct {
+	_tab flatbuffers.Table
+}
+
+func GetRootAsNoTime(buf []byte, offset flatbuffers.UOffsetT) *NoTime {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &NoTime{}
+	x.Init(buf, n+offset)
+	return x
+}
+
+func FinishNoTimeBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.Finish(offset)
+}
+
+func GetSizePrefixedRootAsNoTime(buf []byte, offset flatbuffers.UOffsetT) *NoTime {
+	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
+	x := &NoTime{}
+	x.Init(buf, n+offset+flatbuffers.SizeUint32)
+	return x
+}
+
+func FinishSizePrefixedNoTimeBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.FinishSizePrefixed(offset)
+}
+
+func (rcv *NoTime) Init(buf []byte, i flatbuffers.UOffsetT) {
+	rcv._tab.Bytes = buf
+	rcv._tab.Pos = i
+}
+
+func (rcv *NoTime) Table() flatbuffers.Table {
+	return rcv._tab
+}
+
+func NoTimeStart(builder *flatbuffers.Builder) {
+	builder.StartObject(0)
+}
+func NoTimeEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return builder.EndObject()
+}
+/// Every row is observed at an instant, recorded in this column.
+type ColumnTime struct {
+	_tab flatbuffers.Table
+}
+
+func GetRootAsColumnTime(buf []byte, offset flatbuffers.UOffsetT) *ColumnTime {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &ColumnTime{}
+	x.Init(buf, n+offset)
+	return x
+}
+
+func FinishColumnTimeBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.Finish(offset)
+}
+
+func GetSizePrefixedRootAsColumnTime(buf []byte, offset flatbuffers.UOffsetT) *ColumnTime {
+	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
+	x := &ColumnTime{}
+	x.Init(buf, n+offset+flatbuffers.SizeUint32)
+	return x
+}
+
+func FinishSizePrefixedColumnTimeBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.FinishSizePrefixed(offset)
+}
+
+func (rcv *ColumnTime) Init(buf []byte, i flatbuffers.UOffsetT) {
+	rcv._tab.Bytes = buf
+	rcv._tab.Pos = i
+}
+
+func (rcv *ColumnTime) Table() flatbuffers.Table {
+	return rcv._tab
+}
+
+func (rcv *ColumnTime) Column() []byte {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		return rcv._tab.ByteVector(o + rcv._tab.Pos)
+	}
+	return nil
+}
+
+func ColumnTimeStart(builder *flatbuffers.Builder) {
+	builder.StartObject(1)
+}
+func ColumnTimeAddColumn(builder *flatbuffers.Builder, column flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(column), 0)
+}
+func ColumnTimeEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return builder.EndObject()
+}
 /// One group of fields in a feature's selected-state details panel. Sections
 /// render in list order, fields in theirs; the panel draws a rule between
 /// sections. Sections have no names; editors identify them by position.
@@ -4117,8 +4256,37 @@ func (rcv *Metadata) DetailSectionsLength() int {
 /// Sections of fields shown in a feature's selected-state details panel, in
 /// display order, where `summary` is the hover-popup list. When absent, the
 /// details panel falls back to the summary fields.
+func (rcv *Metadata) TimeSourceType() TimeSource {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(38))
+	if o != 0 {
+		return TimeSource(rcv._tab.GetByte(o + rcv._tab.Pos))
+	}
+	return 0
+}
+
+func (rcv *Metadata) MutateTimeSourceType(n TimeSource) bool {
+	return rcv._tab.MutateByteSlot(38, byte(n))
+}
+
+/// Which of the dataset's columns carries the time its rows are observed;
+/// see TimeSource. Unset on metadata written before this field existed, in
+/// which case a consumer falls back to recognising the conventional column
+/// names.
+func (rcv *Metadata) TimeSource(obj *flatbuffers.Table) bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(40))
+	if o != 0 {
+		rcv._tab.Union(obj, o)
+		return true
+	}
+	return false
+}
+
+/// Which of the dataset's columns carries the time its rows are observed;
+/// see TimeSource. Unset on metadata written before this field existed, in
+/// which case a consumer falls back to recognising the conventional column
+/// names.
 func MetadataStart(builder *flatbuffers.Builder) {
-	builder.StartObject(17)
+	builder.StartObject(19)
 }
 func MetadataAddDisplayName(builder *flatbuffers.Builder, displayName flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(displayName), 0)
@@ -4188,6 +4356,12 @@ func MetadataAddDetailSections(builder *flatbuffers.Builder, detailSections flat
 }
 func MetadataStartDetailSectionsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
 	return builder.StartVector(4, numElems, 4)
+}
+func MetadataAddTimeSourceType(builder *flatbuffers.Builder, timeSourceType TimeSource) {
+	builder.PrependByteSlot(17, byte(timeSourceType), 0)
+}
+func MetadataAddTimeSource(builder *flatbuffers.Builder, timeSource flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(18, flatbuffers.UOffsetT(timeSource), 0)
 }
 func MetadataEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()

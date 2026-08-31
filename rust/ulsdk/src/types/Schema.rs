@@ -37,8 +37,8 @@ use crate::types::generated::Schema_generated::{
 #[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i16)]
 pub enum DateUnit {
-    #[default]
     DAY = 0,
+    #[default]
     MILLISECOND = 1,
 }
 
@@ -414,8 +414,8 @@ impl From<FbsPrecision> for Precision {
 #[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i16)]
 pub enum TimeUnit {
-    #[default]
     SECOND = 0,
+    #[default]
     MILLISECOND = 1,
     MICROSECOND = 2,
     NANOSECOND = 3,
