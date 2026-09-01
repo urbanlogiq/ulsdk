@@ -59,10 +59,9 @@ use crate::types::id::{
     ObjectNamespace, PinnedObjectId, StreamId,
 };
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u8)]
 pub enum BinaryYesNo {
-    #[default]
     NO = 0,
     YES = 1,
 }
@@ -103,10 +102,9 @@ impl From<FbsBinaryYesNo> for BinaryYesNo {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u8)]
 pub enum DayOfWeek {
-    #[default]
     MONDAY = 0,
     TUESDAY = 1,
     WEDNESDAY = 2,
@@ -167,10 +165,9 @@ impl From<FbsDayOfWeek> for DayOfWeek {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i32)]
 pub enum DirectionTy {
-    #[default]
     NB = 0,
     WB = 1,
     SB = 2,
@@ -310,10 +307,9 @@ impl From<FbsNamedParameterFlags> for NamedParameterFlags {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i32)]
 pub enum RoadUserTy {
-    #[default]
     BIKES = 0,
     BUSES = 1,
     CARS = 2,
@@ -558,10 +554,9 @@ impl From<FbsRoadUserTy> for RoadUserTy {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i32)]
 pub enum StatisticTy {
-    #[default]
     PERCENTILE_15 = 15,
     PERCENTILE_20 = 20,
     PERCENTILE_30 = 30,
@@ -664,10 +659,9 @@ impl From<FbsStatisticTy> for StatisticTy {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i32)]
 pub enum TimeGranularity {
-    #[default]
     NONE = 0,
     Daily = 1,
 }
@@ -708,10 +702,9 @@ impl From<FbsTimeGranularity> for TimeGranularity {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i32)]
 pub enum TurnTy {
-    #[default]
     CW = 0,
     CCW = 1,
     NONE = 2,

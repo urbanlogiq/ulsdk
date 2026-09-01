@@ -31,4 +31,5 @@ public final class UlFieldType {
     public static final long FT_TIME = com.urbanlogiq.ulsdk.types.generated.UlFieldType.FT_TIME;
     public static final long FT_GEOMETRY_OR_NODE = com.urbanlogiq.ulsdk.types.generated.UlFieldType.FT_GEOMETRY_OR_NODE;
     public static final long FT_STRING_ARRAY = com.urbanlogiq.ulsdk.types.generated.UlFieldType.FT_STRING_ARRAY;
+    public static final long FT_INT_ARRAY = com.urbanlogiq.ulsdk.types.generated.UlFieldType.FT_INT_ARRAY;
 }

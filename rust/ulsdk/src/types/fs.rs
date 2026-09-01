@@ -138,10 +138,9 @@ use crate::types::worklog::{
     WorkLog, WorklogParameter,
 };
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum EntryTy {
-    #[default]
     File = 0,
     Directory = 1,
     Object = 2,
@@ -190,10 +189,9 @@ impl From<FbsEntryTy> for EntryTy {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i8)]
 pub enum StorageTier {
-    #[default]
     Cold = -2,
     Cool = -1,
     Hot = 0,
@@ -242,7 +240,7 @@ impl From<FbsStorageTier> for StorageTier {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct File {
     pub account: String,
     pub blob: Option<GenericId>,
@@ -366,6 +364,22 @@ impl crate::FbsSerde for File {
     }
 }
 
+impl Default for File {
+    fn default() -> Self {
+        Self {
+            account: String::default(),
+            blob: None,
+            chunks: None,
+            container: None,
+            digest: None,
+            mime: String::default(),
+            size: u64::default(),
+            tier: StorageTier::Hot,
+            virus: None,
+        }
+    }
+}
+
 /// This Directory table holds the entries in the actual directory
 #[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Directory {
@@ -448,7 +462,7 @@ impl crate::FbsSerde for Directory {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct ObjectRef {
     pub id: ObjectId,
     pub ty: DataCatalogObjectTy,
@@ -493,6 +507,15 @@ impl crate::FbsSerde for ObjectRef {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsObjectRef>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for ObjectRef {
+    fn default() -> Self {
+        Self {
+            id: ObjectId::default(),
+            ty: DataCatalogObjectTy::Invalid,
+        }
     }
 }
 
@@ -627,7 +650,7 @@ impl crate::FbsSerde for ListDirectory {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct ListObject {
     pub id: ObjectId,
     pub size: u64,
@@ -675,6 +698,16 @@ impl crate::FbsSerde for ListObject {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsListObject>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for ListObject {
+    fn default() -> Self {
+        Self {
+            id: ObjectId::default(),
+            size: u64::default(),
+            ty: DataCatalogObjectTy::Invalid,
+        }
     }
 }
 
@@ -1173,7 +1206,7 @@ impl crate::FbsSerde for NewLink {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Slot {
     pub attributes: Option<Vec<Attr>>,
     pub id: ObjectId,
@@ -1251,6 +1284,17 @@ impl crate::FbsSerde for Slot {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsSlot>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for Slot {
+    fn default() -> Self {
+        Self {
+            attributes: None,
+            id: ObjectId::default(),
+            name: String::default(),
+            ty: EntryTy::File,
+        }
     }
 }
 

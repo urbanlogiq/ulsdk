@@ -136,10 +136,9 @@ use crate::types::value::{
     VTimestampNsUtc, VTri2D, VU8, VU16, VU32, VU64, VUnit, VUsize, Value, ValueInstance, ValueTy,
 };
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum AggregationFunction {
-    #[default]
     Any = 0,
     Sum = 1,
     Average = 2,
@@ -199,7 +198,7 @@ impl From<FbsAggregationFunction> for AggregationFunction {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum DatasetCategory {
     DC_BUSINESSES = 0,
@@ -212,7 +211,6 @@ pub enum DatasetCategory {
     DC_WEATHER = 7,
     DC_BOUNDARY = 8,
     DC_HEALTH = 9,
-    #[default]
     DC_HIDDEN = 4294967295,
 }
 
@@ -315,10 +313,9 @@ impl From<FbsFieldFlags> for FieldFlags {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum FieldUnit {
-    #[default]
     U_INVALID = 0,
     U_METRES = 1,
     U_DEGREES_CELSIUS = 2,
@@ -408,10 +405,9 @@ impl From<FbsFieldUnit> for FieldUnit {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum NumericalFieldValueType {
-    #[default]
     None_ = 0,
     Percent = 1,
     Ratio = 2,
@@ -459,10 +455,9 @@ impl From<FbsNumericalFieldValueType> for NumericalFieldValueType {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum UlFieldType {
-    #[default]
     FT_UNKNOWN = 0,
     FT_INT = 1,
     FT_FLOAT = 2,
@@ -489,6 +484,7 @@ pub enum UlFieldType {
     FT_TIME = 23,
     FT_GEOMETRY_OR_NODE = 24,
     FT_STRING_ARRAY = 25,
+    FT_INT_ARRAY = 26,
 }
 
 impl TryFrom<u32> for UlFieldType {
@@ -527,6 +523,7 @@ impl UlFieldType {
             Self::FT_TIME => Some("FT_TIME"),
             Self::FT_GEOMETRY_OR_NODE => Some("FT_GEOMETRY_OR_NODE"),
             Self::FT_STRING_ARRAY => Some("FT_STRING_ARRAY"),
+            Self::FT_INT_ARRAY => Some("FT_INT_ARRAY"),
             _ => None,
         }
     }
@@ -561,6 +558,7 @@ impl From<UlFieldType> for FbsUlFieldType {
             UlFieldType::FT_TIME => FbsUlFieldType::FT_TIME,
             UlFieldType::FT_GEOMETRY_OR_NODE => FbsUlFieldType::FT_GEOMETRY_OR_NODE,
             UlFieldType::FT_STRING_ARRAY => FbsUlFieldType::FT_STRING_ARRAY,
+            UlFieldType::FT_INT_ARRAY => FbsUlFieldType::FT_INT_ARRAY,
         }
     }
 }
@@ -594,6 +592,7 @@ impl From<FbsUlFieldType> for UlFieldType {
             23 => Self::FT_TIME,
             24 => Self::FT_GEOMETRY_OR_NODE,
             25 => Self::FT_STRING_ARRAY,
+            26 => Self::FT_INT_ARRAY,
             _ => panic!("Invalid value {} when constructing UlFieldType", fbs.0),
         }
     }
@@ -601,10 +600,9 @@ impl From<FbsUlFieldType> for UlFieldType {
 
 /// The update cadence of the dataset. This looks at the maximum timestamp/observation date in the data,
 /// and not when the pipeline ran because we can run a pipeline today that only ingests data from 2020.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum UpdateCadence {
-    #[default]
     UC_UNSET = 0,
     UC_IRREGULAR = 1,
     UC_DAILY = 2,
@@ -730,7 +728,7 @@ impl crate::FbsSerde for StringCategories {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct NumericalFieldFormat {
     pub decimal_places: u32,
     pub offset: OrderedFloat<f64>,
@@ -788,7 +786,18 @@ impl crate::FbsSerde for NumericalFieldFormat {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+impl Default for NumericalFieldFormat {
+    fn default() -> Self {
+        Self {
+            decimal_places: u32::default(),
+            offset: OrderedFloat::<f64>::default(),
+            scale: OrderedFloat::<f64>::default(),
+            value_type: NumericalFieldValueType::None_,
+        }
+    }
+}
+
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct IntRange {
     pub aggregation_protocol: AggregationFunction,
     pub display_strings: Option<Vec<IntegerDisplayString>>,
@@ -885,7 +894,21 @@ impl crate::FbsSerde for IntRange {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+impl Default for IntRange {
+    fn default() -> Self {
+        Self {
+            aggregation_protocol: AggregationFunction::Any,
+            display_strings: None,
+            enum_name: None,
+            field_format: None,
+            is_bitmask_enum: bool::default(),
+            max: i64::default(),
+            min: i64::default(),
+        }
+    }
+}
+
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct FloatRange {
     pub aggregation_protocol: AggregationFunction,
     pub field_format: Option<NumericalFieldFormat>,
@@ -943,6 +966,17 @@ impl crate::FbsSerde for FloatRange {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsFloatRange>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for FloatRange {
+    fn default() -> Self {
+        Self {
+            aggregation_protocol: AggregationFunction::Any,
+            field_format: None,
+            max: OrderedFloat::<f64>::default(),
+            min: OrderedFloat::<f64>::default(),
+        }
     }
 }
 
@@ -3103,7 +3137,7 @@ impl Default for Metadata {
             detail_sections: None,
             display_name: None,
             do_not_filter_geometry_by_viewport: bool::default(),
-            entity_ty: EntityTy::default(),
+            entity_ty: EntityTy::T_INVALID,
             field_relationships: None,
             fields: None,
             geometry_source: None,
@@ -3112,7 +3146,7 @@ impl Default for Metadata {
             source: None,
             summary: None,
             time_source: None,
-            update_cadence: UpdateCadence::default(),
+            update_cadence: UpdateCadence::UC_UNSET,
             visualize_in_explore_fields: None,
         }
     }
@@ -3548,7 +3582,7 @@ impl From<&FbsUIntBucket> for UIntBucket {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct UlField {
     pub breakdown_display_name: Option<String>,
     pub component_data: Option<ComponentData>,
@@ -3754,6 +3788,23 @@ impl crate::FbsSerde for UlField {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsUlField>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for UlField {
+    fn default() -> Self {
+        Self {
+            breakdown_display_name: None,
+            component_data: None,
+            default: None,
+            description: None,
+            display_name: None,
+            field_name: None,
+            field_type: UlFieldType::FT_UNKNOWN,
+            flags: u32::default(),
+            storage_type: None,
+            unit: FieldUnit::U_INVALID,
+        }
     }
 }
 

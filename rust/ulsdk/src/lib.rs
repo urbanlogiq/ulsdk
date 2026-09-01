@@ -301,20 +301,33 @@ impl Visitor<'_> for PinnedObjectIdVisitor {
 
 #[cfg(test)]
 mod tests {
-    /// FlatBuffers declares defaults on fields, so the generator has to derive
-    /// each enum's `#[default]` from the fields typed as it. These are every
-    /// enum in the schema whose declared default is not its first variant --
-    /// the case the generator used to get wrong, silently substituting a real
-    /// value (`DC_BUSINESSES`, `Predicate::NONE`) for the intended one.
+    /// FlatBuffers declares defaults on fields, not on types, so a table that
+    /// declares one has to name it in its own `Default`. The generator used to
+    /// lean on the enum's derived `Default` instead, which silently substituted
+    /// the first-declared variant wherever the two disagreed -- `DC_BUSINESSES`
+    /// for `DC_HIDDEN`, `Predicate::NONE` for `location`.
     #[test]
-    fn enum_defaults_match_the_schema() {
-        use crate::types::graph::Predicate;
-        use crate::types::metadata::DatasetCategory;
-        use crate::types::Schema::{DateUnit, TimeUnit};
+    fn table_defaults_name_the_declared_variant() {
+        use crate::types::graph::{GeomOp, Predicate};
+        use crate::types::metadata::{DatasetCategory, Metadata};
+        use crate::types::Schema::{Date, DateUnit, Duration, TimeUnit};
 
-        assert_eq!(DatasetCategory::default(), DatasetCategory::DC_HIDDEN);
-        assert_eq!(Predicate::default(), Predicate::location);
-        assert_eq!(DateUnit::default(), DateUnit::MILLISECOND);
-        assert_eq!(TimeUnit::default(), TimeUnit::MILLISECOND);
+        assert_eq!(
+            Metadata::default().dataset_category,
+            DatasetCategory::DC_HIDDEN
+        );
+        assert_eq!(GeomOp::default().predicate, Predicate::location);
+        assert_eq!(Date::default().unit, DateUnit::MILLISECOND);
+        assert_eq!(Duration::default().unit, TimeUnit::MILLISECOND);
+    }
+
+    /// A zero default is a variant like any other, so it gets named too rather
+    /// than deferring to a `Default` the enum no longer has.
+    #[test]
+    fn table_defaults_name_zero_variants() {
+        use crate::types::fun::Fn_;
+        use crate::types::graph::GeomOp;
+
+        assert_eq!(GeomOp::default().op, Fn_::None_);
     }
 }

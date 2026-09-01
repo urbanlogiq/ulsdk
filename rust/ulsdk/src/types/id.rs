@@ -25,10 +25,9 @@ use crate::types::generated::id_generated::{
     PinnedObjectId as FbsPinnedObjectId, StreamId as FbsStreamId,
 };
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u16)]
 pub enum ObjectNamespace {
-    #[default]
     Global = 0,
     User = 1,
     Generated = 2,

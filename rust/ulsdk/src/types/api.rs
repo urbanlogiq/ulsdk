@@ -21,10 +21,9 @@ use strum_macros::FromRepr;
 use crate::types::generated::api_generated::SortOrder as FbsSortOrder;
 
 /// These constants are used to populate the `OrderByOp` struct's `order` field.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum SortOrder {
-    #[default]
     ASC = 0,
     DESC = 1,
 }

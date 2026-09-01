@@ -959,6 +959,7 @@ const (
 	UlFieldTypeFT_TIME UlFieldType = 23
 	UlFieldTypeFT_GEOMETRY_OR_NODE UlFieldType = 24
 	UlFieldTypeFT_STRING_ARRAY UlFieldType = 25
+	UlFieldTypeFT_INT_ARRAY UlFieldType = 26
 )
 
 // UpdateCadence -

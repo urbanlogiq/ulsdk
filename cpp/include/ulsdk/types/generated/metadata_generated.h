@@ -487,11 +487,12 @@ enum class UlFieldType : uint32_t {
   FT_TIME = 23,
   FT_GEOMETRY_OR_NODE = 24,
   FT_STRING_ARRAY = 25,
+  FT_INT_ARRAY = 26,
   MIN = FT_UNKNOWN,
-  MAX = FT_STRING_ARRAY
+  MAX = FT_INT_ARRAY
 };
 
-inline const UlFieldType (&EnumValuesUlFieldType())[26] {
+inline const UlFieldType (&EnumValuesUlFieldType())[27] {
   static const UlFieldType values[] = {
     UlFieldType::FT_UNKNOWN,
     UlFieldType::FT_INT,
@@ -518,13 +519,14 @@ inline const UlFieldType (&EnumValuesUlFieldType())[26] {
     UlFieldType::FT_BINARY,
     UlFieldType::FT_TIME,
     UlFieldType::FT_GEOMETRY_OR_NODE,
-    UlFieldType::FT_STRING_ARRAY
+    UlFieldType::FT_STRING_ARRAY,
+    UlFieldType::FT_INT_ARRAY
   };
   return values;
 }
 
 inline const char * const *EnumNamesUlFieldType() {
-  static const char * const names[27] = {
+  static const char * const names[28] = {
     "FT_UNKNOWN",
     "FT_INT",
     "FT_FLOAT",
@@ -551,13 +553,14 @@ inline const char * const *EnumNamesUlFieldType() {
     "FT_TIME",
     "FT_GEOMETRY_OR_NODE",
     "FT_STRING_ARRAY",
+    "FT_INT_ARRAY",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameUlFieldType(UlFieldType e) {
-  if (::flatbuffers::IsOutRange(e, UlFieldType::FT_UNKNOWN, UlFieldType::FT_STRING_ARRAY)) return "";
+  if (::flatbuffers::IsOutRange(e, UlFieldType::FT_UNKNOWN, UlFieldType::FT_INT_ARRAY)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesUlFieldType()[index];
 }

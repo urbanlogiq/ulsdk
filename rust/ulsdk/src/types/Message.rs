@@ -62,7 +62,7 @@ use crate::types::generated::Tensor_generated::{Tensor as FbsTensor, TensorDim a
 /// Provided for forward compatibility in case we need to support different
 /// strategies for compressing the IPC message body (like whole-body
 /// compression rather than buffer-level) in the future
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i8)]
 pub enum BodyCompressionMethod {
     /// Each constituent buffer is first compressed with the indicated
@@ -72,7 +72,6 @@ pub enum BodyCompressionMethod {
     /// uncompressed length may be set to -1 to indicate that the data that
     /// follows is not compressed, which can be useful for cases where
     /// compression does not yield appreciable savings.
-    #[default]
     BUFFER = 0,
 }
 
@@ -112,10 +111,9 @@ impl From<FbsBodyCompressionMethod> for BodyCompressionMethod {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i8)]
 pub enum CompressionType {
-    #[default]
     LZ4_FRAME = 0,
     ZSTD = 1,
 }
@@ -159,7 +157,7 @@ impl From<FbsCompressionType> for CompressionType {
 /// Optional compression for the memory buffers constituting IPC message
 /// bodies. Intended for use with RecordBatch but could be used for other
 /// message types
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct BodyCompression {
     /// Compressor library.
     /// For LZ4_FRAME, each compressed buffer must consist of a single frame.
@@ -205,6 +203,15 @@ impl crate::FbsSerde for BodyCompression {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsBodyCompression>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for BodyCompression {
+    fn default() -> Self {
+        Self {
+            codec: CompressionType::LZ4_FRAME,
+            method: BodyCompressionMethod::BUFFER,
+        }
     }
 }
 
@@ -508,7 +515,7 @@ impl From<&FbsFieldNode> for FieldNode {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Message {
     pub bodyLength: i64,
     pub custom_metadata: Option<Vec<KeyValue>>,
@@ -612,6 +619,17 @@ impl crate::FbsSerde for Message {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsMessage>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for Message {
+    fn default() -> Self {
+        Self {
+            bodyLength: i64::default(),
+            custom_metadata: None,
+            header: None,
+            version: MetadataVersion::V1,
+        }
     }
 }
 

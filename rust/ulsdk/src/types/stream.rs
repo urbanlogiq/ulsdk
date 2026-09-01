@@ -55,10 +55,9 @@ use crate::types::id::{
     ObjectNamespace, PinnedObjectId, StreamId,
 };
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum AxisType {
-    #[default]
     AXIS_TIMESTAMP = 0,
 }
 

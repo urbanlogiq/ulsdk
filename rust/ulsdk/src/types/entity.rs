@@ -35,10 +35,9 @@ use crate::types::id::{
     ObjectNamespace, PinnedObjectId, StreamId,
 };
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i32)]
 pub enum EdgeTy {
-    #[default]
     E_INVALID = 0,
     E_POSTAL_CODE = 1,
     E_INTERSECTS = 2,
@@ -131,10 +130,9 @@ impl From<FbsEdgeTy> for EdgeTy {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i32)]
 pub enum EntityTy {
-    #[default]
     T_INVALID = 0,
     T_TFC = 1,
     T_TFC_LOOP = 2,
@@ -1315,10 +1313,9 @@ impl From<FbsEntityTy> for EntityTy {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i32)]
 pub enum NodeTy {
-    #[default]
     N_INVALID = 0,
     /// Entities are world objects with (possible) links to other data sets
     N_ENTITY = 1,
@@ -1752,7 +1749,7 @@ impl Geometry {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct GraphEdge {
     pub _from: i64,
     pub _kind: EdgeTy,
@@ -1801,7 +1798,17 @@ impl crate::FbsSerde for GraphEdge {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+impl Default for GraphEdge {
+    fn default() -> Self {
+        Self {
+            _from: i64::default(),
+            _kind: EdgeTy::E_INVALID,
+            _to: i64::default(),
+        }
+    }
+}
+
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct GraphNode {
     /// A human-centric description of this graph node.
     pub _description: Option<String>,
@@ -1919,6 +1926,21 @@ impl crate::FbsSerde for GraphNode {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsGraphNode>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for GraphNode {
+    fn default() -> Self {
+        Self {
+            _description: None,
+            _entity_type: EntityTy::T_INVALID,
+            _geom: None,
+            _location: None,
+            _node_id: None,
+            _node_type: NodeTy::N_INVALID,
+            _stream: None,
+            _uid: u64::default(),
+        }
     }
 }
 

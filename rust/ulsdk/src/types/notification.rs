@@ -41,10 +41,9 @@ use crate::types::id::{
 };
 use crate::types::permissions::{AccessControlList, PermissionTy, Role};
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u8)]
 pub enum DriveAction {
-    #[default]
     Add = 0,
     Remove = 1,
     Overwrite = 2,
@@ -89,10 +88,9 @@ impl From<FbsDriveAction> for DriveAction {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u8)]
 pub enum ReadStatus {
-    #[default]
     Unread = 0,
     Read = 1,
 }
@@ -133,10 +131,9 @@ impl From<FbsReadStatus> for ReadStatus {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u8)]
 pub enum RequestStatus {
-    #[default]
     Pending = 0,
     Approved = 1,
     Rejected = 2,
@@ -295,7 +292,7 @@ impl crate::FbsSerde for JobComplete {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct AccessRequest {
     pub msg: Option<String>,
     pub object: ObjectId,
@@ -361,7 +358,19 @@ impl crate::FbsSerde for AccessRequest {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+impl Default for AccessRequest {
+    fn default() -> Self {
+        Self {
+            msg: None,
+            object: ObjectId::default(),
+            perms: u32::default(),
+            requested_ownership: u32::default(),
+            status: RequestStatus::Pending,
+        }
+    }
+}
+
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct DriveChange {
     pub action: DriveAction,
     pub object: ObjectId,
@@ -414,6 +423,16 @@ impl crate::FbsSerde for DriveChange {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsDriveChange>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for DriveChange {
+    fn default() -> Self {
+        Self {
+            action: DriveAction::Add,
+            object: ObjectId::default(),
+            root: ObjectId::default(),
+        }
     }
 }
 
@@ -515,7 +534,7 @@ impl crate::FbsSerde for Inbox {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct InboxItem {
     pub notification: ObjectId,
     pub status: ReadStatus,
@@ -567,6 +586,16 @@ impl crate::FbsSerde for InboxItem {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsInboxItem>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for InboxItem {
+    fn default() -> Self {
+        Self {
+            notification: ObjectId::default(),
+            status: ReadStatus::Unread,
+            time: u64::default(),
+        }
     }
 }
 

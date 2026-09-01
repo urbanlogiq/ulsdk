@@ -107,10 +107,9 @@ use crate::types::value::{
 
 /// In the aggregate data, there are two relevant keys relevant to the user,
 /// sum and average. This stores which to show in the chart
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum AggregationTy {
-    #[default]
     Invalid = 0,
     Sum = 1,
     Average = 2,
@@ -156,10 +155,9 @@ impl From<FbsAggregationTy> for AggregationTy {
 }
 
 /// The type of chart to use to display the data
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum ChartTypeTy {
-    #[default]
     Invalid = 0,
     Bar = 1,
     HorizontalBar = 2,
@@ -229,10 +227,9 @@ impl From<FbsChartTypeTy> for ChartTypeTy {
 }
 
 /// Whether do display raw numbers or percentages
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum ValuesFormatTy {
-    #[default]
     Invalid = 0,
     RawNumber = 1,
     Percentage = 2,
@@ -691,7 +688,7 @@ impl crate::FbsSerde for Producer {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct TileSettings {
     /// The column of tbe aggregation dataset to use
     pub aggregation: AggregationTy,
@@ -823,6 +820,27 @@ impl crate::FbsSerde for TileSettings {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsTileSettings>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for TileSettings {
+    fn default() -> Self {
+        Self {
+            aggregation: AggregationTy::Invalid,
+            category: u32::default(),
+            chart_type: ChartTypeTy::Invalid,
+            field_name: String::default(),
+            group_others: bool::default(),
+            is_record_count_tile: bool::default(),
+            is_relationship_field: bool::default(),
+            metadata_id: ObjectId::default(),
+            output_stream_index: u32::default(),
+            record_count_stream_id: None,
+            selected_columns: Vec::<String>::default(),
+            text_tile_font_size: u32::default(),
+            title: String::default(),
+            values_format: ValuesFormatTy::Invalid,
+        }
     }
 }
 

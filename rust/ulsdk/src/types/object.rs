@@ -146,10 +146,9 @@ impl From<FbsDataCatalogObjectFlags> for DataCatalogObjectFlags {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i16)]
 pub enum DataCatalogObjectTy {
-    #[default]
     Invalid = 0,
     WorkLog = 1,
     Schematic = 2,
@@ -455,7 +454,7 @@ impl Default for DataCatalogObject {
             signature: None,
             tags: None,
             time: u64::default(),
-            ty: DataCatalogObjectTy::default(),
+            ty: DataCatalogObjectTy::Invalid,
             user: B2cId::default(),
             version: u32::default(),
         }
@@ -634,7 +633,7 @@ impl crate::FbsSerde for ObjectIdPairList {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct ObjectSummary {
     pub acl: Option<ObjectId>,
     pub head_revision: ContentId,
@@ -698,6 +697,18 @@ impl crate::FbsSerde for ObjectSummary {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsObjectSummary>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for ObjectSummary {
+    fn default() -> Self {
+        Self {
+            acl: None,
+            head_revision: ContentId::default(),
+            id: ObjectId::default(),
+            time: u64::default(),
+            ty: DataCatalogObjectTy::Invalid,
+        }
     }
 }
 

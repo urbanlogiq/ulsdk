@@ -30,10 +30,9 @@ use crate::types::generated::value_generated::{
     ValueTy as FbsValueTy,
 };
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u8)]
 pub enum ValueTy {
-    #[default]
     Bool = 0,
     Unit = 1,
     Char = 2,
@@ -1317,7 +1316,7 @@ impl crate::FbsSerde for VTimestampNs {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct VPlaceholder {
     pub name: String,
     pub ty: ValueTy,
@@ -1362,6 +1361,15 @@ impl crate::FbsSerde for VPlaceholder {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsVPlaceholder>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for VPlaceholder {
+    fn default() -> Self {
+        Self {
+            name: String::default(),
+            ty: ValueTy::Bool,
+        }
     }
 }
 

@@ -91,10 +91,9 @@ use crate::types::value::{
     VTimestampNsUtc, VTri2D, VU8, VU16, VU32, VU64, VUnit, VUsize, Value, ValueInstance, ValueTy,
 };
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i8)]
 pub enum Status {
-    #[default]
     Pending = 0,
     Running = 1,
     Complete = 2,
@@ -147,10 +146,9 @@ impl From<FbsStatus> for Status {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i32)]
 pub enum TaskErrorTy {
-    #[default]
     NONE = 0,
     DuplicateData = 1,
 }
@@ -191,10 +189,9 @@ impl From<FbsTaskErrorTy> for TaskErrorTy {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i32)]
 pub enum TaskPriority {
-    #[default]
     High = -256,
     Medium = 0,
     Low = 256,
@@ -549,7 +546,7 @@ impl crate::FbsSerde for Edge {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Job {
     pub attributes: Option<Vec<Attr>>,
     pub error_tys: Option<Vec<TaskErrorTy>>,
@@ -677,6 +674,19 @@ impl crate::FbsSerde for Job {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsJob>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for Job {
+    fn default() -> Self {
+        Self {
+            attributes: None,
+            error_tys: None,
+            params: Vec::<TaskParameter>::default(),
+            status: Status::Pending,
+            tasks: Vec::<Task>::default(),
+            user_id: ObjectId::default(),
+        }
     }
 }
 
@@ -905,7 +915,7 @@ impl Default for RunSpec {
             param_indices: Vec::<ParamIndices>::default(),
             params: Vec::<TaskParameter>::default(),
             persist: bool::default(),
-            priority: TaskPriority::default(),
+            priority: TaskPriority::Medium,
             schematic: PinnedObjectId::default(),
         }
     }
@@ -1002,7 +1012,7 @@ impl crate::FbsSerde for Schematic {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Task {
     pub _id: ObjectId,
     pub barrier_count: i32,
@@ -1188,6 +1198,35 @@ impl crate::FbsSerde for Task {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsTask>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for Task {
+    fn default() -> Self {
+        Self {
+            _id: ObjectId::default(),
+            barrier_count: i32::default(),
+            created: u64::default(),
+            discard: bool::default(),
+            downstream: Vec::<ObjectId>::default(),
+            end: u64::default(),
+            error_ty: TaskErrorTy::NONE,
+            flags: i32::default(),
+            job_id: ObjectId::default(),
+            last_updated: u64::default(),
+            last_updated_by_pod: None,
+            message: None,
+            name: String::default(),
+            output: PinnedObjectId::default(),
+            params: ParamIndices::default(),
+            retries: i32::default(),
+            schematic_id: None,
+            start: u64::default(),
+            status: Status::Pending,
+            task: ObjectId::default(),
+            upstream: Vec::<ObjectId>::default(),
+            user_id: ObjectId::default(),
+        }
     }
 }
 

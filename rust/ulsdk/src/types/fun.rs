@@ -20,10 +20,9 @@ use strum_macros::FromRepr;
 
 use crate::types::generated::fun_generated::Fn as FbsFn;
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i16)]
 pub enum Fn_ {
-    #[default]
     None_ = 0,
     True = 1,
     False = 2,

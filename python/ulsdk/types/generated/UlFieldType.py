@@ -29,3 +29,4 @@ class UlFieldType(object):
     FT_TIME = 23
     FT_GEOMETRY_OR_NODE = 24
     FT_STRING_ARRAY = 25
+    FT_INT_ARRAY = 26

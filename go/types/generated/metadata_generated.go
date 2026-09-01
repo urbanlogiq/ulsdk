@@ -296,6 +296,7 @@ const (
 	UlFieldTypeFT_TIME               UlFieldType = 23
 	UlFieldTypeFT_GEOMETRY_OR_NODE   UlFieldType = 24
 	UlFieldTypeFT_STRING_ARRAY       UlFieldType = 25
+	UlFieldTypeFT_INT_ARRAY          UlFieldType = 26
 )
 
 var EnumNamesUlFieldType = map[UlFieldType]string{
@@ -325,6 +326,7 @@ var EnumNamesUlFieldType = map[UlFieldType]string{
 	UlFieldTypeFT_TIME:               "FT_TIME",
 	UlFieldTypeFT_GEOMETRY_OR_NODE:   "FT_GEOMETRY_OR_NODE",
 	UlFieldTypeFT_STRING_ARRAY:       "FT_STRING_ARRAY",
+	UlFieldTypeFT_INT_ARRAY:          "FT_INT_ARRAY",
 }
 
 var EnumValuesUlFieldType = map[string]UlFieldType{
@@ -354,6 +356,7 @@ var EnumValuesUlFieldType = map[string]UlFieldType{
 	"FT_TIME":               UlFieldTypeFT_TIME,
 	"FT_GEOMETRY_OR_NODE":   UlFieldTypeFT_GEOMETRY_OR_NODE,
 	"FT_STRING_ARRAY":       UlFieldTypeFT_STRING_ARRAY,
+	"FT_INT_ARRAY":          UlFieldTypeFT_INT_ARRAY,
 }
 
 func (v UlFieldType) String() string {

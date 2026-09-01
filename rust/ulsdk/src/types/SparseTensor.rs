@@ -49,10 +49,9 @@ use crate::types::generated::SparseTensor_generated::{
 };
 use crate::types::generated::Tensor_generated::{Tensor as FbsTensor, TensorDim as FbsTensorDim};
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i16)]
 pub enum SparseMatrixCompressedAxis {
-    #[default]
     Row = 0,
     Column = 1,
 }
@@ -216,7 +215,7 @@ impl crate::FbsSerde for SparseTensorIndexCOO {
 }
 
 /// Compressed Sparse format, that is matrix-specific.
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct SparseMatrixIndexCSX {
     /// Which axis, row or column, is compressed
     pub compressedAxis: SparseMatrixCompressedAxis,
@@ -315,6 +314,18 @@ impl crate::FbsSerde for SparseMatrixIndexCSX {
         let fbs =
             flatbuffers::size_prefixed_root_with_opts::<FbsSparseMatrixIndexCSX>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for SparseMatrixIndexCSX {
+    fn default() -> Self {
+        Self {
+            compressedAxis: SparseMatrixCompressedAxis::Row,
+            indicesBuffer: Buffer::default(),
+            indicesType: Int::default(),
+            indptrBuffer: Buffer::default(),
+            indptrType: Int::default(),
+        }
     }
 }
 

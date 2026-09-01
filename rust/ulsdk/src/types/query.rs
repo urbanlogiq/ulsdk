@@ -116,10 +116,9 @@ use crate::types::value::{
     VTimestampNsUtc, VTri2D, VU8, VU16, VU32, VU64, VUnit, VUsize, Value, ValueInstance, ValueTy,
 };
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(u8)]
 pub enum ExplainFormat {
-    #[default]
     Tree = 0,
     Indent = 1,
     Json = 2,
@@ -168,10 +167,9 @@ impl From<FbsExplainFormat> for ExplainFormat {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i8)]
 pub enum JoinTy {
-    #[default]
     Inner = 0,
     LeftOuter = 1,
     RightOuter = 2,
@@ -232,10 +230,9 @@ impl From<FbsJoinTy> for JoinTy {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i8)]
 pub enum QueryElementOp {
-    #[default]
     Union = 0,
     Intersect = 1,
     Except = 2,
@@ -284,10 +281,9 @@ impl From<FbsQueryElementOp> for QueryElementOp {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i8)]
 pub enum TypeHint {
-    #[default]
     None_ = 0,
     TimestampMillis = 1,
     TimestampNanos = 2,
@@ -730,7 +726,7 @@ impl crate::FbsSerde for NullableUint {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Column {
     pub name: String,
     pub source: Option<NullableUint>,
@@ -788,7 +784,17 @@ impl crate::FbsSerde for Column {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+impl Default for Column {
+    fn default() -> Self {
+        Self {
+            name: String::default(),
+            source: None,
+            type_hint: TypeHint::None_,
+        }
+    }
+}
+
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Function {
     pub fn_: Fn_,
     pub parameters: Vec<Expr>,
@@ -842,6 +848,15 @@ impl crate::FbsSerde for Function {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsFunction>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for Function {
+    fn default() -> Self {
+        Self {
+            fn_: Fn_::None_,
+            parameters: Vec::<Expr>::default(),
+        }
     }
 }
 
@@ -1768,7 +1783,7 @@ impl crate::FbsSerde for QueryElement {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct BinaryQueryElement {
     pub lhs: QueryElement,
     pub op: QueryElementOp,
@@ -1817,6 +1832,16 @@ impl crate::FbsSerde for BinaryQueryElement {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsBinaryQueryElement>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for BinaryQueryElement {
+    fn default() -> Self {
+        Self {
+            lhs: QueryElement::default(),
+            op: QueryElementOp::Union,
+            rhs: QueryElement::default(),
+        }
     }
 }
 
@@ -2069,7 +2094,7 @@ impl crate::FbsSerde for Arrow {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Explain {
     pub analyze: bool,
     pub format: ExplainFormat,
@@ -2119,6 +2144,16 @@ impl crate::FbsSerde for Explain {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsExplain>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for Explain {
+    fn default() -> Self {
+        Self {
+            analyze: bool::default(),
+            format: ExplainFormat::Tree,
+            verbose: bool::default(),
+        }
     }
 }
 
@@ -3293,7 +3328,7 @@ impl crate::FbsSerde for AlterTableOperation {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Join {
     pub dest_col: Option<String>,
     pub dest_idx: u32,
@@ -3358,6 +3393,18 @@ impl crate::FbsSerde for Join {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsJoin>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for Join {
+    fn default() -> Self {
+        Self {
+            dest_col: None,
+            dest_idx: u32::default(),
+            src_col: None,
+            src_idx: u32::default(),
+            ty: JoinTy::Inner,
+        }
     }
 }
 

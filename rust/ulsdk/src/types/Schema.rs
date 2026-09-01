@@ -34,11 +34,10 @@ use crate::types::generated::Schema_generated::{
     Utf8 as FbsUtf8, Utf8View as FbsUtf8View,
 };
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i16)]
 pub enum DateUnit {
     DAY = 0,
-    #[default]
     MILLISECOND = 1,
 }
 
@@ -83,10 +82,9 @@ impl From<FbsDateUnit> for DateUnit {
 /// Maintained for forwards compatibility, in the future
 /// Dictionaries might be explicit maps between integers and values
 /// allowing for non-contiguous index values
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i16)]
 pub enum DictionaryKind {
-    #[default]
     DenseArray = 0,
 }
 
@@ -125,10 +123,9 @@ impl From<FbsDictionaryKind> for DictionaryKind {
 
 /// ----------------------------------------------------------------------
 /// Endianness of the platform producing the data
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i16)]
 pub enum Endianness {
-    #[default]
     Little = 0,
     Big = 1,
 }
@@ -186,11 +183,10 @@ impl From<FbsEndianness> for Endianness {
 /// Enums added to this list should be assigned power-of-two values
 /// to facilitate exchanging and comparing bitmaps for supported
 /// features.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i64)]
 pub enum Feature {
     /// Needed to make flatbuffers happy.
-    #[default]
     UNUSED = 0,
     /// The stream makes use of multiple full dictionaries with the
     /// same ID and assumes clients implement dictionary replacement
@@ -240,10 +236,9 @@ impl From<FbsFeature> for Feature {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i16)]
 pub enum IntervalUnit {
-    #[default]
     YEAR_MONTH = 0,
     DAY_TIME = 1,
     MONTH_DAY_NANO = 2,
@@ -296,11 +291,10 @@ impl From<FbsIntervalUnit> for IntervalUnit {
 /// Version 1.3 - Add Run-End Encoded.
 /// Version 1.4 - Add BinaryView, Utf8View, variadicBufferCounts, ListView, and
 /// LargeListView.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i16)]
 pub enum MetadataVersion {
     /// 0.1.0 (October 2016).
-    #[default]
     V1 = 0,
     /// 0.2.0 (February 2017). Non-backwards compatible with V1.
     V2 = 1,
@@ -363,10 +357,9 @@ impl From<FbsMetadataVersion> for MetadataVersion {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i16)]
 pub enum Precision {
-    #[default]
     HALF = 0,
     SINGLE = 1,
     DOUBLE = 2,
@@ -411,11 +404,10 @@ impl From<FbsPrecision> for Precision {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i16)]
 pub enum TimeUnit {
     SECOND = 0,
-    #[default]
     MILLISECOND = 1,
     MICROSECOND = 2,
     NANOSECOND = 3,
@@ -463,10 +455,9 @@ impl From<FbsTimeUnit> for TimeUnit {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i16)]
 pub enum UnionMode {
-    #[default]
     Sparse = 0,
     Dense = 1,
 }
@@ -596,7 +587,7 @@ impl crate::FbsSerde for Int {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct FloatingPoint {
     pub precision: Precision,
 }
@@ -636,6 +627,14 @@ impl crate::FbsSerde for FloatingPoint {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsFloatingPoint>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for FloatingPoint {
+    fn default() -> Self {
+        Self {
+            precision: Precision::HALF,
+        }
     }
 }
 
@@ -1060,7 +1059,7 @@ impl Default for Time {
 /// values should be computed "as if" the timezone of the date-time values
 /// was UTC; for example, the naive date-time "January 1st 1970, 00h00" would
 /// be encoded as timestamp value 0.
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Timestamp {
     /// The timezone is an optional string indicating the name of a timezone,
     /// one of:
@@ -1120,7 +1119,16 @@ impl crate::FbsSerde for Timestamp {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+impl Default for Timestamp {
+    fn default() -> Self {
+        Self {
+            timezone: None,
+            unit: TimeUnit::SECOND,
+        }
+    }
+}
+
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Interval {
     pub unit: IntervalUnit,
 }
@@ -1160,6 +1168,14 @@ impl crate::FbsSerde for Interval {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsInterval>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for Interval {
+    fn default() -> Self {
+        Self {
+            unit: IntervalUnit::YEAR_MONTH,
+        }
     }
 }
 
@@ -1248,7 +1264,7 @@ impl crate::FbsSerde for Struct_ {
 /// By default ids in the type vector refer to the offsets in the children
 /// optionally typeIds provides an indirection between the child offset and the type id
 /// for each child `typeIds[offset]` is the id used in the type vector
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Union {
     pub mode: UnionMode,
     pub typeIds: Option<Vec<i32>>,
@@ -1308,6 +1324,15 @@ impl crate::FbsSerde for Union {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsUnion>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for Union {
+    fn default() -> Self {
+        Self {
+            mode: UnionMode::Sparse,
+            typeIds: None,
+        }
     }
 }
 
@@ -2073,7 +2098,7 @@ impl From<&FbsBuffer> for Buffer {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct DictionaryEncoding {
     pub dictionaryKind: DictionaryKind,
     /// The known dictionary id in the application where this data is used. In
@@ -2143,6 +2168,17 @@ impl crate::FbsSerde for DictionaryEncoding {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsDictionaryEncoding>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for DictionaryEncoding {
+    fn default() -> Self {
+        Self {
+            dictionaryKind: DictionaryKind::DenseArray,
+            id: i64::default(),
+            indexType: None,
+            isOrdered: bool::default(),
+        }
     }
 }
 
@@ -2395,7 +2431,7 @@ impl crate::FbsSerde for KeyValue {
 
 /// ----------------------------------------------------------------------
 /// A Schema describes the columns in a row batch
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Schema {
     pub custom_metadata: Option<Vec<KeyValue>>,
     /// endianness of the buffer
@@ -2516,6 +2552,17 @@ impl crate::FbsSerde for Schema {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsSchema>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for Schema {
+    fn default() -> Self {
+        Self {
+            custom_metadata: None,
+            endianness: Endianness::Little,
+            features: None,
+            fields: None,
+        }
     }
 }
 

@@ -76,7 +76,7 @@ impl From<&FbsBlock> for Block {
 /// ----------------------------------------------------------------------
 /// Arrow File metadata
 ///
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Footer {
     /// User-defined metadata
     pub custom_metadata: Option<Vec<KeyValue>>,
@@ -194,6 +194,18 @@ impl crate::FbsSerde for Footer {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsFooter>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for Footer {
+    fn default() -> Self {
+        Self {
+            custom_metadata: None,
+            dictionaries: None,
+            recordBatches: None,
+            schema: None,
+            version: MetadataVersion::V1,
+        }
     }
 }
 

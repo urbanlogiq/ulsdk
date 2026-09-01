@@ -767,13 +767,13 @@ pub const ENUM_MIN_UL_FIELD_TYPE: u32 = 0;
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
-pub const ENUM_MAX_UL_FIELD_TYPE: u32 = 25;
+pub const ENUM_MAX_UL_FIELD_TYPE: u32 = 26;
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_UL_FIELD_TYPE: [UlFieldType; 26] = [
+pub const ENUM_VALUES_UL_FIELD_TYPE: [UlFieldType; 27] = [
     UlFieldType::FT_UNKNOWN,
     UlFieldType::FT_INT,
     UlFieldType::FT_FLOAT,
@@ -800,6 +800,7 @@ pub const ENUM_VALUES_UL_FIELD_TYPE: [UlFieldType; 26] = [
     UlFieldType::FT_TIME,
     UlFieldType::FT_GEOMETRY_OR_NODE,
     UlFieldType::FT_STRING_ARRAY,
+    UlFieldType::FT_INT_ARRAY,
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
@@ -833,9 +834,10 @@ impl UlFieldType {
     pub const FT_TIME: Self = Self(23);
     pub const FT_GEOMETRY_OR_NODE: Self = Self(24);
     pub const FT_STRING_ARRAY: Self = Self(25);
+    pub const FT_INT_ARRAY: Self = Self(26);
 
     pub const ENUM_MIN: u32 = 0;
-    pub const ENUM_MAX: u32 = 25;
+    pub const ENUM_MAX: u32 = 26;
     pub const ENUM_VALUES: &'static [Self] = &[
         Self::FT_UNKNOWN,
         Self::FT_INT,
@@ -863,6 +865,7 @@ impl UlFieldType {
         Self::FT_TIME,
         Self::FT_GEOMETRY_OR_NODE,
         Self::FT_STRING_ARRAY,
+        Self::FT_INT_ARRAY,
     ];
     /// Returns the variant's name or "" if unknown.
     pub fn variant_name(self) -> Option<&'static str> {
@@ -893,6 +896,7 @@ impl UlFieldType {
             Self::FT_TIME => Some("FT_TIME"),
             Self::FT_GEOMETRY_OR_NODE => Some("FT_GEOMETRY_OR_NODE"),
             Self::FT_STRING_ARRAY => Some("FT_STRING_ARRAY"),
+            Self::FT_INT_ARRAY => Some("FT_INT_ARRAY"),
             _ => None,
         }
     }

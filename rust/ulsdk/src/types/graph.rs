@@ -50,7 +50,7 @@ use crate::types::id::{
     ObjectNamespace, PinnedObjectId, StreamId,
 };
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i32)]
 pub enum Predicate {
     NONE = 0,
@@ -60,7 +60,6 @@ pub enum Predicate {
     entity_ty = 4,
     node_ty = 5,
     description = 6,
-    #[default]
     location = 7,
     geom = 8,
 }
@@ -122,10 +121,9 @@ impl From<FbsPredicate> for Predicate {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
 #[repr(i16)]
 pub enum ValueTransform {
-    #[default]
     NONE = 0,
     UuidToBase64 = 1,
 }
@@ -234,7 +232,7 @@ impl Default for GeomOp {
     fn default() -> Self {
         Self {
             geoms: Vec::<Geom>::default(),
-            op: Fn_::default(),
+            op: Fn_::None_,
             predicate: Predicate::location,
         }
     }
@@ -724,7 +722,7 @@ impl crate::FbsSerde for NodeQuery {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct EdgeQuery {
     pub edge_ty: EdgeTy,
 }
@@ -764,6 +762,14 @@ impl crate::FbsSerde for EdgeQuery {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsEdgeQuery>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for EdgeQuery {
+    fn default() -> Self {
+        Self {
+            edge_ty: EdgeTy::E_INVALID,
+        }
     }
 }
 
@@ -1107,7 +1113,7 @@ impl crate::FbsSerde for NodeList {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct OrderBy {
     pub field: String,
     pub nulls_first: bool,
@@ -1166,7 +1172,18 @@ impl crate::FbsSerde for OrderBy {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+impl Default for OrderBy {
+    fn default() -> Self {
+        Self {
+            field: String::default(),
+            nulls_first: bool::default(),
+            sort: SortOrder::ASC,
+            transform: ValueTransform::NONE,
+        }
+    }
+}
+
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Projection {
     pub alias: String,
     pub predicate: Predicate,
@@ -1211,6 +1228,15 @@ impl crate::FbsSerde for Projection {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsProjection>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for Projection {
+    fn default() -> Self {
+        Self {
+            alias: String::default(),
+            predicate: Predicate::NONE,
+        }
     }
 }
 
