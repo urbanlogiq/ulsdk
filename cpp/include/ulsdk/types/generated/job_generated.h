@@ -208,29 +208,34 @@ inline const char *EnumNameStatus(Status e) {
 enum class TaskErrorTy : int32_t {
   NONE = 0,
   DuplicateData = 1,
+  /// A query the task ran needed more memory than the query worker's budget.
+  /// A retry needs the same memory, so the task fails with this reason.
+  MemoryBudgetExceeded = 2,
   MIN = NONE,
-  MAX = DuplicateData
+  MAX = MemoryBudgetExceeded
 };
 
-inline const TaskErrorTy (&EnumValuesTaskErrorTy())[2] {
+inline const TaskErrorTy (&EnumValuesTaskErrorTy())[3] {
   static const TaskErrorTy values[] = {
     TaskErrorTy::NONE,
-    TaskErrorTy::DuplicateData
+    TaskErrorTy::DuplicateData,
+    TaskErrorTy::MemoryBudgetExceeded
   };
   return values;
 }
 
 inline const char * const *EnumNamesTaskErrorTy() {
-  static const char * const names[3] = {
+  static const char * const names[4] = {
     "NONE",
     "DuplicateData",
+    "MemoryBudgetExceeded",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameTaskErrorTy(TaskErrorTy e) {
-  if (::flatbuffers::IsOutRange(e, TaskErrorTy::NONE, TaskErrorTy::DuplicateData)) return "";
+  if (::flatbuffers::IsOutRange(e, TaskErrorTy::NONE, TaskErrorTy::MemoryBudgetExceeded)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesTaskErrorTy()[index];
 }

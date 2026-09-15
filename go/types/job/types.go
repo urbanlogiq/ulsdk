@@ -29,6 +29,7 @@ type TaskErrorTy int32
 const (
 	TaskErrorTyNONE TaskErrorTy = 0
 	TaskErrorTyDuplicateData TaskErrorTy = 1
+	TaskErrorTyMemoryBudgetExceeded TaskErrorTy = 2
 )
 
 type EmbeddedTable struct {

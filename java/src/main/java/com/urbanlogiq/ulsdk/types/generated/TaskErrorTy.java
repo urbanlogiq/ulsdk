@@ -10,8 +10,13 @@ public final class TaskErrorTy {
   private TaskErrorTy() { }
   public static final int NONE = 0;
   public static final int DuplicateData = 1;
+  /**
+   * A query the task ran needed more memory than the query worker's budget.
+   * A retry needs the same memory, so the task fails with this reason.
+   */
+  public static final int MemoryBudgetExceeded = 2;
 
-  public static final String[] names = { "NONE", "DuplicateData", };
+  public static final String[] names = { "NONE", "DuplicateData", "MemoryBudgetExceeded", };
 
   public static String name(int e) { return names[e]; }
 }

@@ -441,14 +441,17 @@ pub const ENUM_MIN_TASK_ERROR_TY: i32 = 0;
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
-pub const ENUM_MAX_TASK_ERROR_TY: i32 = 1;
+pub const ENUM_MAX_TASK_ERROR_TY: i32 = 2;
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_TASK_ERROR_TY: [TaskErrorTy; 2] =
-    [TaskErrorTy::NONE, TaskErrorTy::DuplicateData];
+pub const ENUM_VALUES_TASK_ERROR_TY: [TaskErrorTy; 3] = [
+    TaskErrorTy::NONE,
+    TaskErrorTy::DuplicateData,
+    TaskErrorTy::MemoryBudgetExceeded,
+];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 #[repr(transparent)]
@@ -457,15 +460,20 @@ pub struct TaskErrorTy(pub i32);
 impl TaskErrorTy {
     pub const NONE: Self = Self(0);
     pub const DuplicateData: Self = Self(1);
+    /// A query the task ran needed more memory than the query worker's budget.
+    /// A retry needs the same memory, so the task fails with this reason.
+    pub const MemoryBudgetExceeded: Self = Self(2);
 
     pub const ENUM_MIN: i32 = 0;
-    pub const ENUM_MAX: i32 = 1;
-    pub const ENUM_VALUES: &'static [Self] = &[Self::NONE, Self::DuplicateData];
+    pub const ENUM_MAX: i32 = 2;
+    pub const ENUM_VALUES: &'static [Self] =
+        &[Self::NONE, Self::DuplicateData, Self::MemoryBudgetExceeded];
     /// Returns the variant's name or "" if unknown.
     pub fn variant_name(self) -> Option<&'static str> {
         match self {
             Self::NONE => Some("NONE"),
             Self::DuplicateData => Some("DuplicateData"),
+            Self::MemoryBudgetExceeded => Some("MemoryBudgetExceeded"),
             _ => None,
         }
     }

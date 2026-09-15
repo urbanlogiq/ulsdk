@@ -121,18 +121,23 @@ func (v Status) String() string {
 type TaskErrorTy int32
 
 const (
-	TaskErrorTyNONE          TaskErrorTy = 0
-	TaskErrorTyDuplicateData TaskErrorTy = 1
+	TaskErrorTyNONE                 TaskErrorTy = 0
+	TaskErrorTyDuplicateData        TaskErrorTy = 1
+	/// A query the task ran needed more memory than the query worker's budget.
+	/// A retry needs the same memory, so the task fails with this reason.
+	TaskErrorTyMemoryBudgetExceeded TaskErrorTy = 2
 )
 
 var EnumNamesTaskErrorTy = map[TaskErrorTy]string{
-	TaskErrorTyNONE:          "NONE",
-	TaskErrorTyDuplicateData: "DuplicateData",
+	TaskErrorTyNONE:                 "NONE",
+	TaskErrorTyDuplicateData:        "DuplicateData",
+	TaskErrorTyMemoryBudgetExceeded: "MemoryBudgetExceeded",
 }
 
 var EnumValuesTaskErrorTy = map[string]TaskErrorTy{
-	"NONE":          TaskErrorTyNONE,
-	"DuplicateData": TaskErrorTyDuplicateData,
+	"NONE":                 TaskErrorTyNONE,
+	"DuplicateData":        TaskErrorTyDuplicateData,
+	"MemoryBudgetExceeded": TaskErrorTyMemoryBudgetExceeded,
 }
 
 func (v TaskErrorTy) String() string {

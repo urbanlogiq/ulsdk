@@ -221,6 +221,7 @@ class Status(Enum):
 class TaskErrorTy(Enum):
     NONE = 0
     DuplicateData = 1
+    MemoryBudgetExceeded = 2
 
 class TaskPriority(Enum):
     High = -256

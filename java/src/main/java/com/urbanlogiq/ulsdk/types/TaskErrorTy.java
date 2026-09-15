@@ -7,4 +7,5 @@ package com.urbanlogiq.ulsdk.types;
 public final class TaskErrorTy {
     public static final int NONE = com.urbanlogiq.ulsdk.types.generated.TaskErrorTy.NONE;
     public static final int DuplicateData = com.urbanlogiq.ulsdk.types.generated.TaskErrorTy.DuplicateData;
+    public static final int MemoryBudgetExceeded = com.urbanlogiq.ulsdk.types.generated.TaskErrorTy.MemoryBudgetExceeded;
 }
