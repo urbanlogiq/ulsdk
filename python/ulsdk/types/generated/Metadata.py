@@ -305,8 +305,23 @@ class Metadata(object):
             return obj
         return None
 
+    # Whether reading this stream needs values the caller has to supply. A view
+    # that is abstract over its sources, or that leaves a `$named` value unbound,
+    # cannot be planned from a stream id alone: such a read fails with an unbound
+    # data source. A consumer reads this to know not to issue that read.
+    #
+    # Derived from the stream's query and stamped onto every metadata response, so
+    # it is never authoritative in a stored metadata object -- the write path
+    # clears it, and it reads false on metadata written before this field existed.
+    # Metadata
+    def NeedsCallerInputs(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(42))
+        if o != 0:
+            return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
+        return False
+
 def MetadataStart(builder):
-    builder.StartObject(19)
+    builder.StartObject(20)
 
 def Start(builder):
     MetadataStart(builder)
@@ -460,6 +475,12 @@ def MetadataAddTimeSource(builder, timeSource):
 
 def AddTimeSource(builder, timeSource):
     MetadataAddTimeSource(builder, timeSource)
+
+def MetadataAddNeedsCallerInputs(builder, needsCallerInputs):
+    builder.PrependBoolSlot(19, needsCallerInputs, 0)
+
+def AddNeedsCallerInputs(builder, needsCallerInputs):
+    MetadataAddNeedsCallerInputs(builder, needsCallerInputs)
 
 def MetadataEnd(builder):
     return builder.EndObject()

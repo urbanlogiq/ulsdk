@@ -2860,6 +2860,16 @@ class Metadata:
     # used as the location description.
     location_description_field: "int"
 
+    # Whether reading this stream needs values the caller has to supply. A view
+    # that is abstract over its sources, or that leaves a `$named` value unbound,
+    # cannot be planned from a stream id alone: such a read fails with an unbound
+    # data source. A consumer reads this to know not to issue that read.
+    #
+    # Derived from the stream's query and stamped onto every metadata response, so
+    # it is never authoritative in a stored metadata object -- the write path
+    # clears it, and it reads false on metadata written before this field existed.
+    needs_caller_inputs: "bool"
+
     # Indices of fields that are "promoted to metrics"
     promoted_metrics: Optional["List[int]"]
 
@@ -2926,6 +2936,7 @@ class Metadata:
             geometry_source_ty = o.GeometrySourceType()
             geometry_source = GeometrySource.from_fbs(geometry_source_val, geometry_source_ty)
         location_description_field = o.LocationDescriptionField()
+        needs_caller_inputs = o.NeedsCallerInputs()
         promoted_metrics = list()
         if not o.PromotedMetricsIsNone():
             for i in range(o.PromotedMetricsLength()):
@@ -2948,7 +2959,7 @@ class Metadata:
         if not o.VisualizeInExploreFieldsIsNone():
             for i in range(o.VisualizeInExploreFieldsLength()):
                 visualize_in_explore_fields.append(o.VisualizeInExploreFields(i))
-        return cls(area_selection, dataset_category, description, detail_sections, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, promoted_metrics, source, summary, time_source, update_cadence, visualize_in_explore_fields)
+        return cls(area_selection, dataset_category, description, detail_sections, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, needs_caller_inputs, promoted_metrics, source, summary, time_source, update_cadence, visualize_in_explore_fields)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -2974,6 +2985,7 @@ class Metadata:
             AddGeometrySource,
             AddGeometrySourceType,
             AddLocationDescriptionField,
+            AddNeedsCallerInputs,
             AddPromotedMetrics,
             StartPromotedMetricsVector,
             AddSource,
@@ -3066,6 +3078,7 @@ class Metadata:
             AddGeometrySource(builder, geometry_source_offset)
             AddGeometrySourceType(builder, geometry_source_ty)
         AddLocationDescriptionField(builder, self.location_description_field)
+        AddNeedsCallerInputs(builder, self.needs_caller_inputs)
         if promoted_metrics_offset is not None:
             AddPromotedMetrics(builder, promoted_metrics_offset)
         if source_offset is not None:
@@ -3099,13 +3112,14 @@ class Metadata:
         fields = []
         geometry_source = GeometrySource.make_default()
         location_description_field = 0
+        needs_caller_inputs = False
         promoted_metrics = []
         source = DatasetSource.make_default()
         summary = []
         time_source = TimeSource.make_default()
         update_cadence = UpdateCadence(0)
         visualize_in_explore_fields = []
-        return cls(area_selection, dataset_category, description, detail_sections, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, promoted_metrics, source, summary, time_source, update_cadence, visualize_in_explore_fields)
+        return cls(area_selection, dataset_category, description, detail_sections, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, needs_caller_inputs, promoted_metrics, source, summary, time_source, update_cadence, visualize_in_explore_fields)
 
     def __eq__(self, other) -> bool:
         eq = True
@@ -3150,6 +3164,7 @@ class Metadata:
             return False
         eq = eq and self.geometry_source == other.geometry_source
         eq = eq and self.location_description_field == other.location_description_field
+        eq = eq and self.needs_caller_inputs == other.needs_caller_inputs
         self_promoted_metrics = self.promoted_metrics
         other_promoted_metrics = other.promoted_metrics
         if self_promoted_metrics is not None and other_promoted_metrics is not None:

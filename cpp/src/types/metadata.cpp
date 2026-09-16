@@ -2156,6 +2156,7 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Metadata &o) {
         instance_builder.add_geometry_source_type(geometry_source_opt.second);
     }
     instance_builder.add_location_description_field(o.location_description_field_);
+    instance_builder.add_needs_caller_inputs(o.needs_caller_inputs_);
     if (promoted_metrics_offset.has_value()) {
         instance_builder.add_promoted_metrics(promoted_metrics_offset.value());
     }
@@ -2197,6 +2198,7 @@ Metadata::Metadata()
     , fields_(std::nullopt)
     , geometry_source_(std::nullopt)
     , location_description_field_(-1)
+    , needs_caller_inputs_(false)
     , promoted_metrics_(std::nullopt)
     , source_(std::nullopt)
     , summary_(std::nullopt)
@@ -2221,6 +2223,7 @@ Metadata::Metadata(const ::Metadata *root)
     , fields_(std::nullopt)
     , geometry_source_(std::nullopt)
     , location_description_field_(-1)
+    , needs_caller_inputs_(false)
     , promoted_metrics_(std::nullopt)
     , source_(std::nullopt)
     , summary_(std::nullopt)
@@ -2299,6 +2302,7 @@ Metadata::Metadata(const ::Metadata *root)
         }
     }
     location_description_field_ = root->location_description_field();
+    needs_caller_inputs_ = root->needs_caller_inputs();
     const auto &promoted_metrics_vector = root->promoted_metrics();
     if (promoted_metrics_vector != nullptr) {
         decltype(promoted_metrics_)::value_type promoted_metrics__target = decltype(promoted_metrics_)::value_type();
@@ -2374,6 +2378,9 @@ Metadata::operator==(const Metadata &rhs) const {
         return false;
     }
     if (this->location_description_field_ != rhs.location_description_field_) {
+        return false;
+    }
+    if (this->needs_caller_inputs_ != rhs.needs_caller_inputs_) {
         return false;
     }
     if (this->promoted_metrics_ != rhs.promoted_metrics_) {

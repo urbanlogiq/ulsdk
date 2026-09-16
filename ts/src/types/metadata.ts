@@ -2215,6 +2215,18 @@ export class Metadata {
   private _locationDescriptionField!: number;
 
 /**
+ *  Whether reading this stream needs values the caller has to supply. A view
+ *  that is abstract over its sources, or that leaves a `$named` value unbound,
+ *  cannot be planned from a stream id alone: such a read fails with an unbound
+ *  data source. A consumer reads this to know not to issue that read.
+ *
+ *  Derived from the stream's query and stamped onto every metadata response, so
+ *  it is never authoritative in a stored metadata object -- the write path
+ *  clears it, and it reads false on metadata written before this field existed.
+ */
+  private _needsCallerInputs!: boolean;
+
+/**
  *  Indices of fields that are "promoted to metrics"
  */
   private _promotedMetrics!: number[] | null;
@@ -2263,6 +2275,7 @@ export class Metadata {
       this._fields = null;
       this._geometrySource = null;
       this._locationDescriptionField = 0;
+      this._needsCallerInputs = false;
       this._promotedMetrics = null;
       this._source = null;
       this._summary = null;
@@ -2320,6 +2333,7 @@ export class Metadata {
       this._geometrySource = null;
     }
     this._locationDescriptionField = fbs.locationDescriptionField();
+    this._needsCallerInputs = fbs.needsCallerInputs();
     if (fbs.promotedMetricsLength() > 0) {
       this._promotedMetrics = Array.from({ length: fbs.promotedMetricsLength() }, (_, i) => fbs.promotedMetrics(i)!);
     } else {
@@ -2438,6 +2452,14 @@ export class Metadata {
     this._locationDescriptionField = value;
   }
 
+  get needsCallerInputs(): boolean {
+    return this._needsCallerInputs;
+  }
+
+  set needsCallerInputs(value: boolean) {
+    this._needsCallerInputs = value;
+  }
+
   get promotedMetrics(): number[] | null {
     return this._promotedMetrics;
   }
@@ -2511,6 +2533,7 @@ export class Metadata {
       t.geometrySource = this._geometrySource.toFbsT();
     }
     t.locationDescriptionField = this._locationDescriptionField;
+    t.needsCallerInputs = this._needsCallerInputs;
     t.promotedMetrics = this._promotedMetrics ?? [];
     t.source = this._source ? this._source.toFbsT() : null;
     t.summary = this._summary ?? [];

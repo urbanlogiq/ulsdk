@@ -1521,6 +1521,7 @@ type Metadata struct {
 	Fields []UlField
 	GeometrySource interface{}
 	LocationDescriptionField int32
+	NeedsCallerInputs bool
 	PromotedMetrics []int32
 	Source *DatasetSource
 	Summary []int32
@@ -1562,6 +1563,7 @@ func MetadataFromFbs(fbs *generated.Metadata) *Metadata {
 		}
 	}
 	o.LocationDescriptionField = fbs.LocationDescriptionField()
+	o.NeedsCallerInputs = fbs.NeedsCallerInputs()
 	for i := 0; i < fbs.PromotedMetricsLength(); i++ {
 		o.PromotedMetrics = append(o.PromotedMetrics, fbs.PromotedMetrics(i))
 	}
@@ -1659,6 +1661,7 @@ func (o *Metadata) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 	generated.MetadataAddFieldRelationships(builder, fieldRelationshipsVecOffset)
 	generated.MetadataAddFields(builder, fieldsVecOffset)
 	generated.MetadataAddLocationDescriptionField(builder, o.LocationDescriptionField)
+	generated.MetadataAddNeedsCallerInputs(builder, o.NeedsCallerInputs)
 	generated.MetadataAddPromotedMetrics(builder, promotedMetricsVecOffset)
 	generated.MetadataAddSource(builder, sourceOffset)
 	generated.MetadataAddSummary(builder, summaryVecOffset)

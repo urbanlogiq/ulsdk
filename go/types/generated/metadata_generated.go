@@ -4288,8 +4288,36 @@ func (rcv *Metadata) TimeSource(obj *flatbuffers.Table) bool {
 /// see TimeSource. Unset on metadata written before this field existed, in
 /// which case a consumer falls back to recognising the conventional column
 /// names.
+/// Whether reading this stream needs values the caller has to supply. A view
+/// that is abstract over its sources, or that leaves a `$named` value unbound,
+/// cannot be planned from a stream id alone: such a read fails with an unbound
+/// data source. A consumer reads this to know not to issue that read.
+///
+/// Derived from the stream's query and stamped onto every metadata response, so
+/// it is never authoritative in a stored metadata object -- the write path
+/// clears it, and it reads false on metadata written before this field existed.
+func (rcv *Metadata) NeedsCallerInputs() bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(42))
+	if o != 0 {
+		return rcv._tab.GetBool(o + rcv._tab.Pos)
+	}
+	return false
+}
+
+/// Whether reading this stream needs values the caller has to supply. A view
+/// that is abstract over its sources, or that leaves a `$named` value unbound,
+/// cannot be planned from a stream id alone: such a read fails with an unbound
+/// data source. A consumer reads this to know not to issue that read.
+///
+/// Derived from the stream's query and stamped onto every metadata response, so
+/// it is never authoritative in a stored metadata object -- the write path
+/// clears it, and it reads false on metadata written before this field existed.
+func (rcv *Metadata) MutateNeedsCallerInputs(n bool) bool {
+	return rcv._tab.MutateBoolSlot(42, n)
+}
+
 func MetadataStart(builder *flatbuffers.Builder) {
-	builder.StartObject(19)
+	builder.StartObject(20)
 }
 func MetadataAddDisplayName(builder *flatbuffers.Builder, displayName flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(displayName), 0)
@@ -4365,6 +4393,9 @@ func MetadataAddTimeSourceType(builder *flatbuffers.Builder, timeSourceType Time
 }
 func MetadataAddTimeSource(builder *flatbuffers.Builder, timeSource flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(18, flatbuffers.UOffsetT(timeSource), 0)
+}
+func MetadataAddNeedsCallerInputs(builder *flatbuffers.Builder, needsCallerInputs bool) {
+	builder.PrependBoolSlot(19, needsCallerInputs, false)
 }
 func MetadataEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()

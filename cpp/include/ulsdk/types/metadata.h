@@ -578,6 +578,7 @@ struct Metadata {
     std::optional<std::vector<UlField>> fields_;
     std::optional<GeometrySource> geometry_source_;
     int32_t location_description_field_;
+    bool needs_caller_inputs_;
     std::optional<std::vector<int32_t>> promoted_metrics_;
     std::optional<DatasetSource> source_;
     std::optional<std::vector<int32_t>> summary_;

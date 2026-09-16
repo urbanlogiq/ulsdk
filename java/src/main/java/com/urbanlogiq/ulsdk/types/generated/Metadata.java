@@ -124,6 +124,17 @@ public final class Metadata extends com.google.flatbuffers.Table {
    * names.
    */
   public com.google.flatbuffers.Table timeSource(com.google.flatbuffers.Table obj) { int o = __offset(40); return o != 0 ? __union(obj, o + bb_pos) : null; }
+  /**
+   * Whether reading this stream needs values the caller has to supply. A view
+   * that is abstract over its sources, or that leaves a `$named` value unbound,
+   * cannot be planned from a stream id alone: such a read fails with an unbound
+   * data source. A consumer reads this to know not to issue that read.
+   *
+   * Derived from the stream's query and stamped onto every metadata response, so
+   * it is never authoritative in a stored metadata object -- the write path
+   * clears it, and it reads false on metadata written before this field existed.
+   */
+  public boolean needsCallerInputs() { int o = __offset(42); return o != 0 ? 0!=bb.get(o + bb_pos) : false; }
 
   public static int createMetadata(FlatBufferBuilder builder,
       int displayNameOffset,
@@ -144,8 +155,9 @@ public final class Metadata extends com.google.flatbuffers.Table {
       int visualizeInExploreFieldsOffset,
       int detailSectionsOffset,
       byte timeSourceType,
-      int timeSourceOffset) {
-    builder.startTable(19);
+      int timeSourceOffset,
+      boolean needsCallerInputs) {
+    builder.startTable(20);
     Metadata.addTimeSource(builder, timeSourceOffset);
     Metadata.addDetailSections(builder, detailSectionsOffset);
     Metadata.addVisualizeInExploreFields(builder, visualizeInExploreFieldsOffset);
@@ -161,6 +173,7 @@ public final class Metadata extends com.google.flatbuffers.Table {
     Metadata.addFields(builder, fieldsOffset);
     Metadata.addDescription(builder, descriptionOffset);
     Metadata.addDisplayName(builder, displayNameOffset);
+    Metadata.addNeedsCallerInputs(builder, needsCallerInputs);
     Metadata.addTimeSourceType(builder, timeSourceType);
     Metadata.addDoNotFilterGeometryByViewport(builder, doNotFilterGeometryByViewport);
     Metadata.addAreaSelection(builder, areaSelection);
@@ -168,7 +181,7 @@ public final class Metadata extends com.google.flatbuffers.Table {
     return Metadata.endMetadata(builder);
   }
 
-  public static void startMetadata(FlatBufferBuilder builder) { builder.startTable(19); }
+  public static void startMetadata(FlatBufferBuilder builder) { builder.startTable(20); }
   public static void addDisplayName(FlatBufferBuilder builder, int displayNameOffset) { builder.addOffset(0, displayNameOffset, 0); }
   public static void addDescription(FlatBufferBuilder builder, int descriptionOffset) { builder.addOffset(1, descriptionOffset, 0); }
   public static void addFields(FlatBufferBuilder builder, int fieldsOffset) { builder.addOffset(2, fieldsOffset, 0); }
@@ -200,6 +213,7 @@ public final class Metadata extends com.google.flatbuffers.Table {
   public static void startDetailSectionsVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
   public static void addTimeSourceType(FlatBufferBuilder builder, byte timeSourceType) { builder.addByte(17, timeSourceType, 0); }
   public static void addTimeSource(FlatBufferBuilder builder, int timeSourceOffset) { builder.addOffset(18, timeSourceOffset, 0); }
+  public static void addNeedsCallerInputs(FlatBufferBuilder builder, boolean needsCallerInputs) { builder.addBoolean(19, needsCallerInputs, false); }
   public static int endMetadata(FlatBufferBuilder builder) {
     int o = builder.endTable();
     return o;

@@ -231,8 +231,23 @@ timeSource<T extends flatbuffers.Table>(obj:any):any|null {
   return offset ? this.bb!.__union(obj, this.bb_pos + offset) : null;
 }
 
+/**
+ * Whether reading this stream needs values the caller has to supply. A view
+ * that is abstract over its sources, or that leaves a `$named` value unbound,
+ * cannot be planned from a stream id alone: such a read fails with an unbound
+ * data source. A consumer reads this to know not to issue that read.
+ *
+ * Derived from the stream's query and stamped onto every metadata response, so
+ * it is never authoritative in a stored metadata object -- the write path
+ * clears it, and it reads false on metadata written before this field existed.
+ */
+needsCallerInputs():boolean {
+  const offset = this.bb!.__offset(this.bb_pos, 42);
+  return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
+}
+
 static startMetadata(builder:flatbuffers.Builder) {
-  builder.startObject(19);
+  builder.startObject(20);
 }
 
 static addDisplayName(builder:flatbuffers.Builder, displayNameOffset:flatbuffers.Offset) {
@@ -398,6 +413,10 @@ static addTimeSource(builder:flatbuffers.Builder, timeSourceOffset:flatbuffers.O
   builder.addFieldOffset(18, timeSourceOffset, 0);
 }
 
+static addNeedsCallerInputs(builder:flatbuffers.Builder, needsCallerInputs:boolean) {
+  builder.addFieldInt8(19, +needsCallerInputs, +false);
+}
+
 static endMetadata(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   return offset;
@@ -440,7 +459,8 @@ unpack(): MetadataT {
       const temp = unionToTimeSource(this.timeSourceType(), this.timeSource.bind(this));
       if(temp === null) { return null; }
       return temp.unpack()
-  })()
+  })(),
+    this.needsCallerInputs()
   );
 }
 
@@ -473,6 +493,7 @@ unpackTo(_o: MetadataT): void {
       if(temp === null) { return null; }
       return temp.unpack()
   })();
+  _o.needsCallerInputs = this.needsCallerInputs();
 }
 }
 
@@ -496,7 +517,8 @@ constructor(
   public visualizeInExploreFields: (number)[] = [],
   public detailSections: (DetailSectionT)[] = [],
   public timeSourceType: TimeSource = TimeSource.NONE,
-  public timeSource: ColumnTimeT|NoTimeT|null = null
+  public timeSource: ColumnTimeT|NoTimeT|null = null,
+  public needsCallerInputs: boolean = false
 ){}
 
 
@@ -533,6 +555,7 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   Metadata.addDetailSections(builder, detailSections);
   Metadata.addTimeSourceType(builder, this.timeSourceType);
   Metadata.addTimeSource(builder, timeSource);
+  Metadata.addNeedsCallerInputs(builder, this.needsCallerInputs);
 
   return Metadata.endMetadata(builder);
 }

@@ -9733,6 +9733,7 @@ impl<'a> Metadata<'a> {
     pub const VT_DETAIL_SECTIONS: flatbuffers::VOffsetT = 36;
     pub const VT_TIME_SOURCE_TYPE: flatbuffers::VOffsetT = 38;
     pub const VT_TIME_SOURCE: flatbuffers::VOffsetT = 40;
+    pub const VT_NEEDS_CALLER_INPUTS: flatbuffers::VOffsetT = 42;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -9781,6 +9782,7 @@ impl<'a> Metadata<'a> {
         if let Some(x) = args.display_name {
             builder.add_display_name(x);
         }
+        builder.add_needs_caller_inputs(args.needs_caller_inputs);
         builder.add_time_source_type(args.time_source_type);
         builder.add_do_not_filter_geometry_by_viewport(args.do_not_filter_geometry_by_viewport);
         builder.add_area_selection(args.area_selection);
@@ -10041,6 +10043,25 @@ impl<'a> Metadata<'a> {
                 )
         }
     }
+    /// Whether reading this stream needs values the caller has to supply. A view
+    /// that is abstract over its sources, or that leaves a `$named` value unbound,
+    /// cannot be planned from a stream id alone: such a read fails with an unbound
+    /// data source. A consumer reads this to know not to issue that read.
+    ///
+    /// Derived from the stream's query and stamped onto every metadata response, so
+    /// it is never authoritative in a stored metadata object -- the write path
+    /// clears it, and it reads false on metadata written before this field existed.
+    #[inline]
+    pub fn needs_caller_inputs(&self) -> bool {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<bool>(Metadata::VT_NEEDS_CALLER_INPUTS, Some(false))
+                .unwrap()
+        }
+    }
     #[inline]
     #[allow(non_snake_case)]
     pub fn geometry_source_as_no_geometry(&self) -> Option<NoGeometry<'a>> {
@@ -10173,6 +10194,7 @@ impl flatbuffers::Verifiable for Metadata<'_> {
           _ => Ok(()),
         }
      })?
+     .visit_field::<bool>("needs_caller_inputs", Self::VT_NEEDS_CALLER_INPUTS, false)?
      .finish();
         Ok(())
     }
@@ -10207,6 +10229,7 @@ pub struct MetadataArgs<'a> {
     >,
     pub time_source_type: TimeSource,
     pub time_source: Option<flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>>,
+    pub needs_caller_inputs: bool,
 }
 impl<'a> Default for MetadataArgs<'a> {
     #[inline]
@@ -10231,6 +10254,7 @@ impl<'a> Default for MetadataArgs<'a> {
             detail_sections: None,
             time_source_type: TimeSource::NONE,
             time_source: None,
+            needs_caller_inputs: false,
         }
     }
 }
@@ -10240,7 +10264,7 @@ impl Serialize for Metadata<'_> {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("Metadata", 19)?;
+        let mut s = serializer.serialize_struct("Metadata", 20)?;
         if let Some(f) = self.display_name() {
             s.serialize_field("display_name", &f)?;
         } else {
@@ -10343,6 +10367,7 @@ impl Serialize for Metadata<'_> {
             }
             _ => unimplemented!(),
         }
+        s.serialize_field("needs_caller_inputs", &self.needs_caller_inputs())?;
         s.end()
     }
 }
@@ -10506,6 +10531,11 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> MetadataBuilder<'a, 'b, A> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(Metadata::VT_TIME_SOURCE, time_source);
     }
     #[inline]
+    pub fn add_needs_caller_inputs(&mut self, needs_caller_inputs: bool) {
+        self.fbb_
+            .push_slot::<bool>(Metadata::VT_NEEDS_CALLER_INPUTS, needs_caller_inputs, false);
+    }
+    #[inline]
     pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> MetadataBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         MetadataBuilder {
@@ -10621,6 +10651,7 @@ impl core::fmt::Debug for Metadata<'_> {
                 ds.field("time_source", &x)
             }
         };
+        ds.field("needs_caller_inputs", &self.needs_caller_inputs());
         ds.finish()
     }
 }

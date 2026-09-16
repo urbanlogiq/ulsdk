@@ -120,6 +120,24 @@ public final class Metadata {
     }
 
     /**
+     *  Whether reading this stream needs values the caller has to supply. A view
+     *  that is abstract over its sources, or that leaves a `$named` value unbound,
+     *  cannot be planned from a stream id alone: such a read fails with an unbound
+     *  data source. A consumer reads this to know not to issue that read.
+     * 
+     *  Derived from the stream's query and stamped onto every metadata response, so
+     *  it is never authoritative in a stored metadata object -- the write path
+     *  clears it, and it reads false on metadata written before this field existed.
+     */
+    boolean _needsCallerInputs;
+    public boolean getNeedsCallerInputs() {
+        return this._needsCallerInputs;
+    }
+    public void setNeedsCallerInputs(boolean value) {
+        this._needsCallerInputs = value;
+    }
+
+    /**
      *  Indices of fields that are "promoted to metrics"
      */
     int[] _promotedMetrics;
@@ -252,6 +270,7 @@ public final class Metadata {
             this._geometrySource = new com.urbanlogiq.ulsdk.types.GeometrySource(geometrySourceValue);
         }
         this._locationDescriptionField = o.locationDescriptionField();
+        this._needsCallerInputs = o.needsCallerInputs();
         if (o.promotedMetricsVector() != null) {
             int[] promotedMetrics = new int[o.promotedMetricsLength()];
             for (int i = 0; i < o.promotedMetricsLength(); i++) {
@@ -403,6 +422,7 @@ public final class Metadata {
             com.urbanlogiq.ulsdk.types.generated.Metadata.addGeometrySourceType(builder, geometrySourcePair.second());
         }
         com.urbanlogiq.ulsdk.types.generated.Metadata.addLocationDescriptionField(builder, this._locationDescriptionField);
+        com.urbanlogiq.ulsdk.types.generated.Metadata.addNeedsCallerInputs(builder, this._needsCallerInputs);
         if (promotedMetricsOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.Metadata.addPromotedMetrics(builder, promotedMetricsOffset);
         }

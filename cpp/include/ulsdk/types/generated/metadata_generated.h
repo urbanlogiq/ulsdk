@@ -4109,7 +4109,8 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_VISUALIZE_IN_EXPLORE_FIELDS = 34,
     VT_DETAIL_SECTIONS = 36,
     VT_TIME_SOURCE_TYPE = 38,
-    VT_TIME_SOURCE = 40
+    VT_TIME_SOURCE = 40,
+    VT_NEEDS_CALLER_INPUTS = 42
   };
   const ::flatbuffers::String *display_name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_DISPLAY_NAME);
@@ -4212,6 +4213,17 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ColumnTime *time_source_as_ColumnTime() const {
     return time_source_type() == TimeSource::ColumnTime ? static_cast<const ColumnTime *>(time_source()) : nullptr;
   }
+  /// Whether reading this stream needs values the caller has to supply. A view
+  /// that is abstract over its sources, or that leaves a `$named` value unbound,
+  /// cannot be planned from a stream id alone: such a read fails with an unbound
+  /// data source. A consumer reads this to know not to issue that read.
+  ///
+  /// Derived from the stream's query and stamped onto every metadata response, so
+  /// it is never authoritative in a stored metadata object -- the write path
+  /// clears it, and it reads false on metadata written before this field existed.
+  bool needs_caller_inputs() const {
+    return GetField<uint8_t>(VT_NEEDS_CALLER_INPUTS, 0) != 0;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_DISPLAY_NAME) &&
@@ -4247,6 +4259,7 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_TIME_SOURCE_TYPE, 1) &&
            VerifyOffset(verifier, VT_TIME_SOURCE) &&
            VerifyTimeSource(verifier, time_source(), time_source_type()) &&
+           VerifyField<uint8_t>(verifier, VT_NEEDS_CALLER_INPUTS, 1) &&
            verifier.EndTable();
   }
 };
@@ -4336,6 +4349,9 @@ struct MetadataBuilder {
   void add_time_source(::flatbuffers::Offset<void> time_source) {
     fbb_.AddOffset(Metadata::VT_TIME_SOURCE, time_source);
   }
+  void add_needs_caller_inputs(bool needs_caller_inputs) {
+    fbb_.AddElement<uint8_t>(Metadata::VT_NEEDS_CALLER_INPUTS, static_cast<uint8_t>(needs_caller_inputs), 0);
+  }
   explicit MetadataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -4367,7 +4383,8 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadata(
     ::flatbuffers::Offset<::flatbuffers::Vector<int32_t>> visualize_in_explore_fields = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<DetailSection>>> detail_sections = 0,
     TimeSource time_source_type = TimeSource::NONE,
-    ::flatbuffers::Offset<void> time_source = 0) {
+    ::flatbuffers::Offset<void> time_source = 0,
+    bool needs_caller_inputs = false) {
   MetadataBuilder builder_(_fbb);
   builder_.add_time_source(time_source);
   builder_.add_detail_sections(detail_sections);
@@ -4384,6 +4401,7 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadata(
   builder_.add_fields(fields);
   builder_.add_description(description);
   builder_.add_display_name(display_name);
+  builder_.add_needs_caller_inputs(needs_caller_inputs);
   builder_.add_time_source_type(time_source_type);
   builder_.add_do_not_filter_geometry_by_viewport(do_not_filter_geometry_by_viewport);
   builder_.add_area_selection(area_selection);
@@ -4416,7 +4434,8 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadataDirect(
     const std::vector<int32_t> *visualize_in_explore_fields = nullptr,
     const std::vector<::flatbuffers::Offset<DetailSection>> *detail_sections = nullptr,
     TimeSource time_source_type = TimeSource::NONE,
-    ::flatbuffers::Offset<void> time_source = 0) {
+    ::flatbuffers::Offset<void> time_source = 0,
+    bool needs_caller_inputs = false) {
   auto display_name__ = display_name ? _fbb.CreateString(display_name) : 0;
   auto description__ = description ? _fbb.CreateString(description) : 0;
   auto fields__ = fields ? _fbb.CreateVector<::flatbuffers::Offset<UlField>>(*fields) : 0;
@@ -4445,7 +4464,8 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadataDirect(
       visualize_in_explore_fields__,
       detail_sections__,
       time_source_type,
-      time_source);
+      time_source,
+      needs_caller_inputs);
 }
 
 inline bool VerifyComponentData(::flatbuffers::Verifier &verifier, const void *obj, ComponentData type) {

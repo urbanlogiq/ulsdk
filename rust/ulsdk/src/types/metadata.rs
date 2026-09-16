@@ -2846,6 +2846,15 @@ pub struct Metadata {
     /// This attribute holds the index of the field in the dataset that should be
     /// used as the location description.
     pub location_description_field: i32,
+    /// Whether reading this stream needs values the caller has to supply. A view
+    /// that is abstract over its sources, or that leaves a `$named` value unbound,
+    /// cannot be planned from a stream id alone: such a read fails with an unbound
+    /// data source. A consumer reads this to know not to issue that read.
+    ///
+    /// Derived from the stream's query and stamped onto every metadata response, so
+    /// it is never authoritative in a stored metadata object -- the write path
+    /// clears it, and it reads false on metadata written before this field existed.
+    pub needs_caller_inputs: bool,
     /// Indices of fields that are "promoted to metrics"
     pub promoted_metrics: Option<Vec<i32>>,
     /// An optional field that is meant to provide information to the user on
@@ -2945,6 +2954,7 @@ impl Metadata {
             bldr.add_geometry_source_type(ty);
         }
         bldr.add_location_description_field(self.location_description_field);
+        bldr.add_needs_caller_inputs(self.needs_caller_inputs);
         if let Some(offset) = promoted_metrics_offset {
             bldr.add_promoted_metrics(offset);
         }
@@ -3037,6 +3047,7 @@ impl From<FbsMetadata<'_>> for Metadata {
         };
 
         let location_description_field = fbs.location_description_field();
+        let needs_caller_inputs = fbs.needs_caller_inputs();
         let promoted_metrics = if let Some(val) = fbs.promoted_metrics() {
             let mut promoted_metrics = Vec::new();
             for elem in val {
@@ -3100,6 +3111,7 @@ impl From<FbsMetadata<'_>> for Metadata {
             fields,
             geometry_source,
             location_description_field,
+            needs_caller_inputs,
             promoted_metrics,
             source,
             summary,
@@ -3142,6 +3154,7 @@ impl Default for Metadata {
             fields: None,
             geometry_source: None,
             location_description_field: -1,
+            needs_caller_inputs: bool::default(),
             promoted_metrics: None,
             source: None,
             summary: None,
