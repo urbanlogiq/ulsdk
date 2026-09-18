@@ -16,7 +16,7 @@ public final class Directory {
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.types.B2cId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/principal/:id";
+        String path = "/v1/api/ulv2/directory/v1/principal/:id";
         path = path.replace(":id", id.toString());
 
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
@@ -39,7 +39,7 @@ public final class Directory {
         com.urbanlogiq.ulsdk.RequestContext ctx,
         String ids
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/principal/:ids";
+        String path = "/v1/api/ulv2/directory/v1/principal/:ids";
         path = path.replace(":ids", ids.toString());
 
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
@@ -78,7 +78,7 @@ public final class Directory {
         com.urbanlogiq.ulsdk.RequestContext ctx,
         String query
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/principals/:query";
+        String path = "/v1/api/ulv2/directory/v1/principals/:query";
         path = path.replace(":query", query.toString());
 
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
@@ -103,7 +103,7 @@ public final class Directory {
     public static com.urbanlogiq.ulsdk.api.directory.AdUser[] getUsers(
         com.urbanlogiq.ulsdk.RequestContext ctx
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/users";
+        String path = "/v1/api/ulv2/directory/v1/users";
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
 
@@ -126,7 +126,7 @@ public final class Directory {
     public static com.urbanlogiq.ulsdk.api.directory.DisplayNames[] getUsersDisplayNames(
         com.urbanlogiq.ulsdk.RequestContext ctx
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/users/display_names";
+        String path = "/v1/api/ulv2/directory/v1/users/display_names";
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
 
@@ -153,7 +153,7 @@ public final class Directory {
         com.urbanlogiq.ulsdk.RequestContext ctx,
         Boolean auditLog
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/user";
+        String path = "/v1/api/ulv2/directory/v1/user";
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         if (auditLog != null) {
             params.add(new com.urbanlogiq.ulsdk.Pair("audit_log", auditLog.toString()));
@@ -178,7 +178,7 @@ public final class Directory {
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.api.directory.CreateUserRequest createUserRequest
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/user";
+        String path = "/v1/api/ulv2/directory/v1/user";
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
 
@@ -200,7 +200,7 @@ public final class Directory {
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.api.directory.UpdateCurrentUser updateUserRequest
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/user";
+        String path = "/v1/api/ulv2/directory/v1/user";
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
 
@@ -223,7 +223,7 @@ public final class Directory {
         com.urbanlogiq.ulsdk.types.B2cId id,
         Boolean auditLog
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/user/:id";
+        String path = "/v1/api/ulv2/directory/v1/user/:id";
         path = path.replace(":id", id.toString());
 
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
@@ -244,17 +244,23 @@ public final class Directory {
      * 
      * @param ctx A request context object
      * @param id The ID of the user to update
+     * @param flush Whether to flush the gateway cache after the update. The default is true. A bulk caller passes false for every update and calls `flush_gateway_cache` once at the end.
      * @param update_user_request The details which which to update the user
      */
     public static void updateUser(
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.types.B2cId id,
+        Boolean flush,
         com.urbanlogiq.ulsdk.api.directory.UpdateUser updateUserRequest
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/user/:id";
+        String path = "/v1/api/ulv2/directory/v1/user/:id";
         path = path.replace(":id", id.toString());
 
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        if (flush != null) {
+            params.add(new com.urbanlogiq.ulsdk.Pair("flush", flush.toString()));
+        }
+
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
 
         byte[] body = null;
@@ -273,7 +279,7 @@ public final class Directory {
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.types.B2cId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/user/:id";
+        String path = "/v1/api/ulv2/directory/v1/user/:id";
         path = path.replace(":id", id.toString());
 
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
@@ -290,7 +296,7 @@ public final class Directory {
     public static com.urbanlogiq.ulsdk.api.directory.AdGroup[] getGroups(
         com.urbanlogiq.ulsdk.RequestContext ctx
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/group";
+        String path = "/v1/api/ulv2/directory/v1/group";
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
 
@@ -317,7 +323,7 @@ public final class Directory {
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.api.directory.CreateGroup createGroupRequest
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/group";
+        String path = "/v1/api/ulv2/directory/v1/group";
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
 
@@ -340,7 +346,7 @@ public final class Directory {
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.types.B2cId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/group/:id";
+        String path = "/v1/api/ulv2/directory/v1/group/:id";
         path = path.replace(":id", id.toString());
 
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
@@ -368,7 +374,7 @@ public final class Directory {
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.types.B2cId id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/group/:id";
+        String path = "/v1/api/ulv2/directory/v1/group/:id";
         path = path.replace(":id", id.toString());
 
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
@@ -390,7 +396,7 @@ public final class Directory {
         com.urbanlogiq.ulsdk.types.B2cId group,
         com.urbanlogiq.ulsdk.types.B2cId member
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/group/:group/:member";
+        String path = "/v1/api/ulv2/directory/v1/group/:group/:member";
         path = path.replace(":group", group.toString());
         path = path.replace(":member", member.toString());
 
@@ -415,7 +421,7 @@ public final class Directory {
         com.urbanlogiq.ulsdk.types.B2cId group,
         com.urbanlogiq.ulsdk.types.B2cId member
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/group/:group/:member";
+        String path = "/v1/api/ulv2/directory/v1/group/:group/:member";
         path = path.replace(":group", group.toString());
         path = path.replace(":member", member.toString());
 
@@ -424,5 +430,159 @@ public final class Directory {
 
         ctx.delete(path, params, headers);
         return;
+    }
+
+    /**
+     * Lists organizations visible to the caller. Admins (admin.directory + admin.org) see all organizations; everyone else sees only organizations whose `org_id` group they belong to.
+     * @return Organizations visible to the caller.
+     */
+    public static com.urbanlogiq.ulsdk.api.directory.OrganizationList listOrganizations(
+        com.urbanlogiq.ulsdk.RequestContext ctx
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/directory/v1/organization";
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+
+        byte[] res = ctx.get(path, params, headers);
+        String jsonString = new String(res, java.nio.charset.StandardCharsets.UTF_8);
+        org.json.JSONObject json = new org.json.JSONObject(jsonString);
+        return new com.urbanlogiq.ulsdk.api.directory.OrganizationList(json);
+    }
+
+    /**
+     * Creates a new organization. Creates three AD groups (org, org mgmt, data owner) and records them in the organizations table. Requires `admin.org`; top-level organizations additionally require `admin.directory`; child organizations require membership in the parent's mgmt group.
+     * 
+     * @param ctx A request context object
+     * @param create_organization_request Organization creation details
+     * @return Details of the created organization.
+     */
+    public static com.urbanlogiq.ulsdk.api.directory.Organization createOrganization(
+        com.urbanlogiq.ulsdk.RequestContext ctx,
+        com.urbanlogiq.ulsdk.api.directory.CreateOrganizationRequest createOrganizationRequest
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/directory/v1/organization";
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+
+        byte[] body = null;
+        body = new org.json.JSONObject(createOrganizationRequest.toMap()).toString().getBytes();
+        byte[] res = ctx.post(path, body, "application/json", params, headers);
+        String jsonString = new String(res, java.nio.charset.StandardCharsets.UTF_8);
+        org.json.JSONObject json = new org.json.JSONObject(jsonString);
+        return new com.urbanlogiq.ulsdk.api.directory.Organization(json);
+    }
+
+    /**
+     * Fetches the details of a single organization by `org_id`.
+     * 
+     * @param ctx A request context object
+     * @param id The organization's `org_id` (B2cId).
+     * @return The organization's details.
+     */
+    public static com.urbanlogiq.ulsdk.api.directory.Organization getOrganization(
+        com.urbanlogiq.ulsdk.RequestContext ctx,
+        com.urbanlogiq.ulsdk.types.B2cId id
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/directory/v1/organization/:id";
+        path = path.replace(":id", id.toString());
+
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+
+        byte[] res = ctx.get(path, params, headers);
+        String jsonString = new String(res, java.nio.charset.StandardCharsets.UTF_8);
+        org.json.JSONObject json = new org.json.JSONObject(jsonString);
+        return new com.urbanlogiq.ulsdk.api.directory.Organization(json);
+    }
+
+    /**
+     * Renames an organization. Caller must belong to the organization's management group.
+     * 
+     * @param ctx A request context object
+     * @param id The organization's `org_id` (B2cId).
+     * @param rename_organization_request New name for the organization.
+     */
+    public static void renameOrganization(
+        com.urbanlogiq.ulsdk.RequestContext ctx,
+        com.urbanlogiq.ulsdk.types.B2cId id,
+        com.urbanlogiq.ulsdk.api.directory.RenameOrganizationRequest renameOrganizationRequest
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/directory/v1/organization/:id";
+        path = path.replace(":id", id.toString());
+
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+
+        byte[] body = null;
+        body = new org.json.JSONObject(renameOrganizationRequest.toMap()).toString().getBytes();
+        ctx.put(path, body, "application/json", params, headers);
+        return;
+    }
+
+    /**
+     * Fetches the organization record for a specific user, derived from the user's AD `department` field.
+     * 
+     * @param ctx A request context object
+     * @param id The user's B2cId.
+     * @return The user's organization record.
+     */
+    public static com.urbanlogiq.ulsdk.api.directory.Organization getUserOrganization(
+        com.urbanlogiq.ulsdk.RequestContext ctx,
+        com.urbanlogiq.ulsdk.types.B2cId id
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/directory/v1/user/:id/organization";
+        path = path.replace(":id", id.toString());
+
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+
+        byte[] res = ctx.get(path, params, headers);
+        String jsonString = new String(res, java.nio.charset.StandardCharsets.UTF_8);
+        org.json.JSONObject json = new org.json.JSONObject(jsonString);
+        return new com.urbanlogiq.ulsdk.api.directory.Organization(json);
+    }
+
+    /**
+     * Associates an existing AD group with an organization. Temporary migration-only endpoint — do not use from new code; will be removed once the backfill is done. Requires both `admin.directory` and `admin.org`. Idempotent: if the association already exists the request is a no-op.
+     * 
+     * @param ctx A request context object
+     * @param group The AD group's B2cId.
+     * @param org The organization's `org_id` (B2cId).
+     */
+    public static void associateGroupWithOrganization(
+        com.urbanlogiq.ulsdk.RequestContext ctx,
+        com.urbanlogiq.ulsdk.types.B2cId group,
+        com.urbanlogiq.ulsdk.types.B2cId org
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/directory/v1/group/:group/org/:org";
+        path = path.replace(":group", group.toString());
+        path = path.replace(":org", org.toString());
+
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+
+        byte[] body = null;
+        body = null;
+        ctx.post(path, body, "text/plain", params, headers);
+        return;
+    }
+
+    /**
+     * Flushes the cache of every gateway pod. The directory flushes after each change that the gateway caches; a bulk caller that passed `flush=false` to `update_user` calls this once at the end. Requires `admin.directory`.
+     * @return How many gateway pods were flushed.
+     */
+    public static com.urbanlogiq.ulsdk.api.directory.FlushedGatewayPods flushGatewayCache(
+        com.urbanlogiq.ulsdk.RequestContext ctx
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/directory/v1/flush_cache";
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+
+        byte[] body = null;
+        body = null;
+        byte[] res = ctx.post(path, body, "text/plain", params, headers);
+        String jsonString = new String(res, java.nio.charset.StandardCharsets.UTF_8);
+        org.json.JSONObject json = new org.json.JSONObject(jsonString);
+        return new com.urbanlogiq.ulsdk.api.directory.FlushedGatewayPods(json);
     }
 }

@@ -12,7 +12,7 @@ public final class Keys {
     public static com.urbanlogiq.ulsdk.api.keys.GetKeys getKeys(
         com.urbanlogiq.ulsdk.RequestContext ctx
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/keys/";
+        String path = "/v1/api/ulv2/directory/v1/keys/";
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
 
@@ -29,7 +29,7 @@ public final class Keys {
     public static com.urbanlogiq.ulsdk.api.keys.CreateKey createKey(
         com.urbanlogiq.ulsdk.RequestContext ctx
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/keys/";
+        String path = "/v1/api/ulv2/directory/v1/keys/";
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
 
@@ -53,7 +53,7 @@ public final class Keys {
         String id,
         com.urbanlogiq.ulsdk.api.keys.UpdateKey updateKey
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/keys/:id";
+        String path = "/v1/api/ulv2/directory/v1/keys/:id";
         path = path.replace(":id", id.toString());
 
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
@@ -76,7 +76,7 @@ public final class Keys {
         com.urbanlogiq.ulsdk.RequestContext ctx,
         String id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/keys/:id";
+        String path = "/v1/api/ulv2/directory/v1/keys/:id";
         path = path.replace(":id", id.toString());
 
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
@@ -98,7 +98,7 @@ public final class Keys {
         com.urbanlogiq.ulsdk.RequestContext ctx,
         String id
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/uldirectory/v1/keys/:id";
+        String path = "/v1/api/ulv2/directory/v1/keys/:id";
         path = path.replace(":id", id.toString());
 
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();

@@ -8,12 +8,14 @@ import com.urbanlogiq.ulsdk.Environment;
 import com.urbanlogiq.ulsdk.Region;
 import java.util.UUID;
 import org.junitpioneer.jupiter.RetryingTest;
+import org.junit.jupiter.api.Disabled;
 import com.urbanlogiq.ulsdk.api.keys.CreateKey;
 import com.urbanlogiq.ulsdk.api.keys.GetKeys;
 import com.urbanlogiq.ulsdk.api.keys.Key;
 import com.urbanlogiq.ulsdk.api.keys.UpdateKey;
 
 public final class TestApiKeys {
+    @Disabled("disabled during the uldirectory-to-ulv2 directory migration")
     @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testGetKeys() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
@@ -35,6 +37,7 @@ public final class TestApiKeys {
         org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 
+    @Disabled("disabled during the uldirectory-to-ulv2 directory migration")
     @RetryingTest(maxAttempts = 5, suspendForMs = 1000)
     public void testGetKeys1() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");

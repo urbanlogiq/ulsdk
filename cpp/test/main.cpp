@@ -64,6 +64,13 @@ void run_api_tests(
 ) {
     while (p != nullptr) {
         if (filter_test(filters, p->name)) {
+            if (p->skip_reason != nullptr) {
+                std::cout << "  Skipping test " << p->name
+                          << " (" << p->skip_reason << ")" << std::endl;
+                p = p->next;
+                continue;
+            }
+
             std::cout << "  Running test " << p->name << " ... ";
 
             for (int i = 0; i < 5; ++i) {

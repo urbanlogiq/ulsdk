@@ -12,11 +12,16 @@ import com.urbanlogiq.ulsdk.api.directory.AdGroup;
 import com.urbanlogiq.ulsdk.api.directory.AdUser;
 import com.urbanlogiq.ulsdk.api.directory.AdUserWithAuditLog;
 import com.urbanlogiq.ulsdk.api.directory.CreateGroup;
+import com.urbanlogiq.ulsdk.api.directory.CreateOrganizationRequest;
 import com.urbanlogiq.ulsdk.api.directory.CreateUser;
 import com.urbanlogiq.ulsdk.api.directory.CreateUserRequest;
 import com.urbanlogiq.ulsdk.api.directory.DisplayNames;
+import com.urbanlogiq.ulsdk.api.directory.FlushedGatewayPods;
 import com.urbanlogiq.ulsdk.api.directory.GroupMembership;
+import com.urbanlogiq.ulsdk.api.directory.Organization;
+import com.urbanlogiq.ulsdk.api.directory.OrganizationList;
 import com.urbanlogiq.ulsdk.api.directory.Principal;
+import com.urbanlogiq.ulsdk.api.directory.RenameOrganizationRequest;
 import com.urbanlogiq.ulsdk.api.directory.UpdateCurrentUser;
 import com.urbanlogiq.ulsdk.api.directory.UpdateUser;
 
@@ -247,10 +252,12 @@ public final class TestApiDirectory {
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
         com.urbanlogiq.ulsdk.types.B2cId p0 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
+        boolean q0 = true;
         com.urbanlogiq.ulsdk.api.directory.UpdateUser body = new com.urbanlogiq.ulsdk.api.directory.UpdateUser();
         com.urbanlogiq.ulsdk.api.directory.Directory.updateUser(
             ctx,
             p0,
+            q0,
             body
         );
     }
@@ -406,5 +413,158 @@ public final class TestApiDirectory {
             p0,
             p1
         );
+    }
+
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
+    public void testListOrganizations() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String caUser = System.getenv("CA_USER");
+        String caAccessKey = System.getenv("CA_ACCESS_KEY");
+        String caSecretKey = System.getenv("CA_SECRET_KEY");
+
+        if (caUser == null || caAccessKey == null || caSecretKey == null) {
+            throw new RuntimeException("user / key not present, cannot run tests");
+        }
+
+        com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
+        com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
+        com.urbanlogiq.ulsdk.api.directory.OrganizationList expected = new com.urbanlogiq.ulsdk.api.directory.OrganizationList();
+        byte[] expectedBytes = new org.json.JSONObject(expected.toMap()).toString().getBytes();
+        ctx.setResponse(expectedBytes);
+        com.urbanlogiq.ulsdk.api.directory.OrganizationList result = com.urbanlogiq.ulsdk.api.directory.Directory.listOrganizations(
+            ctx
+        );
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
+    }
+
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
+    public void testCreateOrganization() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String caUser = System.getenv("CA_USER");
+        String caAccessKey = System.getenv("CA_ACCESS_KEY");
+        String caSecretKey = System.getenv("CA_SECRET_KEY");
+
+        if (caUser == null || caAccessKey == null || caSecretKey == null) {
+            throw new RuntimeException("user / key not present, cannot run tests");
+        }
+
+        com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
+        com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
+        com.urbanlogiq.ulsdk.api.directory.CreateOrganizationRequest body = new com.urbanlogiq.ulsdk.api.directory.CreateOrganizationRequest();
+        com.urbanlogiq.ulsdk.api.directory.Organization expected = new com.urbanlogiq.ulsdk.api.directory.Organization();
+        byte[] expectedBytes = new org.json.JSONObject(expected.toMap()).toString().getBytes();
+        ctx.setResponse(expectedBytes);
+        com.urbanlogiq.ulsdk.api.directory.Organization result = com.urbanlogiq.ulsdk.api.directory.Directory.createOrganization(
+            ctx,
+            body
+        );
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
+    }
+
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
+    public void testGetOrganization() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String caUser = System.getenv("CA_USER");
+        String caAccessKey = System.getenv("CA_ACCESS_KEY");
+        String caSecretKey = System.getenv("CA_SECRET_KEY");
+
+        if (caUser == null || caAccessKey == null || caSecretKey == null) {
+            throw new RuntimeException("user / key not present, cannot run tests");
+        }
+
+        com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
+        com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
+        com.urbanlogiq.ulsdk.types.B2cId p0 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.api.directory.Organization expected = new com.urbanlogiq.ulsdk.api.directory.Organization();
+        byte[] expectedBytes = new org.json.JSONObject(expected.toMap()).toString().getBytes();
+        ctx.setResponse(expectedBytes);
+        com.urbanlogiq.ulsdk.api.directory.Organization result = com.urbanlogiq.ulsdk.api.directory.Directory.getOrganization(
+            ctx,
+            p0
+        );
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
+    }
+
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
+    public void testRenameOrganization() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String caUser = System.getenv("CA_USER");
+        String caAccessKey = System.getenv("CA_ACCESS_KEY");
+        String caSecretKey = System.getenv("CA_SECRET_KEY");
+
+        if (caUser == null || caAccessKey == null || caSecretKey == null) {
+            throw new RuntimeException("user / key not present, cannot run tests");
+        }
+
+        com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
+        com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
+        com.urbanlogiq.ulsdk.types.B2cId p0 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.api.directory.RenameOrganizationRequest body = new com.urbanlogiq.ulsdk.api.directory.RenameOrganizationRequest();
+        com.urbanlogiq.ulsdk.api.directory.Directory.renameOrganization(
+            ctx,
+            p0,
+            body
+        );
+    }
+
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
+    public void testGetUserOrganization() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String caUser = System.getenv("CA_USER");
+        String caAccessKey = System.getenv("CA_ACCESS_KEY");
+        String caSecretKey = System.getenv("CA_SECRET_KEY");
+
+        if (caUser == null || caAccessKey == null || caSecretKey == null) {
+            throw new RuntimeException("user / key not present, cannot run tests");
+        }
+
+        com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
+        com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
+        com.urbanlogiq.ulsdk.types.B2cId p0 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.api.directory.Organization expected = new com.urbanlogiq.ulsdk.api.directory.Organization();
+        byte[] expectedBytes = new org.json.JSONObject(expected.toMap()).toString().getBytes();
+        ctx.setResponse(expectedBytes);
+        com.urbanlogiq.ulsdk.api.directory.Organization result = com.urbanlogiq.ulsdk.api.directory.Directory.getUserOrganization(
+            ctx,
+            p0
+        );
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
+    }
+
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
+    public void testAssociateGroupWithOrganization() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String caUser = System.getenv("CA_USER");
+        String caAccessKey = System.getenv("CA_ACCESS_KEY");
+        String caSecretKey = System.getenv("CA_SECRET_KEY");
+
+        if (caUser == null || caAccessKey == null || caSecretKey == null) {
+            throw new RuntimeException("user / key not present, cannot run tests");
+        }
+
+        com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
+        com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
+        com.urbanlogiq.ulsdk.types.B2cId p0 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.types.B2cId p1 = new com.urbanlogiq.ulsdk.types.B2cId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.api.directory.Directory.associateGroupWithOrganization(
+            ctx,
+            p0,
+            p1
+        );
+    }
+
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
+    public void testFlushGatewayCache() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String caUser = System.getenv("CA_USER");
+        String caAccessKey = System.getenv("CA_ACCESS_KEY");
+        String caSecretKey = System.getenv("CA_SECRET_KEY");
+
+        if (caUser == null || caAccessKey == null || caSecretKey == null) {
+            throw new RuntimeException("user / key not present, cannot run tests");
+        }
+
+        com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
+        com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
+        com.urbanlogiq.ulsdk.api.directory.FlushedGatewayPods expected = new com.urbanlogiq.ulsdk.api.directory.FlushedGatewayPods();
+        byte[] expectedBytes = new org.json.JSONObject(expected.toMap()).toString().getBytes();
+        ctx.setResponse(expectedBytes);
+        com.urbanlogiq.ulsdk.api.directory.FlushedGatewayPods result = com.urbanlogiq.ulsdk.api.directory.Directory.flushGatewayCache(
+            ctx
+        );
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }
 }

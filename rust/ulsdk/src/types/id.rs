@@ -108,6 +108,21 @@ impl B2cId {
         Self([0u8; 16])
     }
 
+    /// The reserved identity of the platform itself: the RFC 9562 Max UUID,
+    /// `ffffffff-ffff-ffff-ffff-ffffffffffff`. No directory issues it (a
+    /// version-4 GUID can never be all ones), so it cannot collide with a real
+    /// principal. It marks work done by the system, as distinct from `nil()`,
+    /// which is the anonymous/public principal. It is an identity for ownership
+    /// and provenance, never a credential: nothing may grant privilege because a
+    /// caller presents this id.
+    pub fn system() -> Self {
+        Self([0xffu8; 16])
+    }
+
+    pub fn is_system(&self) -> bool {
+        self.0 == [0xffu8; 16]
+    }
+
     pub fn serialize_to<'a>(
         &self,
         builder: &mut flatbuffers::FlatBufferBuilder<'a>,

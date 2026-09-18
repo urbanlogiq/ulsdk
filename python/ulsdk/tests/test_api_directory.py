@@ -301,6 +301,7 @@ def test_update_user():
     key_ctx = ApiKeyContext(key, Environment.Stage)
     ctx = TestContext(key_ctx)
     p0 = B2cId.from_uuid("00000000-0000-0000-0000-000000000000");
+    q0 = True
     body = UpdateUser.make_default()
     success = False
     for i in range(5):
@@ -308,6 +309,7 @@ def test_update_user():
             update_user(
                 ctx,
                 p0,
+                q0,
                 body
             )
             success = True
@@ -518,6 +520,208 @@ def test_remove_group_member():
         except Exception as e:
             time.sleep(i + 1)
             continue
+        if success:
+            break
+    assert success, "test was unable to complete with retries"
+
+def test_list_organizations():
+    user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
+    access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None
+    secret_key = os.environ["CA_SECRET_KEY"] if "CA_SECRET_KEY" in os.environ else None
+
+    if user == None or access_key is None or secret_key is None:
+        raise Exception("cannot run test as no credentials are specified")
+    key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
+    key_ctx = ApiKeyContext(key, Environment.Stage)
+    ctx = TestContext(key_ctx)
+    success = False
+    for i in range(5):
+        expected = OrganizationList.make_default()
+        expected_bytes = json.dumps(expected.to_dict()).encode('utf-8')
+        ctx.set_response(expected_bytes);
+        try:
+            result = list_organizations(
+                ctx
+            )
+            success = True
+        except Exception as e:
+            time.sleep(i + 1)
+            continue
+        assert result == expected
+        if success:
+            break
+    assert success, "test was unable to complete with retries"
+
+def test_create_organization():
+    user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
+    access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None
+    secret_key = os.environ["CA_SECRET_KEY"] if "CA_SECRET_KEY" in os.environ else None
+
+    if user == None or access_key is None or secret_key is None:
+        raise Exception("cannot run test as no credentials are specified")
+    key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
+    key_ctx = ApiKeyContext(key, Environment.Stage)
+    ctx = TestContext(key_ctx)
+    body = CreateOrganizationRequest.make_default()
+    success = False
+    for i in range(5):
+        expected = Organization.make_default()
+        expected_bytes = json.dumps(expected.to_dict()).encode('utf-8')
+        ctx.set_response(expected_bytes);
+        try:
+            result = create_organization(
+                ctx,
+                body
+            )
+            success = True
+        except Exception as e:
+            time.sleep(i + 1)
+            continue
+        assert result == expected
+        if success:
+            break
+    assert success, "test was unable to complete with retries"
+
+def test_get_organization():
+    user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
+    access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None
+    secret_key = os.environ["CA_SECRET_KEY"] if "CA_SECRET_KEY" in os.environ else None
+
+    if user == None or access_key is None or secret_key is None:
+        raise Exception("cannot run test as no credentials are specified")
+    key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
+    key_ctx = ApiKeyContext(key, Environment.Stage)
+    ctx = TestContext(key_ctx)
+    p0 = B2cId.from_uuid("00000000-0000-0000-0000-000000000000");
+    success = False
+    for i in range(5):
+        expected = Organization.make_default()
+        expected_bytes = json.dumps(expected.to_dict()).encode('utf-8')
+        ctx.set_response(expected_bytes);
+        try:
+            result = get_organization(
+                ctx,
+                p0
+            )
+            success = True
+        except Exception as e:
+            time.sleep(i + 1)
+            continue
+        assert result == expected
+        if success:
+            break
+    assert success, "test was unable to complete with retries"
+
+def test_rename_organization():
+    user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
+    access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None
+    secret_key = os.environ["CA_SECRET_KEY"] if "CA_SECRET_KEY" in os.environ else None
+
+    if user == None or access_key is None or secret_key is None:
+        raise Exception("cannot run test as no credentials are specified")
+    key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
+    key_ctx = ApiKeyContext(key, Environment.Stage)
+    ctx = TestContext(key_ctx)
+    p0 = B2cId.from_uuid("00000000-0000-0000-0000-000000000000");
+    body = RenameOrganizationRequest.make_default()
+    success = False
+    for i in range(5):
+        try:
+            rename_organization(
+                ctx,
+                p0,
+                body
+            )
+            success = True
+        except Exception as e:
+            time.sleep(i + 1)
+            continue
+        if success:
+            break
+    assert success, "test was unable to complete with retries"
+
+def test_get_user_organization():
+    user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
+    access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None
+    secret_key = os.environ["CA_SECRET_KEY"] if "CA_SECRET_KEY" in os.environ else None
+
+    if user == None or access_key is None or secret_key is None:
+        raise Exception("cannot run test as no credentials are specified")
+    key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
+    key_ctx = ApiKeyContext(key, Environment.Stage)
+    ctx = TestContext(key_ctx)
+    p0 = B2cId.from_uuid("00000000-0000-0000-0000-000000000000");
+    success = False
+    for i in range(5):
+        expected = Organization.make_default()
+        expected_bytes = json.dumps(expected.to_dict()).encode('utf-8')
+        ctx.set_response(expected_bytes);
+        try:
+            result = get_user_organization(
+                ctx,
+                p0
+            )
+            success = True
+        except Exception as e:
+            time.sleep(i + 1)
+            continue
+        assert result == expected
+        if success:
+            break
+    assert success, "test was unable to complete with retries"
+
+def test_associate_group_with_organization():
+    user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
+    access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None
+    secret_key = os.environ["CA_SECRET_KEY"] if "CA_SECRET_KEY" in os.environ else None
+
+    if user == None or access_key is None or secret_key is None:
+        raise Exception("cannot run test as no credentials are specified")
+    key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
+    key_ctx = ApiKeyContext(key, Environment.Stage)
+    ctx = TestContext(key_ctx)
+    p0 = B2cId.from_uuid("00000000-0000-0000-0000-000000000000");
+    p1 = B2cId.from_uuid("00000000-0000-0000-0000-000000000000");
+    success = False
+    for i in range(5):
+        try:
+            associate_group_with_organization(
+                ctx,
+                p0,
+                p1
+            )
+            success = True
+        except Exception as e:
+            time.sleep(i + 1)
+            continue
+        if success:
+            break
+    assert success, "test was unable to complete with retries"
+
+def test_flush_gateway_cache():
+    user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
+    access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None
+    secret_key = os.environ["CA_SECRET_KEY"] if "CA_SECRET_KEY" in os.environ else None
+
+    if user == None or access_key is None or secret_key is None:
+        raise Exception("cannot run test as no credentials are specified")
+    key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
+    key_ctx = ApiKeyContext(key, Environment.Stage)
+    ctx = TestContext(key_ctx)
+    success = False
+    for i in range(5):
+        expected = FlushedGatewayPods.make_default()
+        expected_bytes = json.dumps(expected.to_dict()).encode('utf-8')
+        ctx.set_response(expected_bytes);
+        try:
+            result = flush_gateway_cache(
+                ctx
+            )
+            success = True
+        except Exception as e:
+            time.sleep(i + 1)
+            continue
+        assert result == expected
         if success:
             break
     assert success, "test was unable to complete with retries"

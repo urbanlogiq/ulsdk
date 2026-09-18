@@ -86,6 +86,7 @@ export interface AdUserWithAuditLog {
 export interface CreateUserRequest {
   displayName?: string;
   userPrincipalName?: string;
+  department?: string;
 }
 
 export interface CreateUser {
@@ -101,6 +102,7 @@ export interface UpdateCurrentUser {
 export interface UpdateUser {
   displayName?: string;
   otherMails?: string[];
+  department?: string;
 }
 
 export interface CreateGroup {
@@ -118,6 +120,40 @@ export interface GroupMembership {
   createdDateTime?: string;
 }
 
+export interface OrganizationSummary {
+  name: string;
+  orgId: string;
+}
+
+export interface OrganizationList {
+  organizations: OrganizationSummary[];
+}
+
+export interface CreateOrganizationRequest {
+  name: string;
+  parentId?: string;
+  ssoDomain?: string;
+  addToOrg: boolean;
+  addDataOwner: boolean;
+}
+
+export interface Organization {
+  name: string;
+  orgId: string;
+  orgMgmtId: string;
+  dataOwnerId: string;
+  parentId?: string;
+  ssoDomain?: string;
+}
+
+export interface RenameOrganizationRequest {
+  name: string;
+}
+
+export interface FlushedGatewayPods {
+  pods: number;
+}
+
 /**
  * Retrieves a single principal by id.
  *
@@ -129,7 +165,7 @@ export async function getPrincipal(
   ctx: RequestContext,
   id: B2cId
 ): Promise<Principal> {
-  let path = '/v1/api/uldirectory/v1/principal/:id';
+  let path = '/v1/api/ulv2/directory/v1/principal/:id';
   path = path.replace(':id', id.toString());
 
   const params: [string, string][] = [];
@@ -151,7 +187,7 @@ export async function getPrincipals(
   ctx: RequestContext,
   ids: string
 ): Promise<Principal[]> {
-  let path = '/v1/api/uldirectory/v1/principal/:ids';
+  let path = '/v1/api/ulv2/directory/v1/principal/:ids';
   path = path.replace(':ids', ids.toString());
 
   const params: [string, string][] = [];
@@ -183,7 +219,7 @@ export async function queryPrincipals(
   ctx: RequestContext,
   query: string
 ): Promise<Principal[]> {
-  let path = '/v1/api/uldirectory/v1/principals/:query';
+  let path = '/v1/api/ulv2/directory/v1/principals/:query';
   path = path.replace(':query', query.toString());
 
   const params: [string, string][] = [];
@@ -201,7 +237,7 @@ export async function queryPrincipals(
 export async function getUsers(
   ctx: RequestContext
 ): Promise<AdUser[]> {
-  let path = '/v1/api/uldirectory/v1/users';
+  let path = '/v1/api/ulv2/directory/v1/users';
   const params: [string, string][] = [];
   const headers: Record<string, string> = {};
 
@@ -217,7 +253,7 @@ export async function getUsers(
 export async function getUsersDisplayNames(
   ctx: RequestContext
 ): Promise<DisplayNames[]> {
-  let path = '/v1/api/uldirectory/v1/users/display_names';
+  let path = '/v1/api/ulv2/directory/v1/users/display_names';
   const params: [string, string][] = [];
   const headers: Record<string, string> = {};
 
@@ -237,7 +273,7 @@ export async function getCurrentUser(
   ctx: RequestContext,
   auditLog: boolean | null
 ): Promise<AdUserWithAuditLog> {
-  let path = '/v1/api/uldirectory/v1/user';
+  let path = '/v1/api/ulv2/directory/v1/user';
   const params: [string, string][] = [];
   if (auditLog != null) {
       params.push([`audit_log`, auditLog.toString()]);
@@ -261,7 +297,7 @@ export async function createUser(
   ctx: RequestContext,
   createUserRequest: CreateUserRequest
 ): Promise<CreateUser> {
-  let path = '/v1/api/uldirectory/v1/user';
+  let path = '/v1/api/ulv2/directory/v1/user';
   const params: [string, string][] = [];
   const headers: Record<string, string> = {};
 
@@ -282,7 +318,7 @@ export async function updateCurrentUser(
   ctx: RequestContext,
   updateUserRequest: UpdateCurrentUser
 ): Promise<void> {
-  let path = '/v1/api/uldirectory/v1/user';
+  let path = '/v1/api/ulv2/directory/v1/user';
   const params: [string, string][] = [];
   const headers: Record<string, string> = {};
 
@@ -304,7 +340,7 @@ export async function getUser(
   id: B2cId,
   auditLog: boolean | null
 ): Promise<AdUserWithAuditLog> {
-  let path = '/v1/api/uldirectory/v1/user/:id';
+  let path = '/v1/api/ulv2/directory/v1/user/:id';
   path = path.replace(':id', id.toString());
 
   const params: [string, string][] = [];
@@ -324,17 +360,23 @@ export async function getUser(
  *
  * @param ctx - A request context object
  * @param id - The ID of the user to update
+ * @param flush - Whether to flush the gateway cache after the update. The default is true. A bulk caller passes false for every update and calls `flush_gateway_cache` once at the end.
  * @param updateUserRequest - The details which which to update the user
  */
 export async function updateUser(
   ctx: RequestContext,
   id: B2cId,
+  flush: boolean | null,
   updateUserRequest: UpdateUser
 ): Promise<void> {
-  let path = '/v1/api/uldirectory/v1/user/:id';
+  let path = '/v1/api/ulv2/directory/v1/user/:id';
   path = path.replace(':id', id.toString());
 
   const params: [string, string][] = [];
+  if (flush != null) {
+      params.push([`flush`, flush.toString()]);
+  }
+
   const headers: Record<string, string> = {};
 
   let body: Uint8Array | null = null;
@@ -352,7 +394,7 @@ export async function deleteUser(
   ctx: RequestContext,
   id: B2cId
 ): Promise<void> {
-  let path = '/v1/api/uldirectory/v1/user/:id';
+  let path = '/v1/api/ulv2/directory/v1/user/:id';
   path = path.replace(':id', id.toString());
 
   const params: [string, string][] = [];
@@ -368,7 +410,7 @@ export async function deleteUser(
 export async function getGroups(
   ctx: RequestContext
 ): Promise<AdGroup[]> {
-  let path = '/v1/api/uldirectory/v1/group';
+  let path = '/v1/api/ulv2/directory/v1/group';
   const params: [string, string][] = [];
   const headers: Record<string, string> = {};
 
@@ -388,7 +430,7 @@ export async function createGroup(
   ctx: RequestContext,
   createGroupRequest: CreateGroup
 ): Promise<AdGroup> {
-  let path = '/v1/api/uldirectory/v1/group';
+  let path = '/v1/api/ulv2/directory/v1/group';
   const params: [string, string][] = [];
   const headers: Record<string, string> = {};
 
@@ -410,7 +452,7 @@ export async function getGroupMembers(
   ctx: RequestContext,
   id: B2cId
 ): Promise<GroupMembership[]> {
-  let path = '/v1/api/uldirectory/v1/group/:id';
+  let path = '/v1/api/ulv2/directory/v1/group/:id';
   path = path.replace(':id', id.toString());
 
   const params: [string, string][] = [];
@@ -431,7 +473,7 @@ export async function deleteGroup(
   ctx: RequestContext,
   id: B2cId
 ): Promise<void> {
-  let path = '/v1/api/uldirectory/v1/group/:id';
+  let path = '/v1/api/ulv2/directory/v1/group/:id';
   path = path.replace(':id', id.toString());
 
   const params: [string, string][] = [];
@@ -452,7 +494,7 @@ export async function addGroupMember(
   group: B2cId,
   member: B2cId
 ): Promise<void> {
-  let path = '/v1/api/uldirectory/v1/group/:group/:member';
+  let path = '/v1/api/ulv2/directory/v1/group/:group/:member';
   path = path.replace(':group', group.toString());
   path = path.replace(':member', member.toString());
 
@@ -476,7 +518,7 @@ export async function removeGroupMember(
   group: B2cId,
   member: B2cId
 ): Promise<void> {
-  let path = '/v1/api/uldirectory/v1/group/:group/:member';
+  let path = '/v1/api/ulv2/directory/v1/group/:group/:member';
   path = path.replace(':group', group.toString());
   path = path.replace(':member', member.toString());
 
@@ -484,4 +526,151 @@ export async function removeGroupMember(
   const headers: Record<string, string> = {};
 
   await ctx.delete(path, params, headers);
+}
+
+/**
+ * Lists organizations visible to the caller. Admins (admin.directory + admin.org) see all organizations; everyone else sees only organizations whose `org_id` group they belong to.
+ * @returns Organizations visible to the caller.
+ */
+export async function listOrganizations(
+  ctx: RequestContext
+): Promise<OrganizationList> {
+  let path = '/v1/api/ulv2/directory/v1/organization';
+  const params: [string, string][] = [];
+  const headers: Record<string, string> = {};
+
+  const res = await ctx.get(path, params, headers);
+  const json = JSON.parse(new TextDecoder().decode(res));
+  return json;
+}
+
+/**
+ * Creates a new organization. Creates three AD groups (org, org mgmt, data owner) and records them in the organizations table. Requires `admin.org`; top-level organizations additionally require `admin.directory`; child organizations require membership in the parent's mgmt group.
+ *
+ * @param ctx - A request context object
+ * @param createOrganizationRequest - Organization creation details
+ * @returns Details of the created organization.
+ */
+export async function createOrganization(
+  ctx: RequestContext,
+  createOrganizationRequest: CreateOrganizationRequest
+): Promise<Organization> {
+  let path = '/v1/api/ulv2/directory/v1/organization';
+  const params: [string, string][] = [];
+  const headers: Record<string, string> = {};
+
+  let body: Uint8Array | null = null;
+  body = new TextEncoder().encode(JSON.stringify(createOrganizationRequest));
+  const res = await ctx.post(path, body, 'application/json', params, headers);
+  const json = JSON.parse(new TextDecoder().decode(res));
+  return json;
+}
+
+/**
+ * Fetches the details of a single organization by `org_id`.
+ *
+ * @param ctx - A request context object
+ * @param id - The organization's `org_id` (B2cId).
+ * @returns The organization's details.
+ */
+export async function getOrganization(
+  ctx: RequestContext,
+  id: B2cId
+): Promise<Organization> {
+  let path = '/v1/api/ulv2/directory/v1/organization/:id';
+  path = path.replace(':id', id.toString());
+
+  const params: [string, string][] = [];
+  const headers: Record<string, string> = {};
+
+  const res = await ctx.get(path, params, headers);
+  const json = JSON.parse(new TextDecoder().decode(res));
+  return json;
+}
+
+/**
+ * Renames an organization. Caller must belong to the organization's management group.
+ *
+ * @param ctx - A request context object
+ * @param id - The organization's `org_id` (B2cId).
+ * @param renameOrganizationRequest - New name for the organization.
+ */
+export async function renameOrganization(
+  ctx: RequestContext,
+  id: B2cId,
+  renameOrganizationRequest: RenameOrganizationRequest
+): Promise<void> {
+  let path = '/v1/api/ulv2/directory/v1/organization/:id';
+  path = path.replace(':id', id.toString());
+
+  const params: [string, string][] = [];
+  const headers: Record<string, string> = {};
+
+  let body: Uint8Array | null = null;
+  body = new TextEncoder().encode(JSON.stringify(renameOrganizationRequest));
+  await ctx.put(path, body, 'application/json', params, headers);
+}
+
+/**
+ * Fetches the organization record for a specific user, derived from the user's AD `department` field.
+ *
+ * @param ctx - A request context object
+ * @param id - The user's B2cId.
+ * @returns The user's organization record.
+ */
+export async function getUserOrganization(
+  ctx: RequestContext,
+  id: B2cId
+): Promise<Organization> {
+  let path = '/v1/api/ulv2/directory/v1/user/:id/organization';
+  path = path.replace(':id', id.toString());
+
+  const params: [string, string][] = [];
+  const headers: Record<string, string> = {};
+
+  const res = await ctx.get(path, params, headers);
+  const json = JSON.parse(new TextDecoder().decode(res));
+  return json;
+}
+
+/**
+ * Associates an existing AD group with an organization. Temporary migration-only endpoint — do not use from new code; will be removed once the backfill is done. Requires both `admin.directory` and `admin.org`. Idempotent: if the association already exists the request is a no-op.
+ *
+ * @param ctx - A request context object
+ * @param group - The AD group's B2cId.
+ * @param org - The organization's `org_id` (B2cId).
+ */
+export async function associateGroupWithOrganization(
+  ctx: RequestContext,
+  group: B2cId,
+  org: B2cId
+): Promise<void> {
+  let path = '/v1/api/ulv2/directory/v1/group/:group/org/:org';
+  path = path.replace(':group', group.toString());
+  path = path.replace(':org', org.toString());
+
+  const params: [string, string][] = [];
+  const headers: Record<string, string> = {};
+
+  let body: Uint8Array | null = null;
+  body = null;
+  await ctx.post(path, body, 'text/plain', params, headers);
+}
+
+/**
+ * Flushes the cache of every gateway pod. The directory flushes after each change that the gateway caches; a bulk caller that passed `flush=false` to `update_user` calls this once at the end. Requires `admin.directory`.
+ * @returns How many gateway pods were flushed.
+ */
+export async function flushGatewayCache(
+  ctx: RequestContext
+): Promise<FlushedGatewayPods> {
+  let path = '/v1/api/ulv2/directory/v1/flush_cache';
+  const params: [string, string][] = [];
+  const headers: Record<string, string> = {};
+
+  let body: Uint8Array | null = null;
+  body = null;
+  const res = await ctx.post(path, body, 'text/plain', params, headers);
+  const json = JSON.parse(new TextDecoder().decode(res));
+  return json;
 }

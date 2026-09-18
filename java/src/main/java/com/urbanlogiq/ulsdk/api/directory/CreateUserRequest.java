@@ -21,6 +21,14 @@ public final class CreateUserRequest {
         this._userPrincipalName = value;
     }
 
+    String _department;
+    public String getDepartment() {
+        return this._department;
+    }
+    public void setDepartment(String value) {
+        this._department = value;
+    }
+
     public java.util.Map<String, Object> toMap() {
         java.util.Map<String, Object> o = new java.util.HashMap();
         Object displayNameSerialized = null;
@@ -34,6 +42,12 @@ public final class CreateUserRequest {
             userPrincipalNameSerialized = this._userPrincipalName;
         }
         o.put("userPrincipalName", userPrincipalNameSerialized);
+
+        Object departmentSerialized = null;
+        if (this._department != null) {
+            departmentSerialized = this._department;
+        }
+        o.put("department", departmentSerialized);
 
         return o;
     }
@@ -53,11 +67,19 @@ public final class CreateUserRequest {
         if (userPrincipalNameValue != null) {
             this._userPrincipalName = (String)userPrincipalNameValue;
         }
+        Object departmentValue = null;
+        if (o.has("department") && !o.isNull("department")) {
+            departmentValue = o.get("department");
+        }
+        if (departmentValue != null) {
+            this._department = (String)departmentValue;
+        }
     }
 
     public CreateUserRequest() {
         this._displayName = null;
         this._userPrincipalName = null;
+        this._department = null;
     }
 
     @Override

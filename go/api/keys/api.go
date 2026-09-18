@@ -39,7 +39,7 @@ type UpdateKeyPayload struct {
 // GetKeys -
 // Retrieves a listing of the API keys associated with the current user.
 func GetKeys(ctx api.RequestContext) (*GetKeysPayload, error) {
-	path := "/v1/api/uldirectory/v1/keys/"
+	path := "/v1/api/ulv2/directory/v1/keys/"
 
 	params := [][2]string{}
 
@@ -59,7 +59,7 @@ func GetKeys(ctx api.RequestContext) (*GetKeysPayload, error) {
 // CreateKey -
 // Creates a new API key for the current user.
 func CreateKey(ctx api.RequestContext) (*CreateKeyPayload, error) {
-	path := "/v1/api/uldirectory/v1/keys/"
+	path := "/v1/api/ulv2/directory/v1/keys/"
 
 	params := [][2]string{}
 
@@ -79,7 +79,7 @@ func CreateKey(ctx api.RequestContext) (*CreateKeyPayload, error) {
 // UpdateKey -
 // Updates an API key by id.
 func UpdateKey(ctx api.RequestContext, id string, updateKey *UpdateKeyPayload) error {
-	path := "/v1/api/uldirectory/v1/keys/:id"
+	path := "/v1/api/ulv2/directory/v1/keys/:id"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", id), 1)
 
 	params := [][2]string{}
@@ -98,7 +98,7 @@ func UpdateKey(ctx api.RequestContext, id string, updateKey *UpdateKeyPayload) e
 // GetKey -
 // Retrieves an API key by id.
 func GetKey(ctx api.RequestContext, id string) (*Key, error) {
-	path := "/v1/api/uldirectory/v1/keys/:id"
+	path := "/v1/api/ulv2/directory/v1/keys/:id"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", id), 1)
 
 	params := [][2]string{}
@@ -119,7 +119,7 @@ func GetKey(ctx api.RequestContext, id string) (*Key, error) {
 // DeleteKey -
 // Deletes an API key by id.
 func DeleteKey(ctx api.RequestContext, id string) error {
-	path := "/v1/api/uldirectory/v1/keys/:id"
+	path := "/v1/api/ulv2/directory/v1/keys/:id"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", id), 1)
 
 	params := [][2]string{}

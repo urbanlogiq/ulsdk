@@ -151,11 +151,13 @@ describe('updateUser', () => {
   it('testUpdateUser', async () => {
     const ctx = new TestContext();
     const p0 = new B2cId();
+    const q0: any = null;
     const body = {} as any;
     try {
           await directory.updateUser(
         ctx,
         p0,
+        q0,
         body
       );
     } catch (_) {
@@ -267,6 +269,116 @@ describe('removeGroupMember', () => {
         ctx,
         p0,
         p1
+      );
+    } catch (_) {
+      // Expected for mock tests with empty/invalid responses
+    }
+  });
+});
+
+describe('listOrganizations', () => {
+  it('testListOrganizations', async () => {
+    const ctx = new TestContext();
+    ctx.setResponse(new TextEncoder().encode('{}'));
+    try {
+          await directory.listOrganizations(
+        ctx
+      );
+    } catch (_) {
+      // Expected for mock tests with empty/invalid responses
+    }
+  });
+});
+
+describe('createOrganization', () => {
+  it('testCreateOrganization', async () => {
+    const ctx = new TestContext();
+    const body = {} as any;
+    ctx.setResponse(new TextEncoder().encode('{}'));
+    try {
+          await directory.createOrganization(
+        ctx,
+        body
+      );
+    } catch (_) {
+      // Expected for mock tests with empty/invalid responses
+    }
+  });
+});
+
+describe('getOrganization', () => {
+  it('testGetOrganization', async () => {
+    const ctx = new TestContext();
+    const p0 = new B2cId();
+    ctx.setResponse(new TextEncoder().encode('{}'));
+    try {
+          await directory.getOrganization(
+        ctx,
+        p0
+      );
+    } catch (_) {
+      // Expected for mock tests with empty/invalid responses
+    }
+  });
+});
+
+describe('renameOrganization', () => {
+  it('testRenameOrganization', async () => {
+    const ctx = new TestContext();
+    const p0 = new B2cId();
+    const body = {} as any;
+    try {
+          await directory.renameOrganization(
+        ctx,
+        p0,
+        body
+      );
+    } catch (_) {
+      // Expected for mock tests with empty/invalid responses
+    }
+  });
+});
+
+describe('getUserOrganization', () => {
+  it('testGetUserOrganization', async () => {
+    const ctx = new TestContext();
+    const p0 = new B2cId();
+    ctx.setResponse(new TextEncoder().encode('{}'));
+    try {
+          await directory.getUserOrganization(
+        ctx,
+        p0
+      );
+    } catch (_) {
+      // Expected for mock tests with empty/invalid responses
+    }
+  });
+});
+
+describe('associateGroupWithOrganization', () => {
+  it('testAssociateGroupWithOrganization', async () => {
+    const ctx = new TestContext();
+    const p0 = new B2cId();
+    const p1 = new B2cId();
+    try {
+          await directory.associateGroupWithOrganization(
+        ctx,
+        p0,
+        p1
+      );
+    } catch (_) {
+      // Expected for mock tests with empty/invalid responses
+    }
+  });
+});
+
+describe('flushGatewayCache', () => {
+  it('testFlushGatewayCache', async () => {
+    const ctx = new TestContext();
+    ctx.setResponse(new TextEncoder().encode('{}'));
+    try {
+          await directory.flushGatewayCache(
+        ctx
       );
     } catch (_) {
       // Expected for mock tests with empty/invalid responses

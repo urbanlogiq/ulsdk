@@ -94,6 +94,7 @@ type AdUserWithAuditLog struct {
 type CreateUserRequest struct {
 	DisplayName *string `json:"displayName,omitempty"`
 	UserPrincipalName *string `json:"userPrincipalName,omitempty"`
+	Department *string `json:"department,omitempty"`
 }
 
 type CreateUserPayload struct {
@@ -109,6 +110,7 @@ type UpdateCurrentUserPayload struct {
 type UpdateUserPayload struct {
 	DisplayName *string `json:"displayName,omitempty"`
 	OtherMails *[]string `json:"otherMails,omitempty"`
+	Department *string `json:"department,omitempty"`
 }
 
 type CreateGroupPayload struct {
@@ -126,10 +128,44 @@ type GroupMembership struct {
 	CreatedDateTime *string `json:"createdDateTime,omitempty"`
 }
 
+type OrganizationSummary struct {
+	Name string `json:"name"`
+	OrgId string `json:"org_id"`
+}
+
+type OrganizationList struct {
+	Organizations []OrganizationSummary `json:"organizations"`
+}
+
+type CreateOrganizationRequest struct {
+	Name string `json:"name"`
+	ParentId *string `json:"parent_id,omitempty"`
+	SsoDomain *string `json:"sso_domain,omitempty"`
+	AddToOrg bool `json:"add_to_org"`
+	AddDataOwner bool `json:"add_data_owner"`
+}
+
+type Organization struct {
+	Name string `json:"name"`
+	OrgId string `json:"org_id"`
+	OrgMgmtId string `json:"org_mgmt_id"`
+	DataOwnerId string `json:"data_owner_id"`
+	ParentId *string `json:"parent_id,omitempty"`
+	SsoDomain *string `json:"sso_domain,omitempty"`
+}
+
+type RenameOrganizationRequest struct {
+	Name string `json:"name"`
+}
+
+type FlushedGatewayPods struct {
+	Pods int64 `json:"pods"`
+}
+
 // GetPrincipal -
 // Retrieves a single principal by id.
 func GetPrincipal(ctx api.RequestContext, idParam id.B2cid) (*Principal, error) {
-	path := "/v1/api/uldirectory/v1/principal/:id"
+	path := "/v1/api/ulv2/directory/v1/principal/:id"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
 
 	params := [][2]string{}
@@ -150,7 +186,7 @@ func GetPrincipal(ctx api.RequestContext, idParam id.B2cid) (*Principal, error) 
 // GetPrincipals -
 // Retrieves a list of principals specified by a comma-separated list of ids.
 func GetPrincipals(ctx api.RequestContext, ids string) ([]Principal, error) {
-	path := "/v1/api/uldirectory/v1/principal/:ids"
+	path := "/v1/api/ulv2/directory/v1/principal/:ids"
 	path = strings.Replace(path, ":ids", fmt.Sprintf("%v", ids), 1)
 
 	params := [][2]string{}
@@ -181,7 +217,7 @@ func GetPrincipals(ctx api.RequestContext, ids string) ([]Principal, error) {
 // - id
 // - description
 func QueryPrincipals(ctx api.RequestContext, query string) ([]Principal, error) {
-	path := "/v1/api/uldirectory/v1/principals/:query"
+	path := "/v1/api/ulv2/directory/v1/principals/:query"
 	path = strings.Replace(path, ":query", fmt.Sprintf("%v", query), 1)
 
 	params := [][2]string{}
@@ -202,7 +238,7 @@ func QueryPrincipals(ctx api.RequestContext, query string) ([]Principal, error) 
 // GetUsers -
 // Retrieves details of all users in the directory that are visible to the current user.
 func GetUsers(ctx api.RequestContext) ([]AdUser, error) {
-	path := "/v1/api/uldirectory/v1/users"
+	path := "/v1/api/ulv2/directory/v1/users"
 
 	params := [][2]string{}
 
@@ -222,7 +258,7 @@ func GetUsers(ctx api.RequestContext) ([]AdUser, error) {
 // GetUsersDisplayNames -
 // Retrieves the id and display name of every user in the directory.
 func GetUsersDisplayNames(ctx api.RequestContext) ([]DisplayNames, error) {
-	path := "/v1/api/uldirectory/v1/users/display_names"
+	path := "/v1/api/ulv2/directory/v1/users/display_names"
 
 	params := [][2]string{}
 
@@ -242,7 +278,7 @@ func GetUsersDisplayNames(ctx api.RequestContext) ([]DisplayNames, error) {
 // GetCurrentUser -
 // Retrieves details of the current user.
 func GetCurrentUser(ctx api.RequestContext, auditLog *bool) (*AdUserWithAuditLog, error) {
-	path := "/v1/api/uldirectory/v1/user"
+	path := "/v1/api/ulv2/directory/v1/user"
 
 	params := [][2]string{}
 	if auditLog != nil {
@@ -265,7 +301,7 @@ func GetCurrentUser(ctx api.RequestContext, auditLog *bool) (*AdUserWithAuditLog
 // CreateUser -
 // Creates a new user in the directory.
 func CreateUser(ctx api.RequestContext, createUserRequest *CreateUserRequest) (*CreateUserPayload, error) {
-	path := "/v1/api/uldirectory/v1/user"
+	path := "/v1/api/ulv2/directory/v1/user"
 
 	params := [][2]string{}
 
@@ -289,7 +325,7 @@ func CreateUser(ctx api.RequestContext, createUserRequest *CreateUserRequest) (*
 // UpdateCurrentUser -
 // Updates the current user.
 func UpdateCurrentUser(ctx api.RequestContext, updateUserRequest *UpdateCurrentUserPayload) error {
-	path := "/v1/api/uldirectory/v1/user"
+	path := "/v1/api/ulv2/directory/v1/user"
 
 	params := [][2]string{}
 
@@ -307,7 +343,7 @@ func UpdateCurrentUser(ctx api.RequestContext, updateUserRequest *UpdateCurrentU
 // GetUser -
 // Retrieves details of a user by id.
 func GetUser(ctx api.RequestContext, idParam id.B2cid, auditLog *bool) (*AdUserWithAuditLog, error) {
-	path := "/v1/api/uldirectory/v1/user/:id"
+	path := "/v1/api/ulv2/directory/v1/user/:id"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
 
 	params := [][2]string{}
@@ -330,11 +366,14 @@ func GetUser(ctx api.RequestContext, idParam id.B2cid, auditLog *bool) (*AdUserW
 
 // UpdateUser -
 // Updates a user by id.
-func UpdateUser(ctx api.RequestContext, idParam id.B2cid, updateUserRequest *UpdateUserPayload) error {
-	path := "/v1/api/uldirectory/v1/user/:id"
+func UpdateUser(ctx api.RequestContext, idParam id.B2cid, flush *bool, updateUserRequest *UpdateUserPayload) error {
+	path := "/v1/api/ulv2/directory/v1/user/:id"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
 
 	params := [][2]string{}
+	if flush != nil {
+	params = append(params, [2]string{"flush", fmt.Sprintf("%t", *flush)})
+	}
 
 	headers := map[string]string{}
 
@@ -350,7 +389,7 @@ func UpdateUser(ctx api.RequestContext, idParam id.B2cid, updateUserRequest *Upd
 // DeleteUser -
 // Deletes a user by id.
 func DeleteUser(ctx api.RequestContext, idParam id.B2cid) error {
-	path := "/v1/api/uldirectory/v1/user/:id"
+	path := "/v1/api/ulv2/directory/v1/user/:id"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
 
 	params := [][2]string{}
@@ -364,7 +403,7 @@ func DeleteUser(ctx api.RequestContext, idParam id.B2cid) error {
 // GetGroups -
 // Retrieves a listing of all groups in the directory.
 func GetGroups(ctx api.RequestContext) ([]AdGroup, error) {
-	path := "/v1/api/uldirectory/v1/group"
+	path := "/v1/api/ulv2/directory/v1/group"
 
 	params := [][2]string{}
 
@@ -384,7 +423,7 @@ func GetGroups(ctx api.RequestContext) ([]AdGroup, error) {
 // CreateGroup -
 // Creates a new group in the directory.
 func CreateGroup(ctx api.RequestContext, createGroupRequest *CreateGroupPayload) (*AdGroup, error) {
-	path := "/v1/api/uldirectory/v1/group"
+	path := "/v1/api/ulv2/directory/v1/group"
 
 	params := [][2]string{}
 
@@ -408,7 +447,7 @@ func CreateGroup(ctx api.RequestContext, createGroupRequest *CreateGroupPayload)
 // GetGroupMembers -
 // Retrieves a listing of all members of a group by group id.
 func GetGroupMembers(ctx api.RequestContext, idParam id.B2cid) ([]GroupMembership, error) {
-	path := "/v1/api/uldirectory/v1/group/:id"
+	path := "/v1/api/ulv2/directory/v1/group/:id"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
 
 	params := [][2]string{}
@@ -429,7 +468,7 @@ func GetGroupMembers(ctx api.RequestContext, idParam id.B2cid) ([]GroupMembershi
 // DeleteGroup -
 // Deletes a group by id.
 func DeleteGroup(ctx api.RequestContext, idParam id.B2cid) error {
-	path := "/v1/api/uldirectory/v1/group/:id"
+	path := "/v1/api/ulv2/directory/v1/group/:id"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
 
 	params := [][2]string{}
@@ -443,7 +482,7 @@ func DeleteGroup(ctx api.RequestContext, idParam id.B2cid) error {
 // AddGroupMember -
 // Adds a member to a group.
 func AddGroupMember(ctx api.RequestContext, group id.B2cid, member id.B2cid) error {
-	path := "/v1/api/uldirectory/v1/group/:group/:member"
+	path := "/v1/api/ulv2/directory/v1/group/:group/:member"
 	path = strings.Replace(path, ":group", fmt.Sprintf("%v", group), 1)
 	path = strings.Replace(path, ":member", fmt.Sprintf("%v", member), 1)
 
@@ -459,7 +498,7 @@ func AddGroupMember(ctx api.RequestContext, group id.B2cid, member id.B2cid) err
 // RemoveGroupMember -
 // Removes a member from a group.
 func RemoveGroupMember(ctx api.RequestContext, group id.B2cid, member id.B2cid) error {
-	path := "/v1/api/uldirectory/v1/group/:group/:member"
+	path := "/v1/api/ulv2/directory/v1/group/:group/:member"
 	path = strings.Replace(path, ":group", fmt.Sprintf("%v", group), 1)
 	path = strings.Replace(path, ":member", fmt.Sprintf("%v", member), 1)
 
@@ -469,4 +508,145 @@ func RemoveGroupMember(ctx api.RequestContext, group id.B2cid, member id.B2cid) 
 
 	_, err := ctx.Delete(path, params, headers)
 	return err
+}
+
+// ListOrganizations -
+// Lists organizations visible to the caller. Admins (admin.directory + admin.org) see all organizations; everyone else sees only organizations whose `org_id` group they belong to.
+func ListOrganizations(ctx api.RequestContext) (*OrganizationList, error) {
+	path := "/v1/api/ulv2/directory/v1/organization"
+
+	params := [][2]string{}
+
+	headers := map[string]string{}
+
+	res, err := ctx.Get(path, params, headers)
+	if err != nil {
+		return nil, err
+	}
+	var result OrganizationList
+	if err := json.Unmarshal(res, &result); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal JSON response: %w", err)
+	}
+	return &result, nil
+}
+
+// CreateOrganization -
+// Creates a new organization. Creates three AD groups (org, org mgmt, data owner) and records them in the organizations table. Requires `admin.org`; top-level organizations additionally require `admin.directory`; child organizations require membership in the parent's mgmt group.
+func CreateOrganization(ctx api.RequestContext, createOrganizationRequest *CreateOrganizationRequest) (*Organization, error) {
+	path := "/v1/api/ulv2/directory/v1/organization"
+
+	params := [][2]string{}
+
+	headers := map[string]string{}
+
+	bodyBytes, err := json.Marshal(createOrganizationRequest)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal JSON body: %w", err)
+	}
+	res, err := ctx.Post(path, bodyBytes, "application/json", params, headers)
+	if err != nil {
+		return nil, err
+	}
+	var result Organization
+	if err := json.Unmarshal(res, &result); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal JSON response: %w", err)
+	}
+	return &result, nil
+}
+
+// GetOrganization -
+// Fetches the details of a single organization by `org_id`.
+func GetOrganization(ctx api.RequestContext, idParam id.B2cid) (*Organization, error) {
+	path := "/v1/api/ulv2/directory/v1/organization/:id"
+	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
+
+	params := [][2]string{}
+
+	headers := map[string]string{}
+
+	res, err := ctx.Get(path, params, headers)
+	if err != nil {
+		return nil, err
+	}
+	var result Organization
+	if err := json.Unmarshal(res, &result); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal JSON response: %w", err)
+	}
+	return &result, nil
+}
+
+// RenameOrganization -
+// Renames an organization. Caller must belong to the organization's management group.
+func RenameOrganization(ctx api.RequestContext, idParam id.B2cid, renameOrganizationRequest *RenameOrganizationRequest) error {
+	path := "/v1/api/ulv2/directory/v1/organization/:id"
+	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
+
+	params := [][2]string{}
+
+	headers := map[string]string{}
+
+	bodyBytes, err := json.Marshal(renameOrganizationRequest)
+	if err != nil {
+		return fmt.Errorf("failed to marshal JSON body: %w", err)
+	}
+	res, err := ctx.Put(path, bodyBytes, "application/json", params, headers)
+	_ = res
+	return err
+}
+
+// GetUserOrganization -
+// Fetches the organization record for a specific user, derived from the user's AD `department` field.
+func GetUserOrganization(ctx api.RequestContext, idParam id.B2cid) (*Organization, error) {
+	path := "/v1/api/ulv2/directory/v1/user/:id/organization"
+	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
+
+	params := [][2]string{}
+
+	headers := map[string]string{}
+
+	res, err := ctx.Get(path, params, headers)
+	if err != nil {
+		return nil, err
+	}
+	var result Organization
+	if err := json.Unmarshal(res, &result); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal JSON response: %w", err)
+	}
+	return &result, nil
+}
+
+// AssociateGroupWithOrganization -
+// Associates an existing AD group with an organization. Temporary migration-only endpoint — do not use from new code; will be removed once the backfill is done. Requires both `admin.directory` and `admin.org`. Idempotent: if the association already exists the request is a no-op.
+func AssociateGroupWithOrganization(ctx api.RequestContext, group id.B2cid, org id.B2cid) error {
+	path := "/v1/api/ulv2/directory/v1/group/:group/org/:org"
+	path = strings.Replace(path, ":group", fmt.Sprintf("%v", group), 1)
+	path = strings.Replace(path, ":org", fmt.Sprintf("%v", org), 1)
+
+	params := [][2]string{}
+
+	headers := map[string]string{}
+
+	res, err := ctx.Post(path, nil, "", params, headers)
+	_ = res
+	return err
+}
+
+// FlushGatewayCache -
+// Flushes the cache of every gateway pod. The directory flushes after each change that the gateway caches; a bulk caller that passed `flush=false` to `update_user` calls this once at the end. Requires `admin.directory`.
+func FlushGatewayCache(ctx api.RequestContext) (*FlushedGatewayPods, error) {
+	path := "/v1/api/ulv2/directory/v1/flush_cache"
+
+	params := [][2]string{}
+
+	headers := map[string]string{}
+
+	res, err := ctx.Post(path, nil, "", params, headers)
+	if err != nil {
+		return nil, err
+	}
+	var result FlushedGatewayPods
+	if err := json.Unmarshal(res, &result); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal JSON response: %w", err)
+	}
+	return &result, nil
 }

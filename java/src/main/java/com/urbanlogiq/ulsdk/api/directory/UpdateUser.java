@@ -21,6 +21,14 @@ public final class UpdateUser {
         this._otherMails = value;
     }
 
+    String _department;
+    public String getDepartment() {
+        return this._department;
+    }
+    public void setDepartment(String value) {
+        this._department = value;
+    }
+
     public java.util.Map<String, Object> toMap() {
         java.util.Map<String, Object> o = new java.util.HashMap();
         Object displayNameSerialized = null;
@@ -41,6 +49,12 @@ public final class UpdateUser {
             otherMailsSerialized = otherMailsList;
         }
         o.put("otherMails", otherMailsSerialized);
+
+        Object departmentSerialized = null;
+        if (this._department != null) {
+            departmentSerialized = this._department;
+        }
+        o.put("department", departmentSerialized);
 
         return o;
     }
@@ -67,11 +81,19 @@ public final class UpdateUser {
                 this._otherMails[i0] = otherMailsItem;
             }
         }
+        Object departmentValue = null;
+        if (o.has("department") && !o.isNull("department")) {
+            departmentValue = o.get("department");
+        }
+        if (departmentValue != null) {
+            this._department = (String)departmentValue;
+        }
     }
 
     public UpdateUser() {
         this._displayName = null;
         this._otherMails = null;
+        this._department = null;
     }
 
     @Override

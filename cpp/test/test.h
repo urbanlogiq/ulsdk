@@ -23,9 +23,20 @@ extern TypeTest *type_test_root;
 struct ApiTest {
     ApiTestFn fn;
     const char *name;
+    // When non-null, the runner reports the test as skipped (with this
+    // reason) instead of executing it. Set from the endpoint definition's
+    // `ignore_tests` field in tools/ulsdkbuild.
+    const char *skip_reason;
     ApiTest *next;
 
-    ApiTest(ApiTestFn f, const char *n, ApiTest **root) : fn(f), name(n) {
+    ApiTest(ApiTestFn f, const char *n, ApiTest **root)
+        : fn(f), name(n), skip_reason(nullptr) {
+        next = *root;
+        *root = this;
+    }
+
+    ApiTest(ApiTestFn f, const char *n, const char *skip, ApiTest **root)
+        : fn(f), name(n), skip_reason(skip) {
         next = *root;
         *root = this;
     }

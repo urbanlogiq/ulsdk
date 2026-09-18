@@ -286,10 +286,12 @@ ul::Result<ul::Void>
 test_update_user(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     const ::ul::types::B2cId p0 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
+    bool q0 = true;
     const ::ul::api::directory::UpdateUser body = ::ul::api::directory::UpdateUser();
     return ul::api::directory::update_user(
         ctx,
         p0,
+        q0,
         body
     );
 }
@@ -443,5 +445,159 @@ test_remove_group_member(ul::RequestContext &rctx) {
 }
 
 ApiTest test_remove_group_member_obj(test_remove_group_member, "directory::remove_group_member", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
+test_list_organizations(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::api::directory::OrganizationList expected = ::ul::api::directory::OrganizationList();
+    const std::vector<uint8_t> expected_bytes = ::ul::api::directory::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::directory::list_organizations(
+        ctx
+    );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::api::directory::OrganizationList result_value = std::get<::ul::api::directory::OrganizationList>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
+}
+
+ApiTest test_list_organizations_obj(test_list_organizations, "directory::list_organizations", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
+test_create_organization(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::api::directory::CreateOrganizationRequest body = ::ul::api::directory::CreateOrganizationRequest();
+    const ::ul::api::directory::Organization expected = ::ul::api::directory::Organization();
+    const std::vector<uint8_t> expected_bytes = ::ul::api::directory::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::directory::create_organization(
+        ctx,
+        body
+    );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::api::directory::Organization result_value = std::get<::ul::api::directory::Organization>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
+}
+
+ApiTest test_create_organization_obj(test_create_organization, "directory::create_organization", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
+test_get_organization(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::types::B2cId p0 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
+    const ::ul::api::directory::Organization expected = ::ul::api::directory::Organization();
+    const std::vector<uint8_t> expected_bytes = ::ul::api::directory::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::directory::get_organization(
+        ctx,
+        p0
+    );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::api::directory::Organization result_value = std::get<::ul::api::directory::Organization>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
+}
+
+ApiTest test_get_organization_obj(test_get_organization, "directory::get_organization", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
+test_rename_organization(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::types::B2cId p0 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
+    const ::ul::api::directory::RenameOrganizationRequest body = ::ul::api::directory::RenameOrganizationRequest();
+    return ul::api::directory::rename_organization(
+        ctx,
+        p0,
+        body
+    );
+}
+
+ApiTest test_rename_organization_obj(test_rename_organization, "directory::rename_organization", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
+test_get_user_organization(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::types::B2cId p0 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
+    const ::ul::api::directory::Organization expected = ::ul::api::directory::Organization();
+    const std::vector<uint8_t> expected_bytes = ::ul::api::directory::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::directory::get_user_organization(
+        ctx,
+        p0
+    );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::api::directory::Organization result_value = std::get<::ul::api::directory::Organization>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
+}
+
+ApiTest test_get_user_organization_obj(test_get_user_organization, "directory::get_user_organization", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
+test_associate_group_with_organization(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::types::B2cId p0 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
+    const ::ul::types::B2cId p1 = ::ul::types::B2cId("00000000-0000-0000-0000-000000000000");
+    return ul::api::directory::associate_group_with_organization(
+        ctx,
+        p0,
+        p1
+    );
+}
+
+ApiTest test_associate_group_with_organization_obj(test_associate_group_with_organization, "directory::associate_group_with_organization", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
+test_flush_gateway_cache(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::api::directory::FlushedGatewayPods expected = ::ul::api::directory::FlushedGatewayPods();
+    const std::vector<uint8_t> expected_bytes = ::ul::api::directory::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::directory::flush_gateway_cache(
+        ctx
+    );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::api::directory::FlushedGatewayPods result_value = std::get<::ul::api::directory::FlushedGatewayPods>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
+}
+
+ApiTest test_flush_gateway_cache_obj(test_flush_gateway_cache, "directory::flush_gateway_cache", &idempotent_api_test_root);
 
 } // namespace directory

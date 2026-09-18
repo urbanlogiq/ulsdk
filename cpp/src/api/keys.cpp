@@ -407,7 +407,7 @@ Result<GetKeys>
 get_keys(
     ul::RequestContext &ctx
 ) {
-    std::string path = "/v1/api/uldirectory/v1/keys/";
+    std::string path = "/v1/api/ulv2/directory/v1/keys/";
 
     std::map<std::string, std::string> params;
 
@@ -429,7 +429,7 @@ Result<CreateKey>
 create_key(
     ul::RequestContext &ctx
 ) {
-    std::string path = "/v1/api/uldirectory/v1/keys/";
+    std::string path = "/v1/api/ulv2/directory/v1/keys/";
 
     std::map<std::string, std::string> params;
 
@@ -454,7 +454,7 @@ update_key(
     const std::string &id,
     const UpdateKey &update_key
 ) {
-    std::string path = "/v1/api/uldirectory/v1/keys/:id";
+    std::string path = "/v1/api/ulv2/directory/v1/keys/:id";
     const size_t id_idx = path.find(":id");
     path.replace(id_idx, 3, id);
 
@@ -475,7 +475,7 @@ get_key(
     ul::RequestContext &ctx,
     const std::string &id
 ) {
-    std::string path = "/v1/api/uldirectory/v1/keys/:id";
+    std::string path = "/v1/api/ulv2/directory/v1/keys/:id";
     const size_t id_idx = path.find(":id");
     path.replace(id_idx, 3, id);
 
@@ -500,7 +500,7 @@ delete_key(
     ul::RequestContext &ctx,
     const std::string &id
 ) {
-    std::string path = "/v1/api/uldirectory/v1/keys/:id";
+    std::string path = "/v1/api/ulv2/directory/v1/keys/:id";
     const size_t id_idx = path.find(":id");
     path.replace(id_idx, 3, id);
 

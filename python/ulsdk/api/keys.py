@@ -239,7 +239,7 @@ def get_keys(
     A list of all the API keys currently associated with the current user
     """
 
-    path = "/v1/api/uldirectory/v1/keys/"
+    path = "/v1/api/ulv2/directory/v1/keys/"
     params = dict()
     headers = dict()
     res = ctx.get(path, params=params, headers=headers)
@@ -258,7 +258,7 @@ def create_key(
     The details of the created key, including the secret key. This secret key cannot be retrieved again, if it is lost a new key must be created.
     """
 
-    path = "/v1/api/uldirectory/v1/keys/"
+    path = "/v1/api/ulv2/directory/v1/keys/"
     params = dict()
     headers = dict()
     body = None
@@ -279,7 +279,7 @@ def update_key(
     update_key: UpdateKey -- The details with which to update the key.
     """
 
-    path = "/v1/api/uldirectory/v1/keys/:id"
+    path = "/v1/api/ulv2/directory/v1/keys/:id"
     path = path.replace(":id", str(id_), 1)
 
     params = dict()
@@ -302,7 +302,7 @@ def get_key(
     The key details. Note that the secret key is not stored and cannot be retrieved with this API.
     """
 
-    path = "/v1/api/uldirectory/v1/keys/:id"
+    path = "/v1/api/ulv2/directory/v1/keys/:id"
     path = path.replace(":id", str(id_), 1)
 
     params = dict()
@@ -322,7 +322,7 @@ def delete_key(
     id_: str -- The ID of the key to delete
     """
 
-    path = "/v1/api/uldirectory/v1/keys/:id"
+    path = "/v1/api/ulv2/directory/v1/keys/:id"
     path = path.replace(":id", str(id_), 1)
 
     params = dict()

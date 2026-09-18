@@ -1532,7 +1532,8 @@ to_bytes(const AdUserWithAuditLog &o) {
 
 CreateUserRequest::CreateUserRequest(const struct json_value_s *root)
     : display_name_(std::nullopt)
-    , user_principal_name_(std::nullopt) {
+    , user_principal_name_(std::nullopt)
+    , department_(std::nullopt) {
     if (root->type != json_type_object) {
         throw std::runtime_error("expected json value to be of type object");
     }
@@ -1567,6 +1568,19 @@ CreateUserRequest::CreateUserRequest(const struct json_value_s *root)
                 const struct json_string_s *user_principal_name__str = static_cast<const struct json_string_s *>(create_user_request_value->payload);
                 user_principal_name_ = std::string(user_principal_name__str->string);
             }
+        } else if (std::strcmp(e->name->string, "department") == 0) {
+            const struct json_value_s *create_user_request_value = e->value;
+
+            if (create_user_request_value->type == json_type_null) {
+                department_ = std::nullopt;
+            } else {
+                if (create_user_request_value->type != json_type_string) {
+                    throw std::runtime_error("expected field to be of type string");
+                }
+
+                const struct json_string_s *department__str = static_cast<const struct json_string_s *>(create_user_request_value->payload);
+                department_ = std::string(department__str->string);
+            }
         }
 
         e = e->next;
@@ -1579,6 +1593,9 @@ CreateUserRequest::operator==(const CreateUserRequest&rhs) const {
         return false;
     }
     if (this->user_principal_name_ != rhs.user_principal_name_) {
+        return false;
+    }
+    if (this->department_ != rhs.department_) {
         return false;
     }
     return true;
@@ -1599,6 +1616,13 @@ to_bytes(const CreateUserRequest &o) {
         ss << "\"userPrincipalName\":";
         const auto &user_principal_name__value = o.user_principal_name_.value();
         ss << "\"" << user_principal_name__value << "\"";
+        ss << ",";
+    }
+
+    if (o.department_.has_value()) {
+        ss << "\"department\":";
+        const auto &department__value = o.department_.value();
+        ss << "\"" << department__value << "\"";
     }
 
     std::string str = ss.str();
@@ -1777,7 +1801,8 @@ to_bytes(const UpdateCurrentUser &o) {
 
 UpdateUser::UpdateUser(const struct json_value_s *root)
     : display_name_(std::nullopt)
-    , other_mails_(std::nullopt) {
+    , other_mails_(std::nullopt)
+    , department_(std::nullopt) {
     if (root->type != json_type_object) {
         throw std::runtime_error("expected json value to be of type object");
     }
@@ -1826,6 +1851,19 @@ UpdateUser::UpdateUser(const struct json_value_s *root)
                 }
                 other_mails_ = other_mails__vec;
             }
+        } else if (std::strcmp(e->name->string, "department") == 0) {
+            const struct json_value_s *update_user_value = e->value;
+
+            if (update_user_value->type == json_type_null) {
+                department_ = std::nullopt;
+            } else {
+                if (update_user_value->type != json_type_string) {
+                    throw std::runtime_error("expected field to be of type string");
+                }
+
+                const struct json_string_s *department__str = static_cast<const struct json_string_s *>(update_user_value->payload);
+                department_ = std::string(department__str->string);
+            }
         }
 
         e = e->next;
@@ -1838,6 +1876,9 @@ UpdateUser::operator==(const UpdateUser&rhs) const {
         return false;
     }
     if (this->other_mails_ != rhs.other_mails_) {
+        return false;
+    }
+    if (this->department_ != rhs.department_) {
         return false;
     }
     return true;
@@ -1866,6 +1907,13 @@ to_bytes(const UpdateUser &o) {
             ss.seekp(-1, ss.cur);
         }
         ss << "]";
+        ss << ",";
+    }
+
+    if (o.department_.has_value()) {
+        ss << "\"department\":";
+        const auto &department__value = o.department_.value();
+        ss << "\"" << department__value << "\"";
     }
 
     std::string str = ss.str();
@@ -2148,12 +2196,518 @@ to_bytes(const GroupMembership &o) {
     return std::vector<uint8_t>(str.begin(), str.end());
 }
 
+OrganizationSummary::OrganizationSummary(const struct json_value_s *root)
+    : name_(std::string())
+    , org_id_(std::string()) {
+    if (root->type != json_type_object) {
+        throw std::runtime_error("expected json value to be of type object");
+    }
+
+    const struct json_object_s *object = static_cast<const struct json_object_s *>(root->payload);
+    const struct json_object_element_s *e = object->start;
+
+    while (e != nullptr) {
+        if (std::strcmp(e->name->string, "name") == 0) {
+            const struct json_value_s *organization_summary_value = e->value;
+
+            if (organization_summary_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *name__str = static_cast<const struct json_string_s *>(organization_summary_value->payload);
+            name_ = std::string(name__str->string);
+        } else if (std::strcmp(e->name->string, "org_id") == 0) {
+            const struct json_value_s *organization_summary_value = e->value;
+
+            if (organization_summary_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *org_id__str = static_cast<const struct json_string_s *>(organization_summary_value->payload);
+            org_id_ = std::string(org_id__str->string);
+        }
+
+        e = e->next;
+    }
+}
+
+bool
+OrganizationSummary::operator==(const OrganizationSummary&rhs) const {
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->org_id_ != rhs.org_id_) {
+        return false;
+    }
+    return true;
+}
+
+std::vector<uint8_t>
+to_bytes(const OrganizationSummary &o) {
+    std::stringstream ss;
+    ss << "{";
+    ss << "\"name\":";
+    ss << "\"" << o.name_ << "\"";
+    ss << ",";
+
+    ss << "\"org_id\":";
+    ss << "\"" << o.org_id_ << "\"";
+    std::string str = ss.str();
+    if (str.back() == ',') {
+        str.pop_back();
+    }
+    str.push_back('}');
+    return std::vector<uint8_t>(str.begin(), str.end());
+}
+
+OrganizationList::OrganizationList(const struct json_value_s *root)
+    : organizations_() {
+    if (root->type != json_type_object) {
+        throw std::runtime_error("expected json value to be of type object");
+    }
+
+    const struct json_object_s *object = static_cast<const struct json_object_s *>(root->payload);
+    const struct json_object_element_s *e = object->start;
+
+    while (e != nullptr) {
+        if (std::strcmp(e->name->string, "organizations") == 0) {
+            const struct json_value_s *organization_list_value = e->value;
+
+            if (organization_list_value->type != json_type_array) {
+                throw std::runtime_error("expected field to be of type array");
+            }
+
+            const struct json_array_s *organizations__array = static_cast<const struct json_array_s *>(organization_list_value->payload);
+            const struct json_array_element_s *organizations__element = organizations__array->start;
+            std::vector<OrganizationSummary> organizations__vec = std::vector<OrganizationSummary>();
+            while (organizations__element != nullptr) {
+                const struct json_value_s *organization_list_value_0 = organizations__element->value;
+                OrganizationSummary organizations__value;
+            if (organization_list_value_0->type != json_type_object) {
+                throw std::runtime_error("expected field to be of type object");
+            }
+
+            organizations__value = OrganizationSummary(organization_list_value_0);
+                organizations__vec.push_back(organizations__value);
+                organizations__element = organizations__element->next;
+            }
+            organizations_ = organizations__vec;
+        }
+
+        e = e->next;
+    }
+}
+
+bool
+OrganizationList::operator==(const OrganizationList&rhs) const {
+    if (this->organizations_ != rhs.organizations_) {
+        return false;
+    }
+    return true;
+}
+
+std::vector<uint8_t>
+to_bytes(const OrganizationList &o) {
+    std::stringstream ss;
+    ss << "{";
+    ss << "\"organizations\":";
+    ss << "[";
+    for (const auto &i : o.organizations_) {
+        const std::vector<uint8_t> i_serialized = to_bytes(i);
+        const std::string i_str = std::string(i_serialized.begin(), i_serialized.end());
+        ss << i_str;
+        ss << ",";
+    }
+    if (!o.organizations_.empty()) {
+        ss.seekp(-1, ss.cur);
+    }
+    ss << "]";
+    std::string str = ss.str();
+    if (str.back() == ',') {
+        str.pop_back();
+    }
+    str.push_back('}');
+    return std::vector<uint8_t>(str.begin(), str.end());
+}
+
+CreateOrganizationRequest::CreateOrganizationRequest(const struct json_value_s *root)
+    : name_(std::string())
+    , parent_id_(std::nullopt)
+    , sso_domain_(std::nullopt)
+    , add_to_org_(false)
+    , add_data_owner_(false) {
+    if (root->type != json_type_object) {
+        throw std::runtime_error("expected json value to be of type object");
+    }
+
+    const struct json_object_s *object = static_cast<const struct json_object_s *>(root->payload);
+    const struct json_object_element_s *e = object->start;
+
+    while (e != nullptr) {
+        if (std::strcmp(e->name->string, "name") == 0) {
+            const struct json_value_s *create_organization_request_value = e->value;
+
+            if (create_organization_request_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *name__str = static_cast<const struct json_string_s *>(create_organization_request_value->payload);
+            name_ = std::string(name__str->string);
+        } else if (std::strcmp(e->name->string, "parent_id") == 0) {
+            const struct json_value_s *create_organization_request_value = e->value;
+
+            if (create_organization_request_value->type == json_type_null) {
+                parent_id_ = std::nullopt;
+            } else {
+                if (create_organization_request_value->type != json_type_string) {
+                    throw std::runtime_error("expected field to be of type string");
+                }
+
+                const struct json_string_s *parent_id__str = static_cast<const struct json_string_s *>(create_organization_request_value->payload);
+                parent_id_ = std::string(parent_id__str->string);
+            }
+        } else if (std::strcmp(e->name->string, "sso_domain") == 0) {
+            const struct json_value_s *create_organization_request_value = e->value;
+
+            if (create_organization_request_value->type == json_type_null) {
+                sso_domain_ = std::nullopt;
+            } else {
+                if (create_organization_request_value->type != json_type_string) {
+                    throw std::runtime_error("expected field to be of type string");
+                }
+
+                const struct json_string_s *sso_domain__str = static_cast<const struct json_string_s *>(create_organization_request_value->payload);
+                sso_domain_ = std::string(sso_domain__str->string);
+            }
+        } else if (std::strcmp(e->name->string, "add_to_org") == 0) {
+            const struct json_value_s *create_organization_request_value = e->value;
+
+            if (create_organization_request_value->type == json_type_true) {
+                add_to_org_ = true;
+            } else if (create_organization_request_value->type == json_type_false) {
+                add_to_org_ = false;
+            } else {
+                throw std::runtime_error("expected field to be of type bool");
+            }
+        } else if (std::strcmp(e->name->string, "add_data_owner") == 0) {
+            const struct json_value_s *create_organization_request_value = e->value;
+
+            if (create_organization_request_value->type == json_type_true) {
+                add_data_owner_ = true;
+            } else if (create_organization_request_value->type == json_type_false) {
+                add_data_owner_ = false;
+            } else {
+                throw std::runtime_error("expected field to be of type bool");
+            }
+        }
+
+        e = e->next;
+    }
+}
+
+bool
+CreateOrganizationRequest::operator==(const CreateOrganizationRequest&rhs) const {
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->parent_id_ != rhs.parent_id_) {
+        return false;
+    }
+    if (this->sso_domain_ != rhs.sso_domain_) {
+        return false;
+    }
+    if (this->add_to_org_ != rhs.add_to_org_) {
+        return false;
+    }
+    if (this->add_data_owner_ != rhs.add_data_owner_) {
+        return false;
+    }
+    return true;
+}
+
+std::vector<uint8_t>
+to_bytes(const CreateOrganizationRequest &o) {
+    std::stringstream ss;
+    ss << "{";
+    ss << "\"name\":";
+    ss << "\"" << o.name_ << "\"";
+    ss << ",";
+
+    if (o.parent_id_.has_value()) {
+        ss << "\"parent_id\":";
+        const auto &parent_id__value = o.parent_id_.value();
+        ss << "\"" << parent_id__value << "\"";
+        ss << ",";
+    }
+
+    if (o.sso_domain_.has_value()) {
+        ss << "\"sso_domain\":";
+        const auto &sso_domain__value = o.sso_domain_.value();
+        ss << "\"" << sso_domain__value << "\"";
+        ss << ",";
+    }
+
+    ss << "\"add_to_org\":";
+    ss << (o.add_to_org_ ? "true" : "false");
+    ss << ",";
+
+    ss << "\"add_data_owner\":";
+    ss << (o.add_data_owner_ ? "true" : "false");
+    std::string str = ss.str();
+    if (str.back() == ',') {
+        str.pop_back();
+    }
+    str.push_back('}');
+    return std::vector<uint8_t>(str.begin(), str.end());
+}
+
+Organization::Organization(const struct json_value_s *root)
+    : name_(std::string())
+    , org_id_(std::string())
+    , org_mgmt_id_(std::string())
+    , data_owner_id_(std::string())
+    , parent_id_(std::nullopt)
+    , sso_domain_(std::nullopt) {
+    if (root->type != json_type_object) {
+        throw std::runtime_error("expected json value to be of type object");
+    }
+
+    const struct json_object_s *object = static_cast<const struct json_object_s *>(root->payload);
+    const struct json_object_element_s *e = object->start;
+
+    while (e != nullptr) {
+        if (std::strcmp(e->name->string, "name") == 0) {
+            const struct json_value_s *organization_value = e->value;
+
+            if (organization_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *name__str = static_cast<const struct json_string_s *>(organization_value->payload);
+            name_ = std::string(name__str->string);
+        } else if (std::strcmp(e->name->string, "org_id") == 0) {
+            const struct json_value_s *organization_value = e->value;
+
+            if (organization_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *org_id__str = static_cast<const struct json_string_s *>(organization_value->payload);
+            org_id_ = std::string(org_id__str->string);
+        } else if (std::strcmp(e->name->string, "org_mgmt_id") == 0) {
+            const struct json_value_s *organization_value = e->value;
+
+            if (organization_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *org_mgmt_id__str = static_cast<const struct json_string_s *>(organization_value->payload);
+            org_mgmt_id_ = std::string(org_mgmt_id__str->string);
+        } else if (std::strcmp(e->name->string, "data_owner_id") == 0) {
+            const struct json_value_s *organization_value = e->value;
+
+            if (organization_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *data_owner_id__str = static_cast<const struct json_string_s *>(organization_value->payload);
+            data_owner_id_ = std::string(data_owner_id__str->string);
+        } else if (std::strcmp(e->name->string, "parent_id") == 0) {
+            const struct json_value_s *organization_value = e->value;
+
+            if (organization_value->type == json_type_null) {
+                parent_id_ = std::nullopt;
+            } else {
+                if (organization_value->type != json_type_string) {
+                    throw std::runtime_error("expected field to be of type string");
+                }
+
+                const struct json_string_s *parent_id__str = static_cast<const struct json_string_s *>(organization_value->payload);
+                parent_id_ = std::string(parent_id__str->string);
+            }
+        } else if (std::strcmp(e->name->string, "sso_domain") == 0) {
+            const struct json_value_s *organization_value = e->value;
+
+            if (organization_value->type == json_type_null) {
+                sso_domain_ = std::nullopt;
+            } else {
+                if (organization_value->type != json_type_string) {
+                    throw std::runtime_error("expected field to be of type string");
+                }
+
+                const struct json_string_s *sso_domain__str = static_cast<const struct json_string_s *>(organization_value->payload);
+                sso_domain_ = std::string(sso_domain__str->string);
+            }
+        }
+
+        e = e->next;
+    }
+}
+
+bool
+Organization::operator==(const Organization&rhs) const {
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->org_id_ != rhs.org_id_) {
+        return false;
+    }
+    if (this->org_mgmt_id_ != rhs.org_mgmt_id_) {
+        return false;
+    }
+    if (this->data_owner_id_ != rhs.data_owner_id_) {
+        return false;
+    }
+    if (this->parent_id_ != rhs.parent_id_) {
+        return false;
+    }
+    if (this->sso_domain_ != rhs.sso_domain_) {
+        return false;
+    }
+    return true;
+}
+
+std::vector<uint8_t>
+to_bytes(const Organization &o) {
+    std::stringstream ss;
+    ss << "{";
+    ss << "\"name\":";
+    ss << "\"" << o.name_ << "\"";
+    ss << ",";
+
+    ss << "\"org_id\":";
+    ss << "\"" << o.org_id_ << "\"";
+    ss << ",";
+
+    ss << "\"org_mgmt_id\":";
+    ss << "\"" << o.org_mgmt_id_ << "\"";
+    ss << ",";
+
+    ss << "\"data_owner_id\":";
+    ss << "\"" << o.data_owner_id_ << "\"";
+    ss << ",";
+
+    if (o.parent_id_.has_value()) {
+        ss << "\"parent_id\":";
+        const auto &parent_id__value = o.parent_id_.value();
+        ss << "\"" << parent_id__value << "\"";
+        ss << ",";
+    }
+
+    if (o.sso_domain_.has_value()) {
+        ss << "\"sso_domain\":";
+        const auto &sso_domain__value = o.sso_domain_.value();
+        ss << "\"" << sso_domain__value << "\"";
+    }
+
+    std::string str = ss.str();
+    if (str.back() == ',') {
+        str.pop_back();
+    }
+    str.push_back('}');
+    return std::vector<uint8_t>(str.begin(), str.end());
+}
+
+RenameOrganizationRequest::RenameOrganizationRequest(const struct json_value_s *root)
+    : name_(std::string()) {
+    if (root->type != json_type_object) {
+        throw std::runtime_error("expected json value to be of type object");
+    }
+
+    const struct json_object_s *object = static_cast<const struct json_object_s *>(root->payload);
+    const struct json_object_element_s *e = object->start;
+
+    while (e != nullptr) {
+        if (std::strcmp(e->name->string, "name") == 0) {
+            const struct json_value_s *rename_organization_request_value = e->value;
+
+            if (rename_organization_request_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *name__str = static_cast<const struct json_string_s *>(rename_organization_request_value->payload);
+            name_ = std::string(name__str->string);
+        }
+
+        e = e->next;
+    }
+}
+
+bool
+RenameOrganizationRequest::operator==(const RenameOrganizationRequest&rhs) const {
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    return true;
+}
+
+std::vector<uint8_t>
+to_bytes(const RenameOrganizationRequest &o) {
+    std::stringstream ss;
+    ss << "{";
+    ss << "\"name\":";
+    ss << "\"" << o.name_ << "\"";
+    std::string str = ss.str();
+    if (str.back() == ',') {
+        str.pop_back();
+    }
+    str.push_back('}');
+    return std::vector<uint8_t>(str.begin(), str.end());
+}
+
+FlushedGatewayPods::FlushedGatewayPods(const struct json_value_s *root)
+    : pods_(0) {
+    if (root->type != json_type_object) {
+        throw std::runtime_error("expected json value to be of type object");
+    }
+
+    const struct json_object_s *object = static_cast<const struct json_object_s *>(root->payload);
+    const struct json_object_element_s *e = object->start;
+
+    while (e != nullptr) {
+        if (std::strcmp(e->name->string, "pods") == 0) {
+            const struct json_value_s *flushed_gateway_pods_value = e->value;
+
+            if (flushed_gateway_pods_value->type != json_type_number) {
+                throw std::runtime_error("expected field to be of type number");
+            }
+
+            const struct json_number_s *pods__num = static_cast<const struct json_number_s *>(flushed_gateway_pods_value->payload);
+            pods_ = std::stoll(pods__num->number);
+        }
+
+        e = e->next;
+    }
+}
+
+bool
+FlushedGatewayPods::operator==(const FlushedGatewayPods&rhs) const {
+    if (this->pods_ != rhs.pods_) {
+        return false;
+    }
+    return true;
+}
+
+std::vector<uint8_t>
+to_bytes(const FlushedGatewayPods &o) {
+    std::stringstream ss;
+    ss << "{";
+    ss << "\"pods\":";
+    ss << o.pods_;
+    std::string str = ss.str();
+    if (str.back() == ',') {
+        str.pop_back();
+    }
+    str.push_back('}');
+    return std::vector<uint8_t>(str.begin(), str.end());
+}
+
 Result<Principal>
 get_principal(
     ul::RequestContext &ctx,
     const ::ul::types::B2cId &id
 ) {
-    std::string path = "/v1/api/uldirectory/v1/principal/:id";
+    std::string path = "/v1/api/ulv2/directory/v1/principal/:id";
     const size_t id_idx = path.find(":id");
     path.replace(id_idx, 3, id.to_string());
 
@@ -2178,7 +2732,7 @@ get_principals(
     ul::RequestContext &ctx,
     const std::string &ids
 ) {
-    std::string path = "/v1/api/uldirectory/v1/principal/:ids";
+    std::string path = "/v1/api/ulv2/directory/v1/principal/:ids";
     const size_t ids_idx = path.find(":ids");
     path.replace(ids_idx, 4, ids);
 
@@ -2216,7 +2770,7 @@ query_principals(
     ul::RequestContext &ctx,
     const std::string &query
 ) {
-    std::string path = "/v1/api/uldirectory/v1/principals/:query";
+    std::string path = "/v1/api/ulv2/directory/v1/principals/:query";
     const size_t query_idx = path.find(":query");
     path.replace(query_idx, 6, query);
 
@@ -2253,7 +2807,7 @@ Result<std::vector<AdUser>>
 get_users(
     ul::RequestContext &ctx
 ) {
-    std::string path = "/v1/api/uldirectory/v1/users";
+    std::string path = "/v1/api/ulv2/directory/v1/users";
 
     std::map<std::string, std::string> params;
 
@@ -2288,7 +2842,7 @@ Result<std::vector<DisplayNames>>
 get_users_display_names(
     ul::RequestContext &ctx
 ) {
-    std::string path = "/v1/api/uldirectory/v1/users/display_names";
+    std::string path = "/v1/api/ulv2/directory/v1/users/display_names";
 
     std::map<std::string, std::string> params;
 
@@ -2324,7 +2878,7 @@ get_current_user(
     ul::RequestContext &ctx,
     std::optional<bool> audit_log
 ) {
-    std::string path = "/v1/api/uldirectory/v1/user";
+    std::string path = "/v1/api/ulv2/directory/v1/user";
 
     std::map<std::string, std::string> params;
     if (audit_log.has_value()) {
@@ -2351,7 +2905,7 @@ create_user(
     ul::RequestContext &ctx,
     const CreateUserRequest &create_user_request
 ) {
-    std::string path = "/v1/api/uldirectory/v1/user";
+    std::string path = "/v1/api/ulv2/directory/v1/user";
 
     std::map<std::string, std::string> params;
 
@@ -2375,7 +2929,7 @@ update_current_user(
     ul::RequestContext &ctx,
     const UpdateCurrentUser &update_user_request
 ) {
-    std::string path = "/v1/api/uldirectory/v1/user";
+    std::string path = "/v1/api/ulv2/directory/v1/user";
 
     std::map<std::string, std::string> params;
 
@@ -2395,7 +2949,7 @@ get_user(
     const ::ul::types::B2cId &id,
     std::optional<bool> audit_log
 ) {
-    std::string path = "/v1/api/uldirectory/v1/user/:id";
+    std::string path = "/v1/api/ulv2/directory/v1/user/:id";
     const size_t id_idx = path.find(":id");
     path.replace(id_idx, 3, id.to_string());
 
@@ -2423,13 +2977,18 @@ Result<Void>
 update_user(
     ul::RequestContext &ctx,
     const ::ul::types::B2cId &id,
+    std::optional<bool> flush,
     const UpdateUser &update_user_request
 ) {
-    std::string path = "/v1/api/uldirectory/v1/user/:id";
+    std::string path = "/v1/api/ulv2/directory/v1/user/:id";
     const size_t id_idx = path.find(":id");
     path.replace(id_idx, 3, id.to_string());
 
     std::map<std::string, std::string> params;
+    if (flush.has_value()) {
+        const auto flush_value = flush.value();
+        params["flush"] = flush_value ? "true" : "false";
+    }
 
     std::map<std::string, std::string> headers;
         const std::vector<uint8_t> body = to_bytes(update_user_request);
@@ -2446,7 +3005,7 @@ delete_user(
     ul::RequestContext &ctx,
     const ::ul::types::B2cId &id
 ) {
-    std::string path = "/v1/api/uldirectory/v1/user/:id";
+    std::string path = "/v1/api/ulv2/directory/v1/user/:id";
     const size_t id_idx = path.find(":id");
     path.replace(id_idx, 3, id.to_string());
 
@@ -2465,7 +3024,7 @@ Result<std::vector<AdGroup>>
 get_groups(
     ul::RequestContext &ctx
 ) {
-    std::string path = "/v1/api/uldirectory/v1/group";
+    std::string path = "/v1/api/ulv2/directory/v1/group";
 
     std::map<std::string, std::string> params;
 
@@ -2501,7 +3060,7 @@ create_group(
     ul::RequestContext &ctx,
     const CreateGroup &create_group_request
 ) {
-    std::string path = "/v1/api/uldirectory/v1/group";
+    std::string path = "/v1/api/ulv2/directory/v1/group";
 
     std::map<std::string, std::string> params;
 
@@ -2525,7 +3084,7 @@ get_group_members(
     ul::RequestContext &ctx,
     const ::ul::types::B2cId &id
 ) {
-    std::string path = "/v1/api/uldirectory/v1/group/:id";
+    std::string path = "/v1/api/ulv2/directory/v1/group/:id";
     const size_t id_idx = path.find(":id");
     path.replace(id_idx, 3, id.to_string());
 
@@ -2563,7 +3122,7 @@ delete_group(
     ul::RequestContext &ctx,
     const ::ul::types::B2cId &id
 ) {
-    std::string path = "/v1/api/uldirectory/v1/group/:id";
+    std::string path = "/v1/api/ulv2/directory/v1/group/:id";
     const size_t id_idx = path.find(":id");
     path.replace(id_idx, 3, id.to_string());
 
@@ -2584,7 +3143,7 @@ add_group_member(
     const ::ul::types::B2cId &group,
     const ::ul::types::B2cId &member
 ) {
-    std::string path = "/v1/api/uldirectory/v1/group/:group/:member";
+    std::string path = "/v1/api/ulv2/directory/v1/group/:group/:member";
     const size_t group_idx = path.find(":group");
     path.replace(group_idx, 6, group.to_string());
     const size_t member_idx = path.find(":member");
@@ -2608,7 +3167,7 @@ remove_group_member(
     const ::ul::types::B2cId &group,
     const ::ul::types::B2cId &member
 ) {
-    std::string path = "/v1/api/uldirectory/v1/group/:group/:member";
+    std::string path = "/v1/api/ulv2/directory/v1/group/:group/:member";
     const size_t group_idx = path.find(":group");
     path.replace(group_idx, 6, group.to_string());
     const size_t member_idx = path.find(":member");
@@ -2623,6 +3182,171 @@ remove_group_member(
         return Result<Void>(error);
     }
     return Result<Void>();
+}
+
+Result<OrganizationList>
+list_organizations(
+    ul::RequestContext &ctx
+) {
+    std::string path = "/v1/api/ulv2/directory/v1/organization";
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+    const Result<std::vector<uint8_t>> res = ctx.get(path, params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<OrganizationList>(error);
+    }
+    const std::vector<uint8_t> res_bytes = std::get<std::vector<uint8_t>>(res);
+    const ul::AutoRelease<struct json_value_s> root = ul::AutoRelease(json_parse_ex(res_bytes.data(), res_bytes.size(), json_parse_flags_allow_json5, NULL, NULL, NULL));
+    if (root == nullptr) {
+        return Result<OrganizationList>(Error("failed to parse JSON"));
+    }
+    return OrganizationList(root.get());
+}
+
+Result<Organization>
+create_organization(
+    ul::RequestContext &ctx,
+    const CreateOrganizationRequest &create_organization_request
+) {
+    std::string path = "/v1/api/ulv2/directory/v1/organization";
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+        const std::vector<uint8_t> body = to_bytes(create_organization_request);
+    const Result<std::vector<uint8_t>> res = ctx.post(path, body, "application/json", params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<Organization>(error);
+    }
+    const std::vector<uint8_t> res_bytes = std::get<std::vector<uint8_t>>(res);
+    const ul::AutoRelease<struct json_value_s> root = ul::AutoRelease(json_parse_ex(res_bytes.data(), res_bytes.size(), json_parse_flags_allow_json5, NULL, NULL, NULL));
+    if (root == nullptr) {
+        return Result<Organization>(Error("failed to parse JSON"));
+    }
+    return Organization(root.get());
+}
+
+Result<Organization>
+get_organization(
+    ul::RequestContext &ctx,
+    const ::ul::types::B2cId &id
+) {
+    std::string path = "/v1/api/ulv2/directory/v1/organization/:id";
+    const size_t id_idx = path.find(":id");
+    path.replace(id_idx, 3, id.to_string());
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+    const Result<std::vector<uint8_t>> res = ctx.get(path, params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<Organization>(error);
+    }
+    const std::vector<uint8_t> res_bytes = std::get<std::vector<uint8_t>>(res);
+    const ul::AutoRelease<struct json_value_s> root = ul::AutoRelease(json_parse_ex(res_bytes.data(), res_bytes.size(), json_parse_flags_allow_json5, NULL, NULL, NULL));
+    if (root == nullptr) {
+        return Result<Organization>(Error("failed to parse JSON"));
+    }
+    return Organization(root.get());
+}
+
+Result<Void>
+rename_organization(
+    ul::RequestContext &ctx,
+    const ::ul::types::B2cId &id,
+    const RenameOrganizationRequest &rename_organization_request
+) {
+    std::string path = "/v1/api/ulv2/directory/v1/organization/:id";
+    const size_t id_idx = path.find(":id");
+    path.replace(id_idx, 3, id.to_string());
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+        const std::vector<uint8_t> body = to_bytes(rename_organization_request);
+    const Result<std::vector<uint8_t>> res = ctx.put(path, body, "application/json", params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<Void>(error);
+    }
+    return Result<Void>();
+}
+
+Result<Organization>
+get_user_organization(
+    ul::RequestContext &ctx,
+    const ::ul::types::B2cId &id
+) {
+    std::string path = "/v1/api/ulv2/directory/v1/user/:id/organization";
+    const size_t id_idx = path.find(":id");
+    path.replace(id_idx, 3, id.to_string());
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+    const Result<std::vector<uint8_t>> res = ctx.get(path, params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<Organization>(error);
+    }
+    const std::vector<uint8_t> res_bytes = std::get<std::vector<uint8_t>>(res);
+    const ul::AutoRelease<struct json_value_s> root = ul::AutoRelease(json_parse_ex(res_bytes.data(), res_bytes.size(), json_parse_flags_allow_json5, NULL, NULL, NULL));
+    if (root == nullptr) {
+        return Result<Organization>(Error("failed to parse JSON"));
+    }
+    return Organization(root.get());
+}
+
+Result<Void>
+associate_group_with_organization(
+    ul::RequestContext &ctx,
+    const ::ul::types::B2cId &group,
+    const ::ul::types::B2cId &org
+) {
+    std::string path = "/v1/api/ulv2/directory/v1/group/:group/org/:org";
+    const size_t group_idx = path.find(":group");
+    path.replace(group_idx, 6, group.to_string());
+    const size_t org_idx = path.find(":org");
+    path.replace(org_idx, 4, org.to_string());
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+    const std::vector<uint8_t> body;
+    const Result<std::vector<uint8_t>> res = ctx.post(path, body, "text/plain", params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<Void>(error);
+    }
+    return Result<Void>();
+}
+
+Result<FlushedGatewayPods>
+flush_gateway_cache(
+    ul::RequestContext &ctx
+) {
+    std::string path = "/v1/api/ulv2/directory/v1/flush_cache";
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+    const std::vector<uint8_t> body;
+    const Result<std::vector<uint8_t>> res = ctx.post(path, body, "text/plain", params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<FlushedGatewayPods>(error);
+    }
+    const std::vector<uint8_t> res_bytes = std::get<std::vector<uint8_t>>(res);
+    const ul::AutoRelease<struct json_value_s> root = ul::AutoRelease(json_parse_ex(res_bytes.data(), res_bytes.size(), json_parse_flags_allow_json5, NULL, NULL, NULL));
+    if (root == nullptr) {
+        return Result<FlushedGatewayPods>(Error("failed to parse JSON"));
+    }
+    return FlushedGatewayPods(root.get());
 }
 
 } // namespace directory

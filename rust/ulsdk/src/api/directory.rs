@@ -135,6 +135,7 @@ pub struct CreateUserRequest {
     display_name: Option<String>,
     #[serde(rename = "userPrincipalName")]
     user_principal_name: Option<String>,
+    department: Option<String>,
 }
 
 #[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
@@ -157,6 +158,7 @@ pub struct UpdateUser {
     display_name: Option<String>,
     #[serde(rename = "otherMails")]
     other_mails: Option<Vec<String>>,
+    department: Option<String>,
 }
 
 #[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
@@ -182,6 +184,46 @@ pub struct GroupMembership {
     created_date_time: Option<String>,
 }
 
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct OrganizationSummary {
+    name: String,
+    org_id: String,
+}
+
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct OrganizationList {
+    organizations: Vec<OrganizationSummary>,
+}
+
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct CreateOrganizationRequest {
+    name: String,
+    parent_id: Option<String>,
+    sso_domain: Option<String>,
+    add_to_org: bool,
+    add_data_owner: bool,
+}
+
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct Organization {
+    name: String,
+    org_id: String,
+    org_mgmt_id: String,
+    data_owner_id: String,
+    parent_id: Option<String>,
+    sso_domain: Option<String>,
+}
+
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct RenameOrganizationRequest {
+    name: String,
+}
+
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct FlushedGatewayPods {
+    pods: i64,
+}
+
 /// Retrieves a single principal by id.
 ///
 /// # Arguments
@@ -195,7 +237,7 @@ pub async fn get_principal(
     ctx: &dyn RequestContext,
     id: crate::types::id::B2cId,
 ) -> Result<Principal, Error> {
-    let path = "/v1/api/uldirectory/v1/principal/:id".replace(":id", &id.to_string());
+    let path = "/v1/api/ulv2/directory/v1/principal/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }
@@ -210,7 +252,7 @@ pub async fn get_principal(
 /// Returns
 /// * Details of all the specified principals
 pub async fn get_principals(ctx: &dyn RequestContext, ids: &str) -> Result<Vec<Principal>, Error> {
-    let path = "/v1/api/uldirectory/v1/principal/:ids".replace(":ids", ids);
+    let path = "/v1/api/ulv2/directory/v1/principal/:ids".replace(":ids", ids);
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }
@@ -238,7 +280,7 @@ pub async fn query_principals(
     ctx: &dyn RequestContext,
     query: &str,
 ) -> Result<Vec<Principal>, Error> {
-    let path = "/v1/api/uldirectory/v1/principals/:query".replace(":query", query);
+    let path = "/v1/api/ulv2/directory/v1/principals/:query".replace(":query", query);
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }
@@ -252,7 +294,7 @@ pub async fn query_principals(
 /// Returns
 /// * Details of all specified users.
 pub async fn get_users(ctx: &dyn RequestContext) -> Result<Vec<AdUser>, Error> {
-    let path = "/v1/api/uldirectory/v1/users";
+    let path = "/v1/api/ulv2/directory/v1/users";
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }
@@ -266,7 +308,7 @@ pub async fn get_users(ctx: &dyn RequestContext) -> Result<Vec<AdUser>, Error> {
 /// Returns
 /// * The list of users including their IDs and their display names
 pub async fn get_users_display_names(ctx: &dyn RequestContext) -> Result<Vec<DisplayNames>, Error> {
-    let path = "/v1/api/uldirectory/v1/users/display_names";
+    let path = "/v1/api/ulv2/directory/v1/users/display_names";
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }
@@ -284,7 +326,7 @@ pub async fn get_current_user(
     ctx: &dyn RequestContext,
     audit_log: Option<bool>,
 ) -> Result<AdUserWithAuditLog, Error> {
-    let path = "/v1/api/uldirectory/v1/user";
+    let path = "/v1/api/ulv2/directory/v1/user";
     let mut params = ParamMap::new();
     if let Some(val) = audit_log {
         params.insert(
@@ -310,7 +352,7 @@ pub async fn create_user(
     ctx: &dyn RequestContext,
     create_user_request: CreateUserRequest,
 ) -> Result<CreateUser, Error> {
-    let path = "/v1/api/uldirectory/v1/user";
+    let path = "/v1/api/ulv2/directory/v1/user";
     let body = Bytes::from(serde_json::to_vec(&create_user_request)?);
     let res = ctx
         .post(&path, body, "application/json", None, None)
@@ -328,7 +370,7 @@ pub async fn update_current_user(
     ctx: &dyn RequestContext,
     update_user_request: UpdateCurrentUser,
 ) -> Result<(), Error> {
-    let path = "/v1/api/uldirectory/v1/user";
+    let path = "/v1/api/ulv2/directory/v1/user";
     let body = Bytes::from(serde_json::to_vec(&update_user_request)?);
     ctx.put(&path, body, "application/json", None, None).await?;
     Ok(())
@@ -349,7 +391,7 @@ pub async fn get_user(
     id: crate::types::id::B2cId,
     audit_log: Option<bool>,
 ) -> Result<AdUserWithAuditLog, Error> {
-    let path = "/v1/api/uldirectory/v1/user/:id".replace(":id", &id.to_string());
+    let path = "/v1/api/ulv2/directory/v1/user/:id".replace(":id", &id.to_string());
     let mut params = ParamMap::new();
     if let Some(val) = audit_log {
         params.insert(
@@ -368,15 +410,26 @@ pub async fn get_user(
 ///
 /// * `ctx` - A request context object
 /// * `id` - The ID of the user to update
+/// * `flush` - Whether to flush the gateway cache after the update. The default is true. A bulk caller passes false for every update and calls `flush_gateway_cache` once at the end.
 /// * `update_user_request` - The details which which to update the user
 pub async fn update_user(
     ctx: &dyn RequestContext,
     id: crate::types::id::B2cId,
+    flush: Option<bool>,
     update_user_request: UpdateUser,
 ) -> Result<(), Error> {
-    let path = "/v1/api/uldirectory/v1/user/:id".replace(":id", &id.to_string());
+    let path = "/v1/api/ulv2/directory/v1/user/:id".replace(":id", &id.to_string());
+    let mut params = ParamMap::new();
+    if let Some(val) = flush {
+        params.insert(
+            "flush".to_owned(),
+            if val { "true" } else { "false" }.to_owned(),
+        );
+    }
+
     let body = Bytes::from(serde_json::to_vec(&update_user_request)?);
-    ctx.put(&path, body, "application/json", None, None).await?;
+    ctx.put(&path, body, "application/json", Some(params), None)
+        .await?;
     Ok(())
 }
 
@@ -390,7 +443,7 @@ pub async fn delete_user(
     ctx: &dyn RequestContext,
     id: crate::types::id::B2cId,
 ) -> Result<(), Error> {
-    let path = "/v1/api/uldirectory/v1/user/:id".replace(":id", &id.to_string());
+    let path = "/v1/api/ulv2/directory/v1/user/:id".replace(":id", &id.to_string());
     ctx.delete(&path, None, None).await?;
     Ok(())
 }
@@ -404,7 +457,7 @@ pub async fn delete_user(
 /// Returns
 /// * A list of all the groups from the directory for which the current user is allowed to see.
 pub async fn get_groups(ctx: &dyn RequestContext) -> Result<Vec<AdGroup>, Error> {
-    let path = "/v1/api/uldirectory/v1/group";
+    let path = "/v1/api/ulv2/directory/v1/group";
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }
@@ -422,7 +475,7 @@ pub async fn create_group(
     ctx: &dyn RequestContext,
     create_group_request: CreateGroup,
 ) -> Result<AdGroup, Error> {
-    let path = "/v1/api/uldirectory/v1/group";
+    let path = "/v1/api/ulv2/directory/v1/group";
     let body = Bytes::from(serde_json::to_vec(&create_group_request)?);
     let res = ctx
         .post(&path, body, "application/json", None, None)
@@ -443,7 +496,7 @@ pub async fn get_group_members(
     ctx: &dyn RequestContext,
     id: crate::types::id::B2cId,
 ) -> Result<Vec<GroupMembership>, Error> {
-    let path = "/v1/api/uldirectory/v1/group/:id".replace(":id", &id.to_string());
+    let path = "/v1/api/ulv2/directory/v1/group/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }
@@ -458,7 +511,7 @@ pub async fn delete_group(
     ctx: &dyn RequestContext,
     id: crate::types::id::B2cId,
 ) -> Result<(), Error> {
-    let path = "/v1/api/uldirectory/v1/group/:id".replace(":id", &id.to_string());
+    let path = "/v1/api/ulv2/directory/v1/group/:id".replace(":id", &id.to_string());
     ctx.delete(&path, None, None).await?;
     Ok(())
 }
@@ -475,7 +528,7 @@ pub async fn add_group_member(
     group: crate::types::id::B2cId,
     member: crate::types::id::B2cId,
 ) -> Result<(), Error> {
-    let path = "/v1/api/uldirectory/v1/group/:group/:member"
+    let path = "/v1/api/ulv2/directory/v1/group/:group/:member"
         .replace(":group", &group.to_string())
         .replace(":member", &member.to_string());
     let body = Bytes::new();
@@ -495,11 +548,135 @@ pub async fn remove_group_member(
     group: crate::types::id::B2cId,
     member: crate::types::id::B2cId,
 ) -> Result<(), Error> {
-    let path = "/v1/api/uldirectory/v1/group/:group/:member"
+    let path = "/v1/api/ulv2/directory/v1/group/:group/:member"
         .replace(":group", &group.to_string())
         .replace(":member", &member.to_string());
     ctx.delete(&path, None, None).await?;
     Ok(())
+}
+
+/// Lists organizations visible to the caller. Admins (admin.directory + admin.org) see all organizations; everyone else sees only organizations whose `org_id` group they belong to.
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+///
+/// Returns
+/// * Organizations visible to the caller.
+pub async fn list_organizations(ctx: &dyn RequestContext) -> Result<OrganizationList, Error> {
+    let path = "/v1/api/ulv2/directory/v1/organization";
+    let res = ctx.get(&path, None, None).await?;
+    serde_json::from_slice(&res).map_err(Error::from)
+}
+
+/// Creates a new organization. Creates three AD groups (org, org mgmt, data owner) and records them in the organizations table. Requires `admin.org`; top-level organizations additionally require `admin.directory`; child organizations require membership in the parent's mgmt group.
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+/// * `create_organization_request` - Organization creation details
+///
+/// Returns
+/// * Details of the created organization.
+pub async fn create_organization(
+    ctx: &dyn RequestContext,
+    create_organization_request: CreateOrganizationRequest,
+) -> Result<Organization, Error> {
+    let path = "/v1/api/ulv2/directory/v1/organization";
+    let body = Bytes::from(serde_json::to_vec(&create_organization_request)?);
+    let res = ctx
+        .post(&path, body, "application/json", None, None)
+        .await?;
+    serde_json::from_slice(&res).map_err(Error::from)
+}
+
+/// Fetches the details of a single organization by `org_id`.
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+/// * `id` - The organization's `org_id` (B2cId).
+///
+/// Returns
+/// * The organization's details.
+pub async fn get_organization(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::B2cId,
+) -> Result<Organization, Error> {
+    let path = "/v1/api/ulv2/directory/v1/organization/:id".replace(":id", &id.to_string());
+    let res = ctx.get(&path, None, None).await?;
+    serde_json::from_slice(&res).map_err(Error::from)
+}
+
+/// Renames an organization. Caller must belong to the organization's management group.
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+/// * `id` - The organization's `org_id` (B2cId).
+/// * `rename_organization_request` - New name for the organization.
+pub async fn rename_organization(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::B2cId,
+    rename_organization_request: RenameOrganizationRequest,
+) -> Result<(), Error> {
+    let path = "/v1/api/ulv2/directory/v1/organization/:id".replace(":id", &id.to_string());
+    let body = Bytes::from(serde_json::to_vec(&rename_organization_request)?);
+    ctx.put(&path, body, "application/json", None, None).await?;
+    Ok(())
+}
+
+/// Fetches the organization record for a specific user, derived from the user's AD `department` field.
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+/// * `id` - The user's B2cId.
+///
+/// Returns
+/// * The user's organization record.
+pub async fn get_user_organization(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::B2cId,
+) -> Result<Organization, Error> {
+    let path = "/v1/api/ulv2/directory/v1/user/:id/organization".replace(":id", &id.to_string());
+    let res = ctx.get(&path, None, None).await?;
+    serde_json::from_slice(&res).map_err(Error::from)
+}
+
+/// Associates an existing AD group with an organization. Temporary migration-only endpoint — do not use from new code; will be removed once the backfill is done. Requires both `admin.directory` and `admin.org`. Idempotent: if the association already exists the request is a no-op.
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+/// * `group` - The AD group's B2cId.
+/// * `org` - The organization's `org_id` (B2cId).
+pub async fn associate_group_with_organization(
+    ctx: &dyn RequestContext,
+    group: crate::types::id::B2cId,
+    org: crate::types::id::B2cId,
+) -> Result<(), Error> {
+    let path = "/v1/api/ulv2/directory/v1/group/:group/org/:org"
+        .replace(":group", &group.to_string())
+        .replace(":org", &org.to_string());
+    let body = Bytes::new();
+    ctx.post(&path, body, "text/plain", None, None).await?;
+    Ok(())
+}
+
+/// Flushes the cache of every gateway pod. The directory flushes after each change that the gateway caches; a bulk caller that passed `flush=false` to `update_user` calls this once at the end. Requires `admin.directory`.
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+///
+/// Returns
+/// * How many gateway pods were flushed.
+pub async fn flush_gateway_cache(ctx: &dyn RequestContext) -> Result<FlushedGatewayPods, Error> {
+    let path = "/v1/api/ulv2/directory/v1/flush_cache";
+    let body = Bytes::new();
+    let res = ctx.post(&path, body, "text/plain", None, None).await?;
+    serde_json::from_slice(&res).map_err(Error::from)
 }
 
 #[cfg(test)]
@@ -877,8 +1054,10 @@ mod tests {
 
         for i in 0..5 {
             let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let q0 = true;
+            let q0 = Some(q0);
             let body = UpdateUser::default();
-            let result = update_user(&ctx, p0, body).await;
+            let result = update_user(&ctx, p0, q0, body).await;
             if let Err(e) = result {
                 if i < 4 {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
@@ -1138,6 +1317,260 @@ mod tests {
             } else {
                 break;
             }
+        }
+    }
+
+    #[tokio::test]
+    async fn test_list_organizations() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+
+        for i in 0..5 {
+            let expected = OrganizationList::default();
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = list_organizations(&ctx).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
+    }
+
+    #[tokio::test]
+    async fn test_create_organization() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+
+        for i in 0..5 {
+            let body = CreateOrganizationRequest::default();
+            let expected = Organization::default();
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = create_organization(&ctx, body).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
+    }
+
+    #[tokio::test]
+    async fn test_get_organization() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+
+        for i in 0..5 {
+            let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = Organization::default();
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_organization(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
+    }
+
+    #[tokio::test]
+    async fn test_rename_organization() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+
+        for i in 0..5 {
+            let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let body = RenameOrganizationRequest::default();
+            let result = rename_organization(&ctx, p0, body).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn test_get_user_organization() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+
+        for i in 0..5 {
+            let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let expected = Organization::default();
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_user_organization(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
+    }
+
+    #[tokio::test]
+    async fn test_associate_group_with_organization() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+
+        for i in 0..5 {
+            let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let p1 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let result = associate_group_with_organization(&ctx, p0, p1).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn test_flush_gateway_cache() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+
+        for i in 0..5 {
+            let expected = FlushedGatewayPods::default();
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = flush_gateway_cache(&ctx).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
         }
     }
 }

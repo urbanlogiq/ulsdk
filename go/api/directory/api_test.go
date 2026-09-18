@@ -313,6 +313,8 @@ func TestUpdateUser(t *testing.T) {
 	}
 
 	p0 := id.B2cid{}
+	q0_val := true
+	q0 := &q0_val
 	body := &UpdateUserPayload{}
 
 	success := false
@@ -320,6 +322,7 @@ func TestUpdateUser(t *testing.T) {
 		err := UpdateUser(
 			ctx,
 			p0,
+			q0,
 			body,
 		)
 		if err != nil {
@@ -531,6 +534,223 @@ func TestRemoveGroupMember(t *testing.T) {
 			time.Sleep(time.Duration(i+1) * time.Second)
 			continue
 		}
+		success = true
+		break
+	}
+	if !success {
+		t.Fatal("test was unable to complete with retries")
+	}
+}
+
+func TestListOrganizations(t *testing.T) {
+	ctx := ulsdk.NewTestContextFromEnv()
+	if ctx == nil {
+		t.Skip("credentials not set, skipping API test")
+	}
+
+
+	success := false
+	for i := 0; i < 5; i++ {
+		expected := &OrganizationList{}
+		expectedBytes, err := json.Marshal(expected)
+		if err != nil {
+			t.Fatalf("failed to marshal expected: %v", err)
+		}
+		ctx.SetResponse(expectedBytes)
+		result, err := ListOrganizations(
+			ctx,
+		)
+		if err != nil {
+			time.Sleep(time.Duration(i+1) * time.Second)
+			continue
+		}
+		_ = result
+		success = true
+		break
+	}
+	if !success {
+		t.Fatal("test was unable to complete with retries")
+	}
+}
+
+func TestCreateOrganization(t *testing.T) {
+	ctx := ulsdk.NewTestContextFromEnv()
+	if ctx == nil {
+		t.Skip("credentials not set, skipping API test")
+	}
+
+	body := &CreateOrganizationRequest{}
+
+	success := false
+	for i := 0; i < 5; i++ {
+		expected := &Organization{}
+		expectedBytes, err := json.Marshal(expected)
+		if err != nil {
+			t.Fatalf("failed to marshal expected: %v", err)
+		}
+		ctx.SetResponse(expectedBytes)
+		result, err := CreateOrganization(
+			ctx,
+			body,
+		)
+		if err != nil {
+			time.Sleep(time.Duration(i+1) * time.Second)
+			continue
+		}
+		_ = result
+		success = true
+		break
+	}
+	if !success {
+		t.Fatal("test was unable to complete with retries")
+	}
+}
+
+func TestGetOrganization(t *testing.T) {
+	ctx := ulsdk.NewTestContextFromEnv()
+	if ctx == nil {
+		t.Skip("credentials not set, skipping API test")
+	}
+
+	p0 := id.B2cid{}
+
+	success := false
+	for i := 0; i < 5; i++ {
+		expected := &Organization{}
+		expectedBytes, err := json.Marshal(expected)
+		if err != nil {
+			t.Fatalf("failed to marshal expected: %v", err)
+		}
+		ctx.SetResponse(expectedBytes)
+		result, err := GetOrganization(
+			ctx,
+			p0,
+		)
+		if err != nil {
+			time.Sleep(time.Duration(i+1) * time.Second)
+			continue
+		}
+		_ = result
+		success = true
+		break
+	}
+	if !success {
+		t.Fatal("test was unable to complete with retries")
+	}
+}
+
+func TestRenameOrganization(t *testing.T) {
+	ctx := ulsdk.NewTestContextFromEnv()
+	if ctx == nil {
+		t.Skip("credentials not set, skipping API test")
+	}
+
+	p0 := id.B2cid{}
+	body := &RenameOrganizationRequest{}
+
+	success := false
+	for i := 0; i < 5; i++ {
+		err := RenameOrganization(
+			ctx,
+			p0,
+			body,
+		)
+		if err != nil {
+			time.Sleep(time.Duration(i+1) * time.Second)
+			continue
+		}
+		success = true
+		break
+	}
+	if !success {
+		t.Fatal("test was unable to complete with retries")
+	}
+}
+
+func TestGetUserOrganization(t *testing.T) {
+	ctx := ulsdk.NewTestContextFromEnv()
+	if ctx == nil {
+		t.Skip("credentials not set, skipping API test")
+	}
+
+	p0 := id.B2cid{}
+
+	success := false
+	for i := 0; i < 5; i++ {
+		expected := &Organization{}
+		expectedBytes, err := json.Marshal(expected)
+		if err != nil {
+			t.Fatalf("failed to marshal expected: %v", err)
+		}
+		ctx.SetResponse(expectedBytes)
+		result, err := GetUserOrganization(
+			ctx,
+			p0,
+		)
+		if err != nil {
+			time.Sleep(time.Duration(i+1) * time.Second)
+			continue
+		}
+		_ = result
+		success = true
+		break
+	}
+	if !success {
+		t.Fatal("test was unable to complete with retries")
+	}
+}
+
+func TestAssociateGroupWithOrganization(t *testing.T) {
+	ctx := ulsdk.NewTestContextFromEnv()
+	if ctx == nil {
+		t.Skip("credentials not set, skipping API test")
+	}
+
+	p0 := id.B2cid{}
+	p1 := id.B2cid{}
+
+	success := false
+	for i := 0; i < 5; i++ {
+		err := AssociateGroupWithOrganization(
+			ctx,
+			p0,
+			p1,
+		)
+		if err != nil {
+			time.Sleep(time.Duration(i+1) * time.Second)
+			continue
+		}
+		success = true
+		break
+	}
+	if !success {
+		t.Fatal("test was unable to complete with retries")
+	}
+}
+
+func TestFlushGatewayCache(t *testing.T) {
+	ctx := ulsdk.NewTestContextFromEnv()
+	if ctx == nil {
+		t.Skip("credentials not set, skipping API test")
+	}
+
+
+	success := false
+	for i := 0; i < 5; i++ {
+		expected := &FlushedGatewayPods{}
+		expectedBytes, err := json.Marshal(expected)
+		if err != nil {
+			t.Fatalf("failed to marshal expected: %v", err)
+		}
+		ctx.SetResponse(expectedBytes)
+		result, err := FlushGatewayCache(
+			ctx,
+		)
+		if err != nil {
+			time.Sleep(time.Duration(i+1) * time.Second)
+			continue
+		}
+		_ = result
 		success = true
 		break
 	}

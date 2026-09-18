@@ -836,6 +836,7 @@ class AdUserWithAuditLog:
 class CreateUserRequest:
     display_name: "Optional[str]"
     user_principal_name: "Optional[str]"
+    department: "Optional[str]"
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -845,12 +846,16 @@ class CreateUserRequest:
         o["userPrincipalName"] = None
         if self.user_principal_name is not None:
             o["userPrincipalName"] = self.user_principal_name
+        o["department"] = None
+        if self.department is not None:
+            o["department"] = self.department
         return o
 
     @classmethod
     def from_dict(cls, o: Dict[str, Any]) -> Self:
         display_name = None
         user_principal_name = None
+        department = None
 
         for key in o:
             if key == "displayName":
@@ -867,16 +872,24 @@ class CreateUserRequest:
                     user_principal_name = user_principal_name_var
                 else:
                     user_principal_name = None
+            elif key == "department":
+                if o[key] is not None:
+                    department_var = o[key]
+                    assert type(department_var) is str
+                    department = department_var
+                else:
+                    department = None
 
 
-        return cls(display_name, user_principal_name)
+        return cls(display_name, user_principal_name, department)
 
     @classmethod
     def make_default(cls) -> Self:
         displayName = None
         userPrincipalName = None
+        department = None
 
-        return cls(displayName, userPrincipalName)
+        return cls(displayName, userPrincipalName, department)
 
 @dataclass
 class CreateUser:
@@ -975,6 +988,7 @@ class UpdateCurrentUser:
 class UpdateUser:
     display_name: "Optional[str]"
     other_mails: "Optional[List[str]]"
+    department: "Optional[str]"
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -988,12 +1002,16 @@ class UpdateUser:
                 other_mails_var = item
                 other_mails_list.append(other_mails_var)
             o["otherMails"] = other_mails_list
+        o["department"] = None
+        if self.department is not None:
+            o["department"] = self.department
         return o
 
     @classmethod
     def from_dict(cls, o: Dict[str, Any]) -> Self:
         display_name = None
         other_mails = None
+        department = None
 
         for key in o:
             if key == "displayName":
@@ -1015,16 +1033,24 @@ class UpdateUser:
                         other_mails.append(other_mails_item)
                 else:
                     other_mails = None
+            elif key == "department":
+                if o[key] is not None:
+                    department_var = o[key]
+                    assert type(department_var) is str
+                    department = department_var
+                else:
+                    department = None
 
 
-        return cls(display_name, other_mails)
+        return cls(display_name, other_mails, department)
 
     @classmethod
     def make_default(cls) -> Self:
         displayName = None
         otherMails = None
+        department = None
 
-        return cls(displayName, otherMails)
+        return cls(displayName, otherMails, department)
 
 @dataclass
 class CreateGroup:
@@ -1176,6 +1202,295 @@ class GroupMembership:
 
         return cls(id, objectType, displayName, userPrincipalName, otherMails, department, createdDateTime)
 
+@dataclass
+class OrganizationSummary:
+    name: "str"
+    org_id: "str"
+
+    def to_dict(self) -> Dict[str, Any]:
+        o = dict()
+        o["name"] = self.name
+        o["org_id"] = self.org_id
+        return o
+
+    @classmethod
+    def from_dict(cls, o: Dict[str, Any]) -> Self:
+        name = None
+        org_id = None
+
+        for key in o:
+            if key == "name":
+                name_var = o[key]
+                assert type(name_var) is str
+                name = name_var
+            elif key == "org_id":
+                org_id_var = o[key]
+                assert type(org_id_var) is str
+                org_id = org_id_var
+
+        assert name is not None
+        assert org_id is not None
+
+        return cls(name, org_id)
+
+    @classmethod
+    def make_default(cls) -> Self:
+        name = ""
+        org_id = ""
+
+        return cls(name, org_id)
+
+@dataclass
+class OrganizationList:
+    organizations: "List[OrganizationSummary]"
+
+    def to_dict(self) -> Dict[str, Any]:
+        o = dict()
+        organizations_list = []
+        for item in self.organizations:
+            organizations_var = item.to_dict()
+            organizations_list.append(organizations_var)
+        o["organizations"] = organizations_list
+        return o
+
+    @classmethod
+    def from_dict(cls, o: Dict[str, Any]) -> Self:
+        organizations = None
+
+        for key in o:
+            if key == "organizations":
+                organizations_var = o[key]
+                assert type(organizations_var) is list
+                organizations = []
+                for item in organizations_var:
+                    organizations_item_var = item
+                    assert type(organizations_item_var) is dict
+                    organizations_item = OrganizationSummary.from_dict(organizations_item_var)
+                    organizations.append(organizations_item)
+
+        assert organizations is not None
+
+        return cls(organizations)
+
+    @classmethod
+    def make_default(cls) -> Self:
+        organizations = []
+
+        return cls(organizations)
+
+@dataclass
+class CreateOrganizationRequest:
+    name: "str"
+    parent_id: "Optional[str]"
+    sso_domain: "Optional[str]"
+    add_to_org: "bool"
+    add_data_owner: "bool"
+
+    def to_dict(self) -> Dict[str, Any]:
+        o = dict()
+        o["name"] = self.name
+        o["parent_id"] = None
+        if self.parent_id is not None:
+            o["parent_id"] = self.parent_id
+        o["sso_domain"] = None
+        if self.sso_domain is not None:
+            o["sso_domain"] = self.sso_domain
+        o["add_to_org"] = self.add_to_org
+        o["add_data_owner"] = self.add_data_owner
+        return o
+
+    @classmethod
+    def from_dict(cls, o: Dict[str, Any]) -> Self:
+        name = None
+        parent_id = None
+        sso_domain = None
+        add_to_org = None
+        add_data_owner = None
+
+        for key in o:
+            if key == "name":
+                name_var = o[key]
+                assert type(name_var) is str
+                name = name_var
+            elif key == "parent_id":
+                if o[key] is not None:
+                    parent_id_var = o[key]
+                    assert type(parent_id_var) is str
+                    parent_id = parent_id_var
+                else:
+                    parent_id = None
+            elif key == "sso_domain":
+                if o[key] is not None:
+                    sso_domain_var = o[key]
+                    assert type(sso_domain_var) is str
+                    sso_domain = sso_domain_var
+                else:
+                    sso_domain = None
+            elif key == "add_to_org":
+                add_to_org_var = o[key]
+                assert type(add_to_org_var) is bool
+                add_to_org = add_to_org_var
+            elif key == "add_data_owner":
+                add_data_owner_var = o[key]
+                assert type(add_data_owner_var) is bool
+                add_data_owner = add_data_owner_var
+
+        assert name is not None
+        assert add_to_org is not None
+        assert add_data_owner is not None
+
+        return cls(name, parent_id, sso_domain, add_to_org, add_data_owner)
+
+    @classmethod
+    def make_default(cls) -> Self:
+        name = ""
+        parent_id = None
+        sso_domain = None
+        add_to_org = True
+        add_data_owner = True
+
+        return cls(name, parent_id, sso_domain, add_to_org, add_data_owner)
+
+@dataclass
+class Organization:
+    name: "str"
+    org_id: "str"
+    org_mgmt_id: "str"
+    data_owner_id: "str"
+    parent_id: "Optional[str]"
+    sso_domain: "Optional[str]"
+
+    def to_dict(self) -> Dict[str, Any]:
+        o = dict()
+        o["name"] = self.name
+        o["org_id"] = self.org_id
+        o["org_mgmt_id"] = self.org_mgmt_id
+        o["data_owner_id"] = self.data_owner_id
+        o["parent_id"] = None
+        if self.parent_id is not None:
+            o["parent_id"] = self.parent_id
+        o["sso_domain"] = None
+        if self.sso_domain is not None:
+            o["sso_domain"] = self.sso_domain
+        return o
+
+    @classmethod
+    def from_dict(cls, o: Dict[str, Any]) -> Self:
+        name = None
+        org_id = None
+        org_mgmt_id = None
+        data_owner_id = None
+        parent_id = None
+        sso_domain = None
+
+        for key in o:
+            if key == "name":
+                name_var = o[key]
+                assert type(name_var) is str
+                name = name_var
+            elif key == "org_id":
+                org_id_var = o[key]
+                assert type(org_id_var) is str
+                org_id = org_id_var
+            elif key == "org_mgmt_id":
+                org_mgmt_id_var = o[key]
+                assert type(org_mgmt_id_var) is str
+                org_mgmt_id = org_mgmt_id_var
+            elif key == "data_owner_id":
+                data_owner_id_var = o[key]
+                assert type(data_owner_id_var) is str
+                data_owner_id = data_owner_id_var
+            elif key == "parent_id":
+                if o[key] is not None:
+                    parent_id_var = o[key]
+                    assert type(parent_id_var) is str
+                    parent_id = parent_id_var
+                else:
+                    parent_id = None
+            elif key == "sso_domain":
+                if o[key] is not None:
+                    sso_domain_var = o[key]
+                    assert type(sso_domain_var) is str
+                    sso_domain = sso_domain_var
+                else:
+                    sso_domain = None
+
+        assert name is not None
+        assert org_id is not None
+        assert org_mgmt_id is not None
+        assert data_owner_id is not None
+
+        return cls(name, org_id, org_mgmt_id, data_owner_id, parent_id, sso_domain)
+
+    @classmethod
+    def make_default(cls) -> Self:
+        name = ""
+        org_id = ""
+        org_mgmt_id = ""
+        data_owner_id = ""
+        parent_id = None
+        sso_domain = None
+
+        return cls(name, org_id, org_mgmt_id, data_owner_id, parent_id, sso_domain)
+
+@dataclass
+class RenameOrganizationRequest:
+    name: "str"
+
+    def to_dict(self) -> Dict[str, Any]:
+        o = dict()
+        o["name"] = self.name
+        return o
+
+    @classmethod
+    def from_dict(cls, o: Dict[str, Any]) -> Self:
+        name = None
+
+        for key in o:
+            if key == "name":
+                name_var = o[key]
+                assert type(name_var) is str
+                name = name_var
+
+        assert name is not None
+
+        return cls(name)
+
+    @classmethod
+    def make_default(cls) -> Self:
+        name = ""
+
+        return cls(name)
+
+@dataclass
+class FlushedGatewayPods:
+    pods: "int"
+
+    def to_dict(self) -> Dict[str, Any]:
+        o = dict()
+        o["pods"] = self.pods
+        return o
+
+    @classmethod
+    def from_dict(cls, o: Dict[str, Any]) -> Self:
+        pods = None
+
+        for key in o:
+            if key == "pods":
+                pods_var = o[key]
+                assert type(pods_var) is int
+                pods = pods_var
+
+        assert pods is not None
+
+        return cls(pods)
+
+    @classmethod
+    def make_default(cls) -> Self:
+        pods = 0
+
+        return cls(pods)
+
 def get_principal(
     ctx: RequestContext,
     id_: "B2cId",
@@ -1190,7 +1505,7 @@ def get_principal(
     Details of the specified principal
     """
 
-    path = "/v1/api/uldirectory/v1/principal/:id"
+    path = "/v1/api/ulv2/directory/v1/principal/:id"
     path = path.replace(":id", str(id_), 1)
 
     params = dict()
@@ -1213,7 +1528,7 @@ def get_principals(
     Details of all the specified principals
     """
 
-    path = "/v1/api/uldirectory/v1/principal/:ids"
+    path = "/v1/api/ulv2/directory/v1/principal/:ids"
     path = path.replace(":ids", str(ids), 1)
 
     params = dict()
@@ -1249,7 +1564,7 @@ def query_principals(
     A list of all matching directory principals.
     """
 
-    path = "/v1/api/uldirectory/v1/principals/:query"
+    path = "/v1/api/ulv2/directory/v1/principals/:query"
     path = path.replace(":query", str(query), 1)
 
     params = dict()
@@ -1273,7 +1588,7 @@ def get_users(
     Details of all specified users.
     """
 
-    path = "/v1/api/uldirectory/v1/users"
+    path = "/v1/api/ulv2/directory/v1/users"
     params = dict()
     headers = dict()
     res = ctx.get(path, params=params, headers=headers)
@@ -1295,7 +1610,7 @@ def get_users_display_names(
     The list of users including their IDs and their display names
     """
 
-    path = "/v1/api/uldirectory/v1/users/display_names"
+    path = "/v1/api/ulv2/directory/v1/users/display_names"
     params = dict()
     headers = dict()
     res = ctx.get(path, params=params, headers=headers)
@@ -1319,7 +1634,7 @@ def get_current_user(
     The complete details of the specified user, including audit log if specified.
     """
 
-    path = "/v1/api/uldirectory/v1/user"
+    path = "/v1/api/ulv2/directory/v1/user"
     params = dict()
     if audit_log is not None:
         params["audit_log"] = "true" if audit_log else "false"
@@ -1343,7 +1658,7 @@ def create_user(
     The details of the user along with their temporary, one-time-use password.
     """
 
-    path = "/v1/api/uldirectory/v1/user"
+    path = "/v1/api/ulv2/directory/v1/user"
     params = dict()
     headers = dict()
     body = json.dumps(create_user_request.to_dict())
@@ -1362,7 +1677,7 @@ def update_current_user(
     update_user_request: UpdateCurrentUser -- The details which which to update the current user
     """
 
-    path = "/v1/api/uldirectory/v1/user"
+    path = "/v1/api/ulv2/directory/v1/user"
     params = dict()
     headers = dict()
     body = json.dumps(update_user_request.to_dict())
@@ -1385,7 +1700,7 @@ def get_user(
     The complete details of the specified user, including audit log if specified.
     """
 
-    path = "/v1/api/uldirectory/v1/user/:id"
+    path = "/v1/api/ulv2/directory/v1/user/:id"
     path = path.replace(":id", str(id_), 1)
 
     params = dict()
@@ -1400,6 +1715,7 @@ def get_user(
 def update_user(
     ctx: RequestContext,
     id_: "B2cId",
+    flush: Optional[bool],
     update_user_request: UpdateUser,
 ) -> None:
     """Updates a user by id.
@@ -1407,13 +1723,17 @@ def update_user(
     Arguments:
     ctx: RequestContext -- A request context object
     id_: "B2cId" -- The ID of the user to update
+    flush: Optional[bool] -- Whether to flush the gateway cache after the update. The default is true. A bulk caller passes false for every update and calls `flush_gateway_cache` once at the end.
     update_user_request: UpdateUser -- The details which which to update the user
     """
 
-    path = "/v1/api/uldirectory/v1/user/:id"
+    path = "/v1/api/ulv2/directory/v1/user/:id"
     path = path.replace(":id", str(id_), 1)
 
     params = dict()
+    if flush is not None:
+        params["flush"] = "true" if flush else "false"
+
     headers = dict()
     body = json.dumps(update_user_request.to_dict())
     ctx.put(path, body=body, mimetype="application/json", params=params, headers=headers)
@@ -1430,7 +1750,7 @@ def delete_user(
     id_: "B2cId" -- The ID of the user to delete
     """
 
-    path = "/v1/api/uldirectory/v1/user/:id"
+    path = "/v1/api/ulv2/directory/v1/user/:id"
     path = path.replace(":id", str(id_), 1)
 
     params = dict()
@@ -1450,7 +1770,7 @@ def get_groups(
     A list of all the groups from the directory for which the current user is allowed to see.
     """
 
-    path = "/v1/api/uldirectory/v1/group"
+    path = "/v1/api/ulv2/directory/v1/group"
     params = dict()
     headers = dict()
     res = ctx.get(path, params=params, headers=headers)
@@ -1474,7 +1794,7 @@ def create_group(
     Details of the created group
     """
 
-    path = "/v1/api/uldirectory/v1/group"
+    path = "/v1/api/ulv2/directory/v1/group"
     params = dict()
     headers = dict()
     body = json.dumps(create_group_request.to_dict())
@@ -1496,7 +1816,7 @@ def get_group_members(
     The group membership list.
     """
 
-    path = "/v1/api/uldirectory/v1/group/:id"
+    path = "/v1/api/ulv2/directory/v1/group/:id"
     path = path.replace(":id", str(id_), 1)
 
     params = dict()
@@ -1519,7 +1839,7 @@ def delete_group(
     id_: "B2cId" -- The ID of the group to delete
     """
 
-    path = "/v1/api/uldirectory/v1/group/:id"
+    path = "/v1/api/ulv2/directory/v1/group/:id"
     path = path.replace(":id", str(id_), 1)
 
     params = dict()
@@ -1540,7 +1860,7 @@ def add_group_member(
     member: "B2cId" -- The ID of the member to add
     """
 
-    path = "/v1/api/uldirectory/v1/group/:group/:member"
+    path = "/v1/api/ulv2/directory/v1/group/:group/:member"
     path = path.replace(":group", str(group), 1)
     path = path.replace(":member", str(member), 1)
 
@@ -1563,7 +1883,7 @@ def remove_group_member(
     member: "B2cId" -- The ID of the member to remove
     """
 
-    path = "/v1/api/uldirectory/v1/group/:group/:member"
+    path = "/v1/api/ulv2/directory/v1/group/:group/:member"
     path = path.replace(":group", str(group), 1)
     path = path.replace(":member", str(member), 1)
 
@@ -1571,3 +1891,155 @@ def remove_group_member(
     headers = dict()
     ctx.delete(path, params=params, headers=headers)
     return
+
+def list_organizations(
+    ctx: RequestContext,
+) -> OrganizationList:
+    """Lists organizations visible to the caller. Admins (admin.directory + admin.org) see all organizations; everyone else sees only organizations whose `org_id` group they belong to.
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+
+    Returns:
+    Organizations visible to the caller.
+    """
+
+    path = "/v1/api/ulv2/directory/v1/organization"
+    params = dict()
+    headers = dict()
+    res = ctx.get(path, params=params, headers=headers)
+    res_dict = json.loads(res)
+    return OrganizationList.from_dict(res_dict)
+
+def create_organization(
+    ctx: RequestContext,
+    create_organization_request: CreateOrganizationRequest,
+) -> Organization:
+    """Creates a new organization. Creates three AD groups (org, org mgmt, data owner) and records them in the organizations table. Requires `admin.org`; top-level organizations additionally require `admin.directory`; child organizations require membership in the parent's mgmt group.
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+    create_organization_request: CreateOrganizationRequest -- Organization creation details
+
+    Returns:
+    Details of the created organization.
+    """
+
+    path = "/v1/api/ulv2/directory/v1/organization"
+    params = dict()
+    headers = dict()
+    body = json.dumps(create_organization_request.to_dict())
+    res = ctx.post(path, body=body, mimetype="application/json", params=params, headers=headers)
+    res_dict = json.loads(res)
+    return Organization.from_dict(res_dict)
+
+def get_organization(
+    ctx: RequestContext,
+    id_: "B2cId",
+) -> Organization:
+    """Fetches the details of a single organization by `org_id`.
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+    id_: "B2cId" -- The organization's `org_id` (B2cId).
+
+    Returns:
+    The organization's details.
+    """
+
+    path = "/v1/api/ulv2/directory/v1/organization/:id"
+    path = path.replace(":id", str(id_), 1)
+
+    params = dict()
+    headers = dict()
+    res = ctx.get(path, params=params, headers=headers)
+    res_dict = json.loads(res)
+    return Organization.from_dict(res_dict)
+
+def rename_organization(
+    ctx: RequestContext,
+    id_: "B2cId",
+    rename_organization_request: RenameOrganizationRequest,
+) -> None:
+    """Renames an organization. Caller must belong to the organization's management group.
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+    id_: "B2cId" -- The organization's `org_id` (B2cId).
+    rename_organization_request: RenameOrganizationRequest -- New name for the organization.
+    """
+
+    path = "/v1/api/ulv2/directory/v1/organization/:id"
+    path = path.replace(":id", str(id_), 1)
+
+    params = dict()
+    headers = dict()
+    body = json.dumps(rename_organization_request.to_dict())
+    ctx.put(path, body=body, mimetype="application/json", params=params, headers=headers)
+    return
+
+def get_user_organization(
+    ctx: RequestContext,
+    id_: "B2cId",
+) -> Organization:
+    """Fetches the organization record for a specific user, derived from the user's AD `department` field.
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+    id_: "B2cId" -- The user's B2cId.
+
+    Returns:
+    The user's organization record.
+    """
+
+    path = "/v1/api/ulv2/directory/v1/user/:id/organization"
+    path = path.replace(":id", str(id_), 1)
+
+    params = dict()
+    headers = dict()
+    res = ctx.get(path, params=params, headers=headers)
+    res_dict = json.loads(res)
+    return Organization.from_dict(res_dict)
+
+def associate_group_with_organization(
+    ctx: RequestContext,
+    group: "B2cId",
+    org: "B2cId",
+) -> None:
+    """Associates an existing AD group with an organization. Temporary migration-only endpoint — do not use from new code; will be removed once the backfill is done. Requires both `admin.directory` and `admin.org`. Idempotent: if the association already exists the request is a no-op.
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+    group: "B2cId" -- The AD group's B2cId.
+    org: "B2cId" -- The organization's `org_id` (B2cId).
+    """
+
+    path = "/v1/api/ulv2/directory/v1/group/:group/org/:org"
+    path = path.replace(":group", str(group), 1)
+    path = path.replace(":org", str(org), 1)
+
+    params = dict()
+    headers = dict()
+    body = None
+    ctx.post(path, body=body, mimetype="text/plain", params=params, headers=headers)
+    return
+
+def flush_gateway_cache(
+    ctx: RequestContext,
+) -> FlushedGatewayPods:
+    """Flushes the cache of every gateway pod. The directory flushes after each change that the gateway caches; a bulk caller that passed `flush=false` to `update_user` calls this once at the end. Requires `admin.directory`.
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+
+    Returns:
+    How many gateway pods were flushed.
+    """
+
+    path = "/v1/api/ulv2/directory/v1/flush_cache"
+    params = dict()
+    headers = dict()
+    body = None
+    res = ctx.post(path, body=body, mimetype="text/plain", params=params, headers=headers)
+    res_dict = json.loads(res)
+    return FlushedGatewayPods.from_dict(res_dict)

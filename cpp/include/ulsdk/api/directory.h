@@ -189,6 +189,7 @@ to_bytes(const AdUserWithAuditLog &o);
 struct CreateUserRequest {
     std::optional<std::string> display_name_;
     std::optional<std::string> user_principal_name_;
+    std::optional<std::string> department_;
 
     CreateUserRequest() = default;
     CreateUserRequest(const struct json_value_s *root);
@@ -234,6 +235,7 @@ to_bytes(const UpdateCurrentUser &o);
 struct UpdateUser {
     std::optional<std::string> display_name_;
     std::optional<std::vector<std::string>> other_mails_;
+    std::optional<std::string> department_;
 
     UpdateUser() = default;
     UpdateUser(const struct json_value_s *root);
@@ -280,6 +282,100 @@ struct GroupMembership {
 
 std::vector<uint8_t>
 to_bytes(const GroupMembership &o);
+
+struct OrganizationSummary {
+    std::string name_;
+    std::string org_id_;
+
+    OrganizationSummary() = default;
+    OrganizationSummary(const struct json_value_s *root);
+    bool operator==(const OrganizationSummary &rhs) const;
+    bool operator!=(const OrganizationSummary &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+std::vector<uint8_t>
+to_bytes(const OrganizationSummary &o);
+
+struct OrganizationList {
+    std::vector<OrganizationSummary> organizations_;
+
+    OrganizationList() = default;
+    OrganizationList(const struct json_value_s *root);
+    bool operator==(const OrganizationList &rhs) const;
+    bool operator!=(const OrganizationList &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+std::vector<uint8_t>
+to_bytes(const OrganizationList &o);
+
+struct CreateOrganizationRequest {
+    std::string name_;
+    std::optional<std::string> parent_id_;
+    std::optional<std::string> sso_domain_;
+    bool add_to_org_;
+    bool add_data_owner_;
+
+    CreateOrganizationRequest() = default;
+    CreateOrganizationRequest(const struct json_value_s *root);
+    bool operator==(const CreateOrganizationRequest &rhs) const;
+    bool operator!=(const CreateOrganizationRequest &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+std::vector<uint8_t>
+to_bytes(const CreateOrganizationRequest &o);
+
+struct Organization {
+    std::string name_;
+    std::string org_id_;
+    std::string org_mgmt_id_;
+    std::string data_owner_id_;
+    std::optional<std::string> parent_id_;
+    std::optional<std::string> sso_domain_;
+
+    Organization() = default;
+    Organization(const struct json_value_s *root);
+    bool operator==(const Organization &rhs) const;
+    bool operator!=(const Organization &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+std::vector<uint8_t>
+to_bytes(const Organization &o);
+
+struct RenameOrganizationRequest {
+    std::string name_;
+
+    RenameOrganizationRequest() = default;
+    RenameOrganizationRequest(const struct json_value_s *root);
+    bool operator==(const RenameOrganizationRequest &rhs) const;
+    bool operator!=(const RenameOrganizationRequest &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+std::vector<uint8_t>
+to_bytes(const RenameOrganizationRequest &o);
+
+struct FlushedGatewayPods {
+    int64_t pods_;
+
+    FlushedGatewayPods() = default;
+    FlushedGatewayPods(const struct json_value_s *root);
+    bool operator==(const FlushedGatewayPods &rhs) const;
+    bool operator!=(const FlushedGatewayPods &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+std::vector<uint8_t>
+to_bytes(const FlushedGatewayPods &o);
 
 /**
  * Retrieves a single principal by id.
@@ -390,12 +486,14 @@ get_user(
 /**
  * Updates a user by id.
  * @param id The ID of the user to update
+ * @param flush Whether to flush the gateway cache after the update. The default is true. A bulk caller passes false for every update and calls `flush_gateway_cache` once at the end.
  * @param update_user_request The details which which to update the user
  */
 Result<Void>
 update_user(
     ul::RequestContext &ctx,
     const ::ul::types::B2cId &id,
+    std::optional<bool> flush,
     const UpdateUser &update_user_request
 );
 
@@ -472,6 +570,81 @@ remove_group_member(
     ul::RequestContext &ctx,
     const ::ul::types::B2cId &group,
     const ::ul::types::B2cId &member
+);
+
+/**
+ * Lists organizations visible to the caller. Admins (admin.directory + admin.org) see all organizations; everyone else sees only organizations whose `org_id` group they belong to.
+ * @return Organizations visible to the caller.
+ */
+Result<OrganizationList>
+list_organizations(
+    ul::RequestContext &ctx
+);
+
+/**
+ * Creates a new organization. Creates three AD groups (org, org mgmt, data owner) and records them in the organizations table. Requires `admin.org`; top-level organizations additionally require `admin.directory`; child organizations require membership in the parent's mgmt group.
+ * @param create_organization_request Organization creation details
+ * @return Details of the created organization.
+ */
+Result<Organization>
+create_organization(
+    ul::RequestContext &ctx,
+    const CreateOrganizationRequest &create_organization_request
+);
+
+/**
+ * Fetches the details of a single organization by `org_id`.
+ * @param id The organization's `org_id` (B2cId).
+ * @return The organization's details.
+ */
+Result<Organization>
+get_organization(
+    ul::RequestContext &ctx,
+    const ::ul::types::B2cId &id
+);
+
+/**
+ * Renames an organization. Caller must belong to the organization's management group.
+ * @param id The organization's `org_id` (B2cId).
+ * @param rename_organization_request New name for the organization.
+ */
+Result<Void>
+rename_organization(
+    ul::RequestContext &ctx,
+    const ::ul::types::B2cId &id,
+    const RenameOrganizationRequest &rename_organization_request
+);
+
+/**
+ * Fetches the organization record for a specific user, derived from the user's AD `department` field.
+ * @param id The user's B2cId.
+ * @return The user's organization record.
+ */
+Result<Organization>
+get_user_organization(
+    ul::RequestContext &ctx,
+    const ::ul::types::B2cId &id
+);
+
+/**
+ * Associates an existing AD group with an organization. Temporary migration-only endpoint — do not use from new code; will be removed once the backfill is done. Requires both `admin.directory` and `admin.org`. Idempotent: if the association already exists the request is a no-op.
+ * @param group The AD group's B2cId.
+ * @param org The organization's `org_id` (B2cId).
+ */
+Result<Void>
+associate_group_with_organization(
+    ul::RequestContext &ctx,
+    const ::ul::types::B2cId &group,
+    const ::ul::types::B2cId &org
+);
+
+/**
+ * Flushes the cache of every gateway pod. The directory flushes after each change that the gateway caches; a bulk caller that passed `flush=false` to `update_user` calls this once at the end. Requires `admin.directory`.
+ * @return How many gateway pods were flushed.
+ */
+Result<FlushedGatewayPods>
+flush_gateway_cache(
+    ul::RequestContext &ctx
 );
 
 } // namespace directory

@@ -35,7 +35,7 @@ export interface UpdateKey {
 export async function getKeys(
   ctx: RequestContext
 ): Promise<GetKeys> {
-  let path = '/v1/api/uldirectory/v1/keys/';
+  let path = '/v1/api/ulv2/directory/v1/keys/';
   const params: [string, string][] = [];
   const headers: Record<string, string> = {};
 
@@ -51,7 +51,7 @@ export async function getKeys(
 export async function createKey(
   ctx: RequestContext
 ): Promise<CreateKey> {
-  let path = '/v1/api/uldirectory/v1/keys/';
+  let path = '/v1/api/ulv2/directory/v1/keys/';
   const params: [string, string][] = [];
   const headers: Record<string, string> = {};
 
@@ -74,7 +74,7 @@ export async function updateKey(
   id: string,
   updateKey: UpdateKey
 ): Promise<void> {
-  let path = '/v1/api/uldirectory/v1/keys/:id';
+  let path = '/v1/api/ulv2/directory/v1/keys/:id';
   path = path.replace(':id', id.toString());
 
   const params: [string, string][] = [];
@@ -96,7 +96,7 @@ export async function getKey(
   ctx: RequestContext,
   id: string
 ): Promise<Key> {
-  let path = '/v1/api/uldirectory/v1/keys/:id';
+  let path = '/v1/api/ulv2/directory/v1/keys/:id';
   path = path.replace(':id', id.toString());
 
   const params: [string, string][] = [];
@@ -117,7 +117,7 @@ export async function deleteKey(
   ctx: RequestContext,
   id: string
 ): Promise<void> {
-  let path = '/v1/api/uldirectory/v1/keys/:id';
+  let path = '/v1/api/ulv2/directory/v1/keys/:id';
   path = path.replace(':id', id.toString());
 
   const params: [string, string][] = [];

@@ -46,7 +46,7 @@ test_get_keys(ul::RequestContext &rctx) {
     return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_keys_obj(test_get_keys, "keys::get_keys", &idempotent_api_test_root);
+ApiTest test_get_keys_obj(test_get_keys, "keys::get_keys", "disabled during the uldirectory-to-ulv2 directory migration", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
 test_get_keys_1(ul::RequestContext &ctx) {
@@ -62,7 +62,7 @@ test_get_keys_1(ul::RequestContext &ctx) {
     return ul::Result<ul::Void>(ul::Void());
 }
 
-ApiTest test_get_keys_1_obj(test_get_keys_1, "keys::get_keys (1)", &idempotent_api_test_root);
+ApiTest test_get_keys_1_obj(test_get_keys_1, "keys::get_keys (1)", "disabled during the uldirectory-to-ulv2 directory migration", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
 test_create_key(ul::RequestContext &rctx) {
