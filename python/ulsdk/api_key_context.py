@@ -189,7 +189,10 @@ class ApiKeyContext(RequestContext):
             bytes, cast(str, body).encode("utf8") if type(body) is str else body
         )
         headers["content-type"] = mimetype
-        headers["content-length"] = str(len(data_as_bytes))
+        # A PUT without a body, such as adding a group member, sends length 0.
+        headers["content-length"] = (
+            str(len(data_as_bytes)) if data_as_bytes is not None else "0"
+        )
         headers = _generate_auth_header(
             self._key, "PUT", path, params, headers, data_as_bytes
         )

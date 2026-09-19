@@ -89,3 +89,25 @@ def test_get_plain_path_is_unchanged():
         ctx.get("/v1/api/ulv2/drive/1234/plain-name.csv")
 
     assert captured["url"].endswith("/v1/api/ulv2/drive/1234/plain-name.csv")
+
+
+def test_put_without_body_sends_length_zero():
+    # Adding a group member is a PUT with no body. The content length must be
+    # "0", not a failure on len(None).
+    key = _make_key(bytes(range(32)))
+    ctx = ApiKeyContext(key, Environment.Prod)
+
+    captured = {}
+
+    def fake_put(url, **kwargs):
+        captured["headers"] = dict(kwargs["headers"])
+        captured["data"] = kwargs["data"]
+        return _FakeResponse()
+
+    with patch("ulsdk.api_key_context.requests.put", fake_put):
+        ctx.put("/v1/api/ulv2/directory/v1/group/g/m", body=None, mimetype="text/plain")
+
+    assert captured["data"] is None
+    assert captured["headers"]["content-length"] == "0"
+    assert captured["headers"]["authorization"].startswith(SIGNATURE_V1)
+
