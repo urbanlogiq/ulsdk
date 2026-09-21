@@ -164,6 +164,22 @@ struct AuditLogEntry {
 std::vector<uint8_t>
 to_bytes(const AuditLogEntry &o);
 
+struct ObjectIdentity {
+    std::string sign_in_type_;
+    std::string issuer_;
+    std::string issuer_assigned_id_;
+
+    ObjectIdentity() = default;
+    ObjectIdentity(const struct json_value_s *root);
+    bool operator==(const ObjectIdentity &rhs) const;
+    bool operator!=(const ObjectIdentity &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+std::vector<uint8_t>
+to_bytes(const ObjectIdentity &o);
+
 struct AdUserWithAuditLog {
     std::string display_name_;
     std::string id_;
@@ -174,6 +190,8 @@ struct AdUserWithAuditLog {
     std::optional<std::vector<AdGroup>> groups_;
     bool account_enabled_;
     std::optional<std::vector<AuditLogEntry>> audit_log_;
+    std::optional<std::vector<ObjectIdentity>> identities_;
+    std::optional<std::string> creation_type_;
 
     AdUserWithAuditLog() = default;
     AdUserWithAuditLog(const struct json_value_s *root);

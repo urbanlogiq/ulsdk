@@ -77,6 +77,22 @@ public final class AdUserWithAuditLog {
         this._auditLog = value;
     }
 
+    com.urbanlogiq.ulsdk.api.directory.ObjectIdentity[] _identities;
+    public com.urbanlogiq.ulsdk.api.directory.ObjectIdentity[] getIdentities() {
+        return this._identities;
+    }
+    public void setIdentities(com.urbanlogiq.ulsdk.api.directory.ObjectIdentity[] value) {
+        this._identities = value;
+    }
+
+    String _creationType;
+    public String getCreationType() {
+        return this._creationType;
+    }
+    public void setCreationType(String value) {
+        this._creationType = value;
+    }
+
     public java.util.Map<String, Object> toMap() {
         java.util.Map<String, Object> o = new java.util.HashMap();
         Object displayNameSerialized = null;
@@ -144,6 +160,25 @@ public final class AdUserWithAuditLog {
         }
         o.put("auditLog", auditLogSerialized);
 
+        Object identitiesSerialized = null;
+        if (this._identities != null) {
+            java.util.ArrayList<Object> identitiesList = new java.util.ArrayList();
+            for (int i0 = 0; i0 < this._identities.length; i0++) {
+                com.urbanlogiq.ulsdk.api.directory.ObjectIdentity item0 = this._identities[i0];
+                Object identitiesVar = null;
+                identitiesVar = item0.toMap();
+                identitiesList.add(identitiesVar);
+            }
+            identitiesSerialized = identitiesList;
+        }
+        o.put("identities", identitiesSerialized);
+
+        Object creationTypeSerialized = null;
+        if (this._creationType != null) {
+            creationTypeSerialized = this._creationType;
+        }
+        o.put("creationType", creationTypeSerialized);
+
         return o;
     }
 
@@ -207,6 +242,27 @@ public final class AdUserWithAuditLog {
                 this._auditLog[i0] = auditLogItem;
             }
         }
+        Object identitiesValue = null;
+        if (o.has("identities") && !o.isNull("identities")) {
+            identitiesValue = o.get("identities");
+        }
+        if (identitiesValue != null) {
+            org.json.JSONArray identitiesValueArray = (org.json.JSONArray)identitiesValue;
+            this._identities = new com.urbanlogiq.ulsdk.api.directory.ObjectIdentity[identitiesValueArray.length()];
+            for (int i0 = 0; i0 < identitiesValueArray.length(); i0++) {
+                Object item0 = identitiesValueArray.get(i0);
+                com.urbanlogiq.ulsdk.api.directory.ObjectIdentity identitiesItem = null;
+                identitiesItem = new ObjectIdentity((org.json.JSONObject)item0);
+                this._identities[i0] = identitiesItem;
+            }
+        }
+        Object creationTypeValue = null;
+        if (o.has("creationType") && !o.isNull("creationType")) {
+            creationTypeValue = o.get("creationType");
+        }
+        if (creationTypeValue != null) {
+            this._creationType = (String)creationTypeValue;
+        }
     }
 
     public AdUserWithAuditLog() {
@@ -219,6 +275,8 @@ public final class AdUserWithAuditLog {
         this._groups = null;
         this._accountEnabled = true;
         this._auditLog = null;
+        this._identities = null;
+        this._creationType = null;
     }
 
     @Override

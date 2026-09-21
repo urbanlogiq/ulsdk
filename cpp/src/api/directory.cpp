@@ -1249,6 +1249,87 @@ to_bytes(const AuditLogEntry &o) {
     return std::vector<uint8_t>(str.begin(), str.end());
 }
 
+ObjectIdentity::ObjectIdentity(const struct json_value_s *root)
+    : sign_in_type_(std::string())
+    , issuer_(std::string())
+    , issuer_assigned_id_(std::string()) {
+    if (root->type != json_type_object) {
+        throw std::runtime_error("expected json value to be of type object");
+    }
+
+    const struct json_object_s *object = static_cast<const struct json_object_s *>(root->payload);
+    const struct json_object_element_s *e = object->start;
+
+    while (e != nullptr) {
+        if (std::strcmp(e->name->string, "signInType") == 0) {
+            const struct json_value_s *object_identity_value = e->value;
+
+            if (object_identity_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *sign_in_type__str = static_cast<const struct json_string_s *>(object_identity_value->payload);
+            sign_in_type_ = std::string(sign_in_type__str->string);
+        } else if (std::strcmp(e->name->string, "issuer") == 0) {
+            const struct json_value_s *object_identity_value = e->value;
+
+            if (object_identity_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *issuer__str = static_cast<const struct json_string_s *>(object_identity_value->payload);
+            issuer_ = std::string(issuer__str->string);
+        } else if (std::strcmp(e->name->string, "issuerAssignedId") == 0) {
+            const struct json_value_s *object_identity_value = e->value;
+
+            if (object_identity_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *issuer_assigned_id__str = static_cast<const struct json_string_s *>(object_identity_value->payload);
+            issuer_assigned_id_ = std::string(issuer_assigned_id__str->string);
+        }
+
+        e = e->next;
+    }
+}
+
+bool
+ObjectIdentity::operator==(const ObjectIdentity&rhs) const {
+    if (this->sign_in_type_ != rhs.sign_in_type_) {
+        return false;
+    }
+    if (this->issuer_ != rhs.issuer_) {
+        return false;
+    }
+    if (this->issuer_assigned_id_ != rhs.issuer_assigned_id_) {
+        return false;
+    }
+    return true;
+}
+
+std::vector<uint8_t>
+to_bytes(const ObjectIdentity &o) {
+    std::stringstream ss;
+    ss << "{";
+    ss << "\"signInType\":";
+    ss << "\"" << o.sign_in_type_ << "\"";
+    ss << ",";
+
+    ss << "\"issuer\":";
+    ss << "\"" << o.issuer_ << "\"";
+    ss << ",";
+
+    ss << "\"issuerAssignedId\":";
+    ss << "\"" << o.issuer_assigned_id_ << "\"";
+    std::string str = ss.str();
+    if (str.back() == ',') {
+        str.pop_back();
+    }
+    str.push_back('}');
+    return std::vector<uint8_t>(str.begin(), str.end());
+}
+
 AdUserWithAuditLog::AdUserWithAuditLog(const struct json_value_s *root)
     : display_name_(std::string())
     , id_(std::string())
@@ -1258,7 +1339,9 @@ AdUserWithAuditLog::AdUserWithAuditLog(const struct json_value_s *root)
     , created_date_time_(std::string())
     , groups_(std::nullopt)
     , account_enabled_(false)
-    , audit_log_(std::nullopt) {
+    , audit_log_(std::nullopt)
+    , identities_(std::nullopt)
+    , creation_type_(std::nullopt) {
     if (root->type != json_type_object) {
         throw std::runtime_error("expected json value to be of type object");
     }
@@ -1405,6 +1488,45 @@ AdUserWithAuditLog::AdUserWithAuditLog(const struct json_value_s *root)
                 }
                 audit_log_ = audit_log__vec;
             }
+        } else if (std::strcmp(e->name->string, "identities") == 0) {
+            const struct json_value_s *ad_user_with_audit_log_value = e->value;
+
+            if (ad_user_with_audit_log_value->type == json_type_null) {
+                identities_ = std::nullopt;
+            } else {
+                if (ad_user_with_audit_log_value->type != json_type_array) {
+                    throw std::runtime_error("expected field to be of type array");
+                }
+
+                const struct json_array_s *identities__array = static_cast<const struct json_array_s *>(ad_user_with_audit_log_value->payload);
+                const struct json_array_element_s *identities__element = identities__array->start;
+                std::vector<ObjectIdentity> identities__vec = std::vector<ObjectIdentity>();
+                while (identities__element != nullptr) {
+                    const struct json_value_s *ad_user_with_audit_log_value_1 = identities__element->value;
+                    ObjectIdentity identities__value;
+                    if (ad_user_with_audit_log_value_1->type != json_type_object) {
+                        throw std::runtime_error("expected field to be of type object");
+                    }
+
+                    identities__value = ObjectIdentity(ad_user_with_audit_log_value_1);
+                    identities__vec.push_back(identities__value);
+                    identities__element = identities__element->next;
+                }
+                identities_ = identities__vec;
+            }
+        } else if (std::strcmp(e->name->string, "creationType") == 0) {
+            const struct json_value_s *ad_user_with_audit_log_value = e->value;
+
+            if (ad_user_with_audit_log_value->type == json_type_null) {
+                creation_type_ = std::nullopt;
+            } else {
+                if (ad_user_with_audit_log_value->type != json_type_string) {
+                    throw std::runtime_error("expected field to be of type string");
+                }
+
+                const struct json_string_s *creation_type__str = static_cast<const struct json_string_s *>(ad_user_with_audit_log_value->payload);
+                creation_type_ = std::string(creation_type__str->string);
+            }
         }
 
         e = e->next;
@@ -1438,6 +1560,12 @@ AdUserWithAuditLog::operator==(const AdUserWithAuditLog&rhs) const {
         return false;
     }
     if (this->audit_log_ != rhs.audit_log_) {
+        return false;
+    }
+    if (this->identities_ != rhs.identities_) {
+        return false;
+    }
+    if (this->creation_type_ != rhs.creation_type_) {
         return false;
     }
     return true;
@@ -1520,6 +1648,30 @@ to_bytes(const AdUserWithAuditLog &o) {
             ss.seekp(-1, ss.cur);
         }
         ss << "]";
+        ss << ",";
+    }
+
+    if (o.identities_.has_value()) {
+        ss << "\"identities\":";
+        const auto &identities__value = o.identities_.value();
+        ss << "[";
+        for (const auto &i : identities__value) {
+            const std::vector<uint8_t> i_serialized = to_bytes(i);
+            const std::string i_str = std::string(i_serialized.begin(), i_serialized.end());
+            ss << i_str;
+            ss << ",";
+        }
+        if (!identities__value.empty()) {
+            ss.seekp(-1, ss.cur);
+        }
+        ss << "]";
+        ss << ",";
+    }
+
+    if (o.creation_type_.has_value()) {
+        ss << "\"creationType\":";
+        const auto &creation_type__value = o.creation_type_.value();
+        ss << "\"" << creation_type__value << "\"";
     }
 
     std::string str = ss.str();

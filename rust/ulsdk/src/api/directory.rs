@@ -111,6 +111,15 @@ pub struct AuditLogEntry {
 }
 
 #[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct ObjectIdentity {
+    #[serde(rename = "signInType")]
+    sign_in_type: String,
+    issuer: String,
+    #[serde(rename = "issuerAssignedId")]
+    issuer_assigned_id: String,
+}
+
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct AdUserWithAuditLog {
     #[serde(rename = "displayName")]
     display_name: String,
@@ -127,6 +136,9 @@ pub struct AdUserWithAuditLog {
     account_enabled: bool,
     #[serde(rename = "auditLog")]
     audit_log: Option<Vec<AuditLogEntry>>,
+    identities: Option<Vec<ObjectIdentity>>,
+    #[serde(rename = "creationType")]
+    creation_type: Option<String>,
 }
 
 #[derive(Debug, Default, PartialEq, Serialize, Deserialize)]

@@ -79,6 +79,12 @@ type AuditLogEntry struct {
 	Location *Location `json:"location,omitempty"`
 }
 
+type ObjectIdentity struct {
+	SignInType string `json:"signInType"`
+	Issuer string `json:"issuer"`
+	IssuerAssignedId string `json:"issuerAssignedId"`
+}
+
 type AdUserWithAuditLog struct {
 	DisplayName string `json:"displayName"`
 	Id string `json:"id"`
@@ -89,6 +95,8 @@ type AdUserWithAuditLog struct {
 	Groups *[]AdGroup `json:"groups,omitempty"`
 	AccountEnabled bool `json:"accountEnabled"`
 	AuditLog *[]AuditLogEntry `json:"auditLog,omitempty"`
+	Identities *[]ObjectIdentity `json:"identities,omitempty"`
+	CreationType *string `json:"creationType,omitempty"`
 }
 
 type CreateUserRequest struct {

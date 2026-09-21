@@ -71,6 +71,12 @@ export interface AuditLogEntry {
   location?: Location;
 }
 
+export interface ObjectIdentity {
+  signInType: string;
+  issuer: string;
+  issuerAssignedId: string;
+}
+
 export interface AdUserWithAuditLog {
   displayName: string;
   id: string;
@@ -81,6 +87,8 @@ export interface AdUserWithAuditLog {
   groups?: AdGroup[];
   accountEnabled: boolean;
   auditLog?: AuditLogEntry[];
+  identities?: ObjectIdentity[];
+  creationType?: string;
 }
 
 export interface CreateUserRequest {

@@ -689,6 +689,53 @@ class AuditLogEntry:
         return cls(id, userPrincipalName, userId, createdDateTime, ipAddress, deviceDetail, location)
 
 @dataclass
+class ObjectIdentity:
+    sign_in_type: "str"
+    issuer: "str"
+    issuer_assigned_id: "str"
+
+    def to_dict(self) -> Dict[str, Any]:
+        o = dict()
+        o["signInType"] = self.sign_in_type
+        o["issuer"] = self.issuer
+        o["issuerAssignedId"] = self.issuer_assigned_id
+        return o
+
+    @classmethod
+    def from_dict(cls, o: Dict[str, Any]) -> Self:
+        sign_in_type = None
+        issuer = None
+        issuer_assigned_id = None
+
+        for key in o:
+            if key == "signInType":
+                sign_in_type_var = o[key]
+                assert type(sign_in_type_var) is str
+                sign_in_type = sign_in_type_var
+            elif key == "issuer":
+                issuer_var = o[key]
+                assert type(issuer_var) is str
+                issuer = issuer_var
+            elif key == "issuerAssignedId":
+                issuer_assigned_id_var = o[key]
+                assert type(issuer_assigned_id_var) is str
+                issuer_assigned_id = issuer_assigned_id_var
+
+        assert sign_in_type is not None
+        assert issuer is not None
+        assert issuer_assigned_id is not None
+
+        return cls(sign_in_type, issuer, issuer_assigned_id)
+
+    @classmethod
+    def make_default(cls) -> Self:
+        signInType = ""
+        issuer = ""
+        issuerAssignedId = ""
+
+        return cls(signInType, issuer, issuerAssignedId)
+
+@dataclass
 class AdUserWithAuditLog:
     display_name: "str"
     id_: "str"
@@ -699,6 +746,8 @@ class AdUserWithAuditLog:
     groups: "Optional[List[AdGroup]]"
     account_enabled: "bool"
     audit_log: "Optional[List[AuditLogEntry]]"
+    identities: "Optional[List[ObjectIdentity]]"
+    creation_type: "Optional[str]"
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -731,6 +780,16 @@ class AdUserWithAuditLog:
                 audit_log_var = item.to_dict()
                 audit_log_list.append(audit_log_var)
             o["auditLog"] = audit_log_list
+        o["identities"] = None
+        if self.identities is not None:
+            identities_list = []
+            for item in self.identities:
+                identities_var = item.to_dict()
+                identities_list.append(identities_var)
+            o["identities"] = identities_list
+        o["creationType"] = None
+        if self.creation_type is not None:
+            o["creationType"] = self.creation_type
         return o
 
     @classmethod
@@ -744,6 +803,8 @@ class AdUserWithAuditLog:
         groups = None
         account_enabled = None
         audit_log = None
+        identities = None
+        creation_type = None
 
         for key in o:
             if key == "displayName":
@@ -809,6 +870,25 @@ class AdUserWithAuditLog:
                         audit_log.append(audit_log_item)
                 else:
                     audit_log = None
+            elif key == "identities":
+                if o[key] is not None:
+                    identities_var = o[key]
+                    assert type(identities_var) is list
+                    identities = []
+                    for item in identities_var:
+                        identities_item_var = item
+                        assert type(identities_item_var) is dict
+                        identities_item = ObjectIdentity.from_dict(identities_item_var)
+                        identities.append(identities_item)
+                else:
+                    identities = None
+            elif key == "creationType":
+                if o[key] is not None:
+                    creation_type_var = o[key]
+                    assert type(creation_type_var) is str
+                    creation_type = creation_type_var
+                else:
+                    creation_type = None
 
         assert display_name is not None
         assert id_ is not None
@@ -816,7 +896,7 @@ class AdUserWithAuditLog:
         assert created_date_time is not None
         assert account_enabled is not None
 
-        return cls(display_name, id_, user_principal_name, other_mails, department, created_date_time, groups, account_enabled, audit_log)
+        return cls(display_name, id_, user_principal_name, other_mails, department, created_date_time, groups, account_enabled, audit_log, identities, creation_type)
 
     @classmethod
     def make_default(cls) -> Self:
@@ -829,8 +909,10 @@ class AdUserWithAuditLog:
         groups = None
         accountEnabled = True
         auditLog = None
+        identities = None
+        creationType = None
 
-        return cls(displayName, id, userPrincipalName, otherMails, department, createdDateTime, groups, accountEnabled, auditLog)
+        return cls(displayName, id, userPrincipalName, otherMails, department, createdDateTime, groups, accountEnabled, auditLog, identities, creationType)
 
 @dataclass
 class CreateUserRequest:
