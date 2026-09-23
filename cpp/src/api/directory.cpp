@@ -325,6 +325,7 @@ AdUser::AdUser(const struct json_value_s *root)
     , user_principal_name_(std::string())
     , other_mails_(std::nullopt)
     , department_(std::nullopt)
+    , org_id_(std::nullopt)
     , created_date_time_(std::string())
     , groups_(std::nullopt)
     , account_enabled_(false) {
@@ -403,6 +404,19 @@ AdUser::AdUser(const struct json_value_s *root)
                 const struct json_string_s *department__str = static_cast<const struct json_string_s *>(ad_user_value->payload);
                 department_ = std::string(department__str->string);
             }
+        } else if (std::strcmp(e->name->string, "orgId") == 0) {
+            const struct json_value_s *ad_user_value = e->value;
+
+            if (ad_user_value->type == json_type_null) {
+                org_id_ = std::nullopt;
+            } else {
+                if (ad_user_value->type != json_type_string) {
+                    throw std::runtime_error("expected field to be of type string");
+                }
+
+                const struct json_string_s *org_id__str = static_cast<const struct json_string_s *>(ad_user_value->payload);
+                org_id_ = std::string(org_id__str->string);
+            }
         } else if (std::strcmp(e->name->string, "createdDateTime") == 0) {
             const struct json_value_s *ad_user_value = e->value;
 
@@ -471,6 +485,9 @@ AdUser::operator==(const AdUser&rhs) const {
     if (this->department_ != rhs.department_) {
         return false;
     }
+    if (this->org_id_ != rhs.org_id_) {
+        return false;
+    }
     if (this->created_date_time_ != rhs.created_date_time_) {
         return false;
     }
@@ -518,6 +535,13 @@ to_bytes(const AdUser &o) {
         ss << "\"department\":";
         const auto &department__value = o.department_.value();
         ss << "\"" << department__value << "\"";
+        ss << ",";
+    }
+
+    if (o.org_id_.has_value()) {
+        ss << "\"orgId\":";
+        const auto &org_id__value = o.org_id_.value();
+        ss << "\"" << org_id__value << "\"";
         ss << ",";
     }
 
@@ -1336,6 +1360,7 @@ AdUserWithAuditLog::AdUserWithAuditLog(const struct json_value_s *root)
     , user_principal_name_(std::string())
     , other_mails_(std::nullopt)
     , department_(std::nullopt)
+    , org_id_(std::nullopt)
     , created_date_time_(std::string())
     , groups_(std::nullopt)
     , account_enabled_(false)
@@ -1416,6 +1441,19 @@ AdUserWithAuditLog::AdUserWithAuditLog(const struct json_value_s *root)
 
                 const struct json_string_s *department__str = static_cast<const struct json_string_s *>(ad_user_with_audit_log_value->payload);
                 department_ = std::string(department__str->string);
+            }
+        } else if (std::strcmp(e->name->string, "orgId") == 0) {
+            const struct json_value_s *ad_user_with_audit_log_value = e->value;
+
+            if (ad_user_with_audit_log_value->type == json_type_null) {
+                org_id_ = std::nullopt;
+            } else {
+                if (ad_user_with_audit_log_value->type != json_type_string) {
+                    throw std::runtime_error("expected field to be of type string");
+                }
+
+                const struct json_string_s *org_id__str = static_cast<const struct json_string_s *>(ad_user_with_audit_log_value->payload);
+                org_id_ = std::string(org_id__str->string);
             }
         } else if (std::strcmp(e->name->string, "createdDateTime") == 0) {
             const struct json_value_s *ad_user_with_audit_log_value = e->value;
@@ -1550,6 +1588,9 @@ AdUserWithAuditLog::operator==(const AdUserWithAuditLog&rhs) const {
     if (this->department_ != rhs.department_) {
         return false;
     }
+    if (this->org_id_ != rhs.org_id_) {
+        return false;
+    }
     if (this->created_date_time_ != rhs.created_date_time_) {
         return false;
     }
@@ -1606,6 +1647,13 @@ to_bytes(const AdUserWithAuditLog &o) {
         ss << "\"department\":";
         const auto &department__value = o.department_.value();
         ss << "\"" << department__value << "\"";
+        ss << ",";
+    }
+
+    if (o.org_id_.has_value()) {
+        ss << "\"orgId\":";
+        const auto &org_id__value = o.org_id_.value();
+        ss << "\"" << org_id__value << "\"";
         ss << ",";
     }
 
@@ -1685,6 +1733,7 @@ to_bytes(const AdUserWithAuditLog &o) {
 CreateUserRequest::CreateUserRequest(const struct json_value_s *root)
     : display_name_(std::nullopt)
     , user_principal_name_(std::nullopt)
+    , org_id_(std::nullopt)
     , department_(std::nullopt) {
     if (root->type != json_type_object) {
         throw std::runtime_error("expected json value to be of type object");
@@ -1720,6 +1769,19 @@ CreateUserRequest::CreateUserRequest(const struct json_value_s *root)
                 const struct json_string_s *user_principal_name__str = static_cast<const struct json_string_s *>(create_user_request_value->payload);
                 user_principal_name_ = std::string(user_principal_name__str->string);
             }
+        } else if (std::strcmp(e->name->string, "orgId") == 0) {
+            const struct json_value_s *create_user_request_value = e->value;
+
+            if (create_user_request_value->type == json_type_null) {
+                org_id_ = std::nullopt;
+            } else {
+                if (create_user_request_value->type != json_type_string) {
+                    throw std::runtime_error("expected field to be of type string");
+                }
+
+                const struct json_string_s *org_id__str = static_cast<const struct json_string_s *>(create_user_request_value->payload);
+                org_id_ = std::string(org_id__str->string);
+            }
         } else if (std::strcmp(e->name->string, "department") == 0) {
             const struct json_value_s *create_user_request_value = e->value;
 
@@ -1747,6 +1809,9 @@ CreateUserRequest::operator==(const CreateUserRequest&rhs) const {
     if (this->user_principal_name_ != rhs.user_principal_name_) {
         return false;
     }
+    if (this->org_id_ != rhs.org_id_) {
+        return false;
+    }
     if (this->department_ != rhs.department_) {
         return false;
     }
@@ -1768,6 +1833,13 @@ to_bytes(const CreateUserRequest &o) {
         ss << "\"userPrincipalName\":";
         const auto &user_principal_name__value = o.user_principal_name_.value();
         ss << "\"" << user_principal_name__value << "\"";
+        ss << ",";
+    }
+
+    if (o.org_id_.has_value()) {
+        ss << "\"orgId\":";
+        const auto &org_id__value = o.org_id_.value();
+        ss << "\"" << org_id__value << "\"";
         ss << ",";
     }
 
@@ -1954,6 +2026,7 @@ to_bytes(const UpdateCurrentUser &o) {
 UpdateUser::UpdateUser(const struct json_value_s *root)
     : display_name_(std::nullopt)
     , other_mails_(std::nullopt)
+    , org_id_(std::nullopt)
     , department_(std::nullopt) {
     if (root->type != json_type_object) {
         throw std::runtime_error("expected json value to be of type object");
@@ -2003,6 +2076,19 @@ UpdateUser::UpdateUser(const struct json_value_s *root)
                 }
                 other_mails_ = other_mails__vec;
             }
+        } else if (std::strcmp(e->name->string, "orgId") == 0) {
+            const struct json_value_s *update_user_value = e->value;
+
+            if (update_user_value->type == json_type_null) {
+                org_id_ = std::nullopt;
+            } else {
+                if (update_user_value->type != json_type_string) {
+                    throw std::runtime_error("expected field to be of type string");
+                }
+
+                const struct json_string_s *org_id__str = static_cast<const struct json_string_s *>(update_user_value->payload);
+                org_id_ = std::string(org_id__str->string);
+            }
         } else if (std::strcmp(e->name->string, "department") == 0) {
             const struct json_value_s *update_user_value = e->value;
 
@@ -2028,6 +2114,9 @@ UpdateUser::operator==(const UpdateUser&rhs) const {
         return false;
     }
     if (this->other_mails_ != rhs.other_mails_) {
+        return false;
+    }
+    if (this->org_id_ != rhs.org_id_) {
         return false;
     }
     if (this->department_ != rhs.department_) {
@@ -2059,6 +2148,13 @@ to_bytes(const UpdateUser &o) {
             ss.seekp(-1, ss.cur);
         }
         ss << "]";
+        ss << ",";
+    }
+
+    if (o.org_id_.has_value()) {
+        ss << "\"orgId\":";
+        const auto &org_id__value = o.org_id_.value();
+        ss << "\"" << org_id__value << "\"";
         ss << ",";
     }
 

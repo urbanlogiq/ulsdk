@@ -24,6 +24,7 @@ type AdUser struct {
 	UserPrincipalName string `json:"userPrincipalName"`
 	OtherMails *[]string `json:"otherMails,omitempty"`
 	Department *string `json:"department,omitempty"`
+	OrgId *string `json:"orgId,omitempty"`
 	CreatedDateTime string `json:"createdDateTime"`
 	Groups *[]AdGroup `json:"groups,omitempty"`
 	AccountEnabled bool `json:"accountEnabled"`

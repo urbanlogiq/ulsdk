@@ -21,6 +21,14 @@ public final class CreateUserRequest {
         this._userPrincipalName = value;
     }
 
+    String _orgId;
+    public String getOrgId() {
+        return this._orgId;
+    }
+    public void setOrgId(String value) {
+        this._orgId = value;
+    }
+
     String _department;
     public String getDepartment() {
         return this._department;
@@ -42,6 +50,12 @@ public final class CreateUserRequest {
             userPrincipalNameSerialized = this._userPrincipalName;
         }
         o.put("userPrincipalName", userPrincipalNameSerialized);
+
+        Object orgIdSerialized = null;
+        if (this._orgId != null) {
+            orgIdSerialized = this._orgId;
+        }
+        o.put("orgId", orgIdSerialized);
 
         Object departmentSerialized = null;
         if (this._department != null) {
@@ -67,6 +81,13 @@ public final class CreateUserRequest {
         if (userPrincipalNameValue != null) {
             this._userPrincipalName = (String)userPrincipalNameValue;
         }
+        Object orgIdValue = null;
+        if (o.has("orgId") && !o.isNull("orgId")) {
+            orgIdValue = o.get("orgId");
+        }
+        if (orgIdValue != null) {
+            this._orgId = (String)orgIdValue;
+        }
         Object departmentValue = null;
         if (o.has("department") && !o.isNull("department")) {
             departmentValue = o.get("department");
@@ -79,6 +100,7 @@ public final class CreateUserRequest {
     public CreateUserRequest() {
         this._displayName = null;
         this._userPrincipalName = null;
+        this._orgId = null;
         this._department = null;
     }
 

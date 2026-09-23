@@ -124,6 +124,7 @@ AdUser::AdUser(const struct json_value_s *root)
     , user_principal_name_(std::string())
     , other_mails_(std::nullopt)
     , department_(std::nullopt)
+    , org_id_(std::nullopt)
     , created_date_time_(std::string())
     , groups_(std::nullopt)
     , account_enabled_(false) {
@@ -202,6 +203,19 @@ AdUser::AdUser(const struct json_value_s *root)
                 const struct json_string_s *department__str = static_cast<const struct json_string_s *>(ad_user_value->payload);
                 department_ = std::string(department__str->string);
             }
+        } else if (std::strcmp(e->name->string, "orgId") == 0) {
+            const struct json_value_s *ad_user_value = e->value;
+
+            if (ad_user_value->type == json_type_null) {
+                org_id_ = std::nullopt;
+            } else {
+                if (ad_user_value->type != json_type_string) {
+                    throw std::runtime_error("expected field to be of type string");
+                }
+
+                const struct json_string_s *org_id__str = static_cast<const struct json_string_s *>(ad_user_value->payload);
+                org_id_ = std::string(org_id__str->string);
+            }
         } else if (std::strcmp(e->name->string, "createdDateTime") == 0) {
             const struct json_value_s *ad_user_value = e->value;
 
@@ -270,6 +284,9 @@ AdUser::operator==(const AdUser&rhs) const {
     if (this->department_ != rhs.department_) {
         return false;
     }
+    if (this->org_id_ != rhs.org_id_) {
+        return false;
+    }
     if (this->created_date_time_ != rhs.created_date_time_) {
         return false;
     }
@@ -317,6 +334,13 @@ to_bytes(const AdUser &o) {
         ss << "\"department\":";
         const auto &department__value = o.department_.value();
         ss << "\"" << department__value << "\"";
+        ss << ",";
+    }
+
+    if (o.org_id_.has_value()) {
+        ss << "\"orgId\":";
+        const auto &org_id__value = o.org_id_.value();
+        ss << "\"" << org_id__value << "\"";
         ss << ",";
     }
 

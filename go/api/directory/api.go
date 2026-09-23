@@ -36,6 +36,7 @@ type AdUser struct {
 	UserPrincipalName string `json:"userPrincipalName"`
 	OtherMails *[]string `json:"otherMails,omitempty"`
 	Department *string `json:"department,omitempty"`
+	OrgId *string `json:"orgId,omitempty"`
 	CreatedDateTime string `json:"createdDateTime"`
 	Groups *[]AdGroup `json:"groups,omitempty"`
 	AccountEnabled bool `json:"accountEnabled"`
@@ -91,6 +92,7 @@ type AdUserWithAuditLog struct {
 	UserPrincipalName string `json:"userPrincipalName"`
 	OtherMails *[]string `json:"otherMails,omitempty"`
 	Department *string `json:"department,omitempty"`
+	OrgId *string `json:"orgId,omitempty"`
 	CreatedDateTime string `json:"createdDateTime"`
 	Groups *[]AdGroup `json:"groups,omitempty"`
 	AccountEnabled bool `json:"accountEnabled"`
@@ -102,6 +104,7 @@ type AdUserWithAuditLog struct {
 type CreateUserRequest struct {
 	DisplayName *string `json:"displayName,omitempty"`
 	UserPrincipalName *string `json:"userPrincipalName,omitempty"`
+	OrgId *string `json:"orgId,omitempty"`
 	Department *string `json:"department,omitempty"`
 }
 
@@ -118,6 +121,7 @@ type UpdateCurrentUserPayload struct {
 type UpdateUserPayload struct {
 	DisplayName *string `json:"displayName,omitempty"`
 	OtherMails *[]string `json:"otherMails,omitempty"`
+	OrgId *string `json:"orgId,omitempty"`
 	Department *string `json:"department,omitempty"`
 }
 
@@ -603,7 +607,7 @@ func RenameOrganization(ctx api.RequestContext, idParam id.B2cid, renameOrganiza
 }
 
 // GetUserOrganization -
-// Fetches the organization record for a specific user, derived from the user's AD `department` field.
+// Fetches the organization record for a specific user, from the user's organization attribute.
 func GetUserOrganization(ctx api.RequestContext, idParam id.B2cid) (*Organization, error) {
 	path := "/v1/api/ulv2/directory/v1/user/:id/organization"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)

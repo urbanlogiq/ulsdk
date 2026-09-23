@@ -46,6 +46,8 @@ pub struct AdUser {
     #[serde(rename = "otherMails")]
     other_mails: Option<Vec<String>>,
     department: Option<String>,
+    #[serde(rename = "orgId")]
+    org_id: Option<String>,
     #[serde(rename = "createdDateTime")]
     created_date_time: String,
     groups: Option<Vec<AdGroup>>,
@@ -129,6 +131,8 @@ pub struct AdUserWithAuditLog {
     #[serde(rename = "otherMails")]
     other_mails: Option<Vec<String>>,
     department: Option<String>,
+    #[serde(rename = "orgId")]
+    org_id: Option<String>,
     #[serde(rename = "createdDateTime")]
     created_date_time: String,
     groups: Option<Vec<AdGroup>>,
@@ -147,6 +151,8 @@ pub struct CreateUserRequest {
     display_name: Option<String>,
     #[serde(rename = "userPrincipalName")]
     user_principal_name: Option<String>,
+    #[serde(rename = "orgId")]
+    org_id: Option<String>,
     department: Option<String>,
 }
 
@@ -170,6 +176,8 @@ pub struct UpdateUser {
     display_name: Option<String>,
     #[serde(rename = "otherMails")]
     other_mails: Option<Vec<String>>,
+    #[serde(rename = "orgId")]
+    org_id: Option<String>,
     department: Option<String>,
 }
 
@@ -638,7 +646,7 @@ pub async fn rename_organization(
     Ok(())
 }
 
-/// Fetches the organization record for a specific user, derived from the user's AD `department` field.
+/// Fetches the organization record for a specific user, from the user's organization attribute.
 ///
 /// # Arguments
 ///

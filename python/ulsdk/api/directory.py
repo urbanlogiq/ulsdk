@@ -182,6 +182,7 @@ class AdUser:
     user_principal_name: "str"
     other_mails: "Optional[List[str]]"
     department: "Optional[str]"
+    org_id: "Optional[str]"
     created_date_time: "str"
     groups: "Optional[List[AdGroup]]"
     account_enabled: "bool"
@@ -201,6 +202,9 @@ class AdUser:
         o["department"] = None
         if self.department is not None:
             o["department"] = self.department
+        o["orgId"] = None
+        if self.org_id is not None:
+            o["orgId"] = self.org_id
         o["createdDateTime"] = self.created_date_time
         o["groups"] = None
         if self.groups is not None:
@@ -219,6 +223,7 @@ class AdUser:
         user_principal_name = None
         other_mails = None
         department = None
+        org_id = None
         created_date_time = None
         groups = None
         account_enabled = None
@@ -255,6 +260,13 @@ class AdUser:
                     department = department_var
                 else:
                     department = None
+            elif key == "orgId":
+                if o[key] is not None:
+                    org_id_var = o[key]
+                    assert type(org_id_var) is str
+                    org_id = org_id_var
+                else:
+                    org_id = None
             elif key == "createdDateTime":
                 created_date_time_var = o[key]
                 assert type(created_date_time_var) is str
@@ -282,7 +294,7 @@ class AdUser:
         assert created_date_time is not None
         assert account_enabled is not None
 
-        return cls(display_name, id_, user_principal_name, other_mails, department, created_date_time, groups, account_enabled)
+        return cls(display_name, id_, user_principal_name, other_mails, department, org_id, created_date_time, groups, account_enabled)
 
     @classmethod
     def make_default(cls) -> Self:
@@ -291,11 +303,12 @@ class AdUser:
         userPrincipalName = ""
         otherMails = None
         department = None
+        orgId = None
         createdDateTime = ""
         groups = None
         accountEnabled = True
 
-        return cls(displayName, id, userPrincipalName, otherMails, department, createdDateTime, groups, accountEnabled)
+        return cls(displayName, id, userPrincipalName, otherMails, department, orgId, createdDateTime, groups, accountEnabled)
 
 @dataclass
 class DisplayNames:
@@ -742,6 +755,7 @@ class AdUserWithAuditLog:
     user_principal_name: "str"
     other_mails: "Optional[List[str]]"
     department: "Optional[str]"
+    org_id: "Optional[str]"
     created_date_time: "str"
     groups: "Optional[List[AdGroup]]"
     account_enabled: "bool"
@@ -764,6 +778,9 @@ class AdUserWithAuditLog:
         o["department"] = None
         if self.department is not None:
             o["department"] = self.department
+        o["orgId"] = None
+        if self.org_id is not None:
+            o["orgId"] = self.org_id
         o["createdDateTime"] = self.created_date_time
         o["groups"] = None
         if self.groups is not None:
@@ -799,6 +816,7 @@ class AdUserWithAuditLog:
         user_principal_name = None
         other_mails = None
         department = None
+        org_id = None
         created_date_time = None
         groups = None
         account_enabled = None
@@ -838,6 +856,13 @@ class AdUserWithAuditLog:
                     department = department_var
                 else:
                     department = None
+            elif key == "orgId":
+                if o[key] is not None:
+                    org_id_var = o[key]
+                    assert type(org_id_var) is str
+                    org_id = org_id_var
+                else:
+                    org_id = None
             elif key == "createdDateTime":
                 created_date_time_var = o[key]
                 assert type(created_date_time_var) is str
@@ -896,7 +921,7 @@ class AdUserWithAuditLog:
         assert created_date_time is not None
         assert account_enabled is not None
 
-        return cls(display_name, id_, user_principal_name, other_mails, department, created_date_time, groups, account_enabled, audit_log, identities, creation_type)
+        return cls(display_name, id_, user_principal_name, other_mails, department, org_id, created_date_time, groups, account_enabled, audit_log, identities, creation_type)
 
     @classmethod
     def make_default(cls) -> Self:
@@ -905,6 +930,7 @@ class AdUserWithAuditLog:
         userPrincipalName = ""
         otherMails = None
         department = None
+        orgId = None
         createdDateTime = ""
         groups = None
         accountEnabled = True
@@ -912,12 +938,13 @@ class AdUserWithAuditLog:
         identities = None
         creationType = None
 
-        return cls(displayName, id, userPrincipalName, otherMails, department, createdDateTime, groups, accountEnabled, auditLog, identities, creationType)
+        return cls(displayName, id, userPrincipalName, otherMails, department, orgId, createdDateTime, groups, accountEnabled, auditLog, identities, creationType)
 
 @dataclass
 class CreateUserRequest:
     display_name: "Optional[str]"
     user_principal_name: "Optional[str]"
+    org_id: "Optional[str]"
     department: "Optional[str]"
 
     def to_dict(self) -> Dict[str, Any]:
@@ -928,6 +955,9 @@ class CreateUserRequest:
         o["userPrincipalName"] = None
         if self.user_principal_name is not None:
             o["userPrincipalName"] = self.user_principal_name
+        o["orgId"] = None
+        if self.org_id is not None:
+            o["orgId"] = self.org_id
         o["department"] = None
         if self.department is not None:
             o["department"] = self.department
@@ -937,6 +967,7 @@ class CreateUserRequest:
     def from_dict(cls, o: Dict[str, Any]) -> Self:
         display_name = None
         user_principal_name = None
+        org_id = None
         department = None
 
         for key in o:
@@ -954,6 +985,13 @@ class CreateUserRequest:
                     user_principal_name = user_principal_name_var
                 else:
                     user_principal_name = None
+            elif key == "orgId":
+                if o[key] is not None:
+                    org_id_var = o[key]
+                    assert type(org_id_var) is str
+                    org_id = org_id_var
+                else:
+                    org_id = None
             elif key == "department":
                 if o[key] is not None:
                     department_var = o[key]
@@ -963,15 +1001,16 @@ class CreateUserRequest:
                     department = None
 
 
-        return cls(display_name, user_principal_name, department)
+        return cls(display_name, user_principal_name, org_id, department)
 
     @classmethod
     def make_default(cls) -> Self:
         displayName = None
         userPrincipalName = None
+        orgId = None
         department = None
 
-        return cls(displayName, userPrincipalName, department)
+        return cls(displayName, userPrincipalName, orgId, department)
 
 @dataclass
 class CreateUser:
@@ -1070,6 +1109,7 @@ class UpdateCurrentUser:
 class UpdateUser:
     display_name: "Optional[str]"
     other_mails: "Optional[List[str]]"
+    org_id: "Optional[str]"
     department: "Optional[str]"
 
     def to_dict(self) -> Dict[str, Any]:
@@ -1084,6 +1124,9 @@ class UpdateUser:
                 other_mails_var = item
                 other_mails_list.append(other_mails_var)
             o["otherMails"] = other_mails_list
+        o["orgId"] = None
+        if self.org_id is not None:
+            o["orgId"] = self.org_id
         o["department"] = None
         if self.department is not None:
             o["department"] = self.department
@@ -1093,6 +1136,7 @@ class UpdateUser:
     def from_dict(cls, o: Dict[str, Any]) -> Self:
         display_name = None
         other_mails = None
+        org_id = None
         department = None
 
         for key in o:
@@ -1115,6 +1159,13 @@ class UpdateUser:
                         other_mails.append(other_mails_item)
                 else:
                     other_mails = None
+            elif key == "orgId":
+                if o[key] is not None:
+                    org_id_var = o[key]
+                    assert type(org_id_var) is str
+                    org_id = org_id_var
+                else:
+                    org_id = None
             elif key == "department":
                 if o[key] is not None:
                     department_var = o[key]
@@ -1124,15 +1175,16 @@ class UpdateUser:
                     department = None
 
 
-        return cls(display_name, other_mails, department)
+        return cls(display_name, other_mails, org_id, department)
 
     @classmethod
     def make_default(cls) -> Self:
         displayName = None
         otherMails = None
+        orgId = None
         department = None
 
-        return cls(displayName, otherMails, department)
+        return cls(displayName, otherMails, orgId, department)
 
 @dataclass
 class CreateGroup:
@@ -2064,7 +2116,7 @@ def get_user_organization(
     ctx: RequestContext,
     id_: "B2cId",
 ) -> Organization:
-    """Fetches the organization record for a specific user, derived from the user's AD `department` field.
+    """Fetches the organization record for a specific user, from the user's organization attribute.
 
     Arguments:
     ctx: RequestContext -- A request context object

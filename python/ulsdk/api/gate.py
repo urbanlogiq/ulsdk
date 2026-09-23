@@ -73,6 +73,7 @@ class AdUser:
     user_principal_name: "str"
     other_mails: "Optional[List[str]]"
     department: "Optional[str]"
+    org_id: "Optional[str]"
     created_date_time: "str"
     groups: "Optional[List[AdGroup]]"
     account_enabled: "bool"
@@ -92,6 +93,9 @@ class AdUser:
         o["department"] = None
         if self.department is not None:
             o["department"] = self.department
+        o["orgId"] = None
+        if self.org_id is not None:
+            o["orgId"] = self.org_id
         o["createdDateTime"] = self.created_date_time
         o["groups"] = None
         if self.groups is not None:
@@ -110,6 +114,7 @@ class AdUser:
         user_principal_name = None
         other_mails = None
         department = None
+        org_id = None
         created_date_time = None
         groups = None
         account_enabled = None
@@ -146,6 +151,13 @@ class AdUser:
                     department = department_var
                 else:
                     department = None
+            elif key == "orgId":
+                if o[key] is not None:
+                    org_id_var = o[key]
+                    assert type(org_id_var) is str
+                    org_id = org_id_var
+                else:
+                    org_id = None
             elif key == "createdDateTime":
                 created_date_time_var = o[key]
                 assert type(created_date_time_var) is str
@@ -173,7 +185,7 @@ class AdUser:
         assert created_date_time is not None
         assert account_enabled is not None
 
-        return cls(display_name, id_, user_principal_name, other_mails, department, created_date_time, groups, account_enabled)
+        return cls(display_name, id_, user_principal_name, other_mails, department, org_id, created_date_time, groups, account_enabled)
 
     @classmethod
     def make_default(cls) -> Self:
@@ -182,11 +194,12 @@ class AdUser:
         userPrincipalName = ""
         otherMails = None
         department = None
+        orgId = None
         createdDateTime = ""
         groups = None
         accountEnabled = True
 
-        return cls(displayName, id, userPrincipalName, otherMails, department, createdDateTime, groups, accountEnabled)
+        return cls(displayName, id, userPrincipalName, otherMails, department, orgId, createdDateTime, groups, accountEnabled)
 
 @dataclass
 class Bootstrap:

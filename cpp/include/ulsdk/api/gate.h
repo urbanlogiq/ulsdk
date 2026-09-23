@@ -39,6 +39,7 @@ struct AdUser {
     std::string user_principal_name_;
     std::optional<std::vector<std::string>> other_mails_;
     std::optional<std::string> department_;
+    std::optional<std::string> org_id_;
     std::string created_date_time_;
     std::optional<std::vector<AdGroup>> groups_;
     bool account_enabled_;

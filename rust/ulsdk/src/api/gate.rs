@@ -32,6 +32,8 @@ pub struct AdUser {
     #[serde(rename = "otherMails")]
     other_mails: Option<Vec<String>>,
     department: Option<String>,
+    #[serde(rename = "orgId")]
+    org_id: Option<String>,
     #[serde(rename = "createdDateTime")]
     created_date_time: String,
     groups: Option<Vec<AdGroup>>,

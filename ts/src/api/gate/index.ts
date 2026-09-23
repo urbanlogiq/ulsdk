@@ -17,6 +17,7 @@ export interface AdUser {
   userPrincipalName: string;
   otherMails?: string[];
   department?: string;
+  orgId?: string;
   createdDateTime: string;
   groups?: AdGroup[];
   accountEnabled: boolean;

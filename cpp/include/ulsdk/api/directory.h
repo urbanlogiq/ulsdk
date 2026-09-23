@@ -61,6 +61,7 @@ struct AdUser {
     std::string user_principal_name_;
     std::optional<std::vector<std::string>> other_mails_;
     std::optional<std::string> department_;
+    std::optional<std::string> org_id_;
     std::string created_date_time_;
     std::optional<std::vector<AdGroup>> groups_;
     bool account_enabled_;
@@ -186,6 +187,7 @@ struct AdUserWithAuditLog {
     std::string user_principal_name_;
     std::optional<std::vector<std::string>> other_mails_;
     std::optional<std::string> department_;
+    std::optional<std::string> org_id_;
     std::string created_date_time_;
     std::optional<std::vector<AdGroup>> groups_;
     bool account_enabled_;
@@ -207,6 +209,7 @@ to_bytes(const AdUserWithAuditLog &o);
 struct CreateUserRequest {
     std::optional<std::string> display_name_;
     std::optional<std::string> user_principal_name_;
+    std::optional<std::string> org_id_;
     std::optional<std::string> department_;
 
     CreateUserRequest() = default;
@@ -253,6 +256,7 @@ to_bytes(const UpdateCurrentUser &o);
 struct UpdateUser {
     std::optional<std::string> display_name_;
     std::optional<std::vector<std::string>> other_mails_;
+    std::optional<std::string> org_id_;
     std::optional<std::string> department_;
 
     UpdateUser() = default;
@@ -634,7 +638,7 @@ rename_organization(
 );
 
 /**
- * Fetches the organization record for a specific user, derived from the user's AD `department` field.
+ * Fetches the organization record for a specific user, from the user's organization attribute.
  * @param id The user's B2cId.
  * @return The user's organization record.
  */

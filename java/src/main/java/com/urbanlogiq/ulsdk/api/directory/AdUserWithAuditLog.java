@@ -45,6 +45,14 @@ public final class AdUserWithAuditLog {
         this._department = value;
     }
 
+    String _orgId;
+    public String getOrgId() {
+        return this._orgId;
+    }
+    public void setOrgId(String value) {
+        this._orgId = value;
+    }
+
     String _createdDateTime;
     public String getCreatedDateTime() {
         return this._createdDateTime;
@@ -125,6 +133,12 @@ public final class AdUserWithAuditLog {
             departmentSerialized = this._department;
         }
         o.put("department", departmentSerialized);
+
+        Object orgIdSerialized = null;
+        if (this._orgId != null) {
+            orgIdSerialized = this._orgId;
+        }
+        o.put("orgId", orgIdSerialized);
 
         Object createdDateTimeSerialized = null;
         createdDateTimeSerialized = this._createdDateTime;
@@ -210,6 +224,13 @@ public final class AdUserWithAuditLog {
         if (departmentValue != null) {
             this._department = (String)departmentValue;
         }
+        Object orgIdValue = null;
+        if (o.has("orgId") && !o.isNull("orgId")) {
+            orgIdValue = o.get("orgId");
+        }
+        if (orgIdValue != null) {
+            this._orgId = (String)orgIdValue;
+        }
         Object createdDateTimeValue = o.get("createdDateTime");
         this._createdDateTime = (String)createdDateTimeValue;
         Object groupsValue = null;
@@ -271,6 +292,7 @@ public final class AdUserWithAuditLog {
         this._userPrincipalName = "";
         this._otherMails = null;
         this._department = null;
+        this._orgId = null;
         this._createdDateTime = "";
         this._groups = null;
         this._accountEnabled = true;

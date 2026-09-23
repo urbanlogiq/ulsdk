@@ -28,6 +28,7 @@ export interface AdUser {
   userPrincipalName: string;
   otherMails?: string[];
   department?: string;
+  orgId?: string;
   createdDateTime: string;
   groups?: AdGroup[];
   accountEnabled: boolean;
@@ -83,6 +84,7 @@ export interface AdUserWithAuditLog {
   userPrincipalName: string;
   otherMails?: string[];
   department?: string;
+  orgId?: string;
   createdDateTime: string;
   groups?: AdGroup[];
   accountEnabled: boolean;
@@ -94,6 +96,7 @@ export interface AdUserWithAuditLog {
 export interface CreateUserRequest {
   displayName?: string;
   userPrincipalName?: string;
+  orgId?: string;
   department?: string;
 }
 
@@ -110,6 +113,7 @@ export interface UpdateCurrentUser {
 export interface UpdateUser {
   displayName?: string;
   otherMails?: string[];
+  orgId?: string;
   department?: string;
 }
 
@@ -620,7 +624,7 @@ export async function renameOrganization(
 }
 
 /**
- * Fetches the organization record for a specific user, derived from the user's AD `department` field.
+ * Fetches the organization record for a specific user, from the user's organization attribute.
  *
  * @param ctx - A request context object
  * @param id - The user's B2cId.

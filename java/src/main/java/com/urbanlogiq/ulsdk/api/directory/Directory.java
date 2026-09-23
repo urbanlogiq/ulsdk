@@ -520,7 +520,7 @@ public final class Directory {
     }
 
     /**
-     * Fetches the organization record for a specific user, derived from the user's AD `department` field.
+     * Fetches the organization record for a specific user, from the user's organization attribute.
      * 
      * @param ctx A request context object
      * @param id The user's B2cId.
