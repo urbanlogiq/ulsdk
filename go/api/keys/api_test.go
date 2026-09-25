@@ -16,7 +16,6 @@ var _ = fmt.Sprintf
 var _ = json.Marshal
 
 func TestGetKeys(t *testing.T) {
-	t.Skip("disabled during the uldirectory-to-ulv2 directory migration")
 	ctx := ulsdk.NewTestContextFromEnv()
 	if ctx == nil {
 		t.Skip("credentials not set, skipping API test")

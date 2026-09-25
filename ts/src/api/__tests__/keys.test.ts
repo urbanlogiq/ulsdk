@@ -6,8 +6,7 @@ import * as keys from '../keys';
 import { TestContext } from '../../test_context';
 
 describe('getKeys', () => {
-  // Skipped: disabled during the uldirectory-to-ulv2 directory migration
-  it.skip('testGetKeys', async () => {
+  it('testGetKeys', async () => {
     const ctx = new TestContext();
     ctx.setResponse(new TextEncoder().encode('{}'));
     try {

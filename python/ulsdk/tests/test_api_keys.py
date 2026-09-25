@@ -4,14 +4,12 @@
 
 import time
 import os
-import pytest
 import pyarrow as pa
 from ..api_key_context import ApiKeyContext
 from ..test_context import TestContext
 from ..keys import Region, Key as SigningKey, Environment
 from ..api.keys import *
 
-@pytest.mark.skip(reason="disabled during the uldirectory-to-ulv2 directory migration")
 def test_get_keys():
     user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
     access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None
@@ -40,7 +38,6 @@ def test_get_keys():
             break
     assert success, "test was unable to complete with retries"
 
-@pytest.mark.skip(reason="disabled during the uldirectory-to-ulv2 directory migration")
 def test_get_keys_1():
     user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
     access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None

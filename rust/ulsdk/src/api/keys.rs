@@ -124,7 +124,6 @@ mod tests {
     use crate::{Environment, Region};
     use std::str::FromStr;
 
-    #[ignore = "disabled during the uldirectory-to-ulv2 directory migration"]
     #[tokio::test]
     async fn test_get_keys() {
         let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
@@ -162,7 +161,6 @@ mod tests {
         }
     }
 
-    #[ignore = "disabled during the uldirectory-to-ulv2 directory migration"]
     #[tokio::test]
     async fn test_get_keys_1() {
         let ca_user = std::env::var("CA_USER").ok();
