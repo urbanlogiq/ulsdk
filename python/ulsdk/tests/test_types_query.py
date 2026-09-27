@@ -280,6 +280,18 @@ def test_window():
     _t1 = Window.from_bytes(_b)
     assert _t0 == _t1
 
+def test_window_frame():
+    _t0 = WindowFrame.make_default()
+    _b = _t0.to_bytes()
+    _t1 = WindowFrame.from_bytes(_b)
+    assert _t0 == _t1
+
+def test_window_frame_bound():
+    _t0 = WindowFrameBound.make_default()
+    _b = _t0.to_bytes()
+    _t1 = WindowFrameBound.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_worklog_partition():
     _t0 = WorklogPartition.make_default()
     _b = _t0.to_bytes()

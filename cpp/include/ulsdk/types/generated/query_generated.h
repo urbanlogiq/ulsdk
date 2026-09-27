@@ -59,6 +59,12 @@ struct UnsetArgumentBuilder;
 struct OrderByExpr;
 struct OrderByExprBuilder;
 
+struct WindowFrameBound;
+struct WindowFrameBoundBuilder;
+
+struct WindowFrame;
+struct WindowFrameBuilder;
+
 struct Window;
 struct WindowBuilder;
 
@@ -198,6 +204,78 @@ inline const char *EnumNameTypeHint(TypeHint e) {
   if (::flatbuffers::IsOutRange(e, TypeHint::None, TypeHint::Uuid)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesTypeHint()[index];
+}
+
+enum class WindowFrameUnits : int8_t {
+  Rows = 0,
+  Range = 1,
+  Groups = 2,
+  MIN = Rows,
+  MAX = Groups
+};
+
+inline const WindowFrameUnits (&EnumValuesWindowFrameUnits())[3] {
+  static const WindowFrameUnits values[] = {
+    WindowFrameUnits::Rows,
+    WindowFrameUnits::Range,
+    WindowFrameUnits::Groups
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesWindowFrameUnits() {
+  static const char * const names[4] = {
+    "Rows",
+    "Range",
+    "Groups",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameWindowFrameUnits(WindowFrameUnits e) {
+  if (::flatbuffers::IsOutRange(e, WindowFrameUnits::Rows, WindowFrameUnits::Groups)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesWindowFrameUnits()[index];
+}
+
+enum class WindowFrameBoundTy : int8_t {
+  CurrentRow = 0,
+  Preceding = 1,
+  Following = 2,
+  UnboundedPreceding = 3,
+  UnboundedFollowing = 4,
+  MIN = CurrentRow,
+  MAX = UnboundedFollowing
+};
+
+inline const WindowFrameBoundTy (&EnumValuesWindowFrameBoundTy())[5] {
+  static const WindowFrameBoundTy values[] = {
+    WindowFrameBoundTy::CurrentRow,
+    WindowFrameBoundTy::Preceding,
+    WindowFrameBoundTy::Following,
+    WindowFrameBoundTy::UnboundedPreceding,
+    WindowFrameBoundTy::UnboundedFollowing
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesWindowFrameBoundTy() {
+  static const char * const names[6] = {
+    "CurrentRow",
+    "Preceding",
+    "Following",
+    "UnboundedPreceding",
+    "UnboundedFollowing",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameWindowFrameBoundTy(WindowFrameBoundTy e) {
+  if (::flatbuffers::IsOutRange(e, WindowFrameBoundTy::CurrentRow, WindowFrameBoundTy::UnboundedFollowing)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesWindowFrameBoundTy()[index];
 }
 
 enum class ExprUnion : uint8_t {
@@ -1500,13 +1578,142 @@ inline ::flatbuffers::Offset<OrderByExpr> CreateOrderByExprDirect(
       order_by__);
 }
 
+struct WindowFrameBound FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef WindowFrameBoundBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_TY = 4,
+    VT_OFFSET = 6
+  };
+  WindowFrameBoundTy ty() const {
+    return static_cast<WindowFrameBoundTy>(GetField<int8_t>(VT_TY, 0));
+  }
+  uint64_t offset() const {
+    return GetField<uint64_t>(VT_OFFSET, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int8_t>(verifier, VT_TY, 1) &&
+           VerifyField<uint64_t>(verifier, VT_OFFSET, 8) &&
+           verifier.EndTable();
+  }
+};
+
+struct WindowFrameBoundBuilder {
+  typedef WindowFrameBound Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_ty(WindowFrameBoundTy ty) {
+    fbb_.AddElement<int8_t>(WindowFrameBound::VT_TY, static_cast<int8_t>(ty), 0);
+  }
+  void add_offset(uint64_t offset) {
+    fbb_.AddElement<uint64_t>(WindowFrameBound::VT_OFFSET, offset, 0);
+  }
+  explicit WindowFrameBoundBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<WindowFrameBound> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<WindowFrameBound>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<WindowFrameBound> CreateWindowFrameBound(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    WindowFrameBoundTy ty = WindowFrameBoundTy::CurrentRow,
+    uint64_t offset = 0) {
+  WindowFrameBoundBuilder builder_(_fbb);
+  builder_.add_offset(offset);
+  builder_.add_ty(ty);
+  return builder_.Finish();
+}
+
+struct WindowFrameBound::Traits {
+  using type = WindowFrameBound;
+  static auto constexpr Create = CreateWindowFrameBound;
+};
+
+struct WindowFrame FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef WindowFrameBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_UNITS = 4,
+    VT_START = 6,
+    VT_END = 8
+  };
+  WindowFrameUnits units() const {
+    return static_cast<WindowFrameUnits>(GetField<int8_t>(VT_UNITS, 0));
+  }
+  const WindowFrameBound *start() const {
+    return GetPointer<const WindowFrameBound *>(VT_START);
+  }
+  const WindowFrameBound *end() const {
+    return GetPointer<const WindowFrameBound *>(VT_END);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int8_t>(verifier, VT_UNITS, 1) &&
+           VerifyOffsetRequired(verifier, VT_START) &&
+           verifier.VerifyTable(start()) &&
+           VerifyOffsetRequired(verifier, VT_END) &&
+           verifier.VerifyTable(end()) &&
+           verifier.EndTable();
+  }
+};
+
+struct WindowFrameBuilder {
+  typedef WindowFrame Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_units(WindowFrameUnits units) {
+    fbb_.AddElement<int8_t>(WindowFrame::VT_UNITS, static_cast<int8_t>(units), 0);
+  }
+  void add_start(::flatbuffers::Offset<WindowFrameBound> start) {
+    fbb_.AddOffset(WindowFrame::VT_START, start);
+  }
+  void add_end(::flatbuffers::Offset<WindowFrameBound> end) {
+    fbb_.AddOffset(WindowFrame::VT_END, end);
+  }
+  explicit WindowFrameBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<WindowFrame> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<WindowFrame>(end);
+    fbb_.Required(o, WindowFrame::VT_START);
+    fbb_.Required(o, WindowFrame::VT_END);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<WindowFrame> CreateWindowFrame(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    WindowFrameUnits units = WindowFrameUnits::Rows,
+    ::flatbuffers::Offset<WindowFrameBound> start = 0,
+    ::flatbuffers::Offset<WindowFrameBound> end = 0) {
+  WindowFrameBuilder builder_(_fbb);
+  builder_.add_end(end);
+  builder_.add_start(start);
+  builder_.add_units(units);
+  return builder_.Finish();
+}
+
+struct WindowFrame::Traits {
+  using type = WindowFrame;
+  static auto constexpr Create = CreateWindowFrame;
+};
+
 struct Window FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef WindowBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_FUN = 4,
     VT_PARTITION = 6,
-    VT_ORDER_BY = 8
+    VT_ORDER_BY = 8,
+    VT_FRAME = 10
   };
   const Function *fun() const {
     return GetPointer<const Function *>(VT_FUN);
@@ -1516,6 +1723,9 @@ struct Window FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   const ::flatbuffers::Vector<::flatbuffers::Offset<OrderBy>> *order_by() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<OrderBy>> *>(VT_ORDER_BY);
+  }
+  const WindowFrame *frame() const {
+    return GetPointer<const WindowFrame *>(VT_FRAME);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -1527,6 +1737,8 @@ struct Window FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_ORDER_BY) &&
            verifier.VerifyVector(order_by()) &&
            verifier.VerifyVectorOfTables(order_by()) &&
+           VerifyOffset(verifier, VT_FRAME) &&
+           verifier.VerifyTable(frame()) &&
            verifier.EndTable();
   }
 };
@@ -1544,6 +1756,9 @@ struct WindowBuilder {
   void add_order_by(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<OrderBy>>> order_by) {
     fbb_.AddOffset(Window::VT_ORDER_BY, order_by);
   }
+  void add_frame(::flatbuffers::Offset<WindowFrame> frame) {
+    fbb_.AddOffset(Window::VT_FRAME, frame);
+  }
   explicit WindowBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1560,8 +1775,10 @@ inline ::flatbuffers::Offset<Window> CreateWindow(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<Function> fun = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Expr>>> partition = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<OrderBy>>> order_by = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<OrderBy>>> order_by = 0,
+    ::flatbuffers::Offset<WindowFrame> frame = 0) {
   WindowBuilder builder_(_fbb);
+  builder_.add_frame(frame);
   builder_.add_order_by(order_by);
   builder_.add_partition(partition);
   builder_.add_fun(fun);
@@ -1577,14 +1794,16 @@ inline ::flatbuffers::Offset<Window> CreateWindowDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<Function> fun = 0,
     const std::vector<::flatbuffers::Offset<Expr>> *partition = nullptr,
-    const std::vector<::flatbuffers::Offset<OrderBy>> *order_by = nullptr) {
+    const std::vector<::flatbuffers::Offset<OrderBy>> *order_by = nullptr,
+    ::flatbuffers::Offset<WindowFrame> frame = 0) {
   auto partition__ = partition ? _fbb.CreateVector<::flatbuffers::Offset<Expr>>(*partition) : 0;
   auto order_by__ = order_by ? _fbb.CreateVector<::flatbuffers::Offset<OrderBy>>(*order_by) : 0;
   return CreateWindow(
       _fbb,
       fun,
       partition__,
-      order_by__);
+      order_by__,
+      frame);
 }
 
 struct AggregateFilter FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

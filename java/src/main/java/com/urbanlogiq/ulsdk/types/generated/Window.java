@@ -41,19 +41,23 @@ public final class Window extends com.google.flatbuffers.Table {
   public int orderByLength() { int o = __offset(8); return o != 0 ? __vector_len(o) : 0; }
   public OrderBy._Vector orderByVector() { return orderByVector(new OrderBy._Vector()); }
   public OrderBy._Vector orderByVector(OrderBy._Vector obj) { int o = __offset(8); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
+  public WindowFrame frame() { return frame(new WindowFrame()); }
+  public WindowFrame frame(WindowFrame obj) { int o = __offset(10); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
 
   public static int createWindow(FlatBufferBuilder builder,
       int funOffset,
       int partitionOffset,
-      int orderByOffset) {
-    builder.startTable(3);
+      int orderByOffset,
+      int frameOffset) {
+    builder.startTable(4);
+    Window.addFrame(builder, frameOffset);
     Window.addOrderBy(builder, orderByOffset);
     Window.addPartition(builder, partitionOffset);
     Window.addFun(builder, funOffset);
     return Window.endWindow(builder);
   }
 
-  public static void startWindow(FlatBufferBuilder builder) { builder.startTable(3); }
+  public static void startWindow(FlatBufferBuilder builder) { builder.startTable(4); }
   public static void addFun(FlatBufferBuilder builder, int funOffset) { builder.addOffset(0, funOffset, 0); }
   public static void addPartition(FlatBufferBuilder builder, int partitionOffset) { builder.addOffset(1, partitionOffset, 0); }
   public static int createPartitionVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
@@ -61,6 +65,7 @@ public final class Window extends com.google.flatbuffers.Table {
   public static void addOrderBy(FlatBufferBuilder builder, int orderByOffset) { builder.addOffset(2, orderByOffset, 0); }
   public static int createOrderByVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
   public static void startOrderByVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
+  public static void addFrame(FlatBufferBuilder builder, int frameOffset) { builder.addOffset(3, frameOffset, 0); }
   public static int endWindow(FlatBufferBuilder builder) {
     int o = builder.endTable();
     builder.required(o, 4);  // fun

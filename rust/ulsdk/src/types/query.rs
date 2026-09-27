@@ -89,7 +89,9 @@ use crate::types::generated::query_generated::{
     UnaryQueryElement as FbsUnaryQueryElement, UnsetArgument as FbsUnsetArgument,
     UpdateQueryElement as FbsUpdateQueryElement, ValueIndex as FbsValueIndex,
     ValueName as FbsValueName, ValueRow as FbsValueRow, Values as FbsValues, Vector as FbsVector,
-    When as FbsWhen, Window as FbsWindow, WorklogPartition as FbsWorklogPartition,
+    When as FbsWhen, Window as FbsWindow, WindowFrame as FbsWindowFrame,
+    WindowFrameBound as FbsWindowFrameBound, WindowFrameBoundTy as FbsWindowFrameBoundTy,
+    WindowFrameUnits as FbsWindowFrameUnits, WorklogPartition as FbsWorklogPartition,
 };
 use crate::types::generated::value_generated::{
     Point2D as FbsPoint2D, Tri2D as FbsTri2D, VArray as FbsVArray, VBool as FbsVBool,
@@ -332,6 +334,111 @@ impl From<FbsTypeHint> for TypeHint {
             3 => Self::Base64,
             4 => Self::Uuid,
             _ => panic!("Invalid value {} when constructing TypeHint", fbs.0),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[repr(i8)]
+pub enum WindowFrameBoundTy {
+    CurrentRow = 0,
+    Preceding = 1,
+    Following = 2,
+    UnboundedPreceding = 3,
+    UnboundedFollowing = 4,
+}
+
+impl TryFrom<i8> for WindowFrameBoundTy {
+    type Error = crate::error::Error;
+    fn try_from(v: i8) -> Result<Self, crate::error::Error> {
+        WindowFrameBoundTy::from_repr(v).ok_or(crate::error::Error::InvalidEnumValue(v as i64))
+    }
+}
+
+impl WindowFrameBoundTy {
+    pub fn variant_name(&self) -> Option<&'static str> {
+        match self {
+            Self::CurrentRow => Some("CurrentRow"),
+            Self::Preceding => Some("Preceding"),
+            Self::Following => Some("Following"),
+            Self::UnboundedPreceding => Some("UnboundedPreceding"),
+            Self::UnboundedFollowing => Some("UnboundedFollowing"),
+            _ => None,
+        }
+    }
+}
+
+impl From<WindowFrameBoundTy> for FbsWindowFrameBoundTy {
+    fn from(val: WindowFrameBoundTy) -> Self {
+        match val {
+            WindowFrameBoundTy::CurrentRow => FbsWindowFrameBoundTy::CurrentRow,
+            WindowFrameBoundTy::Preceding => FbsWindowFrameBoundTy::Preceding,
+            WindowFrameBoundTy::Following => FbsWindowFrameBoundTy::Following,
+            WindowFrameBoundTy::UnboundedPreceding => FbsWindowFrameBoundTy::UnboundedPreceding,
+            WindowFrameBoundTy::UnboundedFollowing => FbsWindowFrameBoundTy::UnboundedFollowing,
+        }
+    }
+}
+
+impl From<FbsWindowFrameBoundTy> for WindowFrameBoundTy {
+    fn from(fbs: FbsWindowFrameBoundTy) -> Self {
+        match fbs.0 {
+            0 => Self::CurrentRow,
+            1 => Self::Preceding,
+            2 => Self::Following,
+            3 => Self::UnboundedPreceding,
+            4 => Self::UnboundedFollowing,
+            _ => panic!(
+                "Invalid value {} when constructing WindowFrameBoundTy",
+                fbs.0
+            ),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[repr(i8)]
+pub enum WindowFrameUnits {
+    Rows = 0,
+    Range = 1,
+    Groups = 2,
+}
+
+impl TryFrom<i8> for WindowFrameUnits {
+    type Error = crate::error::Error;
+    fn try_from(v: i8) -> Result<Self, crate::error::Error> {
+        WindowFrameUnits::from_repr(v).ok_or(crate::error::Error::InvalidEnumValue(v as i64))
+    }
+}
+
+impl WindowFrameUnits {
+    pub fn variant_name(&self) -> Option<&'static str> {
+        match self {
+            Self::Rows => Some("Rows"),
+            Self::Range => Some("Range"),
+            Self::Groups => Some("Groups"),
+            _ => None,
+        }
+    }
+}
+
+impl From<WindowFrameUnits> for FbsWindowFrameUnits {
+    fn from(val: WindowFrameUnits) -> Self {
+        match val {
+            WindowFrameUnits::Rows => FbsWindowFrameUnits::Rows,
+            WindowFrameUnits::Range => FbsWindowFrameUnits::Range,
+            WindowFrameUnits::Groups => FbsWindowFrameUnits::Groups,
+        }
+    }
+}
+
+impl From<FbsWindowFrameUnits> for WindowFrameUnits {
+    fn from(fbs: FbsWindowFrameUnits) -> Self {
+        match fbs.0 {
+            0 => Self::Rows,
+            1 => Self::Range,
+            2 => Self::Groups,
+            _ => panic!("Invalid value {} when constructing WindowFrameUnits", fbs.0),
         }
     }
 }
@@ -1183,8 +1290,126 @@ impl crate::FbsSerde for UnsetArgument {
     }
 }
 
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+pub struct WindowFrameBound {
+    pub offset: u64,
+    pub ty: WindowFrameBoundTy,
+}
+
+impl WindowFrameBound {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsWindowFrameBound<'a>> {
+        use crate::types::generated::query_generated::WindowFrameBoundBuilder as FbsWindowFrameBoundBuilder;
+
+        let mut bldr = FbsWindowFrameBoundBuilder::new(builder);
+        bldr.add_offset(self.offset);
+        bldr.add_ty(FbsWindowFrameBoundTy::from(self.ty));
+        bldr.finish()
+    }
+}
+
+impl From<FbsWindowFrameBound<'_>> for WindowFrameBound {
+    fn from(fbs: FbsWindowFrameBound<'_>) -> Self {
+        let offset = fbs.offset();
+        let ty = WindowFrameBoundTy::from(fbs.ty());
+        Self { offset, ty }
+    }
+}
+
+impl crate::FbsSerde for WindowFrameBound {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsWindowFrameBound>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+impl Default for WindowFrameBound {
+    fn default() -> Self {
+        Self {
+            offset: u64::default(),
+            ty: WindowFrameBoundTy::CurrentRow,
+        }
+    }
+}
+
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+pub struct WindowFrame {
+    pub end: WindowFrameBound,
+    pub start: WindowFrameBound,
+    pub units: WindowFrameUnits,
+}
+
+impl WindowFrame {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsWindowFrame<'a>> {
+        use crate::types::generated::query_generated::WindowFrameBuilder as FbsWindowFrameBuilder;
+
+        let end_offset = self.end.serialize_to(builder);
+        let start_offset = self.start.serialize_to(builder);
+
+        let mut bldr = FbsWindowFrameBuilder::new(builder);
+        bldr.add_end(end_offset);
+        bldr.add_start(start_offset);
+        bldr.add_units(FbsWindowFrameUnits::from(self.units));
+        bldr.finish()
+    }
+}
+
+impl From<FbsWindowFrame<'_>> for WindowFrame {
+    fn from(fbs: FbsWindowFrame<'_>) -> Self {
+        let end = WindowFrameBound::from(fbs.end());
+        let start = WindowFrameBound::from(fbs.start());
+        let units = WindowFrameUnits::from(fbs.units());
+        Self { end, start, units }
+    }
+}
+
+impl crate::FbsSerde for WindowFrame {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsWindowFrame>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+impl Default for WindowFrame {
+    fn default() -> Self {
+        Self {
+            end: WindowFrameBound::default(),
+            start: WindowFrameBound::default(),
+            units: WindowFrameUnits::Rows,
+        }
+    }
+}
+
 #[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Window {
+    pub frame: Option<WindowFrame>,
     pub fun: Function,
     pub order_by: Option<Vec<OrderBy>>,
     pub partition: Option<Vec<Expr>>,
@@ -1197,6 +1422,7 @@ impl Window {
     ) -> flatbuffers::WIPOffset<FbsWindow<'a>> {
         use crate::types::generated::query_generated::WindowBuilder as FbsWindowBuilder;
 
+        let frame_offset = self.frame.as_ref().map(|o| o.serialize_to(builder));
         let fun_offset = self.fun.serialize_to(builder);
         let order_by_offset = self.order_by.as_ref().map(|v| {
             let mut order_by_offsets = Vec::with_capacity(v.len());
@@ -1218,6 +1444,9 @@ impl Window {
         });
 
         let mut bldr = FbsWindowBuilder::new(builder);
+        if let Some(offset) = frame_offset {
+            bldr.add_frame(offset);
+        }
         bldr.add_fun(fun_offset);
         if let Some(offset) = order_by_offset {
             bldr.add_order_by(offset);
@@ -1231,6 +1460,7 @@ impl Window {
 
 impl From<FbsWindow<'_>> for Window {
     fn from(fbs: FbsWindow<'_>) -> Self {
+        let frame = fbs.frame().map(WindowFrame::from);
         let fun = Function::from(fbs.fun());
         let order_by = if let Some(val) = fbs.order_by() {
             let mut order_by = Vec::new();
@@ -1255,6 +1485,7 @@ impl From<FbsWindow<'_>> for Window {
         };
 
         Self {
+            frame,
             fun,
             order_by,
             partition,
@@ -4243,6 +4474,22 @@ mod tests {
         let t0 = Window::default();
         let buf = t0.to_fbs_bytes();
         let t1 = Window::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_window_frame() {
+        let t0 = WindowFrame::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = WindowFrame::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_window_frame_bound() {
+        let t0 = WindowFrameBound::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = WindowFrameBound::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 

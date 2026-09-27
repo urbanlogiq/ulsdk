@@ -980,8 +980,122 @@ UnsetArgument::operator==(const UnsetArgument &rhs) const {
     return true;
 }
 
+::flatbuffers::Offset<::WindowFrameBound>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const WindowFrameBound &o) {
+
+    ::WindowFrameBoundBuilder instance_builder = ::WindowFrameBoundBuilder(builder);
+    instance_builder.add_offset(o.offset_);
+    instance_builder.add_ty(o.ty_);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const WindowFrameBound &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+WindowFrameBound::WindowFrameBound()
+    : offset_(0)
+    , ty_(WindowFrameBoundTy(0)) {
+}
+
+WindowFrameBound::WindowFrameBound(const std::vector<uint8_t> &bytes)
+    : WindowFrameBound(::flatbuffers::GetSizePrefixedRoot<::WindowFrameBound>(bytes.data())) {
+}
+
+WindowFrameBound::WindowFrameBound(const ::WindowFrameBound *root) 
+    : offset_(0)
+    , ty_(WindowFrameBoundTy(0)) {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    offset_ = root->offset();
+    ty_ = root->ty();
+}
+
+bool
+WindowFrameBound::operator==(const WindowFrameBound &rhs) const {
+    if (this->offset_ != rhs.offset_) {
+        return false;
+    }
+    if (this->ty_ != rhs.ty_) {
+        return false;
+    }
+    return true;
+}
+
+::flatbuffers::Offset<::WindowFrame>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const WindowFrame &o) {
+    const ::flatbuffers::Offset<::WindowFrameBound> end_offset = serialize_to(builder, o.end_);
+    const ::flatbuffers::Offset<::WindowFrameBound> start_offset = serialize_to(builder, o.start_);
+
+    ::WindowFrameBuilder instance_builder = ::WindowFrameBuilder(builder);
+    instance_builder.add_end(end_offset);
+    instance_builder.add_start(start_offset);
+    instance_builder.add_units(o.units_);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const WindowFrame &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+WindowFrame::WindowFrame()
+    : end_()
+    , start_()
+    , units_(WindowFrameUnits(0)) {
+}
+
+WindowFrame::WindowFrame(const std::vector<uint8_t> &bytes)
+    : WindowFrame(::flatbuffers::GetSizePrefixedRoot<::WindowFrame>(bytes.data())) {
+}
+
+WindowFrame::WindowFrame(const ::WindowFrame *root) 
+    : end_()
+    , start_()
+    , units_(WindowFrameUnits(0)) {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    if (root->end() != nullptr) {
+        end_ = decltype(end_)(root->end());
+    }
+    if (root->start() != nullptr) {
+        start_ = decltype(start_)(root->start());
+    }
+    units_ = root->units();
+}
+
+bool
+WindowFrame::operator==(const WindowFrame &rhs) const {
+    if (this->end_ != rhs.end_) {
+        return false;
+    }
+    if (this->start_ != rhs.start_) {
+        return false;
+    }
+    if (this->units_ != rhs.units_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::Window>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Window &o) {
+    std::optional<::flatbuffers::Offset<::WindowFrame>> frame_offset = std::nullopt;
+    if (o.frame_.has_value()) {
+        const ::flatbuffers::Offset<::WindowFrame> frame_offset_val = serialize_to(builder, o.frame_.value());
+        frame_offset = std::make_optional(frame_offset_val);
+    }
     const ::flatbuffers::Offset<::Function> fun_offset = serialize_to(builder, o.fun_);
     std::optional<::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::OrderBy>>>> order_by_offset = std::nullopt;
     if (o.order_by_.has_value()) {
@@ -1007,6 +1121,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Window &o) {
     }
 
     ::WindowBuilder instance_builder = ::WindowBuilder(builder);
+    if (frame_offset.has_value()) {
+        instance_builder.add_frame(frame_offset.value());
+    }
     instance_builder.add_fun(fun_offset);
     if (order_by_offset.has_value()) {
         instance_builder.add_order_by(order_by_offset.value());
@@ -1026,7 +1143,8 @@ std::vector<uint8_t> to_bytes(const Window &o) {
 }
 
 Window::Window()
-    : fun_()
+    : frame_(std::nullopt)
+    , fun_()
     , order_by_(std::nullopt)
     , partition_(std::nullopt) {
 }
@@ -1036,13 +1154,17 @@ Window::Window(const std::vector<uint8_t> &bytes)
 }
 
 Window::Window(const ::Window *root) 
-    : fun_()
+    : frame_(std::nullopt)
+    , fun_()
     , order_by_(std::nullopt)
     , partition_(std::nullopt) {
     if (root == nullptr) {
         throw std::runtime_error("cannot deserialize flatbuffer type");
     }
 
+    if (root->frame() != nullptr) {
+        frame_ = decltype(frame_)(root->frame());
+    }
     if (root->fun() != nullptr) {
         fun_ = decltype(fun_)(root->fun());
     }
@@ -1068,6 +1190,9 @@ Window::Window(const ::Window *root)
 
 bool
 Window::operator==(const Window &rhs) const {
+    if (this->frame_ != rhs.frame_) {
+        return false;
+    }
     if (this->fun_ != rhs.fun_) {
         return false;
     }

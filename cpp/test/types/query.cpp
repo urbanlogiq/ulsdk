@@ -467,6 +467,26 @@ test_window() {
 TypeTest test_window_obj(test_window, "Window");
 
 bool
+test_window_frame() {
+    ::ul::types::WindowFrame t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::WindowFrame deserialized = ::ul::types::WindowFrame(bytes);
+    return true;
+}
+
+TypeTest test_window_frame_obj(test_window_frame, "WindowFrame");
+
+bool
+test_window_frame_bound() {
+    ::ul::types::WindowFrameBound t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::WindowFrameBound deserialized = ::ul::types::WindowFrameBound(bytes);
+    return true;
+}
+
+TypeTest test_window_frame_bound_obj(test_window_frame_bound, "WindowFrameBound");
+
+bool
 test_worklog_partition() {
     ::ul::types::WorklogPartition t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);

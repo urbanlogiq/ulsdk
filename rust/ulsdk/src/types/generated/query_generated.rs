@@ -152,6 +152,234 @@ impl flatbuffers::SimpleToVerifyInSlice for TypeHint {}
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
+pub const ENUM_MIN_WINDOW_FRAME_UNITS: i8 = 0;
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+pub const ENUM_MAX_WINDOW_FRAME_UNITS: i8 = 2;
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+#[allow(non_camel_case_types)]
+pub const ENUM_VALUES_WINDOW_FRAME_UNITS: [WindowFrameUnits; 3] = [
+    WindowFrameUnits::Rows,
+    WindowFrameUnits::Range,
+    WindowFrameUnits::Groups,
+];
+
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+#[repr(transparent)]
+pub struct WindowFrameUnits(pub i8);
+#[allow(non_upper_case_globals)]
+impl WindowFrameUnits {
+    pub const Rows: Self = Self(0);
+    pub const Range: Self = Self(1);
+    pub const Groups: Self = Self(2);
+
+    pub const ENUM_MIN: i8 = 0;
+    pub const ENUM_MAX: i8 = 2;
+    pub const ENUM_VALUES: &'static [Self] = &[Self::Rows, Self::Range, Self::Groups];
+    /// Returns the variant's name or "" if unknown.
+    pub fn variant_name(self) -> Option<&'static str> {
+        match self {
+            Self::Rows => Some("Rows"),
+            Self::Range => Some("Range"),
+            Self::Groups => Some("Groups"),
+            _ => None,
+        }
+    }
+}
+impl core::fmt::Debug for WindowFrameUnits {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        if let Some(name) = self.variant_name() {
+            f.write_str(name)
+        } else {
+            f.write_fmt(format_args!("<UNKNOWN {:?}>", self.0))
+        }
+    }
+}
+impl Serialize for WindowFrameUnits {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_unit_variant(
+            "WindowFrameUnits",
+            self.0 as u32,
+            self.variant_name().unwrap(),
+        )
+    }
+}
+
+impl<'a> flatbuffers::Follow<'a> for WindowFrameUnits {
+    type Inner = Self;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        let b = flatbuffers::read_scalar_at::<i8>(buf, loc);
+        Self(b)
+    }
+}
+
+impl flatbuffers::Push for WindowFrameUnits {
+    type Output = WindowFrameUnits;
+    #[inline]
+    unsafe fn push(&self, dst: &mut [u8], _written_len: usize) {
+        flatbuffers::emplace_scalar::<i8>(dst, self.0);
+    }
+}
+
+impl flatbuffers::EndianScalar for WindowFrameUnits {
+    type Scalar = i8;
+    #[inline]
+    fn to_little_endian(self) -> i8 {
+        self.0.to_le()
+    }
+    #[inline]
+    #[allow(clippy::wrong_self_convention)]
+    fn from_little_endian(v: i8) -> Self {
+        let b = i8::from_le(v);
+        Self(b)
+    }
+}
+
+impl<'a> flatbuffers::Verifiable for WindowFrameUnits {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        i8::run_verifier(v, pos)
+    }
+}
+
+impl flatbuffers::SimpleToVerifyInSlice for WindowFrameUnits {}
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+pub const ENUM_MIN_WINDOW_FRAME_BOUND_TY: i8 = 0;
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+pub const ENUM_MAX_WINDOW_FRAME_BOUND_TY: i8 = 4;
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+#[allow(non_camel_case_types)]
+pub const ENUM_VALUES_WINDOW_FRAME_BOUND_TY: [WindowFrameBoundTy; 5] = [
+    WindowFrameBoundTy::CurrentRow,
+    WindowFrameBoundTy::Preceding,
+    WindowFrameBoundTy::Following,
+    WindowFrameBoundTy::UnboundedPreceding,
+    WindowFrameBoundTy::UnboundedFollowing,
+];
+
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+#[repr(transparent)]
+pub struct WindowFrameBoundTy(pub i8);
+#[allow(non_upper_case_globals)]
+impl WindowFrameBoundTy {
+    pub const CurrentRow: Self = Self(0);
+    pub const Preceding: Self = Self(1);
+    pub const Following: Self = Self(2);
+    pub const UnboundedPreceding: Self = Self(3);
+    pub const UnboundedFollowing: Self = Self(4);
+
+    pub const ENUM_MIN: i8 = 0;
+    pub const ENUM_MAX: i8 = 4;
+    pub const ENUM_VALUES: &'static [Self] = &[
+        Self::CurrentRow,
+        Self::Preceding,
+        Self::Following,
+        Self::UnboundedPreceding,
+        Self::UnboundedFollowing,
+    ];
+    /// Returns the variant's name or "" if unknown.
+    pub fn variant_name(self) -> Option<&'static str> {
+        match self {
+            Self::CurrentRow => Some("CurrentRow"),
+            Self::Preceding => Some("Preceding"),
+            Self::Following => Some("Following"),
+            Self::UnboundedPreceding => Some("UnboundedPreceding"),
+            Self::UnboundedFollowing => Some("UnboundedFollowing"),
+            _ => None,
+        }
+    }
+}
+impl core::fmt::Debug for WindowFrameBoundTy {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        if let Some(name) = self.variant_name() {
+            f.write_str(name)
+        } else {
+            f.write_fmt(format_args!("<UNKNOWN {:?}>", self.0))
+        }
+    }
+}
+impl Serialize for WindowFrameBoundTy {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_unit_variant(
+            "WindowFrameBoundTy",
+            self.0 as u32,
+            self.variant_name().unwrap(),
+        )
+    }
+}
+
+impl<'a> flatbuffers::Follow<'a> for WindowFrameBoundTy {
+    type Inner = Self;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        let b = flatbuffers::read_scalar_at::<i8>(buf, loc);
+        Self(b)
+    }
+}
+
+impl flatbuffers::Push for WindowFrameBoundTy {
+    type Output = WindowFrameBoundTy;
+    #[inline]
+    unsafe fn push(&self, dst: &mut [u8], _written_len: usize) {
+        flatbuffers::emplace_scalar::<i8>(dst, self.0);
+    }
+}
+
+impl flatbuffers::EndianScalar for WindowFrameBoundTy {
+    type Scalar = i8;
+    #[inline]
+    fn to_little_endian(self) -> i8 {
+        self.0.to_le()
+    }
+    #[inline]
+    #[allow(clippy::wrong_self_convention)]
+    fn from_little_endian(v: i8) -> Self {
+        let b = i8::from_le(v);
+        Self(b)
+    }
+}
+
+impl<'a> flatbuffers::Verifiable for WindowFrameBoundTy {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        i8::run_verifier(v, pos)
+    }
+}
+
+impl flatbuffers::SimpleToVerifyInSlice for WindowFrameBoundTy {}
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
 pub const ENUM_MIN_EXPR_UNION: u8 = 0;
 #[deprecated(
     since = "2.0.0",
@@ -2949,6 +3177,335 @@ impl core::fmt::Debug for OrderByExpr<'_> {
         ds.finish()
     }
 }
+pub enum WindowFrameBoundOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct WindowFrameBound<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for WindowFrameBound<'a> {
+    type Inner = WindowFrameBound<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> WindowFrameBound<'a> {
+    pub const VT_TY: flatbuffers::VOffsetT = 4;
+    pub const VT_OFFSET: flatbuffers::VOffsetT = 6;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        WindowFrameBound { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args WindowFrameBoundArgs,
+    ) -> flatbuffers::WIPOffset<WindowFrameBound<'bldr>> {
+        let mut builder = WindowFrameBoundBuilder::new(_fbb);
+        builder.add_offset(args.offset);
+        builder.add_ty(args.ty);
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn ty(&self) -> WindowFrameBoundTy {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<WindowFrameBoundTy>(
+                    WindowFrameBound::VT_TY,
+                    Some(WindowFrameBoundTy::CurrentRow),
+                )
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn offset(&self) -> u64 {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<u64>(WindowFrameBound::VT_OFFSET, Some(0))
+                .unwrap()
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for WindowFrameBound<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<WindowFrameBoundTy>("ty", Self::VT_TY, false)?
+            .visit_field::<u64>("offset", Self::VT_OFFSET, false)?
+            .finish();
+        Ok(())
+    }
+}
+pub struct WindowFrameBoundArgs {
+    pub ty: WindowFrameBoundTy,
+    pub offset: u64,
+}
+impl<'a> Default for WindowFrameBoundArgs {
+    #[inline]
+    fn default() -> Self {
+        WindowFrameBoundArgs {
+            ty: WindowFrameBoundTy::CurrentRow,
+            offset: 0,
+        }
+    }
+}
+
+impl Serialize for WindowFrameBound<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("WindowFrameBound", 2)?;
+        s.serialize_field("ty", &self.ty())?;
+        s.serialize_field("offset", &self.offset())?;
+        s.end()
+    }
+}
+
+pub struct WindowFrameBoundBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> WindowFrameBoundBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_ty(&mut self, ty: WindowFrameBoundTy) {
+        self.fbb_.push_slot::<WindowFrameBoundTy>(
+            WindowFrameBound::VT_TY,
+            ty,
+            WindowFrameBoundTy::CurrentRow,
+        );
+    }
+    #[inline]
+    pub fn add_offset(&mut self, offset: u64) {
+        self.fbb_
+            .push_slot::<u64>(WindowFrameBound::VT_OFFSET, offset, 0);
+    }
+    #[inline]
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> WindowFrameBoundBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        WindowFrameBoundBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<WindowFrameBound<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for WindowFrameBound<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("WindowFrameBound");
+        ds.field("ty", &self.ty());
+        ds.field("offset", &self.offset());
+        ds.finish()
+    }
+}
+pub enum WindowFrameOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct WindowFrame<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for WindowFrame<'a> {
+    type Inner = WindowFrame<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> WindowFrame<'a> {
+    pub const VT_UNITS: flatbuffers::VOffsetT = 4;
+    pub const VT_START: flatbuffers::VOffsetT = 6;
+    pub const VT_END: flatbuffers::VOffsetT = 8;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        WindowFrame { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args WindowFrameArgs<'args>,
+    ) -> flatbuffers::WIPOffset<WindowFrame<'bldr>> {
+        let mut builder = WindowFrameBuilder::new(_fbb);
+        if let Some(x) = args.end {
+            builder.add_end(x);
+        }
+        if let Some(x) = args.start {
+            builder.add_start(x);
+        }
+        builder.add_units(args.units);
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn units(&self) -> WindowFrameUnits {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<WindowFrameUnits>(WindowFrame::VT_UNITS, Some(WindowFrameUnits::Rows))
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn start(&self) -> WindowFrameBound<'a> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<WindowFrameBound>>(WindowFrame::VT_START, None)
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn end(&self) -> WindowFrameBound<'a> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<WindowFrameBound>>(WindowFrame::VT_END, None)
+                .unwrap()
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for WindowFrame<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<WindowFrameUnits>("units", Self::VT_UNITS, false)?
+            .visit_field::<flatbuffers::ForwardsUOffset<WindowFrameBound>>(
+                "start",
+                Self::VT_START,
+                true,
+            )?
+            .visit_field::<flatbuffers::ForwardsUOffset<WindowFrameBound>>(
+                "end",
+                Self::VT_END,
+                true,
+            )?
+            .finish();
+        Ok(())
+    }
+}
+pub struct WindowFrameArgs<'a> {
+    pub units: WindowFrameUnits,
+    pub start: Option<flatbuffers::WIPOffset<WindowFrameBound<'a>>>,
+    pub end: Option<flatbuffers::WIPOffset<WindowFrameBound<'a>>>,
+}
+impl<'a> Default for WindowFrameArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        WindowFrameArgs {
+            units: WindowFrameUnits::Rows,
+            start: None, // required field
+            end: None,   // required field
+        }
+    }
+}
+
+impl Serialize for WindowFrame<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("WindowFrame", 3)?;
+        s.serialize_field("units", &self.units())?;
+        s.serialize_field("start", &self.start())?;
+        s.serialize_field("end", &self.end())?;
+        s.end()
+    }
+}
+
+pub struct WindowFrameBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> WindowFrameBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_units(&mut self, units: WindowFrameUnits) {
+        self.fbb_.push_slot::<WindowFrameUnits>(
+            WindowFrame::VT_UNITS,
+            units,
+            WindowFrameUnits::Rows,
+        );
+    }
+    #[inline]
+    pub fn add_start(&mut self, start: flatbuffers::WIPOffset<WindowFrameBound<'b>>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<WindowFrameBound>>(
+                WindowFrame::VT_START,
+                start,
+            );
+    }
+    #[inline]
+    pub fn add_end(&mut self, end: flatbuffers::WIPOffset<WindowFrameBound<'b>>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<WindowFrameBound>>(WindowFrame::VT_END, end);
+    }
+    #[inline]
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> WindowFrameBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        WindowFrameBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<WindowFrame<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_.required(o, WindowFrame::VT_START, "start");
+        self.fbb_.required(o, WindowFrame::VT_END, "end");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for WindowFrame<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("WindowFrame");
+        ds.field("units", &self.units());
+        ds.field("start", &self.start());
+        ds.field("end", &self.end());
+        ds.finish()
+    }
+}
 pub enum WindowOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -2970,6 +3527,7 @@ impl<'a> Window<'a> {
     pub const VT_FUN: flatbuffers::VOffsetT = 4;
     pub const VT_PARTITION: flatbuffers::VOffsetT = 6;
     pub const VT_ORDER_BY: flatbuffers::VOffsetT = 8;
+    pub const VT_FRAME: flatbuffers::VOffsetT = 10;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -2981,6 +3539,9 @@ impl<'a> Window<'a> {
         args: &'args WindowArgs<'args>,
     ) -> flatbuffers::WIPOffset<Window<'bldr>> {
         let mut builder = WindowBuilder::new(_fbb);
+        if let Some(x) = args.frame {
+            builder.add_frame(x);
+        }
         if let Some(x) = args.order_by {
             builder.add_order_by(x);
         }
@@ -3030,6 +3591,16 @@ impl<'a> Window<'a> {
             >>(Window::VT_ORDER_BY, None)
         }
     }
+    #[inline]
+    pub fn frame(&self) -> Option<WindowFrame<'a>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<WindowFrame>>(Window::VT_FRAME, None)
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for Window<'_> {
@@ -3047,6 +3618,11 @@ impl flatbuffers::Verifiable for Window<'_> {
             .visit_field::<flatbuffers::ForwardsUOffset<
                 flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<OrderBy>>,
             >>("order_by", Self::VT_ORDER_BY, false)?
+            .visit_field::<flatbuffers::ForwardsUOffset<WindowFrame>>(
+                "frame",
+                Self::VT_FRAME,
+                false,
+            )?
             .finish();
         Ok(())
     }
@@ -3059,6 +3635,7 @@ pub struct WindowArgs<'a> {
     pub order_by: Option<
         flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<OrderBy<'a>>>>,
     >,
+    pub frame: Option<flatbuffers::WIPOffset<WindowFrame<'a>>>,
 }
 impl<'a> Default for WindowArgs<'a> {
     #[inline]
@@ -3067,6 +3644,7 @@ impl<'a> Default for WindowArgs<'a> {
             fun: None, // required field
             partition: None,
             order_by: None,
+            frame: None,
         }
     }
 }
@@ -3076,7 +3654,7 @@ impl Serialize for Window<'_> {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("Window", 3)?;
+        let mut s = serializer.serialize_struct("Window", 4)?;
         s.serialize_field("fun", &self.fun())?;
         if let Some(f) = self.partition() {
             s.serialize_field("partition", &f)?;
@@ -3087,6 +3665,11 @@ impl Serialize for Window<'_> {
             s.serialize_field("order_by", &f)?;
         } else {
             s.skip_field("order_by")?;
+        }
+        if let Some(f) = self.frame() {
+            s.serialize_field("frame", &f)?;
+        } else {
+            s.skip_field("frame")?;
         }
         s.end()
     }
@@ -3123,6 +3706,11 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> WindowBuilder<'a, 'b, A> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(Window::VT_ORDER_BY, order_by);
     }
     #[inline]
+    pub fn add_frame(&mut self, frame: flatbuffers::WIPOffset<WindowFrame<'b>>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<WindowFrame>>(Window::VT_FRAME, frame);
+    }
+    #[inline]
     pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> WindowBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         WindowBuilder {
@@ -3144,6 +3732,7 @@ impl core::fmt::Debug for Window<'_> {
         ds.field("fun", &self.fun());
         ds.field("partition", &self.partition());
         ds.field("order_by", &self.order_by());
+        ds.field("frame", &self.frame());
         ds.finish()
     }
 }

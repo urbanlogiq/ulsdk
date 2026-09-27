@@ -85,8 +85,19 @@ class Window(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
+    # Window
+    def Frame(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        if o != 0:
+            x = self._tab.Indirect(o + self._tab.Pos)
+            from .WindowFrame import WindowFrame
+            obj = WindowFrame()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
 def WindowStart(builder):
-    builder.StartObject(3)
+    builder.StartObject(4)
 
 def Start(builder):
     WindowStart(builder)
@@ -120,6 +131,12 @@ def WindowStartOrderByVector(builder, numElems):
 
 def StartOrderByVector(builder, numElems):
     return WindowStartOrderByVector(builder, numElems)
+
+def WindowAddFrame(builder, frame):
+    builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(frame), 0)
+
+def AddFrame(builder, frame):
+    WindowAddFrame(builder, frame)
 
 def WindowEnd(builder):
     return builder.EndObject()

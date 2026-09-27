@@ -70,6 +70,8 @@ struct Values;
 struct Vector;
 struct When;
 struct Window;
+struct WindowFrame;
+struct WindowFrameBound;
 struct WorklogPartition;
 
 typedef std::variant<
@@ -127,6 +129,8 @@ typedef std::variant<
 > TableSourceUnion;
 
 using ::TypeHint;
+using ::WindowFrameBoundTy;
+using ::WindowFrameUnits;
 struct AddCol {
     std::optional<ValueInstance> default_;
     Field field_;
@@ -321,7 +325,35 @@ struct UnsetArgument {
     }
 };
 
+struct WindowFrameBound {
+    uint64_t offset_;
+    WindowFrameBoundTy ty_;
+
+    WindowFrameBound();
+    WindowFrameBound(const ::WindowFrameBound *root);
+    WindowFrameBound(const std::vector<uint8_t> &bytes);
+    bool operator==(const WindowFrameBound &rhs) const;
+    bool operator!=(const WindowFrameBound &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+struct WindowFrame {
+    WindowFrameBound end_;
+    WindowFrameBound start_;
+    WindowFrameUnits units_;
+
+    WindowFrame();
+    WindowFrame(const ::WindowFrame *root);
+    WindowFrame(const std::vector<uint8_t> &bytes);
+    bool operator==(const WindowFrame &rhs) const;
+    bool operator!=(const WindowFrame &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
 struct Window {
+    std::optional<WindowFrame> frame_;
     Function fun_;
     std::optional<std::vector<OrderBy>> order_by_;
     std::optional<std::vector<Expr>> partition_;
@@ -862,6 +894,12 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Partition &);
 ::flatbuffers::Offset<::UnsetArgument>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UnsetArgument &);
 
+::flatbuffers::Offset<::WindowFrameBound>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const WindowFrameBound &);
+
+::flatbuffers::Offset<::WindowFrame>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const WindowFrame &);
+
 ::flatbuffers::Offset<::Window>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Window &);
 
@@ -1003,6 +1041,12 @@ to_bytes(const Partition &o);
 
 std::vector<uint8_t>
 to_bytes(const UnsetArgument &o);
+
+std::vector<uint8_t>
+to_bytes(const WindowFrameBound &o);
+
+std::vector<uint8_t>
+to_bytes(const WindowFrame &o);
 
 std::vector<uint8_t>
 to_bytes(const Window &o);

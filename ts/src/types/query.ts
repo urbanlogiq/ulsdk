@@ -56,6 +56,8 @@ import { Values as FbsValues, ValuesT as FbsValuesT } from './generated/values';
 import { Vector as FbsVector, VectorT as FbsVectorT } from './generated/vector';
 import { When as FbsWhen, WhenT as FbsWhenT } from './generated/when';
 import { Window as FbsWindow, WindowT as FbsWindowT } from './generated/window';
+import { WindowFrame as FbsWindowFrame, WindowFrameT as FbsWindowFrameT } from './generated/window-frame';
+import { WindowFrameBound as FbsWindowFrameBound, WindowFrameBoundT as FbsWindowFrameBoundT } from './generated/window-frame-bound';
 import { WorklogPartition as FbsWorklogPartition, WorklogPartitionT as FbsWorklogPartitionT } from './generated/worklog-partition';
 
 import { Binary, BinaryView, Bool, Buffer, Date, DateUnit, Decimal, DictionaryEncoding, DictionaryKind, Duration, Endianness, Feature, Field, FixedSizeBinary, FixedSizeList, FloatingPoint, Int, Interval, IntervalUnit, KeyValue, LargeBinary, LargeList, LargeListView, LargeUtf8, List, ListView, Map, MetadataVersion, Null, Precision, RunEndEncoded, Schema, Struct_, Time, TimeUnit, Timestamp, Type, Union, UnionMode, Utf8, Utf8View } from './Schema';
@@ -922,7 +924,132 @@ export class UnsetArgument {
   }
 }
 
+export class WindowFrameBound {
+  private _offset!: bigint;
+
+  private _ty!: number;
+
+  constructor(arg?: FbsWindowFrameBound | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsWindowFrameBound.getSizePrefixedRootAsWindowFrameBound(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsWindowFrameBound) {
+      this._initFromFbs(arg);
+    } else {
+      this._offset = BigInt(0);
+      this._ty = 0;
+    }
+  }
+
+  private _initFromFbs(fbs: FbsWindowFrameBound): void {
+    this._offset = fbs.offset();
+    this._ty = fbs.ty();
+  }
+
+  get offset(): bigint {
+    return this._offset;
+  }
+
+  set offset(value: bigint) {
+    this._offset = value;
+  }
+
+  get ty(): number {
+    return this._ty;
+  }
+
+  set ty(value: number) {
+    this._ty = value;
+  }
+
+  toFbsT(): FbsWindowFrameBoundT {
+    const t = new FbsWindowFrameBoundT();
+    t.offset = this._offset;
+    t.ty = this._ty;
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+}
+
+export class WindowFrame {
+  private _end!: WindowFrameBound;
+
+  private _start!: WindowFrameBound;
+
+  private _units!: number;
+
+  constructor(arg?: FbsWindowFrame | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsWindowFrame.getSizePrefixedRootAsWindowFrame(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsWindowFrame) {
+      this._initFromFbs(arg);
+    } else {
+      this._end = new WindowFrameBound();
+      this._start = new WindowFrameBound();
+      this._units = 0;
+    }
+  }
+
+  private _initFromFbs(fbs: FbsWindowFrame): void {
+    const endVal = fbs.end();
+    this._end = endVal ? new WindowFrameBound(endVal) : new WindowFrameBound();
+    const startVal = fbs.start();
+    this._start = startVal ? new WindowFrameBound(startVal) : new WindowFrameBound();
+    this._units = fbs.units();
+  }
+
+  get end(): WindowFrameBound {
+    return this._end;
+  }
+
+  set end(value: WindowFrameBound) {
+    this._end = value;
+  }
+
+  get start(): WindowFrameBound {
+    return this._start;
+  }
+
+  set start(value: WindowFrameBound) {
+    this._start = value;
+  }
+
+  get units(): number {
+    return this._units;
+  }
+
+  set units(value: number) {
+    this._units = value;
+  }
+
+  toFbsT(): FbsWindowFrameT {
+    const t = new FbsWindowFrameT();
+    t.end = this._end.toFbsT();
+    t.start = this._start.toFbsT();
+    t.units = this._units;
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+}
+
 export class Window {
+  private _frame!: WindowFrame | null;
+
   private _fun!: Function;
 
   private _orderBy!: OrderBy[] | null;
@@ -937,6 +1064,7 @@ export class Window {
     } else if (arg instanceof FbsWindow) {
       this._initFromFbs(arg);
     } else {
+      this._frame = null;
       this._fun = new Function();
       this._orderBy = null;
       this._partition = null;
@@ -944,6 +1072,8 @@ export class Window {
   }
 
   private _initFromFbs(fbs: FbsWindow): void {
+    const frameVal = fbs.frame();
+    this._frame = frameVal ? new WindowFrame(frameVal) : null;
     const funVal = fbs.fun();
     this._fun = funVal ? new Function(funVal) : new Function();
     if (fbs.orderByLength() > 0) {
@@ -962,6 +1092,14 @@ export class Window {
     } else {
       this._partition = null;
     }
+  }
+
+  get frame(): WindowFrame | null {
+    return this._frame;
+  }
+
+  set frame(value: WindowFrame | null) {
+    this._frame = value;
   }
 
   get fun(): Function {
@@ -990,6 +1128,7 @@ export class Window {
 
   toFbsT(): FbsWindowT {
     const t = new FbsWindowT();
+    t.frame = this._frame ? this._frame.toFbsT() : null;
     t.fun = this._fun.toFbsT();
     t.orderBy = this._orderBy ? this._orderBy.map(item => item.toFbsT()) : [];
     t.partition = this._partition ? this._partition.map(item => item.toFbsT()) : [];
@@ -2895,6 +3034,10 @@ export class AlterTableElement {
 export type QueryElementUnion = UnaryQueryElement | BinaryQueryElement | UpdateQueryElement | DeleteQueryElement | InsertQueryElement | AlterTableElement;
 
 export { TypeHint } from './generated/type-hint';
+
+export { WindowFrameBoundTy } from './generated/window-frame-bound-ty';
+
+export { WindowFrameUnits } from './generated/window-frame-units';
 
 export class AlterTableOperation {
   private _op!: AlterTableOperationUnion | null;

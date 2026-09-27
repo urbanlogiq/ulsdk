@@ -5,6 +5,14 @@
 package com.urbanlogiq.ulsdk.types;
 
 public final class Window {
+    com.urbanlogiq.ulsdk.types.WindowFrame _frame;
+    public com.urbanlogiq.ulsdk.types.WindowFrame getFrame() {
+        return this._frame;
+    }
+    public void setFrame(com.urbanlogiq.ulsdk.types.WindowFrame value) {
+        this._frame = value;
+    }
+
     com.urbanlogiq.ulsdk.types.Function _fun;
     public com.urbanlogiq.ulsdk.types.Function getFun() {
         return this._fun;
@@ -30,6 +38,9 @@ public final class Window {
     }
 
     public Window(com.urbanlogiq.ulsdk.types.generated.Window o) {
+        if (o.frame() != null) {
+            this._frame = new com.urbanlogiq.ulsdk.types.WindowFrame(o.frame());
+        }
         this._fun = new com.urbanlogiq.ulsdk.types.Function(o.fun());
         if (o.orderByVector() != null) {
             com.urbanlogiq.ulsdk.types.OrderBy[] orderBy = new com.urbanlogiq.ulsdk.types.OrderBy[o.orderByLength()];
@@ -60,6 +71,10 @@ public final class Window {
     }
 
     public int serializeTo(com.google.flatbuffers.FlatBufferBuilder builder) {
+        Integer frameOffset = null;
+        if (this._frame != null) {
+            frameOffset = this._frame.serializeTo(builder);
+        }
         int funOffset = this._fun.serializeTo(builder);
         Integer orderByOffset = null;
         if (this._orderBy != null) {
@@ -86,6 +101,9 @@ public final class Window {
             partitionOffset = builder.endVector();
         }
         com.urbanlogiq.ulsdk.types.generated.Window.startWindow(builder);
+        if (frameOffset != null) {
+            com.urbanlogiq.ulsdk.types.generated.Window.addFrame(builder, frameOffset);
+        }
         com.urbanlogiq.ulsdk.types.generated.Window.addFun(builder, funOffset);
         if (orderByOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.Window.addOrderBy(builder, orderByOffset);
@@ -104,6 +122,7 @@ public final class Window {
     }
 
     public Window() {
+        this._frame = new com.urbanlogiq.ulsdk.types.WindowFrame();
         this._fun = new com.urbanlogiq.ulsdk.types.Function();
         this._orderBy = new com.urbanlogiq.ulsdk.types.OrderBy[0];
         this._partition = new com.urbanlogiq.ulsdk.types.Expr[0];

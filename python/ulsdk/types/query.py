@@ -268,6 +268,8 @@ from .generated.Values import Values as FbsValues
 from .generated.Vector import Vector as FbsVector
 from .generated.When import When as FbsWhen
 from .generated.Window import Window as FbsWindow
+from .generated.WindowFrame import WindowFrame as FbsWindowFrame
+from .generated.WindowFrameBound import WindowFrameBound as FbsWindowFrameBound
 from .generated.WorklogPartition import WorklogPartition as FbsWorklogPartition
 from .generated.AlterTableOperationUnion import AlterTableOperationUnion as FbsAlterTableOperationUnion
 from .generated.ConflictAction import ConflictAction as FbsConflictAction
@@ -307,6 +309,18 @@ class TypeHint(Enum):
     TimestampNanos = 2
     Base64 = 3
     Uuid = 4
+
+class WindowFrameBoundTy(Enum):
+    CurrentRow = 0
+    Preceding = 1
+    Following = 2
+    UnboundedPreceding = 3
+    UnboundedFollowing = 4
+
+class WindowFrameUnits(Enum):
+    Rows = 0
+    Range = 1
+    Groups = 2
 
 
 @dataclass
@@ -1196,7 +1210,126 @@ class UnsetArgument:
         return eq
 
 @dataclass
+class WindowFrameBound:
+    offset: "int"
+
+    ty: "WindowFrameBoundTy"
+
+    @classmethod
+    def from_fbs(cls, o: FbsWindowFrameBound) -> Self:
+        offset = o.Offset()
+        ty = WindowFrameBoundTy(o.Ty())
+        return cls(offset, ty)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsWindowFrameBound.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.WindowFrameBound import (
+            Start,
+            AddOffset,
+            AddTy,
+            End,
+        )
+
+        Start(builder)
+        AddOffset(builder, self.offset)
+        AddTy(builder, self.ty.value)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        offset = 0
+        ty = WindowFrameBoundTy(0)
+        return cls(offset, ty)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.offset == other.offset
+        eq = eq and self.ty == other.ty
+
+        return eq
+
+@dataclass
+class WindowFrame:
+    end: "WindowFrameBound"
+
+    start: "WindowFrameBound"
+
+    units: "WindowFrameUnits"
+
+    @classmethod
+    def from_fbs(cls, o: FbsWindowFrame) -> Self:
+        end_obj = o.End()
+        if end_obj is not None:
+            end = WindowFrameBound.from_fbs(end_obj)
+        else:
+            raise ValueError("End is required")
+        start_obj = o.Start()
+        if start_obj is not None:
+            start = WindowFrameBound.from_fbs(start_obj)
+        else:
+            raise ValueError("Start is required")
+        units = WindowFrameUnits(o.Units())
+        return cls(end, start, units)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsWindowFrame.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.WindowFrame import (
+            Start,
+            AddEnd,
+            AddStart,
+            AddUnits,
+            End,
+        )
+        end_offset = self.end.serialize_to(builder)
+        start_offset = self.start.serialize_to(builder)
+
+        Start(builder)
+        AddEnd(builder, end_offset)
+        AddStart(builder, start_offset)
+        AddUnits(builder, self.units.value)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        end = WindowFrameBound.make_default()
+        start = WindowFrameBound.make_default()
+        units = WindowFrameUnits(0)
+        return cls(end, start, units)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.end == other.end
+        eq = eq and self.start == other.start
+        eq = eq and self.units == other.units
+
+        return eq
+
+@dataclass
 class Window:
+    frame: Optional["WindowFrame"]
+
     fun: "Function"
 
     order_by: Optional["List[OrderBy]"]
@@ -1205,6 +1338,10 @@ class Window:
 
     @classmethod
     def from_fbs(cls, o: FbsWindow) -> Self:
+        frame = None
+        frame_obj = o.Frame()
+        if frame_obj is not None:
+            frame = WindowFrame.from_fbs(frame_obj)
         fun_obj = o.Fun()
         if fun_obj is not None:
             fun = Function.from_fbs(fun_obj)
@@ -1226,7 +1363,7 @@ class Window:
                 if partition_obj is not None:
                     partition_val = Expr.from_fbs(partition_obj)
                 partition.append(partition_val)
-        return cls(fun, order_by, partition)
+        return cls(frame, fun, order_by, partition)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -1237,6 +1374,7 @@ class Window:
     def serialize_to(self, builder: Builder) -> int:
         from .generated.Window import (
             Start,
+            AddFrame,
             AddFun,
             AddOrderBy,
             StartOrderByVector,
@@ -1244,6 +1382,9 @@ class Window:
             StartPartitionVector,
             End,
         )
+        frame_offset = None
+        if self.frame is not None:
+            frame_offset = self.frame.serialize_to(builder)
         fun_offset = self.fun.serialize_to(builder)
         order_by_offset = None
         if self.order_by is not None:
@@ -1265,6 +1406,8 @@ class Window:
             partition_offset = builder.EndVector()
 
         Start(builder)
+        if frame_offset is not None:
+            AddFrame(builder, frame_offset)
         AddFun(builder, fun_offset)
         if order_by_offset is not None:
             AddOrderBy(builder, order_by_offset)
@@ -1280,13 +1423,15 @@ class Window:
 
     @classmethod
     def make_default(cls) -> Self:
+        frame = WindowFrame.make_default()
         fun = Function.make_default()
         order_by = []
         partition = []
-        return cls(fun, order_by, partition)
+        return cls(frame, fun, order_by, partition)
 
     def __eq__(self, other) -> bool:
         eq = True
+        eq = eq and self.frame == other.frame
         eq = eq and self.fun == other.fun
         self_order_by = self.order_by
         other_order_by = other.order_by

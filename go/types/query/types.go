@@ -600,7 +600,85 @@ func (o *UnsetArgument) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UO
 	return generated.UnsetArgumentEnd(builder)
 }
 
+type WindowFrameBound struct {
+	Offset uint64
+	Ty int8
+}
+
+func WindowFrameBoundFromFbs(fbs *generated.WindowFrameBound) *WindowFrameBound {
+	o := &WindowFrameBound{}
+	o.Offset = fbs.Offset()
+	o.Ty = int8(fbs.Ty())
+	return o
+}
+
+// WindowFrameBoundFromBytes deserializes a WindowFrameBound from size-prefixed FlatBuffer bytes.
+func WindowFrameBoundFromBytes(data []byte) (*WindowFrameBound, error) {
+	fbs := generated.GetSizePrefixedRootAsWindowFrameBound(data, 0)
+	return WindowFrameBoundFromFbs(fbs), nil
+}
+
+// ToBytes serializes the WindowFrameBound to size-prefixed FlatBuffer bytes.
+func (o *WindowFrameBound) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the WindowFrameBound into a FlatBuffer builder and returns the offset.
+func (o *WindowFrameBound) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	generated.WindowFrameBoundStart(builder)
+	generated.WindowFrameBoundAddOffset(builder, o.Offset)
+	generated.WindowFrameBoundAddTy(builder, generated.WindowFrameBoundTy(o.Ty))
+	return generated.WindowFrameBoundEnd(builder)
+}
+
+type WindowFrame struct {
+	End WindowFrameBound
+	Start WindowFrameBound
+	Units int8
+}
+
+func WindowFrameFromFbs(fbs *generated.WindowFrame) *WindowFrame {
+	o := &WindowFrame{}
+	if fbsVal := fbs.End(nil); fbsVal != nil {
+		o.End = *WindowFrameBoundFromFbs(fbsVal)
+	}
+	if fbsVal := fbs.Start(nil); fbsVal != nil {
+		o.Start = *WindowFrameBoundFromFbs(fbsVal)
+	}
+	o.Units = int8(fbs.Units())
+	return o
+}
+
+// WindowFrameFromBytes deserializes a WindowFrame from size-prefixed FlatBuffer bytes.
+func WindowFrameFromBytes(data []byte) (*WindowFrame, error) {
+	fbs := generated.GetSizePrefixedRootAsWindowFrame(data, 0)
+	return WindowFrameFromFbs(fbs), nil
+}
+
+// ToBytes serializes the WindowFrame to size-prefixed FlatBuffer bytes.
+func (o *WindowFrame) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the WindowFrame into a FlatBuffer builder and returns the offset.
+func (o *WindowFrame) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	endOffset := o.End.SerializeTo(builder)
+	startOffset := o.Start.SerializeTo(builder)
+	generated.WindowFrameStart(builder)
+	generated.WindowFrameAddEnd(builder, endOffset)
+	generated.WindowFrameAddStart(builder, startOffset)
+	generated.WindowFrameAddUnits(builder, generated.WindowFrameUnits(o.Units))
+	return generated.WindowFrameEnd(builder)
+}
+
 type Window struct {
+	Frame *WindowFrame
 	Fun Function
 	OrderBy []graph.OrderBy
 	Partition []Expr
@@ -608,6 +686,9 @@ type Window struct {
 
 func WindowFromFbs(fbs *generated.Window) *Window {
 	o := &Window{}
+	if fbsVal := fbs.Frame(nil); fbsVal != nil {
+		o.Frame = WindowFrameFromFbs(fbsVal)
+	}
 	if fbsVal := fbs.Fun(nil); fbsVal != nil {
 		o.Fun = *FunctionFromFbs(fbsVal)
 	}
@@ -642,6 +723,10 @@ func (o *Window) ToBytes() []byte {
 
 // SerializeTo writes the Window into a FlatBuffer builder and returns the offset.
 func (o *Window) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var frameOffset flatbuffers.UOffsetT
+	if o.Frame != nil {
+		frameOffset = o.Frame.SerializeTo(builder)
+	}
 	funOffset := o.Fun.SerializeTo(builder)
 	orderByOffsets := make([]flatbuffers.UOffsetT, len(o.OrderBy))
 	for i := range o.OrderBy {
@@ -662,6 +747,7 @@ func (o *Window) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT 
 	}
 	partitionVecOffset := builder.EndVector(len(o.Partition))
 	generated.WindowStart(builder)
+	generated.WindowAddFrame(builder, frameOffset)
 	generated.WindowAddFun(builder, funOffset)
 	generated.WindowAddOrderBy(builder, orderByVecOffset)
 	generated.WindowAddPartition(builder, partitionVecOffset)
@@ -1916,6 +2002,24 @@ const (
 	TypeHintTimestampNanos TypeHint = 2
 	TypeHintBase64 TypeHint = 3
 	TypeHintUuid TypeHint = 4
+)
+
+type WindowFrameBoundTy int8
+
+const (
+	WindowFrameBoundTyCurrentRow WindowFrameBoundTy = 0
+	WindowFrameBoundTyPreceding WindowFrameBoundTy = 1
+	WindowFrameBoundTyFollowing WindowFrameBoundTy = 2
+	WindowFrameBoundTyUnboundedPreceding WindowFrameBoundTy = 3
+	WindowFrameBoundTyUnboundedFollowing WindowFrameBoundTy = 4
+)
+
+type WindowFrameUnits int8
+
+const (
+	WindowFrameUnitsRows WindowFrameUnits = 0
+	WindowFrameUnitsRange WindowFrameUnits = 1
+	WindowFrameUnitsGroups WindowFrameUnits = 2
 )
 
 type AlterTableOperation struct {

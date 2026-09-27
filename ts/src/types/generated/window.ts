@@ -11,6 +11,7 @@ import * as flatbuffers from 'flatbuffers/js/flatbuffers';
 import { Expr, ExprT } from './expr';
 import { Function, FunctionT } from './function';
 import { OrderBy, OrderByT } from './order-by';
+import { WindowFrame, WindowFrameT } from './window-frame';
 
 
 export class Window implements flatbuffers.IUnpackableObject<WindowT> {
@@ -56,8 +57,13 @@ orderByLength():number {
   return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
 }
 
+frame(obj?:WindowFrame):WindowFrame|null {
+  const offset = this.bb!.__offset(this.bb_pos, 10);
+  return offset ? (obj || new WindowFrame()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
+}
+
 static startWindow(builder:flatbuffers.Builder) {
-  builder.startObject(3);
+  builder.startObject(4);
 }
 
 static addFun(builder:flatbuffers.Builder, funOffset:flatbuffers.Offset) {
@@ -96,25 +102,23 @@ static startOrderByVector(builder:flatbuffers.Builder, numElems:number) {
   builder.startVector(4, numElems, 4);
 }
 
+static addFrame(builder:flatbuffers.Builder, frameOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(3, frameOffset, 0);
+}
+
 static endWindow(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   builder.requiredField(offset, 4) // fun
   return offset;
 }
 
-static createWindow(builder:flatbuffers.Builder, funOffset:flatbuffers.Offset, partitionOffset:flatbuffers.Offset, orderByOffset:flatbuffers.Offset):flatbuffers.Offset {
-  Window.startWindow(builder);
-  Window.addFun(builder, funOffset);
-  Window.addPartition(builder, partitionOffset);
-  Window.addOrderBy(builder, orderByOffset);
-  return Window.endWindow(builder);
-}
 
 unpack(): WindowT {
   return new WindowT(
     (this.fun() !== null ? this.fun()!.unpack() : null),
     this.bb!.createObjList<Expr, ExprT>(this.partition.bind(this), this.partitionLength()),
-    this.bb!.createObjList<OrderBy, OrderByT>(this.orderBy.bind(this), this.orderByLength())
+    this.bb!.createObjList<OrderBy, OrderByT>(this.orderBy.bind(this), this.orderByLength()),
+    (this.frame() !== null ? this.frame()!.unpack() : null)
   );
 }
 
@@ -123,6 +127,7 @@ unpackTo(_o: WindowT): void {
   _o.fun = (this.fun() !== null ? this.fun()!.unpack() : null);
   _o.partition = this.bb!.createObjList<Expr, ExprT>(this.partition.bind(this), this.partitionLength());
   _o.orderBy = this.bb!.createObjList<OrderBy, OrderByT>(this.orderBy.bind(this), this.orderByLength());
+  _o.frame = (this.frame() !== null ? this.frame()!.unpack() : null);
 }
 }
 
@@ -130,7 +135,8 @@ export class WindowT implements flatbuffers.IGeneratedObject {
 constructor(
   public fun: FunctionT|null = null,
   public partition: (ExprT)[] = [],
-  public orderBy: (OrderByT)[] = []
+  public orderBy: (OrderByT)[] = [],
+  public frame: WindowFrameT|null = null
 ){}
 
 
@@ -138,11 +144,14 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   const fun = (this.fun !== null ? this.fun!.pack(builder) : 0);
   const partition = Window.createPartitionVector(builder, builder.createObjectOffsetList(this.partition));
   const orderBy = Window.createOrderByVector(builder, builder.createObjectOffsetList(this.orderBy));
+  const frame = (this.frame !== null ? this.frame!.pack(builder) : 0);
 
-  return Window.createWindow(builder,
-    fun,
-    partition,
-    orderBy
-  );
+  Window.startWindow(builder);
+  Window.addFun(builder, fun);
+  Window.addPartition(builder, partition);
+  Window.addOrderBy(builder, orderBy);
+  Window.addFrame(builder, frame);
+
+  return Window.endWindow(builder);
 }
 }

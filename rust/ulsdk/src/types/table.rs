@@ -91,7 +91,9 @@ use crate::types::generated::query_generated::{
     UnaryQueryElement as FbsUnaryQueryElement, UnsetArgument as FbsUnsetArgument,
     UpdateQueryElement as FbsUpdateQueryElement, ValueIndex as FbsValueIndex,
     ValueName as FbsValueName, ValueRow as FbsValueRow, Values as FbsValues, Vector as FbsVector,
-    When as FbsWhen, Window as FbsWindow, WorklogPartition as FbsWorklogPartition,
+    When as FbsWhen, Window as FbsWindow, WindowFrame as FbsWindowFrame,
+    WindowFrameBound as FbsWindowFrameBound, WindowFrameBoundTy as FbsWindowFrameBoundTy,
+    WindowFrameUnits as FbsWindowFrameUnits, WorklogPartition as FbsWorklogPartition,
 };
 use crate::types::generated::table_generated::{
     Append as FbsAppend, ChangeOp as FbsChangeOp, ChangeOpEntry as FbsChangeOpEntry,
@@ -129,7 +131,7 @@ use crate::types::query::{
     QueryElementOp, QueryElementUnion, QueryTableSource, SetExpr, TableOrderBy, TablePartition,
     TableSource, TableSourceInstance, TableSourceUnion, TimeSeries, TypeHint, UnaryQueryElement,
     UnsetArgument, UpdateQueryElement, ValueIndex, ValueName, ValueRow, Values, Vector, When,
-    Window, WorklogPartition,
+    Window, WindowFrame, WindowFrameBound, WindowFrameBoundTy, WindowFrameUnits, WorklogPartition,
 };
 use crate::types::value::{
     Point2D, Tri2D, VArray, VBool, VBytes, VChar, VF32, VF64, VFixedSizeBytes, VI8, VI16, VI32,

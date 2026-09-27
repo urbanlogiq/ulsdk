@@ -495,6 +495,33 @@ func TestDefaultWindow(t *testing.T) {
 }
 
 
+func TestDefaultWindowFrame(t *testing.T) {
+	o := &WindowFrame{}
+	if o == nil {
+		t.Fatal("expected non-nil")
+	}
+}
+
+
+func TestDefaultWindowFrameBound(t *testing.T) {
+	o := &WindowFrameBound{}
+	if o == nil {
+		t.Fatal("expected non-nil")
+	}
+}
+
+func TestRoundTripWindowFrameBound(t *testing.T) {
+	o := &WindowFrameBound{}
+	data := o.ToBytes()
+	result, err := WindowFrameBoundFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
 func TestDefaultWorklogPartition(t *testing.T) {
 	o := &WorklogPartition{}
 	if o == nil {

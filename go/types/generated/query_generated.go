@@ -40,6 +40,66 @@ func (v TypeHint) String() string {
 	return "TypeHint(" + strconv.FormatInt(int64(v), 10) + ")"
 }
 
+type WindowFrameUnits int8
+
+const (
+	WindowFrameUnitsRows   WindowFrameUnits = 0
+	WindowFrameUnitsRange  WindowFrameUnits = 1
+	WindowFrameUnitsGroups WindowFrameUnits = 2
+)
+
+var EnumNamesWindowFrameUnits = map[WindowFrameUnits]string{
+	WindowFrameUnitsRows:   "Rows",
+	WindowFrameUnitsRange:  "Range",
+	WindowFrameUnitsGroups: "Groups",
+}
+
+var EnumValuesWindowFrameUnits = map[string]WindowFrameUnits{
+	"Rows":   WindowFrameUnitsRows,
+	"Range":  WindowFrameUnitsRange,
+	"Groups": WindowFrameUnitsGroups,
+}
+
+func (v WindowFrameUnits) String() string {
+	if s, ok := EnumNamesWindowFrameUnits[v]; ok {
+		return s
+	}
+	return "WindowFrameUnits(" + strconv.FormatInt(int64(v), 10) + ")"
+}
+
+type WindowFrameBoundTy int8
+
+const (
+	WindowFrameBoundTyCurrentRow         WindowFrameBoundTy = 0
+	WindowFrameBoundTyPreceding          WindowFrameBoundTy = 1
+	WindowFrameBoundTyFollowing          WindowFrameBoundTy = 2
+	WindowFrameBoundTyUnboundedPreceding WindowFrameBoundTy = 3
+	WindowFrameBoundTyUnboundedFollowing WindowFrameBoundTy = 4
+)
+
+var EnumNamesWindowFrameBoundTy = map[WindowFrameBoundTy]string{
+	WindowFrameBoundTyCurrentRow:         "CurrentRow",
+	WindowFrameBoundTyPreceding:          "Preceding",
+	WindowFrameBoundTyFollowing:          "Following",
+	WindowFrameBoundTyUnboundedPreceding: "UnboundedPreceding",
+	WindowFrameBoundTyUnboundedFollowing: "UnboundedFollowing",
+}
+
+var EnumValuesWindowFrameBoundTy = map[string]WindowFrameBoundTy{
+	"CurrentRow":         WindowFrameBoundTyCurrentRow,
+	"Preceding":          WindowFrameBoundTyPreceding,
+	"Following":          WindowFrameBoundTyFollowing,
+	"UnboundedPreceding": WindowFrameBoundTyUnboundedPreceding,
+	"UnboundedFollowing": WindowFrameBoundTyUnboundedFollowing,
+}
+
+func (v WindowFrameBoundTy) String() string {
+	if s, ok := EnumNamesWindowFrameBoundTy[v]; ok {
+		return s
+	}
+	return "WindowFrameBoundTy(" + strconv.FormatInt(int64(v), 10) + ")"
+}
+
 type ExprUnion byte
 
 const (
@@ -1196,6 +1256,165 @@ func OrderByExprStartOrderByVector(builder *flatbuffers.Builder, numElems int) f
 func OrderByExprEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
+type WindowFrameBound struct {
+	_tab flatbuffers.Table
+}
+
+func GetRootAsWindowFrameBound(buf []byte, offset flatbuffers.UOffsetT) *WindowFrameBound {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &WindowFrameBound{}
+	x.Init(buf, n+offset)
+	return x
+}
+
+func FinishWindowFrameBoundBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.Finish(offset)
+}
+
+func GetSizePrefixedRootAsWindowFrameBound(buf []byte, offset flatbuffers.UOffsetT) *WindowFrameBound {
+	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
+	x := &WindowFrameBound{}
+	x.Init(buf, n+offset+flatbuffers.SizeUint32)
+	return x
+}
+
+func FinishSizePrefixedWindowFrameBoundBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.FinishSizePrefixed(offset)
+}
+
+func (rcv *WindowFrameBound) Init(buf []byte, i flatbuffers.UOffsetT) {
+	rcv._tab.Bytes = buf
+	rcv._tab.Pos = i
+}
+
+func (rcv *WindowFrameBound) Table() flatbuffers.Table {
+	return rcv._tab
+}
+
+func (rcv *WindowFrameBound) Ty() WindowFrameBoundTy {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		return WindowFrameBoundTy(rcv._tab.GetInt8(o + rcv._tab.Pos))
+	}
+	return 0
+}
+
+func (rcv *WindowFrameBound) MutateTy(n WindowFrameBoundTy) bool {
+	return rcv._tab.MutateInt8Slot(4, int8(n))
+}
+
+func (rcv *WindowFrameBound) Offset() uint64 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
+	if o != 0 {
+		return rcv._tab.GetUint64(o + rcv._tab.Pos)
+	}
+	return 0
+}
+
+func (rcv *WindowFrameBound) MutateOffset(n uint64) bool {
+	return rcv._tab.MutateUint64Slot(6, n)
+}
+
+func WindowFrameBoundStart(builder *flatbuffers.Builder) {
+	builder.StartObject(2)
+}
+func WindowFrameBoundAddTy(builder *flatbuffers.Builder, ty WindowFrameBoundTy) {
+	builder.PrependInt8Slot(0, int8(ty), 0)
+}
+func WindowFrameBoundAddOffset(builder *flatbuffers.Builder, offset uint64) {
+	builder.PrependUint64Slot(1, offset, 0)
+}
+func WindowFrameBoundEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return builder.EndObject()
+}
+type WindowFrame struct {
+	_tab flatbuffers.Table
+}
+
+func GetRootAsWindowFrame(buf []byte, offset flatbuffers.UOffsetT) *WindowFrame {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &WindowFrame{}
+	x.Init(buf, n+offset)
+	return x
+}
+
+func FinishWindowFrameBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.Finish(offset)
+}
+
+func GetSizePrefixedRootAsWindowFrame(buf []byte, offset flatbuffers.UOffsetT) *WindowFrame {
+	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
+	x := &WindowFrame{}
+	x.Init(buf, n+offset+flatbuffers.SizeUint32)
+	return x
+}
+
+func FinishSizePrefixedWindowFrameBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.FinishSizePrefixed(offset)
+}
+
+func (rcv *WindowFrame) Init(buf []byte, i flatbuffers.UOffsetT) {
+	rcv._tab.Bytes = buf
+	rcv._tab.Pos = i
+}
+
+func (rcv *WindowFrame) Table() flatbuffers.Table {
+	return rcv._tab
+}
+
+func (rcv *WindowFrame) Units() WindowFrameUnits {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		return WindowFrameUnits(rcv._tab.GetInt8(o + rcv._tab.Pos))
+	}
+	return 0
+}
+
+func (rcv *WindowFrame) MutateUnits(n WindowFrameUnits) bool {
+	return rcv._tab.MutateInt8Slot(4, int8(n))
+}
+
+func (rcv *WindowFrame) Start(obj *WindowFrameBound) *WindowFrameBound {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
+	if o != 0 {
+		x := rcv._tab.Indirect(o + rcv._tab.Pos)
+		if obj == nil {
+			obj = new(WindowFrameBound)
+		}
+		obj.Init(rcv._tab.Bytes, x)
+		return obj
+	}
+	return nil
+}
+
+func (rcv *WindowFrame) End(obj *WindowFrameBound) *WindowFrameBound {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
+	if o != 0 {
+		x := rcv._tab.Indirect(o + rcv._tab.Pos)
+		if obj == nil {
+			obj = new(WindowFrameBound)
+		}
+		obj.Init(rcv._tab.Bytes, x)
+		return obj
+	}
+	return nil
+}
+
+func WindowFrameStart(builder *flatbuffers.Builder) {
+	builder.StartObject(3)
+}
+func WindowFrameAddUnits(builder *flatbuffers.Builder, units WindowFrameUnits) {
+	builder.PrependInt8Slot(0, int8(units), 0)
+}
+func WindowFrameAddStart(builder *flatbuffers.Builder, start flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(1, flatbuffers.UOffsetT(start), 0)
+}
+func WindowFrameAddEnd(builder *flatbuffers.Builder, end flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(2, flatbuffers.UOffsetT(end), 0)
+}
+func WindowFrameEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return builder.EndObject()
+}
 type Window struct {
 	_tab flatbuffers.Table
 }
@@ -1284,8 +1503,21 @@ func (rcv *Window) OrderByLength() int {
 	return 0
 }
 
+func (rcv *Window) Frame(obj *WindowFrame) *WindowFrame {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
+	if o != 0 {
+		x := rcv._tab.Indirect(o + rcv._tab.Pos)
+		if obj == nil {
+			obj = new(WindowFrame)
+		}
+		obj.Init(rcv._tab.Bytes, x)
+		return obj
+	}
+	return nil
+}
+
 func WindowStart(builder *flatbuffers.Builder) {
-	builder.StartObject(3)
+	builder.StartObject(4)
 }
 func WindowAddFun(builder *flatbuffers.Builder, fun flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(fun), 0)
@@ -1301,6 +1533,9 @@ func WindowAddOrderBy(builder *flatbuffers.Builder, orderBy flatbuffers.UOffsetT
 }
 func WindowStartOrderByVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
 	return builder.StartVector(4, numElems, 4)
+}
+func WindowAddFrame(builder *flatbuffers.Builder, frame flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(3, flatbuffers.UOffsetT(frame), 0)
 }
 func WindowEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()

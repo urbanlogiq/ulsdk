@@ -159,6 +159,10 @@ from .query import (
     Vector,
     When,
     Window,
+    WindowFrame,
+    WindowFrameBound,
+    WindowFrameBoundTy,
+    WindowFrameUnits,
     WorklogPartition,
 )
 from .value import (
@@ -345,6 +349,8 @@ from .generated.Values import Values as FbsValues
 from .generated.Vector import Vector as FbsVector
 from .generated.When import When as FbsWhen
 from .generated.Window import Window as FbsWindow
+from .generated.WindowFrame import WindowFrame as FbsWindowFrame
+from .generated.WindowFrameBound import WindowFrameBound as FbsWindowFrameBound
 from .generated.WorklogPartition import WorklogPartition as FbsWorklogPartition
 from .generated.AlterTableOperationUnion import AlterTableOperationUnion as FbsAlterTableOperationUnion
 from .generated.ChangeOp import ChangeOp as FbsChangeOp
