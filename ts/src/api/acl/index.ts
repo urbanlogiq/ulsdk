@@ -17,7 +17,7 @@ import { ShareDetails as FbsShareDetails, ShareDetailsT as ShareDetails } from '
 export async function newAcl(
   ctx: RequestContext
 ): Promise<ObjectSummaryList> {
-  let path = '/v1/api/ulv2/datacatalog/acl/';
+  let path = '/v1/api/ulv2/datacatalog/acl';
   const params: [string, string][] = [];
   const headers: Record<string, string> = {};
 
@@ -41,7 +41,7 @@ export async function newFrom(
   ctx: RequestContext,
   extends_: ObjectId | null
 ): Promise<ObjectSummaryList> {
-  let path = '/v1/api/ulv2/datacatalog/acl/';
+  let path = '/v1/api/ulv2/datacatalog/acl';
   const params: [string, string][] = [];
   if (extends_ != null) {
       params.push([`extends`, extends_.toString()]);

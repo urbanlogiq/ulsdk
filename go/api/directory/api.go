@@ -250,7 +250,7 @@ func QueryPrincipals(ctx api.RequestContext, query string) ([]Principal, error) 
 // GetUsers -
 // Retrieves details of all users in the directory that are visible to the current user.
 func GetUsers(ctx api.RequestContext) ([]AdUser, error) {
-	path := "/v1/api/ulv2/directory/v1/users"
+	path := "/v1/api/ulv2/directory/v1/users/"
 
 	params := [][2]string{}
 
@@ -290,7 +290,7 @@ func GetUsersDisplayNames(ctx api.RequestContext) ([]DisplayNames, error) {
 // GetCurrentUser -
 // Retrieves details of the current user.
 func GetCurrentUser(ctx api.RequestContext, auditLog *bool) (*AdUserWithAuditLog, error) {
-	path := "/v1/api/ulv2/directory/v1/user"
+	path := "/v1/api/ulv2/directory/v1/user/"
 
 	params := [][2]string{}
 	if auditLog != nil {
@@ -313,7 +313,7 @@ func GetCurrentUser(ctx api.RequestContext, auditLog *bool) (*AdUserWithAuditLog
 // CreateUser -
 // Creates a new user in the directory.
 func CreateUser(ctx api.RequestContext, createUserRequest *CreateUserRequest) (*CreateUserPayload, error) {
-	path := "/v1/api/ulv2/directory/v1/user"
+	path := "/v1/api/ulv2/directory/v1/user/"
 
 	params := [][2]string{}
 
@@ -337,7 +337,7 @@ func CreateUser(ctx api.RequestContext, createUserRequest *CreateUserRequest) (*
 // UpdateCurrentUser -
 // Updates the current user.
 func UpdateCurrentUser(ctx api.RequestContext, updateUserRequest *UpdateCurrentUserPayload) error {
-	path := "/v1/api/ulv2/directory/v1/user"
+	path := "/v1/api/ulv2/directory/v1/user/"
 
 	params := [][2]string{}
 
@@ -415,7 +415,7 @@ func DeleteUser(ctx api.RequestContext, idParam id.B2cid) error {
 // GetGroups -
 // Retrieves a listing of all groups in the directory.
 func GetGroups(ctx api.RequestContext) ([]AdGroup, error) {
-	path := "/v1/api/ulv2/directory/v1/group"
+	path := "/v1/api/ulv2/directory/v1/group/"
 
 	params := [][2]string{}
 
@@ -435,7 +435,7 @@ func GetGroups(ctx api.RequestContext) ([]AdGroup, error) {
 // CreateGroup -
 // Creates a new group in the directory.
 func CreateGroup(ctx api.RequestContext, createGroupRequest *CreateGroupPayload) (*AdGroup, error) {
-	path := "/v1/api/ulv2/directory/v1/group"
+	path := "/v1/api/ulv2/directory/v1/group/"
 
 	params := [][2]string{}
 

@@ -33,7 +33,7 @@ Result<::ul::types::ObjectSummaryList>
 new_acl(
     ul::RequestContext &ctx
 ) {
-    std::string path = "/v1/api/ulv2/datacatalog/acl/";
+    std::string path = "/v1/api/ulv2/datacatalog/acl";
 
     std::map<std::string, std::string> params;
 
@@ -52,7 +52,7 @@ new_from(
     ul::RequestContext &ctx,
     std::optional<::ul::types::ObjectId> extends
 ) {
-    std::string path = "/v1/api/ulv2/datacatalog/acl/";
+    std::string path = "/v1/api/ulv2/datacatalog/acl";
 
     std::map<std::string, std::string> params;
     if (extends.has_value()) {

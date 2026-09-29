@@ -26,7 +26,7 @@ use crate::types::object::ObjectSummaryList;
 /// Returns
 /// * An object summary list containing a single entry with the new ACL.
 pub async fn new_acl(ctx: &dyn RequestContext) -> Result<ObjectSummaryList, Error> {
-    let path = "/v1/api/ulv2/datacatalog/acl/";
+    let path = "/v1/api/ulv2/datacatalog/acl";
     let body = Bytes::new();
     let res = ctx.post(&path, body, "text/plain", None, None).await?;
     crate::types::ObjectSummaryList::from_fbs_bytes(res.as_slice()).map_err(Error::from)
@@ -45,7 +45,7 @@ pub async fn new_from(
     ctx: &dyn RequestContext,
     extends: Option<crate::types::id::ObjectId>,
 ) -> Result<ObjectSummaryList, Error> {
-    let path = "/v1/api/ulv2/datacatalog/acl/";
+    let path = "/v1/api/ulv2/datacatalog/acl";
     let mut params = ParamMap::new();
     if let Some(val) = extends {
         params.insert("extends".to_owned(), val.to_string());

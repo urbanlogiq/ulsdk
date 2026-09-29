@@ -18,7 +18,7 @@ var _ = fmt.Errorf
 // NewAcl -
 // Create a new access control list. This ACL will be created with the current user as the owner.
 func NewAcl(ctx api.RequestContext) (*object.ObjectSummaryList, error) {
-	path := "/v1/api/ulv2/datacatalog/acl/"
+	path := "/v1/api/ulv2/datacatalog/acl"
 
 	params := [][2]string{}
 
@@ -38,7 +38,7 @@ func NewAcl(ctx api.RequestContext) (*object.ObjectSummaryList, error) {
 // NewFrom -
 // Create a new access control list that inherits from an existing ACL
 func NewFrom(ctx api.RequestContext, extends *id.ObjectId) (*object.ObjectSummaryList, error) {
-	path := "/v1/api/ulv2/datacatalog/acl/"
+	path := "/v1/api/ulv2/datacatalog/acl"
 
 	params := [][2]string{}
 	if extends != nil {

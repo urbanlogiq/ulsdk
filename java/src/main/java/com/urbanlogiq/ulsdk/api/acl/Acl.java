@@ -12,7 +12,7 @@ public final class Acl {
     public static com.urbanlogiq.ulsdk.types.ObjectSummaryList newAcl(
         com.urbanlogiq.ulsdk.RequestContext ctx
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/ulv2/datacatalog/acl/";
+        String path = "/v1/api/ulv2/datacatalog/acl";
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
 
@@ -33,7 +33,7 @@ public final class Acl {
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.types.ObjectId extends_
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/ulv2/datacatalog/acl/";
+        String path = "/v1/api/ulv2/datacatalog/acl";
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         if (extends_ != null) {
             params.add(new com.urbanlogiq.ulsdk.Pair("extends", extends_.toString()));

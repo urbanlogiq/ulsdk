@@ -1722,7 +1722,7 @@ def get_users(
     Details of all specified users.
     """
 
-    path = "/v1/api/ulv2/directory/v1/users"
+    path = "/v1/api/ulv2/directory/v1/users/"
     params = dict()
     headers = dict()
     res = ctx.get(path, params=params, headers=headers)
@@ -1768,7 +1768,7 @@ def get_current_user(
     The complete details of the specified user, including audit log if specified.
     """
 
-    path = "/v1/api/ulv2/directory/v1/user"
+    path = "/v1/api/ulv2/directory/v1/user/"
     params = dict()
     if audit_log is not None:
         params["audit_log"] = "true" if audit_log else "false"
@@ -1792,7 +1792,7 @@ def create_user(
     The details of the user along with their temporary, one-time-use password.
     """
 
-    path = "/v1/api/ulv2/directory/v1/user"
+    path = "/v1/api/ulv2/directory/v1/user/"
     params = dict()
     headers = dict()
     body = json.dumps(create_user_request.to_dict())
@@ -1811,7 +1811,7 @@ def update_current_user(
     update_user_request: UpdateCurrentUser -- The details which which to update the current user
     """
 
-    path = "/v1/api/ulv2/directory/v1/user"
+    path = "/v1/api/ulv2/directory/v1/user/"
     params = dict()
     headers = dict()
     body = json.dumps(update_user_request.to_dict())
@@ -1904,7 +1904,7 @@ def get_groups(
     A list of all the groups from the directory for which the current user is allowed to see.
     """
 
-    path = "/v1/api/ulv2/directory/v1/group"
+    path = "/v1/api/ulv2/directory/v1/group/"
     params = dict()
     headers = dict()
     res = ctx.get(path, params=params, headers=headers)
@@ -1928,7 +1928,7 @@ def create_group(
     Details of the created group
     """
 
-    path = "/v1/api/ulv2/directory/v1/group"
+    path = "/v1/api/ulv2/directory/v1/group/"
     params = dict()
     headers = dict()
     body = json.dumps(create_group_request.to_dict())

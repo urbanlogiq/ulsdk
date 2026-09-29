@@ -30,7 +30,7 @@ def new_acl(
     An object summary list containing a single entry with the new ACL.
     """
 
-    path = "/v1/api/ulv2/datacatalog/acl/"
+    path = "/v1/api/ulv2/datacatalog/acl"
     params = dict()
     headers = dict()
     body = None
@@ -51,7 +51,7 @@ def new_from(
     An object summary list containing a single entry with the new ACL.
     """
 
-    path = "/v1/api/ulv2/datacatalog/acl/"
+    path = "/v1/api/ulv2/datacatalog/acl"
     params = dict()
     if extends is not None:
         params["extends"] = str(extends)

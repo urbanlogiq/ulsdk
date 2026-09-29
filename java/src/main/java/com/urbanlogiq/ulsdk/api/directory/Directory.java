@@ -103,7 +103,7 @@ public final class Directory {
     public static com.urbanlogiq.ulsdk.api.directory.AdUser[] getUsers(
         com.urbanlogiq.ulsdk.RequestContext ctx
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/ulv2/directory/v1/users";
+        String path = "/v1/api/ulv2/directory/v1/users/";
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
 
@@ -153,7 +153,7 @@ public final class Directory {
         com.urbanlogiq.ulsdk.RequestContext ctx,
         Boolean auditLog
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/ulv2/directory/v1/user";
+        String path = "/v1/api/ulv2/directory/v1/user/";
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         if (auditLog != null) {
             params.add(new com.urbanlogiq.ulsdk.Pair("audit_log", auditLog.toString()));
@@ -178,7 +178,7 @@ public final class Directory {
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.api.directory.CreateUserRequest createUserRequest
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/ulv2/directory/v1/user";
+        String path = "/v1/api/ulv2/directory/v1/user/";
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
 
@@ -200,7 +200,7 @@ public final class Directory {
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.api.directory.UpdateCurrentUser updateUserRequest
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/ulv2/directory/v1/user";
+        String path = "/v1/api/ulv2/directory/v1/user/";
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
 
@@ -296,7 +296,7 @@ public final class Directory {
     public static com.urbanlogiq.ulsdk.api.directory.AdGroup[] getGroups(
         com.urbanlogiq.ulsdk.RequestContext ctx
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/ulv2/directory/v1/group";
+        String path = "/v1/api/ulv2/directory/v1/group/";
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
 
@@ -323,7 +323,7 @@ public final class Directory {
         com.urbanlogiq.ulsdk.RequestContext ctx,
         com.urbanlogiq.ulsdk.api.directory.CreateGroup createGroupRequest
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
-        String path = "/v1/api/ulv2/directory/v1/group";
+        String path = "/v1/api/ulv2/directory/v1/group/";
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
 

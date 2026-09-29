@@ -3055,7 +3055,7 @@ Result<std::vector<AdUser>>
 get_users(
     ul::RequestContext &ctx
 ) {
-    std::string path = "/v1/api/ulv2/directory/v1/users";
+    std::string path = "/v1/api/ulv2/directory/v1/users/";
 
     std::map<std::string, std::string> params;
 
@@ -3126,7 +3126,7 @@ get_current_user(
     ul::RequestContext &ctx,
     std::optional<bool> audit_log
 ) {
-    std::string path = "/v1/api/ulv2/directory/v1/user";
+    std::string path = "/v1/api/ulv2/directory/v1/user/";
 
     std::map<std::string, std::string> params;
     if (audit_log.has_value()) {
@@ -3153,7 +3153,7 @@ create_user(
     ul::RequestContext &ctx,
     const CreateUserRequest &create_user_request
 ) {
-    std::string path = "/v1/api/ulv2/directory/v1/user";
+    std::string path = "/v1/api/ulv2/directory/v1/user/";
 
     std::map<std::string, std::string> params;
 
@@ -3177,7 +3177,7 @@ update_current_user(
     ul::RequestContext &ctx,
     const UpdateCurrentUser &update_user_request
 ) {
-    std::string path = "/v1/api/ulv2/directory/v1/user";
+    std::string path = "/v1/api/ulv2/directory/v1/user/";
 
     std::map<std::string, std::string> params;
 
@@ -3272,7 +3272,7 @@ Result<std::vector<AdGroup>>
 get_groups(
     ul::RequestContext &ctx
 ) {
-    std::string path = "/v1/api/ulv2/directory/v1/group";
+    std::string path = "/v1/api/ulv2/directory/v1/group/";
 
     std::map<std::string, std::string> params;
 
@@ -3308,7 +3308,7 @@ create_group(
     ul::RequestContext &ctx,
     const CreateGroup &create_group_request
 ) {
-    std::string path = "/v1/api/ulv2/directory/v1/group";
+    std::string path = "/v1/api/ulv2/directory/v1/group/";
 
     std::map<std::string, std::string> params;
 

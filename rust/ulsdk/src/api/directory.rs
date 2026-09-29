@@ -314,7 +314,7 @@ pub async fn query_principals(
 /// Returns
 /// * Details of all specified users.
 pub async fn get_users(ctx: &dyn RequestContext) -> Result<Vec<AdUser>, Error> {
-    let path = "/v1/api/ulv2/directory/v1/users";
+    let path = "/v1/api/ulv2/directory/v1/users/";
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }
@@ -346,7 +346,7 @@ pub async fn get_current_user(
     ctx: &dyn RequestContext,
     audit_log: Option<bool>,
 ) -> Result<AdUserWithAuditLog, Error> {
-    let path = "/v1/api/ulv2/directory/v1/user";
+    let path = "/v1/api/ulv2/directory/v1/user/";
     let mut params = ParamMap::new();
     if let Some(val) = audit_log {
         params.insert(
@@ -372,7 +372,7 @@ pub async fn create_user(
     ctx: &dyn RequestContext,
     create_user_request: CreateUserRequest,
 ) -> Result<CreateUser, Error> {
-    let path = "/v1/api/ulv2/directory/v1/user";
+    let path = "/v1/api/ulv2/directory/v1/user/";
     let body = Bytes::from(serde_json::to_vec(&create_user_request)?);
     let res = ctx
         .post(&path, body, "application/json", None, None)
@@ -390,7 +390,7 @@ pub async fn update_current_user(
     ctx: &dyn RequestContext,
     update_user_request: UpdateCurrentUser,
 ) -> Result<(), Error> {
-    let path = "/v1/api/ulv2/directory/v1/user";
+    let path = "/v1/api/ulv2/directory/v1/user/";
     let body = Bytes::from(serde_json::to_vec(&update_user_request)?);
     ctx.put(&path, body, "application/json", None, None).await?;
     Ok(())
@@ -477,7 +477,7 @@ pub async fn delete_user(
 /// Returns
 /// * A list of all the groups from the directory for which the current user is allowed to see.
 pub async fn get_groups(ctx: &dyn RequestContext) -> Result<Vec<AdGroup>, Error> {
-    let path = "/v1/api/ulv2/directory/v1/group";
+    let path = "/v1/api/ulv2/directory/v1/group/";
     let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }
@@ -495,7 +495,7 @@ pub async fn create_group(
     ctx: &dyn RequestContext,
     create_group_request: CreateGroup,
 ) -> Result<AdGroup, Error> {
-    let path = "/v1/api/ulv2/directory/v1/group";
+    let path = "/v1/api/ulv2/directory/v1/group/";
     let body = Bytes::from(serde_json::to_vec(&create_group_request)?);
     let res = ctx
         .post(&path, body, "application/json", None, None)

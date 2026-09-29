@@ -249,7 +249,7 @@ export async function queryPrincipals(
 export async function getUsers(
   ctx: RequestContext
 ): Promise<AdUser[]> {
-  let path = '/v1/api/ulv2/directory/v1/users';
+  let path = '/v1/api/ulv2/directory/v1/users/';
   const params: [string, string][] = [];
   const headers: Record<string, string> = {};
 
@@ -285,7 +285,7 @@ export async function getCurrentUser(
   ctx: RequestContext,
   auditLog: boolean | null
 ): Promise<AdUserWithAuditLog> {
-  let path = '/v1/api/ulv2/directory/v1/user';
+  let path = '/v1/api/ulv2/directory/v1/user/';
   const params: [string, string][] = [];
   if (auditLog != null) {
       params.push([`audit_log`, auditLog.toString()]);
@@ -309,7 +309,7 @@ export async function createUser(
   ctx: RequestContext,
   createUserRequest: CreateUserRequest
 ): Promise<CreateUser> {
-  let path = '/v1/api/ulv2/directory/v1/user';
+  let path = '/v1/api/ulv2/directory/v1/user/';
   const params: [string, string][] = [];
   const headers: Record<string, string> = {};
 
@@ -330,7 +330,7 @@ export async function updateCurrentUser(
   ctx: RequestContext,
   updateUserRequest: UpdateCurrentUser
 ): Promise<void> {
-  let path = '/v1/api/ulv2/directory/v1/user';
+  let path = '/v1/api/ulv2/directory/v1/user/';
   const params: [string, string][] = [];
   const headers: Record<string, string> = {};
 
@@ -422,7 +422,7 @@ export async function deleteUser(
 export async function getGroups(
   ctx: RequestContext
 ): Promise<AdGroup[]> {
-  let path = '/v1/api/ulv2/directory/v1/group';
+  let path = '/v1/api/ulv2/directory/v1/group/';
   const params: [string, string][] = [];
   const headers: Record<string, string> = {};
 
@@ -442,7 +442,7 @@ export async function createGroup(
   ctx: RequestContext,
   createGroupRequest: CreateGroup
 ): Promise<AdGroup> {
-  let path = '/v1/api/ulv2/directory/v1/group';
+  let path = '/v1/api/ulv2/directory/v1/group/';
   const params: [string, string][] = [];
   const headers: Record<string, string> = {};
 
