@@ -3924,6 +3924,94 @@ func DetailSectionStartFieldsVector(builder *flatbuffers.Builder, numElems int) 
 func DetailSectionEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
+/// A column of this dataset that holds the key of a row in another dataset.
+/// Filters on this dataset can then narrow the other dataset: a row there
+/// matches when at least one row here that refers to it matches.
+type ForeignKey struct {
+	_tab flatbuffers.Table
+}
+
+func GetRootAsForeignKey(buf []byte, offset flatbuffers.UOffsetT) *ForeignKey {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &ForeignKey{}
+	x.Init(buf, n+offset)
+	return x
+}
+
+func FinishForeignKeyBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.Finish(offset)
+}
+
+func GetSizePrefixedRootAsForeignKey(buf []byte, offset flatbuffers.UOffsetT) *ForeignKey {
+	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
+	x := &ForeignKey{}
+	x.Init(buf, n+offset+flatbuffers.SizeUint32)
+	return x
+}
+
+func FinishSizePrefixedForeignKeyBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.FinishSizePrefixed(offset)
+}
+
+func (rcv *ForeignKey) Init(buf []byte, i flatbuffers.UOffsetT) {
+	rcv._tab.Bytes = buf
+	rcv._tab.Pos = i
+}
+
+func (rcv *ForeignKey) Table() flatbuffers.Table {
+	return rcv._tab
+}
+
+/// The column of this dataset that holds the key.
+func (rcv *ForeignKey) Column() []byte {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		return rcv._tab.ByteVector(o + rcv._tab.Pos)
+	}
+	return nil
+}
+
+/// The column of this dataset that holds the key.
+/// The dataset the key refers to.
+func (rcv *ForeignKey) StreamId(obj *ObjectId) *ObjectId {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
+	if o != 0 {
+		x := rcv._tab.Indirect(o + rcv._tab.Pos)
+		if obj == nil {
+			obj = new(ObjectId)
+		}
+		obj.Init(rcv._tab.Bytes, x)
+		return obj
+	}
+	return nil
+}
+
+/// The dataset the key refers to.
+/// The column of that dataset that the key matches.
+func (rcv *ForeignKey) ReferencedColumn() []byte {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
+	if o != 0 {
+		return rcv._tab.ByteVector(o + rcv._tab.Pos)
+	}
+	return nil
+}
+
+/// The column of that dataset that the key matches.
+func ForeignKeyStart(builder *flatbuffers.Builder) {
+	builder.StartObject(3)
+}
+func ForeignKeyAddColumn(builder *flatbuffers.Builder, column flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(column), 0)
+}
+func ForeignKeyAddStreamId(builder *flatbuffers.Builder, streamId flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(1, flatbuffers.UOffsetT(streamId), 0)
+}
+func ForeignKeyAddReferencedColumn(builder *flatbuffers.Builder, referencedColumn flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(2, flatbuffers.UOffsetT(referencedColumn), 0)
+}
+func ForeignKeyEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return builder.EndObject()
+}
 type Metadata struct {
 	_tab flatbuffers.Table
 }
@@ -4316,8 +4404,32 @@ func (rcv *Metadata) MutateNeedsCallerInputs(n bool) bool {
 	return rcv._tab.MutateBoolSlot(42, n)
 }
 
+/// Columns of this dataset that hold keys of rows in other datasets; see
+/// ForeignKey.
+func (rcv *Metadata) ForeignKeys(obj *ForeignKey, j int) bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(44))
+	if o != 0 {
+		x := rcv._tab.Vector(o)
+		x += flatbuffers.UOffsetT(j) * 4
+		x = rcv._tab.Indirect(x)
+		obj.Init(rcv._tab.Bytes, x)
+		return true
+	}
+	return false
+}
+
+func (rcv *Metadata) ForeignKeysLength() int {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(44))
+	if o != 0 {
+		return rcv._tab.VectorLen(o)
+	}
+	return 0
+}
+
+/// Columns of this dataset that hold keys of rows in other datasets; see
+/// ForeignKey.
 func MetadataStart(builder *flatbuffers.Builder) {
-	builder.StartObject(20)
+	builder.StartObject(21)
 }
 func MetadataAddDisplayName(builder *flatbuffers.Builder, displayName flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(displayName), 0)
@@ -4396,6 +4508,12 @@ func MetadataAddTimeSource(builder *flatbuffers.Builder, timeSource flatbuffers.
 }
 func MetadataAddNeedsCallerInputs(builder *flatbuffers.Builder, needsCallerInputs bool) {
 	builder.PrependBoolSlot(19, needsCallerInputs, false)
+}
+func MetadataAddForeignKeys(builder *flatbuffers.Builder, foreignKeys flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(20, flatbuffers.UOffsetT(foreignKeys), 0)
+}
+func MetadataStartForeignKeysVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+	return builder.StartVector(4, numElems, 4)
 }
 func MetadataEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()

@@ -19,6 +19,7 @@ import { Documents as FbsDocuments, DocumentsT as FbsDocumentsT } from './genera
 import { FloatAggregate as FbsFloatAggregate, FloatAggregateT as FbsFloatAggregateT } from './generated/float-aggregate';
 import { FloatBucket as FbsFloatBucket, FloatBucketT as FbsFloatBucketT } from './generated/float-bucket';
 import { FloatRange as FbsFloatRange, FloatRangeT as FbsFloatRangeT } from './generated/float-range';
+import { ForeignKey as FbsForeignKey, ForeignKeyT as FbsForeignKeyT } from './generated/foreign-key';
 import { GeometryData as FbsGeometryData, GeometryDataT as FbsGeometryDataT } from './generated/geometry-data';
 import { GeometryDataUnion as FbsGeometryDataUnion } from './generated/geometry-data-union';
 import { GeometrySource as FbsGeometrySource } from './generated/geometry-source';
@@ -1827,6 +1828,88 @@ export class FloatBucket {
 
 }
 
+/**
+ *  A column of this dataset that holds the key of a row in another dataset.
+ *  Filters on this dataset can then narrow the other dataset: a row there
+ *  matches when at least one row here that refers to it matches.
+ */
+export class ForeignKey {
+/**
+ *  The column of this dataset that holds the key.
+ */
+  private _column!: string;
+
+/**
+ *  The column of that dataset that the key matches.
+ */
+  private _referencedColumn!: string;
+
+/**
+ *  The dataset the key refers to.
+ */
+  private _streamId!: ObjectId | null;
+
+  constructor(arg?: FbsForeignKey | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsForeignKey.getSizePrefixedRootAsForeignKey(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsForeignKey) {
+      this._initFromFbs(arg);
+    } else {
+      this._column = '';
+      this._referencedColumn = '';
+      this._streamId = null;
+    }
+  }
+
+  private _initFromFbs(fbs: FbsForeignKey): void {
+    this._column = fbs.column() ?? '';
+    this._referencedColumn = fbs.referencedColumn() ?? '';
+    const streamIdVal = fbs.streamId();
+    this._streamId = streamIdVal ? new ObjectId(streamIdVal) : null;
+  }
+
+  get column(): string {
+    return this._column;
+  }
+
+  set column(value: string) {
+    this._column = value;
+  }
+
+  get referencedColumn(): string {
+    return this._referencedColumn;
+  }
+
+  set referencedColumn(value: string) {
+    this._referencedColumn = value;
+  }
+
+  get streamId(): ObjectId | null {
+    return this._streamId;
+  }
+
+  set streamId(value: ObjectId | null) {
+    this._streamId = value;
+  }
+
+  toFbsT(): FbsForeignKeyT {
+    const t = new FbsForeignKeyT();
+    t.column = this._column;
+    t.referencedColumn = this._referencedColumn;
+    t.streamId = this._streamId ? this._streamId.toFbsT() : null;
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+}
+
 export class GeometryData {
   private _data!: GeometryDataUnion | null;
 
@@ -2201,6 +2284,12 @@ export class Metadata {
 
   private _fields!: UlField[] | null;
 
+/**
+ *  Columns of this dataset that hold keys of rows in other datasets; see
+ *  ForeignKey.
+ */
+  private _foreignKeys!: ForeignKey[] | null;
+
   private _geometrySource!: GeometrySource | null;
 
 /**
@@ -2273,6 +2362,7 @@ export class Metadata {
       this._entityTy = 0;
       this._fieldRelationships = null;
       this._fields = null;
+      this._foreignKeys = null;
       this._geometrySource = null;
       this._locationDescriptionField = 0;
       this._needsCallerInputs = false;
@@ -2315,6 +2405,14 @@ export class Metadata {
       });
     } else {
       this._fields = null;
+    }
+    if (fbs.foreignKeysLength() > 0) {
+      this._foreignKeys = Array.from({ length: fbs.foreignKeysLength() }, (_, i) => {
+        const item = fbs.foreignKeys(i);
+        return item ? new ForeignKey(item) : new ForeignKey();
+      });
+    } else {
+      this._foreignKeys = null;
     }
     const geometrySourceTy = fbs.geometrySourceType();
     if (geometrySourceTy === FbsGeometrySource.NoGeometry) {
@@ -2436,6 +2534,14 @@ export class Metadata {
     this._fields = value;
   }
 
+  get foreignKeys(): ForeignKey[] | null {
+    return this._foreignKeys;
+  }
+
+  set foreignKeys(value: ForeignKey[] | null) {
+    this._foreignKeys = value;
+  }
+
   get geometrySource(): GeometrySource | null {
     return this._geometrySource;
   }
@@ -2519,6 +2625,7 @@ export class Metadata {
     t.entityTy = this._entityTy;
     t.fieldRelationships = this._fieldRelationships ? this._fieldRelationships.map(item => item.toFbsT()) : [];
     t.fields = this._fields ? this._fields.map(item => item.toFbsT()) : [];
+    t.foreignKeys = this._foreignKeys ? this._foreignKeys.map(item => item.toFbsT()) : [];
     if (this._geometrySource instanceof NoGeometry) {
       t.geometrySourceType = FbsGeometrySource.NoGeometry;
       t.geometrySource = this._geometrySource.toFbsT();

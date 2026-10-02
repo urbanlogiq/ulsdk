@@ -320,8 +320,35 @@ class Metadata(object):
             return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
         return False
 
+    # Columns of this dataset that hold keys of rows in other datasets; see
+    # ForeignKey.
+    # Metadata
+    def ForeignKeys(self, j):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(44))
+        if o != 0:
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
+            x = self._tab.Indirect(x)
+            from .ForeignKey import ForeignKey
+            obj = ForeignKey()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+    # Metadata
+    def ForeignKeysLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(44))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # Metadata
+    def ForeignKeysIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(44))
+        return o == 0
+
 def MetadataStart(builder):
-    builder.StartObject(20)
+    builder.StartObject(21)
 
 def Start(builder):
     MetadataStart(builder)
@@ -481,6 +508,18 @@ def MetadataAddNeedsCallerInputs(builder, needsCallerInputs):
 
 def AddNeedsCallerInputs(builder, needsCallerInputs):
     MetadataAddNeedsCallerInputs(builder, needsCallerInputs)
+
+def MetadataAddForeignKeys(builder, foreignKeys):
+    builder.PrependUOffsetTRelativeSlot(20, flatbuffers.number_types.UOffsetTFlags.py_type(foreignKeys), 0)
+
+def AddForeignKeys(builder, foreignKeys):
+    MetadataAddForeignKeys(builder, foreignKeys)
+
+def MetadataStartForeignKeysVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+def StartForeignKeysVector(builder, numElems):
+    return MetadataStartForeignKeysVector(builder, numElems)
 
 def MetadataEnd(builder):
     return builder.EndObject()

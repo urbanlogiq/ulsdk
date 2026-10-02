@@ -90,7 +90,7 @@ use crate::types::generated::metadata_generated::{
     DatetimeRange as FbsDatetimeRange, DetailSection as FbsDetailSection, Document as FbsDocument,
     Documents as FbsDocuments, FieldFlags as FbsFieldFlags, FieldUnit as FbsFieldUnit,
     FloatAggregate as FbsFloatAggregate, FloatBucket as FbsFloatBucket,
-    FloatRange as FbsFloatRange, GeometryData as FbsGeometryData,
+    FloatRange as FbsFloatRange, ForeignKey as FbsForeignKey, GeometryData as FbsGeometryData,
     GeometryDataUnion as FbsGeometryDataUnion, GeometrySource as FbsGeometrySource,
     HierarchicalRelationship as FbsHierarchicalRelationship,
     HierarchyRelationshipData as FbsHierarchyRelationshipData, IntAggregate as FbsIntAggregate,
@@ -2537,6 +2537,71 @@ impl From<&FbsFloatBucket> for FloatBucket {
     }
 }
 
+/// A column of this dataset that holds the key of a row in another dataset.
+/// Filters on this dataset can then narrow the other dataset: a row there
+/// matches when at least one row here that refers to it matches.
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+pub struct ForeignKey {
+    /// The column of this dataset that holds the key.
+    pub column: String,
+    /// The column of that dataset that the key matches.
+    pub referenced_column: String,
+    /// The dataset the key refers to.
+    pub stream_id: Option<ObjectId>,
+}
+
+impl ForeignKey {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsForeignKey<'a>> {
+        use crate::types::generated::metadata_generated::ForeignKeyBuilder as FbsForeignKeyBuilder;
+
+        let column_offset = builder.create_string(&self.column);
+        let referenced_column_offset = builder.create_string(&self.referenced_column);
+        let stream_id_offset = self.stream_id.as_ref().map(|o| o.serialize_to(builder));
+
+        let mut bldr = FbsForeignKeyBuilder::new(builder);
+        bldr.add_column(column_offset);
+        bldr.add_referenced_column(referenced_column_offset);
+        if let Some(offset) = stream_id_offset {
+            bldr.add_stream_id(offset);
+        }
+        bldr.finish()
+    }
+}
+
+impl From<FbsForeignKey<'_>> for ForeignKey {
+    fn from(fbs: FbsForeignKey<'_>) -> Self {
+        let column = fbs.column().to_owned();
+        let referenced_column = fbs.referenced_column().to_owned();
+        let stream_id = fbs.stream_id().map(ObjectId::from);
+        Self {
+            column,
+            referenced_column,
+            stream_id,
+        }
+    }
+}
+
+impl crate::FbsSerde for ForeignKey {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsForeignKey>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
 #[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct GeometryData {
     pub data: GeometryDataUnion,
@@ -2837,6 +2902,9 @@ pub struct Metadata {
     /// Field groupings e.g. age ranges, ethnicities or hierarchical codes like zoning and NAICS
     pub field_relationships: Option<Vec<UlFieldRelationship>>,
     pub fields: Option<Vec<UlField>>,
+    /// Columns of this dataset that hold keys of rows in other datasets; see
+    /// ForeignKey.
+    pub foreign_keys: Option<Vec<ForeignKey>>,
     pub geometry_source: Option<GeometrySource>,
     /// Many geospatial datasets whose rows correspond to map locations have a
     /// column that should be used as the human-friendly display name of the location.
@@ -2909,6 +2977,15 @@ impl Metadata {
             let fields_offset = builder.create_vector(&fields_offsets);
             fields_offset
         });
+        let foreign_keys_offset = self.foreign_keys.as_ref().map(|v| {
+            let mut foreign_keys_offsets = Vec::with_capacity(v.len());
+            for val in v.iter() {
+                let offset = val.serialize_to(builder);
+                foreign_keys_offsets.push(offset);
+            }
+            let foreign_keys_offset = builder.create_vector(&foreign_keys_offsets);
+            foreign_keys_offset
+        });
         let geometry_source_offset = self
             .geometry_source
             .as_ref()
@@ -2948,6 +3025,9 @@ impl Metadata {
         }
         if let Some(offset) = fields_offset {
             bldr.add_fields(offset);
+        }
+        if let Some(offset) = foreign_keys_offset {
+            bldr.add_foreign_keys(offset);
         }
         if let Some((offset, ty)) = geometry_source_offset {
             bldr.add_geometry_source(offset);
@@ -3013,6 +3093,17 @@ impl From<FbsMetadata<'_>> for Metadata {
             }
 
             Some(fields)
+        } else {
+            None
+        };
+
+        let foreign_keys = if let Some(val) = fbs.foreign_keys() {
+            let mut foreign_keys = Vec::new();
+            for elem in val {
+                foreign_keys.push(elem.into());
+            }
+
+            Some(foreign_keys)
         } else {
             None
         };
@@ -3109,6 +3200,7 @@ impl From<FbsMetadata<'_>> for Metadata {
             entity_ty,
             field_relationships,
             fields,
+            foreign_keys,
             geometry_source,
             location_description_field,
             needs_caller_inputs,
@@ -3152,6 +3244,7 @@ impl Default for Metadata {
             entity_ty: EntityTy::T_INVALID,
             field_relationships: None,
             fields: None,
+            foreign_keys: None,
             geometry_source: None,
             location_description_field: -1,
             needs_caller_inputs: bool::default(),
@@ -4031,6 +4124,14 @@ mod tests {
         let t0 = FloatRange::default();
         let buf = t0.to_fbs_bytes();
         let t1 = FloatRange::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_foreign_key() {
+        let t0 = ForeignKey::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = ForeignKey::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 

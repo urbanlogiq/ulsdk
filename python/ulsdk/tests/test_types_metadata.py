@@ -82,6 +82,12 @@ def test_float_range():
     _t1 = FloatRange.from_bytes(_b)
     assert _t0 == _t1
 
+def test_foreign_key():
+    _t0 = ForeignKey.make_default()
+    _b = _t0.to_bytes()
+    _t1 = ForeignKey.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_geometry_data():
     _t0 = GeometryData.make_default()
     _b = _t0.to_bytes()

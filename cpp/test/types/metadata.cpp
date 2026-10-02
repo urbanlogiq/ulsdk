@@ -137,6 +137,16 @@ test_float_range() {
 TypeTest test_float_range_obj(test_float_range, "FloatRange");
 
 bool
+test_foreign_key() {
+    ::ul::types::ForeignKey t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::ForeignKey deserialized = ::ul::types::ForeignKey(bytes);
+    return true;
+}
+
+TypeTest test_foreign_key_obj(test_foreign_key, "ForeignKey");
+
+bool
 test_geometry_data() {
     ::ul::types::GeometryData t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);

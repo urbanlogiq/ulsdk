@@ -136,6 +136,9 @@ struct ColumnTimeBuilder;
 struct DetailSection;
 struct DetailSectionBuilder;
 
+struct ForeignKey;
+struct ForeignKeyBuilder;
+
 struct Metadata;
 struct MetadataBuilder;
 
@@ -4087,6 +4090,98 @@ inline ::flatbuffers::Offset<DetailSection> CreateDetailSectionDirect(
       fields__);
 }
 
+/// A column of this dataset that holds the key of a row in another dataset.
+/// Filters on this dataset can then narrow the other dataset: a row there
+/// matches when at least one row here that refers to it matches.
+struct ForeignKey FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ForeignKeyBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_COLUMN = 4,
+    VT_STREAM_ID = 6,
+    VT_REFERENCED_COLUMN = 8
+  };
+  /// The column of this dataset that holds the key.
+  const ::flatbuffers::String *column() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_COLUMN);
+  }
+  /// The dataset the key refers to.
+  const ObjectId *stream_id() const {
+    return GetPointer<const ObjectId *>(VT_STREAM_ID);
+  }
+  /// The column of that dataset that the key matches.
+  const ::flatbuffers::String *referenced_column() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_REFERENCED_COLUMN);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_COLUMN) &&
+           verifier.VerifyString(column()) &&
+           VerifyOffset(verifier, VT_STREAM_ID) &&
+           verifier.VerifyTable(stream_id()) &&
+           VerifyOffsetRequired(verifier, VT_REFERENCED_COLUMN) &&
+           verifier.VerifyString(referenced_column()) &&
+           verifier.EndTable();
+  }
+};
+
+struct ForeignKeyBuilder {
+  typedef ForeignKey Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_column(::flatbuffers::Offset<::flatbuffers::String> column) {
+    fbb_.AddOffset(ForeignKey::VT_COLUMN, column);
+  }
+  void add_stream_id(::flatbuffers::Offset<ObjectId> stream_id) {
+    fbb_.AddOffset(ForeignKey::VT_STREAM_ID, stream_id);
+  }
+  void add_referenced_column(::flatbuffers::Offset<::flatbuffers::String> referenced_column) {
+    fbb_.AddOffset(ForeignKey::VT_REFERENCED_COLUMN, referenced_column);
+  }
+  explicit ForeignKeyBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<ForeignKey> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<ForeignKey>(end);
+    fbb_.Required(o, ForeignKey::VT_COLUMN);
+    fbb_.Required(o, ForeignKey::VT_REFERENCED_COLUMN);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<ForeignKey> CreateForeignKey(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::String> column = 0,
+    ::flatbuffers::Offset<ObjectId> stream_id = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> referenced_column = 0) {
+  ForeignKeyBuilder builder_(_fbb);
+  builder_.add_referenced_column(referenced_column);
+  builder_.add_stream_id(stream_id);
+  builder_.add_column(column);
+  return builder_.Finish();
+}
+
+struct ForeignKey::Traits {
+  using type = ForeignKey;
+  static auto constexpr Create = CreateForeignKey;
+};
+
+inline ::flatbuffers::Offset<ForeignKey> CreateForeignKeyDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const char *column = nullptr,
+    ::flatbuffers::Offset<ObjectId> stream_id = 0,
+    const char *referenced_column = nullptr) {
+  auto column__ = column ? _fbb.CreateString(column) : 0;
+  auto referenced_column__ = referenced_column ? _fbb.CreateString(referenced_column) : 0;
+  return CreateForeignKey(
+      _fbb,
+      column__,
+      stream_id,
+      referenced_column__);
+}
+
 struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef MetadataBuilder Builder;
   struct Traits;
@@ -4110,7 +4205,8 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_DETAIL_SECTIONS = 36,
     VT_TIME_SOURCE_TYPE = 38,
     VT_TIME_SOURCE = 40,
-    VT_NEEDS_CALLER_INPUTS = 42
+    VT_NEEDS_CALLER_INPUTS = 42,
+    VT_FOREIGN_KEYS = 44
   };
   const ::flatbuffers::String *display_name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_DISPLAY_NAME);
@@ -4224,6 +4320,11 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   bool needs_caller_inputs() const {
     return GetField<uint8_t>(VT_NEEDS_CALLER_INPUTS, 0) != 0;
   }
+  /// Columns of this dataset that hold keys of rows in other datasets; see
+  /// ForeignKey.
+  const ::flatbuffers::Vector<::flatbuffers::Offset<ForeignKey>> *foreign_keys() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<ForeignKey>> *>(VT_FOREIGN_KEYS);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_DISPLAY_NAME) &&
@@ -4260,6 +4361,9 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_TIME_SOURCE) &&
            VerifyTimeSource(verifier, time_source(), time_source_type()) &&
            VerifyField<uint8_t>(verifier, VT_NEEDS_CALLER_INPUTS, 1) &&
+           VerifyOffset(verifier, VT_FOREIGN_KEYS) &&
+           verifier.VerifyVector(foreign_keys()) &&
+           verifier.VerifyVectorOfTables(foreign_keys()) &&
            verifier.EndTable();
   }
 };
@@ -4352,6 +4456,9 @@ struct MetadataBuilder {
   void add_needs_caller_inputs(bool needs_caller_inputs) {
     fbb_.AddElement<uint8_t>(Metadata::VT_NEEDS_CALLER_INPUTS, static_cast<uint8_t>(needs_caller_inputs), 0);
   }
+  void add_foreign_keys(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ForeignKey>>> foreign_keys) {
+    fbb_.AddOffset(Metadata::VT_FOREIGN_KEYS, foreign_keys);
+  }
   explicit MetadataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -4384,8 +4491,10 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadata(
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<DetailSection>>> detail_sections = 0,
     TimeSource time_source_type = TimeSource::NONE,
     ::flatbuffers::Offset<void> time_source = 0,
-    bool needs_caller_inputs = false) {
+    bool needs_caller_inputs = false,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ForeignKey>>> foreign_keys = 0) {
   MetadataBuilder builder_(_fbb);
+  builder_.add_foreign_keys(foreign_keys);
   builder_.add_time_source(time_source);
   builder_.add_detail_sections(detail_sections);
   builder_.add_visualize_in_explore_fields(visualize_in_explore_fields);
@@ -4435,7 +4544,8 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadataDirect(
     const std::vector<::flatbuffers::Offset<DetailSection>> *detail_sections = nullptr,
     TimeSource time_source_type = TimeSource::NONE,
     ::flatbuffers::Offset<void> time_source = 0,
-    bool needs_caller_inputs = false) {
+    bool needs_caller_inputs = false,
+    const std::vector<::flatbuffers::Offset<ForeignKey>> *foreign_keys = nullptr) {
   auto display_name__ = display_name ? _fbb.CreateString(display_name) : 0;
   auto description__ = description ? _fbb.CreateString(description) : 0;
   auto fields__ = fields ? _fbb.CreateVector<::flatbuffers::Offset<UlField>>(*fields) : 0;
@@ -4444,6 +4554,7 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadataDirect(
   auto promoted_metrics__ = promoted_metrics ? _fbb.CreateVector<int32_t>(*promoted_metrics) : 0;
   auto visualize_in_explore_fields__ = visualize_in_explore_fields ? _fbb.CreateVector<int32_t>(*visualize_in_explore_fields) : 0;
   auto detail_sections__ = detail_sections ? _fbb.CreateVector<::flatbuffers::Offset<DetailSection>>(*detail_sections) : 0;
+  auto foreign_keys__ = foreign_keys ? _fbb.CreateVector<::flatbuffers::Offset<ForeignKey>>(*foreign_keys) : 0;
   return CreateMetadata(
       _fbb,
       display_name__,
@@ -4465,7 +4576,8 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadataDirect(
       detail_sections__,
       time_source_type,
       time_source,
-      needs_caller_inputs);
+      needs_caller_inputs,
+      foreign_keys__);
 }
 
 inline bool VerifyComponentData(::flatbuffers::Verifier &verifier, const void *obj, ComponentData type) {

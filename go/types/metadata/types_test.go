@@ -220,6 +220,14 @@ func TestRoundTripFloatRange(t *testing.T) {
 	}
 }
 
+func TestDefaultForeignKey(t *testing.T) {
+	o := &ForeignKey{}
+	if o == nil {
+		t.Fatal("expected non-nil")
+	}
+}
+
+
 func TestDefaultGeometryData(t *testing.T) {
 	o := &GeometryData{}
 	if o == nil {

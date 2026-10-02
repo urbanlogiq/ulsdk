@@ -15,6 +15,7 @@ import { DatasetCategory } from './dataset-category';
 import { DatasetSource, DatasetSourceT } from './dataset-source';
 import { DetailSection, DetailSectionT } from './detail-section';
 import { EntityTy } from './entity-ty';
+import { ForeignKey, ForeignKeyT } from './foreign-key';
 import { GeometrySource, unionToGeometrySource, unionListToGeometrySource } from './geometry-source';
 import { NoGeometry, NoGeometryT } from './no-geometry';
 import { NoTime, NoTimeT } from './no-time';
@@ -246,8 +247,22 @@ needsCallerInputs():boolean {
   return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
 }
 
+/**
+ * Columns of this dataset that hold keys of rows in other datasets; see
+ * ForeignKey.
+ */
+foreignKeys(index: number, obj?:ForeignKey):ForeignKey|null {
+  const offset = this.bb!.__offset(this.bb_pos, 44);
+  return offset ? (obj || new ForeignKey()).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
+}
+
+foreignKeysLength():number {
+  const offset = this.bb!.__offset(this.bb_pos, 44);
+  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+}
+
 static startMetadata(builder:flatbuffers.Builder) {
-  builder.startObject(20);
+  builder.startObject(21);
 }
 
 static addDisplayName(builder:flatbuffers.Builder, displayNameOffset:flatbuffers.Offset) {
@@ -417,6 +432,22 @@ static addNeedsCallerInputs(builder:flatbuffers.Builder, needsCallerInputs:boole
   builder.addFieldInt8(19, +needsCallerInputs, +false);
 }
 
+static addForeignKeys(builder:flatbuffers.Builder, foreignKeysOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(20, foreignKeysOffset, 0);
+}
+
+static createForeignKeysVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
+  builder.startVector(4, data.length, 4);
+  for (let i = data.length - 1; i >= 0; i--) {
+    builder.addOffset(data[i]!);
+  }
+  return builder.endVector();
+}
+
+static startForeignKeysVector(builder:flatbuffers.Builder, numElems:number) {
+  builder.startVector(4, numElems, 4);
+}
+
 static endMetadata(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   return offset;
@@ -460,7 +491,8 @@ unpack(): MetadataT {
       if(temp === null) { return null; }
       return temp.unpack()
   })(),
-    this.needsCallerInputs()
+    this.needsCallerInputs(),
+    this.bb!.createObjList<ForeignKey, ForeignKeyT>(this.foreignKeys.bind(this), this.foreignKeysLength())
   );
 }
 
@@ -494,6 +526,7 @@ unpackTo(_o: MetadataT): void {
       return temp.unpack()
   })();
   _o.needsCallerInputs = this.needsCallerInputs();
+  _o.foreignKeys = this.bb!.createObjList<ForeignKey, ForeignKeyT>(this.foreignKeys.bind(this), this.foreignKeysLength());
 }
 }
 
@@ -518,7 +551,8 @@ constructor(
   public detailSections: (DetailSectionT)[] = [],
   public timeSourceType: TimeSource = TimeSource.NONE,
   public timeSource: ColumnTimeT|NoTimeT|null = null,
-  public needsCallerInputs: boolean = false
+  public needsCallerInputs: boolean = false,
+  public foreignKeys: (ForeignKeyT)[] = []
 ){}
 
 
@@ -534,6 +568,7 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   const visualizeInExploreFields = Metadata.createVisualizeInExploreFieldsVector(builder, this.visualizeInExploreFields);
   const detailSections = Metadata.createDetailSectionsVector(builder, builder.createObjectOffsetList(this.detailSections));
   const timeSource = builder.createObjectOffset(this.timeSource);
+  const foreignKeys = Metadata.createForeignKeysVector(builder, builder.createObjectOffsetList(this.foreignKeys));
 
   Metadata.startMetadata(builder);
   Metadata.addDisplayName(builder, displayName);
@@ -556,6 +591,7 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   Metadata.addTimeSourceType(builder, this.timeSourceType);
   Metadata.addTimeSource(builder, timeSource);
   Metadata.addNeedsCallerInputs(builder, this.needsCallerInputs);
+  Metadata.addForeignKeys(builder, foreignKeys);
 
   return Metadata.endMetadata(builder);
 }

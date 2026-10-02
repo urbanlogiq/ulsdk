@@ -94,6 +94,18 @@ public final class Metadata {
         this._fields = value;
     }
 
+    /**
+     *  Columns of this dataset that hold keys of rows in other datasets; see
+     *  ForeignKey.
+     */
+    com.urbanlogiq.ulsdk.types.ForeignKey[] _foreignKeys;
+    public com.urbanlogiq.ulsdk.types.ForeignKey[] getForeignKeys() {
+        return this._foreignKeys;
+    }
+    public void setForeignKeys(com.urbanlogiq.ulsdk.types.ForeignKey[] value) {
+        this._foreignKeys = value;
+    }
+
     com.urbanlogiq.ulsdk.types.GeometrySource _geometrySource;
     public com.urbanlogiq.ulsdk.types.GeometrySource getGeometrySource() {
         return this._geometrySource;
@@ -247,6 +259,17 @@ public final class Metadata {
             }
             this._fields = fields;
         }
+        if (o.foreignKeysVector() != null) {
+            com.urbanlogiq.ulsdk.types.ForeignKey[] foreignKeys = new com.urbanlogiq.ulsdk.types.ForeignKey[o.foreignKeysLength()];
+            for (int i = 0; i < o.foreignKeysLength(); i++) {
+                com.urbanlogiq.ulsdk.types.ForeignKey foreignKeysValue = null;
+                if (o.foreignKeys(i) != null) {
+                    foreignKeysValue = new com.urbanlogiq.ulsdk.types.ForeignKey(o.foreignKeys(i));
+                }
+                foreignKeys[i] = foreignKeysValue;
+            }
+            this._foreignKeys = foreignKeys;
+        }
         Object geometrySourceValue = null;
         var geometrySourceTy = o.geometrySourceType();
         if (geometrySourceTy == com.urbanlogiq.ulsdk.types.generated.GeometrySource.NoGeometry) {
@@ -361,6 +384,18 @@ public final class Metadata {
             }
             fieldsOffset = builder.endVector();
         }
+        Integer foreignKeysOffset = null;
+        if (this._foreignKeys != null) {
+            int[] foreignKeysOffsets = new int[this._foreignKeys.length];;
+            for (int i = 0; i < this._foreignKeys.length; i++) {
+                foreignKeysOffsets[i] = this._foreignKeys[i].serializeTo(builder);
+            }
+            com.urbanlogiq.ulsdk.types.generated.Metadata.startForeignKeysVector(builder, this._foreignKeys.length);
+            for (int i = foreignKeysOffsets.length - 1; i >= 0; i--) {
+                builder.addOffset(foreignKeysOffsets[i]);
+            }
+            foreignKeysOffset = builder.endVector();
+        }
         com.urbanlogiq.ulsdk.Pair<Integer, Byte> geometrySourcePair = null;
         if (this._geometrySource != null) {
             geometrySourcePair = this._geometrySource.serializeTo(builder);
@@ -417,6 +452,9 @@ public final class Metadata {
         if (fieldsOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.Metadata.addFields(builder, fieldsOffset);
         }
+        if (foreignKeysOffset != null) {
+            com.urbanlogiq.ulsdk.types.generated.Metadata.addForeignKeys(builder, foreignKeysOffset);
+        }
         if (geometrySourcePair != null) {
             com.urbanlogiq.ulsdk.types.generated.Metadata.addGeometrySource(builder, geometrySourcePair.first());
             com.urbanlogiq.ulsdk.types.generated.Metadata.addGeometrySourceType(builder, geometrySourcePair.second());
@@ -456,6 +494,7 @@ public final class Metadata {
         this._displayName = new String();
         this._fieldRelationships = new com.urbanlogiq.ulsdk.types.UlFieldRelationship[0];
         this._fields = new com.urbanlogiq.ulsdk.types.UlField[0];
+        this._foreignKeys = new com.urbanlogiq.ulsdk.types.ForeignKey[0];
         this._geometrySource = new com.urbanlogiq.ulsdk.types.GeometrySource();
         this._promotedMetrics = new int[0];
         this._source = new com.urbanlogiq.ulsdk.types.DatasetSource();

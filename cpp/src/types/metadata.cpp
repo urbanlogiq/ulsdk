@@ -1754,6 +1754,72 @@ FloatBucket::operator==(const FloatBucket &rhs) const {
     return true;
 }
 
+::flatbuffers::Offset<::ForeignKey>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ForeignKey &o) {
+    const ::flatbuffers::Offset<::flatbuffers::String> column_offset = builder.CreateString(o.column_);
+    const ::flatbuffers::Offset<::flatbuffers::String> referenced_column_offset = builder.CreateString(o.referenced_column_);
+    std::optional<::flatbuffers::Offset<::ObjectId>> stream_id_offset = std::nullopt;
+    if (o.stream_id_.has_value()) {
+        const ::flatbuffers::Offset<::ObjectId> stream_id_offset_val = serialize_to(builder, o.stream_id_.value());
+        stream_id_offset = std::make_optional(stream_id_offset_val);
+    }
+
+    ::ForeignKeyBuilder instance_builder = ::ForeignKeyBuilder(builder);
+    instance_builder.add_column(column_offset);
+    instance_builder.add_referenced_column(referenced_column_offset);
+    if (stream_id_offset.has_value()) {
+        instance_builder.add_stream_id(stream_id_offset.value());
+    }
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const ForeignKey &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+ForeignKey::ForeignKey()
+    : column_()
+    , referenced_column_()
+    , stream_id_(std::nullopt) {
+}
+
+ForeignKey::ForeignKey(const std::vector<uint8_t> &bytes)
+    : ForeignKey(::flatbuffers::GetSizePrefixedRoot<::ForeignKey>(bytes.data())) {
+}
+
+ForeignKey::ForeignKey(const ::ForeignKey *root) 
+    : column_()
+    , referenced_column_()
+    , stream_id_(std::nullopt) {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+        column_ = std::string(*root->column()->begin(), *root->column()->end());
+        referenced_column_ = std::string(*root->referenced_column()->begin(), *root->referenced_column()->end());
+    if (root->stream_id() != nullptr) {
+        stream_id_ = decltype(stream_id_)(root->stream_id());
+    }
+}
+
+bool
+ForeignKey::operator==(const ForeignKey &rhs) const {
+    if (this->column_ != rhs.column_) {
+        return false;
+    }
+    if (this->referenced_column_ != rhs.referenced_column_) {
+        return false;
+    }
+    if (this->stream_id_ != rhs.stream_id_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::GeometryData>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const GeometryData &o) {
     const std::pair<::flatbuffers::Offset<void>, ::GeometryDataUnion> data_offset = serialize_to(builder, o.data_);
@@ -2099,6 +2165,17 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Metadata &o) {
         const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::UlField>>> fields_offset_val = builder.CreateVector(fields_offsets);
         fields_offset = std::make_optional(fields_offset_val);
     }
+    std::optional<::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::ForeignKey>>>> foreign_keys_offset = std::nullopt;
+    if (o.foreign_keys_.has_value()) {
+        const auto &foreign_keys__var = o.foreign_keys_.value();
+        std::vector<::flatbuffers::Offset<::ForeignKey>> foreign_keys_offsets = std::vector<::flatbuffers::Offset<::ForeignKey>>();
+        foreign_keys_offsets.reserve(foreign_keys__var.size());
+        for (const auto &i: foreign_keys__var) {
+            foreign_keys_offsets.push_back(serialize_to(builder, i));
+        }
+        const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::ForeignKey>>> foreign_keys_offset_val = builder.CreateVector(foreign_keys_offsets);
+        foreign_keys_offset = std::make_optional(foreign_keys_offset_val);
+    }
     std::optional<std::pair<::flatbuffers::Offset<void>, ::GeometrySource>> geometry_source_offset = std::nullopt;
     if (o.geometry_source_.has_value()) {
         const std::pair<::flatbuffers::Offset<void>, ::GeometrySource> geometry_source_offset_val = serialize_to(builder, o.geometry_source_.value());
@@ -2150,6 +2227,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Metadata &o) {
     if (fields_offset.has_value()) {
         instance_builder.add_fields(fields_offset.value());
     }
+    if (foreign_keys_offset.has_value()) {
+        instance_builder.add_foreign_keys(foreign_keys_offset.value());
+    }
     if (geometry_source_offset.has_value()) {
         const auto geometry_source_opt = geometry_source_offset.value();
         instance_builder.add_geometry_source(geometry_source_opt.first);
@@ -2196,6 +2276,7 @@ Metadata::Metadata()
     , entity_ty_(EntityTy(0))
     , field_relationships_(std::nullopt)
     , fields_(std::nullopt)
+    , foreign_keys_(std::nullopt)
     , geometry_source_(std::nullopt)
     , location_description_field_(-1)
     , needs_caller_inputs_(false)
@@ -2221,6 +2302,7 @@ Metadata::Metadata(const ::Metadata *root)
     , entity_ty_(EntityTy(0))
     , field_relationships_(std::nullopt)
     , fields_(std::nullopt)
+    , foreign_keys_(std::nullopt)
     , geometry_source_(std::nullopt)
     , location_description_field_(-1)
     , needs_caller_inputs_(false)
@@ -2270,6 +2352,15 @@ Metadata::Metadata(const ::Metadata *root)
             fields__target.emplace_back(i);
         }
         fields_ = std::make_optional(fields__target);
+    }
+    const auto &foreign_keys_vector = root->foreign_keys();
+    if (foreign_keys_vector != nullptr) {
+        decltype(foreign_keys_)::value_type foreign_keys__target = decltype(foreign_keys_)::value_type();
+        foreign_keys__target.reserve(foreign_keys_vector->size());
+        for (const auto &i: *foreign_keys_vector) {
+            foreign_keys__target.emplace_back(i);
+        }
+        foreign_keys_ = std::make_optional(foreign_keys__target);
     }
     if (root->geometry_source() != nullptr) {
         switch (root->geometry_source_type()) {
@@ -2372,6 +2463,9 @@ Metadata::operator==(const Metadata &rhs) const {
         return false;
     }
     if (this->fields_ != rhs.fields_) {
+        return false;
+    }
+    if (this->foreign_keys_ != rhs.foreign_keys_) {
         return false;
     }
     if (this->geometry_source_ != rhs.geometry_source_) {

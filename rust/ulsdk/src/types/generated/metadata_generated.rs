@@ -9696,6 +9696,200 @@ impl core::fmt::Debug for DetailSection<'_> {
         ds.finish()
     }
 }
+pub enum ForeignKeyOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+/// A column of this dataset that holds the key of a row in another dataset.
+/// Filters on this dataset can then narrow the other dataset: a row there
+/// matches when at least one row here that refers to it matches.
+pub struct ForeignKey<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for ForeignKey<'a> {
+    type Inner = ForeignKey<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> ForeignKey<'a> {
+    pub const VT_COLUMN: flatbuffers::VOffsetT = 4;
+    pub const VT_STREAM_ID: flatbuffers::VOffsetT = 6;
+    pub const VT_REFERENCED_COLUMN: flatbuffers::VOffsetT = 8;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        ForeignKey { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args ForeignKeyArgs<'args>,
+    ) -> flatbuffers::WIPOffset<ForeignKey<'bldr>> {
+        let mut builder = ForeignKeyBuilder::new(_fbb);
+        if let Some(x) = args.referenced_column {
+            builder.add_referenced_column(x);
+        }
+        if let Some(x) = args.stream_id {
+            builder.add_stream_id(x);
+        }
+        if let Some(x) = args.column {
+            builder.add_column(x);
+        }
+        builder.finish()
+    }
+
+    /// The column of this dataset that holds the key.
+    #[inline]
+    pub fn column(&self) -> &'a str {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<&str>>(ForeignKey::VT_COLUMN, None)
+                .unwrap()
+        }
+    }
+    /// The dataset the key refers to.
+    #[inline]
+    pub fn stream_id(&self) -> Option<ObjectId<'a>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<ObjectId>>(ForeignKey::VT_STREAM_ID, None)
+        }
+    }
+    /// The column of that dataset that the key matches.
+    #[inline]
+    pub fn referenced_column(&self) -> &'a str {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<&str>>(ForeignKey::VT_REFERENCED_COLUMN, None)
+                .unwrap()
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for ForeignKey<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<&str>>("column", Self::VT_COLUMN, true)?
+            .visit_field::<flatbuffers::ForwardsUOffset<ObjectId>>(
+                "stream_id",
+                Self::VT_STREAM_ID,
+                false,
+            )?
+            .visit_field::<flatbuffers::ForwardsUOffset<&str>>(
+                "referenced_column",
+                Self::VT_REFERENCED_COLUMN,
+                true,
+            )?
+            .finish();
+        Ok(())
+    }
+}
+pub struct ForeignKeyArgs<'a> {
+    pub column: Option<flatbuffers::WIPOffset<&'a str>>,
+    pub stream_id: Option<flatbuffers::WIPOffset<ObjectId<'a>>>,
+    pub referenced_column: Option<flatbuffers::WIPOffset<&'a str>>,
+}
+impl<'a> Default for ForeignKeyArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        ForeignKeyArgs {
+            column: None, // required field
+            stream_id: None,
+            referenced_column: None, // required field
+        }
+    }
+}
+
+impl Serialize for ForeignKey<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("ForeignKey", 3)?;
+        s.serialize_field("column", &self.column())?;
+        if let Some(f) = self.stream_id() {
+            s.serialize_field("stream_id", &f)?;
+        } else {
+            s.skip_field("stream_id")?;
+        }
+        s.serialize_field("referenced_column", &self.referenced_column())?;
+        s.end()
+    }
+}
+
+pub struct ForeignKeyBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ForeignKeyBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_column(&mut self, column: flatbuffers::WIPOffset<&'b str>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(ForeignKey::VT_COLUMN, column);
+    }
+    #[inline]
+    pub fn add_stream_id(&mut self, stream_id: flatbuffers::WIPOffset<ObjectId<'b>>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<ObjectId>>(
+                ForeignKey::VT_STREAM_ID,
+                stream_id,
+            );
+    }
+    #[inline]
+    pub fn add_referenced_column(&mut self, referenced_column: flatbuffers::WIPOffset<&'b str>) {
+        self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(
+            ForeignKey::VT_REFERENCED_COLUMN,
+            referenced_column,
+        );
+    }
+    #[inline]
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> ForeignKeyBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        ForeignKeyBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<ForeignKey<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_.required(o, ForeignKey::VT_COLUMN, "column");
+        self.fbb_
+            .required(o, ForeignKey::VT_REFERENCED_COLUMN, "referenced_column");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for ForeignKey<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("ForeignKey");
+        ds.field("column", &self.column());
+        ds.field("stream_id", &self.stream_id());
+        ds.field("referenced_column", &self.referenced_column());
+        ds.finish()
+    }
+}
 pub enum MetadataOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -9734,6 +9928,7 @@ impl<'a> Metadata<'a> {
     pub const VT_TIME_SOURCE_TYPE: flatbuffers::VOffsetT = 38;
     pub const VT_TIME_SOURCE: flatbuffers::VOffsetT = 40;
     pub const VT_NEEDS_CALLER_INPUTS: flatbuffers::VOffsetT = 42;
+    pub const VT_FOREIGN_KEYS: flatbuffers::VOffsetT = 44;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -9745,6 +9940,9 @@ impl<'a> Metadata<'a> {
         args: &'args MetadataArgs<'args>,
     ) -> flatbuffers::WIPOffset<Metadata<'bldr>> {
         let mut builder = MetadataBuilder::new(_fbb);
+        if let Some(x) = args.foreign_keys {
+            builder.add_foreign_keys(x);
+        }
         if let Some(x) = args.time_source {
             builder.add_time_source(x);
         }
@@ -10062,6 +10260,21 @@ impl<'a> Metadata<'a> {
                 .unwrap()
         }
     }
+    /// Columns of this dataset that hold keys of rows in other datasets; see
+    /// ForeignKey.
+    #[inline]
+    pub fn foreign_keys(
+        &self,
+    ) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ForeignKey<'a>>>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab.get::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ForeignKey>>,
+            >>(Metadata::VT_FOREIGN_KEYS, None)
+        }
+    }
     #[inline]
     #[allow(non_snake_case)]
     pub fn geometry_source_as_no_geometry(&self) -> Option<NoGeometry<'a>> {
@@ -10195,6 +10408,7 @@ impl flatbuffers::Verifiable for Metadata<'_> {
         }
      })?
      .visit_field::<bool>("needs_caller_inputs", Self::VT_NEEDS_CALLER_INPUTS, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<ForeignKey>>>>("foreign_keys", Self::VT_FOREIGN_KEYS, false)?
      .finish();
         Ok(())
     }
@@ -10230,6 +10444,11 @@ pub struct MetadataArgs<'a> {
     pub time_source_type: TimeSource,
     pub time_source: Option<flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>>,
     pub needs_caller_inputs: bool,
+    pub foreign_keys: Option<
+        flatbuffers::WIPOffset<
+            flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ForeignKey<'a>>>,
+        >,
+    >,
 }
 impl<'a> Default for MetadataArgs<'a> {
     #[inline]
@@ -10255,6 +10474,7 @@ impl<'a> Default for MetadataArgs<'a> {
             time_source_type: TimeSource::NONE,
             time_source: None,
             needs_caller_inputs: false,
+            foreign_keys: None,
         }
     }
 }
@@ -10264,7 +10484,7 @@ impl Serialize for Metadata<'_> {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("Metadata", 20)?;
+        let mut s = serializer.serialize_struct("Metadata", 21)?;
         if let Some(f) = self.display_name() {
             s.serialize_field("display_name", &f)?;
         } else {
@@ -10368,6 +10588,11 @@ impl Serialize for Metadata<'_> {
             _ => unimplemented!(),
         }
         s.serialize_field("needs_caller_inputs", &self.needs_caller_inputs())?;
+        if let Some(f) = self.foreign_keys() {
+            s.serialize_field("foreign_keys", &f)?;
+        } else {
+            s.skip_field("foreign_keys")?;
+        }
         s.end()
     }
 }
@@ -10536,6 +10761,16 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> MetadataBuilder<'a, 'b, A> {
             .push_slot::<bool>(Metadata::VT_NEEDS_CALLER_INPUTS, needs_caller_inputs, false);
     }
     #[inline]
+    pub fn add_foreign_keys(
+        &mut self,
+        foreign_keys: flatbuffers::WIPOffset<
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<ForeignKey<'b>>>,
+        >,
+    ) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(Metadata::VT_FOREIGN_KEYS, foreign_keys);
+    }
+    #[inline]
     pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> MetadataBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         MetadataBuilder {
@@ -10652,6 +10887,7 @@ impl core::fmt::Debug for Metadata<'_> {
             }
         };
         ds.field("needs_caller_inputs", &self.needs_caller_inputs());
+        ds.field("foreign_keys", &self.foreign_keys());
         ds.finish()
     }
 }

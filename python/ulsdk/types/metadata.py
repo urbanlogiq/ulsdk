@@ -185,6 +185,7 @@ from .generated.FloatAggregate import FloatAggregate as FbsFloatAggregate
 from .generated.FloatBucket import FloatBucket as FbsFloatBucket
 from .generated.FloatRange import FloatRange as FbsFloatRange
 from .generated.FloatingPoint import FloatingPoint as FbsFloatingPoint
+from .generated.ForeignKey import ForeignKey as FbsForeignKey
 from .generated.GenericId import GenericId as FbsGenericId
 from .generated.Geom import Geom as FbsGeom
 from .generated.GeomOp import GeomOp as FbsGeomOp
@@ -2504,6 +2505,84 @@ class FloatBucket:
         return eq
 
 @dataclass
+class ForeignKey:
+    """ A column of this dataset that holds the key of a row in another dataset.
+     Filters on this dataset can then narrow the other dataset: a row there
+     matches when at least one row here that refers to it matches.
+    """
+
+    # The column of this dataset that holds the key.
+    column: "str"
+
+    # The column of that dataset that the key matches.
+    referenced_column: "str"
+
+    # The dataset the key refers to.
+    stream_id: Optional["ObjectId"]
+
+    @classmethod
+    def from_fbs(cls, o: FbsForeignKey) -> Self:
+        column_str = o.Column()
+        assert column_str is not None
+        column = column_str.decode('utf-8')
+        referenced_column_str = o.ReferencedColumn()
+        assert referenced_column_str is not None
+        referenced_column = referenced_column_str.decode('utf-8')
+        stream_id = None
+        stream_id_obj = o.StreamId()
+        if stream_id_obj is not None:
+            stream_id = ObjectId.from_fbs(stream_id_obj)
+        return cls(column, referenced_column, stream_id)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsForeignKey.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.ForeignKey import (
+            Start,
+            AddColumn,
+            AddReferencedColumn,
+            AddStreamId,
+            End,
+        )
+        column_offset = builder.CreateString(self.column)
+        referenced_column_offset = builder.CreateString(self.referenced_column)
+        stream_id_offset = None
+        if self.stream_id is not None:
+            stream_id_offset = self.stream_id.serialize_to(builder)
+
+        Start(builder)
+        AddColumn(builder, column_offset)
+        AddReferencedColumn(builder, referenced_column_offset)
+        if stream_id_offset is not None:
+            AddStreamId(builder, stream_id_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        column = ""
+        referenced_column = ""
+        stream_id = ObjectId.make_default()
+        return cls(column, referenced_column, stream_id)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.column == other.column
+        eq = eq and self.referenced_column == other.referenced_column
+        eq = eq and self.stream_id == other.stream_id
+
+        return eq
+
+@dataclass
 class GeometryData:
     data: "GeometryDataUnion"
 
@@ -2849,6 +2928,10 @@ class Metadata:
 
     fields: Optional["List[UlField]"]
 
+    # Columns of this dataset that hold keys of rows in other datasets; see
+    # ForeignKey.
+    foreign_keys: Optional["List[ForeignKey]"]
+
     geometry_source: Optional["GeometrySource"]
 
     # Many geospatial datasets whose rows correspond to map locations have a
@@ -2930,6 +3013,14 @@ class Metadata:
                 if fields_obj is not None:
                     fields_val = UlField.from_fbs(fields_obj)
                 fields.append(fields_val)
+        foreign_keys = list()
+        if not o.ForeignKeysIsNone():
+            for i in range(o.ForeignKeysLength()):
+                foreign_keys_val = None
+                foreign_keys_obj = o.ForeignKeys(i)
+                if foreign_keys_obj is not None:
+                    foreign_keys_val = ForeignKey.from_fbs(foreign_keys_obj)
+                foreign_keys.append(foreign_keys_val)
         geometry_source = None
         geometry_source_val = o.GeometrySource()
         if geometry_source_val is not None:
@@ -2959,7 +3050,7 @@ class Metadata:
         if not o.VisualizeInExploreFieldsIsNone():
             for i in range(o.VisualizeInExploreFieldsLength()):
                 visualize_in_explore_fields.append(o.VisualizeInExploreFields(i))
-        return cls(area_selection, dataset_category, description, detail_sections, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, needs_caller_inputs, promoted_metrics, source, summary, time_source, update_cadence, visualize_in_explore_fields)
+        return cls(area_selection, dataset_category, description, detail_sections, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, foreign_keys, geometry_source, location_description_field, needs_caller_inputs, promoted_metrics, source, summary, time_source, update_cadence, visualize_in_explore_fields)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -2982,6 +3073,8 @@ class Metadata:
             StartFieldRelationshipsVector,
             AddFields,
             StartFieldsVector,
+            AddForeignKeys,
+            StartForeignKeysVector,
             AddGeometrySource,
             AddGeometrySourceType,
             AddLocationDescriptionField,
@@ -3031,6 +3124,15 @@ class Metadata:
             for i in reversed(range(len(self.fields))):
                 builder.PrependUOffsetTRelative(fields_offsets[i])
             fields_offset = builder.EndVector()
+        foreign_keys_offset = None
+        if self.foreign_keys is not None:
+            foreign_keys_offsets = list()
+            for value in self.foreign_keys:
+                foreign_keys_offsets.append(value.serialize_to(builder))
+            StartForeignKeysVector(builder, len(self.foreign_keys))
+            for i in reversed(range(len(self.foreign_keys))):
+                builder.PrependUOffsetTRelative(foreign_keys_offsets[i])
+            foreign_keys_offset = builder.EndVector()
         geometry_source_offset, geometry_source_ty = (None, None)
         if self.geometry_source is not None:
             geometry_source_offset, geometry_source_ty = self.geometry_source.serialize_to(builder)
@@ -3074,6 +3176,8 @@ class Metadata:
             AddFieldRelationships(builder, field_relationships_offset)
         if fields_offset is not None:
             AddFields(builder, fields_offset)
+        if foreign_keys_offset is not None:
+            AddForeignKeys(builder, foreign_keys_offset)
         if geometry_source_offset is not None and geometry_source_ty is not None:
             AddGeometrySource(builder, geometry_source_offset)
             AddGeometrySourceType(builder, geometry_source_ty)
@@ -3110,6 +3214,7 @@ class Metadata:
         entity_ty = EntityTy(0)
         field_relationships = []
         fields = []
+        foreign_keys = []
         geometry_source = GeometrySource.make_default()
         location_description_field = 0
         needs_caller_inputs = False
@@ -3119,7 +3224,7 @@ class Metadata:
         time_source = TimeSource.make_default()
         update_cadence = UpdateCadence(0)
         visualize_in_explore_fields = []
-        return cls(area_selection, dataset_category, description, detail_sections, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, geometry_source, location_description_field, needs_caller_inputs, promoted_metrics, source, summary, time_source, update_cadence, visualize_in_explore_fields)
+        return cls(area_selection, dataset_category, description, detail_sections, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, foreign_keys, geometry_source, location_description_field, needs_caller_inputs, promoted_metrics, source, summary, time_source, update_cadence, visualize_in_explore_fields)
 
     def __eq__(self, other) -> bool:
         eq = True
@@ -3161,6 +3266,17 @@ class Metadata:
         elif self_fields is not None and other_fields is None:
             return False
         elif self_fields is None and other_fields is not None:
+            return False
+        self_foreign_keys = self.foreign_keys
+        other_foreign_keys = other.foreign_keys
+        if self_foreign_keys is not None and other_foreign_keys is not None:
+            if len(self_foreign_keys) != len(other_foreign_keys):
+                return False
+            for i in range(len(self_foreign_keys)):
+                eq = eq and self_foreign_keys[i] == other_foreign_keys[i]
+        elif self_foreign_keys is not None and other_foreign_keys is None:
+            return False
+        elif self_foreign_keys is None and other_foreign_keys is not None:
             return False
         eq = eq and self.geometry_source == other.geometry_source
         eq = eq and self.location_description_field == other.location_description_field

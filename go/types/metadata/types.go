@@ -1336,6 +1336,55 @@ func FloatBucketFromFbs(fbs *generated.FloatBucket) *FloatBucket {
 }
 
 
+// ForeignKey -
+//  A column of this dataset that holds the key of a row in another dataset.
+//  Filters on this dataset can then narrow the other dataset: a row there
+//  matches when at least one row here that refers to it matches.
+type ForeignKey struct {
+	Column string
+	ReferencedColumn string
+	StreamId *id.ObjectId
+}
+
+func ForeignKeyFromFbs(fbs *generated.ForeignKey) *ForeignKey {
+	o := &ForeignKey{}
+	o.Column = string(fbs.Column())
+	o.ReferencedColumn = string(fbs.ReferencedColumn())
+	if fbsVal := fbs.StreamId(nil); fbsVal != nil {
+		o.StreamId = id.ObjectIdFromFbs(fbsVal)
+	}
+	return o
+}
+
+// ForeignKeyFromBytes deserializes a ForeignKey from size-prefixed FlatBuffer bytes.
+func ForeignKeyFromBytes(data []byte) (*ForeignKey, error) {
+	fbs := generated.GetSizePrefixedRootAsForeignKey(data, 0)
+	return ForeignKeyFromFbs(fbs), nil
+}
+
+// ToBytes serializes the ForeignKey to size-prefixed FlatBuffer bytes.
+func (o *ForeignKey) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the ForeignKey into a FlatBuffer builder and returns the offset.
+func (o *ForeignKey) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	columnOffset := builder.CreateString(o.Column)
+	referencedColumnOffset := builder.CreateString(o.ReferencedColumn)
+	var streamIdOffset flatbuffers.UOffsetT
+	if o.StreamId != nil {
+		streamIdOffset = o.StreamId.SerializeTo(builder)
+	}
+	generated.ForeignKeyStart(builder)
+	generated.ForeignKeyAddColumn(builder, columnOffset)
+	generated.ForeignKeyAddReferencedColumn(builder, referencedColumnOffset)
+	generated.ForeignKeyAddStreamId(builder, streamIdOffset)
+	return generated.ForeignKeyEnd(builder)
+}
+
 type GeometryData struct {
 	Data interface{}
 }
@@ -1519,6 +1568,7 @@ type Metadata struct {
 	EntityTy int32
 	FieldRelationships []UlFieldRelationship
 	Fields []UlField
+	ForeignKeys []ForeignKey
 	GeometrySource interface{}
 	LocationDescriptionField int32
 	NeedsCallerInputs bool
@@ -1560,6 +1610,12 @@ func MetadataFromFbs(fbs *generated.Metadata) *Metadata {
 		var item generated.UlField
 		if fbs.Fields(&item, i) {
 			o.Fields = append(o.Fields, *UlFieldFromFbs(&item))
+		}
+	}
+	for i := 0; i < fbs.ForeignKeysLength(); i++ {
+		var item generated.ForeignKey
+		if fbs.ForeignKeys(&item, i) {
+			o.ForeignKeys = append(o.ForeignKeys, *ForeignKeyFromFbs(&item))
 		}
 	}
 	o.LocationDescriptionField = fbs.LocationDescriptionField()
@@ -1631,6 +1687,15 @@ func (o *Metadata) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 		builder.PrependUOffsetT(fieldsOffsets[i])
 	}
 	fieldsVecOffset := builder.EndVector(len(o.Fields))
+	foreignKeysOffsets := make([]flatbuffers.UOffsetT, len(o.ForeignKeys))
+	for i := range o.ForeignKeys {
+		foreignKeysOffsets[i] = o.ForeignKeys[i].SerializeTo(builder)
+	}
+	generated.MetadataStartForeignKeysVector(builder, len(o.ForeignKeys))
+	for i := len(foreignKeysOffsets) - 1; i >= 0; i-- {
+		builder.PrependUOffsetT(foreignKeysOffsets[i])
+	}
+	foreignKeysVecOffset := builder.EndVector(len(o.ForeignKeys))
 	generated.MetadataStartPromotedMetricsVector(builder, len(o.PromotedMetrics))
 	for i := len(o.PromotedMetrics) - 1; i >= 0; i-- {
 		builder.PrependInt32(o.PromotedMetrics[i])
@@ -1660,6 +1725,7 @@ func (o *Metadata) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 	generated.MetadataAddEntityTy(builder, generated.EntityTy(o.EntityTy))
 	generated.MetadataAddFieldRelationships(builder, fieldRelationshipsVecOffset)
 	generated.MetadataAddFields(builder, fieldsVecOffset)
+	generated.MetadataAddForeignKeys(builder, foreignKeysVecOffset)
 	generated.MetadataAddLocationDescriptionField(builder, o.LocationDescriptionField)
 	generated.MetadataAddNeedsCallerInputs(builder, o.NeedsCallerInputs)
 	generated.MetadataAddPromotedMetrics(builder, promotedMetricsVecOffset)

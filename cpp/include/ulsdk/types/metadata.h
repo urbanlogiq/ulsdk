@@ -39,6 +39,7 @@ struct Documents;
 struct FloatAggregate;
 struct FloatBucket;
 struct FloatRange;
+struct ForeignKey;
 struct GeometryData;
 struct HierarchicalRelationship;
 struct HierarchyRelationshipData;
@@ -498,6 +499,25 @@ struct FloatBucket {
     }
 };
 
+///
+/// A column of this dataset that holds the key of a row in another dataset.
+/// Filters on this dataset can then narrow the other dataset: a row there
+/// matches when at least one row here that refers to it matches.
+///
+struct ForeignKey {
+    std::string column_;
+    std::string referenced_column_;
+    std::optional<ObjectId> stream_id_;
+
+    ForeignKey();
+    ForeignKey(const ::ForeignKey *root);
+    ForeignKey(const std::vector<uint8_t> &bytes);
+    bool operator==(const ForeignKey &rhs) const;
+    bool operator!=(const ForeignKey &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
 struct GeometryData {
     GeometryDataUnion data_;
 
@@ -576,6 +596,7 @@ struct Metadata {
     EntityTy entity_ty_;
     std::optional<std::vector<UlFieldRelationship>> field_relationships_;
     std::optional<std::vector<UlField>> fields_;
+    std::optional<std::vector<ForeignKey>> foreign_keys_;
     std::optional<GeometrySource> geometry_source_;
     int32_t location_description_field_;
     bool needs_caller_inputs_;
@@ -807,6 +828,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Documents &);
 ::flatbuffers::Offset<::FloatAggregate>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const FloatAggregate &);
 
+::flatbuffers::Offset<::ForeignKey>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ForeignKey &);
+
 ::flatbuffers::Offset<::GeometryData>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const GeometryData &);
 
@@ -918,6 +942,9 @@ to_bytes(const Documents &o);
 
 std::vector<uint8_t>
 to_bytes(const FloatAggregate &o);
+
+std::vector<uint8_t>
+to_bytes(const ForeignKey &o);
 
 std::vector<uint8_t>
 to_bytes(const GeometryData &o);
