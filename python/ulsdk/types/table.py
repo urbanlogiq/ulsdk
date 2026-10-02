@@ -142,6 +142,7 @@ from .query import (
     QueryElementUnion,
     QueryTableSource,
     SetExpr,
+    SetQuantifier,
     TableOrderBy,
     TablePartition,
     TableSource,

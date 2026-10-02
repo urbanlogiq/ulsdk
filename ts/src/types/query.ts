@@ -1572,6 +1572,12 @@ export class BinaryQueryElement {
 
   private _op!: number;
 
+/**
+ *  `ALL` keeps duplicate rows; `BY NAME` matches columns by name instead of
+ *  position. See `SetQuantifier`.
+ */
+  private _quantifier!: number;
+
   private _rhs!: QueryElement;
 
   constructor(arg?: FbsBinaryQueryElement | Uint8Array) {
@@ -1584,6 +1590,7 @@ export class BinaryQueryElement {
     } else {
       this._lhs = new QueryElement();
       this._op = 0;
+      this._quantifier = 0;
       this._rhs = new QueryElement();
     }
   }
@@ -1592,6 +1599,7 @@ export class BinaryQueryElement {
     const lhsVal = fbs.lhs();
     this._lhs = lhsVal ? new QueryElement(lhsVal) : new QueryElement();
     this._op = fbs.op();
+    this._quantifier = fbs.quantifier();
     const rhsVal = fbs.rhs();
     this._rhs = rhsVal ? new QueryElement(rhsVal) : new QueryElement();
   }
@@ -1612,6 +1620,14 @@ export class BinaryQueryElement {
     this._op = value;
   }
 
+  get quantifier(): number {
+    return this._quantifier;
+  }
+
+  set quantifier(value: number) {
+    this._quantifier = value;
+  }
+
   get rhs(): QueryElement {
     return this._rhs;
   }
@@ -1624,6 +1640,7 @@ export class BinaryQueryElement {
     const t = new FbsBinaryQueryElementT();
     t.lhs = this._lhs.toFbsT();
     t.op = this._op;
+    t.quantifier = this._quantifier;
     t.rhs = this._rhs.toFbsT();
     return t;
   }
@@ -3032,6 +3049,15 @@ export class AlterTableElement {
 }
 
 export type QueryElementUnion = UnaryQueryElement | BinaryQueryElement | UpdateQueryElement | DeleteQueryElement | InsertQueryElement | AlterTableElement;
+
+/**
+ *  The quantifier written after a set operator, as sqlparser models it.
+ *  `None` first, so the default (0) means "no quantifier written", which is
+ *  the distinct form and what every query stored before this field existed
+ *  reads as. The engine decides which combinations it can plan; the IR only
+ *  carries what the author wrote.
+ */
+export { SetQuantifier } from './generated/set-quantifier';
 
 export { TypeHint } from './generated/type-hint';
 

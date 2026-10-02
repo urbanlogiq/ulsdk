@@ -83,9 +83,10 @@ use crate::types::generated::query_generated::{
     Placeholder as FbsPlaceholder, Query as FbsQuery, QueryElement as FbsQueryElement,
     QueryElementOp as FbsQueryElementOp, QueryElementUnion as FbsQueryElementUnion,
     QueryTableSource as FbsQueryTableSource, SetExpr as FbsSetExpr,
-    TableOrderBy as FbsTableOrderBy, TablePartition as FbsTablePartition,
-    TableSource as FbsTableSource, TableSourceInstance as FbsTableSourceInstance,
-    TableSourceUnion as FbsTableSourceUnion, TimeSeries as FbsTimeSeries, TypeHint as FbsTypeHint,
+    SetQuantifier as FbsSetQuantifier, TableOrderBy as FbsTableOrderBy,
+    TablePartition as FbsTablePartition, TableSource as FbsTableSource,
+    TableSourceInstance as FbsTableSourceInstance, TableSourceUnion as FbsTableSourceUnion,
+    TimeSeries as FbsTimeSeries, TypeHint as FbsTypeHint,
     UnaryQueryElement as FbsUnaryQueryElement, UnsetArgument as FbsUnsetArgument,
     UpdateQueryElement as FbsUpdateQueryElement, ValueIndex as FbsValueIndex,
     ValueName as FbsValueName, ValueRow as FbsValueRow, Values as FbsValues, Vector as FbsVector,
@@ -279,6 +280,70 @@ impl From<FbsQueryElementOp> for QueryElementOp {
             2 => Self::Except,
             3 => Self::Minus,
             _ => panic!("Invalid value {} when constructing QueryElementOp", fbs.0),
+        }
+    }
+}
+
+/// The quantifier written after a set operator, as sqlparser models it.
+/// `None` first, so the default (0) means "no quantifier written", which is
+/// the distinct form and what every query stored before this field existed
+/// reads as. The engine decides which combinations it can plan; the IR only
+/// carries what the author wrote.
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, FromRepr, Serialize, Deserialize)]
+#[repr(i8)]
+pub enum SetQuantifier {
+    None_ = 0,
+    All = 1,
+    Distinct = 2,
+    ByName = 3,
+    AllByName = 4,
+    DistinctByName = 5,
+}
+
+impl TryFrom<i8> for SetQuantifier {
+    type Error = crate::error::Error;
+    fn try_from(v: i8) -> Result<Self, crate::error::Error> {
+        SetQuantifier::from_repr(v).ok_or(crate::error::Error::InvalidEnumValue(v as i64))
+    }
+}
+
+impl SetQuantifier {
+    pub fn variant_name(&self) -> Option<&'static str> {
+        match self {
+            Self::None_ => Some("None"),
+            Self::All => Some("All"),
+            Self::Distinct => Some("Distinct"),
+            Self::ByName => Some("ByName"),
+            Self::AllByName => Some("AllByName"),
+            Self::DistinctByName => Some("DistinctByName"),
+            _ => None,
+        }
+    }
+}
+
+impl From<SetQuantifier> for FbsSetQuantifier {
+    fn from(val: SetQuantifier) -> Self {
+        match val {
+            SetQuantifier::None_ => FbsSetQuantifier::None,
+            SetQuantifier::All => FbsSetQuantifier::All,
+            SetQuantifier::Distinct => FbsSetQuantifier::Distinct,
+            SetQuantifier::ByName => FbsSetQuantifier::ByName,
+            SetQuantifier::AllByName => FbsSetQuantifier::AllByName,
+            SetQuantifier::DistinctByName => FbsSetQuantifier::DistinctByName,
+        }
+    }
+}
+
+impl From<FbsSetQuantifier> for SetQuantifier {
+    fn from(fbs: FbsSetQuantifier) -> Self {
+        match fbs.0 {
+            0 => Self::None_,
+            1 => Self::All,
+            2 => Self::Distinct,
+            3 => Self::ByName,
+            4 => Self::AllByName,
+            5 => Self::DistinctByName,
+            _ => panic!("Invalid value {} when constructing SetQuantifier", fbs.0),
         }
     }
 }
@@ -2018,7 +2083,15 @@ impl crate::FbsSerde for QueryElement {
 pub struct BinaryQueryElement {
     pub lhs: QueryElement,
     pub op: QueryElementOp,
+    /// `ALL` keeps duplicate rows; `BY NAME` matches columns by name instead of
+    /// position. See `SetQuantifier`.
+    #[serde(default = "json_default_binary_query_element_quantifier")]
+    pub quantifier: SetQuantifier,
     pub rhs: QueryElement,
+}
+
+fn json_default_binary_query_element_quantifier() -> SetQuantifier {
+    SetQuantifier::None_
 }
 
 impl BinaryQueryElement {
@@ -2034,6 +2107,7 @@ impl BinaryQueryElement {
         let mut bldr = FbsBinaryQueryElementBuilder::new(builder);
         bldr.add_lhs(lhs_offset);
         bldr.add_op(FbsQueryElementOp::from(self.op));
+        bldr.add_quantifier(FbsSetQuantifier::from(self.quantifier));
         bldr.add_rhs(rhs_offset);
         bldr.finish()
     }
@@ -2043,8 +2117,14 @@ impl From<FbsBinaryQueryElement<'_>> for BinaryQueryElement {
     fn from(fbs: FbsBinaryQueryElement<'_>) -> Self {
         let lhs = QueryElement::from(fbs.lhs());
         let op = QueryElementOp::from(fbs.op());
+        let quantifier = SetQuantifier::from(fbs.quantifier());
         let rhs = QueryElement::from(fbs.rhs());
-        Self { lhs, op, rhs }
+        Self {
+            lhs,
+            op,
+            quantifier,
+            rhs,
+        }
     }
 }
 
@@ -2071,6 +2151,7 @@ impl Default for BinaryQueryElement {
         Self {
             lhs: QueryElement::default(),
             op: QueryElementOp::Union,
+            quantifier: SetQuantifier::None_,
             rhs: QueryElement::default(),
         }
     }

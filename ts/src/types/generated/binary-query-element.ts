@@ -10,6 +10,7 @@ import * as flatbuffers from 'flatbuffers/js/flatbuffers';
 
 import { QueryElement, QueryElementT } from './query-element';
 import { QueryElementOp } from './query-element-op';
+import { SetQuantifier } from './set-quantifier';
 
 
 export class BinaryQueryElement implements flatbuffers.IUnpackableObject<BinaryQueryElementT> {
@@ -45,8 +46,17 @@ rhs(obj?:QueryElement):QueryElement|null {
   return offset ? (obj || new QueryElement()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
+/**
+ * `ALL` keeps duplicate rows; `BY NAME` matches columns by name instead of
+ * position. See `SetQuantifier`.
+ */
+quantifier():SetQuantifier {
+  const offset = this.bb!.__offset(this.bb_pos, 10);
+  return offset ? this.bb!.readInt8(this.bb_pos + offset) : SetQuantifier.None;
+}
+
 static startBinaryQueryElement(builder:flatbuffers.Builder) {
-  builder.startObject(3);
+  builder.startObject(4);
 }
 
 static addOp(builder:flatbuffers.Builder, op:QueryElementOp) {
@@ -61,6 +71,10 @@ static addRhs(builder:flatbuffers.Builder, rhsOffset:flatbuffers.Offset) {
   builder.addFieldOffset(2, rhsOffset, 0);
 }
 
+static addQuantifier(builder:flatbuffers.Builder, quantifier:SetQuantifier) {
+  builder.addFieldInt8(3, quantifier, SetQuantifier.None);
+}
+
 static endBinaryQueryElement(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   builder.requiredField(offset, 6) // lhs
@@ -73,7 +87,8 @@ unpack(): BinaryQueryElementT {
   return new BinaryQueryElementT(
     this.op(),
     (this.lhs() !== null ? this.lhs()!.unpack() : null),
-    (this.rhs() !== null ? this.rhs()!.unpack() : null)
+    (this.rhs() !== null ? this.rhs()!.unpack() : null),
+    this.quantifier()
   );
 }
 
@@ -82,6 +97,7 @@ unpackTo(_o: BinaryQueryElementT): void {
   _o.op = this.op();
   _o.lhs = (this.lhs() !== null ? this.lhs()!.unpack() : null);
   _o.rhs = (this.rhs() !== null ? this.rhs()!.unpack() : null);
+  _o.quantifier = this.quantifier();
 }
 }
 
@@ -89,7 +105,8 @@ export class BinaryQueryElementT implements flatbuffers.IGeneratedObject {
 constructor(
   public op: QueryElementOp = QueryElementOp.Union,
   public lhs: QueryElementT|null = null,
-  public rhs: QueryElementT|null = null
+  public rhs: QueryElementT|null = null,
+  public quantifier: SetQuantifier = SetQuantifier.None
 ){}
 
 
@@ -101,6 +118,7 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   BinaryQueryElement.addOp(builder, this.op);
   BinaryQueryElement.addLhs(builder, lhs);
   BinaryQueryElement.addRhs(builder, rhs);
+  BinaryQueryElement.addQuantifier(builder, this.quantifier);
 
   return BinaryQueryElement.endBinaryQueryElement(builder);
 }

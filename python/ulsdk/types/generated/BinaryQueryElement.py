@@ -53,8 +53,17 @@ class BinaryQueryElement(object):
             return obj
         return None
 
+    # `ALL` keeps duplicate rows; `BY NAME` matches columns by name instead of
+    # position. See `SetQuantifier`.
+    # BinaryQueryElement
+    def Quantifier(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Int8Flags, o + self._tab.Pos)
+        return 0
+
 def BinaryQueryElementStart(builder):
-    builder.StartObject(3)
+    builder.StartObject(4)
 
 def Start(builder):
     BinaryQueryElementStart(builder)
@@ -76,6 +85,12 @@ def BinaryQueryElementAddRhs(builder, rhs):
 
 def AddRhs(builder, rhs):
     BinaryQueryElementAddRhs(builder, rhs)
+
+def BinaryQueryElementAddQuantifier(builder, quantifier):
+    builder.PrependInt8Slot(3, quantifier, 0)
+
+def AddQuantifier(builder, quantifier):
+    BinaryQueryElementAddQuantifier(builder, quantifier)
 
 def BinaryQueryElementEnd(builder):
     return builder.EndObject()

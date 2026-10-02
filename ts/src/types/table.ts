@@ -111,7 +111,7 @@ import { ObjectId as FbsObjectId } from './generated/object-id';
 import { ObjectNamespace as FbsObjectNamespace } from './generated/object-namespace';
 import { PinnedObjectId as FbsPinnedObjectId } from './generated/pinned-object-id';
 import { StreamId as FbsStreamId } from './generated/stream-id';
-import { AddCol, AggregateFilter, AllColumns, AlterTableElement, AlterTableOperation, AlterTableOperationUnion, Arrow, BinaryQueryElement, Case, Column, ConflictAction, DataCatalog, DeleteQueryElement, Distinct, DoNothing, DoUpdate, Drive, DropCol, Explain, ExplainFormat, Expr, ExprUnion, Function, InsertConflicting, InsertQueryElement, Join, JoinTy, MvdbPartition, NullableUint, OnConflict, OrderByExpr, Partition, Placeholder, Query, QueryElement, QueryElementOp, QueryElementUnion, QueryTableSource, SetExpr, TableOrderBy, TablePartition, TableSource, TableSourceInstance, TableSourceUnion, TimeSeries, TypeHint, UnaryQueryElement, UnsetArgument, UpdateQueryElement, ValueIndex, ValueName, ValueRow, Values, Vector, When, Window, WindowFrame, WindowFrameBound, WindowFrameBoundTy, WindowFrameUnits, WorklogPartition } from './query';
+import { AddCol, AggregateFilter, AllColumns, AlterTableElement, AlterTableOperation, AlterTableOperationUnion, Arrow, BinaryQueryElement, Case, Column, ConflictAction, DataCatalog, DeleteQueryElement, Distinct, DoNothing, DoUpdate, Drive, DropCol, Explain, ExplainFormat, Expr, ExprUnion, Function, InsertConflicting, InsertQueryElement, Join, JoinTy, MvdbPartition, NullableUint, OnConflict, OrderByExpr, Partition, Placeholder, Query, QueryElement, QueryElementOp, QueryElementUnion, QueryTableSource, SetExpr, SetQuantifier, TableOrderBy, TablePartition, TableSource, TableSourceInstance, TableSourceUnion, TimeSeries, TypeHint, UnaryQueryElement, UnsetArgument, UpdateQueryElement, ValueIndex, ValueName, ValueRow, Values, Vector, When, Window, WindowFrame, WindowFrameBound, WindowFrameBoundTy, WindowFrameUnits, WorklogPartition } from './query';
 import { AddCol as FbsAddCol } from './generated/add-col';
 import { AggregateFilter as FbsAggregateFilter } from './generated/aggregate-filter';
 import { AllColumns as FbsAllColumns } from './generated/all-columns';
@@ -151,6 +151,7 @@ import { QueryElementOp as FbsQueryElementOp } from './generated/query-element-o
 import { QueryElementUnion as FbsQueryElementUnion } from './generated/query-element-union';
 import { QueryTableSource as FbsQueryTableSource } from './generated/query-table-source';
 import { SetExpr as FbsSetExpr } from './generated/set-expr';
+import { SetQuantifier as FbsSetQuantifier } from './generated/set-quantifier';
 import { TableOrderBy as FbsTableOrderBy } from './generated/table-order-by';
 import { TablePartition as FbsTablePartition } from './generated/table-partition';
 import { TableSource as FbsTableSource } from './generated/table-source';

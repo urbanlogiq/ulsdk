@@ -111,6 +111,7 @@ typedef std::variant<
     std::shared_ptr<AlterTableElement>
 > QueryElementUnion;
 
+using ::SetQuantifier;
 typedef std::variant<
     std::shared_ptr<MvdbPartition>,
     std::shared_ptr<WorklogPartition>
@@ -447,6 +448,7 @@ struct QueryElement {
 struct BinaryQueryElement {
     QueryElement lhs_;
     QueryElementOp op_;
+    SetQuantifier quantifier_;
     QueryElement rhs_;
 
     BinaryQueryElement();

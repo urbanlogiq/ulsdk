@@ -34,22 +34,30 @@ public final class BinaryQueryElement extends com.google.flatbuffers.Table {
   public QueryElement lhs(QueryElement obj) { int o = __offset(6); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
   public QueryElement rhs() { return rhs(new QueryElement()); }
   public QueryElement rhs(QueryElement obj) { int o = __offset(8); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
+  /**
+   * `ALL` keeps duplicate rows; `BY NAME` matches columns by name instead of
+   * position. See `SetQuantifier`.
+   */
+  public byte quantifier() { int o = __offset(10); return o != 0 ? bb.get(o + bb_pos) : 0; }
 
   public static int createBinaryQueryElement(FlatBufferBuilder builder,
       byte op,
       int lhsOffset,
-      int rhsOffset) {
-    builder.startTable(3);
+      int rhsOffset,
+      byte quantifier) {
+    builder.startTable(4);
     BinaryQueryElement.addRhs(builder, rhsOffset);
     BinaryQueryElement.addLhs(builder, lhsOffset);
+    BinaryQueryElement.addQuantifier(builder, quantifier);
     BinaryQueryElement.addOp(builder, op);
     return BinaryQueryElement.endBinaryQueryElement(builder);
   }
 
-  public static void startBinaryQueryElement(FlatBufferBuilder builder) { builder.startTable(3); }
+  public static void startBinaryQueryElement(FlatBufferBuilder builder) { builder.startTable(4); }
   public static void addOp(FlatBufferBuilder builder, byte op) { builder.addByte(0, op, 0); }
   public static void addLhs(FlatBufferBuilder builder, int lhsOffset) { builder.addOffset(1, lhsOffset, 0); }
   public static void addRhs(FlatBufferBuilder builder, int rhsOffset) { builder.addOffset(2, rhsOffset, 0); }
+  public static void addQuantifier(FlatBufferBuilder builder, byte quantifier) { builder.addByte(3, quantifier, 0); }
   public static int endBinaryQueryElement(FlatBufferBuilder builder) {
     int o = builder.endTable();
     builder.required(o, 6);  // lhs

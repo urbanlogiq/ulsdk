@@ -303,6 +303,14 @@ class QueryElementOp(Enum):
     Except = 2
     Minus = 3
 
+class SetQuantifier(Enum):
+    None_ = 0
+    All = 1
+    Distinct = 2
+    ByName = 3
+    AllByName = 4
+    DistinctByName = 5
+
 class TypeHint(Enum):
     None_ = 0
     TimestampMillis = 1
@@ -2059,6 +2067,10 @@ class BinaryQueryElement:
 
     op: "QueryElementOp"
 
+    # `ALL` keeps duplicate rows; `BY NAME` matches columns by name instead of
+    # position. See `SetQuantifier`.
+    quantifier: "SetQuantifier"
+
     rhs: "QueryElement"
 
     @classmethod
@@ -2069,12 +2081,13 @@ class BinaryQueryElement:
         else:
             raise ValueError("Lhs is required")
         op = QueryElementOp(o.Op())
+        quantifier = SetQuantifier(o.Quantifier())
         rhs_obj = o.Rhs()
         if rhs_obj is not None:
             rhs = QueryElement.from_fbs(rhs_obj)
         else:
             raise ValueError("Rhs is required")
-        return cls(lhs, op, rhs)
+        return cls(lhs, op, quantifier, rhs)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -2087,6 +2100,7 @@ class BinaryQueryElement:
             Start,
             AddLhs,
             AddOp,
+            AddQuantifier,
             AddRhs,
             End,
         )
@@ -2096,6 +2110,7 @@ class BinaryQueryElement:
         Start(builder)
         AddLhs(builder, lhs_offset)
         AddOp(builder, self.op.value)
+        AddQuantifier(builder, self.quantifier.value)
         AddRhs(builder, rhs_offset)
         return End(builder)
 
@@ -2109,13 +2124,15 @@ class BinaryQueryElement:
     def make_default(cls) -> Self:
         lhs = QueryElement.make_default()
         op = QueryElementOp(0)
+        quantifier = SetQuantifier(0)
         rhs = QueryElement.make_default()
-        return cls(lhs, op, rhs)
+        return cls(lhs, op, quantifier, rhs)
 
     def __eq__(self, other) -> bool:
         eq = True
         eq = eq and self.lhs == other.lhs
         eq = eq and self.op == other.op
+        eq = eq and self.quantifier == other.quantifier
         eq = eq and self.rhs == other.rhs
 
         return eq

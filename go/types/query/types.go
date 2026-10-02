@@ -1079,6 +1079,7 @@ func (o *QueryElement) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOf
 type BinaryQueryElement struct {
 	Lhs QueryElement
 	Op int8
+	Quantifier int8
 	Rhs QueryElement
 }
 
@@ -1088,6 +1089,7 @@ func BinaryQueryElementFromFbs(fbs *generated.BinaryQueryElement) *BinaryQueryEl
 		o.Lhs = *QueryElementFromFbs(fbsVal)
 	}
 	o.Op = int8(fbs.Op())
+	o.Quantifier = int8(fbs.Quantifier())
 	if fbsVal := fbs.Rhs(nil); fbsVal != nil {
 		o.Rhs = *QueryElementFromFbs(fbsVal)
 	}
@@ -1115,6 +1117,7 @@ func (o *BinaryQueryElement) SerializeTo(builder *flatbuffers.Builder) flatbuffe
 	generated.BinaryQueryElementStart(builder)
 	generated.BinaryQueryElementAddLhs(builder, lhsOffset)
 	generated.BinaryQueryElementAddOp(builder, generated.QueryElementOp(o.Op))
+	generated.BinaryQueryElementAddQuantifier(builder, generated.SetQuantifier(o.Quantifier))
 	generated.BinaryQueryElementAddRhs(builder, rhsOffset)
 	return generated.BinaryQueryElementEnd(builder)
 }
@@ -1993,6 +1996,23 @@ func (o *AlterTableElement) SerializeTo(builder *flatbuffers.Builder) flatbuffer
 type QueryElementUnion interface {
 	isQueryElementUnion()
 }
+
+// SetQuantifier -
+//  The quantifier written after a set operator, as sqlparser models it.
+//  `None` first, so the default (0) means "no quantifier written", which is
+//  the distinct form and what every query stored before this field existed
+//  reads as. The engine decides which combinations it can plan; the IR only
+//  carries what the author wrote.
+type SetQuantifier int8
+
+const (
+	SetQuantifierNone SetQuantifier = 0
+	SetQuantifierAll SetQuantifier = 1
+	SetQuantifierDistinct SetQuantifier = 2
+	SetQuantifierByName SetQuantifier = 3
+	SetQuantifierAllByName SetQuantifier = 4
+	SetQuantifierDistinctByName SetQuantifier = 5
+)
 
 type TypeHint int8
 

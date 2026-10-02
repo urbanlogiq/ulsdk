@@ -298,6 +298,47 @@ func (v QueryElementOp) String() string {
 	return "QueryElementOp(" + strconv.FormatInt(int64(v), 10) + ")"
 }
 
+/// The quantifier written after a set operator, as sqlparser models it.
+/// `None` first, so the default (0) means "no quantifier written", which is
+/// the distinct form and what every query stored before this field existed
+/// reads as. The engine decides which combinations it can plan; the IR only
+/// carries what the author wrote.
+type SetQuantifier int8
+
+const (
+	SetQuantifierNone           SetQuantifier = 0
+	SetQuantifierAll            SetQuantifier = 1
+	SetQuantifierDistinct       SetQuantifier = 2
+	SetQuantifierByName         SetQuantifier = 3
+	SetQuantifierAllByName      SetQuantifier = 4
+	SetQuantifierDistinctByName SetQuantifier = 5
+)
+
+var EnumNamesSetQuantifier = map[SetQuantifier]string{
+	SetQuantifierNone:           "None",
+	SetQuantifierAll:            "All",
+	SetQuantifierDistinct:       "Distinct",
+	SetQuantifierByName:         "ByName",
+	SetQuantifierAllByName:      "AllByName",
+	SetQuantifierDistinctByName: "DistinctByName",
+}
+
+var EnumValuesSetQuantifier = map[string]SetQuantifier{
+	"None":           SetQuantifierNone,
+	"All":            SetQuantifierAll,
+	"Distinct":       SetQuantifierDistinct,
+	"ByName":         SetQuantifierByName,
+	"AllByName":      SetQuantifierAllByName,
+	"DistinctByName": SetQuantifierDistinctByName,
+}
+
+func (v SetQuantifier) String() string {
+	if s, ok := EnumNamesSetQuantifier[v]; ok {
+		return s
+	}
+	return "SetQuantifier(" + strconv.FormatInt(int64(v), 10) + ")"
+}
+
 type ConflictAction byte
 
 const (
@@ -3398,8 +3439,24 @@ func (rcv *BinaryQueryElement) Rhs(obj *QueryElement) *QueryElement {
 	return nil
 }
 
+/// `ALL` keeps duplicate rows; `BY NAME` matches columns by name instead of
+/// position. See `SetQuantifier`.
+func (rcv *BinaryQueryElement) Quantifier() SetQuantifier {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
+	if o != 0 {
+		return SetQuantifier(rcv._tab.GetInt8(o + rcv._tab.Pos))
+	}
+	return 0
+}
+
+/// `ALL` keeps duplicate rows; `BY NAME` matches columns by name instead of
+/// position. See `SetQuantifier`.
+func (rcv *BinaryQueryElement) MutateQuantifier(n SetQuantifier) bool {
+	return rcv._tab.MutateInt8Slot(10, int8(n))
+}
+
 func BinaryQueryElementStart(builder *flatbuffers.Builder) {
-	builder.StartObject(3)
+	builder.StartObject(4)
 }
 func BinaryQueryElementAddOp(builder *flatbuffers.Builder, op QueryElementOp) {
 	builder.PrependInt8Slot(0, int8(op), 0)
@@ -3409,6 +3466,9 @@ func BinaryQueryElementAddLhs(builder *flatbuffers.Builder, lhs flatbuffers.UOff
 }
 func BinaryQueryElementAddRhs(builder *flatbuffers.Builder, rhs flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(2, flatbuffers.UOffsetT(rhs), 0)
+}
+func BinaryQueryElementAddQuantifier(builder *flatbuffers.Builder, quantifier SetQuantifier) {
+	builder.PrependInt8Slot(3, int8(quantifier), 0)
 }
 func BinaryQueryElementEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()

@@ -1675,6 +1675,7 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const BinaryQueryElement
     ::BinaryQueryElementBuilder instance_builder = ::BinaryQueryElementBuilder(builder);
     instance_builder.add_lhs(lhs_offset);
     instance_builder.add_op(o.op_);
+    instance_builder.add_quantifier(o.quantifier_);
     instance_builder.add_rhs(rhs_offset);
     return instance_builder.Finish();
 }
@@ -1690,6 +1691,7 @@ std::vector<uint8_t> to_bytes(const BinaryQueryElement &o) {
 BinaryQueryElement::BinaryQueryElement()
     : lhs_()
     , op_(QueryElementOp(0))
+    , quantifier_(SetQuantifier(0))
     , rhs_() {
 }
 
@@ -1700,6 +1702,7 @@ BinaryQueryElement::BinaryQueryElement(const std::vector<uint8_t> &bytes)
 BinaryQueryElement::BinaryQueryElement(const ::BinaryQueryElement *root) 
     : lhs_()
     , op_(QueryElementOp(0))
+    , quantifier_(SetQuantifier(0))
     , rhs_() {
     if (root == nullptr) {
         throw std::runtime_error("cannot deserialize flatbuffer type");
@@ -1709,6 +1712,7 @@ BinaryQueryElement::BinaryQueryElement(const ::BinaryQueryElement *root)
         lhs_ = decltype(lhs_)(root->lhs());
     }
     op_ = root->op();
+    quantifier_ = root->quantifier();
     if (root->rhs() != nullptr) {
         rhs_ = decltype(rhs_)(root->rhs());
     }
@@ -1720,6 +1724,9 @@ BinaryQueryElement::operator==(const BinaryQueryElement &rhs) const {
         return false;
     }
     if (this->op_ != rhs.op_) {
+        return false;
+    }
+    if (this->quantifier_ != rhs.quantifier_) {
         return false;
     }
     if (this->rhs_ != rhs.rhs_) {

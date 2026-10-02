@@ -21,6 +21,18 @@ public final class BinaryQueryElement {
         this._op = value;
     }
 
+    /**
+     *  `ALL` keeps duplicate rows; `BY NAME` matches columns by name instead of
+     *  position. See `SetQuantifier`.
+     */
+    byte _quantifier;
+    public byte getQuantifier() {
+        return this._quantifier;
+    }
+    public void setQuantifier(byte value) {
+        this._quantifier = value;
+    }
+
     com.urbanlogiq.ulsdk.types.QueryElement _rhs;
     public com.urbanlogiq.ulsdk.types.QueryElement getRhs() {
         return this._rhs;
@@ -32,6 +44,7 @@ public final class BinaryQueryElement {
     public BinaryQueryElement(com.urbanlogiq.ulsdk.types.generated.BinaryQueryElement o) {
         this._lhs = new com.urbanlogiq.ulsdk.types.QueryElement(o.lhs());
         this._op = o.op();
+        this._quantifier = o.quantifier();
         this._rhs = new com.urbanlogiq.ulsdk.types.QueryElement(o.rhs());
     }
 
@@ -45,6 +58,7 @@ public final class BinaryQueryElement {
         com.urbanlogiq.ulsdk.types.generated.BinaryQueryElement.startBinaryQueryElement(builder);
         com.urbanlogiq.ulsdk.types.generated.BinaryQueryElement.addLhs(builder, lhsOffset);
         com.urbanlogiq.ulsdk.types.generated.BinaryQueryElement.addOp(builder, this._op);
+        com.urbanlogiq.ulsdk.types.generated.BinaryQueryElement.addQuantifier(builder, this._quantifier);
         com.urbanlogiq.ulsdk.types.generated.BinaryQueryElement.addRhs(builder, rhsOffset);
         return com.urbanlogiq.ulsdk.types.generated.BinaryQueryElement.endBinaryQueryElement(builder);
     }

@@ -615,6 +615,53 @@ inline const char *EnumNameQueryElementOp(QueryElementOp e) {
   return EnumNamesQueryElementOp()[index];
 }
 
+/// The quantifier written after a set operator, as sqlparser models it.
+/// `None` first, so the default (0) means "no quantifier written", which is
+/// the distinct form and what every query stored before this field existed
+/// reads as. The engine decides which combinations it can plan; the IR only
+/// carries what the author wrote.
+enum class SetQuantifier : int8_t {
+  None = 0,
+  All = 1,
+  Distinct = 2,
+  ByName = 3,
+  AllByName = 4,
+  DistinctByName = 5,
+  MIN = None,
+  MAX = DistinctByName
+};
+
+inline const SetQuantifier (&EnumValuesSetQuantifier())[6] {
+  static const SetQuantifier values[] = {
+    SetQuantifier::None,
+    SetQuantifier::All,
+    SetQuantifier::Distinct,
+    SetQuantifier::ByName,
+    SetQuantifier::AllByName,
+    SetQuantifier::DistinctByName
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesSetQuantifier() {
+  static const char * const names[7] = {
+    "None",
+    "All",
+    "Distinct",
+    "ByName",
+    "AllByName",
+    "DistinctByName",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameSetQuantifier(SetQuantifier e) {
+  if (::flatbuffers::IsOutRange(e, SetQuantifier::None, SetQuantifier::DistinctByName)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesSetQuantifier()[index];
+}
+
 enum class ConflictAction : uint8_t {
   NONE = 0,
   InsertConflicting = 1,
@@ -3554,7 +3601,8 @@ struct BinaryQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_OP = 4,
     VT_LHS = 6,
-    VT_RHS = 8
+    VT_RHS = 8,
+    VT_QUANTIFIER = 10
   };
   QueryElementOp op() const {
     return static_cast<QueryElementOp>(GetField<int8_t>(VT_OP, 0));
@@ -3565,6 +3613,11 @@ struct BinaryQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   const QueryElement *rhs() const {
     return GetPointer<const QueryElement *>(VT_RHS);
   }
+  /// `ALL` keeps duplicate rows; `BY NAME` matches columns by name instead of
+  /// position. See `SetQuantifier`.
+  SetQuantifier quantifier() const {
+    return static_cast<SetQuantifier>(GetField<int8_t>(VT_QUANTIFIER, 0));
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int8_t>(verifier, VT_OP, 1) &&
@@ -3572,6 +3625,7 @@ struct BinaryQueryElement FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
            verifier.VerifyTable(lhs()) &&
            VerifyOffsetRequired(verifier, VT_RHS) &&
            verifier.VerifyTable(rhs()) &&
+           VerifyField<int8_t>(verifier, VT_QUANTIFIER, 1) &&
            verifier.EndTable();
   }
 };
@@ -3588,6 +3642,9 @@ struct BinaryQueryElementBuilder {
   }
   void add_rhs(::flatbuffers::Offset<QueryElement> rhs) {
     fbb_.AddOffset(BinaryQueryElement::VT_RHS, rhs);
+  }
+  void add_quantifier(SetQuantifier quantifier) {
+    fbb_.AddElement<int8_t>(BinaryQueryElement::VT_QUANTIFIER, static_cast<int8_t>(quantifier), 0);
   }
   explicit BinaryQueryElementBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -3606,10 +3663,12 @@ inline ::flatbuffers::Offset<BinaryQueryElement> CreateBinaryQueryElement(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     QueryElementOp op = QueryElementOp::Union,
     ::flatbuffers::Offset<QueryElement> lhs = 0,
-    ::flatbuffers::Offset<QueryElement> rhs = 0) {
+    ::flatbuffers::Offset<QueryElement> rhs = 0,
+    SetQuantifier quantifier = SetQuantifier::None) {
   BinaryQueryElementBuilder builder_(_fbb);
   builder_.add_rhs(rhs);
   builder_.add_lhs(lhs);
+  builder_.add_quantifier(quantifier);
   builder_.add_op(op);
   return builder_.Finish();
 }

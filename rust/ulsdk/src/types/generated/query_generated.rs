@@ -1015,6 +1015,135 @@ impl flatbuffers::SimpleToVerifyInSlice for QueryElementOp {}
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
+pub const ENUM_MIN_SET_QUANTIFIER: i8 = 0;
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+pub const ENUM_MAX_SET_QUANTIFIER: i8 = 5;
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
+#[allow(non_camel_case_types)]
+pub const ENUM_VALUES_SET_QUANTIFIER: [SetQuantifier; 6] = [
+    SetQuantifier::None,
+    SetQuantifier::All,
+    SetQuantifier::Distinct,
+    SetQuantifier::ByName,
+    SetQuantifier::AllByName,
+    SetQuantifier::DistinctByName,
+];
+
+/// The quantifier written after a set operator, as sqlparser models it.
+/// `None` first, so the default (0) means "no quantifier written", which is
+/// the distinct form and what every query stored before this field existed
+/// reads as. The engine decides which combinations it can plan; the IR only
+/// carries what the author wrote.
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+#[repr(transparent)]
+pub struct SetQuantifier(pub i8);
+#[allow(non_upper_case_globals)]
+impl SetQuantifier {
+    pub const None: Self = Self(0);
+    pub const All: Self = Self(1);
+    pub const Distinct: Self = Self(2);
+    pub const ByName: Self = Self(3);
+    pub const AllByName: Self = Self(4);
+    pub const DistinctByName: Self = Self(5);
+
+    pub const ENUM_MIN: i8 = 0;
+    pub const ENUM_MAX: i8 = 5;
+    pub const ENUM_VALUES: &'static [Self] = &[
+        Self::None,
+        Self::All,
+        Self::Distinct,
+        Self::ByName,
+        Self::AllByName,
+        Self::DistinctByName,
+    ];
+    /// Returns the variant's name or "" if unknown.
+    pub fn variant_name(self) -> Option<&'static str> {
+        match self {
+            Self::None => Some("None"),
+            Self::All => Some("All"),
+            Self::Distinct => Some("Distinct"),
+            Self::ByName => Some("ByName"),
+            Self::AllByName => Some("AllByName"),
+            Self::DistinctByName => Some("DistinctByName"),
+            _ => None,
+        }
+    }
+}
+impl core::fmt::Debug for SetQuantifier {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        if let Some(name) = self.variant_name() {
+            f.write_str(name)
+        } else {
+            f.write_fmt(format_args!("<UNKNOWN {:?}>", self.0))
+        }
+    }
+}
+impl Serialize for SetQuantifier {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_unit_variant(
+            "SetQuantifier",
+            self.0 as u32,
+            self.variant_name().unwrap(),
+        )
+    }
+}
+
+impl<'a> flatbuffers::Follow<'a> for SetQuantifier {
+    type Inner = Self;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        let b = flatbuffers::read_scalar_at::<i8>(buf, loc);
+        Self(b)
+    }
+}
+
+impl flatbuffers::Push for SetQuantifier {
+    type Output = SetQuantifier;
+    #[inline]
+    unsafe fn push(&self, dst: &mut [u8], _written_len: usize) {
+        flatbuffers::emplace_scalar::<i8>(dst, self.0);
+    }
+}
+
+impl flatbuffers::EndianScalar for SetQuantifier {
+    type Scalar = i8;
+    #[inline]
+    fn to_little_endian(self) -> i8 {
+        self.0.to_le()
+    }
+    #[inline]
+    #[allow(clippy::wrong_self_convention)]
+    fn from_little_endian(v: i8) -> Self {
+        let b = i8::from_le(v);
+        Self(b)
+    }
+}
+
+impl<'a> flatbuffers::Verifiable for SetQuantifier {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        i8::run_verifier(v, pos)
+    }
+}
+
+impl flatbuffers::SimpleToVerifyInSlice for SetQuantifier {}
+#[deprecated(
+    since = "2.0.0",
+    note = "Use associated constants instead. This will no longer be generated in 2021."
+)]
 pub const ENUM_MIN_CONFLICT_ACTION: u8 = 0;
 #[deprecated(
     since = "2.0.0",
@@ -8331,6 +8460,7 @@ impl<'a> BinaryQueryElement<'a> {
     pub const VT_OP: flatbuffers::VOffsetT = 4;
     pub const VT_LHS: flatbuffers::VOffsetT = 6;
     pub const VT_RHS: flatbuffers::VOffsetT = 8;
+    pub const VT_QUANTIFIER: flatbuffers::VOffsetT = 10;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -8348,6 +8478,7 @@ impl<'a> BinaryQueryElement<'a> {
         if let Some(x) = args.lhs {
             builder.add_lhs(x);
         }
+        builder.add_quantifier(args.quantifier);
         builder.add_op(args.op);
         builder.finish()
     }
@@ -8385,6 +8516,19 @@ impl<'a> BinaryQueryElement<'a> {
                 .unwrap()
         }
     }
+    /// `ALL` keeps duplicate rows; `BY NAME` matches columns by name instead of
+    /// position. See `SetQuantifier`.
+    #[inline]
+    pub fn quantifier(&self) -> SetQuantifier {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<SetQuantifier>(BinaryQueryElement::VT_QUANTIFIER, Some(SetQuantifier::None))
+                .unwrap()
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for BinaryQueryElement<'_> {
@@ -8398,6 +8542,7 @@ impl flatbuffers::Verifiable for BinaryQueryElement<'_> {
             .visit_field::<QueryElementOp>("op", Self::VT_OP, false)?
             .visit_field::<flatbuffers::ForwardsUOffset<QueryElement>>("lhs", Self::VT_LHS, true)?
             .visit_field::<flatbuffers::ForwardsUOffset<QueryElement>>("rhs", Self::VT_RHS, true)?
+            .visit_field::<SetQuantifier>("quantifier", Self::VT_QUANTIFIER, false)?
             .finish();
         Ok(())
     }
@@ -8406,6 +8551,7 @@ pub struct BinaryQueryElementArgs<'a> {
     pub op: QueryElementOp,
     pub lhs: Option<flatbuffers::WIPOffset<QueryElement<'a>>>,
     pub rhs: Option<flatbuffers::WIPOffset<QueryElement<'a>>>,
+    pub quantifier: SetQuantifier,
 }
 impl<'a> Default for BinaryQueryElementArgs<'a> {
     #[inline]
@@ -8414,6 +8560,7 @@ impl<'a> Default for BinaryQueryElementArgs<'a> {
             op: QueryElementOp::Union,
             lhs: None, // required field
             rhs: None, // required field
+            quantifier: SetQuantifier::None,
         }
     }
 }
@@ -8423,10 +8570,11 @@ impl Serialize for BinaryQueryElement<'_> {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("BinaryQueryElement", 3)?;
+        let mut s = serializer.serialize_struct("BinaryQueryElement", 4)?;
         s.serialize_field("op", &self.op())?;
         s.serialize_field("lhs", &self.lhs())?;
         s.serialize_field("rhs", &self.rhs())?;
+        s.serialize_field("quantifier", &self.quantifier())?;
         s.end()
     }
 }
@@ -8458,6 +8606,14 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> BinaryQueryElementBuilder<'a, '
             );
     }
     #[inline]
+    pub fn add_quantifier(&mut self, quantifier: SetQuantifier) {
+        self.fbb_.push_slot::<SetQuantifier>(
+            BinaryQueryElement::VT_QUANTIFIER,
+            quantifier,
+            SetQuantifier::None,
+        );
+    }
+    #[inline]
     pub fn new(
         _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     ) -> BinaryQueryElementBuilder<'a, 'b, A> {
@@ -8482,6 +8638,7 @@ impl core::fmt::Debug for BinaryQueryElement<'_> {
         ds.field("op", &self.op());
         ds.field("lhs", &self.lhs());
         ds.field("rhs", &self.rhs());
+        ds.field("quantifier", &self.quantifier());
         ds.finish()
     }
 }
