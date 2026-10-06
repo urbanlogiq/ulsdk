@@ -15,6 +15,7 @@ public final class ObjectNamespace {
   public static final int Evaluator = 4;
   public static final int Drive = 5;
   public static final int Notifications = 6;
+  public static final int Registry = 7;
   public static final int Unknown = 65535;
 }
 

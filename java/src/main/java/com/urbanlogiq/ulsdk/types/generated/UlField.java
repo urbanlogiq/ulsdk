@@ -50,6 +50,14 @@ public final class UlField extends com.google.flatbuffers.Table {
   public ValueInstance default_(ValueInstance obj) { int o = __offset(22); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
   public byte storageTypeType() { int o = __offset(24); return o != 0 ? bb.get(o + bb_pos) : 0; }
   public com.google.flatbuffers.Table storageType(com.google.flatbuffers.Table obj) { int o = __offset(26); return o != 0 ? __union(obj, o + bb_pos) : null; }
+  /**
+   * Ontology attribute this field provides, within one of the stream's
+   * bound concepts: a merged metadata write drops an inherited one whose
+   * concept is no longer bound, and refuses a supplied one. Appended last
+   * (field slots are positional).
+   */
+  public ConceptBinding conceptAttr() { return conceptAttr(new ConceptBinding()); }
+  public ConceptBinding conceptAttr(ConceptBinding obj) { int o = __offset(28); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
 
   public static int createUlField(FlatBufferBuilder builder,
       int fieldNameOffset,
@@ -63,8 +71,10 @@ public final class UlField extends com.google.flatbuffers.Table {
       int breakdownDisplayNameOffset,
       int default_Offset,
       byte storageTypeType,
-      int storageTypeOffset) {
-    builder.startTable(12);
+      int storageTypeOffset,
+      int conceptAttrOffset) {
+    builder.startTable(13);
+    UlField.addConceptAttr(builder, conceptAttrOffset);
     UlField.addStorageType(builder, storageTypeOffset);
     UlField.addDefault(builder, default_Offset);
     UlField.addBreakdownDisplayName(builder, breakdownDisplayNameOffset);
@@ -80,7 +90,7 @@ public final class UlField extends com.google.flatbuffers.Table {
     return UlField.endUlField(builder);
   }
 
-  public static void startUlField(FlatBufferBuilder builder) { builder.startTable(12); }
+  public static void startUlField(FlatBufferBuilder builder) { builder.startTable(13); }
   public static void addFieldName(FlatBufferBuilder builder, int fieldNameOffset) { builder.addOffset(0, fieldNameOffset, 0); }
   public static void addDisplayName(FlatBufferBuilder builder, int displayNameOffset) { builder.addOffset(1, displayNameOffset, 0); }
   public static void addComponentDataType(FlatBufferBuilder builder, byte componentDataType) { builder.addByte(2, componentDataType, 0); }
@@ -93,6 +103,7 @@ public final class UlField extends com.google.flatbuffers.Table {
   public static void addDefault(FlatBufferBuilder builder, int default_Offset) { builder.addOffset(9, default_Offset, 0); }
   public static void addStorageTypeType(FlatBufferBuilder builder, byte storageTypeType) { builder.addByte(10, storageTypeType, 0); }
   public static void addStorageType(FlatBufferBuilder builder, int storageTypeOffset) { builder.addOffset(11, storageTypeOffset, 0); }
+  public static void addConceptAttr(FlatBufferBuilder builder, int conceptAttrOffset) { builder.addOffset(12, conceptAttrOffset, 0); }
   public static int endUlField(FlatBufferBuilder builder) {
     int o = builder.endTable();
     return o;

@@ -2519,6 +2519,100 @@ func GeometryDataAddData(builder *flatbuffers.Builder, data flatbuffers.UOffsetT
 func GeometryDataEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
+/// One ontology concept the stream (or one of its fields) provides, with the
+/// provenance of the binding. Concept ids name classes of the ontologies
+/// registry, where every ontology, `ul` included, is a managed object in
+/// Drive. The catalog does not resolve them yet: the writer binds concepts it
+/// resolved, and resolving them at the metadata write boundary comes with the
+/// registry. Absent = unannotated, and unannotated streams are invisible to
+/// concept-driven discovery -- the intended semantics for pre-existing
+/// payloads.
+type ConceptBinding struct {
+	_tab flatbuffers.Table
+}
+
+func GetRootAsConceptBinding(buf []byte, offset flatbuffers.UOffsetT) *ConceptBinding {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &ConceptBinding{}
+	x.Init(buf, n+offset)
+	return x
+}
+
+func FinishConceptBindingBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.Finish(offset)
+}
+
+func GetSizePrefixedRootAsConceptBinding(buf []byte, offset flatbuffers.UOffsetT) *ConceptBinding {
+	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
+	x := &ConceptBinding{}
+	x.Init(buf, n+offset+flatbuffers.SizeUint32)
+	return x
+}
+
+func FinishSizePrefixedConceptBindingBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.FinishSizePrefixed(offset)
+}
+
+func (rcv *ConceptBinding) Init(buf []byte, i flatbuffers.UOffsetT) {
+	rcv._tab.Bytes = buf
+	rcv._tab.Pos = i
+}
+
+func (rcv *ConceptBinding) Table() flatbuffers.Table {
+	return rcv._tab
+}
+
+/// Ontology concept id, e.g. "ul:RoadSegment". On a field binding this may
+/// address an attribute within the concept, e.g. "ul:RoadSegment/speed_limit".
+func (rcv *ConceptBinding) Concept() []byte {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		return rcv._tab.ByteVector(o + rcv._tab.Pos)
+	}
+	return nil
+}
+
+/// Ontology concept id, e.g. "ul:RoadSegment". On a field binding this may
+/// address an attribute within the concept, e.g. "ul:RoadSegment/speed_limit".
+/// Binding provenance: "human:<oid>" or "model:<model_id@version>".
+func (rcv *ConceptBinding) MappedBy() []byte {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
+	if o != 0 {
+		return rcv._tab.ByteVector(o + rcv._tab.Pos)
+	}
+	return nil
+}
+
+/// Binding provenance: "human:<oid>" or "model:<model_id@version>".
+/// Mapper confidence in [0, 1]; 1.0 for human bindings.
+func (rcv *ConceptBinding) Confidence() float32 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
+	if o != 0 {
+		return rcv._tab.GetFloat32(o + rcv._tab.Pos)
+	}
+	return 0.0
+}
+
+/// Mapper confidence in [0, 1]; 1.0 for human bindings.
+func (rcv *ConceptBinding) MutateConfidence(n float32) bool {
+	return rcv._tab.MutateFloat32Slot(8, n)
+}
+
+func ConceptBindingStart(builder *flatbuffers.Builder) {
+	builder.StartObject(3)
+}
+func ConceptBindingAddConcept(builder *flatbuffers.Builder, concept flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(concept), 0)
+}
+func ConceptBindingAddMappedBy(builder *flatbuffers.Builder, mappedBy flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(1, flatbuffers.UOffsetT(mappedBy), 0)
+}
+func ConceptBindingAddConfidence(builder *flatbuffers.Builder, confidence float32) {
+	builder.PrependFloat32Slot(2, confidence, 0.0)
+}
+func ConceptBindingEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return builder.EndObject()
+}
 type UlField struct {
 	_tab flatbuffers.Table
 }
@@ -2677,8 +2771,29 @@ func (rcv *UlField) StorageType(obj *flatbuffers.Table) bool {
 	return false
 }
 
+/// Ontology attribute this field provides, within one of the stream's
+/// bound concepts: a merged metadata write drops an inherited one whose
+/// concept is no longer bound, and refuses a supplied one. Appended last
+/// (field slots are positional).
+func (rcv *UlField) ConceptAttr(obj *ConceptBinding) *ConceptBinding {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(28))
+	if o != 0 {
+		x := rcv._tab.Indirect(o + rcv._tab.Pos)
+		if obj == nil {
+			obj = new(ConceptBinding)
+		}
+		obj.Init(rcv._tab.Bytes, x)
+		return obj
+	}
+	return nil
+}
+
+/// Ontology attribute this field provides, within one of the stream's
+/// bound concepts: a merged metadata write drops an inherited one whose
+/// concept is no longer bound, and refuses a supplied one. Appended last
+/// (field slots are positional).
 func UlFieldStart(builder *flatbuffers.Builder) {
-	builder.StartObject(12)
+	builder.StartObject(13)
 }
 func UlFieldAddFieldName(builder *flatbuffers.Builder, fieldName flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(fieldName), 0)
@@ -2715,6 +2830,9 @@ func UlFieldAddStorageTypeType(builder *flatbuffers.Builder, storageTypeType Typ
 }
 func UlFieldAddStorageType(builder *flatbuffers.Builder, storageType flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(11, flatbuffers.UOffsetT(storageType), 0)
+}
+func UlFieldAddConceptAttr(builder *flatbuffers.Builder, conceptAttr flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(12, flatbuffers.UOffsetT(conceptAttr), 0)
 }
 func UlFieldEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
@@ -4428,8 +4546,40 @@ func (rcv *Metadata) ForeignKeysLength() int {
 
 /// Columns of this dataset that hold keys of rows in other datasets; see
 /// ForeignKey.
+/// Ontology concepts this stream provides -- the catalog-side annotation
+/// that concept-driven discovery and interest matching join on.
+/// Multi-valued: real sources provide more than one concept. Relationship
+/// to `entity_ty` is an open decision; both are carried in parallel for now.
+/// Field slots are positional: this one follows `foreign_keys`, which took
+/// the slot dev stacks first wrote concept bindings into.
+func (rcv *Metadata) ConceptBindings(obj *ConceptBinding, j int) bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(46))
+	if o != 0 {
+		x := rcv._tab.Vector(o)
+		x += flatbuffers.UOffsetT(j) * 4
+		x = rcv._tab.Indirect(x)
+		obj.Init(rcv._tab.Bytes, x)
+		return true
+	}
+	return false
+}
+
+func (rcv *Metadata) ConceptBindingsLength() int {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(46))
+	if o != 0 {
+		return rcv._tab.VectorLen(o)
+	}
+	return 0
+}
+
+/// Ontology concepts this stream provides -- the catalog-side annotation
+/// that concept-driven discovery and interest matching join on.
+/// Multi-valued: real sources provide more than one concept. Relationship
+/// to `entity_ty` is an open decision; both are carried in parallel for now.
+/// Field slots are positional: this one follows `foreign_keys`, which took
+/// the slot dev stacks first wrote concept bindings into.
 func MetadataStart(builder *flatbuffers.Builder) {
-	builder.StartObject(21)
+	builder.StartObject(22)
 }
 func MetadataAddDisplayName(builder *flatbuffers.Builder, displayName flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(displayName), 0)
@@ -4513,6 +4663,12 @@ func MetadataAddForeignKeys(builder *flatbuffers.Builder, foreignKeys flatbuffer
 	builder.PrependUOffsetTSlot(20, flatbuffers.UOffsetT(foreignKeys), 0)
 }
 func MetadataStartForeignKeysVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+	return builder.StartVector(4, numElems, 4)
+}
+func MetadataAddConceptBindings(builder *flatbuffers.Builder, conceptBindings flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(21, flatbuffers.UOffsetT(conceptBindings), 0)
+}
+func MetadataStartConceptBindingsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
 	return builder.StartVector(4, numElems, 4)
 }
 func MetadataEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {

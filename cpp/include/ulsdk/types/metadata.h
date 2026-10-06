@@ -27,6 +27,7 @@ namespace types {
 
 struct CategoryRelationshipData;
 struct ColumnTime;
+struct ConceptBinding;
 struct ContactInfo;
 struct DatacatalogGeometry;
 struct DatacatalogLatLngGeometry;
@@ -395,6 +396,30 @@ struct NestedHierarchyRelationshipData {
     }
 };
 
+///
+/// One ontology concept the stream (or one of its fields) provides, with the
+/// provenance of the binding. Concept ids name classes of the ontologies
+/// registry, where every ontology, `ul` included, is a managed object in
+/// Drive. The catalog does not resolve them yet: the writer binds concepts it
+/// resolved, and resolving them at the metadata write boundary comes with the
+/// registry. Absent = unannotated, and unannotated streams are invisible to
+/// concept-driven discovery -- the intended semantics for pre-existing
+/// payloads.
+///
+struct ConceptBinding {
+    std::optional<std::string> concept_;
+    float confidence_;
+    std::optional<std::string> mapped_by_;
+
+    ConceptBinding();
+    ConceptBinding(const ::ConceptBinding *root);
+    ConceptBinding(const std::vector<uint8_t> &bytes);
+    bool operator==(const ConceptBinding &rhs) const;
+    bool operator!=(const ConceptBinding &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
 struct ContactInfo {
     std::optional<std::string> address_;
     std::optional<std::string> email_;
@@ -588,6 +613,7 @@ struct IntegerDisplayString {
 
 struct Metadata {
     bool area_selection_;
+    std::optional<std::vector<ConceptBinding>> concept_bindings_;
     DatasetCategory dataset_category_;
     std::optional<std::string> description_;
     std::optional<std::vector<DetailSection>> detail_sections_;
@@ -715,6 +741,7 @@ struct UIntBucket {
 struct UlField {
     std::optional<std::string> breakdown_display_name_;
     std::optional<ComponentData> component_data_;
+    std::optional<ConceptBinding> concept_attr_;
     std::optional<ValueInstance> default_;
     std::optional<std::string> description_;
     std::optional<std::string> display_name_;
@@ -809,6 +836,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NestedCategoryRela
 
 ::flatbuffers::Offset<::NestedHierarchyRelationshipData>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NestedHierarchyRelationshipData &);
+
+::flatbuffers::Offset<::ConceptBinding>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ConceptBinding &);
 
 ::flatbuffers::Offset<::ContactInfo>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ContactInfo &);
@@ -924,6 +954,9 @@ to_bytes(const NestedCategoryRelationshipData &o);
 
 std::vector<uint8_t>
 to_bytes(const NestedHierarchyRelationshipData &o);
+
+std::vector<uint8_t>
+to_bytes(const ConceptBinding &o);
 
 std::vector<uint8_t>
 to_bytes(const ContactInfo &o);

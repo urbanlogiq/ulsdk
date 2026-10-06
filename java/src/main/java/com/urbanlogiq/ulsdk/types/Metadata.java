@@ -17,6 +17,22 @@ public final class Metadata {
     }
 
     /**
+     *  Ontology concepts this stream provides -- the catalog-side annotation
+     *  that concept-driven discovery and interest matching join on.
+     *  Multi-valued: real sources provide more than one concept. Relationship
+     *  to `entity_ty` is an open decision; both are carried in parallel for now.
+     *  Field slots are positional: this one follows `foreign_keys`, which took
+     *  the slot dev stacks first wrote concept bindings into.
+     */
+    com.urbanlogiq.ulsdk.types.ConceptBinding[] _conceptBindings;
+    public com.urbanlogiq.ulsdk.types.ConceptBinding[] getConceptBindings() {
+        return this._conceptBindings;
+    }
+    public void setConceptBindings(com.urbanlogiq.ulsdk.types.ConceptBinding[] value) {
+        this._conceptBindings = value;
+    }
+
+    /**
      *  Organizational category for frontend. Defaults to DC_HIDDEN.
      */
     long _datasetCategory;
@@ -217,6 +233,17 @@ public final class Metadata {
 
     public Metadata(com.urbanlogiq.ulsdk.types.generated.Metadata o) {
         this._areaSelection = o.areaSelection();
+        if (o.conceptBindingsVector() != null) {
+            com.urbanlogiq.ulsdk.types.ConceptBinding[] conceptBindings = new com.urbanlogiq.ulsdk.types.ConceptBinding[o.conceptBindingsLength()];
+            for (int i = 0; i < o.conceptBindingsLength(); i++) {
+                com.urbanlogiq.ulsdk.types.ConceptBinding conceptBindingsValue = null;
+                if (o.conceptBindings(i) != null) {
+                    conceptBindingsValue = new com.urbanlogiq.ulsdk.types.ConceptBinding(o.conceptBindings(i));
+                }
+                conceptBindings[i] = conceptBindingsValue;
+            }
+            this._conceptBindings = conceptBindings;
+        }
         this._datasetCategory = o.datasetCategory();
         if (o.description() != null) {
             this._description = o.description();
@@ -340,6 +367,18 @@ public final class Metadata {
     }
 
     public int serializeTo(com.google.flatbuffers.FlatBufferBuilder builder) {
+        Integer conceptBindingsOffset = null;
+        if (this._conceptBindings != null) {
+            int[] conceptBindingsOffsets = new int[this._conceptBindings.length];;
+            for (int i = 0; i < this._conceptBindings.length; i++) {
+                conceptBindingsOffsets[i] = this._conceptBindings[i].serializeTo(builder);
+            }
+            com.urbanlogiq.ulsdk.types.generated.Metadata.startConceptBindingsVector(builder, this._conceptBindings.length);
+            for (int i = conceptBindingsOffsets.length - 1; i >= 0; i--) {
+                builder.addOffset(conceptBindingsOffsets[i]);
+            }
+            conceptBindingsOffset = builder.endVector();
+        }
         Integer descriptionOffset = null;
         if (this._description != null) {
             descriptionOffset = builder.createString(this._description);
@@ -434,6 +473,9 @@ public final class Metadata {
         }
         com.urbanlogiq.ulsdk.types.generated.Metadata.startMetadata(builder);
         com.urbanlogiq.ulsdk.types.generated.Metadata.addAreaSelection(builder, this._areaSelection);
+        if (conceptBindingsOffset != null) {
+            com.urbanlogiq.ulsdk.types.generated.Metadata.addConceptBindings(builder, conceptBindingsOffset);
+        }
         com.urbanlogiq.ulsdk.types.generated.Metadata.addDatasetCategory(builder, this._datasetCategory);
         if (descriptionOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.Metadata.addDescription(builder, descriptionOffset);
@@ -489,6 +531,7 @@ public final class Metadata {
     }
 
     public Metadata() {
+        this._conceptBindings = new com.urbanlogiq.ulsdk.types.ConceptBinding[0];
         this._description = new String();
         this._detailSections = new com.urbanlogiq.ulsdk.types.DetailSection[0];
         this._displayName = new String();

@@ -118,8 +118,23 @@ class UlField(object):
             return obj
         return None
 
+    # Ontology attribute this field provides, within one of the stream's
+    # bound concepts: a merged metadata write drops an inherited one whose
+    # concept is no longer bound, and refuses a supplied one. Appended last
+    # (field slots are positional).
+    # UlField
+    def ConceptAttr(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(28))
+        if o != 0:
+            x = self._tab.Indirect(o + self._tab.Pos)
+            from .ConceptBinding import ConceptBinding
+            obj = ConceptBinding()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
 def UlFieldStart(builder):
-    builder.StartObject(12)
+    builder.StartObject(13)
 
 def Start(builder):
     UlFieldStart(builder)
@@ -195,6 +210,12 @@ def UlFieldAddStorageType(builder, storageType):
 
 def AddStorageType(builder, storageType):
     UlFieldAddStorageType(builder, storageType)
+
+def UlFieldAddConceptAttr(builder, conceptAttr):
+    builder.PrependUOffsetTRelativeSlot(12, flatbuffers.number_types.UOffsetTFlags.py_type(conceptAttr), 0)
+
+def AddConceptAttr(builder, conceptAttr):
+    UlFieldAddConceptAttr(builder, conceptAttr)
 
 def UlFieldEnd(builder):
     return builder.EndObject()

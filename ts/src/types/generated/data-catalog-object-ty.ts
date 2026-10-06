@@ -22,5 +22,12 @@ export enum DataCatalogObjectTy {
   Notification = 12,
   Model = 13,
   Ingestion = 14,
-  View = 15
+  View = 15,
+  ModelManifest = 16,
+  OntologyDeclaration = 17,
+  Mission = 18,
+  Skill = 19,
+  SourceNote = 20,
+  Exploration = 21,
+  KpiSpec = 22
 }

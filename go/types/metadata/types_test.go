@@ -33,6 +33,25 @@ func TestDefaultColumnTime(t *testing.T) {
 }
 
 
+func TestDefaultConceptBinding(t *testing.T) {
+	o := &ConceptBinding{}
+	if o == nil {
+		t.Fatal("expected non-nil")
+	}
+}
+
+func TestRoundTripConceptBinding(t *testing.T) {
+	o := &ConceptBinding{}
+	data := o.ToBytes()
+	result, err := ConceptBindingFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
 func TestDefaultContactInfo(t *testing.T) {
 	o := &ContactInfo{}
 	if o == nil {

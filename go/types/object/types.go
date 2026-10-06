@@ -40,6 +40,13 @@ const (
 	DataCatalogObjectTyModel DataCatalogObjectTy = 13
 	DataCatalogObjectTyIngestion DataCatalogObjectTy = 14
 	DataCatalogObjectTyView DataCatalogObjectTy = 15
+	DataCatalogObjectTyModelManifest DataCatalogObjectTy = 16
+	DataCatalogObjectTyOntologyDeclaration DataCatalogObjectTy = 17
+	DataCatalogObjectTyMission DataCatalogObjectTy = 18
+	DataCatalogObjectTySkill DataCatalogObjectTy = 19
+	DataCatalogObjectTySourceNote DataCatalogObjectTy = 20
+	DataCatalogObjectTyExploration DataCatalogObjectTy = 21
+	DataCatalogObjectTyKpiSpec DataCatalogObjectTy = 22
 )
 
 type DataCatalogObject struct {

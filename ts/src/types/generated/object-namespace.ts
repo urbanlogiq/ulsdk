@@ -14,5 +14,6 @@ export enum ObjectNamespace {
   Evaluator = 4,
   Drive = 5,
   Notifications = 6,
+  Registry = 7,
   Unknown = 65535
 }

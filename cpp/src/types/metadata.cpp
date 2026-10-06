@@ -1214,6 +1214,79 @@ NestedHierarchyRelationshipData::operator==(const NestedHierarchyRelationshipDat
     return true;
 }
 
+::flatbuffers::Offset<::ConceptBinding>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ConceptBinding &o) {
+    std::optional<::flatbuffers::Offset<::flatbuffers::String>> concept__offset = std::nullopt;
+    if (o.concept_.has_value()) {
+        const ::flatbuffers::Offset<::flatbuffers::String> concept__offset_val = builder.CreateString(o.concept_.value());
+        concept__offset = std::make_optional(concept__offset_val);
+    }
+    std::optional<::flatbuffers::Offset<::flatbuffers::String>> mapped_by_offset = std::nullopt;
+    if (o.mapped_by_.has_value()) {
+        const ::flatbuffers::Offset<::flatbuffers::String> mapped_by_offset_val = builder.CreateString(o.mapped_by_.value());
+        mapped_by_offset = std::make_optional(mapped_by_offset_val);
+    }
+
+    ::ConceptBindingBuilder instance_builder = ::ConceptBindingBuilder(builder);
+    if (concept__offset.has_value()) {
+        instance_builder.add_concept_(concept__offset.value());
+    }
+    instance_builder.add_confidence(o.confidence_);
+    if (mapped_by_offset.has_value()) {
+        instance_builder.add_mapped_by(mapped_by_offset.value());
+    }
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const ConceptBinding &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+ConceptBinding::ConceptBinding()
+    : concept_(std::nullopt)
+    , confidence_(0)
+    , mapped_by_(std::nullopt) {
+}
+
+ConceptBinding::ConceptBinding(const std::vector<uint8_t> &bytes)
+    : ConceptBinding(::flatbuffers::GetSizePrefixedRoot<::ConceptBinding>(bytes.data())) {
+}
+
+ConceptBinding::ConceptBinding(const ::ConceptBinding *root) 
+    : concept_(std::nullopt)
+    , confidence_(0)
+    , mapped_by_(std::nullopt) {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    if (root->concept_() != nullptr) {
+        concept_ = std::string(*root->concept_()->begin(), *root->concept_()->end());
+    }
+    confidence_ = root->confidence();
+    if (root->mapped_by() != nullptr) {
+        mapped_by_ = std::string(*root->mapped_by()->begin(), *root->mapped_by()->end());
+    }
+}
+
+bool
+ConceptBinding::operator==(const ConceptBinding &rhs) const {
+    if (this->concept_ != rhs.concept_) {
+        return false;
+    }
+    if (this->confidence_ != rhs.confidence_) {
+        return false;
+    }
+    if (this->mapped_by_ != rhs.mapped_by_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::ContactInfo>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ContactInfo &o) {
     std::optional<::flatbuffers::Offset<::flatbuffers::String>> address_offset = std::nullopt;
@@ -2122,6 +2195,17 @@ IntegerDisplayString::operator==(const IntegerDisplayString &rhs) const {
 
 ::flatbuffers::Offset<::Metadata>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Metadata &o) {
+    std::optional<::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::ConceptBinding>>>> concept_bindings_offset = std::nullopt;
+    if (o.concept_bindings_.has_value()) {
+        const auto &concept_bindings__var = o.concept_bindings_.value();
+        std::vector<::flatbuffers::Offset<::ConceptBinding>> concept_bindings_offsets = std::vector<::flatbuffers::Offset<::ConceptBinding>>();
+        concept_bindings_offsets.reserve(concept_bindings__var.size());
+        for (const auto &i: concept_bindings__var) {
+            concept_bindings_offsets.push_back(serialize_to(builder, i));
+        }
+        const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::ConceptBinding>>> concept_bindings_offset_val = builder.CreateVector(concept_bindings_offsets);
+        concept_bindings_offset = std::make_optional(concept_bindings_offset_val);
+    }
     std::optional<::flatbuffers::Offset<::flatbuffers::String>> description_offset = std::nullopt;
     if (o.description_.has_value()) {
         const ::flatbuffers::Offset<::flatbuffers::String> description_offset_val = builder.CreateString(o.description_.value());
@@ -2209,6 +2293,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Metadata &o) {
 
     ::MetadataBuilder instance_builder = ::MetadataBuilder(builder);
     instance_builder.add_area_selection(o.area_selection_);
+    if (concept_bindings_offset.has_value()) {
+        instance_builder.add_concept_bindings(concept_bindings_offset.value());
+    }
     instance_builder.add_dataset_category(o.dataset_category_);
     if (description_offset.has_value()) {
         instance_builder.add_description(description_offset.value());
@@ -2268,6 +2355,7 @@ std::vector<uint8_t> to_bytes(const Metadata &o) {
 
 Metadata::Metadata()
     : area_selection_(false)
+    , concept_bindings_(std::nullopt)
     , dataset_category_(DatasetCategory(4294967295))
     , description_(std::nullopt)
     , detail_sections_(std::nullopt)
@@ -2294,6 +2382,7 @@ Metadata::Metadata(const std::vector<uint8_t> &bytes)
 
 Metadata::Metadata(const ::Metadata *root) 
     : area_selection_(false)
+    , concept_bindings_(std::nullopt)
     , dataset_category_(DatasetCategory(4294967295))
     , description_(std::nullopt)
     , detail_sections_(std::nullopt)
@@ -2317,6 +2406,15 @@ Metadata::Metadata(const ::Metadata *root)
     }
 
     area_selection_ = root->area_selection();
+    const auto &concept_bindings_vector = root->concept_bindings();
+    if (concept_bindings_vector != nullptr) {
+        decltype(concept_bindings_)::value_type concept_bindings__target = decltype(concept_bindings_)::value_type();
+        concept_bindings__target.reserve(concept_bindings_vector->size());
+        for (const auto &i: *concept_bindings_vector) {
+            concept_bindings__target.emplace_back(i);
+        }
+        concept_bindings_ = std::make_optional(concept_bindings__target);
+    }
     dataset_category_ = root->dataset_category();
     if (root->description() != nullptr) {
         description_ = std::string(*root->description()->begin(), *root->description()->end());
@@ -2439,6 +2537,9 @@ Metadata::Metadata(const ::Metadata *root)
 bool
 Metadata::operator==(const Metadata &rhs) const {
     if (this->area_selection_ != rhs.area_selection_) {
+        return false;
+    }
+    if (this->concept_bindings_ != rhs.concept_bindings_) {
         return false;
     }
     if (this->dataset_category_ != rhs.dataset_category_) {
@@ -2962,6 +3063,11 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UlField &o) {
         const std::pair<::flatbuffers::Offset<void>, ::ComponentData> component_data_offset_val = serialize_to(builder, o.component_data_.value());
         component_data_offset = std::make_optional(component_data_offset_val);
     }
+    std::optional<::flatbuffers::Offset<::ConceptBinding>> concept_attr_offset = std::nullopt;
+    if (o.concept_attr_.has_value()) {
+        const ::flatbuffers::Offset<::ConceptBinding> concept_attr_offset_val = serialize_to(builder, o.concept_attr_.value());
+        concept_attr_offset = std::make_optional(concept_attr_offset_val);
+    }
     std::optional<::flatbuffers::Offset<::ValueInstance>> default__offset = std::nullopt;
     if (o.default_.has_value()) {
         const ::flatbuffers::Offset<::ValueInstance> default__offset_val = serialize_to(builder, o.default_.value());
@@ -2997,6 +3103,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const UlField &o) {
         instance_builder.add_component_data(component_data_opt.first);
         instance_builder.add_component_data_type(component_data_opt.second);
     }
+    if (concept_attr_offset.has_value()) {
+        instance_builder.add_concept_attr(concept_attr_offset.value());
+    }
     if (default__offset.has_value()) {
         instance_builder.add_default_(default__offset.value());
     }
@@ -3031,6 +3140,7 @@ std::vector<uint8_t> to_bytes(const UlField &o) {
 UlField::UlField()
     : breakdown_display_name_(std::nullopt)
     , component_data_(std::nullopt)
+    , concept_attr_(std::nullopt)
     , default_(std::nullopt)
     , description_(std::nullopt)
     , display_name_(std::nullopt)
@@ -3048,6 +3158,7 @@ UlField::UlField(const std::vector<uint8_t> &bytes)
 UlField::UlField(const ::UlField *root) 
     : breakdown_display_name_(std::nullopt)
     , component_data_(std::nullopt)
+    , concept_attr_(std::nullopt)
     , default_(std::nullopt)
     , description_(std::nullopt)
     , display_name_(std::nullopt)
@@ -3104,6 +3215,9 @@ UlField::UlField(const ::UlField *root)
             }
             default: throw std::runtime_error("unknown union variant");
         }
+    }
+    if (root->concept_attr() != nullptr) {
+        concept_attr_ = decltype(concept_attr_)(root->concept_attr());
     }
     if (root->default_() != nullptr) {
         default_ = decltype(default_)(root->default_());
@@ -3290,6 +3404,9 @@ UlField::operator==(const UlField &rhs) const {
         return false;
     }
     if (this->component_data_ != rhs.component_data_) {
+        return false;
+    }
+    if (this->concept_attr_ != rhs.concept_attr_) {
         return false;
     }
     if (this->default_ != rhs.default_) {

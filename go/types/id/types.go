@@ -22,6 +22,7 @@ const (
 	ObjectNamespaceEvaluator ObjectNamespace = 4
 	ObjectNamespaceDrive ObjectNamespace = 5
 	ObjectNamespaceNotifications ObjectNamespace = 6
+	ObjectNamespaceRegistry ObjectNamespace = 7
 	ObjectNamespaceUnknown ObjectNamespace = 65535
 )
 

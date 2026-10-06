@@ -109,6 +109,7 @@ features = [
     "hickory-dns",
     "http2",
     "rustls-tls-webpki-roots",
+    "stream",
 ]
 default-features = false
 

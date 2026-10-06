@@ -977,6 +977,66 @@ const (
 	UpdateCadenceUC_YEARLY UpdateCadence = 6
 )
 
+// ConceptBinding -
+//  One ontology concept the stream (or one of its fields) provides, with the
+//  provenance of the binding. Concept ids name classes of the ontologies
+//  registry, where every ontology, `ul` included, is a managed object in
+//  Drive. The catalog does not resolve them yet: the writer binds concepts it
+//  resolved, and resolving them at the metadata write boundary comes with the
+//  registry. Absent = unannotated, and unannotated streams are invisible to
+//  concept-driven discovery -- the intended semantics for pre-existing
+//  payloads.
+type ConceptBinding struct {
+	Concept *string
+	Confidence float32
+	MappedBy *string
+}
+
+func ConceptBindingFromFbs(fbs *generated.ConceptBinding) *ConceptBinding {
+	o := &ConceptBinding{}
+	if s := fbs.Concept(); s != nil {
+		str := string(s)
+		o.Concept = &str
+	}
+	o.Confidence = fbs.Confidence()
+	if s := fbs.MappedBy(); s != nil {
+		str := string(s)
+		o.MappedBy = &str
+	}
+	return o
+}
+
+// ConceptBindingFromBytes deserializes a ConceptBinding from size-prefixed FlatBuffer bytes.
+func ConceptBindingFromBytes(data []byte) (*ConceptBinding, error) {
+	fbs := generated.GetSizePrefixedRootAsConceptBinding(data, 0)
+	return ConceptBindingFromFbs(fbs), nil
+}
+
+// ToBytes serializes the ConceptBinding to size-prefixed FlatBuffer bytes.
+func (o *ConceptBinding) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the ConceptBinding into a FlatBuffer builder and returns the offset.
+func (o *ConceptBinding) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var conceptOffset flatbuffers.UOffsetT
+	if o.Concept != nil {
+		conceptOffset = builder.CreateString(*o.Concept)
+	}
+	var mappedByOffset flatbuffers.UOffsetT
+	if o.MappedBy != nil {
+		mappedByOffset = builder.CreateString(*o.MappedBy)
+	}
+	generated.ConceptBindingStart(builder)
+	generated.ConceptBindingAddConcept(builder, conceptOffset)
+	generated.ConceptBindingAddConfidence(builder, o.Confidence)
+	generated.ConceptBindingAddMappedBy(builder, mappedByOffset)
+	return generated.ConceptBindingEnd(builder)
+}
+
 type ContactInfo struct {
 	Address *string
 	Email *string
@@ -1560,6 +1620,7 @@ func (o *IntegerDisplayString) SerializeTo(builder *flatbuffers.Builder) flatbuf
 
 type Metadata struct {
 	AreaSelection bool
+	ConceptBindings []ConceptBinding
 	DatasetCategory uint32
 	Description *string
 	DetailSections []DetailSection
@@ -1583,6 +1644,12 @@ type Metadata struct {
 func MetadataFromFbs(fbs *generated.Metadata) *Metadata {
 	o := &Metadata{}
 	o.AreaSelection = fbs.AreaSelection()
+	for i := 0; i < fbs.ConceptBindingsLength(); i++ {
+		var item generated.ConceptBinding
+		if fbs.ConceptBindings(&item, i) {
+			o.ConceptBindings = append(o.ConceptBindings, *ConceptBindingFromFbs(&item))
+		}
+	}
 	o.DatasetCategory = uint32(fbs.DatasetCategory())
 	if s := fbs.Description(); s != nil {
 		str := string(s)
@@ -1652,6 +1719,15 @@ func (o *Metadata) ToBytes() []byte {
 
 // SerializeTo writes the Metadata into a FlatBuffer builder and returns the offset.
 func (o *Metadata) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	conceptBindingsOffsets := make([]flatbuffers.UOffsetT, len(o.ConceptBindings))
+	for i := range o.ConceptBindings {
+		conceptBindingsOffsets[i] = o.ConceptBindings[i].SerializeTo(builder)
+	}
+	generated.MetadataStartConceptBindingsVector(builder, len(o.ConceptBindings))
+	for i := len(conceptBindingsOffsets) - 1; i >= 0; i-- {
+		builder.PrependUOffsetT(conceptBindingsOffsets[i])
+	}
+	conceptBindingsVecOffset := builder.EndVector(len(o.ConceptBindings))
 	var descriptionOffset flatbuffers.UOffsetT
 	if o.Description != nil {
 		descriptionOffset = builder.CreateString(*o.Description)
@@ -1717,6 +1793,7 @@ func (o *Metadata) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 	visualizeInExploreFieldsVecOffset := builder.EndVector(len(o.VisualizeInExploreFields))
 	generated.MetadataStart(builder)
 	generated.MetadataAddAreaSelection(builder, o.AreaSelection)
+	generated.MetadataAddConceptBindings(builder, conceptBindingsVecOffset)
 	generated.MetadataAddDatasetCategory(builder, generated.DatasetCategory(o.DatasetCategory))
 	generated.MetadataAddDescription(builder, descriptionOffset)
 	generated.MetadataAddDetailSections(builder, detailSectionsVecOffset)
@@ -2033,6 +2110,7 @@ func UIntBucketFromFbs(fbs *generated.UIntBucket) *UIntBucket {
 type UlField struct {
 	BreakdownDisplayName *string
 	ComponentData interface{}
+	ConceptAttr *ConceptBinding
 	Default *value.ValueInstance
 	Description *string
 	DisplayName *string
@@ -2048,6 +2126,9 @@ func UlFieldFromFbs(fbs *generated.UlField) *UlField {
 	if s := fbs.BreakdownDisplayName(); s != nil {
 		str := string(s)
 		o.BreakdownDisplayName = &str
+	}
+	if fbsVal := fbs.ConceptAttr(nil); fbsVal != nil {
+		o.ConceptAttr = ConceptBindingFromFbs(fbsVal)
 	}
 	if fbsVal := fbs.Default(nil); fbsVal != nil {
 		o.Default = value.ValueInstanceFromFbs(fbsVal)
@@ -2090,6 +2171,10 @@ func (o *UlField) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT
 	if o.BreakdownDisplayName != nil {
 		breakdownDisplayNameOffset = builder.CreateString(*o.BreakdownDisplayName)
 	}
+	var conceptAttrOffset flatbuffers.UOffsetT
+	if o.ConceptAttr != nil {
+		conceptAttrOffset = o.ConceptAttr.SerializeTo(builder)
+	}
 	var defaultOffset flatbuffers.UOffsetT
 	if o.Default != nil {
 		defaultOffset = o.Default.SerializeTo(builder)
@@ -2108,6 +2193,7 @@ func (o *UlField) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT
 	}
 	generated.UlFieldStart(builder)
 	generated.UlFieldAddBreakdownDisplayName(builder, breakdownDisplayNameOffset)
+	generated.UlFieldAddConceptAttr(builder, conceptAttrOffset)
 	generated.UlFieldAddDefault(builder, defaultOffset)
 	generated.UlFieldAddDescription(builder, descriptionOffset)
 	generated.UlFieldAddDisplayName(builder, displayNameOffset)

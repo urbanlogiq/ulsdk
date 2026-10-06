@@ -83,8 +83,8 @@ use crate::types::generated::id_generated::{
 use crate::types::generated::metadata_generated::{
     AggregationFunction as FbsAggregationFunction,
     CategoryRelationshipData as FbsCategoryRelationshipData, ColumnTime as FbsColumnTime,
-    ComponentData as FbsComponentData, ContactInfo as FbsContactInfo,
-    DatacatalogGeometry as FbsDatacatalogGeometry,
+    ComponentData as FbsComponentData, ConceptBinding as FbsConceptBinding,
+    ContactInfo as FbsContactInfo, DatacatalogGeometry as FbsDatacatalogGeometry,
     DatacatalogLatLngGeometry as FbsDatacatalogLatLngGeometry,
     DatasetCategory as FbsDatasetCategory, DatasetSource as FbsDatasetSource, Dates as FbsDates,
     DatetimeRange as FbsDatetimeRange, DetailSection as FbsDetailSection, Document as FbsDocument,
@@ -2086,6 +2086,78 @@ impl UlFieldRelationshipData {
     }
 }
 
+/// One ontology concept the stream (or one of its fields) provides, with the
+/// provenance of the binding. Concept ids name classes of the ontologies
+/// registry, where every ontology, `ul` included, is a managed object in
+/// Drive. The catalog does not resolve them yet: the writer binds concepts it
+/// resolved, and resolving them at the metadata write boundary comes with the
+/// registry. Absent = unannotated, and unannotated streams are invisible to
+/// concept-driven discovery -- the intended semantics for pre-existing
+/// payloads.
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+pub struct ConceptBinding {
+    /// Ontology concept id, e.g. "ul:RoadSegment". On a field binding this may
+    /// address an attribute within the concept, e.g. "ul:RoadSegment/speed_limit".
+    pub concept: Option<String>,
+    /// Mapper confidence in [0, 1]; 1.0 for human bindings.
+    pub confidence: OrderedFloat<f32>,
+    /// Binding provenance: "human:<oid>" or "model:<model_id@version>".
+    pub mapped_by: Option<String>,
+}
+
+impl ConceptBinding {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsConceptBinding<'a>> {
+        use crate::types::generated::metadata_generated::ConceptBindingBuilder as FbsConceptBindingBuilder;
+
+        let concept_offset = self.concept.as_ref().map(|s| builder.create_string(s));
+        let mapped_by_offset = self.mapped_by.as_ref().map(|s| builder.create_string(s));
+
+        let mut bldr = FbsConceptBindingBuilder::new(builder);
+        if let Some(offset) = concept_offset {
+            bldr.add_concept(offset);
+        }
+        bldr.add_confidence(*self.confidence);
+        if let Some(offset) = mapped_by_offset {
+            bldr.add_mapped_by(offset);
+        }
+        bldr.finish()
+    }
+}
+
+impl From<FbsConceptBinding<'_>> for ConceptBinding {
+    fn from(fbs: FbsConceptBinding<'_>) -> Self {
+        let concept = fbs.concept().map(ToOwned::to_owned);
+        let confidence = OrderedFloat(fbs.confidence());
+        let mapped_by = fbs.mapped_by().map(ToOwned::to_owned);
+        Self {
+            concept,
+            confidence,
+            mapped_by,
+        }
+    }
+}
+
+impl crate::FbsSerde for ConceptBinding {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsConceptBinding>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
 #[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct ContactInfo {
     pub address: Option<String>,
@@ -2888,6 +2960,13 @@ impl crate::FbsSerde for IntegerDisplayString {
 pub struct Metadata {
     /// is to be included in the boundary selection modal
     pub area_selection: bool,
+    /// Ontology concepts this stream provides -- the catalog-side annotation
+    /// that concept-driven discovery and interest matching join on.
+    /// Multi-valued: real sources provide more than one concept. Relationship
+    /// to `entity_ty` is an open decision; both are carried in parallel for now.
+    /// Field slots are positional: this one follows `foreign_keys`, which took
+    /// the slot dev stacks first wrote concept bindings into.
+    pub concept_bindings: Option<Vec<ConceptBinding>>,
     /// Organizational category for frontend. Defaults to DC_HIDDEN.
     pub dataset_category: DatasetCategory,
     pub description: Option<String>,
@@ -2948,6 +3027,15 @@ impl Metadata {
     ) -> flatbuffers::WIPOffset<FbsMetadata<'a>> {
         use crate::types::generated::metadata_generated::MetadataBuilder as FbsMetadataBuilder;
 
+        let concept_bindings_offset = self.concept_bindings.as_ref().map(|v| {
+            let mut concept_bindings_offsets = Vec::with_capacity(v.len());
+            for val in v.iter() {
+                let offset = val.serialize_to(builder);
+                concept_bindings_offsets.push(offset);
+            }
+            let concept_bindings_offset = builder.create_vector(&concept_bindings_offsets);
+            concept_bindings_offset
+        });
         let description_offset = self.description.as_ref().map(|s| builder.create_string(s));
         let detail_sections_offset = self.detail_sections.as_ref().map(|v| {
             let mut detail_sections_offsets = Vec::with_capacity(v.len());
@@ -3008,6 +3096,9 @@ impl Metadata {
 
         let mut bldr = FbsMetadataBuilder::new(builder);
         bldr.add_area_selection(self.area_selection);
+        if let Some(offset) = concept_bindings_offset {
+            bldr.add_concept_bindings(offset);
+        }
         bldr.add_dataset_category(FbsDatasetCategory::from(self.dataset_category));
         if let Some(offset) = description_offset {
             bldr.add_description(offset);
@@ -3059,6 +3150,17 @@ impl Metadata {
 impl From<FbsMetadata<'_>> for Metadata {
     fn from(fbs: FbsMetadata<'_>) -> Self {
         let area_selection = fbs.area_selection();
+        let concept_bindings = if let Some(val) = fbs.concept_bindings() {
+            let mut concept_bindings = Vec::new();
+            for elem in val {
+                concept_bindings.push(elem.into());
+            }
+
+            Some(concept_bindings)
+        } else {
+            None
+        };
+
         let dataset_category = DatasetCategory::from(fbs.dataset_category());
         let description = fbs.description().map(ToOwned::to_owned);
         let detail_sections = if let Some(val) = fbs.detail_sections() {
@@ -3192,6 +3294,7 @@ impl From<FbsMetadata<'_>> for Metadata {
 
         Self {
             area_selection,
+            concept_bindings,
             dataset_category,
             description,
             detail_sections,
@@ -3236,6 +3339,7 @@ impl Default for Metadata {
     fn default() -> Self {
         Self {
             area_selection: bool::default(),
+            concept_bindings: None,
             dataset_category: DatasetCategory::DC_HIDDEN,
             description: None,
             detail_sections: None,
@@ -3692,6 +3796,11 @@ impl From<&FbsUIntBucket> for UIntBucket {
 pub struct UlField {
     pub breakdown_display_name: Option<String>,
     pub component_data: Option<ComponentData>,
+    /// Ontology attribute this field provides, within one of the stream's
+    /// bound concepts: a merged metadata write drops an inherited one whose
+    /// concept is no longer bound, and refuses a supplied one. Appended last
+    /// (field slots are positional).
+    pub concept_attr: Option<ConceptBinding>,
     pub default: Option<ValueInstance>,
     pub description: Option<String>,
     pub display_name: Option<String>,
@@ -3717,6 +3826,7 @@ impl UlField {
             .component_data
             .as_ref()
             .map(|u| u.serialize_to(builder));
+        let concept_attr_offset = self.concept_attr.as_ref().map(|o| o.serialize_to(builder));
         let default_offset = self.default.as_ref().map(|o| o.serialize_to(builder));
         let description_offset = self.description.as_ref().map(|s| builder.create_string(s));
         let display_name_offset = self.display_name.as_ref().map(|s| builder.create_string(s));
@@ -3730,6 +3840,9 @@ impl UlField {
         if let Some((offset, ty)) = component_data_offset {
             bldr.add_component_data(offset);
             bldr.add_component_data_type(ty);
+        }
+        if let Some(offset) = concept_attr_offset {
+            bldr.add_concept_attr(offset);
         }
         if let Some(offset) = default_offset {
             bldr.add_default(offset);
@@ -3787,6 +3900,7 @@ impl From<FbsUlField<'_>> for UlField {
             None
         };
 
+        let concept_attr = fbs.concept_attr().map(ConceptBinding::from);
         let default = fbs.default().map(ValueInstance::from);
         let description = fbs.description().map(ToOwned::to_owned);
         let display_name = fbs.display_name().map(ToOwned::to_owned);
@@ -3867,6 +3981,7 @@ impl From<FbsUlField<'_>> for UlField {
         Self {
             breakdown_display_name,
             component_data,
+            concept_attr,
             default,
             description,
             display_name,
@@ -3902,6 +4017,7 @@ impl Default for UlField {
         Self {
             breakdown_display_name: None,
             component_data: None,
+            concept_attr: None,
             default: None,
             description: None,
             display_name: None,
@@ -4036,6 +4152,14 @@ mod tests {
         let t0 = ColumnTime::default();
         let buf = t0.to_fbs_bytes();
         let t1 = ColumnTime::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_concept_binding() {
+        let t0 = ConceptBinding::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = ConceptBinding::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 

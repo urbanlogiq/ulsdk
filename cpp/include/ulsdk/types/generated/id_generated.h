@@ -48,12 +48,13 @@ enum class ObjectNamespace : uint16_t {
   Evaluator = 4,
   Drive = 5,
   Notifications = 6,
+  Registry = 7,
   Unknown = 65535,
   MIN = Global,
   MAX = Unknown
 };
 
-inline const ObjectNamespace (&EnumValuesObjectNamespace())[8] {
+inline const ObjectNamespace (&EnumValuesObjectNamespace())[9] {
   static const ObjectNamespace values[] = {
     ObjectNamespace::Global,
     ObjectNamespace::User,
@@ -62,6 +63,7 @@ inline const ObjectNamespace (&EnumValuesObjectNamespace())[8] {
     ObjectNamespace::Evaluator,
     ObjectNamespace::Drive,
     ObjectNamespace::Notifications,
+    ObjectNamespace::Registry,
     ObjectNamespace::Unknown
   };
   return values;
@@ -76,6 +78,7 @@ inline const char *EnumNameObjectNamespace(ObjectNamespace e) {
     case ObjectNamespace::Evaluator: return "Evaluator";
     case ObjectNamespace::Drive: return "Drive";
     case ObjectNamespace::Notifications: return "Notifications";
+    case ObjectNamespace::Registry: return "Registry";
     case ObjectNamespace::Unknown: return "Unknown";
     default: return "";
   }

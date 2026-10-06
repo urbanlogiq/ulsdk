@@ -35,6 +35,7 @@ pub enum ObjectNamespace {
     Evaluator = 4,
     Drive = 5,
     Notifications = 6,
+    Registry = 7,
     Unknown = 65535,
 }
 
@@ -55,6 +56,7 @@ impl ObjectNamespace {
             Self::Evaluator => Some("Evaluator"),
             Self::Drive => Some("Drive"),
             Self::Notifications => Some("Notifications"),
+            Self::Registry => Some("Registry"),
             Self::Unknown => Some("Unknown"),
             _ => None,
         }
@@ -71,6 +73,7 @@ impl From<ObjectNamespace> for FbsObjectNamespace {
             ObjectNamespace::Evaluator => FbsObjectNamespace::Evaluator,
             ObjectNamespace::Drive => FbsObjectNamespace::Drive,
             ObjectNamespace::Notifications => FbsObjectNamespace::Notifications,
+            ObjectNamespace::Registry => FbsObjectNamespace::Registry,
             ObjectNamespace::Unknown => FbsObjectNamespace::Unknown,
         }
     }
@@ -86,6 +89,7 @@ impl From<FbsObjectNamespace> for ObjectNamespace {
             4 => Self::Evaluator,
             5 => Self::Drive,
             6 => Self::Notifications,
+            7 => Self::Registry,
             65535 => Self::Unknown,
             _ => panic!("Invalid value {} when constructing ObjectNamespace", fbs.0),
         }

@@ -16,6 +16,12 @@ def test_column_time():
     _t1 = ColumnTime.from_bytes(_b)
     assert _t0 == _t1
 
+def test_concept_binding():
+    _t0 = ConceptBinding.make_default()
+    _b = _t0.to_bytes()
+    _t1 = ConceptBinding.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_contact_info():
     _t0 = ContactInfo.make_default()
     _b = _t0.to_bytes()

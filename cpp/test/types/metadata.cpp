@@ -27,6 +27,16 @@ test_column_time() {
 TypeTest test_column_time_obj(test_column_time, "ColumnTime");
 
 bool
+test_concept_binding() {
+    ::ul::types::ConceptBinding t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::ConceptBinding deserialized = ::ul::types::ConceptBinding(bytes);
+    return true;
+}
+
+TypeTest test_concept_binding_obj(test_concept_binding, "ConceptBinding");
+
+bool
 test_contact_info() {
     ::ul::types::ContactInfo t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);

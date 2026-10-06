@@ -347,8 +347,39 @@ class Metadata(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(44))
         return o == 0
 
+    # Ontology concepts this stream provides -- the catalog-side annotation
+    # that concept-driven discovery and interest matching join on.
+    # Multi-valued: real sources provide more than one concept. Relationship
+    # to `entity_ty` is an open decision; both are carried in parallel for now.
+    # Field slots are positional: this one follows `foreign_keys`, which took
+    # the slot dev stacks first wrote concept bindings into.
+    # Metadata
+    def ConceptBindings(self, j):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(46))
+        if o != 0:
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
+            x = self._tab.Indirect(x)
+            from .ConceptBinding import ConceptBinding
+            obj = ConceptBinding()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+    # Metadata
+    def ConceptBindingsLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(46))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # Metadata
+    def ConceptBindingsIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(46))
+        return o == 0
+
 def MetadataStart(builder):
-    builder.StartObject(21)
+    builder.StartObject(22)
 
 def Start(builder):
     MetadataStart(builder)
@@ -520,6 +551,18 @@ def MetadataStartForeignKeysVector(builder, numElems):
 
 def StartForeignKeysVector(builder, numElems):
     return MetadataStartForeignKeysVector(builder, numElems)
+
+def MetadataAddConceptBindings(builder, conceptBindings):
+    builder.PrependUOffsetTRelativeSlot(21, flatbuffers.number_types.UOffsetTFlags.py_type(conceptBindings), 0)
+
+def AddConceptBindings(builder, conceptBindings):
+    MetadataAddConceptBindings(builder, conceptBindings)
+
+def MetadataStartConceptBindingsVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+def StartConceptBindingsVector(builder, numElems):
+    return MetadataStartConceptBindingsVector(builder, numElems)
 
 def MetadataEnd(builder):
     return builder.EndObject()

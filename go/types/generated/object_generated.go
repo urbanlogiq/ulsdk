@@ -10,60 +10,81 @@ import (
 type DataCatalogObjectTy int16
 
 const (
-	DataCatalogObjectTyInvalid           DataCatalogObjectTy = 0
-	DataCatalogObjectTyWorkLog           DataCatalogObjectTy = 1
-	DataCatalogObjectTySchematic         DataCatalogObjectTy = 2
-	DataCatalogObjectTyNode              DataCatalogObjectTy = 3
-	DataCatalogObjectTyStream            DataCatalogObjectTy = 4
-	DataCatalogObjectTyMetadata          DataCatalogObjectTy = 5
-	DataCatalogObjectTySource            DataCatalogObjectTy = 6
-	DataCatalogObjectTyUserProject       DataCatalogObjectTy = 7
-	DataCatalogObjectTyUseCase           DataCatalogObjectTy = 8
-	DataCatalogObjectTyUserPreferences   DataCatalogObjectTy = 9
-	DataCatalogObjectTyAccessControlList DataCatalogObjectTy = 10
-	DataCatalogObjectTyDirectoryEntry    DataCatalogObjectTy = 11
-	DataCatalogObjectTyNotification      DataCatalogObjectTy = 12
-	DataCatalogObjectTyModel             DataCatalogObjectTy = 13
-	DataCatalogObjectTyIngestion         DataCatalogObjectTy = 14
-	DataCatalogObjectTyView              DataCatalogObjectTy = 15
+	DataCatalogObjectTyInvalid             DataCatalogObjectTy = 0
+	DataCatalogObjectTyWorkLog             DataCatalogObjectTy = 1
+	DataCatalogObjectTySchematic           DataCatalogObjectTy = 2
+	DataCatalogObjectTyNode                DataCatalogObjectTy = 3
+	DataCatalogObjectTyStream              DataCatalogObjectTy = 4
+	DataCatalogObjectTyMetadata            DataCatalogObjectTy = 5
+	DataCatalogObjectTySource              DataCatalogObjectTy = 6
+	DataCatalogObjectTyUserProject         DataCatalogObjectTy = 7
+	DataCatalogObjectTyUseCase             DataCatalogObjectTy = 8
+	DataCatalogObjectTyUserPreferences     DataCatalogObjectTy = 9
+	DataCatalogObjectTyAccessControlList   DataCatalogObjectTy = 10
+	DataCatalogObjectTyDirectoryEntry      DataCatalogObjectTy = 11
+	DataCatalogObjectTyNotification        DataCatalogObjectTy = 12
+	DataCatalogObjectTyModel               DataCatalogObjectTy = 13
+	DataCatalogObjectTyIngestion           DataCatalogObjectTy = 14
+	DataCatalogObjectTyView                DataCatalogObjectTy = 15
+	DataCatalogObjectTyModelManifest       DataCatalogObjectTy = 16
+	DataCatalogObjectTyOntologyDeclaration DataCatalogObjectTy = 17
+	DataCatalogObjectTyMission             DataCatalogObjectTy = 18
+	DataCatalogObjectTySkill               DataCatalogObjectTy = 19
+	DataCatalogObjectTySourceNote          DataCatalogObjectTy = 20
+	DataCatalogObjectTyExploration         DataCatalogObjectTy = 21
+	DataCatalogObjectTyKpiSpec             DataCatalogObjectTy = 22
 )
 
 var EnumNamesDataCatalogObjectTy = map[DataCatalogObjectTy]string{
-	DataCatalogObjectTyInvalid:           "Invalid",
-	DataCatalogObjectTyWorkLog:           "WorkLog",
-	DataCatalogObjectTySchematic:         "Schematic",
-	DataCatalogObjectTyNode:              "Node",
-	DataCatalogObjectTyStream:            "Stream",
-	DataCatalogObjectTyMetadata:          "Metadata",
-	DataCatalogObjectTySource:            "Source",
-	DataCatalogObjectTyUserProject:       "UserProject",
-	DataCatalogObjectTyUseCase:           "UseCase",
-	DataCatalogObjectTyUserPreferences:   "UserPreferences",
-	DataCatalogObjectTyAccessControlList: "AccessControlList",
-	DataCatalogObjectTyDirectoryEntry:    "DirectoryEntry",
-	DataCatalogObjectTyNotification:      "Notification",
-	DataCatalogObjectTyModel:             "Model",
-	DataCatalogObjectTyIngestion:         "Ingestion",
-	DataCatalogObjectTyView:              "View",
+	DataCatalogObjectTyInvalid:             "Invalid",
+	DataCatalogObjectTyWorkLog:             "WorkLog",
+	DataCatalogObjectTySchematic:           "Schematic",
+	DataCatalogObjectTyNode:                "Node",
+	DataCatalogObjectTyStream:              "Stream",
+	DataCatalogObjectTyMetadata:            "Metadata",
+	DataCatalogObjectTySource:              "Source",
+	DataCatalogObjectTyUserProject:         "UserProject",
+	DataCatalogObjectTyUseCase:             "UseCase",
+	DataCatalogObjectTyUserPreferences:     "UserPreferences",
+	DataCatalogObjectTyAccessControlList:   "AccessControlList",
+	DataCatalogObjectTyDirectoryEntry:      "DirectoryEntry",
+	DataCatalogObjectTyNotification:        "Notification",
+	DataCatalogObjectTyModel:               "Model",
+	DataCatalogObjectTyIngestion:           "Ingestion",
+	DataCatalogObjectTyView:                "View",
+	DataCatalogObjectTyModelManifest:       "ModelManifest",
+	DataCatalogObjectTyOntologyDeclaration: "OntologyDeclaration",
+	DataCatalogObjectTyMission:             "Mission",
+	DataCatalogObjectTySkill:               "Skill",
+	DataCatalogObjectTySourceNote:          "SourceNote",
+	DataCatalogObjectTyExploration:         "Exploration",
+	DataCatalogObjectTyKpiSpec:             "KpiSpec",
 }
 
 var EnumValuesDataCatalogObjectTy = map[string]DataCatalogObjectTy{
-	"Invalid":           DataCatalogObjectTyInvalid,
-	"WorkLog":           DataCatalogObjectTyWorkLog,
-	"Schematic":         DataCatalogObjectTySchematic,
-	"Node":              DataCatalogObjectTyNode,
-	"Stream":            DataCatalogObjectTyStream,
-	"Metadata":          DataCatalogObjectTyMetadata,
-	"Source":            DataCatalogObjectTySource,
-	"UserProject":       DataCatalogObjectTyUserProject,
-	"UseCase":           DataCatalogObjectTyUseCase,
-	"UserPreferences":   DataCatalogObjectTyUserPreferences,
-	"AccessControlList": DataCatalogObjectTyAccessControlList,
-	"DirectoryEntry":    DataCatalogObjectTyDirectoryEntry,
-	"Notification":      DataCatalogObjectTyNotification,
-	"Model":             DataCatalogObjectTyModel,
-	"Ingestion":         DataCatalogObjectTyIngestion,
-	"View":              DataCatalogObjectTyView,
+	"Invalid":             DataCatalogObjectTyInvalid,
+	"WorkLog":             DataCatalogObjectTyWorkLog,
+	"Schematic":           DataCatalogObjectTySchematic,
+	"Node":                DataCatalogObjectTyNode,
+	"Stream":              DataCatalogObjectTyStream,
+	"Metadata":            DataCatalogObjectTyMetadata,
+	"Source":              DataCatalogObjectTySource,
+	"UserProject":         DataCatalogObjectTyUserProject,
+	"UseCase":             DataCatalogObjectTyUseCase,
+	"UserPreferences":     DataCatalogObjectTyUserPreferences,
+	"AccessControlList":   DataCatalogObjectTyAccessControlList,
+	"DirectoryEntry":      DataCatalogObjectTyDirectoryEntry,
+	"Notification":        DataCatalogObjectTyNotification,
+	"Model":               DataCatalogObjectTyModel,
+	"Ingestion":           DataCatalogObjectTyIngestion,
+	"View":                DataCatalogObjectTyView,
+	"ModelManifest":       DataCatalogObjectTyModelManifest,
+	"OntologyDeclaration": DataCatalogObjectTyOntologyDeclaration,
+	"Mission":             DataCatalogObjectTyMission,
+	"Skill":               DataCatalogObjectTySkill,
+	"SourceNote":          DataCatalogObjectTySourceNote,
+	"Exploration":         DataCatalogObjectTyExploration,
+	"KpiSpec":             DataCatalogObjectTyKpiSpec,
 }
 
 func (v DataCatalogObjectTy) String() string {

@@ -42,13 +42,13 @@ pub const ENUM_MIN_DATA_CATALOG_OBJECT_TY: i16 = 0;
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
-pub const ENUM_MAX_DATA_CATALOG_OBJECT_TY: i16 = 15;
+pub const ENUM_MAX_DATA_CATALOG_OBJECT_TY: i16 = 22;
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_DATA_CATALOG_OBJECT_TY: [DataCatalogObjectTy; 16] = [
+pub const ENUM_VALUES_DATA_CATALOG_OBJECT_TY: [DataCatalogObjectTy; 23] = [
     DataCatalogObjectTy::Invalid,
     DataCatalogObjectTy::WorkLog,
     DataCatalogObjectTy::Schematic,
@@ -65,6 +65,13 @@ pub const ENUM_VALUES_DATA_CATALOG_OBJECT_TY: [DataCatalogObjectTy; 16] = [
     DataCatalogObjectTy::Model,
     DataCatalogObjectTy::Ingestion,
     DataCatalogObjectTy::View,
+    DataCatalogObjectTy::ModelManifest,
+    DataCatalogObjectTy::OntologyDeclaration,
+    DataCatalogObjectTy::Mission,
+    DataCatalogObjectTy::Skill,
+    DataCatalogObjectTy::SourceNote,
+    DataCatalogObjectTy::Exploration,
+    DataCatalogObjectTy::KpiSpec,
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
@@ -88,9 +95,16 @@ impl DataCatalogObjectTy {
     pub const Model: Self = Self(13);
     pub const Ingestion: Self = Self(14);
     pub const View: Self = Self(15);
+    pub const ModelManifest: Self = Self(16);
+    pub const OntologyDeclaration: Self = Self(17);
+    pub const Mission: Self = Self(18);
+    pub const Skill: Self = Self(19);
+    pub const SourceNote: Self = Self(20);
+    pub const Exploration: Self = Self(21);
+    pub const KpiSpec: Self = Self(22);
 
     pub const ENUM_MIN: i16 = 0;
-    pub const ENUM_MAX: i16 = 15;
+    pub const ENUM_MAX: i16 = 22;
     pub const ENUM_VALUES: &'static [Self] = &[
         Self::Invalid,
         Self::WorkLog,
@@ -108,6 +122,13 @@ impl DataCatalogObjectTy {
         Self::Model,
         Self::Ingestion,
         Self::View,
+        Self::ModelManifest,
+        Self::OntologyDeclaration,
+        Self::Mission,
+        Self::Skill,
+        Self::SourceNote,
+        Self::Exploration,
+        Self::KpiSpec,
     ];
     /// Returns the variant's name or "" if unknown.
     pub fn variant_name(self) -> Option<&'static str> {
@@ -128,6 +149,13 @@ impl DataCatalogObjectTy {
             Self::Model => Some("Model"),
             Self::Ingestion => Some("Ingestion"),
             Self::View => Some("View"),
+            Self::ModelManifest => Some("ModelManifest"),
+            Self::OntologyDeclaration => Some("OntologyDeclaration"),
+            Self::Mission => Some("Mission"),
+            Self::Skill => Some("Skill"),
+            Self::SourceNote => Some("SourceNote"),
+            Self::Exploration => Some("Exploration"),
+            Self::KpiSpec => Some("KpiSpec"),
             _ => None,
         }
     }

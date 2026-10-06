@@ -7,6 +7,7 @@ import * as flatbuffers from 'flatbuffers/js/flatbuffers';
 import { CategoryRelationshipData as FbsCategoryRelationshipData, CategoryRelationshipDataT as FbsCategoryRelationshipDataT } from './generated/category-relationship-data';
 import { ColumnTime as FbsColumnTime, ColumnTimeT as FbsColumnTimeT } from './generated/column-time';
 import { ComponentData as FbsComponentData } from './generated/component-data';
+import { ConceptBinding as FbsConceptBinding, ConceptBindingT as FbsConceptBindingT } from './generated/concept-binding';
 import { ContactInfo as FbsContactInfo, ContactInfoT as FbsContactInfoT } from './generated/contact-info';
 import { DatacatalogGeometry as FbsDatacatalogGeometry, DatacatalogGeometryT as FbsDatacatalogGeometryT } from './generated/datacatalog-geometry';
 import { DatacatalogLatLngGeometry as FbsDatacatalogLatLngGeometry, DatacatalogLatLngGeometryT as FbsDatacatalogLatLngGeometryT } from './generated/datacatalog-lat-lng-geometry';
@@ -1306,6 +1307,93 @@ export { UlFieldType } from './generated/ul-field-type';
  */
 export { UpdateCadence } from './generated/update-cadence';
 
+/**
+ *  One ontology concept the stream (or one of its fields) provides, with the
+ *  provenance of the binding. Concept ids name classes of the ontologies
+ *  registry, where every ontology, `ul` included, is a managed object in
+ *  Drive. The catalog does not resolve them yet: the writer binds concepts it
+ *  resolved, and resolving them at the metadata write boundary comes with the
+ *  registry. Absent = unannotated, and unannotated streams are invisible to
+ *  concept-driven discovery -- the intended semantics for pre-existing
+ *  payloads.
+ */
+export class ConceptBinding {
+/**
+ *  Ontology concept id, e.g. "ul:RoadSegment". On a field binding this may
+ *  address an attribute within the concept, e.g. "ul:RoadSegment/speed_limit".
+ */
+  private _concept!: string | null;
+
+/**
+ *  Mapper confidence in [0, 1]; 1.0 for human bindings.
+ */
+  private _confidence!: number;
+
+/**
+ *  Binding provenance: "human:<oid>" or "model:<model_id@version>".
+ */
+  private _mappedBy!: string | null;
+
+  constructor(arg?: FbsConceptBinding | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsConceptBinding.getSizePrefixedRootAsConceptBinding(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsConceptBinding) {
+      this._initFromFbs(arg);
+    } else {
+      this._concept = null;
+      this._confidence = 0;
+      this._mappedBy = null;
+    }
+  }
+
+  private _initFromFbs(fbs: FbsConceptBinding): void {
+    this._concept = fbs.concept();
+    this._confidence = fbs.confidence();
+    this._mappedBy = fbs.mappedBy();
+  }
+
+  get concept(): string | null {
+    return this._concept;
+  }
+
+  set concept(value: string | null) {
+    this._concept = value;
+  }
+
+  get confidence(): number {
+    return this._confidence;
+  }
+
+  set confidence(value: number) {
+    this._confidence = value;
+  }
+
+  get mappedBy(): string | null {
+    return this._mappedBy;
+  }
+
+  set mappedBy(value: string | null) {
+    this._mappedBy = value;
+  }
+
+  toFbsT(): FbsConceptBindingT {
+    const t = new FbsConceptBindingT();
+    t.concept = this._concept;
+    t.confidence = this._confidence;
+    t.mappedBy = this._mappedBy;
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+}
+
 export class ContactInfo {
   private _address!: string | null;
 
@@ -2255,6 +2343,16 @@ export class Metadata {
   private _areaSelection!: boolean;
 
 /**
+ *  Ontology concepts this stream provides -- the catalog-side annotation
+ *  that concept-driven discovery and interest matching join on.
+ *  Multi-valued: real sources provide more than one concept. Relationship
+ *  to `entity_ty` is an open decision; both are carried in parallel for now.
+ *  Field slots are positional: this one follows `foreign_keys`, which took
+ *  the slot dev stacks first wrote concept bindings into.
+ */
+  private _conceptBindings!: ConceptBinding[] | null;
+
+/**
  *  Organizational category for frontend. Defaults to DC_HIDDEN.
  */
   private _datasetCategory!: number;
@@ -2354,6 +2452,7 @@ export class Metadata {
       this._initFromFbs(arg);
     } else {
       this._areaSelection = false;
+      this._conceptBindings = null;
       this._datasetCategory = 0;
       this._description = null;
       this._detailSections = null;
@@ -2377,6 +2476,14 @@ export class Metadata {
 
   private _initFromFbs(fbs: FbsMetadata): void {
     this._areaSelection = fbs.areaSelection();
+    if (fbs.conceptBindingsLength() > 0) {
+      this._conceptBindings = Array.from({ length: fbs.conceptBindingsLength() }, (_, i) => {
+        const item = fbs.conceptBindings(i);
+        return item ? new ConceptBinding(item) : new ConceptBinding();
+      });
+    } else {
+      this._conceptBindings = null;
+    }
     this._datasetCategory = fbs.datasetCategory();
     this._description = fbs.description();
     if (fbs.detailSectionsLength() > 0) {
@@ -2468,6 +2575,14 @@ export class Metadata {
 
   set areaSelection(value: boolean) {
     this._areaSelection = value;
+  }
+
+  get conceptBindings(): ConceptBinding[] | null {
+    return this._conceptBindings;
+  }
+
+  set conceptBindings(value: ConceptBinding[] | null) {
+    this._conceptBindings = value;
   }
 
   get datasetCategory(): number {
@@ -2617,6 +2732,7 @@ export class Metadata {
   toFbsT(): FbsMetadataT {
     const t = new FbsMetadataT();
     t.areaSelection = this._areaSelection;
+    t.conceptBindings = this._conceptBindings ? this._conceptBindings.map(item => item.toFbsT()) : [];
     t.datasetCategory = this._datasetCategory;
     t.description = this._description;
     t.detailSections = this._detailSections ? this._detailSections.map(item => item.toFbsT()) : [];
@@ -3134,6 +3250,14 @@ export class UlField {
 
   private _componentData!: ComponentData | null;
 
+/**
+ *  Ontology attribute this field provides, within one of the stream's
+ *  bound concepts: a merged metadata write drops an inherited one whose
+ *  concept is no longer bound, and refuses a supplied one. Appended last
+ *  (field slots are positional).
+ */
+  private _conceptAttr!: ConceptBinding | null;
+
   private _default_!: ValueInstance | null;
 
   private _description!: string | null;
@@ -3160,6 +3284,7 @@ export class UlField {
     } else {
       this._breakdownDisplayName = null;
       this._componentData = null;
+      this._conceptAttr = null;
       this._default_ = null;
       this._description = null;
       this._displayName = null;
@@ -3195,6 +3320,8 @@ export class UlField {
     } else {
       this._componentData = null;
     }
+    const conceptAttrVal = fbs.conceptAttr();
+    this._conceptAttr = conceptAttrVal ? new ConceptBinding(conceptAttrVal) : null;
     const default_Val = fbs.default_();
     this._default_ = default_Val ? new ValueInstance(default_Val) : null;
     this._description = fbs.description();
@@ -3303,6 +3430,14 @@ export class UlField {
     this._componentData = value;
   }
 
+  get conceptAttr(): ConceptBinding | null {
+    return this._conceptAttr;
+  }
+
+  set conceptAttr(value: ConceptBinding | null) {
+    this._conceptAttr = value;
+  }
+
   get default_(): ValueInstance | null {
     return this._default_;
   }
@@ -3389,6 +3524,7 @@ export class UlField {
       t.componentDataType = FbsComponentData.NestedStringCategories;
       t.componentData = this._componentData.toFbsT();
     }
+    t.conceptAttr = this._conceptAttr ? this._conceptAttr.toFbsT() : null;
     t.default_ = this._default_ ? this._default_.toFbsT() : null;
     t.description = this._description;
     t.displayName = this._displayName;

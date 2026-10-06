@@ -55,11 +55,18 @@ enum class DataCatalogObjectTy : int16_t {
   Model = 13,
   Ingestion = 14,
   View = 15,
+  ModelManifest = 16,
+  OntologyDeclaration = 17,
+  Mission = 18,
+  Skill = 19,
+  SourceNote = 20,
+  Exploration = 21,
+  KpiSpec = 22,
   MIN = Invalid,
-  MAX = View
+  MAX = KpiSpec
 };
 
-inline const DataCatalogObjectTy (&EnumValuesDataCatalogObjectTy())[16] {
+inline const DataCatalogObjectTy (&EnumValuesDataCatalogObjectTy())[23] {
   static const DataCatalogObjectTy values[] = {
     DataCatalogObjectTy::Invalid,
     DataCatalogObjectTy::WorkLog,
@@ -76,13 +83,20 @@ inline const DataCatalogObjectTy (&EnumValuesDataCatalogObjectTy())[16] {
     DataCatalogObjectTy::Notification,
     DataCatalogObjectTy::Model,
     DataCatalogObjectTy::Ingestion,
-    DataCatalogObjectTy::View
+    DataCatalogObjectTy::View,
+    DataCatalogObjectTy::ModelManifest,
+    DataCatalogObjectTy::OntologyDeclaration,
+    DataCatalogObjectTy::Mission,
+    DataCatalogObjectTy::Skill,
+    DataCatalogObjectTy::SourceNote,
+    DataCatalogObjectTy::Exploration,
+    DataCatalogObjectTy::KpiSpec
   };
   return values;
 }
 
 inline const char * const *EnumNamesDataCatalogObjectTy() {
-  static const char * const names[17] = {
+  static const char * const names[24] = {
     "Invalid",
     "WorkLog",
     "Schematic",
@@ -99,13 +113,20 @@ inline const char * const *EnumNamesDataCatalogObjectTy() {
     "Model",
     "Ingestion",
     "View",
+    "ModelManifest",
+    "OntologyDeclaration",
+    "Mission",
+    "Skill",
+    "SourceNote",
+    "Exploration",
+    "KpiSpec",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameDataCatalogObjectTy(DataCatalogObjectTy e) {
-  if (::flatbuffers::IsOutRange(e, DataCatalogObjectTy::Invalid, DataCatalogObjectTy::View)) return "";
+  if (::flatbuffers::IsOutRange(e, DataCatalogObjectTy::Invalid, DataCatalogObjectTy::KpiSpec)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesDataCatalogObjectTy()[index];
 }

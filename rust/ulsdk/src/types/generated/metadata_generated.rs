@@ -5675,6 +5675,195 @@ impl core::fmt::Debug for GeometryData<'_> {
         ds.finish()
     }
 }
+pub enum ConceptBindingOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+/// One ontology concept the stream (or one of its fields) provides, with the
+/// provenance of the binding. Concept ids name classes of the ontologies
+/// registry, where every ontology, `ul` included, is a managed object in
+/// Drive. The catalog does not resolve them yet: the writer binds concepts it
+/// resolved, and resolving them at the metadata write boundary comes with the
+/// registry. Absent = unannotated, and unannotated streams are invisible to
+/// concept-driven discovery -- the intended semantics for pre-existing
+/// payloads.
+pub struct ConceptBinding<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for ConceptBinding<'a> {
+    type Inner = ConceptBinding<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> ConceptBinding<'a> {
+    pub const VT_CONCEPT: flatbuffers::VOffsetT = 4;
+    pub const VT_MAPPED_BY: flatbuffers::VOffsetT = 6;
+    pub const VT_CONFIDENCE: flatbuffers::VOffsetT = 8;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        ConceptBinding { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args ConceptBindingArgs<'args>,
+    ) -> flatbuffers::WIPOffset<ConceptBinding<'bldr>> {
+        let mut builder = ConceptBindingBuilder::new(_fbb);
+        builder.add_confidence(args.confidence);
+        if let Some(x) = args.mapped_by {
+            builder.add_mapped_by(x);
+        }
+        if let Some(x) = args.concept {
+            builder.add_concept(x);
+        }
+        builder.finish()
+    }
+
+    /// Ontology concept id, e.g. "ul:RoadSegment". On a field binding this may
+    /// address an attribute within the concept, e.g. "ul:RoadSegment/speed_limit".
+    #[inline]
+    pub fn concept(&self) -> Option<&'a str> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<&str>>(ConceptBinding::VT_CONCEPT, None)
+        }
+    }
+    /// Binding provenance: "human:<oid>" or "model:<model_id@version>".
+    #[inline]
+    pub fn mapped_by(&self) -> Option<&'a str> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<&str>>(ConceptBinding::VT_MAPPED_BY, None)
+        }
+    }
+    /// Mapper confidence in [0, 1]; 1.0 for human bindings.
+    #[inline]
+    pub fn confidence(&self) -> f32 {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<f32>(ConceptBinding::VT_CONFIDENCE, Some(0.0))
+                .unwrap()
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for ConceptBinding<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<&str>>("concept", Self::VT_CONCEPT, false)?
+            .visit_field::<flatbuffers::ForwardsUOffset<&str>>(
+                "mapped_by",
+                Self::VT_MAPPED_BY,
+                false,
+            )?
+            .visit_field::<f32>("confidence", Self::VT_CONFIDENCE, false)?
+            .finish();
+        Ok(())
+    }
+}
+pub struct ConceptBindingArgs<'a> {
+    pub concept: Option<flatbuffers::WIPOffset<&'a str>>,
+    pub mapped_by: Option<flatbuffers::WIPOffset<&'a str>>,
+    pub confidence: f32,
+}
+impl<'a> Default for ConceptBindingArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        ConceptBindingArgs {
+            concept: None,
+            mapped_by: None,
+            confidence: 0.0,
+        }
+    }
+}
+
+impl Serialize for ConceptBinding<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("ConceptBinding", 3)?;
+        if let Some(f) = self.concept() {
+            s.serialize_field("concept", &f)?;
+        } else {
+            s.skip_field("concept")?;
+        }
+        if let Some(f) = self.mapped_by() {
+            s.serialize_field("mapped_by", &f)?;
+        } else {
+            s.skip_field("mapped_by")?;
+        }
+        s.serialize_field("confidence", &self.confidence())?;
+        s.end()
+    }
+}
+
+pub struct ConceptBindingBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ConceptBindingBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_concept(&mut self, concept: flatbuffers::WIPOffset<&'b str>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(ConceptBinding::VT_CONCEPT, concept);
+    }
+    #[inline]
+    pub fn add_mapped_by(&mut self, mapped_by: flatbuffers::WIPOffset<&'b str>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(ConceptBinding::VT_MAPPED_BY, mapped_by);
+    }
+    #[inline]
+    pub fn add_confidence(&mut self, confidence: f32) {
+        self.fbb_
+            .push_slot::<f32>(ConceptBinding::VT_CONFIDENCE, confidence, 0.0);
+    }
+    #[inline]
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> ConceptBindingBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        ConceptBindingBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<ConceptBinding<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for ConceptBinding<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("ConceptBinding");
+        ds.field("concept", &self.concept());
+        ds.field("mapped_by", &self.mapped_by());
+        ds.field("confidence", &self.confidence());
+        ds.finish()
+    }
+}
 pub enum UlFieldOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -5705,6 +5894,7 @@ impl<'a> UlField<'a> {
     pub const VT_DEFAULT: flatbuffers::VOffsetT = 22;
     pub const VT_STORAGE_TYPE_TYPE: flatbuffers::VOffsetT = 24;
     pub const VT_STORAGE_TYPE: flatbuffers::VOffsetT = 26;
+    pub const VT_CONCEPT_ATTR: flatbuffers::VOffsetT = 28;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -5716,6 +5906,9 @@ impl<'a> UlField<'a> {
         args: &'args UlFieldArgs<'args>,
     ) -> flatbuffers::WIPOffset<UlField<'bldr>> {
         let mut builder = UlFieldBuilder::new(_fbb);
+        if let Some(x) = args.concept_attr {
+            builder.add_concept_attr(x);
+        }
         if let Some(x) = args.storage_type {
             builder.add_storage_type(x);
         }
@@ -5870,6 +6063,20 @@ impl<'a> UlField<'a> {
                     UlField::VT_STORAGE_TYPE,
                     None,
                 )
+        }
+    }
+    /// Ontology attribute this field provides, within one of the stream's
+    /// bound concepts: a merged metadata write drops an inherited one whose
+    /// concept is no longer bound, and refuses a supplied one. Appended last
+    /// (field slots are positional).
+    #[inline]
+    pub fn concept_attr(&self) -> Option<ConceptBinding<'a>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<ConceptBinding>>(UlField::VT_CONCEPT_ATTR, None)
         }
     }
     #[inline]
@@ -6411,6 +6618,7 @@ impl flatbuffers::Verifiable for UlField<'_> {
           _ => Ok(()),
         }
      })?
+     .visit_field::<flatbuffers::ForwardsUOffset<ConceptBinding>>("concept_attr", Self::VT_CONCEPT_ATTR, false)?
      .finish();
         Ok(())
     }
@@ -6428,6 +6636,7 @@ pub struct UlFieldArgs<'a> {
     pub default: Option<flatbuffers::WIPOffset<ValueInstance<'a>>>,
     pub storage_type_type: Type,
     pub storage_type: Option<flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>>,
+    pub concept_attr: Option<flatbuffers::WIPOffset<ConceptBinding<'a>>>,
 }
 impl<'a> Default for UlFieldArgs<'a> {
     #[inline]
@@ -6445,6 +6654,7 @@ impl<'a> Default for UlFieldArgs<'a> {
             default: None,
             storage_type_type: Type::NONE,
             storage_type: None,
+            concept_attr: None,
         }
     }
 }
@@ -6454,7 +6664,7 @@ impl Serialize for UlField<'_> {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("UlField", 12)?;
+        let mut s = serializer.serialize_struct("UlField", 13)?;
         if let Some(f) = self.field_name() {
             s.serialize_field("field_name", &f)?;
         } else {
@@ -6685,6 +6895,11 @@ impl Serialize for UlField<'_> {
             }
             _ => unimplemented!(),
         }
+        if let Some(f) = self.concept_attr() {
+            s.serialize_field("concept_attr", &f)?;
+        } else {
+            s.skip_field("concept_attr")?;
+        }
         s.end()
     }
 }
@@ -6774,6 +6989,14 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> UlFieldBuilder<'a, 'b, A> {
     ) {
         self.fbb_
             .push_slot_always::<flatbuffers::WIPOffset<_>>(UlField::VT_STORAGE_TYPE, storage_type);
+    }
+    #[inline]
+    pub fn add_concept_attr(&mut self, concept_attr: flatbuffers::WIPOffset<ConceptBinding<'b>>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<ConceptBinding>>(
+                UlField::VT_CONCEPT_ATTR,
+                concept_attr,
+            );
     }
     #[inline]
     pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> UlFieldBuilder<'a, 'b, A> {
@@ -7135,6 +7358,7 @@ impl core::fmt::Debug for UlField<'_> {
                 ds.field("storage_type", &x)
             }
         };
+        ds.field("concept_attr", &self.concept_attr());
         ds.finish()
     }
 }
@@ -9929,6 +10153,7 @@ impl<'a> Metadata<'a> {
     pub const VT_TIME_SOURCE: flatbuffers::VOffsetT = 40;
     pub const VT_NEEDS_CALLER_INPUTS: flatbuffers::VOffsetT = 42;
     pub const VT_FOREIGN_KEYS: flatbuffers::VOffsetT = 44;
+    pub const VT_CONCEPT_BINDINGS: flatbuffers::VOffsetT = 46;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -9940,6 +10165,9 @@ impl<'a> Metadata<'a> {
         args: &'args MetadataArgs<'args>,
     ) -> flatbuffers::WIPOffset<Metadata<'bldr>> {
         let mut builder = MetadataBuilder::new(_fbb);
+        if let Some(x) = args.concept_bindings {
+            builder.add_concept_bindings(x);
+        }
         if let Some(x) = args.foreign_keys {
             builder.add_foreign_keys(x);
         }
@@ -10275,6 +10503,25 @@ impl<'a> Metadata<'a> {
             >>(Metadata::VT_FOREIGN_KEYS, None)
         }
     }
+    /// Ontology concepts this stream provides -- the catalog-side annotation
+    /// that concept-driven discovery and interest matching join on.
+    /// Multi-valued: real sources provide more than one concept. Relationship
+    /// to `entity_ty` is an open decision; both are carried in parallel for now.
+    /// Field slots are positional: this one follows `foreign_keys`, which took
+    /// the slot dev stacks first wrote concept bindings into.
+    #[inline]
+    pub fn concept_bindings(
+        &self,
+    ) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ConceptBinding<'a>>>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab.get::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ConceptBinding>>,
+            >>(Metadata::VT_CONCEPT_BINDINGS, None)
+        }
+    }
     #[inline]
     #[allow(non_snake_case)]
     pub fn geometry_source_as_no_geometry(&self) -> Option<NoGeometry<'a>> {
@@ -10409,6 +10656,7 @@ impl flatbuffers::Verifiable for Metadata<'_> {
      })?
      .visit_field::<bool>("needs_caller_inputs", Self::VT_NEEDS_CALLER_INPUTS, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<ForeignKey>>>>("foreign_keys", Self::VT_FOREIGN_KEYS, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<ConceptBinding>>>>("concept_bindings", Self::VT_CONCEPT_BINDINGS, false)?
      .finish();
         Ok(())
     }
@@ -10449,6 +10697,11 @@ pub struct MetadataArgs<'a> {
             flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ForeignKey<'a>>>,
         >,
     >,
+    pub concept_bindings: Option<
+        flatbuffers::WIPOffset<
+            flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ConceptBinding<'a>>>,
+        >,
+    >,
 }
 impl<'a> Default for MetadataArgs<'a> {
     #[inline]
@@ -10475,6 +10728,7 @@ impl<'a> Default for MetadataArgs<'a> {
             time_source: None,
             needs_caller_inputs: false,
             foreign_keys: None,
+            concept_bindings: None,
         }
     }
 }
@@ -10484,7 +10738,7 @@ impl Serialize for Metadata<'_> {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("Metadata", 21)?;
+        let mut s = serializer.serialize_struct("Metadata", 22)?;
         if let Some(f) = self.display_name() {
             s.serialize_field("display_name", &f)?;
         } else {
@@ -10592,6 +10846,11 @@ impl Serialize for Metadata<'_> {
             s.serialize_field("foreign_keys", &f)?;
         } else {
             s.skip_field("foreign_keys")?;
+        }
+        if let Some(f) = self.concept_bindings() {
+            s.serialize_field("concept_bindings", &f)?;
+        } else {
+            s.skip_field("concept_bindings")?;
         }
         s.end()
     }
@@ -10771,6 +11030,18 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> MetadataBuilder<'a, 'b, A> {
             .push_slot_always::<flatbuffers::WIPOffset<_>>(Metadata::VT_FOREIGN_KEYS, foreign_keys);
     }
     #[inline]
+    pub fn add_concept_bindings(
+        &mut self,
+        concept_bindings: flatbuffers::WIPOffset<
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<ConceptBinding<'b>>>,
+        >,
+    ) {
+        self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(
+            Metadata::VT_CONCEPT_BINDINGS,
+            concept_bindings,
+        );
+    }
+    #[inline]
     pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> MetadataBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         MetadataBuilder {
@@ -10888,6 +11159,7 @@ impl core::fmt::Debug for Metadata<'_> {
         };
         ds.field("needs_caller_inputs", &self.needs_caller_inputs());
         ds.field("foreign_keys", &self.foreign_keys());
+        ds.field("concept_bindings", &self.concept_bindings());
         ds.finish()
     }
 }

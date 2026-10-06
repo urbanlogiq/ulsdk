@@ -165,6 +165,13 @@ pub enum DataCatalogObjectTy {
     Model = 13,
     Ingestion = 14,
     View = 15,
+    ModelManifest = 16,
+    OntologyDeclaration = 17,
+    Mission = 18,
+    Skill = 19,
+    SourceNote = 20,
+    Exploration = 21,
+    KpiSpec = 22,
 }
 
 impl TryFrom<i16> for DataCatalogObjectTy {
@@ -193,6 +200,13 @@ impl DataCatalogObjectTy {
             Self::Model => Some("Model"),
             Self::Ingestion => Some("Ingestion"),
             Self::View => Some("View"),
+            Self::ModelManifest => Some("ModelManifest"),
+            Self::OntologyDeclaration => Some("OntologyDeclaration"),
+            Self::Mission => Some("Mission"),
+            Self::Skill => Some("Skill"),
+            Self::SourceNote => Some("SourceNote"),
+            Self::Exploration => Some("Exploration"),
+            Self::KpiSpec => Some("KpiSpec"),
             _ => None,
         }
     }
@@ -217,6 +231,13 @@ impl From<DataCatalogObjectTy> for FbsDataCatalogObjectTy {
             DataCatalogObjectTy::Model => FbsDataCatalogObjectTy::Model,
             DataCatalogObjectTy::Ingestion => FbsDataCatalogObjectTy::Ingestion,
             DataCatalogObjectTy::View => FbsDataCatalogObjectTy::View,
+            DataCatalogObjectTy::ModelManifest => FbsDataCatalogObjectTy::ModelManifest,
+            DataCatalogObjectTy::OntologyDeclaration => FbsDataCatalogObjectTy::OntologyDeclaration,
+            DataCatalogObjectTy::Mission => FbsDataCatalogObjectTy::Mission,
+            DataCatalogObjectTy::Skill => FbsDataCatalogObjectTy::Skill,
+            DataCatalogObjectTy::SourceNote => FbsDataCatalogObjectTy::SourceNote,
+            DataCatalogObjectTy::Exploration => FbsDataCatalogObjectTy::Exploration,
+            DataCatalogObjectTy::KpiSpec => FbsDataCatalogObjectTy::KpiSpec,
         }
     }
 }
@@ -240,6 +261,13 @@ impl From<FbsDataCatalogObjectTy> for DataCatalogObjectTy {
             13 => Self::Model,
             14 => Self::Ingestion,
             15 => Self::View,
+            16 => Self::ModelManifest,
+            17 => Self::OntologyDeclaration,
+            18 => Self::Mission,
+            19 => Self::Skill,
+            20 => Self::SourceNote,
+            21 => Self::Exploration,
+            22 => Self::KpiSpec,
             _ => panic!(
                 "Invalid value {} when constructing DataCatalogObjectTy",
                 fbs.0

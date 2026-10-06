@@ -40,7 +40,7 @@ pub const ENUM_MAX_OBJECT_NAMESPACE: u16 = 65535;
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_OBJECT_NAMESPACE: [ObjectNamespace; 8] = [
+pub const ENUM_VALUES_OBJECT_NAMESPACE: [ObjectNamespace; 9] = [
     ObjectNamespace::Global,
     ObjectNamespace::User,
     ObjectNamespace::Generated,
@@ -48,6 +48,7 @@ pub const ENUM_VALUES_OBJECT_NAMESPACE: [ObjectNamespace; 8] = [
     ObjectNamespace::Evaluator,
     ObjectNamespace::Drive,
     ObjectNamespace::Notifications,
+    ObjectNamespace::Registry,
     ObjectNamespace::Unknown,
 ];
 
@@ -63,6 +64,7 @@ impl ObjectNamespace {
     pub const Evaluator: Self = Self(4);
     pub const Drive: Self = Self(5);
     pub const Notifications: Self = Self(6);
+    pub const Registry: Self = Self(7);
     pub const Unknown: Self = Self(65535);
 
     pub const ENUM_MIN: u16 = 0;
@@ -75,6 +77,7 @@ impl ObjectNamespace {
         Self::Evaluator,
         Self::Drive,
         Self::Notifications,
+        Self::Registry,
         Self::Unknown,
     ];
     /// Returns the variant's name or "" if unknown.
@@ -87,6 +90,7 @@ impl ObjectNamespace {
             Self::Evaluator => Some("Evaluator"),
             Self::Drive => Some("Drive"),
             Self::Notifications => Some("Notifications"),
+            Self::Registry => Some("Registry"),
             Self::Unknown => Some("Unknown"),
             _ => None,
         }

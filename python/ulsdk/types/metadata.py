@@ -159,6 +159,7 @@ from .generated.Buffer import Buffer as FbsBuffer
 from .generated.CategoryRelationshipData import CategoryRelationshipData as FbsCategoryRelationshipData
 from .generated.ColumnGroupId import ColumnGroupId as FbsColumnGroupId
 from .generated.ColumnTime import ColumnTime as FbsColumnTime
+from .generated.ConceptBinding import ConceptBinding as FbsConceptBinding
 from .generated.ContactInfo import ContactInfo as FbsContactInfo
 from .generated.ContentId import ContentId as FbsContentId
 from .generated.DataStateId import DataStateId as FbsDataStateId
@@ -1939,6 +1940,91 @@ class UlFieldRelationshipData:
         return self.value == other.value
 
 @dataclass
+class ConceptBinding:
+    """ One ontology concept the stream (or one of its fields) provides, with the
+     provenance of the binding. Concept ids name classes of the ontologies
+     registry, where every ontology, `ul` included, is a managed object in
+     Drive. The catalog does not resolve them yet: the writer binds concepts it
+     resolved, and resolving them at the metadata write boundary comes with the
+     registry. Absent = unannotated, and unannotated streams are invisible to
+     concept-driven discovery -- the intended semantics for pre-existing
+     payloads.
+    """
+
+    # Ontology concept id, e.g. "ul:RoadSegment". On a field binding this may
+    # address an attribute within the concept, e.g. "ul:RoadSegment/speed_limit".
+    concept: Optional["str"]
+
+    # Mapper confidence in [0, 1]; 1.0 for human bindings.
+    confidence: "float"
+
+    # Binding provenance: "human:<oid>" or "model:<model_id@version>".
+    mapped_by: Optional["str"]
+
+    @classmethod
+    def from_fbs(cls, o: FbsConceptBinding) -> Self:
+        concept = None
+        concept_str = o.Concept()
+        if concept_str is not None:
+            concept = concept_str.decode('utf-8')
+        confidence = o.Confidence()
+        mapped_by = None
+        mapped_by_str = o.MappedBy()
+        if mapped_by_str is not None:
+            mapped_by = mapped_by_str.decode('utf-8')
+        return cls(concept, confidence, mapped_by)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsConceptBinding.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.ConceptBinding import (
+            Start,
+            AddConcept,
+            AddConfidence,
+            AddMappedBy,
+            End,
+        )
+        concept_offset = None
+        if self.concept is not None:
+            concept_offset = builder.CreateString(self.concept)
+        mapped_by_offset = None
+        if self.mapped_by is not None:
+            mapped_by_offset = builder.CreateString(self.mapped_by)
+
+        Start(builder)
+        if concept_offset is not None:
+            AddConcept(builder, concept_offset)
+        AddConfidence(builder, self.confidence)
+        if mapped_by_offset is not None:
+            AddMappedBy(builder, mapped_by_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        concept = ""
+        confidence = 0.0
+        mapped_by = ""
+        return cls(concept, confidence, mapped_by)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.concept == other.concept
+        eq = eq and self.confidence == other.confidence
+        eq = eq and self.mapped_by == other.mapped_by
+
+        return eq
+
+@dataclass
 class ContactInfo:
     address: Optional["str"]
 
@@ -2906,6 +2992,14 @@ class Metadata:
     # is to be included in the boundary selection modal
     area_selection: "bool"
 
+    # Ontology concepts this stream provides -- the catalog-side annotation
+    # that concept-driven discovery and interest matching join on.
+    # Multi-valued: real sources provide more than one concept. Relationship
+    # to `entity_ty` is an open decision; both are carried in parallel for now.
+    # Field slots are positional: this one follows `foreign_keys`, which took
+    # the slot dev stacks first wrote concept bindings into.
+    concept_bindings: Optional["List[ConceptBinding]"]
+
     # Organizational category for frontend. Defaults to DC_HIDDEN.
     dataset_category: "DatasetCategory"
 
@@ -2978,6 +3072,14 @@ class Metadata:
     @classmethod
     def from_fbs(cls, o: FbsMetadata) -> Self:
         area_selection = o.AreaSelection()
+        concept_bindings = list()
+        if not o.ConceptBindingsIsNone():
+            for i in range(o.ConceptBindingsLength()):
+                concept_bindings_val = None
+                concept_bindings_obj = o.ConceptBindings(i)
+                if concept_bindings_obj is not None:
+                    concept_bindings_val = ConceptBinding.from_fbs(concept_bindings_obj)
+                concept_bindings.append(concept_bindings_val)
         dataset_category = DatasetCategory(o.DatasetCategory())
         description = None
         description_str = o.Description()
@@ -3050,7 +3152,7 @@ class Metadata:
         if not o.VisualizeInExploreFieldsIsNone():
             for i in range(o.VisualizeInExploreFieldsLength()):
                 visualize_in_explore_fields.append(o.VisualizeInExploreFields(i))
-        return cls(area_selection, dataset_category, description, detail_sections, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, foreign_keys, geometry_source, location_description_field, needs_caller_inputs, promoted_metrics, source, summary, time_source, update_cadence, visualize_in_explore_fields)
+        return cls(area_selection, concept_bindings, dataset_category, description, detail_sections, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, foreign_keys, geometry_source, location_description_field, needs_caller_inputs, promoted_metrics, source, summary, time_source, update_cadence, visualize_in_explore_fields)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -3062,6 +3164,8 @@ class Metadata:
         from .generated.Metadata import (
             Start,
             AddAreaSelection,
+            AddConceptBindings,
+            StartConceptBindingsVector,
             AddDatasetCategory,
             AddDescription,
             AddDetailSections,
@@ -3091,6 +3195,15 @@ class Metadata:
             StartVisualizeInExploreFieldsVector,
             End,
         )
+        concept_bindings_offset = None
+        if self.concept_bindings is not None:
+            concept_bindings_offsets = list()
+            for value in self.concept_bindings:
+                concept_bindings_offsets.append(value.serialize_to(builder))
+            StartConceptBindingsVector(builder, len(self.concept_bindings))
+            for i in reversed(range(len(self.concept_bindings))):
+                builder.PrependUOffsetTRelative(concept_bindings_offsets[i])
+            concept_bindings_offset = builder.EndVector()
         description_offset = None
         if self.description is not None:
             description_offset = builder.CreateString(self.description)
@@ -3163,6 +3276,8 @@ class Metadata:
 
         Start(builder)
         AddAreaSelection(builder, self.area_selection)
+        if concept_bindings_offset is not None:
+            AddConceptBindings(builder, concept_bindings_offset)
         AddDatasetCategory(builder, self.dataset_category.value)
         if description_offset is not None:
             AddDescription(builder, description_offset)
@@ -3206,6 +3321,7 @@ class Metadata:
     @classmethod
     def make_default(cls) -> Self:
         area_selection = False
+        concept_bindings = []
         dataset_category = DatasetCategory(0)
         description = ""
         detail_sections = []
@@ -3224,11 +3340,22 @@ class Metadata:
         time_source = TimeSource.make_default()
         update_cadence = UpdateCadence(0)
         visualize_in_explore_fields = []
-        return cls(area_selection, dataset_category, description, detail_sections, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, foreign_keys, geometry_source, location_description_field, needs_caller_inputs, promoted_metrics, source, summary, time_source, update_cadence, visualize_in_explore_fields)
+        return cls(area_selection, concept_bindings, dataset_category, description, detail_sections, display_name, do_not_filter_geometry_by_viewport, entity_ty, field_relationships, fields, foreign_keys, geometry_source, location_description_field, needs_caller_inputs, promoted_metrics, source, summary, time_source, update_cadence, visualize_in_explore_fields)
 
     def __eq__(self, other) -> bool:
         eq = True
         eq = eq and self.area_selection == other.area_selection
+        self_concept_bindings = self.concept_bindings
+        other_concept_bindings = other.concept_bindings
+        if self_concept_bindings is not None and other_concept_bindings is not None:
+            if len(self_concept_bindings) != len(other_concept_bindings):
+                return False
+            for i in range(len(self_concept_bindings)):
+                eq = eq and self_concept_bindings[i] == other_concept_bindings[i]
+        elif self_concept_bindings is not None and other_concept_bindings is None:
+            return False
+        elif self_concept_bindings is None and other_concept_bindings is not None:
+            return False
         eq = eq and self.dataset_category == other.dataset_category
         eq = eq and self.description == other.description
         self_detail_sections = self.detail_sections
@@ -3825,6 +3952,12 @@ class UlField:
 
     component_data: Optional["ComponentData"]
 
+    # Ontology attribute this field provides, within one of the stream's
+    # bound concepts: a merged metadata write drops an inherited one whose
+    # concept is no longer bound, and refuses a supplied one. Appended last
+    # (field slots are positional).
+    concept_attr: Optional["ConceptBinding"]
+
     default: Optional["ValueInstance"]
 
     description: Optional["str"]
@@ -3852,6 +3985,10 @@ class UlField:
         if component_data_val is not None:
             component_data_ty = o.ComponentDataType()
             component_data = ComponentData.from_fbs(component_data_val, component_data_ty)
+        concept_attr = None
+        concept_attr_obj = o.ConceptAttr()
+        if concept_attr_obj is not None:
+            concept_attr = ConceptBinding.from_fbs(concept_attr_obj)
         default = None
         default_obj = o.Default()
         if default_obj is not None:
@@ -3876,7 +4013,7 @@ class UlField:
             storage_type_ty = o.StorageTypeType()
             storage_type = Type.from_fbs(storage_type_val, storage_type_ty)
         unit = FieldUnit(o.Unit())
-        return cls(breakdown_display_name, component_data, default, description, display_name, field_name, field_type, flags, storage_type, unit)
+        return cls(breakdown_display_name, component_data, concept_attr, default, description, display_name, field_name, field_type, flags, storage_type, unit)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -3890,6 +4027,7 @@ class UlField:
             AddBreakdownDisplayName,
             AddComponentData,
             AddComponentDataType,
+            AddConceptAttr,
             AddDefault,
             AddDescription,
             AddDisplayName,
@@ -3907,6 +4045,9 @@ class UlField:
         component_data_offset, component_data_ty = (None, None)
         if self.component_data is not None:
             component_data_offset, component_data_ty = self.component_data.serialize_to(builder)
+        concept_attr_offset = None
+        if self.concept_attr is not None:
+            concept_attr_offset = self.concept_attr.serialize_to(builder)
         default_offset = None
         if self.default is not None:
             default_offset = self.default.serialize_to(builder)
@@ -3929,6 +4070,8 @@ class UlField:
         if component_data_offset is not None and component_data_ty is not None:
             AddComponentData(builder, component_data_offset)
             AddComponentDataType(builder, component_data_ty)
+        if concept_attr_offset is not None:
+            AddConceptAttr(builder, concept_attr_offset)
         if default_offset is not None:
             AddDefault(builder, default_offset)
         if description_offset is not None:
@@ -3955,6 +4098,7 @@ class UlField:
     def make_default(cls) -> Self:
         breakdown_display_name = ""
         component_data = ComponentData.make_default()
+        concept_attr = ConceptBinding.make_default()
         default = ValueInstance.make_default()
         description = ""
         display_name = ""
@@ -3963,12 +4107,13 @@ class UlField:
         flags = 0
         storage_type = Type.make_default()
         unit = FieldUnit(0)
-        return cls(breakdown_display_name, component_data, default, description, display_name, field_name, field_type, flags, storage_type, unit)
+        return cls(breakdown_display_name, component_data, concept_attr, default, description, display_name, field_name, field_type, flags, storage_type, unit)
 
     def __eq__(self, other) -> bool:
         eq = True
         eq = eq and self.breakdown_display_name == other.breakdown_display_name
         eq = eq and self.component_data == other.component_data
+        eq = eq and self.concept_attr == other.concept_attr
         eq = eq and self.default == other.default
         eq = eq and self.description == other.description
         eq = eq and self.display_name == other.display_name

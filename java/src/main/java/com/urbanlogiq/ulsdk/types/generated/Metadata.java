@@ -144,6 +144,19 @@ public final class Metadata extends com.google.flatbuffers.Table {
   public int foreignKeysLength() { int o = __offset(44); return o != 0 ? __vector_len(o) : 0; }
   public ForeignKey._Vector foreignKeysVector() { return foreignKeysVector(new ForeignKey._Vector()); }
   public ForeignKey._Vector foreignKeysVector(ForeignKey._Vector obj) { int o = __offset(44); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
+  /**
+   * Ontology concepts this stream provides -- the catalog-side annotation
+   * that concept-driven discovery and interest matching join on.
+   * Multi-valued: real sources provide more than one concept. Relationship
+   * to `entity_ty` is an open decision; both are carried in parallel for now.
+   * Field slots are positional: this one follows `foreign_keys`, which took
+   * the slot dev stacks first wrote concept bindings into.
+   */
+  public ConceptBinding conceptBindings(int j) { return conceptBindings(new ConceptBinding(), j); }
+  public ConceptBinding conceptBindings(ConceptBinding obj, int j) { int o = __offset(46); return o != 0 ? obj.__assign(__indirect(__vector(o) + j * 4), bb) : null; }
+  public int conceptBindingsLength() { int o = __offset(46); return o != 0 ? __vector_len(o) : 0; }
+  public ConceptBinding._Vector conceptBindingsVector() { return conceptBindingsVector(new ConceptBinding._Vector()); }
+  public ConceptBinding._Vector conceptBindingsVector(ConceptBinding._Vector obj) { int o = __offset(46); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
 
   public static int createMetadata(FlatBufferBuilder builder,
       int displayNameOffset,
@@ -166,8 +179,10 @@ public final class Metadata extends com.google.flatbuffers.Table {
       byte timeSourceType,
       int timeSourceOffset,
       boolean needsCallerInputs,
-      int foreignKeysOffset) {
-    builder.startTable(21);
+      int foreignKeysOffset,
+      int conceptBindingsOffset) {
+    builder.startTable(22);
+    Metadata.addConceptBindings(builder, conceptBindingsOffset);
     Metadata.addForeignKeys(builder, foreignKeysOffset);
     Metadata.addTimeSource(builder, timeSourceOffset);
     Metadata.addDetailSections(builder, detailSectionsOffset);
@@ -192,7 +207,7 @@ public final class Metadata extends com.google.flatbuffers.Table {
     return Metadata.endMetadata(builder);
   }
 
-  public static void startMetadata(FlatBufferBuilder builder) { builder.startTable(21); }
+  public static void startMetadata(FlatBufferBuilder builder) { builder.startTable(22); }
   public static void addDisplayName(FlatBufferBuilder builder, int displayNameOffset) { builder.addOffset(0, displayNameOffset, 0); }
   public static void addDescription(FlatBufferBuilder builder, int descriptionOffset) { builder.addOffset(1, descriptionOffset, 0); }
   public static void addFields(FlatBufferBuilder builder, int fieldsOffset) { builder.addOffset(2, fieldsOffset, 0); }
@@ -228,6 +243,9 @@ public final class Metadata extends com.google.flatbuffers.Table {
   public static void addForeignKeys(FlatBufferBuilder builder, int foreignKeysOffset) { builder.addOffset(20, foreignKeysOffset, 0); }
   public static int createForeignKeysVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
   public static void startForeignKeysVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
+  public static void addConceptBindings(FlatBufferBuilder builder, int conceptBindingsOffset) { builder.addOffset(21, conceptBindingsOffset, 0); }
+  public static int createConceptBindingsVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
+  public static void startConceptBindingsVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
   public static int endMetadata(FlatBufferBuilder builder) {
     int o = builder.endTable();
     return o;

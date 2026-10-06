@@ -9,6 +9,7 @@
 import * as flatbuffers from 'flatbuffers/js/flatbuffers';
 
 import { ColumnTime, ColumnTimeT } from './column-time';
+import { ConceptBinding, ConceptBindingT } from './concept-binding';
 import { DatacatalogGeometry, DatacatalogGeometryT } from './datacatalog-geometry';
 import { DatacatalogLatLngGeometry, DatacatalogLatLngGeometryT } from './datacatalog-lat-lng-geometry';
 import { DatasetCategory } from './dataset-category';
@@ -261,8 +262,26 @@ foreignKeysLength():number {
   return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
 }
 
+/**
+ * Ontology concepts this stream provides -- the catalog-side annotation
+ * that concept-driven discovery and interest matching join on.
+ * Multi-valued: real sources provide more than one concept. Relationship
+ * to `entity_ty` is an open decision; both are carried in parallel for now.
+ * Field slots are positional: this one follows `foreign_keys`, which took
+ * the slot dev stacks first wrote concept bindings into.
+ */
+conceptBindings(index: number, obj?:ConceptBinding):ConceptBinding|null {
+  const offset = this.bb!.__offset(this.bb_pos, 46);
+  return offset ? (obj || new ConceptBinding()).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
+}
+
+conceptBindingsLength():number {
+  const offset = this.bb!.__offset(this.bb_pos, 46);
+  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+}
+
 static startMetadata(builder:flatbuffers.Builder) {
-  builder.startObject(21);
+  builder.startObject(22);
 }
 
 static addDisplayName(builder:flatbuffers.Builder, displayNameOffset:flatbuffers.Offset) {
@@ -448,6 +467,22 @@ static startForeignKeysVector(builder:flatbuffers.Builder, numElems:number) {
   builder.startVector(4, numElems, 4);
 }
 
+static addConceptBindings(builder:flatbuffers.Builder, conceptBindingsOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(21, conceptBindingsOffset, 0);
+}
+
+static createConceptBindingsVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
+  builder.startVector(4, data.length, 4);
+  for (let i = data.length - 1; i >= 0; i--) {
+    builder.addOffset(data[i]!);
+  }
+  return builder.endVector();
+}
+
+static startConceptBindingsVector(builder:flatbuffers.Builder, numElems:number) {
+  builder.startVector(4, numElems, 4);
+}
+
 static endMetadata(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   return offset;
@@ -492,7 +527,8 @@ unpack(): MetadataT {
       return temp.unpack()
   })(),
     this.needsCallerInputs(),
-    this.bb!.createObjList<ForeignKey, ForeignKeyT>(this.foreignKeys.bind(this), this.foreignKeysLength())
+    this.bb!.createObjList<ForeignKey, ForeignKeyT>(this.foreignKeys.bind(this), this.foreignKeysLength()),
+    this.bb!.createObjList<ConceptBinding, ConceptBindingT>(this.conceptBindings.bind(this), this.conceptBindingsLength())
   );
 }
 
@@ -527,6 +563,7 @@ unpackTo(_o: MetadataT): void {
   })();
   _o.needsCallerInputs = this.needsCallerInputs();
   _o.foreignKeys = this.bb!.createObjList<ForeignKey, ForeignKeyT>(this.foreignKeys.bind(this), this.foreignKeysLength());
+  _o.conceptBindings = this.bb!.createObjList<ConceptBinding, ConceptBindingT>(this.conceptBindings.bind(this), this.conceptBindingsLength());
 }
 }
 
@@ -552,7 +589,8 @@ constructor(
   public timeSourceType: TimeSource = TimeSource.NONE,
   public timeSource: ColumnTimeT|NoTimeT|null = null,
   public needsCallerInputs: boolean = false,
-  public foreignKeys: (ForeignKeyT)[] = []
+  public foreignKeys: (ForeignKeyT)[] = [],
+  public conceptBindings: (ConceptBindingT)[] = []
 ){}
 
 
@@ -569,6 +607,7 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   const detailSections = Metadata.createDetailSectionsVector(builder, builder.createObjectOffsetList(this.detailSections));
   const timeSource = builder.createObjectOffset(this.timeSource);
   const foreignKeys = Metadata.createForeignKeysVector(builder, builder.createObjectOffsetList(this.foreignKeys));
+  const conceptBindings = Metadata.createConceptBindingsVector(builder, builder.createObjectOffsetList(this.conceptBindings));
 
   Metadata.startMetadata(builder);
   Metadata.addDisplayName(builder, displayName);
@@ -592,6 +631,7 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   Metadata.addTimeSource(builder, timeSource);
   Metadata.addNeedsCallerInputs(builder, this.needsCallerInputs);
   Metadata.addForeignKeys(builder, foreignKeys);
+  Metadata.addConceptBindings(builder, conceptBindings);
 
   return Metadata.endMetadata(builder);
 }

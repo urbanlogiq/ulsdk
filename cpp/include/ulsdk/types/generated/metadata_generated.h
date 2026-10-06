@@ -85,6 +85,9 @@ struct RawGeomBuilder;
 struct GeometryData;
 struct GeometryDataBuilder;
 
+struct ConceptBinding;
+struct ConceptBindingBuilder;
+
 struct UlField;
 struct UlFieldBuilder;
 
@@ -2580,6 +2583,101 @@ struct GeometryData::Traits {
   static auto constexpr Create = CreateGeometryData;
 };
 
+/// One ontology concept the stream (or one of its fields) provides, with the
+/// provenance of the binding. Concept ids name classes of the ontologies
+/// registry, where every ontology, `ul` included, is a managed object in
+/// Drive. The catalog does not resolve them yet: the writer binds concepts it
+/// resolved, and resolving them at the metadata write boundary comes with the
+/// registry. Absent = unannotated, and unannotated streams are invisible to
+/// concept-driven discovery -- the intended semantics for pre-existing
+/// payloads.
+struct ConceptBinding FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ConceptBindingBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_CONCEPT_ = 4,
+    VT_MAPPED_BY = 6,
+    VT_CONFIDENCE = 8
+  };
+  /// Ontology concept id, e.g. "ul:RoadSegment". On a field binding this may
+  /// address an attribute within the concept, e.g. "ul:RoadSegment/speed_limit".
+  const ::flatbuffers::String *concept_() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_CONCEPT_);
+  }
+  /// Binding provenance: "human:<oid>" or "model:<model_id@version>".
+  const ::flatbuffers::String *mapped_by() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_MAPPED_BY);
+  }
+  /// Mapper confidence in [0, 1]; 1.0 for human bindings.
+  float confidence() const {
+    return GetField<float>(VT_CONFIDENCE, 0.0f);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_CONCEPT_) &&
+           verifier.VerifyString(concept_()) &&
+           VerifyOffset(verifier, VT_MAPPED_BY) &&
+           verifier.VerifyString(mapped_by()) &&
+           VerifyField<float>(verifier, VT_CONFIDENCE, 4) &&
+           verifier.EndTable();
+  }
+};
+
+struct ConceptBindingBuilder {
+  typedef ConceptBinding Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_concept_(::flatbuffers::Offset<::flatbuffers::String> concept_) {
+    fbb_.AddOffset(ConceptBinding::VT_CONCEPT_, concept_);
+  }
+  void add_mapped_by(::flatbuffers::Offset<::flatbuffers::String> mapped_by) {
+    fbb_.AddOffset(ConceptBinding::VT_MAPPED_BY, mapped_by);
+  }
+  void add_confidence(float confidence) {
+    fbb_.AddElement<float>(ConceptBinding::VT_CONFIDENCE, confidence, 0.0f);
+  }
+  explicit ConceptBindingBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<ConceptBinding> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<ConceptBinding>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<ConceptBinding> CreateConceptBinding(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::String> concept_ = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> mapped_by = 0,
+    float confidence = 0.0f) {
+  ConceptBindingBuilder builder_(_fbb);
+  builder_.add_confidence(confidence);
+  builder_.add_mapped_by(mapped_by);
+  builder_.add_concept_(concept_);
+  return builder_.Finish();
+}
+
+struct ConceptBinding::Traits {
+  using type = ConceptBinding;
+  static auto constexpr Create = CreateConceptBinding;
+};
+
+inline ::flatbuffers::Offset<ConceptBinding> CreateConceptBindingDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const char *concept_ = nullptr,
+    const char *mapped_by = nullptr,
+    float confidence = 0.0f) {
+  auto concept___ = concept_ ? _fbb.CreateString(concept_) : 0;
+  auto mapped_by__ = mapped_by ? _fbb.CreateString(mapped_by) : 0;
+  return CreateConceptBinding(
+      _fbb,
+      concept___,
+      mapped_by__,
+      confidence);
+}
+
 struct UlField FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef UlFieldBuilder Builder;
   struct Traits;
@@ -2595,7 +2693,8 @@ struct UlField FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_BREAKDOWN_DISPLAY_NAME = 20,
     VT_DEFAULT_ = 22,
     VT_STORAGE_TYPE_TYPE = 24,
-    VT_STORAGE_TYPE = 26
+    VT_STORAGE_TYPE = 26,
+    VT_CONCEPT_ATTR = 28
   };
   const ::flatbuffers::String *field_name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_FIELD_NAME);
@@ -2731,6 +2830,13 @@ struct UlField FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const LargeListView *storage_type_as_LargeListView() const {
     return storage_type_type() == Type::LargeListView ? static_cast<const LargeListView *>(storage_type()) : nullptr;
   }
+  /// Ontology attribute this field provides, within one of the stream's
+  /// bound concepts: a merged metadata write drops an inherited one whose
+  /// concept is no longer bound, and refuses a supplied one. Appended last
+  /// (field slots are positional).
+  const ConceptBinding *concept_attr() const {
+    return GetPointer<const ConceptBinding *>(VT_CONCEPT_ATTR);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_FIELD_NAME) &&
@@ -2752,6 +2858,8 @@ struct UlField FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_STORAGE_TYPE_TYPE, 1) &&
            VerifyOffset(verifier, VT_STORAGE_TYPE) &&
            VerifyType(verifier, storage_type(), storage_type_type()) &&
+           VerifyOffset(verifier, VT_CONCEPT_ATTR) &&
+           verifier.VerifyTable(concept_attr()) &&
            verifier.EndTable();
   }
 };
@@ -2924,6 +3032,9 @@ struct UlFieldBuilder {
   void add_storage_type(::flatbuffers::Offset<void> storage_type) {
     fbb_.AddOffset(UlField::VT_STORAGE_TYPE, storage_type);
   }
+  void add_concept_attr(::flatbuffers::Offset<ConceptBinding> concept_attr) {
+    fbb_.AddOffset(UlField::VT_CONCEPT_ATTR, concept_attr);
+  }
   explicit UlFieldBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -2948,8 +3059,10 @@ inline ::flatbuffers::Offset<UlField> CreateUlField(
     ::flatbuffers::Offset<::flatbuffers::String> breakdown_display_name = 0,
     ::flatbuffers::Offset<ValueInstance> default_ = 0,
     Type storage_type_type = Type::NONE,
-    ::flatbuffers::Offset<void> storage_type = 0) {
+    ::flatbuffers::Offset<void> storage_type = 0,
+    ::flatbuffers::Offset<ConceptBinding> concept_attr = 0) {
   UlFieldBuilder builder_(_fbb);
+  builder_.add_concept_attr(concept_attr);
   builder_.add_storage_type(storage_type);
   builder_.add_default_(default_);
   builder_.add_breakdown_display_name(breakdown_display_name);
@@ -2983,7 +3096,8 @@ inline ::flatbuffers::Offset<UlField> CreateUlFieldDirect(
     const char *breakdown_display_name = nullptr,
     ::flatbuffers::Offset<ValueInstance> default_ = 0,
     Type storage_type_type = Type::NONE,
-    ::flatbuffers::Offset<void> storage_type = 0) {
+    ::flatbuffers::Offset<void> storage_type = 0,
+    ::flatbuffers::Offset<ConceptBinding> concept_attr = 0) {
   auto field_name__ = field_name ? _fbb.CreateString(field_name) : 0;
   auto display_name__ = display_name ? _fbb.CreateString(display_name) : 0;
   auto description__ = description ? _fbb.CreateString(description) : 0;
@@ -3001,7 +3115,8 @@ inline ::flatbuffers::Offset<UlField> CreateUlFieldDirect(
       breakdown_display_name__,
       default_,
       storage_type_type,
-      storage_type);
+      storage_type,
+      concept_attr);
 }
 
 struct HierarchicalRelationship FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -4206,7 +4321,8 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_TIME_SOURCE_TYPE = 38,
     VT_TIME_SOURCE = 40,
     VT_NEEDS_CALLER_INPUTS = 42,
-    VT_FOREIGN_KEYS = 44
+    VT_FOREIGN_KEYS = 44,
+    VT_CONCEPT_BINDINGS = 46
   };
   const ::flatbuffers::String *display_name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_DISPLAY_NAME);
@@ -4325,6 +4441,15 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::Vector<::flatbuffers::Offset<ForeignKey>> *foreign_keys() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<ForeignKey>> *>(VT_FOREIGN_KEYS);
   }
+  /// Ontology concepts this stream provides -- the catalog-side annotation
+  /// that concept-driven discovery and interest matching join on.
+  /// Multi-valued: real sources provide more than one concept. Relationship
+  /// to `entity_ty` is an open decision; both are carried in parallel for now.
+  /// Field slots are positional: this one follows `foreign_keys`, which took
+  /// the slot dev stacks first wrote concept bindings into.
+  const ::flatbuffers::Vector<::flatbuffers::Offset<ConceptBinding>> *concept_bindings() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<ConceptBinding>> *>(VT_CONCEPT_BINDINGS);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_DISPLAY_NAME) &&
@@ -4364,6 +4489,9 @@ struct Metadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_FOREIGN_KEYS) &&
            verifier.VerifyVector(foreign_keys()) &&
            verifier.VerifyVectorOfTables(foreign_keys()) &&
+           VerifyOffset(verifier, VT_CONCEPT_BINDINGS) &&
+           verifier.VerifyVector(concept_bindings()) &&
+           verifier.VerifyVectorOfTables(concept_bindings()) &&
            verifier.EndTable();
   }
 };
@@ -4459,6 +4587,9 @@ struct MetadataBuilder {
   void add_foreign_keys(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ForeignKey>>> foreign_keys) {
     fbb_.AddOffset(Metadata::VT_FOREIGN_KEYS, foreign_keys);
   }
+  void add_concept_bindings(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ConceptBinding>>> concept_bindings) {
+    fbb_.AddOffset(Metadata::VT_CONCEPT_BINDINGS, concept_bindings);
+  }
   explicit MetadataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -4492,8 +4623,10 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadata(
     TimeSource time_source_type = TimeSource::NONE,
     ::flatbuffers::Offset<void> time_source = 0,
     bool needs_caller_inputs = false,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ForeignKey>>> foreign_keys = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ForeignKey>>> foreign_keys = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ConceptBinding>>> concept_bindings = 0) {
   MetadataBuilder builder_(_fbb);
+  builder_.add_concept_bindings(concept_bindings);
   builder_.add_foreign_keys(foreign_keys);
   builder_.add_time_source(time_source);
   builder_.add_detail_sections(detail_sections);
@@ -4545,7 +4678,8 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadataDirect(
     TimeSource time_source_type = TimeSource::NONE,
     ::flatbuffers::Offset<void> time_source = 0,
     bool needs_caller_inputs = false,
-    const std::vector<::flatbuffers::Offset<ForeignKey>> *foreign_keys = nullptr) {
+    const std::vector<::flatbuffers::Offset<ForeignKey>> *foreign_keys = nullptr,
+    const std::vector<::flatbuffers::Offset<ConceptBinding>> *concept_bindings = nullptr) {
   auto display_name__ = display_name ? _fbb.CreateString(display_name) : 0;
   auto description__ = description ? _fbb.CreateString(description) : 0;
   auto fields__ = fields ? _fbb.CreateVector<::flatbuffers::Offset<UlField>>(*fields) : 0;
@@ -4555,6 +4689,7 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadataDirect(
   auto visualize_in_explore_fields__ = visualize_in_explore_fields ? _fbb.CreateVector<int32_t>(*visualize_in_explore_fields) : 0;
   auto detail_sections__ = detail_sections ? _fbb.CreateVector<::flatbuffers::Offset<DetailSection>>(*detail_sections) : 0;
   auto foreign_keys__ = foreign_keys ? _fbb.CreateVector<::flatbuffers::Offset<ForeignKey>>(*foreign_keys) : 0;
+  auto concept_bindings__ = concept_bindings ? _fbb.CreateVector<::flatbuffers::Offset<ConceptBinding>>(*concept_bindings) : 0;
   return CreateMetadata(
       _fbb,
       display_name__,
@@ -4577,7 +4712,8 @@ inline ::flatbuffers::Offset<Metadata> CreateMetadataDirect(
       time_source_type,
       time_source,
       needs_caller_inputs,
-      foreign_keys__);
+      foreign_keys__,
+      concept_bindings__);
 }
 
 inline bool VerifyComponentData(::flatbuffers::Verifier &verifier, const void *obj, ComponentData type) {

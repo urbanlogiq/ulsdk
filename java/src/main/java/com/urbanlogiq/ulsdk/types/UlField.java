@@ -21,6 +21,20 @@ public final class UlField {
         this._componentData = value;
     }
 
+    /**
+     *  Ontology attribute this field provides, within one of the stream's
+     *  bound concepts: a merged metadata write drops an inherited one whose
+     *  concept is no longer bound, and refuses a supplied one. Appended last
+     *  (field slots are positional).
+     */
+    com.urbanlogiq.ulsdk.types.ConceptBinding _conceptAttr;
+    public com.urbanlogiq.ulsdk.types.ConceptBinding getConceptAttr() {
+        return this._conceptAttr;
+    }
+    public void setConceptAttr(com.urbanlogiq.ulsdk.types.ConceptBinding value) {
+        this._conceptAttr = value;
+    }
+
     com.urbanlogiq.ulsdk.types.ValueInstance _default_;
     public com.urbanlogiq.ulsdk.types.ValueInstance getDefault() {
         return this._default_;
@@ -118,6 +132,9 @@ public final class UlField {
         }
         if (componentDataValue != null) {
             this._componentData = new com.urbanlogiq.ulsdk.types.ComponentData(componentDataValue);
+        }
+        if (o.conceptAttr() != null) {
+            this._conceptAttr = new com.urbanlogiq.ulsdk.types.ConceptBinding(o.conceptAttr());
         }
         if (o.default_() != null) {
             this._default_ = new com.urbanlogiq.ulsdk.types.ValueInstance(o.default_());
@@ -259,6 +276,10 @@ public final class UlField {
         if (this._componentData != null) {
             componentDataPair = this._componentData.serializeTo(builder);
         }
+        Integer conceptAttrOffset = null;
+        if (this._conceptAttr != null) {
+            conceptAttrOffset = this._conceptAttr.serializeTo(builder);
+        }
         Integer default_Offset = null;
         if (this._default_ != null) {
             default_Offset = this._default_.serializeTo(builder);
@@ -286,6 +307,9 @@ public final class UlField {
         if (componentDataPair != null) {
             com.urbanlogiq.ulsdk.types.generated.UlField.addComponentData(builder, componentDataPair.first());
             com.urbanlogiq.ulsdk.types.generated.UlField.addComponentDataType(builder, componentDataPair.second());
+        }
+        if (conceptAttrOffset != null) {
+            com.urbanlogiq.ulsdk.types.generated.UlField.addConceptAttr(builder, conceptAttrOffset);
         }
         if (default_Offset != null) {
             com.urbanlogiq.ulsdk.types.generated.UlField.addDefault(builder, default_Offset);
@@ -319,6 +343,7 @@ public final class UlField {
     public UlField() {
         this._breakdownDisplayName = new String();
         this._componentData = new com.urbanlogiq.ulsdk.types.ComponentData();
+        this._conceptAttr = new com.urbanlogiq.ulsdk.types.ConceptBinding();
         this._default_ = new com.urbanlogiq.ulsdk.types.ValueInstance();
         this._description = new String();
         this._displayName = new String();

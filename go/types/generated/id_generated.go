@@ -17,6 +17,7 @@ const (
 	ObjectNamespaceEvaluator     ObjectNamespace = 4
 	ObjectNamespaceDrive         ObjectNamespace = 5
 	ObjectNamespaceNotifications ObjectNamespace = 6
+	ObjectNamespaceRegistry      ObjectNamespace = 7
 	ObjectNamespaceUnknown       ObjectNamespace = 65535
 )
 
@@ -28,6 +29,7 @@ var EnumNamesObjectNamespace = map[ObjectNamespace]string{
 	ObjectNamespaceEvaluator:     "Evaluator",
 	ObjectNamespaceDrive:         "Drive",
 	ObjectNamespaceNotifications: "Notifications",
+	ObjectNamespaceRegistry:      "Registry",
 	ObjectNamespaceUnknown:       "Unknown",
 }
 
@@ -39,6 +41,7 @@ var EnumValuesObjectNamespace = map[string]ObjectNamespace{
 	"Evaluator":     ObjectNamespaceEvaluator,
 	"Drive":         ObjectNamespaceDrive,
 	"Notifications": ObjectNamespaceNotifications,
+	"Registry":      ObjectNamespaceRegistry,
 	"Unknown":       ObjectNamespaceUnknown,
 }
 

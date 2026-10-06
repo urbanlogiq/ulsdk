@@ -21,4 +21,11 @@ public final class DataCatalogObjectTy {
     public static final short Model = com.urbanlogiq.ulsdk.types.generated.DataCatalogObjectTy.Model;
     public static final short Ingestion = com.urbanlogiq.ulsdk.types.generated.DataCatalogObjectTy.Ingestion;
     public static final short View = com.urbanlogiq.ulsdk.types.generated.DataCatalogObjectTy.View;
+    public static final short ModelManifest = com.urbanlogiq.ulsdk.types.generated.DataCatalogObjectTy.ModelManifest;
+    public static final short OntologyDeclaration = com.urbanlogiq.ulsdk.types.generated.DataCatalogObjectTy.OntologyDeclaration;
+    public static final short Mission = com.urbanlogiq.ulsdk.types.generated.DataCatalogObjectTy.Mission;
+    public static final short Skill = com.urbanlogiq.ulsdk.types.generated.DataCatalogObjectTy.Skill;
+    public static final short SourceNote = com.urbanlogiq.ulsdk.types.generated.DataCatalogObjectTy.SourceNote;
+    public static final short Exploration = com.urbanlogiq.ulsdk.types.generated.DataCatalogObjectTy.Exploration;
+    public static final short KpiSpec = com.urbanlogiq.ulsdk.types.generated.DataCatalogObjectTy.KpiSpec;
 }

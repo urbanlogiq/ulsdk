@@ -8,5 +8,6 @@ pub mod drive;
 pub mod gate;
 pub mod inbox;
 pub mod keys;
+pub mod registry;
 pub mod schematic_evaluator;
 pub mod worldgraph;

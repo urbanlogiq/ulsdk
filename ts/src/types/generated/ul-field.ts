@@ -12,6 +12,7 @@ import { Binary, BinaryT } from './binary';
 import { BinaryView, BinaryViewT } from './binary-view';
 import { Bool, BoolT } from './bool';
 import { ComponentData, unionToComponentData, unionListToComponentData } from './component-data';
+import { ConceptBinding, ConceptBindingT } from './concept-binding';
 import { Date, DateT } from './date';
 import { Dates, DatesT } from './dates';
 import { DatetimeRange, DatetimeRangeT } from './datetime-range';
@@ -133,8 +134,19 @@ storageType<T extends flatbuffers.Table>(obj:any):any|null {
   return offset ? this.bb!.__union(obj, this.bb_pos + offset) : null;
 }
 
+/**
+ * Ontology attribute this field provides, within one of the stream's
+ * bound concepts: a merged metadata write drops an inherited one whose
+ * concept is no longer bound, and refuses a supplied one. Appended last
+ * (field slots are positional).
+ */
+conceptAttr(obj?:ConceptBinding):ConceptBinding|null {
+  const offset = this.bb!.__offset(this.bb_pos, 28);
+  return offset ? (obj || new ConceptBinding()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
+}
+
 static startUlField(builder:flatbuffers.Builder) {
-  builder.startObject(12);
+  builder.startObject(13);
 }
 
 static addFieldName(builder:flatbuffers.Builder, fieldNameOffset:flatbuffers.Offset) {
@@ -185,6 +197,10 @@ static addStorageType(builder:flatbuffers.Builder, storageTypeOffset:flatbuffers
   builder.addFieldOffset(11, storageTypeOffset, 0);
 }
 
+static addConceptAttr(builder:flatbuffers.Builder, conceptAttrOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(12, conceptAttrOffset, 0);
+}
+
 static endUlField(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   return offset;
@@ -212,7 +228,8 @@ unpack(): UlFieldT {
       const temp = unionToType(this.storageTypeType(), this.storageType.bind(this));
       if(temp === null) { return null; }
       return temp.unpack()
-  })()
+  })(),
+    (this.conceptAttr() !== null ? this.conceptAttr()!.unpack() : null)
   );
 }
 
@@ -238,6 +255,7 @@ unpackTo(_o: UlFieldT): void {
       if(temp === null) { return null; }
       return temp.unpack()
   })();
+  _o.conceptAttr = (this.conceptAttr() !== null ? this.conceptAttr()!.unpack() : null);
 }
 }
 
@@ -254,7 +272,8 @@ constructor(
   public breakdownDisplayName: string|Uint8Array|null = null,
   public default_: ValueInstanceT|null = null,
   public storageTypeType: Type = Type.NONE,
-  public storageType: BinaryT|BinaryViewT|BoolT|DateT|DecimalT|DurationT|FixedSizeBinaryT|FixedSizeListT|FloatingPointT|IntT|IntervalT|LargeBinaryT|LargeListT|LargeListViewT|LargeUtf8T|ListT|ListViewT|MapT|NullT|RunEndEncodedT|Struct_T|TimeT|TimestampT|UnionT|Utf8T|Utf8ViewT|null = null
+  public storageType: BinaryT|BinaryViewT|BoolT|DateT|DecimalT|DurationT|FixedSizeBinaryT|FixedSizeListT|FloatingPointT|IntT|IntervalT|LargeBinaryT|LargeListT|LargeListViewT|LargeUtf8T|ListT|ListViewT|MapT|NullT|RunEndEncodedT|Struct_T|TimeT|TimestampT|UnionT|Utf8T|Utf8ViewT|null = null,
+  public conceptAttr: ConceptBindingT|null = null
 ){}
 
 
@@ -266,6 +285,7 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   const breakdownDisplayName = (this.breakdownDisplayName !== null ? builder.createString(this.breakdownDisplayName!) : 0);
   const default_ = (this.default_ !== null ? this.default_!.pack(builder) : 0);
   const storageType = builder.createObjectOffset(this.storageType);
+  const conceptAttr = (this.conceptAttr !== null ? this.conceptAttr!.pack(builder) : 0);
 
   UlField.startUlField(builder);
   UlField.addFieldName(builder, fieldName);
@@ -280,6 +300,7 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   UlField.addDefault(builder, default_);
   UlField.addStorageTypeType(builder, this.storageTypeType);
   UlField.addStorageType(builder, storageType);
+  UlField.addConceptAttr(builder, conceptAttr);
 
   return UlField.endUlField(builder);
 }

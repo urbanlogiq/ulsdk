@@ -12,5 +12,6 @@ public final class ObjectNamespace {
     public static final int Evaluator = com.urbanlogiq.ulsdk.types.generated.ObjectNamespace.Evaluator;
     public static final int Drive = com.urbanlogiq.ulsdk.types.generated.ObjectNamespace.Drive;
     public static final int Notifications = com.urbanlogiq.ulsdk.types.generated.ObjectNamespace.Notifications;
+    public static final int Registry = com.urbanlogiq.ulsdk.types.generated.ObjectNamespace.Registry;
     public static final int Unknown = com.urbanlogiq.ulsdk.types.generated.ObjectNamespace.Unknown;
 }
