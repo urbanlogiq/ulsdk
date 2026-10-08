@@ -49,27 +49,36 @@ public final class RegistryRelation extends com.google.flatbuffers.Table {
   public int columnsLength() { int o = __offset(10); return o != 0 ? __vector_len(o) : 0; }
   public RegistryField._Vector columnsVector() { return columnsVector(new RegistryField._Vector()); }
   public RegistryField._Vector columnsVector(RegistryField._Vector obj) { int o = __offset(10); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
+  /**
+   * What `pointer` reads: the parsed source document (the default, as every
+   * relation before it), or the governed object's own fields — a document
+   * kind whose source is text lists from the object.
+   */
+  public int source() { int o = __offset(12); return o != 0 ? bb.get(o + bb_pos) & 0xFF : 0; }
 
   public static int createRegistryRelation(FlatBufferBuilder builder,
       int nameOffset,
       int pointerOffset,
       int transformOffset,
-      int columnsOffset) {
-    builder.startTable(4);
+      int columnsOffset,
+      int source) {
+    builder.startTable(5);
     RegistryRelation.addColumns(builder, columnsOffset);
     RegistryRelation.addTransform(builder, transformOffset);
     RegistryRelation.addPointer(builder, pointerOffset);
     RegistryRelation.addName(builder, nameOffset);
+    RegistryRelation.addSource(builder, source);
     return RegistryRelation.endRegistryRelation(builder);
   }
 
-  public static void startRegistryRelation(FlatBufferBuilder builder) { builder.startTable(4); }
+  public static void startRegistryRelation(FlatBufferBuilder builder) { builder.startTable(5); }
   public static void addName(FlatBufferBuilder builder, int nameOffset) { builder.addOffset(0, nameOffset, 0); }
   public static void addPointer(FlatBufferBuilder builder, int pointerOffset) { builder.addOffset(1, pointerOffset, 0); }
   public static void addTransform(FlatBufferBuilder builder, int transformOffset) { builder.addOffset(2, transformOffset, 0); }
   public static void addColumns(FlatBufferBuilder builder, int columnsOffset) { builder.addOffset(3, columnsOffset, 0); }
   public static int createColumnsVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
   public static void startColumnsVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
+  public static void addSource(FlatBufferBuilder builder, int source) { builder.addByte(4, (byte) source, (byte) 0); }
   public static int endRegistryRelation(FlatBufferBuilder builder) {
     int o = builder.endTable();
     builder.required(o, 4);  // name

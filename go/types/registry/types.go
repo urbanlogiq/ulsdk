@@ -148,6 +148,7 @@ type RegistryRelation struct {
 	Columns []RegistryField
 	Name string
 	Pointer string
+	Source byte
 	Transform *string
 }
 
@@ -161,6 +162,7 @@ func RegistryRelationFromFbs(fbs *generated.RegistryRelation) *RegistryRelation 
 	}
 	o.Name = string(fbs.Name())
 	o.Pointer = string(fbs.Pointer())
+	o.Source = byte(fbs.Source())
 	if s := fbs.Transform(); s != nil {
 		str := string(s)
 		o.Transform = &str
@@ -203,6 +205,7 @@ func (o *RegistryRelation) SerializeTo(builder *flatbuffers.Builder) flatbuffers
 	generated.RegistryRelationAddColumns(builder, columnsVecOffset)
 	generated.RegistryRelationAddName(builder, nameOffset)
 	generated.RegistryRelationAddPointer(builder, pointerOffset)
+	generated.RegistryRelationAddSource(builder, generated.RegistryFieldSource(o.Source))
 	generated.RegistryRelationAddTransform(builder, transformOffset)
 	return generated.RegistryRelationEnd(builder)
 }

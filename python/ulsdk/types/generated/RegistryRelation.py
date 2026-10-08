@@ -74,8 +74,18 @@ class RegistryRelation(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         return o == 0
 
+    # What `pointer` reads: the parsed source document (the default, as every
+    # relation before it), or the governed object's own fields — a document
+    # kind whose source is text lists from the object.
+    # RegistryRelation
+    def Source(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Uint8Flags, o + self._tab.Pos)
+        return 0
+
 def RegistryRelationStart(builder):
-    builder.StartObject(4)
+    builder.StartObject(5)
 
 def Start(builder):
     RegistryRelationStart(builder)
@@ -109,6 +119,12 @@ def RegistryRelationStartColumnsVector(builder, numElems):
 
 def StartColumnsVector(builder, numElems):
     return RegistryRelationStartColumnsVector(builder, numElems)
+
+def RegistryRelationAddSource(builder, source):
+    builder.PrependUint8Slot(4, source, 0)
+
+def AddSource(builder, source):
+    RegistryRelationAddSource(builder, source)
 
 def RegistryRelationEnd(builder):
     return builder.EndObject()

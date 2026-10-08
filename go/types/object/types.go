@@ -47,6 +47,7 @@ const (
 	DataCatalogObjectTySourceNote DataCatalogObjectTy = 20
 	DataCatalogObjectTyExploration DataCatalogObjectTy = 21
 	DataCatalogObjectTyKpiSpec DataCatalogObjectTy = 22
+	DataCatalogObjectTyGovernedDocument DataCatalogObjectTy = 23
 )
 
 type DataCatalogObject struct {

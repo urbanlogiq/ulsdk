@@ -35,6 +35,19 @@ public final class RegistryRelation {
         this._pointer = value;
     }
 
+    /**
+     *  What `pointer` reads: the parsed source document (the default, as every
+     *  relation before it), or the governed object's own fields — a document
+     *  kind whose source is text lists from the object.
+     */
+    byte _source;
+    public byte getSource() {
+        return this._source;
+    }
+    public void setSource(byte value) {
+        this._source = value;
+    }
+
     String _transform;
     public String getTransform() {
         return this._transform;
@@ -55,6 +68,7 @@ public final class RegistryRelation {
         this._columns = columns;
         this._name = o.name();
         this._pointer = o.pointer();
+        this._source = (byte)o.source();
         if (o.transform() != null) {
             this._transform = o.transform();
         }
@@ -84,6 +98,7 @@ public final class RegistryRelation {
         com.urbanlogiq.ulsdk.types.generated.RegistryRelation.addColumns(builder, columnsOffset);
         com.urbanlogiq.ulsdk.types.generated.RegistryRelation.addName(builder, nameOffset);
         com.urbanlogiq.ulsdk.types.generated.RegistryRelation.addPointer(builder, pointerOffset);
+        com.urbanlogiq.ulsdk.types.generated.RegistryRelation.addSource(builder, this._source);
         if (transformOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.RegistryRelation.addTransform(builder, transformOffset);
         }

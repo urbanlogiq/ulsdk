@@ -26,3 +26,4 @@ class DataCatalogObjectTy(object):
     SourceNote = 20
     Exploration = 21
     KpiSpec = 22
+    GovernedDocument = 23

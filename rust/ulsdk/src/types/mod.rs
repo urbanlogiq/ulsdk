@@ -30,6 +30,8 @@ pub mod fs;
 pub use crate::types::fs::*;
 pub mod fun;
 pub use crate::types::fun::*;
+pub mod governed_document;
+pub use crate::types::governed_document::*;
 pub mod graph;
 pub use crate::types::graph::*;
 pub mod id;

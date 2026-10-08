@@ -82,6 +82,7 @@ struct RegistryRelation {
     std::vector<RegistryField> columns_;
     std::string name_;
     std::string pointer_;
+    RegistryFieldSource source_;
     std::optional<std::string> transform_;
 
     RegistryRelation();

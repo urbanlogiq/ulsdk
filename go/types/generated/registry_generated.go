@@ -273,8 +273,26 @@ func (rcv *RegistryRelation) ColumnsLength() int {
 	return 0
 }
 
+/// What `pointer` reads: the parsed source document (the default, as every
+/// relation before it), or the governed object's own fields — a document
+/// kind whose source is text lists from the object.
+func (rcv *RegistryRelation) Source() RegistryFieldSource {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(12))
+	if o != 0 {
+		return RegistryFieldSource(rcv._tab.GetByte(o + rcv._tab.Pos))
+	}
+	return 0
+}
+
+/// What `pointer` reads: the parsed source document (the default, as every
+/// relation before it), or the governed object's own fields — a document
+/// kind whose source is text lists from the object.
+func (rcv *RegistryRelation) MutateSource(n RegistryFieldSource) bool {
+	return rcv._tab.MutateByteSlot(12, byte(n))
+}
+
 func RegistryRelationStart(builder *flatbuffers.Builder) {
-	builder.StartObject(4)
+	builder.StartObject(5)
 }
 func RegistryRelationAddName(builder *flatbuffers.Builder, name flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(name), 0)
@@ -290,6 +308,9 @@ func RegistryRelationAddColumns(builder *flatbuffers.Builder, columns flatbuffer
 }
 func RegistryRelationStartColumnsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
 	return builder.StartVector(4, numElems, 4)
+}
+func RegistryRelationAddSource(builder *flatbuffers.Builder, source RegistryFieldSource) {
+	builder.PrependByteSlot(4, byte(source), 0)
 }
 func RegistryRelationEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()

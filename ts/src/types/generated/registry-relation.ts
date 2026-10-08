@@ -9,6 +9,7 @@
 import * as flatbuffers from 'flatbuffers/js/flatbuffers';
 
 import { RegistryField, RegistryFieldT } from './registry-field';
+import { RegistryFieldSource } from './registry-field-source';
 
 
 /**
@@ -66,8 +67,18 @@ columnsLength():number {
   return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
 }
 
+/**
+ * What `pointer` reads: the parsed source document (the default, as every
+ * relation before it), or the governed object's own fields — a document
+ * kind whose source is text lists from the object.
+ */
+source():RegistryFieldSource {
+  const offset = this.bb!.__offset(this.bb_pos, 12);
+  return offset ? this.bb!.readUint8(this.bb_pos + offset) : RegistryFieldSource.Source;
+}
+
 static startRegistryRelation(builder:flatbuffers.Builder) {
-  builder.startObject(4);
+  builder.startObject(5);
 }
 
 static addName(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset) {
@@ -98,6 +109,10 @@ static startColumnsVector(builder:flatbuffers.Builder, numElems:number) {
   builder.startVector(4, numElems, 4);
 }
 
+static addSource(builder:flatbuffers.Builder, source:RegistryFieldSource) {
+  builder.addFieldInt8(4, source, RegistryFieldSource.Source);
+}
+
 static endRegistryRelation(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   builder.requiredField(offset, 4) // name
@@ -106,12 +121,13 @@ static endRegistryRelation(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 }
 
-static createRegistryRelation(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset, pointerOffset:flatbuffers.Offset, transformOffset:flatbuffers.Offset, columnsOffset:flatbuffers.Offset):flatbuffers.Offset {
+static createRegistryRelation(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset, pointerOffset:flatbuffers.Offset, transformOffset:flatbuffers.Offset, columnsOffset:flatbuffers.Offset, source:RegistryFieldSource):flatbuffers.Offset {
   RegistryRelation.startRegistryRelation(builder);
   RegistryRelation.addName(builder, nameOffset);
   RegistryRelation.addPointer(builder, pointerOffset);
   RegistryRelation.addTransform(builder, transformOffset);
   RegistryRelation.addColumns(builder, columnsOffset);
+  RegistryRelation.addSource(builder, source);
   return RegistryRelation.endRegistryRelation(builder);
 }
 
@@ -120,7 +136,8 @@ unpack(): RegistryRelationT {
     this.name(),
     this.pointer(),
     this.transform(),
-    this.bb!.createObjList<RegistryField, RegistryFieldT>(this.columns.bind(this), this.columnsLength())
+    this.bb!.createObjList<RegistryField, RegistryFieldT>(this.columns.bind(this), this.columnsLength()),
+    this.source()
   );
 }
 
@@ -130,6 +147,7 @@ unpackTo(_o: RegistryRelationT): void {
   _o.pointer = this.pointer();
   _o.transform = this.transform();
   _o.columns = this.bb!.createObjList<RegistryField, RegistryFieldT>(this.columns.bind(this), this.columnsLength());
+  _o.source = this.source();
 }
 }
 
@@ -138,7 +156,8 @@ constructor(
   public name: string|Uint8Array|null = null,
   public pointer: string|Uint8Array|null = null,
   public transform: string|Uint8Array|null = null,
-  public columns: (RegistryFieldT)[] = []
+  public columns: (RegistryFieldT)[] = [],
+  public source: RegistryFieldSource = RegistryFieldSource.Source
 ){}
 
 
@@ -152,7 +171,8 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
     name,
     pointer,
     transform,
-    columns
+    columns,
+    this.source
   );
 }
 }

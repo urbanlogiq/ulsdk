@@ -534,6 +534,7 @@ impl<'a> RegistryRelation<'a> {
     pub const VT_POINTER: flatbuffers::VOffsetT = 6;
     pub const VT_TRANSFORM: flatbuffers::VOffsetT = 8;
     pub const VT_COLUMNS: flatbuffers::VOffsetT = 10;
+    pub const VT_SOURCE: flatbuffers::VOffsetT = 12;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -557,6 +558,7 @@ impl<'a> RegistryRelation<'a> {
         if let Some(x) = args.name {
             builder.add_name(x);
         }
+        builder.add_source(args.source);
         builder.finish()
     }
 
@@ -607,6 +609,23 @@ impl<'a> RegistryRelation<'a> {
                 .unwrap()
         }
     }
+    /// What `pointer` reads: the parsed source document (the default, as every
+    /// relation before it), or the governed object's own fields — a document
+    /// kind whose source is text lists from the object.
+    #[inline]
+    pub fn source(&self) -> RegistryFieldSource {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<RegistryFieldSource>(
+                    RegistryRelation::VT_SOURCE,
+                    Some(RegistryFieldSource::Source),
+                )
+                .unwrap()
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for RegistryRelation<'_> {
@@ -627,6 +646,7 @@ impl flatbuffers::Verifiable for RegistryRelation<'_> {
             .visit_field::<flatbuffers::ForwardsUOffset<
                 flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<RegistryField>>,
             >>("columns", Self::VT_COLUMNS, true)?
+            .visit_field::<RegistryFieldSource>("source", Self::VT_SOURCE, false)?
             .finish();
         Ok(())
     }
@@ -640,6 +660,7 @@ pub struct RegistryRelationArgs<'a> {
             flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<RegistryField<'a>>>,
         >,
     >,
+    pub source: RegistryFieldSource,
 }
 impl<'a> Default for RegistryRelationArgs<'a> {
     #[inline]
@@ -649,6 +670,7 @@ impl<'a> Default for RegistryRelationArgs<'a> {
             pointer: None, // required field
             transform: None,
             columns: None, // required field
+            source: RegistryFieldSource::Source,
         }
     }
 }
@@ -658,7 +680,7 @@ impl Serialize for RegistryRelation<'_> {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("RegistryRelation", 4)?;
+        let mut s = serializer.serialize_struct("RegistryRelation", 5)?;
         s.serialize_field("name", &self.name())?;
         s.serialize_field("pointer", &self.pointer())?;
         if let Some(f) = self.transform() {
@@ -667,6 +689,7 @@ impl Serialize for RegistryRelation<'_> {
             s.skip_field("transform")?;
         }
         s.serialize_field("columns", &self.columns())?;
+        s.serialize_field("source", &self.source())?;
         s.end()
     }
 }
@@ -704,6 +727,14 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> RegistryRelationBuilder<'a, 'b,
             .push_slot_always::<flatbuffers::WIPOffset<_>>(RegistryRelation::VT_COLUMNS, columns);
     }
     #[inline]
+    pub fn add_source(&mut self, source: RegistryFieldSource) {
+        self.fbb_.push_slot::<RegistryFieldSource>(
+            RegistryRelation::VT_SOURCE,
+            source,
+            RegistryFieldSource::Source,
+        );
+    }
+    #[inline]
     pub fn new(
         _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
     ) -> RegistryRelationBuilder<'a, 'b, A> {
@@ -732,6 +763,7 @@ impl core::fmt::Debug for RegistryRelation<'_> {
         ds.field("pointer", &self.pointer());
         ds.field("transform", &self.transform());
         ds.field("columns", &self.columns());
+        ds.field("source", &self.source());
         ds.finish()
     }
 }

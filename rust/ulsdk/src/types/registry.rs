@@ -400,11 +400,15 @@ impl Default for RegistryField {
 /// element of the array (or map entry) the pointer names. `columns` are read
 /// relative to each element; an element that is a scalar fills the single
 /// column named `value`.
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct RegistryRelation {
     pub columns: Vec<RegistryField>,
     pub name: String,
     pub pointer: String,
+    /// What `pointer` reads: the parsed source document (the default, as every
+    /// relation before it), or the governed object's own fields — a document
+    /// kind whose source is text lists from the object.
+    pub source: RegistryFieldSource,
     pub transform: Option<String>,
 }
 
@@ -429,6 +433,7 @@ impl RegistryRelation {
         bldr.add_columns(columns_offset);
         bldr.add_name(name_offset);
         bldr.add_pointer(pointer_offset);
+        bldr.add_source(FbsRegistryFieldSource::from(self.source));
         if let Some(offset) = transform_offset {
             bldr.add_transform(offset);
         }
@@ -445,11 +450,13 @@ impl From<FbsRegistryRelation<'_>> for RegistryRelation {
 
         let name = fbs.name().to_owned();
         let pointer = fbs.pointer().to_owned();
+        let source = RegistryFieldSource::from(fbs.source());
         let transform = fbs.transform().map(ToOwned::to_owned);
         Self {
             columns,
             name,
             pointer,
+            source,
             transform,
         }
     }
@@ -470,6 +477,18 @@ impl crate::FbsSerde for RegistryRelation {
         };
         let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsRegistryRelation>(&opts, bytes)?;
         Ok(Self::from(fbs))
+    }
+}
+
+impl Default for RegistryRelation {
+    fn default() -> Self {
+        Self {
+            columns: Vec::<RegistryField>::default(),
+            name: String::default(),
+            pointer: String::default(),
+            source: RegistryFieldSource::Source,
+            transform: None,
+        }
     }
 }
 

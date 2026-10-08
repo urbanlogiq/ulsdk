@@ -246,7 +246,8 @@ struct RegistryRelation FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_NAME = 4,
     VT_POINTER = 6,
     VT_TRANSFORM = 8,
-    VT_COLUMNS = 10
+    VT_COLUMNS = 10,
+    VT_SOURCE = 12
   };
   const ::flatbuffers::String *name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_NAME);
@@ -260,6 +261,12 @@ struct RegistryRelation FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::Vector<::flatbuffers::Offset<RegistryField>> *columns() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<RegistryField>> *>(VT_COLUMNS);
   }
+  /// What `pointer` reads: the parsed source document (the default, as every
+  /// relation before it), or the governed object's own fields — a document
+  /// kind whose source is text lists from the object.
+  RegistryFieldSource source() const {
+    return static_cast<RegistryFieldSource>(GetField<uint8_t>(VT_SOURCE, 0));
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_NAME) &&
@@ -271,6 +278,7 @@ struct RegistryRelation FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffsetRequired(verifier, VT_COLUMNS) &&
            verifier.VerifyVector(columns()) &&
            verifier.VerifyVectorOfTables(columns()) &&
+           VerifyField<uint8_t>(verifier, VT_SOURCE, 1) &&
            verifier.EndTable();
   }
 };
@@ -291,6 +299,9 @@ struct RegistryRelationBuilder {
   void add_columns(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<RegistryField>>> columns) {
     fbb_.AddOffset(RegistryRelation::VT_COLUMNS, columns);
   }
+  void add_source(RegistryFieldSource source) {
+    fbb_.AddElement<uint8_t>(RegistryRelation::VT_SOURCE, static_cast<uint8_t>(source), 0);
+  }
   explicit RegistryRelationBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -310,12 +321,14 @@ inline ::flatbuffers::Offset<RegistryRelation> CreateRegistryRelation(
     ::flatbuffers::Offset<::flatbuffers::String> name = 0,
     ::flatbuffers::Offset<::flatbuffers::String> pointer = 0,
     ::flatbuffers::Offset<::flatbuffers::String> transform = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<RegistryField>>> columns = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<RegistryField>>> columns = 0,
+    RegistryFieldSource source = RegistryFieldSource::Source) {
   RegistryRelationBuilder builder_(_fbb);
   builder_.add_columns(columns);
   builder_.add_transform(transform);
   builder_.add_pointer(pointer);
   builder_.add_name(name);
+  builder_.add_source(source);
   return builder_.Finish();
 }
 
@@ -329,7 +342,8 @@ inline ::flatbuffers::Offset<RegistryRelation> CreateRegistryRelationDirect(
     const char *name = nullptr,
     const char *pointer = nullptr,
     const char *transform = nullptr,
-    const std::vector<::flatbuffers::Offset<RegistryField>> *columns = nullptr) {
+    const std::vector<::flatbuffers::Offset<RegistryField>> *columns = nullptr,
+    RegistryFieldSource source = RegistryFieldSource::Source) {
   auto name__ = name ? _fbb.CreateString(name) : 0;
   auto pointer__ = pointer ? _fbb.CreateString(pointer) : 0;
   auto transform__ = transform ? _fbb.CreateString(transform) : 0;
@@ -339,7 +353,8 @@ inline ::flatbuffers::Offset<RegistryRelation> CreateRegistryRelationDirect(
       name__,
       pointer__,
       transform__,
-      columns__);
+      columns__,
+      source);
 }
 
 /// The declaration of a registry.

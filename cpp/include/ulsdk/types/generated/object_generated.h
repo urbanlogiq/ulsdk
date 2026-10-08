@@ -62,11 +62,12 @@ enum class DataCatalogObjectTy : int16_t {
   SourceNote = 20,
   Exploration = 21,
   KpiSpec = 22,
+  GovernedDocument = 23,
   MIN = Invalid,
-  MAX = KpiSpec
+  MAX = GovernedDocument
 };
 
-inline const DataCatalogObjectTy (&EnumValuesDataCatalogObjectTy())[23] {
+inline const DataCatalogObjectTy (&EnumValuesDataCatalogObjectTy())[24] {
   static const DataCatalogObjectTy values[] = {
     DataCatalogObjectTy::Invalid,
     DataCatalogObjectTy::WorkLog,
@@ -90,13 +91,14 @@ inline const DataCatalogObjectTy (&EnumValuesDataCatalogObjectTy())[23] {
     DataCatalogObjectTy::Skill,
     DataCatalogObjectTy::SourceNote,
     DataCatalogObjectTy::Exploration,
-    DataCatalogObjectTy::KpiSpec
+    DataCatalogObjectTy::KpiSpec,
+    DataCatalogObjectTy::GovernedDocument
   };
   return values;
 }
 
 inline const char * const *EnumNamesDataCatalogObjectTy() {
-  static const char * const names[24] = {
+  static const char * const names[25] = {
     "Invalid",
     "WorkLog",
     "Schematic",
@@ -120,13 +122,14 @@ inline const char * const *EnumNamesDataCatalogObjectTy() {
     "SourceNote",
     "Exploration",
     "KpiSpec",
+    "GovernedDocument",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameDataCatalogObjectTy(DataCatalogObjectTy e) {
-  if (::flatbuffers::IsOutRange(e, DataCatalogObjectTy::Invalid, DataCatalogObjectTy::KpiSpec)) return "";
+  if (::flatbuffers::IsOutRange(e, DataCatalogObjectTy::Invalid, DataCatalogObjectTy::GovernedDocument)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesDataCatalogObjectTy()[index];
 }

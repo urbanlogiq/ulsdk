@@ -303,6 +303,7 @@ class DataCatalogObjectTy(Enum):
     SourceNote = 20
     Exploration = 21
     KpiSpec = 22
+    GovernedDocument = 23
 
 
 @dataclass

@@ -486,6 +486,11 @@ class RegistryRelation:
 
     pointer: "str"
 
+    # What `pointer` reads: the parsed source document (the default, as every
+    # relation before it), or the governed object's own fields — a document
+    # kind whose source is text lists from the object.
+    source: "RegistryFieldSource"
+
     transform: Optional["str"]
 
     @classmethod
@@ -504,11 +509,12 @@ class RegistryRelation:
         pointer_str = o.Pointer()
         assert pointer_str is not None
         pointer = pointer_str.decode('utf-8')
+        source = RegistryFieldSource(o.Source())
         transform = None
         transform_str = o.Transform()
         if transform_str is not None:
             transform = transform_str.decode('utf-8')
-        return cls(columns, name, pointer, transform)
+        return cls(columns, name, pointer, source, transform)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -523,6 +529,7 @@ class RegistryRelation:
             StartColumnsVector,
             AddName,
             AddPointer,
+            AddSource,
             AddTransform,
             End,
         )
@@ -543,6 +550,7 @@ class RegistryRelation:
         AddColumns(builder, columns_offset)
         AddName(builder, name_offset)
         AddPointer(builder, pointer_offset)
+        AddSource(builder, self.source.value)
         if transform_offset is not None:
             AddTransform(builder, transform_offset)
         return End(builder)
@@ -558,8 +566,9 @@ class RegistryRelation:
         columns = []
         name = ""
         pointer = ""
+        source = RegistryFieldSource(0)
         transform = ""
-        return cls(columns, name, pointer, transform)
+        return cls(columns, name, pointer, source, transform)
 
     def __eq__(self, other) -> bool:
         eq = True
@@ -569,6 +578,7 @@ class RegistryRelation:
             eq = eq and self.columns[i] == other.columns[i]
         eq = eq and self.name == other.name
         eq = eq and self.pointer == other.pointer
+        eq = eq and self.source == other.source
         eq = eq and self.transform == other.transform
 
         return eq

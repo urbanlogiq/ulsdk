@@ -384,6 +384,13 @@ export class RegistryRelation {
 
   private _pointer!: string;
 
+/**
+ *  What `pointer` reads: the parsed source document (the default, as every
+ *  relation before it), or the governed object's own fields — a document
+ *  kind whose source is text lists from the object.
+ */
+  private _source!: number;
+
   private _transform!: string | null;
 
   constructor(arg?: FbsRegistryRelation | Uint8Array) {
@@ -397,6 +404,7 @@ export class RegistryRelation {
       this._columns = [];
       this._name = '';
       this._pointer = '';
+      this._source = 0;
       this._transform = null;
     }
   }
@@ -408,6 +416,7 @@ export class RegistryRelation {
     });
     this._name = fbs.name() ?? '';
     this._pointer = fbs.pointer() ?? '';
+    this._source = fbs.source();
     this._transform = fbs.transform();
   }
 
@@ -435,6 +444,14 @@ export class RegistryRelation {
     this._pointer = value;
   }
 
+  get source(): number {
+    return this._source;
+  }
+
+  set source(value: number) {
+    this._source = value;
+  }
+
   get transform(): string | null {
     return this._transform;
   }
@@ -448,6 +465,7 @@ export class RegistryRelation {
     t.columns = this._columns.map(item => item.toFbsT());
     t.name = this._name;
     t.pointer = this._pointer;
+    t.source = this._source;
     t.transform = this._transform;
     return t;
   }

@@ -25,6 +25,7 @@ pub mod entity_generated;
 pub mod exploration_generated;
 pub mod fs_generated;
 pub mod fun_generated;
+pub mod governed_document_generated;
 pub mod graph_generated;
 pub mod id_generated;
 pub mod job_generated;

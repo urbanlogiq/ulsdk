@@ -175,6 +175,7 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const RegistryRelation &
     instance_builder.add_columns(columns_offset);
     instance_builder.add_name(name_offset);
     instance_builder.add_pointer(pointer_offset);
+    instance_builder.add_source(o.source_);
     if (transform_offset.has_value()) {
         instance_builder.add_transform(transform_offset.value());
     }
@@ -193,6 +194,7 @@ RegistryRelation::RegistryRelation()
     : columns_()
     , name_()
     , pointer_()
+    , source_(RegistryFieldSource(0))
     , transform_(std::nullopt) {
 }
 
@@ -204,6 +206,7 @@ RegistryRelation::RegistryRelation(const ::RegistryRelation *root)
     : columns_()
     , name_()
     , pointer_()
+    , source_(RegistryFieldSource(0))
     , transform_(std::nullopt) {
     if (root == nullptr) {
         throw std::runtime_error("cannot deserialize flatbuffer type");
@@ -218,6 +221,7 @@ RegistryRelation::RegistryRelation(const ::RegistryRelation *root)
     }
         name_ = std::string(*root->name()->begin(), *root->name()->end());
         pointer_ = std::string(*root->pointer()->begin(), *root->pointer()->end());
+    source_ = root->source();
     if (root->transform() != nullptr) {
         transform_ = std::string(*root->transform()->begin(), *root->transform()->end());
     }
@@ -232,6 +236,9 @@ RegistryRelation::operator==(const RegistryRelation &rhs) const {
         return false;
     }
     if (this->pointer_ != rhs.pointer_) {
+        return false;
+    }
+    if (this->source_ != rhs.source_) {
         return false;
     }
     if (this->transform_ != rhs.transform_) {
