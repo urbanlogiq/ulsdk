@@ -7,8 +7,8 @@ All access to UrbanLogiq systems requires some sort of authentication, typically
 The API keys contain a Secret Key and an Access Key ID. The Secret Key is used to sign the requests and must be kept secret. Please do not deploy API keys in plain text to user applications or public repositories.
 
 API keys can be managed through our API key portal:
-* [US environments](https://home.urbanlogiq.us/admin/keys)
-* [Canadian environments](https://home.urbanlogiq.ca/admin/keys)
+* [US environments](https://home.urbanlogiq.us/settings/keys)
+* [Canadian environments](https://home.urbanlogiq.ca/settings/keys)
 
 To verify the keys are setup properly, you can call the `bootstrap` API, which returns basic user information. Please see the example sections below for how to call the `bootstrap` API.
 
