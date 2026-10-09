@@ -202,6 +202,64 @@ def test_get_current_user():
             break
     assert success, "test was unable to complete with retries"
 
+def test_get_own_namespace():
+    user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
+    access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None
+    secret_key = os.environ["CA_SECRET_KEY"] if "CA_SECRET_KEY" in os.environ else None
+
+    if user == None or access_key is None or secret_key is None:
+        raise Exception("cannot run test as no credentials are specified")
+    key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
+    key_ctx = ApiKeyContext(key, Environment.Stage)
+    ctx = TestContext(key_ctx)
+    success = False
+    for i in range(5):
+        expected = OwnNamespace.make_default()
+        expected_bytes = json.dumps(expected.to_dict()).encode('utf-8')
+        ctx.set_response(expected_bytes);
+        try:
+            result = get_own_namespace(
+                ctx
+            )
+            success = True
+        except Exception as e:
+            time.sleep(i + 1)
+            continue
+        assert result == expected
+        if success:
+            break
+    assert success, "test was unable to complete with retries"
+
+def test_get_namespace():
+    user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
+    access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None
+    secret_key = os.environ["CA_SECRET_KEY"] if "CA_SECRET_KEY" in os.environ else None
+
+    if user == None or access_key is None or secret_key is None:
+        raise Exception("cannot run test as no credentials are specified")
+    key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
+    key_ctx = ApiKeyContext(key, Environment.Stage)
+    ctx = TestContext(key_ctx)
+    p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    success = False
+    for i in range(5):
+        expected = Namespace.make_default()
+        expected_bytes = json.dumps(expected.to_dict()).encode('utf-8')
+        ctx.set_response(expected_bytes);
+        try:
+            result = get_namespace(
+                ctx,
+                p0
+            )
+            success = True
+        except Exception as e:
+            time.sleep(i + 1)
+            continue
+        assert result == expected
+        if success:
+            break
+    assert success, "test was unable to complete with retries"
+
 def test_create_user():
     user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
     access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None

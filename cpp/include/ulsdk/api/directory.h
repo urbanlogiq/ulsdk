@@ -206,6 +206,46 @@ struct AdUserWithAuditLog {
 std::vector<uint8_t>
 to_bytes(const AdUserWithAuditLog &o);
 
+struct OwnNamespace {
+    std::string holder_id_;
+    std::string holder_kind_;
+    std::vector<std::string> aliases_;
+    std::string preferred_;
+    std::optional<std::string> label_;
+    std::optional<std::string> sign_in_;
+    std::string assigned_at_;
+    std::string assigned_by_;
+    std::string status_;
+
+    OwnNamespace() = default;
+    OwnNamespace(const struct json_value_s *root);
+    bool operator==(const OwnNamespace &rhs) const;
+    bool operator!=(const OwnNamespace &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+std::vector<uint8_t>
+to_bytes(const OwnNamespace &o);
+
+struct Namespace {
+    std::string holder_id_;
+    std::string holder_kind_;
+    std::string preferred_;
+    std::string status_;
+    std::optional<std::string> label_;
+
+    Namespace() = default;
+    Namespace(const struct json_value_s *root);
+    bool operator==(const Namespace &rhs) const;
+    bool operator!=(const Namespace &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+std::vector<uint8_t>
+to_bytes(const Namespace &o);
+
 struct CreateUserRequest {
     std::optional<std::string> display_name_;
     std::optional<std::string> user_principal_name_;
@@ -469,6 +509,26 @@ Result<AdUserWithAuditLog>
 get_current_user(
     ul::RequestContext &ctx,
     std::optional<bool> audit_log
+);
+
+/**
+ * Retrieves the current user's namespace, assigning one from their sign-in address on first ask.
+ * @return The current user's namespace record and its status.
+ */
+Result<OwnNamespace>
+get_own_namespace(
+    ul::RequestContext &ctx
+);
+
+/**
+ * Looks up the holder of a namespace alias. A person holder is never named; a group's label is given.
+ * @param alias The alias to look up
+ * @return The holder's id and kind (user or group), its preferred alias and status (active or orphaned), and a group's label.
+ */
+Result<Namespace>
+get_namespace(
+    ul::RequestContext &ctx,
+    const std::string &alias
 );
 
 /**

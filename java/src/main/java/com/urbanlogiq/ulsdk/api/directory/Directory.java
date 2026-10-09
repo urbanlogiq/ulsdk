@@ -168,6 +168,46 @@ public final class Directory {
     }
 
     /**
+     * Retrieves the current user's namespace, assigning one from their sign-in address on first ask.
+     * @return The current user's namespace record and its status.
+     */
+    public static com.urbanlogiq.ulsdk.api.directory.OwnNamespace getOwnNamespace(
+        com.urbanlogiq.ulsdk.RequestContext ctx
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/directory/v1/user/namespace";
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+
+        byte[] res = ctx.get(path, params, headers);
+        String jsonString = new String(res, java.nio.charset.StandardCharsets.UTF_8);
+        org.json.JSONObject json = new org.json.JSONObject(jsonString);
+        return new com.urbanlogiq.ulsdk.api.directory.OwnNamespace(json);
+    }
+
+    /**
+     * Looks up the holder of a namespace alias. A person holder is never named; a group's label is given.
+     * 
+     * @param ctx A request context object
+     * @param alias The alias to look up
+     * @return The holder's id and kind (user or group), its preferred alias and status (active or orphaned), and a group's label.
+     */
+    public static com.urbanlogiq.ulsdk.api.directory.Namespace getNamespace(
+        com.urbanlogiq.ulsdk.RequestContext ctx,
+        String alias
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/directory/v1/namespace/:alias";
+        path = path.replace(":alias", alias.toString());
+
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+
+        byte[] res = ctx.get(path, params, headers);
+        String jsonString = new String(res, java.nio.charset.StandardCharsets.UTF_8);
+        org.json.JSONObject json = new org.json.JSONObject(jsonString);
+        return new com.urbanlogiq.ulsdk.api.directory.Namespace(json);
+    }
+
+    /**
      * Creates a new user in the directory.
      * 
      * @param ctx A request context object

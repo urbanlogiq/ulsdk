@@ -1730,6 +1730,348 @@ to_bytes(const AdUserWithAuditLog &o) {
     return std::vector<uint8_t>(str.begin(), str.end());
 }
 
+OwnNamespace::OwnNamespace(const struct json_value_s *root)
+    : holder_id_(std::string())
+    , holder_kind_(std::string())
+    , aliases_()
+    , preferred_(std::string())
+    , label_(std::nullopt)
+    , sign_in_(std::nullopt)
+    , assigned_at_(std::string())
+    , assigned_by_(std::string())
+    , status_(std::string()) {
+    if (root->type != json_type_object) {
+        throw std::runtime_error("expected json value to be of type object");
+    }
+
+    const struct json_object_s *object = static_cast<const struct json_object_s *>(root->payload);
+    const struct json_object_element_s *e = object->start;
+
+    while (e != nullptr) {
+        if (std::strcmp(e->name->string, "holderId") == 0) {
+            const struct json_value_s *own_namespace_value = e->value;
+
+            if (own_namespace_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *holder_id__str = static_cast<const struct json_string_s *>(own_namespace_value->payload);
+            holder_id_ = std::string(holder_id__str->string);
+        } else if (std::strcmp(e->name->string, "holderKind") == 0) {
+            const struct json_value_s *own_namespace_value = e->value;
+
+            if (own_namespace_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *holder_kind__str = static_cast<const struct json_string_s *>(own_namespace_value->payload);
+            holder_kind_ = std::string(holder_kind__str->string);
+        } else if (std::strcmp(e->name->string, "aliases") == 0) {
+            const struct json_value_s *own_namespace_value = e->value;
+
+            if (own_namespace_value->type != json_type_array) {
+                throw std::runtime_error("expected field to be of type array");
+            }
+
+            const struct json_array_s *aliases__array = static_cast<const struct json_array_s *>(own_namespace_value->payload);
+            const struct json_array_element_s *aliases__element = aliases__array->start;
+            std::vector<std::string> aliases__vec = std::vector<std::string>();
+            while (aliases__element != nullptr) {
+                const struct json_value_s *own_namespace_value_0 = aliases__element->value;
+                std::string aliases__value;
+            if (own_namespace_value_0->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *aliases__value_str = static_cast<const struct json_string_s *>(own_namespace_value_0->payload);
+            aliases__value = std::string(aliases__value_str->string);
+                aliases__vec.push_back(aliases__value);
+                aliases__element = aliases__element->next;
+            }
+            aliases_ = aliases__vec;
+        } else if (std::strcmp(e->name->string, "preferred") == 0) {
+            const struct json_value_s *own_namespace_value = e->value;
+
+            if (own_namespace_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *preferred__str = static_cast<const struct json_string_s *>(own_namespace_value->payload);
+            preferred_ = std::string(preferred__str->string);
+        } else if (std::strcmp(e->name->string, "label") == 0) {
+            const struct json_value_s *own_namespace_value = e->value;
+
+            if (own_namespace_value->type == json_type_null) {
+                label_ = std::nullopt;
+            } else {
+                if (own_namespace_value->type != json_type_string) {
+                    throw std::runtime_error("expected field to be of type string");
+                }
+
+                const struct json_string_s *label__str = static_cast<const struct json_string_s *>(own_namespace_value->payload);
+                label_ = std::string(label__str->string);
+            }
+        } else if (std::strcmp(e->name->string, "signIn") == 0) {
+            const struct json_value_s *own_namespace_value = e->value;
+
+            if (own_namespace_value->type == json_type_null) {
+                sign_in_ = std::nullopt;
+            } else {
+                if (own_namespace_value->type != json_type_string) {
+                    throw std::runtime_error("expected field to be of type string");
+                }
+
+                const struct json_string_s *sign_in__str = static_cast<const struct json_string_s *>(own_namespace_value->payload);
+                sign_in_ = std::string(sign_in__str->string);
+            }
+        } else if (std::strcmp(e->name->string, "assignedAt") == 0) {
+            const struct json_value_s *own_namespace_value = e->value;
+
+            if (own_namespace_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *assigned_at__str = static_cast<const struct json_string_s *>(own_namespace_value->payload);
+            assigned_at_ = std::string(assigned_at__str->string);
+        } else if (std::strcmp(e->name->string, "assignedBy") == 0) {
+            const struct json_value_s *own_namespace_value = e->value;
+
+            if (own_namespace_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *assigned_by__str = static_cast<const struct json_string_s *>(own_namespace_value->payload);
+            assigned_by_ = std::string(assigned_by__str->string);
+        } else if (std::strcmp(e->name->string, "status") == 0) {
+            const struct json_value_s *own_namespace_value = e->value;
+
+            if (own_namespace_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *status__str = static_cast<const struct json_string_s *>(own_namespace_value->payload);
+            status_ = std::string(status__str->string);
+        }
+
+        e = e->next;
+    }
+}
+
+bool
+OwnNamespace::operator==(const OwnNamespace&rhs) const {
+    if (this->holder_id_ != rhs.holder_id_) {
+        return false;
+    }
+    if (this->holder_kind_ != rhs.holder_kind_) {
+        return false;
+    }
+    if (this->aliases_ != rhs.aliases_) {
+        return false;
+    }
+    if (this->preferred_ != rhs.preferred_) {
+        return false;
+    }
+    if (this->label_ != rhs.label_) {
+        return false;
+    }
+    if (this->sign_in_ != rhs.sign_in_) {
+        return false;
+    }
+    if (this->assigned_at_ != rhs.assigned_at_) {
+        return false;
+    }
+    if (this->assigned_by_ != rhs.assigned_by_) {
+        return false;
+    }
+    if (this->status_ != rhs.status_) {
+        return false;
+    }
+    return true;
+}
+
+std::vector<uint8_t>
+to_bytes(const OwnNamespace &o) {
+    std::stringstream ss;
+    ss << "{";
+    ss << "\"holderId\":";
+    ss << "\"" << o.holder_id_ << "\"";
+    ss << ",";
+
+    ss << "\"holderKind\":";
+    ss << "\"" << o.holder_kind_ << "\"";
+    ss << ",";
+
+    ss << "\"aliases\":";
+    ss << "[";
+    for (const auto &i : o.aliases_) {
+        ss << "\"" << i << "\"";
+        ss << ",";
+    }
+    if (!o.aliases_.empty()) {
+        ss.seekp(-1, ss.cur);
+    }
+    ss << "]";
+    ss << ",";
+
+    ss << "\"preferred\":";
+    ss << "\"" << o.preferred_ << "\"";
+    ss << ",";
+
+    if (o.label_.has_value()) {
+        ss << "\"label\":";
+        const auto &label__value = o.label_.value();
+        ss << "\"" << label__value << "\"";
+        ss << ",";
+    }
+
+    if (o.sign_in_.has_value()) {
+        ss << "\"signIn\":";
+        const auto &sign_in__value = o.sign_in_.value();
+        ss << "\"" << sign_in__value << "\"";
+        ss << ",";
+    }
+
+    ss << "\"assignedAt\":";
+    ss << "\"" << o.assigned_at_ << "\"";
+    ss << ",";
+
+    ss << "\"assignedBy\":";
+    ss << "\"" << o.assigned_by_ << "\"";
+    ss << ",";
+
+    ss << "\"status\":";
+    ss << "\"" << o.status_ << "\"";
+    std::string str = ss.str();
+    if (str.back() == ',') {
+        str.pop_back();
+    }
+    str.push_back('}');
+    return std::vector<uint8_t>(str.begin(), str.end());
+}
+
+Namespace::Namespace(const struct json_value_s *root)
+    : holder_id_(std::string())
+    , holder_kind_(std::string())
+    , preferred_(std::string())
+    , status_(std::string())
+    , label_(std::nullopt) {
+    if (root->type != json_type_object) {
+        throw std::runtime_error("expected json value to be of type object");
+    }
+
+    const struct json_object_s *object = static_cast<const struct json_object_s *>(root->payload);
+    const struct json_object_element_s *e = object->start;
+
+    while (e != nullptr) {
+        if (std::strcmp(e->name->string, "holderId") == 0) {
+            const struct json_value_s *namespace_value = e->value;
+
+            if (namespace_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *holder_id__str = static_cast<const struct json_string_s *>(namespace_value->payload);
+            holder_id_ = std::string(holder_id__str->string);
+        } else if (std::strcmp(e->name->string, "holderKind") == 0) {
+            const struct json_value_s *namespace_value = e->value;
+
+            if (namespace_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *holder_kind__str = static_cast<const struct json_string_s *>(namespace_value->payload);
+            holder_kind_ = std::string(holder_kind__str->string);
+        } else if (std::strcmp(e->name->string, "preferred") == 0) {
+            const struct json_value_s *namespace_value = e->value;
+
+            if (namespace_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *preferred__str = static_cast<const struct json_string_s *>(namespace_value->payload);
+            preferred_ = std::string(preferred__str->string);
+        } else if (std::strcmp(e->name->string, "status") == 0) {
+            const struct json_value_s *namespace_value = e->value;
+
+            if (namespace_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *status__str = static_cast<const struct json_string_s *>(namespace_value->payload);
+            status_ = std::string(status__str->string);
+        } else if (std::strcmp(e->name->string, "label") == 0) {
+            const struct json_value_s *namespace_value = e->value;
+
+            if (namespace_value->type == json_type_null) {
+                label_ = std::nullopt;
+            } else {
+                if (namespace_value->type != json_type_string) {
+                    throw std::runtime_error("expected field to be of type string");
+                }
+
+                const struct json_string_s *label__str = static_cast<const struct json_string_s *>(namespace_value->payload);
+                label_ = std::string(label__str->string);
+            }
+        }
+
+        e = e->next;
+    }
+}
+
+bool
+Namespace::operator==(const Namespace&rhs) const {
+    if (this->holder_id_ != rhs.holder_id_) {
+        return false;
+    }
+    if (this->holder_kind_ != rhs.holder_kind_) {
+        return false;
+    }
+    if (this->preferred_ != rhs.preferred_) {
+        return false;
+    }
+    if (this->status_ != rhs.status_) {
+        return false;
+    }
+    if (this->label_ != rhs.label_) {
+        return false;
+    }
+    return true;
+}
+
+std::vector<uint8_t>
+to_bytes(const Namespace &o) {
+    std::stringstream ss;
+    ss << "{";
+    ss << "\"holderId\":";
+    ss << "\"" << o.holder_id_ << "\"";
+    ss << ",";
+
+    ss << "\"holderKind\":";
+    ss << "\"" << o.holder_kind_ << "\"";
+    ss << ",";
+
+    ss << "\"preferred\":";
+    ss << "\"" << o.preferred_ << "\"";
+    ss << ",";
+
+    ss << "\"status\":";
+    ss << "\"" << o.status_ << "\"";
+    ss << ",";
+
+    if (o.label_.has_value()) {
+        ss << "\"label\":";
+        const auto &label__value = o.label_.value();
+        ss << "\"" << label__value << "\"";
+    }
+
+    std::string str = ss.str();
+    if (str.back() == ',') {
+        str.pop_back();
+    }
+    str.push_back('}');
+    return std::vector<uint8_t>(str.begin(), str.end());
+}
+
 CreateUserRequest::CreateUserRequest(const struct json_value_s *root)
     : display_name_(std::nullopt)
     , user_principal_name_(std::nullopt)
@@ -3146,6 +3488,53 @@ get_current_user(
         return Result<AdUserWithAuditLog>(Error("failed to parse JSON"));
     }
     return AdUserWithAuditLog(root.get());
+}
+
+Result<OwnNamespace>
+get_own_namespace(
+    ul::RequestContext &ctx
+) {
+    std::string path = "/v1/api/ulv2/directory/v1/user/namespace";
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+    const Result<std::vector<uint8_t>> res = ctx.get(path, params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<OwnNamespace>(error);
+    }
+    const std::vector<uint8_t> res_bytes = std::get<std::vector<uint8_t>>(res);
+    const ul::AutoRelease<struct json_value_s> root = ul::AutoRelease(json_parse_ex(res_bytes.data(), res_bytes.size(), json_parse_flags_allow_json5, NULL, NULL, NULL));
+    if (root == nullptr) {
+        return Result<OwnNamespace>(Error("failed to parse JSON"));
+    }
+    return OwnNamespace(root.get());
+}
+
+Result<Namespace>
+get_namespace(
+    ul::RequestContext &ctx,
+    const std::string &alias
+) {
+    std::string path = "/v1/api/ulv2/directory/v1/namespace/:alias";
+    const size_t alias_idx = path.find(":alias");
+    path.replace(alias_idx, 6, alias);
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+    const Result<std::vector<uint8_t>> res = ctx.get(path, params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<Namespace>(error);
+    }
+    const std::vector<uint8_t> res_bytes = std::get<std::vector<uint8_t>>(res);
+    const ul::AutoRelease<struct json_value_s> root = ul::AutoRelease(json_parse_ex(res_bytes.data(), res_bytes.size(), json_parse_flags_allow_json5, NULL, NULL, NULL));
+    if (root == nullptr) {
+        return Result<Namespace>(Error("failed to parse JSON"));
+    }
+    return Namespace(root.get());
 }
 
 Result<CreateUser>

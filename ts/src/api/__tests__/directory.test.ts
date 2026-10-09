@@ -98,6 +98,36 @@ describe('getCurrentUser', () => {
   });
 });
 
+describe('getOwnNamespace', () => {
+  it('testGetOwnNamespace', async () => {
+    const ctx = new TestContext();
+    ctx.setResponse(new TextEncoder().encode('{}'));
+    try {
+          await directory.getOwnNamespace(
+        ctx
+      );
+    } catch (_) {
+      // Expected for mock tests with empty/invalid responses
+    }
+  });
+});
+
+describe('getNamespace', () => {
+  it('testGetNamespace', async () => {
+    const ctx = new TestContext();
+    const p0 = 'test';
+    ctx.setResponse(new TextEncoder().encode('{}'));
+    try {
+          await directory.getNamespace(
+        ctx,
+        p0
+      );
+    } catch (_) {
+      // Expected for mock tests with empty/invalid responses
+    }
+  });
+});
+
 describe('createUser', () => {
   it('testCreateUser', async () => {
     const ctx = new TestContext();

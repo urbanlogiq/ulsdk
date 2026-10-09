@@ -146,6 +146,35 @@ pub struct AdUserWithAuditLog {
 }
 
 #[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct OwnNamespace {
+    #[serde(rename = "holderId")]
+    holder_id: String,
+    #[serde(rename = "holderKind")]
+    holder_kind: String,
+    aliases: Vec<String>,
+    preferred: String,
+    label: Option<String>,
+    #[serde(rename = "signIn")]
+    sign_in: Option<String>,
+    #[serde(rename = "assignedAt")]
+    assigned_at: String,
+    #[serde(rename = "assignedBy")]
+    assigned_by: String,
+    status: String,
+}
+
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct Namespace {
+    #[serde(rename = "holderId")]
+    holder_id: String,
+    #[serde(rename = "holderKind")]
+    holder_kind: String,
+    preferred: String,
+    status: String,
+    label: Option<String>,
+}
+
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct CreateUserRequest {
     #[serde(rename = "displayName")]
     display_name: Option<String>,
@@ -356,6 +385,35 @@ pub async fn get_current_user(
     }
 
     let res = ctx.get(&path, Some(params), None).await?;
+    serde_json::from_slice(&res).map_err(Error::from)
+}
+
+/// Retrieves the current user's namespace, assigning one from their sign-in address on first ask.
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+///
+/// Returns
+/// * The current user's namespace record and its status.
+pub async fn get_own_namespace(ctx: &dyn RequestContext) -> Result<OwnNamespace, Error> {
+    let path = "/v1/api/ulv2/directory/v1/user/namespace";
+    let res = ctx.get(&path, None, None).await?;
+    serde_json::from_slice(&res).map_err(Error::from)
+}
+
+/// Looks up the holder of a namespace alias. A person holder is never named; a group's label is given.
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+/// * `alias` - The alias to look up
+///
+/// Returns
+/// * The holder's id and kind (user or group), its preferred alias and status (active or orphaned), and a group's label.
+pub async fn get_namespace(ctx: &dyn RequestContext, alias: &str) -> Result<Namespace, Error> {
+    let path = "/v1/api/ulv2/directory/v1/namespace/:alias".replace(":alias", alias);
+    let res = ctx.get(&path, None, None).await?;
     serde_json::from_slice(&res).map_err(Error::from)
 }
 
@@ -930,6 +988,81 @@ mod tests {
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
             ctx.set_response(expected_bytes.clone());
             let result = get_current_user(&ctx, q0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
+    }
+
+    #[tokio::test]
+    async fn test_get_own_namespace() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+
+        for i in 0..5 {
+            let expected = OwnNamespace::default();
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_own_namespace(&ctx).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
+    }
+
+    #[tokio::test]
+    async fn test_get_namespace() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+
+        for i in 0..5 {
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let expected = Namespace::default();
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_namespace(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
                 Err(e) => {

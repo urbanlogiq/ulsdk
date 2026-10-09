@@ -211,6 +211,70 @@ func TestGetCurrentUser(t *testing.T) {
 	}
 }
 
+func TestGetOwnNamespace(t *testing.T) {
+	ctx := ulsdk.NewTestContextFromEnv()
+	if ctx == nil {
+		t.Skip("credentials not set, skipping API test")
+	}
+
+
+	success := false
+	for i := 0; i < 5; i++ {
+		expected := &OwnNamespace{}
+		expectedBytes, err := json.Marshal(expected)
+		if err != nil {
+			t.Fatalf("failed to marshal expected: %v", err)
+		}
+		ctx.SetResponse(expectedBytes)
+		result, err := GetOwnNamespace(
+			ctx,
+		)
+		if err != nil {
+			time.Sleep(time.Duration(i+1) * time.Second)
+			continue
+		}
+		_ = result
+		success = true
+		break
+	}
+	if !success {
+		t.Fatal("test was unable to complete with retries")
+	}
+}
+
+func TestGetNamespace(t *testing.T) {
+	ctx := ulsdk.NewTestContextFromEnv()
+	if ctx == nil {
+		t.Skip("credentials not set, skipping API test")
+	}
+
+	p0 := "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+
+	success := false
+	for i := 0; i < 5; i++ {
+		expected := &Namespace{}
+		expectedBytes, err := json.Marshal(expected)
+		if err != nil {
+			t.Fatalf("failed to marshal expected: %v", err)
+		}
+		ctx.SetResponse(expectedBytes)
+		result, err := GetNamespace(
+			ctx,
+			p0,
+		)
+		if err != nil {
+			time.Sleep(time.Duration(i+1) * time.Second)
+			continue
+		}
+		_ = result
+		success = true
+		break
+	}
+	if !success {
+		t.Fatal("test was unable to complete with retries")
+	}
+}
+
 func TestCreateUser(t *testing.T) {
 	ctx := ulsdk.NewTestContextFromEnv()
 	if ctx == nil {

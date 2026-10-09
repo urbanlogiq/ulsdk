@@ -941,6 +941,193 @@ class AdUserWithAuditLog:
         return cls(displayName, id, userPrincipalName, otherMails, department, orgId, createdDateTime, groups, accountEnabled, auditLog, identities, creationType)
 
 @dataclass
+class OwnNamespace:
+    holder_id: "str"
+    holder_kind: "str"
+    aliases: "List[str]"
+    preferred: "str"
+    label: "Optional[str]"
+    sign_in: "Optional[str]"
+    assigned_at: "str"
+    assigned_by: "str"
+    status: "str"
+
+    def to_dict(self) -> Dict[str, Any]:
+        o = dict()
+        o["holderId"] = self.holder_id
+        o["holderKind"] = self.holder_kind
+        aliases_list = []
+        for item in self.aliases:
+            aliases_var = item
+            aliases_list.append(aliases_var)
+        o["aliases"] = aliases_list
+        o["preferred"] = self.preferred
+        o["label"] = None
+        if self.label is not None:
+            o["label"] = self.label
+        o["signIn"] = None
+        if self.sign_in is not None:
+            o["signIn"] = self.sign_in
+        o["assignedAt"] = self.assigned_at
+        o["assignedBy"] = self.assigned_by
+        o["status"] = self.status
+        return o
+
+    @classmethod
+    def from_dict(cls, o: Dict[str, Any]) -> Self:
+        holder_id = None
+        holder_kind = None
+        aliases = None
+        preferred = None
+        label = None
+        sign_in = None
+        assigned_at = None
+        assigned_by = None
+        status = None
+
+        for key in o:
+            if key == "holderId":
+                holder_id_var = o[key]
+                assert type(holder_id_var) is str
+                holder_id = holder_id_var
+            elif key == "holderKind":
+                holder_kind_var = o[key]
+                assert type(holder_kind_var) is str
+                holder_kind = holder_kind_var
+            elif key == "aliases":
+                aliases_var = o[key]
+                assert type(aliases_var) is list
+                aliases = []
+                for item in aliases_var:
+                    aliases_item_var = item
+                    assert type(aliases_item_var) is str
+                    aliases_item = aliases_item_var
+                    aliases.append(aliases_item)
+            elif key == "preferred":
+                preferred_var = o[key]
+                assert type(preferred_var) is str
+                preferred = preferred_var
+            elif key == "label":
+                if o[key] is not None:
+                    label_var = o[key]
+                    assert type(label_var) is str
+                    label = label_var
+                else:
+                    label = None
+            elif key == "signIn":
+                if o[key] is not None:
+                    sign_in_var = o[key]
+                    assert type(sign_in_var) is str
+                    sign_in = sign_in_var
+                else:
+                    sign_in = None
+            elif key == "assignedAt":
+                assigned_at_var = o[key]
+                assert type(assigned_at_var) is str
+                assigned_at = assigned_at_var
+            elif key == "assignedBy":
+                assigned_by_var = o[key]
+                assert type(assigned_by_var) is str
+                assigned_by = assigned_by_var
+            elif key == "status":
+                status_var = o[key]
+                assert type(status_var) is str
+                status = status_var
+
+        assert holder_id is not None
+        assert holder_kind is not None
+        assert aliases is not None
+        assert preferred is not None
+        assert assigned_at is not None
+        assert assigned_by is not None
+        assert status is not None
+
+        return cls(holder_id, holder_kind, aliases, preferred, label, sign_in, assigned_at, assigned_by, status)
+
+    @classmethod
+    def make_default(cls) -> Self:
+        holderId = ""
+        holderKind = ""
+        aliases = []
+        preferred = ""
+        label = None
+        signIn = None
+        assignedAt = ""
+        assignedBy = ""
+        status = ""
+
+        return cls(holderId, holderKind, aliases, preferred, label, signIn, assignedAt, assignedBy, status)
+
+@dataclass
+class Namespace:
+    holder_id: "str"
+    holder_kind: "str"
+    preferred: "str"
+    status: "str"
+    label: "Optional[str]"
+
+    def to_dict(self) -> Dict[str, Any]:
+        o = dict()
+        o["holderId"] = self.holder_id
+        o["holderKind"] = self.holder_kind
+        o["preferred"] = self.preferred
+        o["status"] = self.status
+        o["label"] = None
+        if self.label is not None:
+            o["label"] = self.label
+        return o
+
+    @classmethod
+    def from_dict(cls, o: Dict[str, Any]) -> Self:
+        holder_id = None
+        holder_kind = None
+        preferred = None
+        status = None
+        label = None
+
+        for key in o:
+            if key == "holderId":
+                holder_id_var = o[key]
+                assert type(holder_id_var) is str
+                holder_id = holder_id_var
+            elif key == "holderKind":
+                holder_kind_var = o[key]
+                assert type(holder_kind_var) is str
+                holder_kind = holder_kind_var
+            elif key == "preferred":
+                preferred_var = o[key]
+                assert type(preferred_var) is str
+                preferred = preferred_var
+            elif key == "status":
+                status_var = o[key]
+                assert type(status_var) is str
+                status = status_var
+            elif key == "label":
+                if o[key] is not None:
+                    label_var = o[key]
+                    assert type(label_var) is str
+                    label = label_var
+                else:
+                    label = None
+
+        assert holder_id is not None
+        assert holder_kind is not None
+        assert preferred is not None
+        assert status is not None
+
+        return cls(holder_id, holder_kind, preferred, status, label)
+
+    @classmethod
+    def make_default(cls) -> Self:
+        holderId = ""
+        holderKind = ""
+        preferred = ""
+        status = ""
+        label = None
+
+        return cls(holderId, holderKind, preferred, status, label)
+
+@dataclass
 class CreateUserRequest:
     display_name: "Optional[str]"
     user_principal_name: "Optional[str]"
@@ -1777,6 +1964,48 @@ def get_current_user(
     res = ctx.get(path, params=params, headers=headers)
     res_dict = json.loads(res)
     return AdUserWithAuditLog.from_dict(res_dict)
+
+def get_own_namespace(
+    ctx: RequestContext,
+) -> OwnNamespace:
+    """Retrieves the current user's namespace, assigning one from their sign-in address on first ask.
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+
+    Returns:
+    The current user's namespace record and its status.
+    """
+
+    path = "/v1/api/ulv2/directory/v1/user/namespace"
+    params = dict()
+    headers = dict()
+    res = ctx.get(path, params=params, headers=headers)
+    res_dict = json.loads(res)
+    return OwnNamespace.from_dict(res_dict)
+
+def get_namespace(
+    ctx: RequestContext,
+    alias: str,
+) -> Namespace:
+    """Looks up the holder of a namespace alias. A person holder is never named; a group's label is given.
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+    alias: str -- The alias to look up
+
+    Returns:
+    The holder's id and kind (user or group), its preferred alias and status (active or orphaned), and a group's label.
+    """
+
+    path = "/v1/api/ulv2/directory/v1/namespace/:alias"
+    path = path.replace(":alias", str(alias), 1)
+
+    params = dict()
+    headers = dict()
+    res = ctx.get(path, params=params, headers=headers)
+    res_dict = json.loads(res)
+    return Namespace.from_dict(res_dict)
 
 def create_user(
     ctx: RequestContext,

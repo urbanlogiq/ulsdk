@@ -93,6 +93,26 @@ export interface AdUserWithAuditLog {
   creationType?: string;
 }
 
+export interface OwnNamespace {
+  holderId: string;
+  holderKind: string;
+  aliases: string[];
+  preferred: string;
+  label?: string;
+  signIn?: string;
+  assignedAt: string;
+  assignedBy: string;
+  status: string;
+}
+
+export interface Namespace {
+  holderId: string;
+  holderKind: string;
+  preferred: string;
+  status: string;
+  label?: string;
+}
+
 export interface CreateUserRequest {
   displayName?: string;
   userPrincipalName?: string;
@@ -291,6 +311,44 @@ export async function getCurrentUser(
       params.push([`audit_log`, auditLog.toString()]);
   }
 
+  const headers: Record<string, string> = {};
+
+  const res = await ctx.get(path, params, headers);
+  const json = JSON.parse(new TextDecoder().decode(res));
+  return json;
+}
+
+/**
+ * Retrieves the current user's namespace, assigning one from their sign-in address on first ask.
+ * @returns The current user's namespace record and its status.
+ */
+export async function getOwnNamespace(
+  ctx: RequestContext
+): Promise<OwnNamespace> {
+  let path = '/v1/api/ulv2/directory/v1/user/namespace';
+  const params: [string, string][] = [];
+  const headers: Record<string, string> = {};
+
+  const res = await ctx.get(path, params, headers);
+  const json = JSON.parse(new TextDecoder().decode(res));
+  return json;
+}
+
+/**
+ * Looks up the holder of a namespace alias. A person holder is never named; a group's label is given.
+ *
+ * @param ctx - A request context object
+ * @param alias - The alias to look up
+ * @returns The holder's id and kind (user or group), its preferred alias and status (active or orphaned), and a group's label.
+ */
+export async function getNamespace(
+  ctx: RequestContext,
+  alias: string
+): Promise<Namespace> {
+  let path = '/v1/api/ulv2/directory/v1/namespace/:alias';
+  path = path.replace(':alias', alias.toString());
+
+  const params: [string, string][] = [];
   const headers: Record<string, string> = {};
 
   const res = await ctx.get(path, params, headers);

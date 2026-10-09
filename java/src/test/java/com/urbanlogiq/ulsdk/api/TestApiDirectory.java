@@ -18,8 +18,10 @@ import com.urbanlogiq.ulsdk.api.directory.CreateUserRequest;
 import com.urbanlogiq.ulsdk.api.directory.DisplayNames;
 import com.urbanlogiq.ulsdk.api.directory.FlushedGatewayPods;
 import com.urbanlogiq.ulsdk.api.directory.GroupMembership;
+import com.urbanlogiq.ulsdk.api.directory.Namespace;
 import com.urbanlogiq.ulsdk.api.directory.Organization;
 import com.urbanlogiq.ulsdk.api.directory.OrganizationList;
+import com.urbanlogiq.ulsdk.api.directory.OwnNamespace;
 import com.urbanlogiq.ulsdk.api.directory.Principal;
 import com.urbanlogiq.ulsdk.api.directory.RenameOrganizationRequest;
 import com.urbanlogiq.ulsdk.api.directory.UpdateCurrentUser;
@@ -168,6 +170,50 @@ public final class TestApiDirectory {
         com.urbanlogiq.ulsdk.api.directory.AdUserWithAuditLog result = com.urbanlogiq.ulsdk.api.directory.Directory.getCurrentUser(
             ctx,
             q0
+        );
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
+    }
+
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
+    public void testGetOwnNamespace() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String caUser = System.getenv("CA_USER");
+        String caAccessKey = System.getenv("CA_ACCESS_KEY");
+        String caSecretKey = System.getenv("CA_SECRET_KEY");
+
+        if (caUser == null || caAccessKey == null || caSecretKey == null) {
+            throw new RuntimeException("user / key not present, cannot run tests");
+        }
+
+        com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
+        com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
+        com.urbanlogiq.ulsdk.api.directory.OwnNamespace expected = new com.urbanlogiq.ulsdk.api.directory.OwnNamespace();
+        byte[] expectedBytes = new org.json.JSONObject(expected.toMap()).toString().getBytes();
+        ctx.setResponse(expectedBytes);
+        com.urbanlogiq.ulsdk.api.directory.OwnNamespace result = com.urbanlogiq.ulsdk.api.directory.Directory.getOwnNamespace(
+            ctx
+        );
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
+    }
+
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
+    public void testGetNamespace() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String caUser = System.getenv("CA_USER");
+        String caAccessKey = System.getenv("CA_ACCESS_KEY");
+        String caSecretKey = System.getenv("CA_SECRET_KEY");
+
+        if (caUser == null || caAccessKey == null || caSecretKey == null) {
+            throw new RuntimeException("user / key not present, cannot run tests");
+        }
+
+        com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
+        com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
+        String p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        com.urbanlogiq.ulsdk.api.directory.Namespace expected = new com.urbanlogiq.ulsdk.api.directory.Namespace();
+        byte[] expectedBytes = new org.json.JSONObject(expected.toMap()).toString().getBytes();
+        ctx.setResponse(expectedBytes);
+        com.urbanlogiq.ulsdk.api.directory.Namespace result = com.urbanlogiq.ulsdk.api.directory.Directory.getNamespace(
+            ctx,
+            p0
         );
         org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }

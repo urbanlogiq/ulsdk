@@ -101,6 +101,26 @@ type AdUserWithAuditLog struct {
 	CreationType *string `json:"creationType,omitempty"`
 }
 
+type OwnNamespace struct {
+	HolderId string `json:"holderId"`
+	HolderKind string `json:"holderKind"`
+	Aliases []string `json:"aliases"`
+	Preferred string `json:"preferred"`
+	Label *string `json:"label,omitempty"`
+	SignIn *string `json:"signIn,omitempty"`
+	AssignedAt string `json:"assignedAt"`
+	AssignedBy string `json:"assignedBy"`
+	Status string `json:"status"`
+}
+
+type Namespace struct {
+	HolderId string `json:"holderId"`
+	HolderKind string `json:"holderKind"`
+	Preferred string `json:"preferred"`
+	Status string `json:"status"`
+	Label *string `json:"label,omitempty"`
+}
+
 type CreateUserRequest struct {
 	DisplayName *string `json:"displayName,omitempty"`
 	UserPrincipalName *string `json:"userPrincipalName,omitempty"`
@@ -304,6 +324,47 @@ func GetCurrentUser(ctx api.RequestContext, auditLog *bool) (*AdUserWithAuditLog
 		return nil, err
 	}
 	var result AdUserWithAuditLog
+	if err := json.Unmarshal(res, &result); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal JSON response: %w", err)
+	}
+	return &result, nil
+}
+
+// GetOwnNamespace -
+// Retrieves the current user's namespace, assigning one from their sign-in address on first ask.
+func GetOwnNamespace(ctx api.RequestContext) (*OwnNamespace, error) {
+	path := "/v1/api/ulv2/directory/v1/user/namespace"
+
+	params := [][2]string{}
+
+	headers := map[string]string{}
+
+	res, err := ctx.Get(path, params, headers)
+	if err != nil {
+		return nil, err
+	}
+	var result OwnNamespace
+	if err := json.Unmarshal(res, &result); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal JSON response: %w", err)
+	}
+	return &result, nil
+}
+
+// GetNamespace -
+// Looks up the holder of a namespace alias. A person holder is never named; a group's label is given.
+func GetNamespace(ctx api.RequestContext, alias string) (*Namespace, error) {
+	path := "/v1/api/ulv2/directory/v1/namespace/:alias"
+	path = strings.Replace(path, ":alias", fmt.Sprintf("%v", alias), 1)
+
+	params := [][2]string{}
+
+	headers := map[string]string{}
+
+	res, err := ctx.Get(path, params, headers)
+	if err != nil {
+		return nil, err
+	}
+	var result Namespace
 	if err := json.Unmarshal(res, &result); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal JSON response: %w", err)
 	}

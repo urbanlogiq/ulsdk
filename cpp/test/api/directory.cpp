@@ -217,6 +217,56 @@ test_get_current_user(ul::RequestContext &rctx) {
 ApiTest test_get_current_user_obj(test_get_current_user, "directory::get_current_user", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
+test_get_own_namespace(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::api::directory::OwnNamespace expected = ::ul::api::directory::OwnNamespace();
+    const std::vector<uint8_t> expected_bytes = ::ul::api::directory::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::directory::get_own_namespace(
+        ctx
+    );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::api::directory::OwnNamespace result_value = std::get<::ul::api::directory::OwnNamespace>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
+}
+
+ApiTest test_get_own_namespace_obj(test_get_own_namespace, "directory::get_own_namespace", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
+test_get_namespace(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const std::string p0 = std::string("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+    const ::ul::api::directory::Namespace expected = ::ul::api::directory::Namespace();
+    const std::vector<uint8_t> expected_bytes = ::ul::api::directory::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::directory::get_namespace(
+        ctx,
+        p0
+    );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::api::directory::Namespace result_value = std::get<::ul::api::directory::Namespace>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
+}
+
+ApiTest test_get_namespace_obj(test_get_namespace, "directory::get_namespace", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
 test_create_user(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     const ::ul::api::directory::CreateUserRequest body = ::ul::api::directory::CreateUserRequest();
