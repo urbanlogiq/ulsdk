@@ -1730,6 +1730,134 @@ to_bytes(const AdUserWithAuditLog &o) {
     return std::vector<uint8_t>(str.begin(), str.end());
 }
 
+GroupNamespace::GroupNamespace(const struct json_value_s *root)
+    : holder_id_(std::string())
+    , aliases_()
+    , preferred_(std::string())
+    , label_(std::nullopt) {
+    if (root->type != json_type_object) {
+        throw std::runtime_error("expected json value to be of type object");
+    }
+
+    const struct json_object_s *object = static_cast<const struct json_object_s *>(root->payload);
+    const struct json_object_element_s *e = object->start;
+
+    while (e != nullptr) {
+        if (std::strcmp(e->name->string, "holderId") == 0) {
+            const struct json_value_s *group_namespace_value = e->value;
+
+            if (group_namespace_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *holder_id__str = static_cast<const struct json_string_s *>(group_namespace_value->payload);
+            holder_id_ = std::string(holder_id__str->string);
+        } else if (std::strcmp(e->name->string, "aliases") == 0) {
+            const struct json_value_s *group_namespace_value = e->value;
+
+            if (group_namespace_value->type != json_type_array) {
+                throw std::runtime_error("expected field to be of type array");
+            }
+
+            const struct json_array_s *aliases__array = static_cast<const struct json_array_s *>(group_namespace_value->payload);
+            const struct json_array_element_s *aliases__element = aliases__array->start;
+            std::vector<std::string> aliases__vec = std::vector<std::string>();
+            while (aliases__element != nullptr) {
+                const struct json_value_s *group_namespace_value_0 = aliases__element->value;
+                std::string aliases__value;
+            if (group_namespace_value_0->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *aliases__value_str = static_cast<const struct json_string_s *>(group_namespace_value_0->payload);
+            aliases__value = std::string(aliases__value_str->string);
+                aliases__vec.push_back(aliases__value);
+                aliases__element = aliases__element->next;
+            }
+            aliases_ = aliases__vec;
+        } else if (std::strcmp(e->name->string, "preferred") == 0) {
+            const struct json_value_s *group_namespace_value = e->value;
+
+            if (group_namespace_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *preferred__str = static_cast<const struct json_string_s *>(group_namespace_value->payload);
+            preferred_ = std::string(preferred__str->string);
+        } else if (std::strcmp(e->name->string, "label") == 0) {
+            const struct json_value_s *group_namespace_value = e->value;
+
+            if (group_namespace_value->type == json_type_null) {
+                label_ = std::nullopt;
+            } else {
+                if (group_namespace_value->type != json_type_string) {
+                    throw std::runtime_error("expected field to be of type string");
+                }
+
+                const struct json_string_s *label__str = static_cast<const struct json_string_s *>(group_namespace_value->payload);
+                label_ = std::string(label__str->string);
+            }
+        }
+
+        e = e->next;
+    }
+}
+
+bool
+GroupNamespace::operator==(const GroupNamespace&rhs) const {
+    if (this->holder_id_ != rhs.holder_id_) {
+        return false;
+    }
+    if (this->aliases_ != rhs.aliases_) {
+        return false;
+    }
+    if (this->preferred_ != rhs.preferred_) {
+        return false;
+    }
+    if (this->label_ != rhs.label_) {
+        return false;
+    }
+    return true;
+}
+
+std::vector<uint8_t>
+to_bytes(const GroupNamespace &o) {
+    std::stringstream ss;
+    ss << "{";
+    ss << "\"holderId\":";
+    ss << "\"" << o.holder_id_ << "\"";
+    ss << ",";
+
+    ss << "\"aliases\":";
+    ss << "[";
+    for (const auto &i : o.aliases_) {
+        ss << "\"" << i << "\"";
+        ss << ",";
+    }
+    if (!o.aliases_.empty()) {
+        ss.seekp(-1, ss.cur);
+    }
+    ss << "]";
+    ss << ",";
+
+    ss << "\"preferred\":";
+    ss << "\"" << o.preferred_ << "\"";
+    ss << ",";
+
+    if (o.label_.has_value()) {
+        ss << "\"label\":";
+        const auto &label__value = o.label_.value();
+        ss << "\"" << label__value << "\"";
+    }
+
+    std::string str = ss.str();
+    if (str.back() == ',') {
+        str.pop_back();
+    }
+    str.push_back('}');
+    return std::vector<uint8_t>(str.begin(), str.end());
+}
+
 OwnNamespace::OwnNamespace(const struct json_value_s *root)
     : holder_id_(std::string())
     , holder_kind_(std::string())
@@ -1739,7 +1867,8 @@ OwnNamespace::OwnNamespace(const struct json_value_s *root)
     , sign_in_(std::nullopt)
     , assigned_at_(std::string())
     , assigned_by_(std::string())
-    , status_(std::string()) {
+    , status_(std::string())
+    , groups_(std::nullopt) {
     if (root->type != json_type_object) {
         throw std::runtime_error("expected json value to be of type object");
     }
@@ -1851,6 +1980,32 @@ OwnNamespace::OwnNamespace(const struct json_value_s *root)
 
             const struct json_string_s *status__str = static_cast<const struct json_string_s *>(own_namespace_value->payload);
             status_ = std::string(status__str->string);
+        } else if (std::strcmp(e->name->string, "groups") == 0) {
+            const struct json_value_s *own_namespace_value = e->value;
+
+            if (own_namespace_value->type == json_type_null) {
+                groups_ = std::nullopt;
+            } else {
+                if (own_namespace_value->type != json_type_array) {
+                    throw std::runtime_error("expected field to be of type array");
+                }
+
+                const struct json_array_s *groups__array = static_cast<const struct json_array_s *>(own_namespace_value->payload);
+                const struct json_array_element_s *groups__element = groups__array->start;
+                std::vector<GroupNamespace> groups__vec = std::vector<GroupNamespace>();
+                while (groups__element != nullptr) {
+                    const struct json_value_s *own_namespace_value_1 = groups__element->value;
+                    GroupNamespace groups__value;
+                    if (own_namespace_value_1->type != json_type_object) {
+                        throw std::runtime_error("expected field to be of type object");
+                    }
+
+                    groups__value = GroupNamespace(own_namespace_value_1);
+                    groups__vec.push_back(groups__value);
+                    groups__element = groups__element->next;
+                }
+                groups_ = groups__vec;
+            }
         }
 
         e = e->next;
@@ -1884,6 +2039,9 @@ OwnNamespace::operator==(const OwnNamespace&rhs) const {
         return false;
     }
     if (this->status_ != rhs.status_) {
+        return false;
+    }
+    if (this->groups_ != rhs.groups_) {
         return false;
     }
     return true;
@@ -1941,6 +2099,24 @@ to_bytes(const OwnNamespace &o) {
 
     ss << "\"status\":";
     ss << "\"" << o.status_ << "\"";
+    ss << ",";
+
+    if (o.groups_.has_value()) {
+        ss << "\"groups\":";
+        const auto &groups__value = o.groups_.value();
+        ss << "[";
+        for (const auto &i : groups__value) {
+            const std::vector<uint8_t> i_serialized = to_bytes(i);
+            const std::string i_str = std::string(i_serialized.begin(), i_serialized.end());
+            ss << i_str;
+            ss << ",";
+        }
+        if (!groups__value.empty()) {
+            ss.seekp(-1, ss.cur);
+        }
+        ss << "]";
+    }
+
     std::string str = ss.str();
     if (str.back() == ',') {
         str.pop_back();

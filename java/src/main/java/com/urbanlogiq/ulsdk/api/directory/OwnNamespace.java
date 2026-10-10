@@ -77,6 +77,14 @@ public final class OwnNamespace {
         this._status = value;
     }
 
+    com.urbanlogiq.ulsdk.api.directory.GroupNamespace[] _groups;
+    public com.urbanlogiq.ulsdk.api.directory.GroupNamespace[] getGroups() {
+        return this._groups;
+    }
+    public void setGroups(com.urbanlogiq.ulsdk.api.directory.GroupNamespace[] value) {
+        this._groups = value;
+    }
+
     public java.util.Map<String, Object> toMap() {
         java.util.Map<String, Object> o = new java.util.HashMap();
         Object holderIdSerialized = null;
@@ -126,6 +134,19 @@ public final class OwnNamespace {
         statusSerialized = this._status;
         o.put("status", statusSerialized);
 
+        Object groupsSerialized = null;
+        if (this._groups != null) {
+            java.util.ArrayList<Object> groupsList = new java.util.ArrayList();
+            for (int i0 = 0; i0 < this._groups.length; i0++) {
+                com.urbanlogiq.ulsdk.api.directory.GroupNamespace item0 = this._groups[i0];
+                Object groupsVar = null;
+                groupsVar = item0.toMap();
+                groupsList.add(groupsVar);
+            }
+            groupsSerialized = groupsList;
+        }
+        o.put("groups", groupsSerialized);
+
         return o;
     }
 
@@ -165,6 +186,20 @@ public final class OwnNamespace {
         this._assignedBy = (String)assignedByValue;
         Object statusValue = o.get("status");
         this._status = (String)statusValue;
+        Object groupsValue = null;
+        if (o.has("groups") && !o.isNull("groups")) {
+            groupsValue = o.get("groups");
+        }
+        if (groupsValue != null) {
+            org.json.JSONArray groupsValueArray = (org.json.JSONArray)groupsValue;
+            this._groups = new com.urbanlogiq.ulsdk.api.directory.GroupNamespace[groupsValueArray.length()];
+            for (int i0 = 0; i0 < groupsValueArray.length(); i0++) {
+                Object item0 = groupsValueArray.get(i0);
+                com.urbanlogiq.ulsdk.api.directory.GroupNamespace groupsItem = null;
+                groupsItem = new GroupNamespace((org.json.JSONObject)item0);
+                this._groups[i0] = groupsItem;
+            }
+        }
     }
 
     public OwnNamespace() {
@@ -177,6 +212,7 @@ public final class OwnNamespace {
         this._assignedAt = "";
         this._assignedBy = "";
         this._status = "";
+        this._groups = null;
     }
 
     @Override

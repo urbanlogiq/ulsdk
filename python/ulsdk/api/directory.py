@@ -941,6 +941,75 @@ class AdUserWithAuditLog:
         return cls(displayName, id, userPrincipalName, otherMails, department, orgId, createdDateTime, groups, accountEnabled, auditLog, identities, creationType)
 
 @dataclass
+class GroupNamespace:
+    holder_id: "str"
+    aliases: "List[str]"
+    preferred: "str"
+    label: "Optional[str]"
+
+    def to_dict(self) -> Dict[str, Any]:
+        o = dict()
+        o["holderId"] = self.holder_id
+        aliases_list = []
+        for item in self.aliases:
+            aliases_var = item
+            aliases_list.append(aliases_var)
+        o["aliases"] = aliases_list
+        o["preferred"] = self.preferred
+        o["label"] = None
+        if self.label is not None:
+            o["label"] = self.label
+        return o
+
+    @classmethod
+    def from_dict(cls, o: Dict[str, Any]) -> Self:
+        holder_id = None
+        aliases = None
+        preferred = None
+        label = None
+
+        for key in o:
+            if key == "holderId":
+                holder_id_var = o[key]
+                assert type(holder_id_var) is str
+                holder_id = holder_id_var
+            elif key == "aliases":
+                aliases_var = o[key]
+                assert type(aliases_var) is list
+                aliases = []
+                for item in aliases_var:
+                    aliases_item_var = item
+                    assert type(aliases_item_var) is str
+                    aliases_item = aliases_item_var
+                    aliases.append(aliases_item)
+            elif key == "preferred":
+                preferred_var = o[key]
+                assert type(preferred_var) is str
+                preferred = preferred_var
+            elif key == "label":
+                if o[key] is not None:
+                    label_var = o[key]
+                    assert type(label_var) is str
+                    label = label_var
+                else:
+                    label = None
+
+        assert holder_id is not None
+        assert aliases is not None
+        assert preferred is not None
+
+        return cls(holder_id, aliases, preferred, label)
+
+    @classmethod
+    def make_default(cls) -> Self:
+        holderId = ""
+        aliases = []
+        preferred = ""
+        label = None
+
+        return cls(holderId, aliases, preferred, label)
+
+@dataclass
 class OwnNamespace:
     holder_id: "str"
     holder_kind: "str"
@@ -951,6 +1020,7 @@ class OwnNamespace:
     assigned_at: "str"
     assigned_by: "str"
     status: "str"
+    groups: "Optional[List[GroupNamespace]]"
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -971,6 +1041,13 @@ class OwnNamespace:
         o["assignedAt"] = self.assigned_at
         o["assignedBy"] = self.assigned_by
         o["status"] = self.status
+        o["groups"] = None
+        if self.groups is not None:
+            groups_list = []
+            for item in self.groups:
+                groups_var = item.to_dict()
+                groups_list.append(groups_var)
+            o["groups"] = groups_list
         return o
 
     @classmethod
@@ -984,6 +1061,7 @@ class OwnNamespace:
         assigned_at = None
         assigned_by = None
         status = None
+        groups = None
 
         for key in o:
             if key == "holderId":
@@ -1033,6 +1111,18 @@ class OwnNamespace:
                 status_var = o[key]
                 assert type(status_var) is str
                 status = status_var
+            elif key == "groups":
+                if o[key] is not None:
+                    groups_var = o[key]
+                    assert type(groups_var) is list
+                    groups = []
+                    for item in groups_var:
+                        groups_item_var = item
+                        assert type(groups_item_var) is dict
+                        groups_item = GroupNamespace.from_dict(groups_item_var)
+                        groups.append(groups_item)
+                else:
+                    groups = None
 
         assert holder_id is not None
         assert holder_kind is not None
@@ -1042,7 +1132,7 @@ class OwnNamespace:
         assert assigned_by is not None
         assert status is not None
 
-        return cls(holder_id, holder_kind, aliases, preferred, label, sign_in, assigned_at, assigned_by, status)
+        return cls(holder_id, holder_kind, aliases, preferred, label, sign_in, assigned_at, assigned_by, status, groups)
 
     @classmethod
     def make_default(cls) -> Self:
@@ -1055,8 +1145,9 @@ class OwnNamespace:
         assignedAt = ""
         assignedBy = ""
         status = ""
+        groups = None
 
-        return cls(holderId, holderKind, aliases, preferred, label, signIn, assignedAt, assignedBy, status)
+        return cls(holderId, holderKind, aliases, preferred, label, signIn, assignedAt, assignedBy, status, groups)
 
 @dataclass
 class Namespace:
@@ -1974,7 +2065,7 @@ def get_own_namespace(
     ctx: RequestContext -- A request context object
 
     Returns:
-    The current user's namespace record and its status.
+    The current user's namespace record and its status, and the namespaces their groups hold (absent from older directories).
     """
 
     path = "/v1/api/ulv2/directory/v1/user/namespace"

@@ -101,6 +101,13 @@ type AdUserWithAuditLog struct {
 	CreationType *string `json:"creationType,omitempty"`
 }
 
+type GroupNamespace struct {
+	HolderId string `json:"holderId"`
+	Aliases []string `json:"aliases"`
+	Preferred string `json:"preferred"`
+	Label *string `json:"label,omitempty"`
+}
+
 type OwnNamespace struct {
 	HolderId string `json:"holderId"`
 	HolderKind string `json:"holderKind"`
@@ -111,6 +118,7 @@ type OwnNamespace struct {
 	AssignedAt string `json:"assignedAt"`
 	AssignedBy string `json:"assignedBy"`
 	Status string `json:"status"`
+	Groups *[]GroupNamespace `json:"groups,omitempty"`
 }
 
 type Namespace struct {

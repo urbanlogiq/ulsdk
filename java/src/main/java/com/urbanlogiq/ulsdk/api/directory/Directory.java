@@ -169,7 +169,7 @@ public final class Directory {
 
     /**
      * Retrieves the current user's namespace, assigning one from their sign-in address on first ask.
-     * @return The current user's namespace record and its status.
+     * @return The current user's namespace record and its status, and the namespaces their groups hold (absent from older directories).
      */
     public static com.urbanlogiq.ulsdk.api.directory.OwnNamespace getOwnNamespace(
         com.urbanlogiq.ulsdk.RequestContext ctx

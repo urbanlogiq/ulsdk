@@ -146,6 +146,15 @@ pub struct AdUserWithAuditLog {
 }
 
 #[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct GroupNamespace {
+    #[serde(rename = "holderId")]
+    holder_id: String,
+    aliases: Vec<String>,
+    preferred: String,
+    label: Option<String>,
+}
+
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct OwnNamespace {
     #[serde(rename = "holderId")]
     holder_id: String,
@@ -161,6 +170,7 @@ pub struct OwnNamespace {
     #[serde(rename = "assignedBy")]
     assigned_by: String,
     status: String,
+    groups: Option<Vec<GroupNamespace>>,
 }
 
 #[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
@@ -395,7 +405,7 @@ pub async fn get_current_user(
 /// * `ctx` - A request context object
 ///
 /// Returns
-/// * The current user's namespace record and its status.
+/// * The current user's namespace record and its status, and the namespaces their groups hold (absent from older directories).
 pub async fn get_own_namespace(ctx: &dyn RequestContext) -> Result<OwnNamespace, Error> {
     let path = "/v1/api/ulv2/directory/v1/user/namespace";
     let res = ctx.get(&path, None, None).await?;

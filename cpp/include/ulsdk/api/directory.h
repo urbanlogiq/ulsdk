@@ -206,6 +206,23 @@ struct AdUserWithAuditLog {
 std::vector<uint8_t>
 to_bytes(const AdUserWithAuditLog &o);
 
+struct GroupNamespace {
+    std::string holder_id_;
+    std::vector<std::string> aliases_;
+    std::string preferred_;
+    std::optional<std::string> label_;
+
+    GroupNamespace() = default;
+    GroupNamespace(const struct json_value_s *root);
+    bool operator==(const GroupNamespace &rhs) const;
+    bool operator!=(const GroupNamespace &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+std::vector<uint8_t>
+to_bytes(const GroupNamespace &o);
+
 struct OwnNamespace {
     std::string holder_id_;
     std::string holder_kind_;
@@ -216,6 +233,7 @@ struct OwnNamespace {
     std::string assigned_at_;
     std::string assigned_by_;
     std::string status_;
+    std::optional<std::vector<GroupNamespace>> groups_;
 
     OwnNamespace() = default;
     OwnNamespace(const struct json_value_s *root);
@@ -513,7 +531,7 @@ get_current_user(
 
 /**
  * Retrieves the current user's namespace, assigning one from their sign-in address on first ask.
- * @return The current user's namespace record and its status.
+ * @return The current user's namespace record and its status, and the namespaces their groups hold (absent from older directories).
  */
 Result<OwnNamespace>
 get_own_namespace(

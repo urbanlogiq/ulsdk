@@ -93,6 +93,13 @@ export interface AdUserWithAuditLog {
   creationType?: string;
 }
 
+export interface GroupNamespace {
+  holderId: string;
+  aliases: string[];
+  preferred: string;
+  label?: string;
+}
+
 export interface OwnNamespace {
   holderId: string;
   holderKind: string;
@@ -103,6 +110,7 @@ export interface OwnNamespace {
   assignedAt: string;
   assignedBy: string;
   status: string;
+  groups?: GroupNamespace[];
 }
 
 export interface Namespace {
@@ -320,7 +328,7 @@ export async function getCurrentUser(
 
 /**
  * Retrieves the current user's namespace, assigning one from their sign-in address on first ask.
- * @returns The current user's namespace record and its status.
+ * @returns The current user's namespace record and its status, and the namespaces their groups hold (absent from older directories).
  */
 export async function getOwnNamespace(
   ctx: RequestContext
