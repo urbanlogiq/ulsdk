@@ -5,6 +5,7 @@
 package tensor
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/schema"
@@ -16,7 +17,7 @@ type Tensor struct {
 	Data schema.Buffer
 	Shape []TensorDim
 	Strides []int64
-	Type interface{}
+	Type schema.Type
 }
 
 func TensorFromFbs(fbs *generated.Tensor) *Tensor {
@@ -32,6 +33,114 @@ func TensorFromFbs(fbs *generated.Tensor) *Tensor {
 	}
 	for i := 0; i < fbs.StridesLength(); i++ {
 		o.Strides = append(o.Strides, fbs.Strides(i))
+	}
+	if tbl := new(flatbuffers.Table); fbs.Type(tbl) {
+		switch fbs.TypeType() {
+		case generated.TypeNull:
+			var u generated.Null
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.NullFromFbs(&u)
+		case generated.TypeInt:
+			var u generated.Int
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.IntFromFbs(&u)
+		case generated.TypeFloatingPoint:
+			var u generated.FloatingPoint
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.FloatingPointFromFbs(&u)
+		case generated.TypeBinary:
+			var u generated.Binary
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.BinaryFromFbs(&u)
+		case generated.TypeUtf8:
+			var u generated.Utf8
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.Utf8FromFbs(&u)
+		case generated.TypeBool:
+			var u generated.Bool
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.BoolFromFbs(&u)
+		case generated.TypeDecimal:
+			var u generated.Decimal
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.DecimalFromFbs(&u)
+		case generated.TypeDate:
+			var u generated.Date
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.DateFromFbs(&u)
+		case generated.TypeTime:
+			var u generated.Time
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.TimeFromFbs(&u)
+		case generated.TypeTimestamp:
+			var u generated.Timestamp
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.TimestampFromFbs(&u)
+		case generated.TypeInterval:
+			var u generated.Interval
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.IntervalFromFbs(&u)
+		case generated.TypeList:
+			var u generated.List
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.ListFromFbs(&u)
+		case generated.TypeStruct_:
+			var u generated.Struct_
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.StructFromFbs(&u)
+		case generated.TypeUnion:
+			var u generated.Union
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.UnionFromFbs(&u)
+		case generated.TypeFixedSizeBinary:
+			var u generated.FixedSizeBinary
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.FixedSizeBinaryFromFbs(&u)
+		case generated.TypeFixedSizeList:
+			var u generated.FixedSizeList
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.FixedSizeListFromFbs(&u)
+		case generated.TypeMap:
+			var u generated.Map
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.MapFromFbs(&u)
+		case generated.TypeDuration:
+			var u generated.Duration
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.DurationFromFbs(&u)
+		case generated.TypeLargeBinary:
+			var u generated.LargeBinary
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.LargeBinaryFromFbs(&u)
+		case generated.TypeLargeUtf8:
+			var u generated.LargeUtf8
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.LargeUtf8FromFbs(&u)
+		case generated.TypeLargeList:
+			var u generated.LargeList
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.LargeListFromFbs(&u)
+		case generated.TypeRunEndEncoded:
+			var u generated.RunEndEncoded
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.RunEndEncodedFromFbs(&u)
+		case generated.TypeBinaryView:
+			var u generated.BinaryView
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.BinaryViewFromFbs(&u)
+		case generated.TypeUtf8View:
+			var u generated.Utf8View
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.Utf8viewFromFbs(&u)
+		case generated.TypeListView:
+			var u generated.ListView
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.ListViewFromFbs(&u)
+		case generated.TypeLargeListView:
+			var u generated.LargeListView
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = schema.LargeListViewFromFbs(&u)
+		}
 	}
 	return o
 }
@@ -66,9 +175,124 @@ func (o *Tensor) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT 
 		builder.PrependInt64(o.Strides[i])
 	}
 	stridesVecOffset := builder.EndVector(len(o.Strides))
+	var typeType generated.Type
+	var typeOffset flatbuffers.UOffsetT
+	switch v := o.Type.(type) {
+	case nil:
+	case *schema.Null:
+		if v != nil {
+			typeType, typeOffset = generated.TypeNull, v.SerializeTo(builder)
+		}
+	case *schema.Int:
+		if v != nil {
+			typeType, typeOffset = generated.TypeInt, v.SerializeTo(builder)
+		}
+	case *schema.FloatingPoint:
+		if v != nil {
+			typeType, typeOffset = generated.TypeFloatingPoint, v.SerializeTo(builder)
+		}
+	case *schema.Binary:
+		if v != nil {
+			typeType, typeOffset = generated.TypeBinary, v.SerializeTo(builder)
+		}
+	case *schema.Utf8:
+		if v != nil {
+			typeType, typeOffset = generated.TypeUtf8, v.SerializeTo(builder)
+		}
+	case *schema.Bool:
+		if v != nil {
+			typeType, typeOffset = generated.TypeBool, v.SerializeTo(builder)
+		}
+	case *schema.Decimal:
+		if v != nil {
+			typeType, typeOffset = generated.TypeDecimal, v.SerializeTo(builder)
+		}
+	case *schema.Date:
+		if v != nil {
+			typeType, typeOffset = generated.TypeDate, v.SerializeTo(builder)
+		}
+	case *schema.Time:
+		if v != nil {
+			typeType, typeOffset = generated.TypeTime, v.SerializeTo(builder)
+		}
+	case *schema.Timestamp:
+		if v != nil {
+			typeType, typeOffset = generated.TypeTimestamp, v.SerializeTo(builder)
+		}
+	case *schema.Interval:
+		if v != nil {
+			typeType, typeOffset = generated.TypeInterval, v.SerializeTo(builder)
+		}
+	case *schema.List:
+		if v != nil {
+			typeType, typeOffset = generated.TypeList, v.SerializeTo(builder)
+		}
+	case *schema.Struct:
+		if v != nil {
+			typeType, typeOffset = generated.TypeStruct_, v.SerializeTo(builder)
+		}
+	case *schema.Union:
+		if v != nil {
+			typeType, typeOffset = generated.TypeUnion, v.SerializeTo(builder)
+		}
+	case *schema.FixedSizeBinary:
+		if v != nil {
+			typeType, typeOffset = generated.TypeFixedSizeBinary, v.SerializeTo(builder)
+		}
+	case *schema.FixedSizeList:
+		if v != nil {
+			typeType, typeOffset = generated.TypeFixedSizeList, v.SerializeTo(builder)
+		}
+	case *schema.Map:
+		if v != nil {
+			typeType, typeOffset = generated.TypeMap, v.SerializeTo(builder)
+		}
+	case *schema.Duration:
+		if v != nil {
+			typeType, typeOffset = generated.TypeDuration, v.SerializeTo(builder)
+		}
+	case *schema.LargeBinary:
+		if v != nil {
+			typeType, typeOffset = generated.TypeLargeBinary, v.SerializeTo(builder)
+		}
+	case *schema.LargeUtf8:
+		if v != nil {
+			typeType, typeOffset = generated.TypeLargeUtf8, v.SerializeTo(builder)
+		}
+	case *schema.LargeList:
+		if v != nil {
+			typeType, typeOffset = generated.TypeLargeList, v.SerializeTo(builder)
+		}
+	case *schema.RunEndEncoded:
+		if v != nil {
+			typeType, typeOffset = generated.TypeRunEndEncoded, v.SerializeTo(builder)
+		}
+	case *schema.BinaryView:
+		if v != nil {
+			typeType, typeOffset = generated.TypeBinaryView, v.SerializeTo(builder)
+		}
+	case *schema.Utf8view:
+		if v != nil {
+			typeType, typeOffset = generated.TypeUtf8View, v.SerializeTo(builder)
+		}
+	case *schema.ListView:
+		if v != nil {
+			typeType, typeOffset = generated.TypeListView, v.SerializeTo(builder)
+		}
+	case *schema.LargeListView:
+		if v != nil {
+			typeType, typeOffset = generated.TypeLargeListView, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("Tensor.Type: %T is not a pointer to a Type variant", v))
+	}
 	generated.TensorStart(builder)
 	generated.TensorAddShape(builder, shapeVecOffset)
 	generated.TensorAddStrides(builder, stridesVecOffset)
+	if typeOffset != 0 {
+		generated.TensorAddTypeType(builder, typeType)
+		generated.TensorAddType(builder, typeOffset)
+	}
 	return generated.TensorEnd(builder)
 }
 

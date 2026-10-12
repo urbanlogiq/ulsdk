@@ -4,7 +4,13 @@
 
 package table
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+
+	"github.com/urbanlogiq/ulsdk/types/id"
+	"github.com/urbanlogiq/ulsdk/types/schema"
+)
 
 func TestDefaultAppend(t *testing.T) {
 	o := &Append{}
@@ -21,6 +27,23 @@ func TestDefaultChangeOpEntry(t *testing.T) {
 	}
 }
 
+
+func TestUnionChangeOpEntryOp(t *testing.T) {
+	for _, v := range []ChangeOp{
+		&Modify{},
+		&Delete{},
+		&Restore{},
+	} {
+		o := &ChangeOpEntry{Op: v}
+		got, err := ChangeOpEntryFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Op) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Op, v)
+		}
+	}
+}
 
 func TestDefaultChangeSet(t *testing.T) {
 	o := &ChangeSet{}
@@ -70,6 +93,22 @@ func TestDefaultNewTable(t *testing.T) {
 }
 
 
+func TestUnionNewTableFrom(t *testing.T) {
+	for _, v := range []TableFrom{
+		&id.ObjectId{},
+		&schema.Schema{},
+	} {
+		o := &NewTable{From: v}
+		got, err := NewTableFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.From) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.From, v)
+		}
+	}
+}
+
 func TestDefaultNewTableList(t *testing.T) {
 	o := &NewTableList{}
 	if o == nil {
@@ -101,6 +140,24 @@ func TestDefaultOpEntry(t *testing.T) {
 	}
 }
 
+
+func TestUnionOpEntryOp(t *testing.T) {
+	for _, v := range []Op{
+		&Set{},
+		&RmRow{},
+		&RestoreRow{},
+		&Append{},
+	} {
+		o := &OpEntry{Op: v}
+		got, err := OpEntryFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Op) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Op, v)
+		}
+	}
+}
 
 func TestDefaultRestore(t *testing.T) {
 	o := &Restore{}

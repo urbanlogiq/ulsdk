@@ -5,9 +5,12 @@
 package message
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/schema"
+	"github.com/urbanlogiq/ulsdk/types/sparse_tensor"
+	"github.com/urbanlogiq/ulsdk/types/tensor"
 )
 
 var _ flatbuffers.UOffsetT
@@ -199,9 +202,8 @@ func (o *DictionaryBatch) SerializeTo(builder *flatbuffers.Builder) flatbuffers.
 //  which may include experimental metadata types. For maximum compatibility,
 //  it is best to send data using RecordBatch
 // MessageHeader is a union type. Possible concrete types: Schema, DictionaryBatch, RecordBatch, Tensor, SparseTensor
-type MessageHeader interface {
-	isMessageHeader()
-}
+// Assign a pointer to one of these types.
+type MessageHeader interface{}
 
 // FieldNode -
 //  ----------------------------------------------------------------------
@@ -229,7 +231,7 @@ func FieldNodeFromFbs(fbs *generated.FieldNode) *FieldNode {
 type Message struct {
 	BodyLength int64
 	CustomMetadata []schema.KeyValue
-	Header interface{}
+	Header MessageHeader
 	Version int16
 }
 
@@ -240,6 +242,30 @@ func MessageFromFbs(fbs *generated.Message) *Message {
 		var item generated.KeyValue
 		if fbs.CustomMetadata(&item, i) {
 			o.CustomMetadata = append(o.CustomMetadata, *schema.KeyValueFromFbs(&item))
+		}
+	}
+	if tbl := new(flatbuffers.Table); fbs.Header(tbl) {
+		switch fbs.HeaderType() {
+		case generated.MessageHeaderSchema:
+			var u generated.Schema
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Header = schema.SchemaFromFbs(&u)
+		case generated.MessageHeaderDictionaryBatch:
+			var u generated.DictionaryBatch
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Header = DictionaryBatchFromFbs(&u)
+		case generated.MessageHeaderRecordBatch:
+			var u generated.RecordBatch
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Header = RecordBatchFromFbs(&u)
+		case generated.MessageHeaderTensor:
+			var u generated.Tensor
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Header = tensor.TensorFromFbs(&u)
+		case generated.MessageHeaderSparseTensor:
+			var u generated.SparseTensor
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Header = sparse_tensor.SparseTensorFromFbs(&u)
 		}
 	}
 	o.Version = int16(fbs.Version())
@@ -271,9 +297,40 @@ func (o *Message) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT
 		builder.PrependUOffsetT(customMetadataOffsets[i])
 	}
 	customMetadataVecOffset := builder.EndVector(len(o.CustomMetadata))
+	var headerType generated.MessageHeader
+	var headerOffset flatbuffers.UOffsetT
+	switch v := o.Header.(type) {
+	case nil:
+	case *schema.Schema:
+		if v != nil {
+			headerType, headerOffset = generated.MessageHeaderSchema, v.SerializeTo(builder)
+		}
+	case *DictionaryBatch:
+		if v != nil {
+			headerType, headerOffset = generated.MessageHeaderDictionaryBatch, v.SerializeTo(builder)
+		}
+	case *RecordBatch:
+		if v != nil {
+			headerType, headerOffset = generated.MessageHeaderRecordBatch, v.SerializeTo(builder)
+		}
+	case *tensor.Tensor:
+		if v != nil {
+			headerType, headerOffset = generated.MessageHeaderTensor, v.SerializeTo(builder)
+		}
+	case *sparse_tensor.SparseTensor:
+		if v != nil {
+			headerType, headerOffset = generated.MessageHeaderSparseTensor, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("Message.Header: %T is not a pointer to a MessageHeader variant", v))
+	}
 	generated.MessageStart(builder)
 	generated.MessageAddBodyLength(builder, o.BodyLength)
 	generated.MessageAddCustomMetadata(builder, customMetadataVecOffset)
+	if headerOffset != 0 {
+		generated.MessageAddHeaderType(builder, headerType)
+		generated.MessageAddHeader(builder, headerOffset)
+	}
 	generated.MessageAddVersion(builder, generated.MetadataVersion(o.Version))
 	return generated.MessageEnd(builder)
 }

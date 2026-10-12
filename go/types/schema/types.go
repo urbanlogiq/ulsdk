@@ -5,6 +5,7 @@
 package schema
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 )
@@ -1123,9 +1124,8 @@ func (o *LargeListView) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UO
 //  Top-level Type value, enabling extensible type-specific metadata. We can
 //  add new logical types to Type without breaking backwards compatibility
 // Type is a union type. Possible concrete types: Null, Int, FloatingPoint, Binary, Utf8, Bool, Decimal, Date, Time, Timestamp, Interval, List, Struct, Union, FixedSizeBinary, FixedSizeList, Map, Duration, LargeBinary, LargeUtf8, LargeList, RunEndEncoded, BinaryView, Utf8view, ListView, LargeListView
-type Type interface {
-	isType()
-}
+// Assign a pointer to one of these types.
+type Type interface{}
 
 type UnionMode int16
 
@@ -1206,7 +1206,7 @@ type Field struct {
 	Dictionary *DictionaryEncoding
 	Name *string
 	Nullable bool
-	Type interface{}
+	Type Type
 }
 
 func FieldFromFbs(fbs *generated.Field) *Field {
@@ -1231,6 +1231,114 @@ func FieldFromFbs(fbs *generated.Field) *Field {
 		o.Name = &str
 	}
 	o.Nullable = fbs.Nullable()
+	if tbl := new(flatbuffers.Table); fbs.Type(tbl) {
+		switch fbs.TypeType() {
+		case generated.TypeNull:
+			var u generated.Null
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = NullFromFbs(&u)
+		case generated.TypeInt:
+			var u generated.Int
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = IntFromFbs(&u)
+		case generated.TypeFloatingPoint:
+			var u generated.FloatingPoint
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = FloatingPointFromFbs(&u)
+		case generated.TypeBinary:
+			var u generated.Binary
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = BinaryFromFbs(&u)
+		case generated.TypeUtf8:
+			var u generated.Utf8
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = Utf8FromFbs(&u)
+		case generated.TypeBool:
+			var u generated.Bool
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = BoolFromFbs(&u)
+		case generated.TypeDecimal:
+			var u generated.Decimal
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = DecimalFromFbs(&u)
+		case generated.TypeDate:
+			var u generated.Date
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = DateFromFbs(&u)
+		case generated.TypeTime:
+			var u generated.Time
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = TimeFromFbs(&u)
+		case generated.TypeTimestamp:
+			var u generated.Timestamp
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = TimestampFromFbs(&u)
+		case generated.TypeInterval:
+			var u generated.Interval
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = IntervalFromFbs(&u)
+		case generated.TypeList:
+			var u generated.List
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = ListFromFbs(&u)
+		case generated.TypeStruct_:
+			var u generated.Struct_
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = StructFromFbs(&u)
+		case generated.TypeUnion:
+			var u generated.Union
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = UnionFromFbs(&u)
+		case generated.TypeFixedSizeBinary:
+			var u generated.FixedSizeBinary
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = FixedSizeBinaryFromFbs(&u)
+		case generated.TypeFixedSizeList:
+			var u generated.FixedSizeList
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = FixedSizeListFromFbs(&u)
+		case generated.TypeMap:
+			var u generated.Map
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = MapFromFbs(&u)
+		case generated.TypeDuration:
+			var u generated.Duration
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = DurationFromFbs(&u)
+		case generated.TypeLargeBinary:
+			var u generated.LargeBinary
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = LargeBinaryFromFbs(&u)
+		case generated.TypeLargeUtf8:
+			var u generated.LargeUtf8
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = LargeUtf8FromFbs(&u)
+		case generated.TypeLargeList:
+			var u generated.LargeList
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = LargeListFromFbs(&u)
+		case generated.TypeRunEndEncoded:
+			var u generated.RunEndEncoded
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = RunEndEncodedFromFbs(&u)
+		case generated.TypeBinaryView:
+			var u generated.BinaryView
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = BinaryViewFromFbs(&u)
+		case generated.TypeUtf8View:
+			var u generated.Utf8View
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = Utf8viewFromFbs(&u)
+		case generated.TypeListView:
+			var u generated.ListView
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = ListViewFromFbs(&u)
+		case generated.TypeLargeListView:
+			var u generated.LargeListView
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Type = LargeListViewFromFbs(&u)
+		}
+	}
 	return o
 }
 
@@ -1276,12 +1384,127 @@ func (o *Field) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	if o.Name != nil {
 		nameOffset = builder.CreateString(*o.Name)
 	}
+	var typeType generated.Type
+	var typeOffset flatbuffers.UOffsetT
+	switch v := o.Type.(type) {
+	case nil:
+	case *Null:
+		if v != nil {
+			typeType, typeOffset = generated.TypeNull, v.SerializeTo(builder)
+		}
+	case *Int:
+		if v != nil {
+			typeType, typeOffset = generated.TypeInt, v.SerializeTo(builder)
+		}
+	case *FloatingPoint:
+		if v != nil {
+			typeType, typeOffset = generated.TypeFloatingPoint, v.SerializeTo(builder)
+		}
+	case *Binary:
+		if v != nil {
+			typeType, typeOffset = generated.TypeBinary, v.SerializeTo(builder)
+		}
+	case *Utf8:
+		if v != nil {
+			typeType, typeOffset = generated.TypeUtf8, v.SerializeTo(builder)
+		}
+	case *Bool:
+		if v != nil {
+			typeType, typeOffset = generated.TypeBool, v.SerializeTo(builder)
+		}
+	case *Decimal:
+		if v != nil {
+			typeType, typeOffset = generated.TypeDecimal, v.SerializeTo(builder)
+		}
+	case *Date:
+		if v != nil {
+			typeType, typeOffset = generated.TypeDate, v.SerializeTo(builder)
+		}
+	case *Time:
+		if v != nil {
+			typeType, typeOffset = generated.TypeTime, v.SerializeTo(builder)
+		}
+	case *Timestamp:
+		if v != nil {
+			typeType, typeOffset = generated.TypeTimestamp, v.SerializeTo(builder)
+		}
+	case *Interval:
+		if v != nil {
+			typeType, typeOffset = generated.TypeInterval, v.SerializeTo(builder)
+		}
+	case *List:
+		if v != nil {
+			typeType, typeOffset = generated.TypeList, v.SerializeTo(builder)
+		}
+	case *Struct:
+		if v != nil {
+			typeType, typeOffset = generated.TypeStruct_, v.SerializeTo(builder)
+		}
+	case *Union:
+		if v != nil {
+			typeType, typeOffset = generated.TypeUnion, v.SerializeTo(builder)
+		}
+	case *FixedSizeBinary:
+		if v != nil {
+			typeType, typeOffset = generated.TypeFixedSizeBinary, v.SerializeTo(builder)
+		}
+	case *FixedSizeList:
+		if v != nil {
+			typeType, typeOffset = generated.TypeFixedSizeList, v.SerializeTo(builder)
+		}
+	case *Map:
+		if v != nil {
+			typeType, typeOffset = generated.TypeMap, v.SerializeTo(builder)
+		}
+	case *Duration:
+		if v != nil {
+			typeType, typeOffset = generated.TypeDuration, v.SerializeTo(builder)
+		}
+	case *LargeBinary:
+		if v != nil {
+			typeType, typeOffset = generated.TypeLargeBinary, v.SerializeTo(builder)
+		}
+	case *LargeUtf8:
+		if v != nil {
+			typeType, typeOffset = generated.TypeLargeUtf8, v.SerializeTo(builder)
+		}
+	case *LargeList:
+		if v != nil {
+			typeType, typeOffset = generated.TypeLargeList, v.SerializeTo(builder)
+		}
+	case *RunEndEncoded:
+		if v != nil {
+			typeType, typeOffset = generated.TypeRunEndEncoded, v.SerializeTo(builder)
+		}
+	case *BinaryView:
+		if v != nil {
+			typeType, typeOffset = generated.TypeBinaryView, v.SerializeTo(builder)
+		}
+	case *Utf8view:
+		if v != nil {
+			typeType, typeOffset = generated.TypeUtf8View, v.SerializeTo(builder)
+		}
+	case *ListView:
+		if v != nil {
+			typeType, typeOffset = generated.TypeListView, v.SerializeTo(builder)
+		}
+	case *LargeListView:
+		if v != nil {
+			typeType, typeOffset = generated.TypeLargeListView, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("Field.Type: %T is not a pointer to a Type variant", v))
+	}
 	generated.FieldStart(builder)
 	generated.FieldAddChildren(builder, childrenVecOffset)
 	generated.FieldAddCustomMetadata(builder, customMetadataVecOffset)
 	generated.FieldAddDictionary(builder, dictionaryOffset)
 	generated.FieldAddName(builder, nameOffset)
 	generated.FieldAddNullable(builder, o.Nullable)
+	if typeOffset != 0 {
+		generated.FieldAddTypeType(builder, typeType)
+		generated.FieldAddType(builder, typeOffset)
+	}
 	return generated.FieldEnd(builder)
 }
 

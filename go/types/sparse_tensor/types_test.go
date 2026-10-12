@@ -4,7 +4,12 @@
 
 package sparse_tensor
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+
+	"github.com/urbanlogiq/ulsdk/types/schema"
+)
 
 func TestDefaultSparseMatrixIndexCSX(t *testing.T) {
 	o := &SparseMatrixIndexCSX{}
@@ -21,6 +26,63 @@ func TestDefaultSparseTensor(t *testing.T) {
 	}
 }
 
+
+func TestUnionSparseTensorSparseIndex(t *testing.T) {
+	for _, v := range []SparseTensorIndex{
+		&SparseTensorIndexCOO{},
+		&SparseMatrixIndexCSX{},
+		&SparseTensorIndexCSF{},
+	} {
+		o := &SparseTensor{SparseIndex: v}
+		got, err := SparseTensorFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.SparseIndex) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.SparseIndex, v)
+		}
+	}
+}
+
+func TestUnionSparseTensorType(t *testing.T) {
+	for _, v := range []schema.Type{
+		&schema.Null{},
+		&schema.Int{},
+		&schema.FloatingPoint{},
+		&schema.Binary{},
+		&schema.Utf8{},
+		&schema.Bool{},
+		&schema.Decimal{},
+		&schema.Date{},
+		&schema.Time{},
+		&schema.Timestamp{},
+		&schema.Interval{},
+		&schema.List{},
+		&schema.Struct{},
+		&schema.Union{},
+		&schema.FixedSizeBinary{},
+		&schema.FixedSizeList{},
+		&schema.Map{},
+		&schema.Duration{},
+		&schema.LargeBinary{},
+		&schema.LargeUtf8{},
+		&schema.LargeList{},
+		&schema.RunEndEncoded{},
+		&schema.BinaryView{},
+		&schema.Utf8view{},
+		&schema.ListView{},
+		&schema.LargeListView{},
+	} {
+		o := &SparseTensor{Type: v}
+		got, err := SparseTensorFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Type) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Type, v)
+		}
+	}
+}
 
 func TestDefaultSparseTensorIndexCOO(t *testing.T) {
 	o := &SparseTensorIndexCOO{}

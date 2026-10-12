@@ -5,10 +5,12 @@
 package table
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/attr"
 	"github.com/urbanlogiq/ulsdk/types/id"
+	"github.com/urbanlogiq/ulsdk/types/schema"
 	"github.com/urbanlogiq/ulsdk/types/value"
 )
 
@@ -136,9 +138,8 @@ func (o *Restore) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT
 }
 
 // ChangeOp is a union type. Possible concrete types: Modify, Delete, Restore
-type ChangeOp interface {
-	isChangeOp()
-}
+// Assign a pointer to one of these types.
+type ChangeOp interface{}
 
 // Set -
 //  The Set operation is used to set the value of a cell in a table.
@@ -300,21 +301,35 @@ func (o *Append) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT 
 // Op -
 //  Table Ops are used to modify the contents of a table.
 // Op is a union type. Possible concrete types: Set, RmRow, RestoreRow, Append
-type Op interface {
-	isOp()
-}
+// Assign a pointer to one of these types.
+type Op interface{}
 
 // TableFrom is a union type. Possible concrete types: ObjectId, Schema
-type TableFrom interface {
-	isTableFrom()
-}
+// Assign a pointer to one of these types.
+type TableFrom interface{}
 
 type ChangeOpEntry struct {
-	Op interface{}
+	Op ChangeOp
 }
 
 func ChangeOpEntryFromFbs(fbs *generated.ChangeOpEntry) *ChangeOpEntry {
 	o := &ChangeOpEntry{}
+	if tbl := new(flatbuffers.Table); fbs.Op(tbl) {
+		switch fbs.OpType() {
+		case generated.ChangeOpModify:
+			var u generated.Modify
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Op = ModifyFromFbs(&u)
+		case generated.ChangeOpDelete:
+			var u generated.Delete
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Op = DeleteFromFbs(&u)
+		case generated.ChangeOpRestore:
+			var u generated.Restore
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Op = RestoreFromFbs(&u)
+		}
+	}
 	return o
 }
 
@@ -334,7 +349,30 @@ func (o *ChangeOpEntry) ToBytes() []byte {
 
 // SerializeTo writes the ChangeOpEntry into a FlatBuffer builder and returns the offset.
 func (o *ChangeOpEntry) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var opType generated.ChangeOp
+	var opOffset flatbuffers.UOffsetT
+	switch v := o.Op.(type) {
+	case nil:
+	case *Modify:
+		if v != nil {
+			opType, opOffset = generated.ChangeOpModify, v.SerializeTo(builder)
+		}
+	case *Delete:
+		if v != nil {
+			opType, opOffset = generated.ChangeOpDelete, v.SerializeTo(builder)
+		}
+	case *Restore:
+		if v != nil {
+			opType, opOffset = generated.ChangeOpRestore, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("ChangeOpEntry.Op: %T is not a pointer to a ChangeOp variant", v))
+	}
 	generated.ChangeOpEntryStart(builder)
+	if opOffset != 0 {
+		generated.ChangeOpEntryAddOpType(builder, opType)
+		generated.ChangeOpEntryAddOp(builder, opOffset)
+	}
 	return generated.ChangeOpEntryEnd(builder)
 }
 
@@ -543,7 +581,7 @@ func (o *History) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT
 // NewTable -
 //  Body parameter for POST datacatalog/table
 type NewTable struct {
-	From interface{}
+	From TableFrom
 	Migrate bool
 	Name string
 	Parent *id.ObjectId
@@ -552,6 +590,18 @@ type NewTable struct {
 
 func NewTableFromFbs(fbs *generated.NewTable) *NewTable {
 	o := &NewTable{}
+	if tbl := new(flatbuffers.Table); fbs.From(tbl) {
+		switch fbs.FromType() {
+		case generated.TableFromObjectId:
+			var u generated.ObjectId
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.From = id.ObjectIdFromFbs(&u)
+		case generated.TableFromSchema:
+			var u generated.Schema
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.From = schema.SchemaFromFbs(&u)
+		}
+	}
 	o.Migrate = fbs.Migrate()
 	o.Name = string(fbs.Name())
 	if fbsVal := fbs.Parent(nil); fbsVal != nil {
@@ -579,6 +629,21 @@ func (o *NewTable) ToBytes() []byte {
 
 // SerializeTo writes the NewTable into a FlatBuffer builder and returns the offset.
 func (o *NewTable) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var fromType generated.TableFrom
+	var fromOffset flatbuffers.UOffsetT
+	switch v := o.From.(type) {
+	case nil:
+	case *id.ObjectId:
+		if v != nil {
+			fromType, fromOffset = generated.TableFromObjectId, v.SerializeTo(builder)
+		}
+	case *schema.Schema:
+		if v != nil {
+			fromType, fromOffset = generated.TableFromSchema, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("NewTable.From: %T is not a pointer to a TableFrom variant", v))
+	}
 	nameOffset := builder.CreateString(o.Name)
 	var parentOffset flatbuffers.UOffsetT
 	if o.Parent != nil {
@@ -589,6 +654,10 @@ func (o *NewTable) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 		targetOffset = o.Target.SerializeTo(builder)
 	}
 	generated.NewTableStart(builder)
+	if fromOffset != 0 {
+		generated.NewTableAddFromType(builder, fromType)
+		generated.NewTableAddFrom(builder, fromOffset)
+	}
 	generated.NewTableAddMigrate(builder, o.Migrate)
 	generated.NewTableAddName(builder, nameOffset)
 	generated.NewTableAddParent(builder, parentOffset)
@@ -750,11 +819,31 @@ func (o *NewTableResult) SerializeTo(builder *flatbuffers.Builder) flatbuffers.U
 }
 
 type OpEntry struct {
-	Op interface{}
+	Op Op
 }
 
 func OpEntryFromFbs(fbs *generated.OpEntry) *OpEntry {
 	o := &OpEntry{}
+	if tbl := new(flatbuffers.Table); fbs.Op(tbl) {
+		switch fbs.OpType() {
+		case generated.OpSet:
+			var u generated.Set
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Op = SetFromFbs(&u)
+		case generated.OpRmRow:
+			var u generated.RmRow
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Op = RmRowFromFbs(&u)
+		case generated.OpRestoreRow:
+			var u generated.RestoreRow
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Op = RestoreRowFromFbs(&u)
+		case generated.OpAppend:
+			var u generated.Append
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Op = AppendFromFbs(&u)
+		}
+	}
 	return o
 }
 
@@ -774,6 +863,33 @@ func (o *OpEntry) ToBytes() []byte {
 
 // SerializeTo writes the OpEntry into a FlatBuffer builder and returns the offset.
 func (o *OpEntry) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var opType generated.Op
+	var opOffset flatbuffers.UOffsetT
+	switch v := o.Op.(type) {
+	case nil:
+	case *Set:
+		if v != nil {
+			opType, opOffset = generated.OpSet, v.SerializeTo(builder)
+		}
+	case *RmRow:
+		if v != nil {
+			opType, opOffset = generated.OpRmRow, v.SerializeTo(builder)
+		}
+	case *RestoreRow:
+		if v != nil {
+			opType, opOffset = generated.OpRestoreRow, v.SerializeTo(builder)
+		}
+	case *Append:
+		if v != nil {
+			opType, opOffset = generated.OpAppend, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("OpEntry.Op: %T is not a pointer to a Op variant", v))
+	}
 	generated.OpEntryStart(builder)
+	if opOffset != 0 {
+		generated.OpEntryAddOpType(builder, opType)
+		generated.OpEntryAddOp(builder, opOffset)
+	}
 	return generated.OpEntryEnd(builder)
 }

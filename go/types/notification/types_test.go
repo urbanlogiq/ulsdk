@@ -4,7 +4,10 @@
 
 package notification
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestDefaultAccessRequest(t *testing.T) {
 	o := &AccessRequest{}
@@ -53,6 +56,24 @@ func TestDefaultNotification(t *testing.T) {
 	}
 }
 
+
+func TestUnionNotificationNotification(t *testing.T) {
+	for _, v := range []NotificationUnion{
+		&Share{},
+		&JobComplete{},
+		&AccessRequest{},
+		&DriveChange{},
+	} {
+		o := &Notification{Notification: v}
+		got, err := NotificationFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Notification) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Notification, v)
+		}
+	}
+}
 
 func TestDefaultResponse(t *testing.T) {
 	o := &Response{}

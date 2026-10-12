@@ -4,7 +4,12 @@
 
 package tensor
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+
+	"github.com/urbanlogiq/ulsdk/types/schema"
+)
 
 func TestDefaultTensor(t *testing.T) {
 	o := &Tensor{}
@@ -13,6 +18,46 @@ func TestDefaultTensor(t *testing.T) {
 	}
 }
 
+
+func TestUnionTensorType(t *testing.T) {
+	for _, v := range []schema.Type{
+		&schema.Null{},
+		&schema.Int{},
+		&schema.FloatingPoint{},
+		&schema.Binary{},
+		&schema.Utf8{},
+		&schema.Bool{},
+		&schema.Decimal{},
+		&schema.Date{},
+		&schema.Time{},
+		&schema.Timestamp{},
+		&schema.Interval{},
+		&schema.List{},
+		&schema.Struct{},
+		&schema.Union{},
+		&schema.FixedSizeBinary{},
+		&schema.FixedSizeList{},
+		&schema.Map{},
+		&schema.Duration{},
+		&schema.LargeBinary{},
+		&schema.LargeUtf8{},
+		&schema.LargeList{},
+		&schema.RunEndEncoded{},
+		&schema.BinaryView{},
+		&schema.Utf8view{},
+		&schema.ListView{},
+		&schema.LargeListView{},
+	} {
+		o := &Tensor{Type: v}
+		got, err := TensorFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Type) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Type, v)
+		}
+	}
+}
 
 func TestDefaultTensorDim(t *testing.T) {
 	o := &TensorDim{}

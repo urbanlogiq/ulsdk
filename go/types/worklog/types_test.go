@@ -4,7 +4,13 @@
 
 package worklog
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+
+	"github.com/urbanlogiq/ulsdk/types/id"
+	"github.com/urbanlogiq/ulsdk/types/value"
+)
 
 func TestDefaultByteArray(t *testing.T) {
 	o := &ByteArray{}
@@ -87,6 +93,22 @@ func TestDefaultProducer(t *testing.T) {
 }
 
 
+func TestUnionProducerModel(t *testing.T) {
+	for _, v := range []ProducerRef{
+		&id.ObjectId{},
+		&ContainerRef{},
+	} {
+		o := &Producer{Model: v}
+		got, err := ProducerFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Model) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Model, v)
+		}
+	}
+}
+
 func TestDefaultTileData(t *testing.T) {
 	o := &TileData{}
 	if o == nil {
@@ -126,3 +148,21 @@ func TestDefaultWorklogParameter(t *testing.T) {
 	}
 }
 
+
+func TestUnionWorklogParameterValue(t *testing.T) {
+	for _, v := range []ParameterValue{
+		&ByteArray{},
+		&id.ObjectId{},
+		&ParameterFlags{},
+		&value.ValueInstance{},
+	} {
+		o := &WorklogParameter{Value: v}
+		got, err := WorklogParameterFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Value) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Value, v)
+		}
+	}
+}

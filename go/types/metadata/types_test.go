@@ -4,7 +4,13 @@
 
 package metadata
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+
+	"github.com/urbanlogiq/ulsdk/types/graph"
+	"github.com/urbanlogiq/ulsdk/types/schema"
+)
 
 func TestDefaultCategoryRelationshipData(t *testing.T) {
 	o := &CategoryRelationshipData{}
@@ -255,6 +261,22 @@ func TestDefaultGeometryData(t *testing.T) {
 }
 
 
+func TestUnionGeometryDataData(t *testing.T) {
+	for _, v := range []GeometryDataUnion{
+		&RawGeom{},
+		&graph.NodeIdPair{},
+	} {
+		o := &GeometryData{Data: v}
+		got, err := GeometryDataFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Data) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Data, v)
+		}
+	}
+}
+
 func TestDefaultHierarchicalRelationship(t *testing.T) {
 	o := &HierarchicalRelationship{}
 	if o == nil {
@@ -355,6 +377,40 @@ func TestRoundTripMetadata(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestUnionMetadataGeometrySource(t *testing.T) {
+	for _, v := range []GeometrySource{
+		&NoGeometry{},
+		&DatacatalogGeometry{},
+		&WorldGraphGeometry{},
+		&DatacatalogLatLngGeometry{},
+	} {
+		o := &Metadata{GeometrySource: v}
+		got, err := MetadataFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.GeometrySource) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.GeometrySource, v)
+		}
+	}
+}
+
+func TestUnionMetadataTimeSource(t *testing.T) {
+	for _, v := range []TimeSource{
+		&NoTime{},
+		&ColumnTime{},
+	} {
+		o := &Metadata{TimeSource: v}
+		got, err := MetadataFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.TimeSource) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.TimeSource, v)
+		}
 	}
 }
 
@@ -610,6 +666,66 @@ func TestRoundTripUlField(t *testing.T) {
 	}
 }
 
+func TestUnionUlFieldComponentData(t *testing.T) {
+	for _, v := range []ComponentData{
+		&StringCategories{},
+		&IntRange{},
+		&FloatRange{},
+		&DatetimeRange{},
+		&Dates{},
+		&NestedStringCategories{},
+	} {
+		o := &UlField{ComponentData: v}
+		got, err := UlFieldFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.ComponentData) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.ComponentData, v)
+		}
+	}
+}
+
+func TestUnionUlFieldStorageType(t *testing.T) {
+	for _, v := range []schema.Type{
+		&schema.Null{},
+		&schema.Int{},
+		&schema.FloatingPoint{},
+		&schema.Binary{},
+		&schema.Utf8{},
+		&schema.Bool{},
+		&schema.Decimal{},
+		&schema.Date{},
+		&schema.Time{},
+		&schema.Timestamp{},
+		&schema.Interval{},
+		&schema.List{},
+		&schema.Struct{},
+		&schema.Union{},
+		&schema.FixedSizeBinary{},
+		&schema.FixedSizeList{},
+		&schema.Map{},
+		&schema.Duration{},
+		&schema.LargeBinary{},
+		&schema.LargeUtf8{},
+		&schema.LargeList{},
+		&schema.RunEndEncoded{},
+		&schema.BinaryView{},
+		&schema.Utf8view{},
+		&schema.ListView{},
+		&schema.LargeListView{},
+	} {
+		o := &UlField{StorageType: v}
+		got, err := UlFieldFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.StorageType) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.StorageType, v)
+		}
+	}
+}
+
 func TestDefaultUlFieldRelationship(t *testing.T) {
 	o := &UlFieldRelationship{}
 	if o == nil {
@@ -626,6 +742,24 @@ func TestRoundTripUlFieldRelationship(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestUnionUlFieldRelationshipRelationshipData(t *testing.T) {
+	for _, v := range []UlFieldRelationshipData{
+		&HierarchyRelationshipData{},
+		&CategoryRelationshipData{},
+		&NestedCategoryRelationshipData{},
+		&NestedHierarchyRelationshipData{},
+	} {
+		o := &UlFieldRelationship{RelationshipData: v}
+		got, err := UlFieldRelationshipFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.RelationshipData) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.RelationshipData, v)
+		}
 	}
 }
 

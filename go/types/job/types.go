@@ -5,11 +5,13 @@
 package job
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/attr"
 	"github.com/urbanlogiq/ulsdk/types/data"
 	"github.com/urbanlogiq/ulsdk/types/id"
+	"github.com/urbanlogiq/ulsdk/types/value"
 )
 
 var _ flatbuffers.UOffsetT
@@ -68,9 +70,8 @@ func (o *EmbeddedTable) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UO
 }
 
 // TaskParameterValue is a union type. Possible concrete types: ObjectId, EmbeddedTable, ValueInstance
-type TaskParameterValue interface {
-	isTaskParameterValue()
-}
+// Assign a pointer to one of these types.
+type TaskParameterValue interface{}
 
 type TaskPriority int32
 
@@ -810,12 +811,28 @@ func (o *TaskList) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 
 type TaskParameter struct {
 	Key string
-	Value interface{}
+	Value TaskParameterValue
 }
 
 func TaskParameterFromFbs(fbs *generated.TaskParameter) *TaskParameter {
 	o := &TaskParameter{}
 	o.Key = string(fbs.Key())
+	if tbl := new(flatbuffers.Table); fbs.Value(tbl) {
+		switch fbs.ValueType() {
+		case generated.TaskParameterValueObjectId:
+			var u generated.ObjectId
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Value = id.ObjectIdFromFbs(&u)
+		case generated.TaskParameterValueEmbeddedTable:
+			var u generated.EmbeddedTable
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Value = EmbeddedTableFromFbs(&u)
+		case generated.TaskParameterValueValueInstance:
+			var u generated.ValueInstance
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Value = value.ValueInstanceFromFbs(&u)
+		}
+	}
 	return o
 }
 
@@ -836,7 +853,30 @@ func (o *TaskParameter) ToBytes() []byte {
 // SerializeTo writes the TaskParameter into a FlatBuffer builder and returns the offset.
 func (o *TaskParameter) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	keyOffset := builder.CreateString(o.Key)
+	var valueType generated.TaskParameterValue
+	var valueOffset flatbuffers.UOffsetT
+	switch v := o.Value.(type) {
+	case nil:
+	case *id.ObjectId:
+		if v != nil {
+			valueType, valueOffset = generated.TaskParameterValueObjectId, v.SerializeTo(builder)
+		}
+	case *EmbeddedTable:
+		if v != nil {
+			valueType, valueOffset = generated.TaskParameterValueEmbeddedTable, v.SerializeTo(builder)
+		}
+	case *value.ValueInstance:
+		if v != nil {
+			valueType, valueOffset = generated.TaskParameterValueValueInstance, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("TaskParameter.Value: %T is not a pointer to a TaskParameterValue variant", v))
+	}
 	generated.TaskParameterStart(builder)
 	generated.TaskParameterAddKey(builder, keyOffset)
+	if valueOffset != 0 {
+		generated.TaskParameterAddValueType(builder, valueType)
+		generated.TaskParameterAddValue(builder, valueOffset)
+	}
 	return generated.TaskParameterEnd(builder)
 }

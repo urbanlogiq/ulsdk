@@ -5,9 +5,11 @@
 package fs
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/attr"
+	"github.com/urbanlogiq/ulsdk/types/crypto"
 	"github.com/urbanlogiq/ulsdk/types/id"
 )
 
@@ -18,7 +20,7 @@ type File struct {
 	Blob *id.GenericId
 	Chunks []Chunk
 	Container *string
-	Digest interface{}
+	Digest crypto.Digest
 	Mime string
 	Size uint64
 	Tier int8
@@ -40,6 +42,14 @@ func FileFromFbs(fbs *generated.File) *File {
 	if s := fbs.Container(); s != nil {
 		str := string(s)
 		o.Container = &str
+	}
+	if tbl := new(flatbuffers.Table); fbs.Digest(tbl) {
+		switch fbs.DigestType() {
+		case generated.DigestSha256:
+			var u generated.Sha256
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Digest = crypto.Sha256FromFbs(&u)
+		}
 	}
 	o.Mime = string(fbs.Mime())
 	o.Size = fbs.Size()
@@ -85,6 +95,17 @@ func (o *File) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	if o.Container != nil {
 		containerOffset = builder.CreateString(*o.Container)
 	}
+	var digestType generated.Digest
+	var digestOffset flatbuffers.UOffsetT
+	switch v := o.Digest.(type) {
+	case nil:
+	case *crypto.Sha256:
+		if v != nil {
+			digestType, digestOffset = generated.DigestSha256, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("File.Digest: %T is not a pointer to a Digest variant", v))
+	}
 	mimeOffset := builder.CreateString(o.Mime)
 	var virusOffset flatbuffers.UOffsetT
 	if o.Virus != nil {
@@ -95,6 +116,10 @@ func (o *File) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	generated.FileAddBlob(builder, blobOffset)
 	generated.FileAddChunks(builder, chunksVecOffset)
 	generated.FileAddContainer(builder, containerOffset)
+	if digestOffset != 0 {
+		generated.FileAddDigestType(builder, digestType)
+		generated.FileAddDigest(builder, digestOffset)
+	}
 	generated.FileAddMime(builder, mimeOffset)
 	generated.FileAddSize(builder, o.Size)
 	generated.FileAddTier(builder, generated.StorageTier(o.Tier))
@@ -204,9 +229,8 @@ func (o *ObjectRef) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffse
 }
 
 // Entry is a union type. Possible concrete types: File, Directory, ObjectRef
-type Entry interface {
-	isEntry()
-}
+// Assign a pointer to one of these types.
+type Entry interface{}
 
 type EntryTy uint32
 
@@ -365,9 +389,8 @@ func (o *TopLevelDirectory) SerializeTo(builder *flatbuffers.Builder) flatbuffer
 }
 
 // ListEntry is a union type. Possible concrete types: ListFile, ListDirectory, ListObject, TopLevelDirectory
-type ListEntry interface {
-	isListEntry()
-}
+// Assign a pointer to one of these types.
+type ListEntry interface{}
 
 type StorageTier int8
 
@@ -380,7 +403,7 @@ const (
 
 type Chunk struct {
 	Blob id.GenericId
-	Digest interface{}
+	Digest crypto.Digest
 	Size uint64
 }
 
@@ -388,6 +411,14 @@ func ChunkFromFbs(fbs *generated.Chunk) *Chunk {
 	o := &Chunk{}
 	if fbsVal := fbs.Blob(nil); fbsVal != nil {
 		o.Blob = *id.GenericIdFromFbs(fbsVal)
+	}
+	if tbl := new(flatbuffers.Table); fbs.Digest(tbl) {
+		switch fbs.DigestType() {
+		case generated.DigestSha256:
+			var u generated.Sha256
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Digest = crypto.Sha256FromFbs(&u)
+		}
 	}
 	o.Size = fbs.Size()
 	return o
@@ -410,19 +441,50 @@ func (o *Chunk) ToBytes() []byte {
 // SerializeTo writes the Chunk into a FlatBuffer builder and returns the offset.
 func (o *Chunk) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	blobOffset := o.Blob.SerializeTo(builder)
+	var digestType generated.Digest
+	var digestOffset flatbuffers.UOffsetT
+	switch v := o.Digest.(type) {
+	case nil:
+	case *crypto.Sha256:
+		if v != nil {
+			digestType, digestOffset = generated.DigestSha256, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("Chunk.Digest: %T is not a pointer to a Digest variant", v))
+	}
 	generated.ChunkStart(builder)
 	generated.ChunkAddBlob(builder, blobOffset)
+	if digestOffset != 0 {
+		generated.ChunkAddDigestType(builder, digestType)
+		generated.ChunkAddDigest(builder, digestOffset)
+	}
 	generated.ChunkAddSize(builder, o.Size)
 	return generated.ChunkEnd(builder)
 }
 
 type DirectoryEntry struct {
-	Entry interface{}
+	Entry Entry
 	Parent id.ObjectId
 }
 
 func DirectoryEntryFromFbs(fbs *generated.DirectoryEntry) *DirectoryEntry {
 	o := &DirectoryEntry{}
+	if tbl := new(flatbuffers.Table); fbs.Entry(tbl) {
+		switch fbs.EntryType() {
+		case generated.EntryFile:
+			var u generated.File
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Entry = FileFromFbs(&u)
+		case generated.EntryDirectory:
+			var u generated.Directory
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Entry = DirectoryFromFbs(&u)
+		case generated.EntryObjectRef:
+			var u generated.ObjectRef
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Entry = ObjectRefFromFbs(&u)
+		}
+	}
 	if fbsVal := fbs.Parent(nil); fbsVal != nil {
 		o.Parent = *id.ObjectIdFromFbs(fbsVal)
 	}
@@ -445,8 +507,31 @@ func (o *DirectoryEntry) ToBytes() []byte {
 
 // SerializeTo writes the DirectoryEntry into a FlatBuffer builder and returns the offset.
 func (o *DirectoryEntry) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var entryType generated.Entry
+	var entryOffset flatbuffers.UOffsetT
+	switch v := o.Entry.(type) {
+	case nil:
+	case *File:
+		if v != nil {
+			entryType, entryOffset = generated.EntryFile, v.SerializeTo(builder)
+		}
+	case *Directory:
+		if v != nil {
+			entryType, entryOffset = generated.EntryDirectory, v.SerializeTo(builder)
+		}
+	case *ObjectRef:
+		if v != nil {
+			entryType, entryOffset = generated.EntryObjectRef, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("DirectoryEntry.Entry: %T is not a pointer to a Entry variant", v))
+	}
 	parentOffset := o.Parent.SerializeTo(builder)
 	generated.DirectoryEntryStart(builder)
+	if entryOffset != 0 {
+		generated.DirectoryEntryAddEntryType(builder, entryType)
+		generated.DirectoryEntryAddEntry(builder, entryOffset)
+	}
 	generated.DirectoryEntryAddParent(builder, parentOffset)
 	return generated.DirectoryEntryEnd(builder)
 }
@@ -498,7 +583,7 @@ func (o *DirectoryList) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UO
 
 type ListSlot struct {
 	Attributes []attr.Attr
-	Entry interface{}
+	Entry ListEntry
 	Id id.ObjectId
 	LastModifiedBy *id.B2cid
 	Name string
@@ -513,6 +598,26 @@ func ListSlotFromFbs(fbs *generated.ListSlot) *ListSlot {
 		var item generated.Attr
 		if fbs.Attributes(&item, i) {
 			o.Attributes = append(o.Attributes, *attr.AttrFromFbs(&item))
+		}
+	}
+	if tbl := new(flatbuffers.Table); fbs.Entry(tbl) {
+		switch fbs.EntryType() {
+		case generated.ListEntryListFile:
+			var u generated.ListFile
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Entry = ListFileFromFbs(&u)
+		case generated.ListEntryListDirectory:
+			var u generated.ListDirectory
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Entry = ListDirectoryFromFbs(&u)
+		case generated.ListEntryListObject:
+			var u generated.ListObject
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Entry = ListObjectFromFbs(&u)
+		case generated.ListEntryTopLevelDirectory:
+			var u generated.TopLevelDirectory
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Entry = TopLevelDirectoryFromFbs(&u)
 		}
 	}
 	if fbsVal := fbs.Id(nil); fbsVal != nil {
@@ -553,6 +658,29 @@ func (o *ListSlot) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 		builder.PrependUOffsetT(attributesOffsets[i])
 	}
 	attributesVecOffset := builder.EndVector(len(o.Attributes))
+	var entryType generated.ListEntry
+	var entryOffset flatbuffers.UOffsetT
+	switch v := o.Entry.(type) {
+	case nil:
+	case *ListFile:
+		if v != nil {
+			entryType, entryOffset = generated.ListEntryListFile, v.SerializeTo(builder)
+		}
+	case *ListDirectory:
+		if v != nil {
+			entryType, entryOffset = generated.ListEntryListDirectory, v.SerializeTo(builder)
+		}
+	case *ListObject:
+		if v != nil {
+			entryType, entryOffset = generated.ListEntryListObject, v.SerializeTo(builder)
+		}
+	case *TopLevelDirectory:
+		if v != nil {
+			entryType, entryOffset = generated.ListEntryTopLevelDirectory, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("ListSlot.Entry: %T is not a pointer to a ListEntry variant", v))
+	}
 	idOffset := o.Id.SerializeTo(builder)
 	var lastModifiedByOffset flatbuffers.UOffsetT
 	if o.LastModifiedBy != nil {
@@ -561,6 +689,10 @@ func (o *ListSlot) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 	nameOffset := builder.CreateString(o.Name)
 	generated.ListSlotStart(builder)
 	generated.ListSlotAddAttributes(builder, attributesVecOffset)
+	if entryOffset != 0 {
+		generated.ListSlotAddEntryType(builder, entryType)
+		generated.ListSlotAddEntry(builder, entryOffset)
+	}
 	generated.ListSlotAddId(builder, idOffset)
 	generated.ListSlotAddLastModifiedBy(builder, lastModifiedByOffset)
 	generated.ListSlotAddName(builder, nameOffset)

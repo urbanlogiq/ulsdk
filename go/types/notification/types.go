@@ -5,6 +5,7 @@
 package notification
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/id"
@@ -211,9 +212,8 @@ func (o *DriveChange) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOff
 }
 
 // NotificationUnion is a union type. Possible concrete types: Share, JobComplete, AccessRequest, DriveChange
-type NotificationUnion interface {
-	isNotificationUnion()
-}
+// Assign a pointer to one of these types.
+type NotificationUnion interface{}
 
 type ReadStatus byte
 
@@ -316,12 +316,32 @@ func (o *InboxItem) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffse
 }
 
 type Notification struct {
-	Notification interface{}
+	Notification NotificationUnion
 	Sender *id.B2cid
 }
 
 func NotificationFromFbs(fbs *generated.Notification) *Notification {
 	o := &Notification{}
+	if tbl := new(flatbuffers.Table); fbs.Notification(tbl) {
+		switch fbs.NotificationType() {
+		case generated.NotificationUnionShare:
+			var u generated.Share
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Notification = ShareFromFbs(&u)
+		case generated.NotificationUnionJobComplete:
+			var u generated.JobComplete
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Notification = JobCompleteFromFbs(&u)
+		case generated.NotificationUnionAccessRequest:
+			var u generated.AccessRequest
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Notification = AccessRequestFromFbs(&u)
+		case generated.NotificationUnionDriveChange:
+			var u generated.DriveChange
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Notification = DriveChangeFromFbs(&u)
+		}
+	}
 	if fbsVal := fbs.Sender(nil); fbsVal != nil {
 		o.Sender = id.B2cidFromFbs(fbsVal)
 	}
@@ -344,11 +364,38 @@ func (o *Notification) ToBytes() []byte {
 
 // SerializeTo writes the Notification into a FlatBuffer builder and returns the offset.
 func (o *Notification) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var notificationType generated.NotificationUnion
+	var notificationOffset flatbuffers.UOffsetT
+	switch v := o.Notification.(type) {
+	case nil:
+	case *Share:
+		if v != nil {
+			notificationType, notificationOffset = generated.NotificationUnionShare, v.SerializeTo(builder)
+		}
+	case *JobComplete:
+		if v != nil {
+			notificationType, notificationOffset = generated.NotificationUnionJobComplete, v.SerializeTo(builder)
+		}
+	case *AccessRequest:
+		if v != nil {
+			notificationType, notificationOffset = generated.NotificationUnionAccessRequest, v.SerializeTo(builder)
+		}
+	case *DriveChange:
+		if v != nil {
+			notificationType, notificationOffset = generated.NotificationUnionDriveChange, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("Notification.Notification: %T is not a pointer to a NotificationUnion variant", v))
+	}
 	var senderOffset flatbuffers.UOffsetT
 	if o.Sender != nil {
 		senderOffset = o.Sender.SerializeTo(builder)
 	}
 	generated.NotificationStart(builder)
+	if notificationOffset != 0 {
+		generated.NotificationAddNotificationType(builder, notificationType)
+		generated.NotificationAddNotification(builder, notificationOffset)
+	}
 	generated.NotificationAddSender(builder, senderOffset)
 	return generated.NotificationEnd(builder)
 }

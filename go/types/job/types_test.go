@@ -4,7 +4,13 @@
 
 package job
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+
+	"github.com/urbanlogiq/ulsdk/types/id"
+	"github.com/urbanlogiq/ulsdk/types/value"
+)
 
 func TestDefaultDeprecatedRunSpec(t *testing.T) {
 	o := &DeprecatedRunSpec{}
@@ -112,3 +118,20 @@ func TestDefaultTaskParameter(t *testing.T) {
 	}
 }
 
+
+func TestUnionTaskParameterValue(t *testing.T) {
+	for _, v := range []TaskParameterValue{
+		&id.ObjectId{},
+		&EmbeddedTable{},
+		&value.ValueInstance{},
+	} {
+		o := &TaskParameter{Value: v}
+		got, err := TaskParameterFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Value) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Value, v)
+		}
+	}
+}

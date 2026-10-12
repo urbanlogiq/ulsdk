@@ -5,9 +5,11 @@
 package worklog
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/id"
+	"github.com/urbanlogiq/ulsdk/types/value"
 )
 
 var _ flatbuffers.UOffsetT
@@ -106,9 +108,8 @@ func (o *ParameterFlags) SerializeTo(builder *flatbuffers.Builder) flatbuffers.U
 }
 
 // ParameterValue is a union type. Possible concrete types: ByteArray, ObjectId, ParameterFlags, ValueInstance
-type ParameterValue interface {
-	isParameterValue()
-}
+// Assign a pointer to one of these types.
+type ParameterValue interface{}
 
 type ContainerRef struct {
 	Image string
@@ -143,9 +144,8 @@ func (o *ContainerRef) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOf
 }
 
 // ProducerRef is a union type. Possible concrete types: ObjectId, ContainerRef
-type ProducerRef interface {
-	isProducerRef()
-}
+// Assign a pointer to one of these types.
+type ProducerRef interface{}
 
 // ValuesFormatTy -
 //  Whether do display raw numbers or percentages
@@ -236,7 +236,7 @@ func (o *Layout) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT 
 type Producer struct {
 	BuilderCodeRef *GitRef
 	Executor GitRef
-	Model interface{}
+	Model ProducerRef
 }
 
 func ProducerFromFbs(fbs *generated.Producer) *Producer {
@@ -246,6 +246,18 @@ func ProducerFromFbs(fbs *generated.Producer) *Producer {
 	}
 	if fbsVal := fbs.Executor(nil); fbsVal != nil {
 		o.Executor = *GitRefFromFbs(fbsVal)
+	}
+	if tbl := new(flatbuffers.Table); fbs.Model(tbl) {
+		switch fbs.ModelType() {
+		case generated.ProducerRefObjectId:
+			var u generated.ObjectId
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Model = id.ObjectIdFromFbs(&u)
+		case generated.ProducerRefContainerRef:
+			var u generated.ContainerRef
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Model = ContainerRefFromFbs(&u)
+		}
 	}
 	return o
 }
@@ -271,9 +283,28 @@ func (o *Producer) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 		builderCodeRefOffset = o.BuilderCodeRef.SerializeTo(builder)
 	}
 	executorOffset := o.Executor.SerializeTo(builder)
+	var modelType generated.ProducerRef
+	var modelOffset flatbuffers.UOffsetT
+	switch v := o.Model.(type) {
+	case nil:
+	case *id.ObjectId:
+		if v != nil {
+			modelType, modelOffset = generated.ProducerRefObjectId, v.SerializeTo(builder)
+		}
+	case *ContainerRef:
+		if v != nil {
+			modelType, modelOffset = generated.ProducerRefContainerRef, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("Producer.Model: %T is not a pointer to a ProducerRef variant", v))
+	}
 	generated.ProducerStart(builder)
 	generated.ProducerAddBuilderCodeRef(builder, builderCodeRefOffset)
 	generated.ProducerAddExecutor(builder, executorOffset)
+	if modelOffset != 0 {
+		generated.ProducerAddModelType(builder, modelType)
+		generated.ProducerAddModel(builder, modelOffset)
+	}
 	return generated.ProducerEnd(builder)
 }
 
@@ -590,12 +621,32 @@ func (o *WorkLog) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT
 
 type WorklogParameter struct {
 	Key string
-	Value interface{}
+	Value ParameterValue
 }
 
 func WorklogParameterFromFbs(fbs *generated.WorklogParameter) *WorklogParameter {
 	o := &WorklogParameter{}
 	o.Key = string(fbs.Key())
+	if tbl := new(flatbuffers.Table); fbs.Value(tbl) {
+		switch fbs.ValueType() {
+		case generated.ParameterValueByteArray:
+			var u generated.ByteArray
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Value = ByteArrayFromFbs(&u)
+		case generated.ParameterValueObjectId:
+			var u generated.ObjectId
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Value = id.ObjectIdFromFbs(&u)
+		case generated.ParameterValueParameterFlags:
+			var u generated.ParameterFlags
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Value = ParameterFlagsFromFbs(&u)
+		case generated.ParameterValueValueInstance:
+			var u generated.ValueInstance
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Value = value.ValueInstanceFromFbs(&u)
+		}
+	}
 	return o
 }
 
@@ -616,7 +667,34 @@ func (o *WorklogParameter) ToBytes() []byte {
 // SerializeTo writes the WorklogParameter into a FlatBuffer builder and returns the offset.
 func (o *WorklogParameter) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	keyOffset := builder.CreateString(o.Key)
+	var valueType generated.ParameterValue
+	var valueOffset flatbuffers.UOffsetT
+	switch v := o.Value.(type) {
+	case nil:
+	case *ByteArray:
+		if v != nil {
+			valueType, valueOffset = generated.ParameterValueByteArray, v.SerializeTo(builder)
+		}
+	case *id.ObjectId:
+		if v != nil {
+			valueType, valueOffset = generated.ParameterValueObjectId, v.SerializeTo(builder)
+		}
+	case *ParameterFlags:
+		if v != nil {
+			valueType, valueOffset = generated.ParameterValueParameterFlags, v.SerializeTo(builder)
+		}
+	case *value.ValueInstance:
+		if v != nil {
+			valueType, valueOffset = generated.ParameterValueValueInstance, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("WorklogParameter.Value: %T is not a pointer to a ParameterValue variant", v))
+	}
 	generated.WorklogParameterStart(builder)
 	generated.WorklogParameterAddKey(builder, keyOffset)
+	if valueOffset != 0 {
+		generated.WorklogParameterAddValueType(builder, valueType)
+		generated.WorklogParameterAddValue(builder, valueOffset)
+	}
 	return generated.WorklogParameterEnd(builder)
 }

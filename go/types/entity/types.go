@@ -580,9 +580,8 @@ func (o *MultiPoint) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffs
 }
 
 // Geometry is a union type. Possible concrete types: Point, Line, MultiLine, Polygon, MultiPolygon, MultiPoint
-type Geometry interface {
-	isGeometry()
-}
+// Assign a pointer to one of these types.
+type Geometry interface{}
 
 type NodeTy int32
 
@@ -627,7 +626,7 @@ func (o *GraphEdge) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffse
 type GraphNode struct {
 	Description *string
 	EntityType int32
-	Geom interface{}
+	Geom Geometry
 	Location *Point
 	NodeId *id.GenericId
 	NodeType int32

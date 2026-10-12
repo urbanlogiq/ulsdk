@@ -4,7 +4,12 @@
 
 package query
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+
+	"github.com/urbanlogiq/ulsdk/types/graph"
+)
 
 func TestDefaultAddCol(t *testing.T) {
 	o := &AddCol{}
@@ -57,6 +62,22 @@ func TestDefaultAlterTableOperation(t *testing.T) {
 }
 
 
+func TestUnionAlterTableOperationOp(t *testing.T) {
+	for _, v := range []AlterTableOperationUnion{
+		&AddCol{},
+		&DropCol{},
+	} {
+		o := &AlterTableOperation{Op: v}
+		got, err := AlterTableOperationFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Op) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Op, v)
+		}
+	}
+}
+
 func TestDefaultArrow(t *testing.T) {
 	o := &Arrow{}
 	if o == nil {
@@ -97,6 +118,22 @@ func TestDefaultDataCatalog(t *testing.T) {
 }
 
 
+func TestUnionDataCatalogPartition(t *testing.T) {
+	for _, v := range []TablePartition{
+		&MvdbPartition{},
+		&WorklogPartition{},
+	} {
+		o := &DataCatalog{Partition: v}
+		got, err := DataCatalogFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Partition) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Partition, v)
+		}
+	}
+}
+
 func TestDefaultDeleteQueryElement(t *testing.T) {
 	o := &DeleteQueryElement{}
 	if o == nil {
@@ -104,6 +141,29 @@ func TestDefaultDeleteQueryElement(t *testing.T) {
 	}
 }
 
+
+func TestUnionDeleteQueryElementSource(t *testing.T) {
+	for _, v := range []TableSourceUnion{
+		&DataCatalog{},
+		&Arrow{},
+		&graph.GraphQuery{},
+		&QueryTableSource{},
+		&Vector{},
+		&Placeholder{},
+		&Drive{},
+		&Values{},
+		&TimeSeries{},
+	} {
+		o := &DeleteQueryElement{Source: v}
+		got, err := DeleteQueryElementFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Source) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Source, v)
+		}
+	}
+}
 
 func TestDefaultDistinct(t *testing.T) {
 	o := &Distinct{}
@@ -205,6 +265,31 @@ func TestDefaultExpr(t *testing.T) {
 }
 
 
+func TestUnionExprExprs(t *testing.T) {
+	for _, v := range []ExprUnion{
+		&ValueIndex{},
+		&Column{},
+		&Function{},
+		&AllColumns{},
+		&Case{},
+		&OrderByExpr{},
+		&Partition{},
+		&UnsetArgument{},
+		&Window{},
+		&ValueName{},
+		&AggregateFilter{},
+	} {
+		o := &Expr{Exprs: v}
+		got, err := ExprFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Exprs) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Exprs, v)
+		}
+	}
+}
+
 func TestDefaultFunction(t *testing.T) {
 	o := &Function{}
 	if o == nil {
@@ -239,6 +324,29 @@ func TestDefaultInsertQueryElement(t *testing.T) {
 	}
 }
 
+
+func TestUnionInsertQueryElementDest(t *testing.T) {
+	for _, v := range []TableSourceUnion{
+		&DataCatalog{},
+		&Arrow{},
+		&graph.GraphQuery{},
+		&QueryTableSource{},
+		&Vector{},
+		&Placeholder{},
+		&Drive{},
+		&Values{},
+		&TimeSeries{},
+	} {
+		o := &InsertQueryElement{Dest: v}
+		got, err := InsertQueryElementFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Dest) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Dest, v)
+		}
+	}
+}
 
 func TestDefaultJoin(t *testing.T) {
 	o := &Join{}
@@ -294,6 +402,23 @@ func TestDefaultOnConflict(t *testing.T) {
 }
 
 
+func TestUnionOnConflictAction(t *testing.T) {
+	for _, v := range []ConflictAction{
+		&InsertConflicting{},
+		&DoNothing{},
+		&DoUpdate{},
+	} {
+		o := &OnConflict{Action: v}
+		got, err := OnConflictFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Action) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Action, v)
+		}
+	}
+}
+
 func TestDefaultOrderByExpr(t *testing.T) {
 	o := &OrderByExpr{}
 	if o == nil {
@@ -345,6 +470,26 @@ func TestDefaultQueryElement(t *testing.T) {
 }
 
 
+func TestUnionQueryElementQ(t *testing.T) {
+	for _, v := range []QueryElementUnion{
+		&UnaryQueryElement{},
+		&BinaryQueryElement{},
+		&UpdateQueryElement{},
+		&DeleteQueryElement{},
+		&InsertQueryElement{},
+		&AlterTableElement{},
+	} {
+		o := &QueryElement{Q: v}
+		got, err := QueryElementFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Q) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Q, v)
+		}
+	}
+}
+
 func TestDefaultQueryTableSource(t *testing.T) {
 	o := &QueryTableSource{}
 	if o == nil {
@@ -377,6 +522,29 @@ func TestDefaultTableSource(t *testing.T) {
 }
 
 
+func TestUnionTableSourceT(t *testing.T) {
+	for _, v := range []TableSourceUnion{
+		&DataCatalog{},
+		&Arrow{},
+		&graph.GraphQuery{},
+		&QueryTableSource{},
+		&Vector{},
+		&Placeholder{},
+		&Drive{},
+		&Values{},
+		&TimeSeries{},
+	} {
+		o := &TableSource{T: v}
+		got, err := TableSourceFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.T) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.T, v)
+		}
+	}
+}
+
 func TestDefaultTableSourceInstance(t *testing.T) {
 	o := &TableSourceInstance{}
 	if o == nil {
@@ -384,6 +552,29 @@ func TestDefaultTableSourceInstance(t *testing.T) {
 	}
 }
 
+
+func TestUnionTableSourceInstanceT(t *testing.T) {
+	for _, v := range []TableSourceUnion{
+		&DataCatalog{},
+		&Arrow{},
+		&graph.GraphQuery{},
+		&QueryTableSource{},
+		&Vector{},
+		&Placeholder{},
+		&Drive{},
+		&Values{},
+		&TimeSeries{},
+	} {
+		o := &TableSourceInstance{T: v}
+		got, err := TableSourceInstanceFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.T) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.T, v)
+		}
+	}
+}
 
 func TestDefaultTimeSeries(t *testing.T) {
 	o := &TimeSeries{}
@@ -427,6 +618,29 @@ func TestDefaultUpdateQueryElement(t *testing.T) {
 	}
 }
 
+
+func TestUnionUpdateQueryElementSource(t *testing.T) {
+	for _, v := range []TableSourceUnion{
+		&DataCatalog{},
+		&Arrow{},
+		&graph.GraphQuery{},
+		&QueryTableSource{},
+		&Vector{},
+		&Placeholder{},
+		&Drive{},
+		&Values{},
+		&TimeSeries{},
+	} {
+		o := &UpdateQueryElement{Source: v}
+		got, err := UpdateQueryElementFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Source) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Source, v)
+		}
+	}
+}
 
 func TestDefaultValueIndex(t *testing.T) {
 	o := &ValueIndex{}

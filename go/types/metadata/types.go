@@ -5,9 +5,12 @@
 package metadata
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
+	"github.com/urbanlogiq/ulsdk/types/graph"
 	"github.com/urbanlogiq/ulsdk/types/id"
+	"github.com/urbanlogiq/ulsdk/types/schema"
 	"github.com/urbanlogiq/ulsdk/types/value"
 )
 
@@ -379,9 +382,8 @@ func (o *NestedStringCategories) SerializeTo(builder *flatbuffers.Builder) flatb
 }
 
 // ComponentData is a union type. Possible concrete types: StringCategories, IntRange, FloatRange, DatetimeRange, Dates, NestedStringCategories
-type ComponentData interface {
-	isComponentData()
-}
+// Assign a pointer to one of these types.
+type ComponentData interface{}
 
 type DatasetCategory uint32
 
@@ -469,9 +471,8 @@ func (o *RawGeom) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT
 }
 
 // GeometryDataUnion is a union type. Possible concrete types: RawGeom, NodeIdPair
-type GeometryDataUnion interface {
-	isGeometryDataUnion()
-}
+// Assign a pointer to one of these types.
+type GeometryDataUnion interface{}
 
 type NoGeometry struct {
 }
@@ -643,9 +644,8 @@ func (o *DatacatalogLatLngGeometry) SerializeTo(builder *flatbuffers.Builder) fl
 //  Append new variants only — a union member's position is its wire value, so
 //  inserting one would silently reinterpret existing stored metadata.
 // GeometrySource is a union type. Possible concrete types: NoGeometry, DatacatalogGeometry, WorldGraphGeometry, DatacatalogLatLngGeometry
-type GeometrySource interface {
-	isGeometrySource()
-}
+// Assign a pointer to one of these types.
+type GeometrySource interface{}
 
 type NumericalFieldValueType uint32
 
@@ -738,9 +738,8 @@ func (o *ColumnTime) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffs
 //  Append new variants only -- a union member's position is its wire value, so
 //  inserting one would silently reinterpret existing stored metadata.
 // TimeSource is a union type. Possible concrete types: NoTime, ColumnTime
-type TimeSource interface {
-	isTimeSource()
-}
+// Assign a pointer to one of these types.
+type TimeSource interface{}
 
 type HierarchyRelationshipData struct {
 	Hierarchy []HierarchicalRelationship
@@ -926,9 +925,8 @@ func (o *NestedHierarchyRelationshipData) SerializeTo(builder *flatbuffers.Build
 }
 
 // UlFieldRelationshipData is a union type. Possible concrete types: HierarchyRelationshipData, CategoryRelationshipData, NestedCategoryRelationshipData, NestedHierarchyRelationshipData
-type UlFieldRelationshipData interface {
-	isUlFieldRelationshipData()
-}
+// Assign a pointer to one of these types.
+type UlFieldRelationshipData interface{}
 
 type UlFieldType uint32
 
@@ -1446,11 +1444,23 @@ func (o *ForeignKey) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffs
 }
 
 type GeometryData struct {
-	Data interface{}
+	Data GeometryDataUnion
 }
 
 func GeometryDataFromFbs(fbs *generated.GeometryData) *GeometryData {
 	o := &GeometryData{}
+	if tbl := new(flatbuffers.Table); fbs.Data(tbl) {
+		switch fbs.DataType() {
+		case generated.GeometryDataUnionRawGeom:
+			var u generated.RawGeom
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Data = RawGeomFromFbs(&u)
+		case generated.GeometryDataUnionNodeIdPair:
+			var u generated.NodeIdPair
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Data = graph.NodeIdPairFromFbs(&u)
+		}
+	}
 	return o
 }
 
@@ -1470,7 +1480,26 @@ func (o *GeometryData) ToBytes() []byte {
 
 // SerializeTo writes the GeometryData into a FlatBuffer builder and returns the offset.
 func (o *GeometryData) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var dataType generated.GeometryDataUnion
+	var dataOffset flatbuffers.UOffsetT
+	switch v := o.Data.(type) {
+	case nil:
+	case *RawGeom:
+		if v != nil {
+			dataType, dataOffset = generated.GeometryDataUnionRawGeom, v.SerializeTo(builder)
+		}
+	case *graph.NodeIdPair:
+		if v != nil {
+			dataType, dataOffset = generated.GeometryDataUnionNodeIdPair, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("GeometryData.Data: %T is not a pointer to a GeometryDataUnion variant", v))
+	}
 	generated.GeometryDataStart(builder)
+	if dataOffset != 0 {
+		generated.GeometryDataAddDataType(builder, dataType)
+		generated.GeometryDataAddData(builder, dataOffset)
+	}
 	return generated.GeometryDataEnd(builder)
 }
 
@@ -1630,13 +1659,13 @@ type Metadata struct {
 	FieldRelationships []UlFieldRelationship
 	Fields []UlField
 	ForeignKeys []ForeignKey
-	GeometrySource interface{}
+	GeometrySource GeometrySource
 	LocationDescriptionField int32
 	NeedsCallerInputs bool
 	PromotedMetrics []int32
 	Source *DatasetSource
 	Summary []int32
-	TimeSource interface{}
+	TimeSource TimeSource
 	UpdateCadence uint32
 	VisualizeInExploreFields []int32
 }
@@ -1685,6 +1714,26 @@ func MetadataFromFbs(fbs *generated.Metadata) *Metadata {
 			o.ForeignKeys = append(o.ForeignKeys, *ForeignKeyFromFbs(&item))
 		}
 	}
+	if tbl := new(flatbuffers.Table); fbs.GeometrySource(tbl) {
+		switch fbs.GeometrySourceType() {
+		case generated.GeometrySourceNoGeometry:
+			var u generated.NoGeometry
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.GeometrySource = NoGeometryFromFbs(&u)
+		case generated.GeometrySourceDatacatalogGeometry:
+			var u generated.DatacatalogGeometry
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.GeometrySource = DatacatalogGeometryFromFbs(&u)
+		case generated.GeometrySourceWorldGraphGeometry:
+			var u generated.WorldGraphGeometry
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.GeometrySource = WorldGraphGeometryFromFbs(&u)
+		case generated.GeometrySourceDatacatalogLatLngGeometry:
+			var u generated.DatacatalogLatLngGeometry
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.GeometrySource = DatacatalogLatLngGeometryFromFbs(&u)
+		}
+	}
 	o.LocationDescriptionField = fbs.LocationDescriptionField()
 	o.NeedsCallerInputs = fbs.NeedsCallerInputs()
 	for i := 0; i < fbs.PromotedMetricsLength(); i++ {
@@ -1695,6 +1744,18 @@ func MetadataFromFbs(fbs *generated.Metadata) *Metadata {
 	}
 	for i := 0; i < fbs.SummaryLength(); i++ {
 		o.Summary = append(o.Summary, fbs.Summary(i))
+	}
+	if tbl := new(flatbuffers.Table); fbs.TimeSource(tbl) {
+		switch fbs.TimeSourceType() {
+		case generated.TimeSourceNoTime:
+			var u generated.NoTime
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.TimeSource = NoTimeFromFbs(&u)
+		case generated.TimeSourceColumnTime:
+			var u generated.ColumnTime
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.TimeSource = ColumnTimeFromFbs(&u)
+		}
 	}
 	o.UpdateCadence = uint32(fbs.UpdateCadence())
 	for i := 0; i < fbs.VisualizeInExploreFieldsLength(); i++ {
@@ -1772,6 +1833,29 @@ func (o *Metadata) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 		builder.PrependUOffsetT(foreignKeysOffsets[i])
 	}
 	foreignKeysVecOffset := builder.EndVector(len(o.ForeignKeys))
+	var geometrySourceType generated.GeometrySource
+	var geometrySourceOffset flatbuffers.UOffsetT
+	switch v := o.GeometrySource.(type) {
+	case nil:
+	case *NoGeometry:
+		if v != nil {
+			geometrySourceType, geometrySourceOffset = generated.GeometrySourceNoGeometry, v.SerializeTo(builder)
+		}
+	case *DatacatalogGeometry:
+		if v != nil {
+			geometrySourceType, geometrySourceOffset = generated.GeometrySourceDatacatalogGeometry, v.SerializeTo(builder)
+		}
+	case *WorldGraphGeometry:
+		if v != nil {
+			geometrySourceType, geometrySourceOffset = generated.GeometrySourceWorldGraphGeometry, v.SerializeTo(builder)
+		}
+	case *DatacatalogLatLngGeometry:
+		if v != nil {
+			geometrySourceType, geometrySourceOffset = generated.GeometrySourceDatacatalogLatLngGeometry, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("Metadata.GeometrySource: %T is not a pointer to a GeometrySource variant", v))
+	}
 	generated.MetadataStartPromotedMetricsVector(builder, len(o.PromotedMetrics))
 	for i := len(o.PromotedMetrics) - 1; i >= 0; i-- {
 		builder.PrependInt32(o.PromotedMetrics[i])
@@ -1786,6 +1870,21 @@ func (o *Metadata) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 		builder.PrependInt32(o.Summary[i])
 	}
 	summaryVecOffset := builder.EndVector(len(o.Summary))
+	var timeSourceType generated.TimeSource
+	var timeSourceOffset flatbuffers.UOffsetT
+	switch v := o.TimeSource.(type) {
+	case nil:
+	case *NoTime:
+		if v != nil {
+			timeSourceType, timeSourceOffset = generated.TimeSourceNoTime, v.SerializeTo(builder)
+		}
+	case *ColumnTime:
+		if v != nil {
+			timeSourceType, timeSourceOffset = generated.TimeSourceColumnTime, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("Metadata.TimeSource: %T is not a pointer to a TimeSource variant", v))
+	}
 	generated.MetadataStartVisualizeInExploreFieldsVector(builder, len(o.VisualizeInExploreFields))
 	for i := len(o.VisualizeInExploreFields) - 1; i >= 0; i-- {
 		builder.PrependInt32(o.VisualizeInExploreFields[i])
@@ -1803,11 +1902,19 @@ func (o *Metadata) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 	generated.MetadataAddFieldRelationships(builder, fieldRelationshipsVecOffset)
 	generated.MetadataAddFields(builder, fieldsVecOffset)
 	generated.MetadataAddForeignKeys(builder, foreignKeysVecOffset)
+	if geometrySourceOffset != 0 {
+		generated.MetadataAddGeometrySourceType(builder, geometrySourceType)
+		generated.MetadataAddGeometrySource(builder, geometrySourceOffset)
+	}
 	generated.MetadataAddLocationDescriptionField(builder, o.LocationDescriptionField)
 	generated.MetadataAddNeedsCallerInputs(builder, o.NeedsCallerInputs)
 	generated.MetadataAddPromotedMetrics(builder, promotedMetricsVecOffset)
 	generated.MetadataAddSource(builder, sourceOffset)
 	generated.MetadataAddSummary(builder, summaryVecOffset)
+	if timeSourceOffset != 0 {
+		generated.MetadataAddTimeSourceType(builder, timeSourceType)
+		generated.MetadataAddTimeSource(builder, timeSourceOffset)
+	}
 	generated.MetadataAddUpdateCadence(builder, generated.UpdateCadence(o.UpdateCadence))
 	generated.MetadataAddVisualizeInExploreFields(builder, visualizeInExploreFieldsVecOffset)
 	return generated.MetadataEnd(builder)
@@ -2109,7 +2216,7 @@ func UIntBucketFromFbs(fbs *generated.UIntBucket) *UIntBucket {
 
 type UlField struct {
 	BreakdownDisplayName *string
-	ComponentData interface{}
+	ComponentData ComponentData
 	ConceptAttr *ConceptBinding
 	Default *value.ValueInstance
 	Description *string
@@ -2117,7 +2224,7 @@ type UlField struct {
 	FieldName *string
 	FieldType uint32
 	Flags uint32
-	StorageType interface{}
+	StorageType schema.Type
 	Unit uint32
 }
 
@@ -2126,6 +2233,34 @@ func UlFieldFromFbs(fbs *generated.UlField) *UlField {
 	if s := fbs.BreakdownDisplayName(); s != nil {
 		str := string(s)
 		o.BreakdownDisplayName = &str
+	}
+	if tbl := new(flatbuffers.Table); fbs.ComponentData(tbl) {
+		switch fbs.ComponentDataType() {
+		case generated.ComponentDataStringCategories:
+			var u generated.StringCategories
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.ComponentData = StringCategoriesFromFbs(&u)
+		case generated.ComponentDataIntRange:
+			var u generated.IntRange
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.ComponentData = IntRangeFromFbs(&u)
+		case generated.ComponentDataFloatRange:
+			var u generated.FloatRange
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.ComponentData = FloatRangeFromFbs(&u)
+		case generated.ComponentDataDatetimeRange:
+			var u generated.DatetimeRange
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.ComponentData = DatetimeRangeFromFbs(&u)
+		case generated.ComponentDataDates:
+			var u generated.Dates
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.ComponentData = DatesFromFbs(&u)
+		case generated.ComponentDataNestedStringCategories:
+			var u generated.NestedStringCategories
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.ComponentData = NestedStringCategoriesFromFbs(&u)
+		}
 	}
 	if fbsVal := fbs.ConceptAttr(nil); fbsVal != nil {
 		o.ConceptAttr = ConceptBindingFromFbs(fbsVal)
@@ -2147,6 +2282,114 @@ func UlFieldFromFbs(fbs *generated.UlField) *UlField {
 	}
 	o.FieldType = uint32(fbs.FieldType())
 	o.Flags = fbs.Flags()
+	if tbl := new(flatbuffers.Table); fbs.StorageType(tbl) {
+		switch fbs.StorageTypeType() {
+		case generated.TypeNull:
+			var u generated.Null
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.NullFromFbs(&u)
+		case generated.TypeInt:
+			var u generated.Int
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.IntFromFbs(&u)
+		case generated.TypeFloatingPoint:
+			var u generated.FloatingPoint
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.FloatingPointFromFbs(&u)
+		case generated.TypeBinary:
+			var u generated.Binary
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.BinaryFromFbs(&u)
+		case generated.TypeUtf8:
+			var u generated.Utf8
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.Utf8FromFbs(&u)
+		case generated.TypeBool:
+			var u generated.Bool
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.BoolFromFbs(&u)
+		case generated.TypeDecimal:
+			var u generated.Decimal
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.DecimalFromFbs(&u)
+		case generated.TypeDate:
+			var u generated.Date
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.DateFromFbs(&u)
+		case generated.TypeTime:
+			var u generated.Time
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.TimeFromFbs(&u)
+		case generated.TypeTimestamp:
+			var u generated.Timestamp
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.TimestampFromFbs(&u)
+		case generated.TypeInterval:
+			var u generated.Interval
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.IntervalFromFbs(&u)
+		case generated.TypeList:
+			var u generated.List
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.ListFromFbs(&u)
+		case generated.TypeStruct_:
+			var u generated.Struct_
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.StructFromFbs(&u)
+		case generated.TypeUnion:
+			var u generated.Union
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.UnionFromFbs(&u)
+		case generated.TypeFixedSizeBinary:
+			var u generated.FixedSizeBinary
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.FixedSizeBinaryFromFbs(&u)
+		case generated.TypeFixedSizeList:
+			var u generated.FixedSizeList
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.FixedSizeListFromFbs(&u)
+		case generated.TypeMap:
+			var u generated.Map
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.MapFromFbs(&u)
+		case generated.TypeDuration:
+			var u generated.Duration
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.DurationFromFbs(&u)
+		case generated.TypeLargeBinary:
+			var u generated.LargeBinary
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.LargeBinaryFromFbs(&u)
+		case generated.TypeLargeUtf8:
+			var u generated.LargeUtf8
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.LargeUtf8FromFbs(&u)
+		case generated.TypeLargeList:
+			var u generated.LargeList
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.LargeListFromFbs(&u)
+		case generated.TypeRunEndEncoded:
+			var u generated.RunEndEncoded
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.RunEndEncodedFromFbs(&u)
+		case generated.TypeBinaryView:
+			var u generated.BinaryView
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.BinaryViewFromFbs(&u)
+		case generated.TypeUtf8View:
+			var u generated.Utf8View
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.Utf8viewFromFbs(&u)
+		case generated.TypeListView:
+			var u generated.ListView
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.ListViewFromFbs(&u)
+		case generated.TypeLargeListView:
+			var u generated.LargeListView
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.StorageType = schema.LargeListViewFromFbs(&u)
+		}
+	}
 	o.Unit = uint32(fbs.Unit())
 	return o
 }
@@ -2171,6 +2414,37 @@ func (o *UlField) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT
 	if o.BreakdownDisplayName != nil {
 		breakdownDisplayNameOffset = builder.CreateString(*o.BreakdownDisplayName)
 	}
+	var componentDataType generated.ComponentData
+	var componentDataOffset flatbuffers.UOffsetT
+	switch v := o.ComponentData.(type) {
+	case nil:
+	case *StringCategories:
+		if v != nil {
+			componentDataType, componentDataOffset = generated.ComponentDataStringCategories, v.SerializeTo(builder)
+		}
+	case *IntRange:
+		if v != nil {
+			componentDataType, componentDataOffset = generated.ComponentDataIntRange, v.SerializeTo(builder)
+		}
+	case *FloatRange:
+		if v != nil {
+			componentDataType, componentDataOffset = generated.ComponentDataFloatRange, v.SerializeTo(builder)
+		}
+	case *DatetimeRange:
+		if v != nil {
+			componentDataType, componentDataOffset = generated.ComponentDataDatetimeRange, v.SerializeTo(builder)
+		}
+	case *Dates:
+		if v != nil {
+			componentDataType, componentDataOffset = generated.ComponentDataDates, v.SerializeTo(builder)
+		}
+	case *NestedStringCategories:
+		if v != nil {
+			componentDataType, componentDataOffset = generated.ComponentDataNestedStringCategories, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("UlField.ComponentData: %T is not a pointer to a ComponentData variant", v))
+	}
 	var conceptAttrOffset flatbuffers.UOffsetT
 	if o.ConceptAttr != nil {
 		conceptAttrOffset = o.ConceptAttr.SerializeTo(builder)
@@ -2191,8 +2465,123 @@ func (o *UlField) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT
 	if o.FieldName != nil {
 		fieldNameOffset = builder.CreateString(*o.FieldName)
 	}
+	var storageTypeType generated.Type
+	var storageTypeOffset flatbuffers.UOffsetT
+	switch v := o.StorageType.(type) {
+	case nil:
+	case *schema.Null:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeNull, v.SerializeTo(builder)
+		}
+	case *schema.Int:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeInt, v.SerializeTo(builder)
+		}
+	case *schema.FloatingPoint:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeFloatingPoint, v.SerializeTo(builder)
+		}
+	case *schema.Binary:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeBinary, v.SerializeTo(builder)
+		}
+	case *schema.Utf8:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeUtf8, v.SerializeTo(builder)
+		}
+	case *schema.Bool:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeBool, v.SerializeTo(builder)
+		}
+	case *schema.Decimal:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeDecimal, v.SerializeTo(builder)
+		}
+	case *schema.Date:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeDate, v.SerializeTo(builder)
+		}
+	case *schema.Time:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeTime, v.SerializeTo(builder)
+		}
+	case *schema.Timestamp:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeTimestamp, v.SerializeTo(builder)
+		}
+	case *schema.Interval:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeInterval, v.SerializeTo(builder)
+		}
+	case *schema.List:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeList, v.SerializeTo(builder)
+		}
+	case *schema.Struct:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeStruct_, v.SerializeTo(builder)
+		}
+	case *schema.Union:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeUnion, v.SerializeTo(builder)
+		}
+	case *schema.FixedSizeBinary:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeFixedSizeBinary, v.SerializeTo(builder)
+		}
+	case *schema.FixedSizeList:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeFixedSizeList, v.SerializeTo(builder)
+		}
+	case *schema.Map:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeMap, v.SerializeTo(builder)
+		}
+	case *schema.Duration:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeDuration, v.SerializeTo(builder)
+		}
+	case *schema.LargeBinary:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeLargeBinary, v.SerializeTo(builder)
+		}
+	case *schema.LargeUtf8:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeLargeUtf8, v.SerializeTo(builder)
+		}
+	case *schema.LargeList:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeLargeList, v.SerializeTo(builder)
+		}
+	case *schema.RunEndEncoded:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeRunEndEncoded, v.SerializeTo(builder)
+		}
+	case *schema.BinaryView:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeBinaryView, v.SerializeTo(builder)
+		}
+	case *schema.Utf8view:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeUtf8View, v.SerializeTo(builder)
+		}
+	case *schema.ListView:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeListView, v.SerializeTo(builder)
+		}
+	case *schema.LargeListView:
+		if v != nil {
+			storageTypeType, storageTypeOffset = generated.TypeLargeListView, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("UlField.StorageType: %T is not a pointer to a Type variant", v))
+	}
 	generated.UlFieldStart(builder)
 	generated.UlFieldAddBreakdownDisplayName(builder, breakdownDisplayNameOffset)
+	if componentDataOffset != 0 {
+		generated.UlFieldAddComponentDataType(builder, componentDataType)
+		generated.UlFieldAddComponentData(builder, componentDataOffset)
+	}
 	generated.UlFieldAddConceptAttr(builder, conceptAttrOffset)
 	generated.UlFieldAddDefault(builder, defaultOffset)
 	generated.UlFieldAddDescription(builder, descriptionOffset)
@@ -2200,17 +2589,41 @@ func (o *UlField) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT
 	generated.UlFieldAddFieldName(builder, fieldNameOffset)
 	generated.UlFieldAddFieldType(builder, generated.UlFieldType(o.FieldType))
 	generated.UlFieldAddFlags(builder, o.Flags)
+	if storageTypeOffset != 0 {
+		generated.UlFieldAddStorageTypeType(builder, storageTypeType)
+		generated.UlFieldAddStorageType(builder, storageTypeOffset)
+	}
 	generated.UlFieldAddUnit(builder, generated.FieldUnit(o.Unit))
 	return generated.UlFieldEnd(builder)
 }
 
 type UlFieldRelationship struct {
-	RelationshipData interface{}
+	RelationshipData UlFieldRelationshipData
 	RelationshipDisplayName *string
 }
 
 func UlFieldRelationshipFromFbs(fbs *generated.UlFieldRelationship) *UlFieldRelationship {
 	o := &UlFieldRelationship{}
+	if tbl := new(flatbuffers.Table); fbs.RelationshipData(tbl) {
+		switch fbs.RelationshipDataType() {
+		case generated.UlFieldRelationshipDataHierarchyRelationshipData:
+			var u generated.HierarchyRelationshipData
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.RelationshipData = HierarchyRelationshipDataFromFbs(&u)
+		case generated.UlFieldRelationshipDataCategoryRelationshipData:
+			var u generated.CategoryRelationshipData
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.RelationshipData = CategoryRelationshipDataFromFbs(&u)
+		case generated.UlFieldRelationshipDataNestedCategoryRelationshipData:
+			var u generated.NestedCategoryRelationshipData
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.RelationshipData = NestedCategoryRelationshipDataFromFbs(&u)
+		case generated.UlFieldRelationshipDataNestedHierarchyRelationshipData:
+			var u generated.NestedHierarchyRelationshipData
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.RelationshipData = NestedHierarchyRelationshipDataFromFbs(&u)
+		}
+	}
 	if s := fbs.RelationshipDisplayName(); s != nil {
 		str := string(s)
 		o.RelationshipDisplayName = &str
@@ -2234,11 +2647,38 @@ func (o *UlFieldRelationship) ToBytes() []byte {
 
 // SerializeTo writes the UlFieldRelationship into a FlatBuffer builder and returns the offset.
 func (o *UlFieldRelationship) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var relationshipDataType generated.UlFieldRelationshipData
+	var relationshipDataOffset flatbuffers.UOffsetT
+	switch v := o.RelationshipData.(type) {
+	case nil:
+	case *HierarchyRelationshipData:
+		if v != nil {
+			relationshipDataType, relationshipDataOffset = generated.UlFieldRelationshipDataHierarchyRelationshipData, v.SerializeTo(builder)
+		}
+	case *CategoryRelationshipData:
+		if v != nil {
+			relationshipDataType, relationshipDataOffset = generated.UlFieldRelationshipDataCategoryRelationshipData, v.SerializeTo(builder)
+		}
+	case *NestedCategoryRelationshipData:
+		if v != nil {
+			relationshipDataType, relationshipDataOffset = generated.UlFieldRelationshipDataNestedCategoryRelationshipData, v.SerializeTo(builder)
+		}
+	case *NestedHierarchyRelationshipData:
+		if v != nil {
+			relationshipDataType, relationshipDataOffset = generated.UlFieldRelationshipDataNestedHierarchyRelationshipData, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("UlFieldRelationship.RelationshipData: %T is not a pointer to a UlFieldRelationshipData variant", v))
+	}
 	var relationshipDisplayNameOffset flatbuffers.UOffsetT
 	if o.RelationshipDisplayName != nil {
 		relationshipDisplayNameOffset = builder.CreateString(*o.RelationshipDisplayName)
 	}
 	generated.UlFieldRelationshipStart(builder)
+	if relationshipDataOffset != 0 {
+		generated.UlFieldRelationshipAddRelationshipDataType(builder, relationshipDataType)
+		generated.UlFieldRelationshipAddRelationshipData(builder, relationshipDataOffset)
+	}
 	generated.UlFieldRelationshipAddRelationshipDisplayName(builder, relationshipDisplayNameOffset)
 	return generated.UlFieldRelationshipEnd(builder)
 }

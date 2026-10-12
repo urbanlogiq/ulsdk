@@ -4,7 +4,10 @@
 
 package schema
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestDefaultBinary(t *testing.T) {
 	o := &Binary{}
@@ -155,6 +158,46 @@ func TestRoundTripField(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestUnionFieldType(t *testing.T) {
+	for _, v := range []Type{
+		&Null{},
+		&Int{},
+		&FloatingPoint{},
+		&Binary{},
+		&Utf8{},
+		&Bool{},
+		&Decimal{},
+		&Date{},
+		&Time{},
+		&Timestamp{},
+		&Interval{},
+		&List{},
+		&Struct{},
+		&Union{},
+		&FixedSizeBinary{},
+		&FixedSizeList{},
+		&Map{},
+		&Duration{},
+		&LargeBinary{},
+		&LargeUtf8{},
+		&LargeList{},
+		&RunEndEncoded{},
+		&BinaryView{},
+		&Utf8view{},
+		&ListView{},
+		&LargeListView{},
+	} {
+		o := &Field{Type: v}
+		got, err := FieldFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Type) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Type, v)
+		}
 	}
 }
 

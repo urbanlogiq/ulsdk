@@ -4,7 +4,12 @@
 
 package fs
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+
+	"github.com/urbanlogiq/ulsdk/types/crypto"
+)
 
 func TestDefaultChunk(t *testing.T) {
 	o := &Chunk{}
@@ -13,6 +18,21 @@ func TestDefaultChunk(t *testing.T) {
 	}
 }
 
+
+func TestUnionChunkDigest(t *testing.T) {
+	for _, v := range []crypto.Digest{
+		&crypto.Sha256{},
+	} {
+		o := &Chunk{Digest: v}
+		got, err := ChunkFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Digest) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Digest, v)
+		}
+	}
+}
 
 func TestDefaultDirectory(t *testing.T) {
 	o := &Directory{}
@@ -30,6 +50,23 @@ func TestDefaultDirectoryEntry(t *testing.T) {
 }
 
 
+func TestUnionDirectoryEntryEntry(t *testing.T) {
+	for _, v := range []Entry{
+		&File{},
+		&Directory{},
+		&ObjectRef{},
+	} {
+		o := &DirectoryEntry{Entry: v}
+		got, err := DirectoryEntryFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Entry) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Entry, v)
+		}
+	}
+}
+
 func TestDefaultDirectoryList(t *testing.T) {
 	o := &DirectoryList{}
 	if o == nil {
@@ -45,6 +82,21 @@ func TestDefaultFile(t *testing.T) {
 	}
 }
 
+
+func TestUnionFileDigest(t *testing.T) {
+	for _, v := range []crypto.Digest{
+		&crypto.Sha256{},
+	} {
+		o := &File{Digest: v}
+		got, err := FileFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Digest) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Digest, v)
+		}
+	}
+}
 
 func TestDefaultListDirectory(t *testing.T) {
 	o := &ListDirectory{}
@@ -88,6 +140,24 @@ func TestDefaultListSlot(t *testing.T) {
 	}
 }
 
+
+func TestUnionListSlotEntry(t *testing.T) {
+	for _, v := range []ListEntry{
+		&ListFile{},
+		&ListDirectory{},
+		&ListObject{},
+		&TopLevelDirectory{},
+	} {
+		o := &ListSlot{Entry: v}
+		got, err := ListSlotFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Entry) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Entry, v)
+		}
+	}
+}
 
 func TestDefaultMoveRequest(t *testing.T) {
 	o := &MoveRequest{}

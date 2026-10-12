@@ -47,9 +47,8 @@ func (o *Sha256) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT 
 }
 
 // Digest is a union type. Possible concrete types: Sha256
-type Digest interface {
-	isDigest()
-}
+// Assign a pointer to one of these types.
+type Digest interface{}
 
 type CryptHeader struct {
 	Kid string

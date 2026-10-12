@@ -4,7 +4,14 @@
 
 package message
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+
+	"github.com/urbanlogiq/ulsdk/types/schema"
+	"github.com/urbanlogiq/ulsdk/types/sparse_tensor"
+	"github.com/urbanlogiq/ulsdk/types/tensor"
+)
 
 func TestDefaultBodyCompression(t *testing.T) {
 	o := &BodyCompression{}
@@ -60,6 +67,25 @@ func TestRoundTripMessage(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestUnionMessageHeader(t *testing.T) {
+	for _, v := range []MessageHeader{
+		&schema.Schema{},
+		&DictionaryBatch{},
+		&RecordBatch{},
+		&tensor.Tensor{},
+		&sparse_tensor.SparseTensor{},
+	} {
+		o := &Message{Header: v}
+		got, err := MessageFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Header) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Header, v)
+		}
 	}
 }
 

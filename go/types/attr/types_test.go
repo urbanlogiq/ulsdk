@@ -4,7 +4,12 @@
 
 package attr
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+
+	"github.com/urbanlogiq/ulsdk/types/value"
+)
 
 func TestDefaultAttr(t *testing.T) {
 	o := &Attr{}
@@ -13,3 +18,43 @@ func TestDefaultAttr(t *testing.T) {
 	}
 }
 
+
+func TestUnionAttrV(t *testing.T) {
+	for _, v := range []value.Value{
+		&value.Vbool{},
+		&value.Vunit{},
+		&value.Vchar{},
+		&value.Vnull{},
+		&value.Vi8{},
+		&value.Vu8{},
+		&value.Vi16{},
+		&value.Vu16{},
+		&value.Vi32{},
+		&value.Vu32{},
+		&value.Vf32{},
+		&value.Visize{},
+		&value.Vusize{},
+		&value.Vi64{},
+		&value.Vu64{},
+		&value.Vf64{},
+		&value.Vstr{},
+		&value.Vbytes{},
+		&value.Varray{},
+		&value.Vtri2D{},
+		&value.VfixedSizeBytes{},
+		&value.VtimestampMsUtc{},
+		&value.VtimestampMs{},
+		&value.VtimestampNsUtc{},
+		&value.VtimestampNs{},
+		&value.Vplaceholder{},
+	} {
+		o := &Attr{V: v}
+		got, err := AttrFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.V) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.V, v)
+		}
+	}
+}

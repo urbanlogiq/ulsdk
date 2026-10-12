@@ -4,7 +4,10 @@
 
 package value
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestDefaultVarray(t *testing.T) {
 	o := &Varray{}
@@ -441,3 +444,43 @@ func TestDefaultValueInstance(t *testing.T) {
 	}
 }
 
+
+func TestUnionValueInstanceV(t *testing.T) {
+	for _, v := range []Value{
+		&Vbool{},
+		&Vunit{},
+		&Vchar{},
+		&Vnull{},
+		&Vi8{},
+		&Vu8{},
+		&Vi16{},
+		&Vu16{},
+		&Vi32{},
+		&Vu32{},
+		&Vf32{},
+		&Visize{},
+		&Vusize{},
+		&Vi64{},
+		&Vu64{},
+		&Vf64{},
+		&Vstr{},
+		&Vbytes{},
+		&Varray{},
+		&Vtri2D{},
+		&VfixedSizeBytes{},
+		&VtimestampMsUtc{},
+		&VtimestampMs{},
+		&VtimestampNsUtc{},
+		&VtimestampNs{},
+		&Vplaceholder{},
+	} {
+		o := &ValueInstance{V: v}
+		got, err := ValueInstanceFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.V) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.V, v)
+		}
+	}
+}

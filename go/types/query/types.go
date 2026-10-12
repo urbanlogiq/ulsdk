@@ -5,6 +5,7 @@
 package query
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/graph"
@@ -91,9 +92,8 @@ func (o *DropCol) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT
 }
 
 // AlterTableOperationUnion is a union type. Possible concrete types: AddCol, DropCol
-type AlterTableOperationUnion interface {
-	isAlterTableOperationUnion()
-}
+// Assign a pointer to one of these types.
+type AlterTableOperationUnion interface{}
 
 // InsertConflicting -
 //  This variant is for selecting the default behavior of an INSERT statement
@@ -206,9 +206,8 @@ func (o *DoUpdate) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 }
 
 // ConflictAction is a union type. Possible concrete types: InsertConflicting, DoNothing, DoUpdate
-type ConflictAction interface {
-	isConflictAction()
-}
+// Assign a pointer to one of these types.
+type ConflictAction interface{}
 
 type ExplainFormat byte
 
@@ -411,11 +410,59 @@ func (o *AllColumns) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffs
 }
 
 type Expr struct {
-	Exprs interface{}
+	Exprs ExprUnion
 }
 
 func ExprFromFbs(fbs *generated.Expr) *Expr {
 	o := &Expr{}
+	if tbl := new(flatbuffers.Table); fbs.Exprs(tbl) {
+		switch fbs.ExprsType() {
+		case generated.ExprUnionValueIndex:
+			var u generated.ValueIndex
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Exprs = ValueIndexFromFbs(&u)
+		case generated.ExprUnionColumn:
+			var u generated.Column
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Exprs = ColumnFromFbs(&u)
+		case generated.ExprUnionFunction:
+			var u generated.Function
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Exprs = FunctionFromFbs(&u)
+		case generated.ExprUnionAllColumns:
+			var u generated.AllColumns
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Exprs = AllColumnsFromFbs(&u)
+		case generated.ExprUnionCase:
+			var u generated.Case
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Exprs = CaseFromFbs(&u)
+		case generated.ExprUnionOrderByExpr:
+			var u generated.OrderByExpr
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Exprs = OrderByExprFromFbs(&u)
+		case generated.ExprUnionPartition:
+			var u generated.Partition
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Exprs = PartitionFromFbs(&u)
+		case generated.ExprUnionUnsetArgument:
+			var u generated.UnsetArgument
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Exprs = UnsetArgumentFromFbs(&u)
+		case generated.ExprUnionWindow:
+			var u generated.Window
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Exprs = WindowFromFbs(&u)
+		case generated.ExprUnionValueName:
+			var u generated.ValueName
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Exprs = ValueNameFromFbs(&u)
+		case generated.ExprUnionAggregateFilter:
+			var u generated.AggregateFilter
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Exprs = AggregateFilterFromFbs(&u)
+		}
+	}
 	return o
 }
 
@@ -435,7 +482,62 @@ func (o *Expr) ToBytes() []byte {
 
 // SerializeTo writes the Expr into a FlatBuffer builder and returns the offset.
 func (o *Expr) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var exprsType generated.ExprUnion
+	var exprsOffset flatbuffers.UOffsetT
+	switch v := o.Exprs.(type) {
+	case nil:
+	case *ValueIndex:
+		if v != nil {
+			exprsType, exprsOffset = generated.ExprUnionValueIndex, v.SerializeTo(builder)
+		}
+	case *Column:
+		if v != nil {
+			exprsType, exprsOffset = generated.ExprUnionColumn, v.SerializeTo(builder)
+		}
+	case *Function:
+		if v != nil {
+			exprsType, exprsOffset = generated.ExprUnionFunction, v.SerializeTo(builder)
+		}
+	case *AllColumns:
+		if v != nil {
+			exprsType, exprsOffset = generated.ExprUnionAllColumns, v.SerializeTo(builder)
+		}
+	case *Case:
+		if v != nil {
+			exprsType, exprsOffset = generated.ExprUnionCase, v.SerializeTo(builder)
+		}
+	case *OrderByExpr:
+		if v != nil {
+			exprsType, exprsOffset = generated.ExprUnionOrderByExpr, v.SerializeTo(builder)
+		}
+	case *Partition:
+		if v != nil {
+			exprsType, exprsOffset = generated.ExprUnionPartition, v.SerializeTo(builder)
+		}
+	case *UnsetArgument:
+		if v != nil {
+			exprsType, exprsOffset = generated.ExprUnionUnsetArgument, v.SerializeTo(builder)
+		}
+	case *Window:
+		if v != nil {
+			exprsType, exprsOffset = generated.ExprUnionWindow, v.SerializeTo(builder)
+		}
+	case *ValueName:
+		if v != nil {
+			exprsType, exprsOffset = generated.ExprUnionValueName, v.SerializeTo(builder)
+		}
+	case *AggregateFilter:
+		if v != nil {
+			exprsType, exprsOffset = generated.ExprUnionAggregateFilter, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("Expr.Exprs: %T is not a pointer to a ExprUnion variant", v))
+	}
 	generated.ExprStart(builder)
+	if exprsOffset != 0 {
+		generated.ExprAddExprsType(builder, exprsType)
+		generated.ExprAddExprs(builder, exprsOffset)
+	}
 	return generated.ExprEnd(builder)
 }
 
@@ -827,9 +929,8 @@ func (o *AggregateFilter) SerializeTo(builder *flatbuffers.Builder) flatbuffers.
 }
 
 // ExprUnion is a union type. Possible concrete types: ValueIndex, Column, Function, AllColumns, Case, OrderByExpr, Partition, UnsetArgument, Window, ValueName, AggregateFilter
-type ExprUnion interface {
-	isExprUnion()
-}
+// Assign a pointer to one of these types.
+type ExprUnion interface{}
 
 type JoinTy int8
 
@@ -1048,11 +1149,39 @@ func (o *UnaryQueryElement) SerializeTo(builder *flatbuffers.Builder) flatbuffer
 }
 
 type QueryElement struct {
-	Q interface{}
+	Q QueryElementUnion
 }
 
 func QueryElementFromFbs(fbs *generated.QueryElement) *QueryElement {
 	o := &QueryElement{}
+	if tbl := new(flatbuffers.Table); fbs.Q(tbl) {
+		switch fbs.QType() {
+		case generated.QueryElementUnionUnaryQueryElement:
+			var u generated.UnaryQueryElement
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Q = UnaryQueryElementFromFbs(&u)
+		case generated.QueryElementUnionBinaryQueryElement:
+			var u generated.BinaryQueryElement
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Q = BinaryQueryElementFromFbs(&u)
+		case generated.QueryElementUnionUpdateQueryElement:
+			var u generated.UpdateQueryElement
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Q = UpdateQueryElementFromFbs(&u)
+		case generated.QueryElementUnionDeleteQueryElement:
+			var u generated.DeleteQueryElement
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Q = DeleteQueryElementFromFbs(&u)
+		case generated.QueryElementUnionInsertQueryElement:
+			var u generated.InsertQueryElement
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Q = InsertQueryElementFromFbs(&u)
+		case generated.QueryElementUnionAlterTableElement:
+			var u generated.AlterTableElement
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Q = AlterTableElementFromFbs(&u)
+		}
+	}
 	return o
 }
 
@@ -1072,7 +1201,42 @@ func (o *QueryElement) ToBytes() []byte {
 
 // SerializeTo writes the QueryElement into a FlatBuffer builder and returns the offset.
 func (o *QueryElement) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var qType generated.QueryElementUnion
+	var qOffset flatbuffers.UOffsetT
+	switch v := o.Q.(type) {
+	case nil:
+	case *UnaryQueryElement:
+		if v != nil {
+			qType, qOffset = generated.QueryElementUnionUnaryQueryElement, v.SerializeTo(builder)
+		}
+	case *BinaryQueryElement:
+		if v != nil {
+			qType, qOffset = generated.QueryElementUnionBinaryQueryElement, v.SerializeTo(builder)
+		}
+	case *UpdateQueryElement:
+		if v != nil {
+			qType, qOffset = generated.QueryElementUnionUpdateQueryElement, v.SerializeTo(builder)
+		}
+	case *DeleteQueryElement:
+		if v != nil {
+			qType, qOffset = generated.QueryElementUnionDeleteQueryElement, v.SerializeTo(builder)
+		}
+	case *InsertQueryElement:
+		if v != nil {
+			qType, qOffset = generated.QueryElementUnionInsertQueryElement, v.SerializeTo(builder)
+		}
+	case *AlterTableElement:
+		if v != nil {
+			qType, qOffset = generated.QueryElementUnionAlterTableElement, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("QueryElement.Q: %T is not a pointer to a QueryElementUnion variant", v))
+	}
 	generated.QueryElementStart(builder)
+	if qOffset != 0 {
+		generated.QueryElementAddQType(builder, qType)
+		generated.QueryElementAddQ(builder, qOffset)
+	}
 	return generated.QueryElementEnd(builder)
 }
 
@@ -1189,13 +1353,12 @@ func (o *WorklogPartition) SerializeTo(builder *flatbuffers.Builder) flatbuffers
 }
 
 // TablePartition is a union type. Possible concrete types: MvdbPartition, WorklogPartition
-type TablePartition interface {
-	isTablePartition()
-}
+// Assign a pointer to one of these types.
+type TablePartition interface{}
 
 type DataCatalog struct {
 	Id id.ObjectId
-	Partition interface{}
+	Partition TablePartition
 	Revision *id.ContentId
 }
 
@@ -1203,6 +1366,18 @@ func DataCatalogFromFbs(fbs *generated.DataCatalog) *DataCatalog {
 	o := &DataCatalog{}
 	if fbsVal := fbs.Id(nil); fbsVal != nil {
 		o.Id = *id.ObjectIdFromFbs(fbsVal)
+	}
+	if tbl := new(flatbuffers.Table); fbs.Partition(tbl) {
+		switch fbs.PartitionType() {
+		case generated.TablePartitionMvdbPartition:
+			var u generated.MvdbPartition
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Partition = MvdbPartitionFromFbs(&u)
+		case generated.TablePartitionWorklogPartition:
+			var u generated.WorklogPartition
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Partition = WorklogPartitionFromFbs(&u)
+		}
 	}
 	if fbsVal := fbs.Revision(nil); fbsVal != nil {
 		o.Revision = id.ContentIdFromFbs(fbsVal)
@@ -1227,12 +1402,31 @@ func (o *DataCatalog) ToBytes() []byte {
 // SerializeTo writes the DataCatalog into a FlatBuffer builder and returns the offset.
 func (o *DataCatalog) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	idOffset := o.Id.SerializeTo(builder)
+	var partitionType generated.TablePartition
+	var partitionOffset flatbuffers.UOffsetT
+	switch v := o.Partition.(type) {
+	case nil:
+	case *MvdbPartition:
+		if v != nil {
+			partitionType, partitionOffset = generated.TablePartitionMvdbPartition, v.SerializeTo(builder)
+		}
+	case *WorklogPartition:
+		if v != nil {
+			partitionType, partitionOffset = generated.TablePartitionWorklogPartition, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("DataCatalog.Partition: %T is not a pointer to a TablePartition variant", v))
+	}
 	var revisionOffset flatbuffers.UOffsetT
 	if o.Revision != nil {
 		revisionOffset = o.Revision.SerializeTo(builder)
 	}
 	generated.DataCatalogStart(builder)
 	generated.DataCatalogAddId(builder, idOffset)
+	if partitionOffset != 0 {
+		generated.DataCatalogAddPartitionType(builder, partitionType)
+		generated.DataCatalogAddPartition(builder, partitionOffset)
+	}
 	generated.DataCatalogAddRevision(builder, revisionOffset)
 	return generated.DataCatalogEnd(builder)
 }
@@ -1695,16 +1889,15 @@ func (o *TimeSeries) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffs
 }
 
 // TableSourceUnion is a union type. Possible concrete types: DataCatalog, Arrow, GraphQuery, QueryTableSource, Vector, Placeholder, Drive, Values, TimeSeries
-type TableSourceUnion interface {
-	isTableSourceUnion()
-}
+// Assign a pointer to one of these types.
+type TableSourceUnion interface{}
 
 type UpdateQueryElement struct {
 	Filter *Function
 	FromSources []TableSource
 	Joins []Join
 	Sets []SetExpr
-	Source interface{}
+	Source TableSourceUnion
 }
 
 func UpdateQueryElementFromFbs(fbs *generated.UpdateQueryElement) *UpdateQueryElement {
@@ -1728,6 +1921,46 @@ func UpdateQueryElementFromFbs(fbs *generated.UpdateQueryElement) *UpdateQueryEl
 		var item generated.SetExpr
 		if fbs.Sets(&item, i) {
 			o.Sets = append(o.Sets, *SetExprFromFbs(&item))
+		}
+	}
+	if tbl := new(flatbuffers.Table); fbs.Source(tbl) {
+		switch fbs.SourceType() {
+		case generated.TableSourceUnionDataCatalog:
+			var u generated.DataCatalog
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Source = DataCatalogFromFbs(&u)
+		case generated.TableSourceUnionArrow:
+			var u generated.Arrow
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Source = ArrowFromFbs(&u)
+		case generated.TableSourceUnionGraphQuery:
+			var u generated.GraphQuery
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Source = graph.GraphQueryFromFbs(&u)
+		case generated.TableSourceUnionQueryTableSource:
+			var u generated.QueryTableSource
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Source = QueryTableSourceFromFbs(&u)
+		case generated.TableSourceUnionVector:
+			var u generated.Vector
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Source = VectorFromFbs(&u)
+		case generated.TableSourceUnionPlaceholder:
+			var u generated.Placeholder
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Source = PlaceholderFromFbs(&u)
+		case generated.TableSourceUnionDrive:
+			var u generated.Drive
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Source = DriveFromFbs(&u)
+		case generated.TableSourceUnionValues:
+			var u generated.Values
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Source = ValuesFromFbs(&u)
+		case generated.TableSourceUnionTimeSeries:
+			var u generated.TimeSeries
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Source = TimeSeriesFromFbs(&u)
 		}
 	}
 	return o
@@ -1780,23 +2013,110 @@ func (o *UpdateQueryElement) SerializeTo(builder *flatbuffers.Builder) flatbuffe
 		builder.PrependUOffsetT(setsOffsets[i])
 	}
 	setsVecOffset := builder.EndVector(len(o.Sets))
+	var sourceType generated.TableSourceUnion
+	var sourceOffset flatbuffers.UOffsetT
+	switch v := o.Source.(type) {
+	case nil:
+	case *DataCatalog:
+		if v != nil {
+			sourceType, sourceOffset = generated.TableSourceUnionDataCatalog, v.SerializeTo(builder)
+		}
+	case *Arrow:
+		if v != nil {
+			sourceType, sourceOffset = generated.TableSourceUnionArrow, v.SerializeTo(builder)
+		}
+	case *graph.GraphQuery:
+		if v != nil {
+			sourceType, sourceOffset = generated.TableSourceUnionGraphQuery, v.SerializeTo(builder)
+		}
+	case *QueryTableSource:
+		if v != nil {
+			sourceType, sourceOffset = generated.TableSourceUnionQueryTableSource, v.SerializeTo(builder)
+		}
+	case *Vector:
+		if v != nil {
+			sourceType, sourceOffset = generated.TableSourceUnionVector, v.SerializeTo(builder)
+		}
+	case *Placeholder:
+		if v != nil {
+			sourceType, sourceOffset = generated.TableSourceUnionPlaceholder, v.SerializeTo(builder)
+		}
+	case *Drive:
+		if v != nil {
+			sourceType, sourceOffset = generated.TableSourceUnionDrive, v.SerializeTo(builder)
+		}
+	case *Values:
+		if v != nil {
+			sourceType, sourceOffset = generated.TableSourceUnionValues, v.SerializeTo(builder)
+		}
+	case *TimeSeries:
+		if v != nil {
+			sourceType, sourceOffset = generated.TableSourceUnionTimeSeries, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("UpdateQueryElement.Source: %T is not a pointer to a TableSourceUnion variant", v))
+	}
 	generated.UpdateQueryElementStart(builder)
 	generated.UpdateQueryElementAddFilter(builder, filterOffset)
 	generated.UpdateQueryElementAddFromSources(builder, fromSourcesVecOffset)
 	generated.UpdateQueryElementAddJoins(builder, joinsVecOffset)
 	generated.UpdateQueryElementAddSets(builder, setsVecOffset)
+	if sourceOffset != 0 {
+		generated.UpdateQueryElementAddSourceType(builder, sourceType)
+		generated.UpdateQueryElementAddSource(builder, sourceOffset)
+	}
 	return generated.UpdateQueryElementEnd(builder)
 }
 
 type DeleteQueryElement struct {
 	Filter *Function
-	Source interface{}
+	Source TableSourceUnion
 }
 
 func DeleteQueryElementFromFbs(fbs *generated.DeleteQueryElement) *DeleteQueryElement {
 	o := &DeleteQueryElement{}
 	if fbsVal := fbs.Filter(nil); fbsVal != nil {
 		o.Filter = FunctionFromFbs(fbsVal)
+	}
+	if tbl := new(flatbuffers.Table); fbs.Source(tbl) {
+		switch fbs.SourceType() {
+		case generated.TableSourceUnionDataCatalog:
+			var u generated.DataCatalog
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Source = DataCatalogFromFbs(&u)
+		case generated.TableSourceUnionArrow:
+			var u generated.Arrow
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Source = ArrowFromFbs(&u)
+		case generated.TableSourceUnionGraphQuery:
+			var u generated.GraphQuery
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Source = graph.GraphQueryFromFbs(&u)
+		case generated.TableSourceUnionQueryTableSource:
+			var u generated.QueryTableSource
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Source = QueryTableSourceFromFbs(&u)
+		case generated.TableSourceUnionVector:
+			var u generated.Vector
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Source = VectorFromFbs(&u)
+		case generated.TableSourceUnionPlaceholder:
+			var u generated.Placeholder
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Source = PlaceholderFromFbs(&u)
+		case generated.TableSourceUnionDrive:
+			var u generated.Drive
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Source = DriveFromFbs(&u)
+		case generated.TableSourceUnionValues:
+			var u generated.Values
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Source = ValuesFromFbs(&u)
+		case generated.TableSourceUnionTimeSeries:
+			var u generated.TimeSeries
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Source = TimeSeriesFromFbs(&u)
+		}
 	}
 	return o
 }
@@ -1821,18 +2141,81 @@ func (o *DeleteQueryElement) SerializeTo(builder *flatbuffers.Builder) flatbuffe
 	if o.Filter != nil {
 		filterOffset = o.Filter.SerializeTo(builder)
 	}
+	var sourceType generated.TableSourceUnion
+	var sourceOffset flatbuffers.UOffsetT
+	switch v := o.Source.(type) {
+	case nil:
+	case *DataCatalog:
+		if v != nil {
+			sourceType, sourceOffset = generated.TableSourceUnionDataCatalog, v.SerializeTo(builder)
+		}
+	case *Arrow:
+		if v != nil {
+			sourceType, sourceOffset = generated.TableSourceUnionArrow, v.SerializeTo(builder)
+		}
+	case *graph.GraphQuery:
+		if v != nil {
+			sourceType, sourceOffset = generated.TableSourceUnionGraphQuery, v.SerializeTo(builder)
+		}
+	case *QueryTableSource:
+		if v != nil {
+			sourceType, sourceOffset = generated.TableSourceUnionQueryTableSource, v.SerializeTo(builder)
+		}
+	case *Vector:
+		if v != nil {
+			sourceType, sourceOffset = generated.TableSourceUnionVector, v.SerializeTo(builder)
+		}
+	case *Placeholder:
+		if v != nil {
+			sourceType, sourceOffset = generated.TableSourceUnionPlaceholder, v.SerializeTo(builder)
+		}
+	case *Drive:
+		if v != nil {
+			sourceType, sourceOffset = generated.TableSourceUnionDrive, v.SerializeTo(builder)
+		}
+	case *Values:
+		if v != nil {
+			sourceType, sourceOffset = generated.TableSourceUnionValues, v.SerializeTo(builder)
+		}
+	case *TimeSeries:
+		if v != nil {
+			sourceType, sourceOffset = generated.TableSourceUnionTimeSeries, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("DeleteQueryElement.Source: %T is not a pointer to a TableSourceUnion variant", v))
+	}
 	generated.DeleteQueryElementStart(builder)
 	generated.DeleteQueryElementAddFilter(builder, filterOffset)
+	if sourceOffset != 0 {
+		generated.DeleteQueryElementAddSourceType(builder, sourceType)
+		generated.DeleteQueryElementAddSource(builder, sourceOffset)
+	}
 	return generated.DeleteQueryElementEnd(builder)
 }
 
 type OnConflict struct {
-	Action interface{}
+	Action ConflictAction
 	ConflictTarget []string
 }
 
 func OnConflictFromFbs(fbs *generated.OnConflict) *OnConflict {
 	o := &OnConflict{}
+	if tbl := new(flatbuffers.Table); fbs.Action(tbl) {
+		switch fbs.ActionType() {
+		case generated.ConflictActionInsertConflicting:
+			var u generated.InsertConflicting
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Action = InsertConflictingFromFbs(&u)
+		case generated.ConflictActionDoNothing:
+			var u generated.DoNothing
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Action = DoNothingFromFbs(&u)
+		case generated.ConflictActionDoUpdate:
+			var u generated.DoUpdate
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Action = DoUpdateFromFbs(&u)
+		}
+	}
 	for i := 0; i < fbs.ConflictTargetLength(); i++ {
 		o.ConflictTarget = append(o.ConflictTarget, string(fbs.ConflictTarget(i)))
 	}
@@ -1855,6 +2238,25 @@ func (o *OnConflict) ToBytes() []byte {
 
 // SerializeTo writes the OnConflict into a FlatBuffer builder and returns the offset.
 func (o *OnConflict) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var actionType generated.ConflictAction
+	var actionOffset flatbuffers.UOffsetT
+	switch v := o.Action.(type) {
+	case nil:
+	case *InsertConflicting:
+		if v != nil {
+			actionType, actionOffset = generated.ConflictActionInsertConflicting, v.SerializeTo(builder)
+		}
+	case *DoNothing:
+		if v != nil {
+			actionType, actionOffset = generated.ConflictActionDoNothing, v.SerializeTo(builder)
+		}
+	case *DoUpdate:
+		if v != nil {
+			actionType, actionOffset = generated.ConflictActionDoUpdate, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("OnConflict.Action: %T is not a pointer to a ConflictAction variant", v))
+	}
 	conflictTargetOffsets := make([]flatbuffers.UOffsetT, len(o.ConflictTarget))
 	for i, s := range o.ConflictTarget {
 		conflictTargetOffsets[i] = builder.CreateString(s)
@@ -1865,13 +2267,17 @@ func (o *OnConflict) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffs
 	}
 	conflictTargetVecOffset := builder.EndVector(len(o.ConflictTarget))
 	generated.OnConflictStart(builder)
+	if actionOffset != 0 {
+		generated.OnConflictAddActionType(builder, actionType)
+		generated.OnConflictAddAction(builder, actionOffset)
+	}
 	generated.OnConflictAddConflictTarget(builder, conflictTargetVecOffset)
 	return generated.OnConflictEnd(builder)
 }
 
 type InsertQueryElement struct {
 	Columns []string
-	Dest interface{}
+	Dest TableSourceUnion
 	OnConflict *OnConflict
 	Returning []string
 	Source QueryElement
@@ -1881,6 +2287,46 @@ func InsertQueryElementFromFbs(fbs *generated.InsertQueryElement) *InsertQueryEl
 	o := &InsertQueryElement{}
 	for i := 0; i < fbs.ColumnsLength(); i++ {
 		o.Columns = append(o.Columns, string(fbs.Columns(i)))
+	}
+	if tbl := new(flatbuffers.Table); fbs.Dest(tbl) {
+		switch fbs.DestType() {
+		case generated.TableSourceUnionDataCatalog:
+			var u generated.DataCatalog
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Dest = DataCatalogFromFbs(&u)
+		case generated.TableSourceUnionArrow:
+			var u generated.Arrow
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Dest = ArrowFromFbs(&u)
+		case generated.TableSourceUnionGraphQuery:
+			var u generated.GraphQuery
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Dest = graph.GraphQueryFromFbs(&u)
+		case generated.TableSourceUnionQueryTableSource:
+			var u generated.QueryTableSource
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Dest = QueryTableSourceFromFbs(&u)
+		case generated.TableSourceUnionVector:
+			var u generated.Vector
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Dest = VectorFromFbs(&u)
+		case generated.TableSourceUnionPlaceholder:
+			var u generated.Placeholder
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Dest = PlaceholderFromFbs(&u)
+		case generated.TableSourceUnionDrive:
+			var u generated.Drive
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Dest = DriveFromFbs(&u)
+		case generated.TableSourceUnionValues:
+			var u generated.Values
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Dest = ValuesFromFbs(&u)
+		case generated.TableSourceUnionTimeSeries:
+			var u generated.TimeSeries
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Dest = TimeSeriesFromFbs(&u)
+		}
 	}
 	if fbsVal := fbs.OnConflict(nil); fbsVal != nil {
 		o.OnConflict = OnConflictFromFbs(fbsVal)
@@ -1919,6 +2365,49 @@ func (o *InsertQueryElement) SerializeTo(builder *flatbuffers.Builder) flatbuffe
 		builder.PrependUOffsetT(columnsOffsets[i])
 	}
 	columnsVecOffset := builder.EndVector(len(o.Columns))
+	var destType generated.TableSourceUnion
+	var destOffset flatbuffers.UOffsetT
+	switch v := o.Dest.(type) {
+	case nil:
+	case *DataCatalog:
+		if v != nil {
+			destType, destOffset = generated.TableSourceUnionDataCatalog, v.SerializeTo(builder)
+		}
+	case *Arrow:
+		if v != nil {
+			destType, destOffset = generated.TableSourceUnionArrow, v.SerializeTo(builder)
+		}
+	case *graph.GraphQuery:
+		if v != nil {
+			destType, destOffset = generated.TableSourceUnionGraphQuery, v.SerializeTo(builder)
+		}
+	case *QueryTableSource:
+		if v != nil {
+			destType, destOffset = generated.TableSourceUnionQueryTableSource, v.SerializeTo(builder)
+		}
+	case *Vector:
+		if v != nil {
+			destType, destOffset = generated.TableSourceUnionVector, v.SerializeTo(builder)
+		}
+	case *Placeholder:
+		if v != nil {
+			destType, destOffset = generated.TableSourceUnionPlaceholder, v.SerializeTo(builder)
+		}
+	case *Drive:
+		if v != nil {
+			destType, destOffset = generated.TableSourceUnionDrive, v.SerializeTo(builder)
+		}
+	case *Values:
+		if v != nil {
+			destType, destOffset = generated.TableSourceUnionValues, v.SerializeTo(builder)
+		}
+	case *TimeSeries:
+		if v != nil {
+			destType, destOffset = generated.TableSourceUnionTimeSeries, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("InsertQueryElement.Dest: %T is not a pointer to a TableSourceUnion variant", v))
+	}
 	var onConflictOffset flatbuffers.UOffsetT
 	if o.OnConflict != nil {
 		onConflictOffset = o.OnConflict.SerializeTo(builder)
@@ -1935,6 +2424,10 @@ func (o *InsertQueryElement) SerializeTo(builder *flatbuffers.Builder) flatbuffe
 	sourceOffset := o.Source.SerializeTo(builder)
 	generated.InsertQueryElementStart(builder)
 	generated.InsertQueryElementAddColumns(builder, columnsVecOffset)
+	if destOffset != 0 {
+		generated.InsertQueryElementAddDestType(builder, destType)
+		generated.InsertQueryElementAddDest(builder, destOffset)
+	}
 	generated.InsertQueryElementAddOnConflict(builder, onConflictOffset)
 	generated.InsertQueryElementAddReturning(builder, returningVecOffset)
 	generated.InsertQueryElementAddSource(builder, sourceOffset)
@@ -1993,9 +2486,8 @@ func (o *AlterTableElement) SerializeTo(builder *flatbuffers.Builder) flatbuffer
 }
 
 // QueryElementUnion is a union type. Possible concrete types: UnaryQueryElement, BinaryQueryElement, UpdateQueryElement, DeleteQueryElement, InsertQueryElement, AlterTableElement
-type QueryElementUnion interface {
-	isQueryElementUnion()
-}
+// Assign a pointer to one of these types.
+type QueryElementUnion interface{}
 
 // SetQuantifier -
 //  The quantifier written after a set operator, as sqlparser models it.
@@ -2043,11 +2535,23 @@ const (
 )
 
 type AlterTableOperation struct {
-	Op interface{}
+	Op AlterTableOperationUnion
 }
 
 func AlterTableOperationFromFbs(fbs *generated.AlterTableOperation) *AlterTableOperation {
 	o := &AlterTableOperation{}
+	if tbl := new(flatbuffers.Table); fbs.Op(tbl) {
+		switch fbs.OpType() {
+		case generated.AlterTableOperationUnionAddCol:
+			var u generated.AddCol
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Op = AddColFromFbs(&u)
+		case generated.AlterTableOperationUnionDropCol:
+			var u generated.DropCol
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Op = DropColFromFbs(&u)
+		}
+	}
 	return o
 }
 
@@ -2067,7 +2571,26 @@ func (o *AlterTableOperation) ToBytes() []byte {
 
 // SerializeTo writes the AlterTableOperation into a FlatBuffer builder and returns the offset.
 func (o *AlterTableOperation) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var opType generated.AlterTableOperationUnion
+	var opOffset flatbuffers.UOffsetT
+	switch v := o.Op.(type) {
+	case nil:
+	case *AddCol:
+		if v != nil {
+			opType, opOffset = generated.AlterTableOperationUnionAddCol, v.SerializeTo(builder)
+		}
+	case *DropCol:
+		if v != nil {
+			opType, opOffset = generated.AlterTableOperationUnionDropCol, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("AlterTableOperation.Op: %T is not a pointer to a AlterTableOperationUnion variant", v))
+	}
 	generated.AlterTableOperationStart(builder)
+	if opOffset != 0 {
+		generated.AlterTableOperationAddOpType(builder, opType)
+		generated.AlterTableOperationAddOp(builder, opOffset)
+	}
 	return generated.AlterTableOperationEnd(builder)
 }
 
@@ -2213,7 +2736,7 @@ type TableSource struct {
 	Filter *Function
 	GroupBy []Expr
 	OrderBy []graph.OrderBy
-	T interface{}
+	T TableSourceUnion
 }
 
 func TableSourceFromFbs(fbs *generated.TableSource) *TableSource {
@@ -2237,6 +2760,46 @@ func TableSourceFromFbs(fbs *generated.TableSource) *TableSource {
 		var item generated.OrderBy
 		if fbs.OrderBy(&item, i) {
 			o.OrderBy = append(o.OrderBy, *graph.OrderByFromFbs(&item))
+		}
+	}
+	if tbl := new(flatbuffers.Table); fbs.T(tbl) {
+		switch fbs.TType() {
+		case generated.TableSourceUnionDataCatalog:
+			var u generated.DataCatalog
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.T = DataCatalogFromFbs(&u)
+		case generated.TableSourceUnionArrow:
+			var u generated.Arrow
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.T = ArrowFromFbs(&u)
+		case generated.TableSourceUnionGraphQuery:
+			var u generated.GraphQuery
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.T = graph.GraphQueryFromFbs(&u)
+		case generated.TableSourceUnionQueryTableSource:
+			var u generated.QueryTableSource
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.T = QueryTableSourceFromFbs(&u)
+		case generated.TableSourceUnionVector:
+			var u generated.Vector
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.T = VectorFromFbs(&u)
+		case generated.TableSourceUnionPlaceholder:
+			var u generated.Placeholder
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.T = PlaceholderFromFbs(&u)
+		case generated.TableSourceUnionDrive:
+			var u generated.Drive
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.T = DriveFromFbs(&u)
+		case generated.TableSourceUnionValues:
+			var u generated.Values
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.T = ValuesFromFbs(&u)
+		case generated.TableSourceUnionTimeSeries:
+			var u generated.TimeSeries
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.T = TimeSeriesFromFbs(&u)
 		}
 	}
 	return o
@@ -2289,20 +2852,107 @@ func (o *TableSource) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOff
 		builder.PrependUOffsetT(orderByOffsets[i])
 	}
 	orderByVecOffset := builder.EndVector(len(o.OrderBy))
+	var tType generated.TableSourceUnion
+	var tOffset flatbuffers.UOffsetT
+	switch v := o.T.(type) {
+	case nil:
+	case *DataCatalog:
+		if v != nil {
+			tType, tOffset = generated.TableSourceUnionDataCatalog, v.SerializeTo(builder)
+		}
+	case *Arrow:
+		if v != nil {
+			tType, tOffset = generated.TableSourceUnionArrow, v.SerializeTo(builder)
+		}
+	case *graph.GraphQuery:
+		if v != nil {
+			tType, tOffset = generated.TableSourceUnionGraphQuery, v.SerializeTo(builder)
+		}
+	case *QueryTableSource:
+		if v != nil {
+			tType, tOffset = generated.TableSourceUnionQueryTableSource, v.SerializeTo(builder)
+		}
+	case *Vector:
+		if v != nil {
+			tType, tOffset = generated.TableSourceUnionVector, v.SerializeTo(builder)
+		}
+	case *Placeholder:
+		if v != nil {
+			tType, tOffset = generated.TableSourceUnionPlaceholder, v.SerializeTo(builder)
+		}
+	case *Drive:
+		if v != nil {
+			tType, tOffset = generated.TableSourceUnionDrive, v.SerializeTo(builder)
+		}
+	case *Values:
+		if v != nil {
+			tType, tOffset = generated.TableSourceUnionValues, v.SerializeTo(builder)
+		}
+	case *TimeSeries:
+		if v != nil {
+			tType, tOffset = generated.TableSourceUnionTimeSeries, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("TableSource.T: %T is not a pointer to a TableSourceUnion variant", v))
+	}
 	generated.TableSourceStart(builder)
 	generated.TableSourceAddFields(builder, fieldsVecOffset)
 	generated.TableSourceAddFilter(builder, filterOffset)
 	generated.TableSourceAddGroupBy(builder, groupByVecOffset)
 	generated.TableSourceAddOrderBy(builder, orderByVecOffset)
+	if tOffset != 0 {
+		generated.TableSourceAddTType(builder, tType)
+		generated.TableSourceAddT(builder, tOffset)
+	}
 	return generated.TableSourceEnd(builder)
 }
 
 type TableSourceInstance struct {
-	T interface{}
+	T TableSourceUnion
 }
 
 func TableSourceInstanceFromFbs(fbs *generated.TableSourceInstance) *TableSourceInstance {
 	o := &TableSourceInstance{}
+	if tbl := new(flatbuffers.Table); fbs.T(tbl) {
+		switch fbs.TType() {
+		case generated.TableSourceUnionDataCatalog:
+			var u generated.DataCatalog
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.T = DataCatalogFromFbs(&u)
+		case generated.TableSourceUnionArrow:
+			var u generated.Arrow
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.T = ArrowFromFbs(&u)
+		case generated.TableSourceUnionGraphQuery:
+			var u generated.GraphQuery
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.T = graph.GraphQueryFromFbs(&u)
+		case generated.TableSourceUnionQueryTableSource:
+			var u generated.QueryTableSource
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.T = QueryTableSourceFromFbs(&u)
+		case generated.TableSourceUnionVector:
+			var u generated.Vector
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.T = VectorFromFbs(&u)
+		case generated.TableSourceUnionPlaceholder:
+			var u generated.Placeholder
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.T = PlaceholderFromFbs(&u)
+		case generated.TableSourceUnionDrive:
+			var u generated.Drive
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.T = DriveFromFbs(&u)
+		case generated.TableSourceUnionValues:
+			var u generated.Values
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.T = ValuesFromFbs(&u)
+		case generated.TableSourceUnionTimeSeries:
+			var u generated.TimeSeries
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.T = TimeSeriesFromFbs(&u)
+		}
+	}
 	return o
 }
 
@@ -2322,7 +2972,54 @@ func (o *TableSourceInstance) ToBytes() []byte {
 
 // SerializeTo writes the TableSourceInstance into a FlatBuffer builder and returns the offset.
 func (o *TableSourceInstance) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var tType generated.TableSourceUnion
+	var tOffset flatbuffers.UOffsetT
+	switch v := o.T.(type) {
+	case nil:
+	case *DataCatalog:
+		if v != nil {
+			tType, tOffset = generated.TableSourceUnionDataCatalog, v.SerializeTo(builder)
+		}
+	case *Arrow:
+		if v != nil {
+			tType, tOffset = generated.TableSourceUnionArrow, v.SerializeTo(builder)
+		}
+	case *graph.GraphQuery:
+		if v != nil {
+			tType, tOffset = generated.TableSourceUnionGraphQuery, v.SerializeTo(builder)
+		}
+	case *QueryTableSource:
+		if v != nil {
+			tType, tOffset = generated.TableSourceUnionQueryTableSource, v.SerializeTo(builder)
+		}
+	case *Vector:
+		if v != nil {
+			tType, tOffset = generated.TableSourceUnionVector, v.SerializeTo(builder)
+		}
+	case *Placeholder:
+		if v != nil {
+			tType, tOffset = generated.TableSourceUnionPlaceholder, v.SerializeTo(builder)
+		}
+	case *Drive:
+		if v != nil {
+			tType, tOffset = generated.TableSourceUnionDrive, v.SerializeTo(builder)
+		}
+	case *Values:
+		if v != nil {
+			tType, tOffset = generated.TableSourceUnionValues, v.SerializeTo(builder)
+		}
+	case *TimeSeries:
+		if v != nil {
+			tType, tOffset = generated.TableSourceUnionTimeSeries, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("TableSourceInstance.T: %T is not a pointer to a TableSourceUnion variant", v))
+	}
 	generated.TableSourceInstanceStart(builder)
+	if tOffset != 0 {
+		generated.TableSourceInstanceAddTType(builder, tType)
+		generated.TableSourceInstanceAddT(builder, tOffset)
+	}
 	return generated.TableSourceInstanceEnd(builder)
 }
 

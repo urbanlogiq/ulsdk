@@ -5,6 +5,7 @@
 package value
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 )
@@ -877,9 +878,8 @@ func (o *Vplaceholder) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOf
 }
 
 // Value is a union type. Possible concrete types: Vbool, Vunit, Vchar, Vnull, Vi8, Vu8, Vi16, Vu16, Vi32, Vu32, Vf32, Visize, Vusize, Vi64, Vu64, Vf64, Vstr, Vbytes, Varray, Vtri2D, VfixedSizeBytes, VtimestampMsUtc, VtimestampMs, VtimestampNsUtc, VtimestampNs, Vplaceholder
-type Value interface {
-	isValue()
-}
+// Assign a pointer to one of these types.
+type Value interface{}
 
 type ValueTy byte
 
@@ -914,7 +914,7 @@ const (
 
 type ValueInstance struct {
 	Name *string
-	V interface{}
+	V Value
 }
 
 func ValueInstanceFromFbs(fbs *generated.ValueInstance) *ValueInstance {
@@ -922,6 +922,114 @@ func ValueInstanceFromFbs(fbs *generated.ValueInstance) *ValueInstance {
 	if s := fbs.Name(); s != nil {
 		str := string(s)
 		o.Name = &str
+	}
+	if tbl := new(flatbuffers.Table); fbs.V(tbl) {
+		switch fbs.VType() {
+		case generated.ValueVBool:
+			var u generated.VBool
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = VboolFromFbs(&u)
+		case generated.ValueVUnit:
+			var u generated.VUnit
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = VunitFromFbs(&u)
+		case generated.ValueVChar:
+			var u generated.VChar
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = VcharFromFbs(&u)
+		case generated.ValueVNull:
+			var u generated.VNull
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = VnullFromFbs(&u)
+		case generated.ValueVI8:
+			var u generated.VI8
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = Vi8FromFbs(&u)
+		case generated.ValueVU8:
+			var u generated.VU8
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = Vu8FromFbs(&u)
+		case generated.ValueVI16:
+			var u generated.VI16
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = Vi16FromFbs(&u)
+		case generated.ValueVU16:
+			var u generated.VU16
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = Vu16FromFbs(&u)
+		case generated.ValueVI32:
+			var u generated.VI32
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = Vi32FromFbs(&u)
+		case generated.ValueVU32:
+			var u generated.VU32
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = Vu32FromFbs(&u)
+		case generated.ValueVF32:
+			var u generated.VF32
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = Vf32FromFbs(&u)
+		case generated.ValueVIsize:
+			var u generated.VIsize
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = VisizeFromFbs(&u)
+		case generated.ValueVUsize:
+			var u generated.VUsize
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = VusizeFromFbs(&u)
+		case generated.ValueVI64:
+			var u generated.VI64
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = Vi64FromFbs(&u)
+		case generated.ValueVU64:
+			var u generated.VU64
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = Vu64FromFbs(&u)
+		case generated.ValueVF64:
+			var u generated.VF64
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = Vf64FromFbs(&u)
+		case generated.ValueVStr:
+			var u generated.VStr
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = VstrFromFbs(&u)
+		case generated.ValueVBytes:
+			var u generated.VBytes
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = VbytesFromFbs(&u)
+		case generated.ValueVArray:
+			var u generated.VArray
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = VarrayFromFbs(&u)
+		case generated.ValueVTri2D:
+			var u generated.VTri2D
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = Vtri2DFromFbs(&u)
+		case generated.ValueVFixedSizeBytes:
+			var u generated.VFixedSizeBytes
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = VfixedSizeBytesFromFbs(&u)
+		case generated.ValueVTimestampMsUtc:
+			var u generated.VTimestampMsUtc
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = VtimestampMsUtcFromFbs(&u)
+		case generated.ValueVTimestampMs:
+			var u generated.VTimestampMs
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = VtimestampMsFromFbs(&u)
+		case generated.ValueVTimestampNsUtc:
+			var u generated.VTimestampNsUtc
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = VtimestampNsUtcFromFbs(&u)
+		case generated.ValueVTimestampNs:
+			var u generated.VTimestampNs
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = VtimestampNsFromFbs(&u)
+		case generated.ValueVPlaceholder:
+			var u generated.VPlaceholder
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.V = VplaceholderFromFbs(&u)
+		}
 	}
 	return o
 }
@@ -946,7 +1054,122 @@ func (o *ValueInstance) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UO
 	if o.Name != nil {
 		nameOffset = builder.CreateString(*o.Name)
 	}
+	var vType generated.Value
+	var vOffset flatbuffers.UOffsetT
+	switch v := o.V.(type) {
+	case nil:
+	case *Vbool:
+		if v != nil {
+			vType, vOffset = generated.ValueVBool, v.SerializeTo(builder)
+		}
+	case *Vunit:
+		if v != nil {
+			vType, vOffset = generated.ValueVUnit, v.SerializeTo(builder)
+		}
+	case *Vchar:
+		if v != nil {
+			vType, vOffset = generated.ValueVChar, v.SerializeTo(builder)
+		}
+	case *Vnull:
+		if v != nil {
+			vType, vOffset = generated.ValueVNull, v.SerializeTo(builder)
+		}
+	case *Vi8:
+		if v != nil {
+			vType, vOffset = generated.ValueVI8, v.SerializeTo(builder)
+		}
+	case *Vu8:
+		if v != nil {
+			vType, vOffset = generated.ValueVU8, v.SerializeTo(builder)
+		}
+	case *Vi16:
+		if v != nil {
+			vType, vOffset = generated.ValueVI16, v.SerializeTo(builder)
+		}
+	case *Vu16:
+		if v != nil {
+			vType, vOffset = generated.ValueVU16, v.SerializeTo(builder)
+		}
+	case *Vi32:
+		if v != nil {
+			vType, vOffset = generated.ValueVI32, v.SerializeTo(builder)
+		}
+	case *Vu32:
+		if v != nil {
+			vType, vOffset = generated.ValueVU32, v.SerializeTo(builder)
+		}
+	case *Vf32:
+		if v != nil {
+			vType, vOffset = generated.ValueVF32, v.SerializeTo(builder)
+		}
+	case *Visize:
+		if v != nil {
+			vType, vOffset = generated.ValueVIsize, v.SerializeTo(builder)
+		}
+	case *Vusize:
+		if v != nil {
+			vType, vOffset = generated.ValueVUsize, v.SerializeTo(builder)
+		}
+	case *Vi64:
+		if v != nil {
+			vType, vOffset = generated.ValueVI64, v.SerializeTo(builder)
+		}
+	case *Vu64:
+		if v != nil {
+			vType, vOffset = generated.ValueVU64, v.SerializeTo(builder)
+		}
+	case *Vf64:
+		if v != nil {
+			vType, vOffset = generated.ValueVF64, v.SerializeTo(builder)
+		}
+	case *Vstr:
+		if v != nil {
+			vType, vOffset = generated.ValueVStr, v.SerializeTo(builder)
+		}
+	case *Vbytes:
+		if v != nil {
+			vType, vOffset = generated.ValueVBytes, v.SerializeTo(builder)
+		}
+	case *Varray:
+		if v != nil {
+			vType, vOffset = generated.ValueVArray, v.SerializeTo(builder)
+		}
+	case *Vtri2D:
+		if v != nil {
+			vType, vOffset = generated.ValueVTri2D, v.SerializeTo(builder)
+		}
+	case *VfixedSizeBytes:
+		if v != nil {
+			vType, vOffset = generated.ValueVFixedSizeBytes, v.SerializeTo(builder)
+		}
+	case *VtimestampMsUtc:
+		if v != nil {
+			vType, vOffset = generated.ValueVTimestampMsUtc, v.SerializeTo(builder)
+		}
+	case *VtimestampMs:
+		if v != nil {
+			vType, vOffset = generated.ValueVTimestampMs, v.SerializeTo(builder)
+		}
+	case *VtimestampNsUtc:
+		if v != nil {
+			vType, vOffset = generated.ValueVTimestampNsUtc, v.SerializeTo(builder)
+		}
+	case *VtimestampNs:
+		if v != nil {
+			vType, vOffset = generated.ValueVTimestampNs, v.SerializeTo(builder)
+		}
+	case *Vplaceholder:
+		if v != nil {
+			vType, vOffset = generated.ValueVPlaceholder, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("ValueInstance.V: %T is not a pointer to a Value variant", v))
+	}
 	generated.ValueInstanceStart(builder)
 	generated.ValueInstanceAddName(builder, nameOffset)
+	if vOffset != 0 {
+		generated.ValueInstanceAddVType(builder, vType)
+		generated.ValueInstanceAddV(builder, vOffset)
+	}
 	return generated.ValueInstanceEnd(builder)
 }

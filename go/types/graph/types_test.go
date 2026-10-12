@@ -4,7 +4,12 @@
 
 package graph
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+
+	"github.com/urbanlogiq/ulsdk/types/entity"
+)
 
 func TestDefaultEdgeList(t *testing.T) {
 	o := &EdgeList{}
@@ -40,6 +45,26 @@ func TestDefaultGeom(t *testing.T) {
 	}
 }
 
+
+func TestUnionGeomGeom(t *testing.T) {
+	for _, v := range []entity.Geometry{
+		&entity.Point{},
+		&entity.Line{},
+		&entity.MultiLine{},
+		&entity.Polygon{},
+		&entity.MultiPolygon{},
+		&entity.MultiPoint{},
+	} {
+		o := &Geom{Geom: v}
+		got, err := GeomFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Geom) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Geom, v)
+		}
+	}
+}
 
 func TestDefaultGeomOp(t *testing.T) {
 	o := &GeomOp{}
@@ -115,3 +140,19 @@ func TestDefaultQueryPathElement(t *testing.T) {
 	}
 }
 
+
+func TestUnionQueryPathElementElement(t *testing.T) {
+	for _, v := range []QueryPathElementUnion{
+		&NodeQuery{},
+		&EdgeQuery{},
+	} {
+		o := &QueryPathElement{Element: v}
+		got, err := QueryPathElementFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Element) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Element, v)
+		}
+	}
+}

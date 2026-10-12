@@ -5,6 +5,7 @@
 package graph
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/entity"
@@ -222,9 +223,8 @@ func (o *EdgeQuery) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffse
 }
 
 // QueryPathElementUnion is a union type. Possible concrete types: NodeQuery, EdgeQuery
-type QueryPathElementUnion interface {
-	isQueryPathElementUnion()
-}
+// Assign a pointer to one of these types.
+type QueryPathElementUnion interface{}
 
 type ValueTransform int16
 
@@ -279,11 +279,39 @@ func (o *EdgeList) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 }
 
 type Geom struct {
-	Geom interface{}
+	Geom entity.Geometry
 }
 
 func GeomFromFbs(fbs *generated.Geom) *Geom {
 	o := &Geom{}
+	if tbl := new(flatbuffers.Table); fbs.Geom(tbl) {
+		switch fbs.GeomType() {
+		case generated.GeometryPoint:
+			var u generated.Point
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Geom = entity.PointFromFbs(&u)
+		case generated.GeometryLine:
+			var u generated.Line
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Geom = entity.LineFromFbs(&u)
+		case generated.GeometryMultiLine:
+			var u generated.MultiLine
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Geom = entity.MultiLineFromFbs(&u)
+		case generated.GeometryPolygon:
+			var u generated.Polygon
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Geom = entity.PolygonFromFbs(&u)
+		case generated.GeometryMultiPolygon:
+			var u generated.MultiPolygon
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Geom = entity.MultiPolygonFromFbs(&u)
+		case generated.GeometryMultiPoint:
+			var u generated.MultiPoint
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Geom = entity.MultiPointFromFbs(&u)
+		}
+	}
 	return o
 }
 
@@ -303,7 +331,42 @@ func (o *Geom) ToBytes() []byte {
 
 // SerializeTo writes the Geom into a FlatBuffer builder and returns the offset.
 func (o *Geom) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var geomType generated.Geometry
+	var geomOffset flatbuffers.UOffsetT
+	switch v := o.Geom.(type) {
+	case nil:
+	case *entity.Point:
+		if v != nil {
+			geomType, geomOffset = generated.GeometryPoint, v.SerializeTo(builder)
+		}
+	case *entity.Line:
+		if v != nil {
+			geomType, geomOffset = generated.GeometryLine, v.SerializeTo(builder)
+		}
+	case *entity.MultiLine:
+		if v != nil {
+			geomType, geomOffset = generated.GeometryMultiLine, v.SerializeTo(builder)
+		}
+	case *entity.Polygon:
+		if v != nil {
+			geomType, geomOffset = generated.GeometryPolygon, v.SerializeTo(builder)
+		}
+	case *entity.MultiPolygon:
+		if v != nil {
+			geomType, geomOffset = generated.GeometryMultiPolygon, v.SerializeTo(builder)
+		}
+	case *entity.MultiPoint:
+		if v != nil {
+			geomType, geomOffset = generated.GeometryMultiPoint, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("Geom.Geom: %T is not a pointer to a Geometry variant", v))
+	}
 	generated.GeomStart(builder)
+	if geomOffset != 0 {
+		generated.GeomAddGeomType(builder, geomType)
+		generated.GeomAddGeom(builder, geomOffset)
+	}
 	return generated.GeomEnd(builder)
 }
 
@@ -539,11 +602,23 @@ func (o *Projection) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffs
 }
 
 type QueryPathElement struct {
-	Element interface{}
+	Element QueryPathElementUnion
 }
 
 func QueryPathElementFromFbs(fbs *generated.QueryPathElement) *QueryPathElement {
 	o := &QueryPathElement{}
+	if tbl := new(flatbuffers.Table); fbs.Element(tbl) {
+		switch fbs.ElementType() {
+		case generated.QueryPathElementUnionNodeQuery:
+			var u generated.NodeQuery
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Element = NodeQueryFromFbs(&u)
+		case generated.QueryPathElementUnionEdgeQuery:
+			var u generated.EdgeQuery
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Element = EdgeQueryFromFbs(&u)
+		}
+	}
 	return o
 }
 
@@ -563,6 +638,25 @@ func (o *QueryPathElement) ToBytes() []byte {
 
 // SerializeTo writes the QueryPathElement into a FlatBuffer builder and returns the offset.
 func (o *QueryPathElement) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var elementType generated.QueryPathElementUnion
+	var elementOffset flatbuffers.UOffsetT
+	switch v := o.Element.(type) {
+	case nil:
+	case *NodeQuery:
+		if v != nil {
+			elementType, elementOffset = generated.QueryPathElementUnionNodeQuery, v.SerializeTo(builder)
+		}
+	case *EdgeQuery:
+		if v != nil {
+			elementType, elementOffset = generated.QueryPathElementUnionEdgeQuery, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("QueryPathElement.Element: %T is not a pointer to a QueryPathElementUnion variant", v))
+	}
 	generated.QueryPathElementStart(builder)
+	if elementOffset != 0 {
+		generated.QueryPathElementAddElementType(builder, elementType)
+		generated.QueryPathElementAddElement(builder, elementOffset)
+	}
 	return generated.QueryPathElementEnd(builder)
 }
