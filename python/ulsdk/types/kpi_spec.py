@@ -61,6 +61,13 @@ class KpiSpec:
     # The principal whose write this revision is (oid).
     authored_by: Optional["str"]
 
+    # The Drive file object the user dropped (the bronze KPI file), as
+    # provenance. Absent for a seeded spec.
+    bronze: Optional["ObjectId"]
+
+    # That file's content revision at registration.
+    bronze_cid: Optional["ContentId"]
+
     # That file's content revision at this write.
     document_cid: Optional["ContentId"]
 
@@ -92,6 +99,14 @@ class KpiSpec:
         authored_by_str = o.AuthoredBy()
         if authored_by_str is not None:
             authored_by = authored_by_str.decode('utf-8')
+        bronze = None
+        bronze_obj = o.Bronze()
+        if bronze_obj is not None:
+            bronze = ObjectId.from_fbs(bronze_obj)
+        bronze_cid = None
+        bronze_cid_obj = o.BronzeCid()
+        if bronze_cid_obj is not None:
+            bronze_cid = ContentId.from_fbs(bronze_cid_obj)
         document_cid = None
         document_cid_obj = o.DocumentCid()
         if document_cid_obj is not None:
@@ -117,7 +132,7 @@ class KpiSpec:
         if title_str is not None:
             title = title_str.decode('utf-8')
         version = o.Version()
-        return cls(authored_by, document_cid, document_id, document_sha256, kpi, published_at, service_system, title, version)
+        return cls(authored_by, bronze, bronze_cid, document_cid, document_id, document_sha256, kpi, published_at, service_system, title, version)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
@@ -129,6 +144,8 @@ class KpiSpec:
         from .generated.KpiSpec import (
             Start,
             AddAuthoredBy,
+            AddBronze,
+            AddBronzeCid,
             AddDocumentCid,
             AddDocumentId,
             AddDocumentSha256,
@@ -142,6 +159,12 @@ class KpiSpec:
         authored_by_offset = None
         if self.authored_by is not None:
             authored_by_offset = builder.CreateString(self.authored_by)
+        bronze_offset = None
+        if self.bronze is not None:
+            bronze_offset = self.bronze.serialize_to(builder)
+        bronze_cid_offset = None
+        if self.bronze_cid is not None:
+            bronze_cid_offset = self.bronze_cid.serialize_to(builder)
         document_cid_offset = None
         if self.document_cid is not None:
             document_cid_offset = self.document_cid.serialize_to(builder)
@@ -158,6 +181,10 @@ class KpiSpec:
         Start(builder)
         if authored_by_offset is not None:
             AddAuthoredBy(builder, authored_by_offset)
+        if bronze_offset is not None:
+            AddBronze(builder, bronze_offset)
+        if bronze_cid_offset is not None:
+            AddBronzeCid(builder, bronze_cid_offset)
         if document_cid_offset is not None:
             AddDocumentCid(builder, document_cid_offset)
         AddDocumentId(builder, document_id_offset)
@@ -180,6 +207,8 @@ class KpiSpec:
     @classmethod
     def make_default(cls) -> Self:
         authored_by = ""
+        bronze = ObjectId.make_default()
+        bronze_cid = ContentId.make_default()
         document_cid = ContentId.make_default()
         document_id = ObjectId.make_default()
         document_sha256 = ""
@@ -188,11 +217,13 @@ class KpiSpec:
         service_system = ""
         title = ""
         version = 0
-        return cls(authored_by, document_cid, document_id, document_sha256, kpi, published_at, service_system, title, version)
+        return cls(authored_by, bronze, bronze_cid, document_cid, document_id, document_sha256, kpi, published_at, service_system, title, version)
 
     def __eq__(self, other) -> bool:
         eq = True
         eq = eq and self.authored_by == other.authored_by
+        eq = eq and self.bronze == other.bronze
+        eq = eq and self.bronze_cid == other.bronze_cid
         eq = eq and self.document_cid == other.document_cid
         eq = eq and self.document_id == other.document_id
         eq = eq and self.document_sha256 == other.document_sha256

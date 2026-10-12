@@ -16,6 +16,16 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const KpiSpec &o) {
         const ::flatbuffers::Offset<::flatbuffers::String> authored_by_offset_val = builder.CreateString(o.authored_by_.value());
         authored_by_offset = std::make_optional(authored_by_offset_val);
     }
+    std::optional<::flatbuffers::Offset<::ObjectId>> bronze_offset = std::nullopt;
+    if (o.bronze_.has_value()) {
+        const ::flatbuffers::Offset<::ObjectId> bronze_offset_val = serialize_to(builder, o.bronze_.value());
+        bronze_offset = std::make_optional(bronze_offset_val);
+    }
+    std::optional<::flatbuffers::Offset<::ContentId>> bronze_cid_offset = std::nullopt;
+    if (o.bronze_cid_.has_value()) {
+        const ::flatbuffers::Offset<::ContentId> bronze_cid_offset_val = serialize_to(builder, o.bronze_cid_.value());
+        bronze_cid_offset = std::make_optional(bronze_cid_offset_val);
+    }
     std::optional<::flatbuffers::Offset<::ContentId>> document_cid_offset = std::nullopt;
     if (o.document_cid_.has_value()) {
         const ::flatbuffers::Offset<::ContentId> document_cid_offset_val = serialize_to(builder, o.document_cid_.value());
@@ -38,6 +48,12 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const KpiSpec &o) {
     ::KpiSpecBuilder instance_builder = ::KpiSpecBuilder(builder);
     if (authored_by_offset.has_value()) {
         instance_builder.add_authored_by(authored_by_offset.value());
+    }
+    if (bronze_offset.has_value()) {
+        instance_builder.add_bronze(bronze_offset.value());
+    }
+    if (bronze_cid_offset.has_value()) {
+        instance_builder.add_bronze_cid(bronze_cid_offset.value());
     }
     if (document_cid_offset.has_value()) {
         instance_builder.add_document_cid(document_cid_offset.value());
@@ -66,6 +82,8 @@ std::vector<uint8_t> to_bytes(const KpiSpec &o) {
 
 KpiSpec::KpiSpec()
     : authored_by_(std::nullopt)
+    , bronze_(std::nullopt)
+    , bronze_cid_(std::nullopt)
     , document_cid_(std::nullopt)
     , document_id_()
     , document_sha256_()
@@ -82,6 +100,8 @@ KpiSpec::KpiSpec(const std::vector<uint8_t> &bytes)
 
 KpiSpec::KpiSpec(const ::KpiSpec *root) 
     : authored_by_(std::nullopt)
+    , bronze_(std::nullopt)
+    , bronze_cid_(std::nullopt)
     , document_cid_(std::nullopt)
     , document_id_()
     , document_sha256_()
@@ -96,6 +116,12 @@ KpiSpec::KpiSpec(const ::KpiSpec *root)
 
     if (root->authored_by() != nullptr) {
         authored_by_ = std::string(*root->authored_by()->begin(), *root->authored_by()->end());
+    }
+    if (root->bronze() != nullptr) {
+        bronze_ = decltype(bronze_)(root->bronze());
+    }
+    if (root->bronze_cid() != nullptr) {
+        bronze_cid_ = decltype(bronze_cid_)(root->bronze_cid());
     }
     if (root->document_cid() != nullptr) {
         document_cid_ = decltype(document_cid_)(root->document_cid());
@@ -118,6 +144,12 @@ KpiSpec::KpiSpec(const ::KpiSpec *root)
 bool
 KpiSpec::operator==(const KpiSpec &rhs) const {
     if (this->authored_by_ != rhs.authored_by_) {
+        return false;
+    }
+    if (this->bronze_ != rhs.bronze_) {
+        return false;
+    }
+    if (this->bronze_cid_ != rhs.bronze_cid_) {
         return false;
     }
     if (this->document_cid_ != rhs.document_cid_) {

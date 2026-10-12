@@ -69,6 +69,8 @@ impl<'a> KpiSpec<'a> {
     pub const VT_DOCUMENT_SHA256: flatbuffers::VOffsetT = 16;
     pub const VT_AUTHORED_BY: flatbuffers::VOffsetT = 18;
     pub const VT_PUBLISHED_AT: flatbuffers::VOffsetT = 20;
+    pub const VT_BRONZE: flatbuffers::VOffsetT = 22;
+    pub const VT_BRONZE_CID: flatbuffers::VOffsetT = 24;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -81,6 +83,12 @@ impl<'a> KpiSpec<'a> {
     ) -> flatbuffers::WIPOffset<KpiSpec<'bldr>> {
         let mut builder = KpiSpecBuilder::new(_fbb);
         builder.add_published_at(args.published_at);
+        if let Some(x) = args.bronze_cid {
+            builder.add_bronze_cid(x);
+        }
+        if let Some(x) = args.bronze {
+            builder.add_bronze(x);
+        }
         if let Some(x) = args.authored_by {
             builder.add_authored_by(x);
         }
@@ -207,6 +215,29 @@ impl<'a> KpiSpec<'a> {
                 .unwrap()
         }
     }
+    /// The Drive file object the user dropped (the bronze KPI file), as
+    /// provenance. Absent for a seeded spec.
+    #[inline]
+    pub fn bronze(&self) -> Option<ObjectId<'a>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<ObjectId>>(KpiSpec::VT_BRONZE, None)
+        }
+    }
+    /// That file's content revision at registration.
+    #[inline]
+    pub fn bronze_cid(&self) -> Option<ContentId<'a>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<ContentId>>(KpiSpec::VT_BRONZE_CID, None)
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for KpiSpec<'_> {
@@ -246,6 +277,16 @@ impl flatbuffers::Verifiable for KpiSpec<'_> {
                 false,
             )?
             .visit_field::<i64>("published_at", Self::VT_PUBLISHED_AT, false)?
+            .visit_field::<flatbuffers::ForwardsUOffset<ObjectId>>(
+                "bronze",
+                Self::VT_BRONZE,
+                false,
+            )?
+            .visit_field::<flatbuffers::ForwardsUOffset<ContentId>>(
+                "bronze_cid",
+                Self::VT_BRONZE_CID,
+                false,
+            )?
             .finish();
         Ok(())
     }
@@ -260,6 +301,8 @@ pub struct KpiSpecArgs<'a> {
     pub document_sha256: Option<flatbuffers::WIPOffset<&'a str>>,
     pub authored_by: Option<flatbuffers::WIPOffset<&'a str>>,
     pub published_at: i64,
+    pub bronze: Option<flatbuffers::WIPOffset<ObjectId<'a>>>,
+    pub bronze_cid: Option<flatbuffers::WIPOffset<ContentId<'a>>>,
 }
 impl<'a> Default for KpiSpecArgs<'a> {
     #[inline]
@@ -274,6 +317,8 @@ impl<'a> Default for KpiSpecArgs<'a> {
             document_sha256: None, // required field
             authored_by: None,
             published_at: 0,
+            bronze: None,
+            bronze_cid: None,
         }
     }
 }
@@ -283,7 +328,7 @@ impl Serialize for KpiSpec<'_> {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("KpiSpec", 9)?;
+        let mut s = serializer.serialize_struct("KpiSpec", 11)?;
         s.serialize_field("kpi", &self.kpi())?;
         if let Some(f) = self.title() {
             s.serialize_field("title", &f)?;
@@ -309,6 +354,16 @@ impl Serialize for KpiSpec<'_> {
             s.skip_field("authored_by")?;
         }
         s.serialize_field("published_at", &self.published_at())?;
+        if let Some(f) = self.bronze() {
+            s.serialize_field("bronze", &f)?;
+        } else {
+            s.skip_field("bronze")?;
+        }
+        if let Some(f) = self.bronze_cid() {
+            s.serialize_field("bronze_cid", &f)?;
+        } else {
+            s.skip_field("bronze_cid")?;
+        }
         s.end()
     }
 }
@@ -373,6 +428,19 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> KpiSpecBuilder<'a, 'b, A> {
             .push_slot::<i64>(KpiSpec::VT_PUBLISHED_AT, published_at, 0);
     }
     #[inline]
+    pub fn add_bronze(&mut self, bronze: flatbuffers::WIPOffset<ObjectId<'b>>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<ObjectId>>(KpiSpec::VT_BRONZE, bronze);
+    }
+    #[inline]
+    pub fn add_bronze_cid(&mut self, bronze_cid: flatbuffers::WIPOffset<ContentId<'b>>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<ContentId>>(
+                KpiSpec::VT_BRONZE_CID,
+                bronze_cid,
+            );
+    }
+    #[inline]
     pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> KpiSpecBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         KpiSpecBuilder {
@@ -404,6 +472,8 @@ impl core::fmt::Debug for KpiSpec<'_> {
         ds.field("document_sha256", &self.document_sha256());
         ds.field("authored_by", &self.authored_by());
         ds.field("published_at", &self.published_at());
+        ds.field("bronze", &self.bronze());
+        ds.field("bronze_cid", &self.bronze_cid());
         ds.finish()
     }
 }

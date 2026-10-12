@@ -50,6 +50,11 @@ use crate::types::id::{
 pub struct KpiSpec {
     /// The principal whose write this revision is (oid).
     pub authored_by: Option<String>,
+    /// The Drive file object the user dropped (the bronze KPI file), as
+    /// provenance. Absent for a seeded spec.
+    pub bronze: Option<ObjectId>,
+    /// That file's content revision at registration.
+    pub bronze_cid: Option<ContentId>,
     /// That file's content revision at this write.
     pub document_cid: Option<ContentId>,
     /// The Drive file object holding the spec (YAML).
@@ -77,6 +82,8 @@ impl KpiSpec {
         use crate::types::generated::kpi_spec_generated::KpiSpecBuilder as FbsKpiSpecBuilder;
 
         let authored_by_offset = self.authored_by.as_ref().map(|s| builder.create_string(s));
+        let bronze_offset = self.bronze.as_ref().map(|o| o.serialize_to(builder));
+        let bronze_cid_offset = self.bronze_cid.as_ref().map(|o| o.serialize_to(builder));
         let document_cid_offset = self.document_cid.as_ref().map(|o| o.serialize_to(builder));
         let document_id_offset = self.document_id.serialize_to(builder);
         let document_sha256_offset = builder.create_string(&self.document_sha256);
@@ -90,6 +97,12 @@ impl KpiSpec {
         let mut bldr = FbsKpiSpecBuilder::new(builder);
         if let Some(offset) = authored_by_offset {
             bldr.add_authored_by(offset);
+        }
+        if let Some(offset) = bronze_offset {
+            bldr.add_bronze(offset);
+        }
+        if let Some(offset) = bronze_cid_offset {
+            bldr.add_bronze_cid(offset);
         }
         if let Some(offset) = document_cid_offset {
             bldr.add_document_cid(offset);
@@ -112,6 +125,8 @@ impl KpiSpec {
 impl From<FbsKpiSpec<'_>> for KpiSpec {
     fn from(fbs: FbsKpiSpec<'_>) -> Self {
         let authored_by = fbs.authored_by().map(ToOwned::to_owned);
+        let bronze = fbs.bronze().map(ObjectId::from);
+        let bronze_cid = fbs.bronze_cid().map(ContentId::from);
         let document_cid = fbs.document_cid().map(ContentId::from);
         let document_id = ObjectId::from(fbs.document_id());
         let document_sha256 = fbs.document_sha256().to_owned();
@@ -122,6 +137,8 @@ impl From<FbsKpiSpec<'_>> for KpiSpec {
         let version = fbs.version();
         Self {
             authored_by,
+            bronze,
+            bronze_cid,
             document_cid,
             document_id,
             document_sha256,

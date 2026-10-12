@@ -46,7 +46,9 @@ struct KpiSpec FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_DOCUMENT_CID = 14,
     VT_DOCUMENT_SHA256 = 16,
     VT_AUTHORED_BY = 18,
-    VT_PUBLISHED_AT = 20
+    VT_PUBLISHED_AT = 20,
+    VT_BRONZE = 22,
+    VT_BRONZE_CID = 24
   };
   /// The KPI's id, permanent and unique; the object id derives from it, so a
   /// re-registration of the same KPI revises the same object.
@@ -85,6 +87,15 @@ struct KpiSpec FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   int64_t published_at() const {
     return GetField<int64_t>(VT_PUBLISHED_AT, 0);
   }
+  /// The Drive file object the user dropped (the bronze KPI file), as
+  /// provenance. Absent for a seeded spec.
+  const ObjectId *bronze() const {
+    return GetPointer<const ObjectId *>(VT_BRONZE);
+  }
+  /// That file's content revision at registration.
+  const ContentId *bronze_cid() const {
+    return GetPointer<const ContentId *>(VT_BRONZE_CID);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_KPI) &&
@@ -103,6 +114,10 @@ struct KpiSpec FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_AUTHORED_BY) &&
            verifier.VerifyString(authored_by()) &&
            VerifyField<int64_t>(verifier, VT_PUBLISHED_AT, 8) &&
+           VerifyOffset(verifier, VT_BRONZE) &&
+           verifier.VerifyTable(bronze()) &&
+           VerifyOffset(verifier, VT_BRONZE_CID) &&
+           verifier.VerifyTable(bronze_cid()) &&
            verifier.EndTable();
   }
 };
@@ -138,6 +153,12 @@ struct KpiSpecBuilder {
   void add_published_at(int64_t published_at) {
     fbb_.AddElement<int64_t>(KpiSpec::VT_PUBLISHED_AT, published_at, 0);
   }
+  void add_bronze(::flatbuffers::Offset<ObjectId> bronze) {
+    fbb_.AddOffset(KpiSpec::VT_BRONZE, bronze);
+  }
+  void add_bronze_cid(::flatbuffers::Offset<ContentId> bronze_cid) {
+    fbb_.AddOffset(KpiSpec::VT_BRONZE_CID, bronze_cid);
+  }
   explicit KpiSpecBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -162,9 +183,13 @@ inline ::flatbuffers::Offset<KpiSpec> CreateKpiSpec(
     ::flatbuffers::Offset<ContentId> document_cid = 0,
     ::flatbuffers::Offset<::flatbuffers::String> document_sha256 = 0,
     ::flatbuffers::Offset<::flatbuffers::String> authored_by = 0,
-    int64_t published_at = 0) {
+    int64_t published_at = 0,
+    ::flatbuffers::Offset<ObjectId> bronze = 0,
+    ::flatbuffers::Offset<ContentId> bronze_cid = 0) {
   KpiSpecBuilder builder_(_fbb);
   builder_.add_published_at(published_at);
+  builder_.add_bronze_cid(bronze_cid);
+  builder_.add_bronze(bronze);
   builder_.add_authored_by(authored_by);
   builder_.add_document_sha256(document_sha256);
   builder_.add_document_cid(document_cid);
@@ -191,7 +216,9 @@ inline ::flatbuffers::Offset<KpiSpec> CreateKpiSpecDirect(
     ::flatbuffers::Offset<ContentId> document_cid = 0,
     const char *document_sha256 = nullptr,
     const char *authored_by = nullptr,
-    int64_t published_at = 0) {
+    int64_t published_at = 0,
+    ::flatbuffers::Offset<ObjectId> bronze = 0,
+    ::flatbuffers::Offset<ContentId> bronze_cid = 0) {
   auto kpi__ = kpi ? _fbb.CreateString(kpi) : 0;
   auto title__ = title ? _fbb.CreateString(title) : 0;
   auto service_system__ = service_system ? _fbb.CreateString(service_system) : 0;
@@ -207,7 +234,9 @@ inline ::flatbuffers::Offset<KpiSpec> CreateKpiSpecDirect(
       document_cid,
       document_sha256__,
       authored_by__,
-      published_at);
+      published_at,
+      bronze,
+      bronze_cid);
 }
 
 inline const KpiSpec *GetKpiSpec(const void *buf) {

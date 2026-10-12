@@ -31,6 +31,8 @@ var _ flatbuffers.UOffsetT
 //  can serve the rule that was in force rather than the file as it reads now.
 type KpiSpec struct {
 	AuthoredBy *string
+	Bronze *id.ObjectId
+	BronzeCid *id.ContentId
 	DocumentCid *id.ContentId
 	DocumentId id.ObjectId
 	DocumentSha256 string
@@ -46,6 +48,12 @@ func KpiSpecFromFbs(fbs *generated.KpiSpec) *KpiSpec {
 	if s := fbs.AuthoredBy(); s != nil {
 		str := string(s)
 		o.AuthoredBy = &str
+	}
+	if fbsVal := fbs.Bronze(nil); fbsVal != nil {
+		o.Bronze = id.ObjectIdFromFbs(fbsVal)
+	}
+	if fbsVal := fbs.BronzeCid(nil); fbsVal != nil {
+		o.BronzeCid = id.ContentIdFromFbs(fbsVal)
 	}
 	if fbsVal := fbs.DocumentCid(nil); fbsVal != nil {
 		o.DocumentCid = id.ContentIdFromFbs(fbsVal)
@@ -88,6 +96,14 @@ func (o *KpiSpec) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT
 	if o.AuthoredBy != nil {
 		authoredByOffset = builder.CreateString(*o.AuthoredBy)
 	}
+	var bronzeOffset flatbuffers.UOffsetT
+	if o.Bronze != nil {
+		bronzeOffset = o.Bronze.SerializeTo(builder)
+	}
+	var bronzeCidOffset flatbuffers.UOffsetT
+	if o.BronzeCid != nil {
+		bronzeCidOffset = o.BronzeCid.SerializeTo(builder)
+	}
 	var documentCidOffset flatbuffers.UOffsetT
 	if o.DocumentCid != nil {
 		documentCidOffset = o.DocumentCid.SerializeTo(builder)
@@ -105,6 +121,8 @@ func (o *KpiSpec) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT
 	}
 	generated.KpiSpecStart(builder)
 	generated.KpiSpecAddAuthoredBy(builder, authoredByOffset)
+	generated.KpiSpecAddBronze(builder, bronzeOffset)
+	generated.KpiSpecAddBronzeCid(builder, bronzeCidOffset)
 	generated.KpiSpecAddDocumentCid(builder, documentCidOffset)
 	generated.KpiSpecAddDocumentId(builder, documentIdOffset)
 	generated.KpiSpecAddDocumentSha256(builder, documentSha256Offset)

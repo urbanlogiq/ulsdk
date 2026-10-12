@@ -35,6 +35,29 @@ public final class KpiSpec {
     }
 
     /**
+     *  The Drive file object the user dropped (the bronze KPI file), as
+     *  provenance. Absent for a seeded spec.
+     */
+    com.urbanlogiq.ulsdk.types.ObjectId _bronze;
+    public com.urbanlogiq.ulsdk.types.ObjectId getBronze() {
+        return this._bronze;
+    }
+    public void setBronze(com.urbanlogiq.ulsdk.types.ObjectId value) {
+        this._bronze = value;
+    }
+
+    /**
+     *  That file's content revision at registration.
+     */
+    com.urbanlogiq.ulsdk.types.ContentId _bronzeCid;
+    public com.urbanlogiq.ulsdk.types.ContentId getBronzeCid() {
+        return this._bronzeCid;
+    }
+    public void setBronzeCid(com.urbanlogiq.ulsdk.types.ContentId value) {
+        this._bronzeCid = value;
+    }
+
+    /**
      *  That file's content revision at this write.
      */
     com.urbanlogiq.ulsdk.types.ContentId _documentCid;
@@ -127,6 +150,12 @@ public final class KpiSpec {
         if (o.authoredBy() != null) {
             this._authoredBy = o.authoredBy();
         }
+        if (o.bronze() != null) {
+            this._bronze = new com.urbanlogiq.ulsdk.types.ObjectId(o.bronze());
+        }
+        if (o.bronzeCid() != null) {
+            this._bronzeCid = new com.urbanlogiq.ulsdk.types.ContentId(o.bronzeCid());
+        }
         if (o.documentCid() != null) {
             this._documentCid = new com.urbanlogiq.ulsdk.types.ContentId(o.documentCid());
         }
@@ -152,6 +181,14 @@ public final class KpiSpec {
         if (this._authoredBy != null) {
             authoredByOffset = builder.createString(this._authoredBy);
         }
+        Integer bronzeOffset = null;
+        if (this._bronze != null) {
+            bronzeOffset = this._bronze.serializeTo(builder);
+        }
+        Integer bronzeCidOffset = null;
+        if (this._bronzeCid != null) {
+            bronzeCidOffset = this._bronzeCid.serializeTo(builder);
+        }
         Integer documentCidOffset = null;
         if (this._documentCid != null) {
             documentCidOffset = this._documentCid.serializeTo(builder);
@@ -170,6 +207,12 @@ public final class KpiSpec {
         com.urbanlogiq.ulsdk.types.generated.KpiSpec.startKpiSpec(builder);
         if (authoredByOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.KpiSpec.addAuthoredBy(builder, authoredByOffset);
+        }
+        if (bronzeOffset != null) {
+            com.urbanlogiq.ulsdk.types.generated.KpiSpec.addBronze(builder, bronzeOffset);
+        }
+        if (bronzeCidOffset != null) {
+            com.urbanlogiq.ulsdk.types.generated.KpiSpec.addBronzeCid(builder, bronzeCidOffset);
         }
         if (documentCidOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.KpiSpec.addDocumentCid(builder, documentCidOffset);
@@ -197,6 +240,8 @@ public final class KpiSpec {
 
     public KpiSpec() {
         this._authoredBy = new String();
+        this._bronze = new com.urbanlogiq.ulsdk.types.ObjectId();
+        this._bronzeCid = new com.urbanlogiq.ulsdk.types.ContentId();
         this._documentCid = new com.urbanlogiq.ulsdk.types.ContentId();
         this._documentId = new com.urbanlogiq.ulsdk.types.ObjectId();
         this._documentSha256 = new String();

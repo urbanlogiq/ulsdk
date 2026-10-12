@@ -40,6 +40,8 @@ struct KpiSpec;
 ///
 struct KpiSpec {
     std::optional<std::string> authored_by_;
+    std::optional<ObjectId> bronze_;
+    std::optional<ContentId> bronze_cid_;
     std::optional<ContentId> document_cid_;
     ObjectId document_id_;
     std::string document_sha256_;

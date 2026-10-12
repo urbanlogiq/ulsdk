@@ -131,8 +131,25 @@ publishedAt():bigint {
   return offset ? this.bb!.readInt64(this.bb_pos + offset) : BigInt('0');
 }
 
+/**
+ * The Drive file object the user dropped (the bronze KPI file), as
+ * provenance. Absent for a seeded spec.
+ */
+bronze(obj?:ObjectId):ObjectId|null {
+  const offset = this.bb!.__offset(this.bb_pos, 22);
+  return offset ? (obj || new ObjectId()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
+}
+
+/**
+ * That file's content revision at registration.
+ */
+bronzeCid(obj?:ContentId):ContentId|null {
+  const offset = this.bb!.__offset(this.bb_pos, 24);
+  return offset ? (obj || new ContentId()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
+}
+
 static startKpiSpec(builder:flatbuffers.Builder) {
-  builder.startObject(9);
+  builder.startObject(11);
 }
 
 static addKpi(builder:flatbuffers.Builder, kpiOffset:flatbuffers.Offset) {
@@ -171,6 +188,14 @@ static addPublishedAt(builder:flatbuffers.Builder, publishedAt:bigint) {
   builder.addFieldInt64(8, publishedAt, BigInt('0'));
 }
 
+static addBronze(builder:flatbuffers.Builder, bronzeOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(9, bronzeOffset, 0);
+}
+
+static addBronzeCid(builder:flatbuffers.Builder, bronzeCidOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(10, bronzeCidOffset, 0);
+}
+
 static endKpiSpec(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   builder.requiredField(offset, 4) // kpi
@@ -198,7 +223,9 @@ unpack(): KpiSpecT {
     (this.documentCid() !== null ? this.documentCid()!.unpack() : null),
     this.documentSha256(),
     this.authoredBy(),
-    this.publishedAt()
+    this.publishedAt(),
+    (this.bronze() !== null ? this.bronze()!.unpack() : null),
+    (this.bronzeCid() !== null ? this.bronzeCid()!.unpack() : null)
   );
 }
 
@@ -213,6 +240,8 @@ unpackTo(_o: KpiSpecT): void {
   _o.documentSha256 = this.documentSha256();
   _o.authoredBy = this.authoredBy();
   _o.publishedAt = this.publishedAt();
+  _o.bronze = (this.bronze() !== null ? this.bronze()!.unpack() : null);
+  _o.bronzeCid = (this.bronzeCid() !== null ? this.bronzeCid()!.unpack() : null);
 }
 }
 
@@ -226,7 +255,9 @@ constructor(
   public documentCid: ContentIdT|null = null,
   public documentSha256: string|Uint8Array|null = null,
   public authoredBy: string|Uint8Array|null = null,
-  public publishedAt: bigint = BigInt('0')
+  public publishedAt: bigint = BigInt('0'),
+  public bronze: ObjectIdT|null = null,
+  public bronzeCid: ContentIdT|null = null
 ){}
 
 
@@ -238,6 +269,8 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   const documentCid = (this.documentCid !== null ? this.documentCid!.pack(builder) : 0);
   const documentSha256 = (this.documentSha256 !== null ? builder.createString(this.documentSha256!) : 0);
   const authoredBy = (this.authoredBy !== null ? builder.createString(this.authoredBy!) : 0);
+  const bronze = (this.bronze !== null ? this.bronze!.pack(builder) : 0);
+  const bronzeCid = (this.bronzeCid !== null ? this.bronzeCid!.pack(builder) : 0);
 
   KpiSpec.startKpiSpec(builder);
   KpiSpec.addKpi(builder, kpi);
@@ -249,6 +282,8 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   KpiSpec.addDocumentSha256(builder, documentSha256);
   KpiSpec.addAuthoredBy(builder, authoredBy);
   KpiSpec.addPublishedAt(builder, this.publishedAt);
+  KpiSpec.addBronze(builder, bronze);
+  KpiSpec.addBronzeCid(builder, bronzeCid);
 
   return KpiSpec.endKpiSpec(builder);
 }

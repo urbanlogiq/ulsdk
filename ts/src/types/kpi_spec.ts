@@ -43,6 +43,17 @@ export class KpiSpec {
   private _authoredBy!: string | null;
 
 /**
+ *  The Drive file object the user dropped (the bronze KPI file), as
+ *  provenance. Absent for a seeded spec.
+ */
+  private _bronze!: ObjectId | null;
+
+/**
+ *  That file's content revision at registration.
+ */
+  private _bronzeCid!: ContentId | null;
+
+/**
  *  That file's content revision at this write.
  */
   private _documentCid!: ContentId | null;
@@ -92,6 +103,8 @@ export class KpiSpec {
       this._initFromFbs(arg);
     } else {
       this._authoredBy = null;
+      this._bronze = null;
+      this._bronzeCid = null;
       this._documentCid = null;
       this._documentId = new ObjectId();
       this._documentSha256 = '';
@@ -105,6 +118,10 @@ export class KpiSpec {
 
   private _initFromFbs(fbs: FbsKpiSpec): void {
     this._authoredBy = fbs.authoredBy();
+    const bronzeVal = fbs.bronze();
+    this._bronze = bronzeVal ? new ObjectId(bronzeVal) : null;
+    const bronzeCidVal = fbs.bronzeCid();
+    this._bronzeCid = bronzeCidVal ? new ContentId(bronzeCidVal) : null;
     const documentCidVal = fbs.documentCid();
     this._documentCid = documentCidVal ? new ContentId(documentCidVal) : null;
     const documentIdVal = fbs.documentId();
@@ -123,6 +140,22 @@ export class KpiSpec {
 
   set authoredBy(value: string | null) {
     this._authoredBy = value;
+  }
+
+  get bronze(): ObjectId | null {
+    return this._bronze;
+  }
+
+  set bronze(value: ObjectId | null) {
+    this._bronze = value;
+  }
+
+  get bronzeCid(): ContentId | null {
+    return this._bronzeCid;
+  }
+
+  set bronzeCid(value: ContentId | null) {
+    this._bronzeCid = value;
   }
 
   get documentCid(): ContentId | null {
@@ -192,6 +225,8 @@ export class KpiSpec {
   toFbsT(): FbsKpiSpecT {
     const t = new FbsKpiSpecT();
     t.authoredBy = this._authoredBy;
+    t.bronze = this._bronze ? this._bronze.toFbsT() : null;
+    t.bronzeCid = this._bronzeCid ? this._bronzeCid.toFbsT() : null;
     t.documentCid = this._documentCid ? this._documentCid.toFbsT() : null;
     t.documentId = this._documentId.toFbsT();
     t.documentSha256 = this._documentSha256;

@@ -121,8 +121,33 @@ class KpiSpec(object):
             return self._tab.Get(flatbuffers.number_types.Int64Flags, o + self._tab.Pos)
         return 0
 
+    # The Drive file object the user dropped (the bronze KPI file), as
+    # provenance. Absent for a seeded spec.
+    # KpiSpec
+    def Bronze(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(22))
+        if o != 0:
+            x = self._tab.Indirect(o + self._tab.Pos)
+            from .ObjectId import ObjectId
+            obj = ObjectId()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+    # That file's content revision at registration.
+    # KpiSpec
+    def BronzeCid(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(24))
+        if o != 0:
+            x = self._tab.Indirect(o + self._tab.Pos)
+            from .ContentId import ContentId
+            obj = ContentId()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
 def KpiSpecStart(builder):
-    builder.StartObject(9)
+    builder.StartObject(11)
 
 def Start(builder):
     KpiSpecStart(builder)
@@ -180,6 +205,18 @@ def KpiSpecAddPublishedAt(builder, publishedAt):
 
 def AddPublishedAt(builder, publishedAt):
     KpiSpecAddPublishedAt(builder, publishedAt)
+
+def KpiSpecAddBronze(builder, bronze):
+    builder.PrependUOffsetTRelativeSlot(9, flatbuffers.number_types.UOffsetTFlags.py_type(bronze), 0)
+
+def AddBronze(builder, bronze):
+    KpiSpecAddBronze(builder, bronze)
+
+def KpiSpecAddBronzeCid(builder, bronzeCid):
+    builder.PrependUOffsetTRelativeSlot(10, flatbuffers.number_types.UOffsetTFlags.py_type(bronzeCid), 0)
+
+def AddBronzeCid(builder, bronzeCid):
+    KpiSpecAddBronzeCid(builder, bronzeCid)
 
 def KpiSpecEnd(builder):
     return builder.EndObject()

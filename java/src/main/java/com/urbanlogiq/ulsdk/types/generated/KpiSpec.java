@@ -96,6 +96,17 @@ public final class KpiSpec extends com.google.flatbuffers.Table {
    * When this revision was published, ms since the epoch (UTC).
    */
   public long publishedAt() { int o = __offset(20); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
+  /**
+   * The Drive file object the user dropped (the bronze KPI file), as
+   * provenance. Absent for a seeded spec.
+   */
+  public ObjectId bronze() { return bronze(new ObjectId()); }
+  public ObjectId bronze(ObjectId obj) { int o = __offset(22); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
+  /**
+   * That file's content revision at registration.
+   */
+  public ContentId bronzeCid() { return bronzeCid(new ContentId()); }
+  public ContentId bronzeCid(ContentId obj) { int o = __offset(24); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
 
   public static int createKpiSpec(FlatBufferBuilder builder,
       int kpiOffset,
@@ -106,9 +117,13 @@ public final class KpiSpec extends com.google.flatbuffers.Table {
       int documentCidOffset,
       int documentSha256Offset,
       int authoredByOffset,
-      long publishedAt) {
-    builder.startTable(9);
+      long publishedAt,
+      int bronzeOffset,
+      int bronzeCidOffset) {
+    builder.startTable(11);
     KpiSpec.addPublishedAt(builder, publishedAt);
+    KpiSpec.addBronzeCid(builder, bronzeCidOffset);
+    KpiSpec.addBronze(builder, bronzeOffset);
     KpiSpec.addAuthoredBy(builder, authoredByOffset);
     KpiSpec.addDocumentSha256(builder, documentSha256Offset);
     KpiSpec.addDocumentCid(builder, documentCidOffset);
@@ -120,7 +135,7 @@ public final class KpiSpec extends com.google.flatbuffers.Table {
     return KpiSpec.endKpiSpec(builder);
   }
 
-  public static void startKpiSpec(FlatBufferBuilder builder) { builder.startTable(9); }
+  public static void startKpiSpec(FlatBufferBuilder builder) { builder.startTable(11); }
   public static void addKpi(FlatBufferBuilder builder, int kpiOffset) { builder.addOffset(0, kpiOffset, 0); }
   public static void addTitle(FlatBufferBuilder builder, int titleOffset) { builder.addOffset(1, titleOffset, 0); }
   public static void addVersion(FlatBufferBuilder builder, int version) { builder.addInt(2, version, 0); }
@@ -130,6 +145,8 @@ public final class KpiSpec extends com.google.flatbuffers.Table {
   public static void addDocumentSha256(FlatBufferBuilder builder, int documentSha256Offset) { builder.addOffset(6, documentSha256Offset, 0); }
   public static void addAuthoredBy(FlatBufferBuilder builder, int authoredByOffset) { builder.addOffset(7, authoredByOffset, 0); }
   public static void addPublishedAt(FlatBufferBuilder builder, long publishedAt) { builder.addLong(8, publishedAt, 0L); }
+  public static void addBronze(FlatBufferBuilder builder, int bronzeOffset) { builder.addOffset(9, bronzeOffset, 0); }
+  public static void addBronzeCid(FlatBufferBuilder builder, int bronzeCidOffset) { builder.addOffset(10, bronzeCidOffset, 0); }
   public static int endKpiSpec(FlatBufferBuilder builder) {
     int o = builder.endTable();
     builder.required(o, 4);  // kpi

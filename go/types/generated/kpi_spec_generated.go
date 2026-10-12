@@ -167,8 +167,40 @@ func (rcv *KpiSpec) MutatePublishedAt(n int64) bool {
 	return rcv._tab.MutateInt64Slot(20, n)
 }
 
+/// The Drive file object the user dropped (the bronze KPI file), as
+/// provenance. Absent for a seeded spec.
+func (rcv *KpiSpec) Bronze(obj *ObjectId) *ObjectId {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(22))
+	if o != 0 {
+		x := rcv._tab.Indirect(o + rcv._tab.Pos)
+		if obj == nil {
+			obj = new(ObjectId)
+		}
+		obj.Init(rcv._tab.Bytes, x)
+		return obj
+	}
+	return nil
+}
+
+/// The Drive file object the user dropped (the bronze KPI file), as
+/// provenance. Absent for a seeded spec.
+/// That file's content revision at registration.
+func (rcv *KpiSpec) BronzeCid(obj *ContentId) *ContentId {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(24))
+	if o != 0 {
+		x := rcv._tab.Indirect(o + rcv._tab.Pos)
+		if obj == nil {
+			obj = new(ContentId)
+		}
+		obj.Init(rcv._tab.Bytes, x)
+		return obj
+	}
+	return nil
+}
+
+/// That file's content revision at registration.
 func KpiSpecStart(builder *flatbuffers.Builder) {
-	builder.StartObject(9)
+	builder.StartObject(11)
 }
 func KpiSpecAddKpi(builder *flatbuffers.Builder, kpi flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(kpi), 0)
@@ -196,6 +228,12 @@ func KpiSpecAddAuthoredBy(builder *flatbuffers.Builder, authoredBy flatbuffers.U
 }
 func KpiSpecAddPublishedAt(builder *flatbuffers.Builder, publishedAt int64) {
 	builder.PrependInt64Slot(8, publishedAt, 0)
+}
+func KpiSpecAddBronze(builder *flatbuffers.Builder, bronze flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(9, flatbuffers.UOffsetT(bronze), 0)
+}
+func KpiSpecAddBronzeCid(builder *flatbuffers.Builder, bronzeCid flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(10, flatbuffers.UOffsetT(bronzeCid), 0)
 }
 func KpiSpecEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
