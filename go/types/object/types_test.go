@@ -4,7 +4,11 @@
 
 package object
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/urbanlogiq/ulsdk/types/generated"
+)
 
 func TestDefaultDataCatalogObject(t *testing.T) {
 	o := &DataCatalogObject{}
@@ -13,6 +17,48 @@ func TestDefaultDataCatalogObject(t *testing.T) {
 	}
 }
 
+
+func TestVectorPresenceDataCatalogObject(t *testing.T) {
+	o := &DataCatalogObject{}
+	var fbs *generated.DataCatalogObject
+	fbs = generated.GetSizePrefixedRootAsDataCatalogObject(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(20) != 0 {
+		t.Errorf("Attributes: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(26) != 0 {
+		t.Errorf("Signature: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(16) != 0 {
+		t.Errorf("Tags: nil vector is written")
+	}
+	o.Attributes = emptyOf(o.Attributes)
+	o.Signature = emptyOf(o.Signature)
+	o.Tags = emptyOf(o.Tags)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsDataCatalogObject(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(20) == 0 {
+		t.Errorf("Attributes: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(26) == 0 {
+		t.Errorf("Signature: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(16) == 0 {
+		t.Errorf("Tags: empty vector is not written")
+	}
+	got, err := DataCatalogObjectFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Attributes == nil {
+		t.Errorf("Attributes: empty vector is read back as nil")
+	}
+	if got.Signature == nil {
+		t.Errorf("Signature: empty vector is read back as nil")
+	}
+	if got.Tags == nil {
+		t.Errorf("Tags: empty vector is read back as nil")
+	}
+}
 
 func TestDefaultObjectIdList(t *testing.T) {
 	o := &ObjectIdList{}
@@ -29,6 +75,28 @@ func TestDefaultObjectIdPair(t *testing.T) {
 	}
 }
 
+
+func TestVectorPresenceObjectIdPair(t *testing.T) {
+	o := &ObjectIdPair{}
+	var fbs *generated.ObjectIdPair
+	fbs = generated.GetSizePrefixedRootAsObjectIdPair(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		t.Errorf("Object: nil vector is written")
+	}
+	o.Object = emptyOf(o.Object)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsObjectIdPair(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(6) == 0 {
+		t.Errorf("Object: empty vector is not written")
+	}
+	got, err := ObjectIdPairFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Object == nil {
+		t.Errorf("Object: empty vector is read back as nil")
+	}
+}
 
 func TestDefaultObjectIdPairList(t *testing.T) {
 	o := &ObjectIdPairList{}
@@ -53,3 +121,8 @@ func TestDefaultObjectSummaryList(t *testing.T) {
 	}
 }
 
+
+// emptyOf returns an empty, non-nil slice of the type of its argument.
+func emptyOf[T any](_ []T) []T {
+	return []T{}
+}

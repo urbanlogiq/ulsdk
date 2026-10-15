@@ -25,14 +25,20 @@ func TensorFromFbs(fbs *generated.Tensor) *Tensor {
 	if fbsVal := fbs.Data(nil); fbsVal != nil {
 		o.Data = *schema.BufferFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.ShapeLength(); i++ {
-		var item generated.TensorDim
-		if fbs.Shape(&item, i) {
-			o.Shape = append(o.Shape, *TensorDimFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.Shape = []TensorDim{}
+		for i := 0; i < fbs.ShapeLength(); i++ {
+			var item generated.TensorDim
+			if fbs.Shape(&item, i) {
+				o.Shape = append(o.Shape, *TensorDimFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.StridesLength(); i++ {
-		o.Strides = append(o.Strides, fbs.Strides(i))
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		o.Strides = []int64{}
+		for i := 0; i < fbs.StridesLength(); i++ {
+			o.Strides = append(o.Strides, fbs.Strides(i))
+		}
 	}
 	if tbl := new(flatbuffers.Table); fbs.Type(tbl) {
 		switch fbs.TypeType() {
@@ -161,20 +167,24 @@ func (o *Tensor) ToBytes() []byte {
 
 // SerializeTo writes the Tensor into a FlatBuffer builder and returns the offset.
 func (o *Tensor) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var shapeVecOffset flatbuffers.UOffsetT
 	shapeOffsets := make([]flatbuffers.UOffsetT, len(o.Shape))
 	for i := range o.Shape {
 		shapeOffsets[i] = o.Shape[i].SerializeTo(builder)
 	}
 	generated.TensorStartShapeVector(builder, len(o.Shape))
-	for i := len(shapeOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Shape) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(shapeOffsets[i])
 	}
-	shapeVecOffset := builder.EndVector(len(o.Shape))
-	generated.TensorStartStridesVector(builder, len(o.Strides))
-	for i := len(o.Strides) - 1; i >= 0; i-- {
-		builder.PrependInt64(o.Strides[i])
+	shapeVecOffset = builder.EndVector(len(o.Shape))
+	var stridesVecOffset flatbuffers.UOffsetT
+	if o.Strides != nil {
+		generated.TensorStartStridesVector(builder, len(o.Strides))
+		for i := len(o.Strides) - 1; i >= 0; i-- {
+			builder.PrependInt64(o.Strides[i])
+		}
+		stridesVecOffset = builder.EndVector(len(o.Strides))
 	}
-	stridesVecOffset := builder.EndVector(len(o.Strides))
 	var typeType generated.Type
 	var typeOffset flatbuffers.UOffsetT
 	switch v := o.Type.(type) {

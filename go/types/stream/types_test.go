@@ -4,7 +4,11 @@
 
 package stream
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/urbanlogiq/ulsdk/types/generated"
+)
 
 func TestDefaultStream(t *testing.T) {
 	o := &Stream{}
@@ -13,3 +17,50 @@ func TestDefaultStream(t *testing.T) {
 	}
 }
 
+
+func TestVectorPresenceStream(t *testing.T) {
+	o := &Stream{}
+	var fbs *generated.Stream
+	fbs = generated.GetSizePrefixedRootAsStream(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		t.Errorf("Options: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		t.Errorf("Parameters: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(22) != 0 {
+		t.Errorf("Substreams: nil vector is written")
+	}
+	o.Options = emptyOf(o.Options)
+	o.Parameters = emptyOf(o.Parameters)
+	o.Substreams = emptyOf(o.Substreams)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsStream(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(6) == 0 {
+		t.Errorf("Options: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(8) == 0 {
+		t.Errorf("Parameters: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(22) == 0 {
+		t.Errorf("Substreams: empty vector is not written")
+	}
+	got, err := StreamFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Options == nil {
+		t.Errorf("Options: empty vector is read back as nil")
+	}
+	if got.Parameters == nil {
+		t.Errorf("Parameters: empty vector is read back as nil")
+	}
+	if got.Substreams == nil {
+		t.Errorf("Substreams: empty vector is read back as nil")
+	}
+}
+
+// emptyOf returns an empty, non-nil slice of the type of its argument.
+func emptyOf[T any](_ []T) []T {
+	return []T{}
+}

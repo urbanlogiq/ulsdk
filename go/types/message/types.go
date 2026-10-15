@@ -84,24 +84,33 @@ type RecordBatch struct {
 
 func RecordBatchFromFbs(fbs *generated.RecordBatch) *RecordBatch {
 	o := &RecordBatch{}
-	for i := 0; i < fbs.BuffersLength(); i++ {
-		var item generated.Buffer
-		if fbs.Buffers(&item, i) {
-			o.Buffers = append(o.Buffers, *schema.BufferFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.Buffers = []schema.Buffer{}
+		for i := 0; i < fbs.BuffersLength(); i++ {
+			var item generated.Buffer
+			if fbs.Buffers(&item, i) {
+				o.Buffers = append(o.Buffers, *schema.BufferFromFbs(&item))
+			}
 		}
 	}
 	if fbsVal := fbs.Compression(nil); fbsVal != nil {
 		o.Compression = BodyCompressionFromFbs(fbsVal)
 	}
 	o.Length = fbs.Length()
-	for i := 0; i < fbs.NodesLength(); i++ {
-		var item generated.FieldNode
-		if fbs.Nodes(&item, i) {
-			o.Nodes = append(o.Nodes, *FieldNodeFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Nodes = []FieldNode{}
+		for i := 0; i < fbs.NodesLength(); i++ {
+			var item generated.FieldNode
+			if fbs.Nodes(&item, i) {
+				o.Nodes = append(o.Nodes, *FieldNodeFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.VariadicBufferCountsLength(); i++ {
-		o.VariadicBufferCounts = append(o.VariadicBufferCounts, fbs.VariadicBufferCounts(i))
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		o.VariadicBufferCounts = []int64{}
+		for i := 0; i < fbs.VariadicBufferCountsLength(); i++ {
+			o.VariadicBufferCounts = append(o.VariadicBufferCounts, fbs.VariadicBufferCounts(i))
+		}
 	}
 	return o
 }
@@ -128,11 +137,14 @@ func (o *RecordBatch) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOff
 		compressionOffset = o.Compression.SerializeTo(builder)
 	}
 	var nodesVecOffset flatbuffers.UOffsetT // TODO: struct vector
-	generated.RecordBatchStartVariadicBufferCountsVector(builder, len(o.VariadicBufferCounts))
-	for i := len(o.VariadicBufferCounts) - 1; i >= 0; i-- {
-		builder.PrependInt64(o.VariadicBufferCounts[i])
+	var variadicBufferCountsVecOffset flatbuffers.UOffsetT
+	if o.VariadicBufferCounts != nil {
+		generated.RecordBatchStartVariadicBufferCountsVector(builder, len(o.VariadicBufferCounts))
+		for i := len(o.VariadicBufferCounts) - 1; i >= 0; i-- {
+			builder.PrependInt64(o.VariadicBufferCounts[i])
+		}
+		variadicBufferCountsVecOffset = builder.EndVector(len(o.VariadicBufferCounts))
 	}
-	variadicBufferCountsVecOffset := builder.EndVector(len(o.VariadicBufferCounts))
 	generated.RecordBatchStart(builder)
 	generated.RecordBatchAddBuffers(builder, buffersVecOffset)
 	generated.RecordBatchAddCompression(builder, compressionOffset)
@@ -238,10 +250,13 @@ type Message struct {
 func MessageFromFbs(fbs *generated.Message) *Message {
 	o := &Message{}
 	o.BodyLength = fbs.BodyLength()
-	for i := 0; i < fbs.CustomMetadataLength(); i++ {
-		var item generated.KeyValue
-		if fbs.CustomMetadata(&item, i) {
-			o.CustomMetadata = append(o.CustomMetadata, *schema.KeyValueFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		o.CustomMetadata = []schema.KeyValue{}
+		for i := 0; i < fbs.CustomMetadataLength(); i++ {
+			var item generated.KeyValue
+			if fbs.CustomMetadata(&item, i) {
+				o.CustomMetadata = append(o.CustomMetadata, *schema.KeyValueFromFbs(&item))
+			}
 		}
 	}
 	if tbl := new(flatbuffers.Table); fbs.Header(tbl) {
@@ -288,15 +303,18 @@ func (o *Message) ToBytes() []byte {
 
 // SerializeTo writes the Message into a FlatBuffer builder and returns the offset.
 func (o *Message) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	customMetadataOffsets := make([]flatbuffers.UOffsetT, len(o.CustomMetadata))
-	for i := range o.CustomMetadata {
-		customMetadataOffsets[i] = o.CustomMetadata[i].SerializeTo(builder)
+	var customMetadataVecOffset flatbuffers.UOffsetT
+	if o.CustomMetadata != nil {
+		customMetadataOffsets := make([]flatbuffers.UOffsetT, len(o.CustomMetadata))
+		for i := range o.CustomMetadata {
+			customMetadataOffsets[i] = o.CustomMetadata[i].SerializeTo(builder)
+		}
+		generated.MessageStartCustomMetadataVector(builder, len(o.CustomMetadata))
+		for i := len(o.CustomMetadata) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(customMetadataOffsets[i])
+		}
+		customMetadataVecOffset = builder.EndVector(len(o.CustomMetadata))
 	}
-	generated.MessageStartCustomMetadataVector(builder, len(o.CustomMetadata))
-	for i := len(customMetadataOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(customMetadataOffsets[i])
-	}
-	customMetadataVecOffset := builder.EndVector(len(o.CustomMetadata))
 	var headerType generated.MessageHeader
 	var headerOffset flatbuffers.UOffsetT
 	switch v := o.Header.(type) {

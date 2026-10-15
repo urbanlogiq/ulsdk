@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/id"
 	"github.com/urbanlogiq/ulsdk/types/value"
 )
@@ -28,6 +29,28 @@ func TestRoundTripByteArray(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestVectorPresenceByteArray(t *testing.T) {
+	o := &ByteArray{}
+	var fbs *generated.ByteArray
+	fbs = generated.GetSizePrefixedRootAsByteArray(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		t.Errorf("B: nil vector is written")
+	}
+	o.B = emptyOf(o.B)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsByteArray(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(4) == 0 {
+		t.Errorf("B: empty vector is not written")
+	}
+	got, err := ByteArrayFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.B == nil {
+		t.Errorf("B: empty vector is read back as nil")
 	}
 }
 
@@ -141,6 +164,28 @@ func TestDefaultWorkLog(t *testing.T) {
 }
 
 
+func TestVectorPresenceWorkLog(t *testing.T) {
+	o := &WorkLog{}
+	var fbs *generated.WorkLog
+	fbs = generated.GetSizePrefixedRootAsWorkLog(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		t.Errorf("InputStreams: nil vector is written")
+	}
+	o.InputStreams = emptyOf(o.InputStreams)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsWorkLog(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(8) == 0 {
+		t.Errorf("InputStreams: empty vector is not written")
+	}
+	got, err := WorkLogFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.InputStreams == nil {
+		t.Errorf("InputStreams: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultWorklogParameter(t *testing.T) {
 	o := &WorklogParameter{}
 	if o == nil {
@@ -165,4 +210,9 @@ func TestUnionWorklogParameterValue(t *testing.T) {
 			t.Fatalf("got %T, want %T", got.Value, v)
 		}
 	}
+}
+
+// emptyOf returns an empty, non-nil slice of the type of its argument.
+func emptyOf[T any](_ []T) []T {
+	return []T{}
 }

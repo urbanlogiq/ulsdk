@@ -4,7 +4,11 @@
 
 package data
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/urbanlogiq/ulsdk/types/generated"
+)
 
 func TestDefaultAttributePair(t *testing.T) {
 	o := &AttributePair{}
@@ -52,6 +56,28 @@ func TestRoundTripDirectionAndRoadNames(t *testing.T) {
 	}
 }
 
+func TestVectorPresenceDirectionAndRoadNames(t *testing.T) {
+	o := &DirectionAndRoadNames{}
+	var fbs *generated.DirectionAndRoadNames
+	fbs = generated.GetSizePrefixedRootAsDirectionAndRoadNames(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		t.Errorf("DirectionAndRoadNames: nil vector is written")
+	}
+	o.DirectionAndRoadNames = emptyOf(o.DirectionAndRoadNames)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsDirectionAndRoadNames(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(4) == 0 {
+		t.Errorf("DirectionAndRoadNames: empty vector is not written")
+	}
+	got, err := DirectionAndRoadNamesFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.DirectionAndRoadNames == nil {
+		t.Errorf("DirectionAndRoadNames: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultNamedParameter(t *testing.T) {
 	o := &NamedParameter{}
 	if o == nil {
@@ -75,3 +101,50 @@ func TestDefaultSource(t *testing.T) {
 	}
 }
 
+
+func TestVectorPresenceSource(t *testing.T) {
+	o := &Source{}
+	var fbs *generated.Source
+	fbs = generated.GetSizePrefixedRootAsSource(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(18) != 0 {
+		t.Errorf("NamedParameters: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		t.Errorf("Options: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(20) != 0 {
+		t.Errorf("OutputSchemas: nil vector is written")
+	}
+	o.NamedParameters = emptyOf(o.NamedParameters)
+	o.Options = emptyOf(o.Options)
+	o.OutputSchemas = emptyOf(o.OutputSchemas)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsSource(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(18) == 0 {
+		t.Errorf("NamedParameters: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(8) == 0 {
+		t.Errorf("Options: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(20) == 0 {
+		t.Errorf("OutputSchemas: empty vector is not written")
+	}
+	got, err := SourceFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.NamedParameters == nil {
+		t.Errorf("NamedParameters: empty vector is read back as nil")
+	}
+	if got.Options == nil {
+		t.Errorf("Options: empty vector is read back as nil")
+	}
+	if got.OutputSchemas == nil {
+		t.Errorf("OutputSchemas: empty vector is read back as nil")
+	}
+}
+
+// emptyOf returns an empty, non-nil slice of the type of its argument.
+func emptyOf[T any](_ []T) []T {
+	return []T{}
+}

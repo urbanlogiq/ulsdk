@@ -540,9 +540,8 @@ type Vbytes struct {
 
 func VbytesFromFbs(fbs *generated.VBytes) *Vbytes {
 	o := &Vbytes{}
-	o.V = make([]byte, fbs.VLength())
-	for i := 0; i < fbs.VLength(); i++ {
-		o.V[i] = fbs.V(i)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.V = append([]byte{}, fbs.VBytes()...)
 	}
 	return o
 }
@@ -563,7 +562,8 @@ func (o *Vbytes) ToBytes() []byte {
 
 // SerializeTo writes the Vbytes into a FlatBuffer builder and returns the offset.
 func (o *Vbytes) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	vOffset := builder.CreateByteVector(o.V)
+	var vOffset flatbuffers.UOffsetT
+	vOffset = builder.CreateByteVector(o.V)
 	generated.VBytesStart(builder)
 	generated.VBytesAddV(builder, vOffset)
 	return generated.VBytesEnd(builder)
@@ -575,10 +575,13 @@ type Varray struct {
 
 func VarrayFromFbs(fbs *generated.VArray) *Varray {
 	o := &Varray{}
-	for i := 0; i < fbs.VLength(); i++ {
-		var item generated.ValueInstance
-		if fbs.V(&item, i) {
-			o.V = append(o.V, *ValueInstanceFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.V = []ValueInstance{}
+		for i := 0; i < fbs.VLength(); i++ {
+			var item generated.ValueInstance
+			if fbs.V(&item, i) {
+				o.V = append(o.V, *ValueInstanceFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -600,15 +603,16 @@ func (o *Varray) ToBytes() []byte {
 
 // SerializeTo writes the Varray into a FlatBuffer builder and returns the offset.
 func (o *Varray) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var vVecOffset flatbuffers.UOffsetT
 	vOffsets := make([]flatbuffers.UOffsetT, len(o.V))
 	for i := range o.V {
 		vOffsets[i] = o.V[i].SerializeTo(builder)
 	}
 	generated.VArrayStartVVector(builder, len(o.V))
-	for i := len(vOffsets) - 1; i >= 0; i-- {
+	for i := len(o.V) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(vOffsets[i])
 	}
-	vVecOffset := builder.EndVector(len(o.V))
+	vVecOffset = builder.EndVector(len(o.V))
 	generated.VArrayStart(builder)
 	generated.VArrayAddV(builder, vVecOffset)
 	return generated.VArrayEnd(builder)
@@ -688,9 +692,8 @@ type VfixedSizeBytes struct {
 func VfixedSizeBytesFromFbs(fbs *generated.VFixedSizeBytes) *VfixedSizeBytes {
 	o := &VfixedSizeBytes{}
 	o.Sz = fbs.Sz()
-	o.V = make([]byte, fbs.VLength())
-	for i := 0; i < fbs.VLength(); i++ {
-		o.V[i] = fbs.V(i)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.V = append([]byte{}, fbs.VBytes()...)
 	}
 	return o
 }
@@ -711,7 +714,8 @@ func (o *VfixedSizeBytes) ToBytes() []byte {
 
 // SerializeTo writes the VfixedSizeBytes into a FlatBuffer builder and returns the offset.
 func (o *VfixedSizeBytes) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	vOffset := builder.CreateByteVector(o.V)
+	var vOffset flatbuffers.UOffsetT
+	vOffset = builder.CreateByteVector(o.V)
 	generated.VFixedSizeBytesStart(builder)
 	generated.VFixedSizeBytesAddSz(builder, o.Sz)
 	generated.VFixedSizeBytesAddV(builder, vOffset)

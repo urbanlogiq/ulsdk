@@ -66,8 +66,11 @@ func SparseTensorIndexCOOFromFbs(fbs *generated.SparseTensorIndexCOO) *SparseTen
 	if fbsVal := fbs.IndicesBuffer(nil); fbsVal != nil {
 		o.IndicesBuffer = *schema.BufferFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.IndicesStridesLength(); i++ {
-		o.IndicesStrides = append(o.IndicesStrides, fbs.IndicesStrides(i))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.IndicesStrides = []int64{}
+		for i := 0; i < fbs.IndicesStridesLength(); i++ {
+			o.IndicesStrides = append(o.IndicesStrides, fbs.IndicesStrides(i))
+		}
 	}
 	if fbsVal := fbs.IndicesType(nil); fbsVal != nil {
 		o.IndicesType = *schema.IntFromFbs(fbsVal)
@@ -92,11 +95,14 @@ func (o *SparseTensorIndexCOO) ToBytes() []byte {
 
 // SerializeTo writes the SparseTensorIndexCOO into a FlatBuffer builder and returns the offset.
 func (o *SparseTensorIndexCOO) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	generated.SparseTensorIndexCOOStartIndicesStridesVector(builder, len(o.IndicesStrides))
-	for i := len(o.IndicesStrides) - 1; i >= 0; i-- {
-		builder.PrependInt64(o.IndicesStrides[i])
+	var indicesStridesVecOffset flatbuffers.UOffsetT
+	if o.IndicesStrides != nil {
+		generated.SparseTensorIndexCOOStartIndicesStridesVector(builder, len(o.IndicesStrides))
+		for i := len(o.IndicesStrides) - 1; i >= 0; i-- {
+			builder.PrependInt64(o.IndicesStrides[i])
+		}
+		indicesStridesVecOffset = builder.EndVector(len(o.IndicesStrides))
 	}
-	indicesStridesVecOffset := builder.EndVector(len(o.IndicesStrides))
 	indicesTypeOffset := o.IndicesType.SerializeTo(builder)
 	generated.SparseTensorIndexCOOStart(builder)
 	generated.SparseTensorIndexCOOAddIndicesStrides(builder, indicesStridesVecOffset)
@@ -170,22 +176,31 @@ type SparseTensorIndexCSF struct {
 
 func SparseTensorIndexCSFFromFbs(fbs *generated.SparseTensorIndexCSF) *SparseTensorIndexCSF {
 	o := &SparseTensorIndexCSF{}
-	for i := 0; i < fbs.AxisOrderLength(); i++ {
-		o.AxisOrder = append(o.AxisOrder, fbs.AxisOrder(i))
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		o.AxisOrder = []int32{}
+		for i := 0; i < fbs.AxisOrderLength(); i++ {
+			o.AxisOrder = append(o.AxisOrder, fbs.AxisOrder(i))
+		}
 	}
-	for i := 0; i < fbs.IndicesBuffersLength(); i++ {
-		var item generated.Buffer
-		if fbs.IndicesBuffers(&item, i) {
-			o.IndicesBuffers = append(o.IndicesBuffers, *schema.BufferFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		o.IndicesBuffers = []schema.Buffer{}
+		for i := 0; i < fbs.IndicesBuffersLength(); i++ {
+			var item generated.Buffer
+			if fbs.IndicesBuffers(&item, i) {
+				o.IndicesBuffers = append(o.IndicesBuffers, *schema.BufferFromFbs(&item))
+			}
 		}
 	}
 	if fbsVal := fbs.IndicesType(nil); fbsVal != nil {
 		o.IndicesType = *schema.IntFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.IndptrBuffersLength(); i++ {
-		var item generated.Buffer
-		if fbs.IndptrBuffers(&item, i) {
-			o.IndptrBuffers = append(o.IndptrBuffers, *schema.BufferFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.IndptrBuffers = []schema.Buffer{}
+		for i := 0; i < fbs.IndptrBuffersLength(); i++ {
+			var item generated.Buffer
+			if fbs.IndptrBuffers(&item, i) {
+				o.IndptrBuffers = append(o.IndptrBuffers, *schema.BufferFromFbs(&item))
+			}
 		}
 	}
 	if fbsVal := fbs.IndptrType(nil); fbsVal != nil {
@@ -210,11 +225,12 @@ func (o *SparseTensorIndexCSF) ToBytes() []byte {
 
 // SerializeTo writes the SparseTensorIndexCSF into a FlatBuffer builder and returns the offset.
 func (o *SparseTensorIndexCSF) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var axisOrderVecOffset flatbuffers.UOffsetT
 	generated.SparseTensorIndexCSFStartAxisOrderVector(builder, len(o.AxisOrder))
 	for i := len(o.AxisOrder) - 1; i >= 0; i-- {
 		builder.PrependInt32(o.AxisOrder[i])
 	}
-	axisOrderVecOffset := builder.EndVector(len(o.AxisOrder))
+	axisOrderVecOffset = builder.EndVector(len(o.AxisOrder))
 	var indicesBuffersVecOffset flatbuffers.UOffsetT // TODO: struct vector
 	indicesTypeOffset := o.IndicesType.SerializeTo(builder)
 	var indptrBuffersVecOffset flatbuffers.UOffsetT // TODO: struct vector
@@ -246,10 +262,13 @@ func SparseTensorFromFbs(fbs *generated.SparseTensor) *SparseTensor {
 		o.Data = *schema.BufferFromFbs(fbsVal)
 	}
 	o.NonZeroLength = fbs.NonZeroLength()
-	for i := 0; i < fbs.ShapeLength(); i++ {
-		var item generated.TensorDim
-		if fbs.Shape(&item, i) {
-			o.Shape = append(o.Shape, *tensor.TensorDimFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.Shape = []tensor.TensorDim{}
+		for i := 0; i < fbs.ShapeLength(); i++ {
+			var item generated.TensorDim
+			if fbs.Shape(&item, i) {
+				o.Shape = append(o.Shape, *tensor.TensorDimFromFbs(&item))
+			}
 		}
 	}
 	if tbl := new(flatbuffers.Table); fbs.SparseIndex(tbl) {
@@ -395,15 +414,16 @@ func (o *SparseTensor) ToBytes() []byte {
 
 // SerializeTo writes the SparseTensor into a FlatBuffer builder and returns the offset.
 func (o *SparseTensor) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var shapeVecOffset flatbuffers.UOffsetT
 	shapeOffsets := make([]flatbuffers.UOffsetT, len(o.Shape))
 	for i := range o.Shape {
 		shapeOffsets[i] = o.Shape[i].SerializeTo(builder)
 	}
 	generated.SparseTensorStartShapeVector(builder, len(o.Shape))
-	for i := len(shapeOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Shape) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(shapeOffsets[i])
 	}
-	shapeVecOffset := builder.EndVector(len(o.Shape))
+	shapeVecOffset = builder.EndVector(len(o.Shape))
 	var sparseIndexType generated.SparseTensorIndex
 	var sparseIndexOffset flatbuffers.UOffsetT
 	switch v := o.SparseIndex.(type) {

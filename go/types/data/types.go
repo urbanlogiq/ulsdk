@@ -254,10 +254,13 @@ type DirectionAndRoadNames struct {
 
 func DirectionAndRoadNamesFromFbs(fbs *generated.DirectionAndRoadNames) *DirectionAndRoadNames {
 	o := &DirectionAndRoadNames{}
-	for i := 0; i < fbs.DirectionAndRoadNamesLength(); i++ {
-		var item generated.DirectionAndRoadName
-		if fbs.DirectionAndRoadNames(&item, i) {
-			o.DirectionAndRoadNames = append(o.DirectionAndRoadNames, *DirectionAndRoadNameFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.DirectionAndRoadNames = []DirectionAndRoadName{}
+		for i := 0; i < fbs.DirectionAndRoadNamesLength(); i++ {
+			var item generated.DirectionAndRoadName
+			if fbs.DirectionAndRoadNames(&item, i) {
+				o.DirectionAndRoadNames = append(o.DirectionAndRoadNames, *DirectionAndRoadNameFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -279,15 +282,18 @@ func (o *DirectionAndRoadNames) ToBytes() []byte {
 
 // SerializeTo writes the DirectionAndRoadNames into a FlatBuffer builder and returns the offset.
 func (o *DirectionAndRoadNames) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	directionAndRoadNamesOffsets := make([]flatbuffers.UOffsetT, len(o.DirectionAndRoadNames))
-	for i := range o.DirectionAndRoadNames {
-		directionAndRoadNamesOffsets[i] = o.DirectionAndRoadNames[i].SerializeTo(builder)
+	var directionAndRoadNamesVecOffset flatbuffers.UOffsetT
+	if o.DirectionAndRoadNames != nil {
+		directionAndRoadNamesOffsets := make([]flatbuffers.UOffsetT, len(o.DirectionAndRoadNames))
+		for i := range o.DirectionAndRoadNames {
+			directionAndRoadNamesOffsets[i] = o.DirectionAndRoadNames[i].SerializeTo(builder)
+		}
+		generated.DirectionAndRoadNamesStartDirectionAndRoadNamesVector(builder, len(o.DirectionAndRoadNames))
+		for i := len(o.DirectionAndRoadNames) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(directionAndRoadNamesOffsets[i])
+		}
+		directionAndRoadNamesVecOffset = builder.EndVector(len(o.DirectionAndRoadNames))
 	}
-	generated.DirectionAndRoadNamesStartDirectionAndRoadNamesVector(builder, len(o.DirectionAndRoadNames))
-	for i := len(directionAndRoadNamesOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(directionAndRoadNamesOffsets[i])
-	}
-	directionAndRoadNamesVecOffset := builder.EndVector(len(o.DirectionAndRoadNames))
 	generated.DirectionAndRoadNamesStart(builder)
 	generated.DirectionAndRoadNamesAddDirectionAndRoadNames(builder, directionAndRoadNamesVecOffset)
 	return generated.DirectionAndRoadNamesEnd(builder)
@@ -354,16 +360,22 @@ type OutputSchema struct {
 
 func OutputSchemaFromFbs(fbs *generated.OutputSchema) *OutputSchema {
 	o := &OutputSchema{}
-	for i := 0; i < fbs.AttributesLength(); i++ {
-		var item generated.AttributePair
-		if fbs.Attributes(&item, i) {
-			o.Attributes = append(o.Attributes, *AttributePairFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Attributes = []AttributePair{}
+		for i := 0; i < fbs.AttributesLength(); i++ {
+			var item generated.AttributePair
+			if fbs.Attributes(&item, i) {
+				o.Attributes = append(o.Attributes, *AttributePairFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.SchemaLength(); i++ {
-		var item generated.Schema
-		if fbs.Schema(&item, i) {
-			o.Schema = append(o.Schema, *schema.SchemaFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Schema = []schema.Schema{}
+		for i := 0; i < fbs.SchemaLength(); i++ {
+			var item generated.Schema
+			if fbs.Schema(&item, i) {
+				o.Schema = append(o.Schema, *schema.SchemaFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -385,24 +397,26 @@ func (o *OutputSchema) ToBytes() []byte {
 
 // SerializeTo writes the OutputSchema into a FlatBuffer builder and returns the offset.
 func (o *OutputSchema) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var attributesVecOffset flatbuffers.UOffsetT
 	attributesOffsets := make([]flatbuffers.UOffsetT, len(o.Attributes))
 	for i := range o.Attributes {
 		attributesOffsets[i] = o.Attributes[i].SerializeTo(builder)
 	}
 	generated.OutputSchemaStartAttributesVector(builder, len(o.Attributes))
-	for i := len(attributesOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Attributes) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(attributesOffsets[i])
 	}
-	attributesVecOffset := builder.EndVector(len(o.Attributes))
+	attributesVecOffset = builder.EndVector(len(o.Attributes))
+	var schemaVecOffset flatbuffers.UOffsetT
 	schemaOffsets := make([]flatbuffers.UOffsetT, len(o.Schema))
 	for i := range o.Schema {
 		schemaOffsets[i] = o.Schema[i].SerializeTo(builder)
 	}
 	generated.OutputSchemaStartSchemaVector(builder, len(o.Schema))
-	for i := len(schemaOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Schema) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(schemaOffsets[i])
 	}
-	schemaVecOffset := builder.EndVector(len(o.Schema))
+	schemaVecOffset = builder.EndVector(len(o.Schema))
 	generated.OutputSchemaStart(builder)
 	generated.OutputSchemaAddAttributes(builder, attributesVecOffset)
 	generated.OutputSchemaAddSchema(builder, schemaVecOffset)
@@ -428,20 +442,25 @@ func SourceFromFbs(fbs *generated.Source) *Source {
 		o.MetadataRevision = id.ContentIdFromFbs(fbsVal)
 	}
 	o.Name = string(fbs.Name())
-	for i := 0; i < fbs.NamedParametersLength(); i++ {
-		var item generated.NamedParameter
-		if fbs.NamedParameters(&item, i) {
-			o.NamedParameters = append(o.NamedParameters, *NamedParameterFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(18) != 0 {
+		o.NamedParameters = []NamedParameter{}
+		for i := 0; i < fbs.NamedParametersLength(); i++ {
+			var item generated.NamedParameter
+			if fbs.NamedParameters(&item, i) {
+				o.NamedParameters = append(o.NamedParameters, *NamedParameterFromFbs(&item))
+			}
 		}
 	}
-	o.Options = make([]byte, fbs.OptionsLength())
-	for i := 0; i < fbs.OptionsLength(); i++ {
-		o.Options[i] = fbs.Options(i)
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.Options = append([]byte{}, fbs.OptionsBytes()...)
 	}
-	for i := 0; i < fbs.OutputSchemasLength(); i++ {
-		var item generated.OutputSchema
-		if fbs.OutputSchemas(&item, i) {
-			o.OutputSchemas = append(o.OutputSchemas, *OutputSchemaFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(20) != 0 {
+		o.OutputSchemas = []OutputSchema{}
+		for i := 0; i < fbs.OutputSchemasLength(); i++ {
+			var item generated.OutputSchema
+			if fbs.OutputSchemas(&item, i) {
+				o.OutputSchemas = append(o.OutputSchemas, *OutputSchemaFromFbs(&item))
+			}
 		}
 	}
 	o.Url = string(fbs.Url())
@@ -473,25 +492,34 @@ func (o *Source) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT 
 		metadataRevisionOffset = o.MetadataRevision.SerializeTo(builder)
 	}
 	nameOffset := builder.CreateString(o.Name)
-	namedParametersOffsets := make([]flatbuffers.UOffsetT, len(o.NamedParameters))
-	for i := range o.NamedParameters {
-		namedParametersOffsets[i] = o.NamedParameters[i].SerializeTo(builder)
+	var namedParametersVecOffset flatbuffers.UOffsetT
+	if o.NamedParameters != nil {
+		namedParametersOffsets := make([]flatbuffers.UOffsetT, len(o.NamedParameters))
+		for i := range o.NamedParameters {
+			namedParametersOffsets[i] = o.NamedParameters[i].SerializeTo(builder)
+		}
+		generated.SourceStartNamedParametersVector(builder, len(o.NamedParameters))
+		for i := len(o.NamedParameters) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(namedParametersOffsets[i])
+		}
+		namedParametersVecOffset = builder.EndVector(len(o.NamedParameters))
 	}
-	generated.SourceStartNamedParametersVector(builder, len(o.NamedParameters))
-	for i := len(namedParametersOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(namedParametersOffsets[i])
+	var optionsOffset flatbuffers.UOffsetT
+	if o.Options != nil {
+		optionsOffset = builder.CreateByteVector(o.Options)
 	}
-	namedParametersVecOffset := builder.EndVector(len(o.NamedParameters))
-	optionsOffset := builder.CreateByteVector(o.Options)
-	outputSchemasOffsets := make([]flatbuffers.UOffsetT, len(o.OutputSchemas))
-	for i := range o.OutputSchemas {
-		outputSchemasOffsets[i] = o.OutputSchemas[i].SerializeTo(builder)
+	var outputSchemasVecOffset flatbuffers.UOffsetT
+	if o.OutputSchemas != nil {
+		outputSchemasOffsets := make([]flatbuffers.UOffsetT, len(o.OutputSchemas))
+		for i := range o.OutputSchemas {
+			outputSchemasOffsets[i] = o.OutputSchemas[i].SerializeTo(builder)
+		}
+		generated.SourceStartOutputSchemasVector(builder, len(o.OutputSchemas))
+		for i := len(o.OutputSchemas) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(outputSchemasOffsets[i])
+		}
+		outputSchemasVecOffset = builder.EndVector(len(o.OutputSchemas))
 	}
-	generated.SourceStartOutputSchemasVector(builder, len(o.OutputSchemas))
-	for i := len(outputSchemasOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(outputSchemasOffsets[i])
-	}
-	outputSchemasVecOffset := builder.EndVector(len(o.OutputSchemas))
 	urlOffset := builder.CreateString(o.Url)
 	generated.SourceStart(builder)
 	generated.SourceAddMetadata(builder, metadataOffset)

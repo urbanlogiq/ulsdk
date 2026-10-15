@@ -32,9 +32,8 @@ type B2cid struct {
 
 func B2cidFromFbs(fbs *generated.B2cId) *B2cid {
 	o := &B2cid{}
-	o.B = make([]byte, fbs.BLength())
-	for i := 0; i < fbs.BLength(); i++ {
-		o.B[i] = fbs.B(i)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.B = append([]byte{}, fbs.BBytes()...)
 	}
 	return o
 }
@@ -55,7 +54,8 @@ func (o *B2cid) ToBytes() []byte {
 
 // SerializeTo writes the B2cid into a FlatBuffer builder and returns the offset.
 func (o *B2cid) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	bOffset := builder.CreateByteVector(o.B)
+	var bOffset flatbuffers.UOffsetT
+	bOffset = builder.CreateByteVector(o.B)
 	generated.B2cIdStart(builder)
 	generated.B2cIdAddB(builder, bOffset)
 	return generated.B2cIdEnd(builder)
@@ -74,9 +74,8 @@ type ColumnGroupId struct {
 
 func ColumnGroupIdFromFbs(fbs *generated.ColumnGroupId) *ColumnGroupId {
 	o := &ColumnGroupId{}
-	o.B = make([]byte, fbs.BLength())
-	for i := 0; i < fbs.BLength(); i++ {
-		o.B[i] = fbs.B(i)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.B = append([]byte{}, fbs.BBytes()...)
 	}
 	return o
 }
@@ -97,7 +96,8 @@ func (o *ColumnGroupId) ToBytes() []byte {
 
 // SerializeTo writes the ColumnGroupId into a FlatBuffer builder and returns the offset.
 func (o *ColumnGroupId) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	bOffset := builder.CreateByteVector(o.B)
+	var bOffset flatbuffers.UOffsetT
+	bOffset = builder.CreateByteVector(o.B)
 	generated.ColumnGroupIdStart(builder)
 	generated.ColumnGroupIdAddB(builder, bOffset)
 	return generated.ColumnGroupIdEnd(builder)
@@ -116,9 +116,8 @@ type ContentId struct {
 
 func ContentIdFromFbs(fbs *generated.ContentId) *ContentId {
 	o := &ContentId{}
-	o.B = make([]byte, fbs.BLength())
-	for i := 0; i < fbs.BLength(); i++ {
-		o.B[i] = fbs.B(i)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.B = append([]byte{}, fbs.BBytes()...)
 	}
 	return o
 }
@@ -139,7 +138,8 @@ func (o *ContentId) ToBytes() []byte {
 
 // SerializeTo writes the ContentId into a FlatBuffer builder and returns the offset.
 func (o *ContentId) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	bOffset := builder.CreateByteVector(o.B)
+	var bOffset flatbuffers.UOffsetT
+	bOffset = builder.CreateByteVector(o.B)
 	generated.ContentIdStart(builder)
 	generated.ContentIdAddB(builder, bOffset)
 	return generated.ContentIdEnd(builder)
@@ -158,9 +158,8 @@ type DataStateId struct {
 
 func DataStateIdFromFbs(fbs *generated.DataStateId) *DataStateId {
 	o := &DataStateId{}
-	o.B = make([]byte, fbs.BLength())
-	for i := 0; i < fbs.BLength(); i++ {
-		o.B[i] = fbs.B(i)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.B = append([]byte{}, fbs.BBytes()...)
 	}
 	return o
 }
@@ -181,7 +180,8 @@ func (o *DataStateId) ToBytes() []byte {
 
 // SerializeTo writes the DataStateId into a FlatBuffer builder and returns the offset.
 func (o *DataStateId) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	bOffset := builder.CreateByteVector(o.B)
+	var bOffset flatbuffers.UOffsetT
+	bOffset = builder.CreateByteVector(o.B)
 	generated.DataStateIdStart(builder)
 	generated.DataStateIdAddB(builder, bOffset)
 	return generated.DataStateIdEnd(builder)
@@ -200,9 +200,8 @@ type GenericId struct {
 
 func GenericIdFromFbs(fbs *generated.GenericId) *GenericId {
 	o := &GenericId{}
-	o.B = make([]byte, fbs.BLength())
-	for i := 0; i < fbs.BLength(); i++ {
-		o.B[i] = fbs.B(i)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.B = append([]byte{}, fbs.BBytes()...)
 	}
 	return o
 }
@@ -223,7 +222,8 @@ func (o *GenericId) ToBytes() []byte {
 
 // SerializeTo writes the GenericId into a FlatBuffer builder and returns the offset.
 func (o *GenericId) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	bOffset := builder.CreateByteVector(o.B)
+	var bOffset flatbuffers.UOffsetT
+	bOffset = builder.CreateByteVector(o.B)
 	generated.GenericIdStart(builder)
 	generated.GenericIdAddB(builder, bOffset)
 	return generated.GenericIdEnd(builder)
@@ -242,9 +242,8 @@ type GraphNodeId struct {
 
 func GraphNodeIdFromFbs(fbs *generated.GraphNodeId) *GraphNodeId {
 	o := &GraphNodeId{}
-	o.B = make([]byte, fbs.BLength())
-	for i := 0; i < fbs.BLength(); i++ {
-		o.B[i] = fbs.B(i)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.B = append([]byte{}, fbs.BBytes()...)
 	}
 	return o
 }
@@ -265,7 +264,8 @@ func (o *GraphNodeId) ToBytes() []byte {
 
 // SerializeTo writes the GraphNodeId into a FlatBuffer builder and returns the offset.
 func (o *GraphNodeId) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	bOffset := builder.CreateByteVector(o.B)
+	var bOffset flatbuffers.UOffsetT
+	bOffset = builder.CreateByteVector(o.B)
 	generated.GraphNodeIdStart(builder)
 	generated.GraphNodeIdAddB(builder, bOffset)
 	return generated.GraphNodeIdEnd(builder)
@@ -284,9 +284,8 @@ type ObjectId struct {
 
 func ObjectIdFromFbs(fbs *generated.ObjectId) *ObjectId {
 	o := &ObjectId{}
-	o.B = make([]byte, fbs.BLength())
-	for i := 0; i < fbs.BLength(); i++ {
-		o.B[i] = fbs.B(i)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.B = append([]byte{}, fbs.BBytes()...)
 	}
 	return o
 }
@@ -307,7 +306,8 @@ func (o *ObjectId) ToBytes() []byte {
 
 // SerializeTo writes the ObjectId into a FlatBuffer builder and returns the offset.
 func (o *ObjectId) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	bOffset := builder.CreateByteVector(o.B)
+	var bOffset flatbuffers.UOffsetT
+	bOffset = builder.CreateByteVector(o.B)
 	generated.ObjectIdStart(builder)
 	generated.ObjectIdAddB(builder, bOffset)
 	return generated.ObjectIdEnd(builder)
@@ -327,9 +327,8 @@ type PinnedObjectId struct {
 
 func PinnedObjectIdFromFbs(fbs *generated.PinnedObjectId) *PinnedObjectId {
 	o := &PinnedObjectId{}
-	o.B = make([]byte, fbs.BLength())
-	for i := 0; i < fbs.BLength(); i++ {
-		o.B[i] = fbs.B(i)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.B = append([]byte{}, fbs.BBytes()...)
 	}
 	if fbsVal := fbs.Cid(nil); fbsVal != nil {
 		o.Cid = ContentIdFromFbs(fbsVal)
@@ -353,7 +352,8 @@ func (o *PinnedObjectId) ToBytes() []byte {
 
 // SerializeTo writes the PinnedObjectId into a FlatBuffer builder and returns the offset.
 func (o *PinnedObjectId) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	bOffset := builder.CreateByteVector(o.B)
+	var bOffset flatbuffers.UOffsetT
+	bOffset = builder.CreateByteVector(o.B)
 	var cidOffset flatbuffers.UOffsetT
 	if o.Cid != nil {
 		cidOffset = o.Cid.SerializeTo(builder)
@@ -370,9 +370,8 @@ type StreamId struct {
 
 func StreamIdFromFbs(fbs *generated.StreamId) *StreamId {
 	o := &StreamId{}
-	o.B = make([]byte, fbs.BLength())
-	for i := 0; i < fbs.BLength(); i++ {
-		o.B[i] = fbs.B(i)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.B = append([]byte{}, fbs.BBytes()...)
 	}
 	return o
 }
@@ -393,7 +392,8 @@ func (o *StreamId) ToBytes() []byte {
 
 // SerializeTo writes the StreamId into a FlatBuffer builder and returns the offset.
 func (o *StreamId) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	bOffset := builder.CreateByteVector(o.B)
+	var bOffset flatbuffers.UOffsetT
+	bOffset = builder.CreateByteVector(o.B)
 	generated.StreamIdStart(builder)
 	generated.StreamIdAddB(builder, bOffset)
 	return generated.StreamIdEnd(builder)

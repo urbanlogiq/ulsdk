@@ -40,9 +40,8 @@ type EmbeddedTable struct {
 
 func EmbeddedTableFromFbs(fbs *generated.EmbeddedTable) *EmbeddedTable {
 	o := &EmbeddedTable{}
-	o.V = make([]byte, fbs.VLength())
-	for i := 0; i < fbs.VLength(); i++ {
-		o.V[i] = fbs.V(i)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.V = append([]byte{}, fbs.VBytes()...)
 	}
 	return o
 }
@@ -63,7 +62,8 @@ func (o *EmbeddedTable) ToBytes() []byte {
 
 // SerializeTo writes the EmbeddedTable into a FlatBuffer builder and returns the offset.
 func (o *EmbeddedTable) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	vOffset := builder.CreateByteVector(o.V)
+	var vOffset flatbuffers.UOffsetT
+	vOffset = builder.CreateByteVector(o.V)
 	generated.EmbeddedTableStart(builder)
 	generated.EmbeddedTableAddV(builder, vOffset)
 	return generated.EmbeddedTableEnd(builder)
@@ -96,16 +96,22 @@ type DeprecatedRunSpec struct {
 
 func DeprecatedRunSpecFromFbs(fbs *generated.DeprecatedRunSpec) *DeprecatedRunSpec {
 	o := &DeprecatedRunSpec{}
-	for i := 0; i < fbs.ParamIndicesLength(); i++ {
-		var item generated.ParamIndices
-		if fbs.ParamIndices(&item, i) {
-			o.ParamIndices = append(o.ParamIndices, *ParamIndicesFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.ParamIndices = []ParamIndices{}
+		for i := 0; i < fbs.ParamIndicesLength(); i++ {
+			var item generated.ParamIndices
+			if fbs.ParamIndices(&item, i) {
+				o.ParamIndices = append(o.ParamIndices, *ParamIndicesFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.ParamsLength(); i++ {
-		var item generated.DeprecatedTaskParameter
-		if fbs.Params(&item, i) {
-			o.Params = append(o.Params, *DeprecatedTaskParameterFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		o.Params = []DeprecatedTaskParameter{}
+		for i := 0; i < fbs.ParamsLength(); i++ {
+			var item generated.DeprecatedTaskParameter
+			if fbs.Params(&item, i) {
+				o.Params = append(o.Params, *DeprecatedTaskParameterFromFbs(&item))
+			}
 		}
 	}
 	o.Persist = fbs.Persist()
@@ -131,24 +137,26 @@ func (o *DeprecatedRunSpec) ToBytes() []byte {
 
 // SerializeTo writes the DeprecatedRunSpec into a FlatBuffer builder and returns the offset.
 func (o *DeprecatedRunSpec) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var paramIndicesVecOffset flatbuffers.UOffsetT
 	paramIndicesOffsets := make([]flatbuffers.UOffsetT, len(o.ParamIndices))
 	for i := range o.ParamIndices {
 		paramIndicesOffsets[i] = o.ParamIndices[i].SerializeTo(builder)
 	}
 	generated.DeprecatedRunSpecStartParamIndicesVector(builder, len(o.ParamIndices))
-	for i := len(paramIndicesOffsets) - 1; i >= 0; i-- {
+	for i := len(o.ParamIndices) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(paramIndicesOffsets[i])
 	}
-	paramIndicesVecOffset := builder.EndVector(len(o.ParamIndices))
+	paramIndicesVecOffset = builder.EndVector(len(o.ParamIndices))
+	var paramsVecOffset flatbuffers.UOffsetT
 	paramsOffsets := make([]flatbuffers.UOffsetT, len(o.Params))
 	for i := range o.Params {
 		paramsOffsets[i] = o.Params[i].SerializeTo(builder)
 	}
 	generated.DeprecatedRunSpecStartParamsVector(builder, len(o.Params))
-	for i := len(paramsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Params) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(paramsOffsets[i])
 	}
-	paramsVecOffset := builder.EndVector(len(o.Params))
+	paramsVecOffset = builder.EndVector(len(o.Params))
 	schematicOffset := o.Schematic.SerializeTo(builder)
 	generated.DeprecatedRunSpecStart(builder)
 	generated.DeprecatedRunSpecAddParamIndices(builder, paramIndicesVecOffset)
@@ -172,9 +180,8 @@ func DeprecatedTaskParameterFromFbs(fbs *generated.DeprecatedTaskParameter) *Dep
 	if fbsVal := fbs.Obj(nil); fbsVal != nil {
 		o.Obj = id.ObjectIdFromFbs(fbsVal)
 	}
-	o.Value = make([]byte, fbs.ValueLength())
-	for i := 0; i < fbs.ValueLength(); i++ {
-		o.Value[i] = fbs.Value(i)
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Value = append([]byte{}, fbs.ValueBytes()...)
 	}
 	return o
 }
@@ -200,7 +207,10 @@ func (o *DeprecatedTaskParameter) SerializeTo(builder *flatbuffers.Builder) flat
 	if o.Obj != nil {
 		objOffset = o.Obj.SerializeTo(builder)
 	}
-	valueOffset := builder.CreateByteVector(o.Value)
+	var valueOffset flatbuffers.UOffsetT
+	if o.Value != nil {
+		valueOffset = builder.CreateByteVector(o.Value)
+	}
 	generated.DeprecatedTaskParameterStart(builder)
 	generated.DeprecatedTaskParameterAddFlags(builder, o.Flags)
 	generated.DeprecatedTaskParameterAddKey(builder, keyOffset)
@@ -254,26 +264,38 @@ type Job struct {
 
 func JobFromFbs(fbs *generated.Job) *Job {
 	o := &Job{}
-	for i := 0; i < fbs.AttributesLength(); i++ {
-		var item generated.Attr
-		if fbs.Attributes(&item, i) {
-			o.Attributes = append(o.Attributes, *attr.AttrFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(14) != 0 {
+		o.Attributes = []attr.Attr{}
+		for i := 0; i < fbs.AttributesLength(); i++ {
+			var item generated.Attr
+			if fbs.Attributes(&item, i) {
+				o.Attributes = append(o.Attributes, *attr.AttrFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.ErrorTysLength(); i++ {
-		o.ErrorTys = append(o.ErrorTys, int32(fbs.ErrorTys(i)))
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		o.ErrorTys = []int32{}
+		for i := 0; i < fbs.ErrorTysLength(); i++ {
+			o.ErrorTys = append(o.ErrorTys, int32(fbs.ErrorTys(i)))
+		}
 	}
-	for i := 0; i < fbs.ParamsLength(); i++ {
-		var item generated.TaskParameter
-		if fbs.Params(&item, i) {
-			o.Params = append(o.Params, *TaskParameterFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		o.Params = []TaskParameter{}
+		for i := 0; i < fbs.ParamsLength(); i++ {
+			var item generated.TaskParameter
+			if fbs.Params(&item, i) {
+				o.Params = append(o.Params, *TaskParameterFromFbs(&item))
+			}
 		}
 	}
 	o.Status = int8(fbs.Status())
-	for i := 0; i < fbs.TasksLength(); i++ {
-		var item generated.Task
-		if fbs.Tasks(&item, i) {
-			o.Tasks = append(o.Tasks, *TaskFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.Tasks = []Task{}
+		for i := 0; i < fbs.TasksLength(); i++ {
+			var item generated.Task
+			if fbs.Tasks(&item, i) {
+				o.Tasks = append(o.Tasks, *TaskFromFbs(&item))
+			}
 		}
 	}
 	if fbsVal := fbs.UserId(nil); fbsVal != nil {
@@ -298,38 +320,46 @@ func (o *Job) ToBytes() []byte {
 
 // SerializeTo writes the Job into a FlatBuffer builder and returns the offset.
 func (o *Job) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	attributesOffsets := make([]flatbuffers.UOffsetT, len(o.Attributes))
-	for i := range o.Attributes {
-		attributesOffsets[i] = o.Attributes[i].SerializeTo(builder)
+	var attributesVecOffset flatbuffers.UOffsetT
+	if o.Attributes != nil {
+		attributesOffsets := make([]flatbuffers.UOffsetT, len(o.Attributes))
+		for i := range o.Attributes {
+			attributesOffsets[i] = o.Attributes[i].SerializeTo(builder)
+		}
+		generated.JobStartAttributesVector(builder, len(o.Attributes))
+		for i := len(o.Attributes) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(attributesOffsets[i])
+		}
+		attributesVecOffset = builder.EndVector(len(o.Attributes))
 	}
-	generated.JobStartAttributesVector(builder, len(o.Attributes))
-	for i := len(attributesOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(attributesOffsets[i])
+	var errorTysVecOffset flatbuffers.UOffsetT
+	if o.ErrorTys != nil {
+		generated.JobStartErrorTysVector(builder, len(o.ErrorTys))
+		for i := len(o.ErrorTys) - 1; i >= 0; i-- {
+			builder.PrependInt32(o.ErrorTys[i])
+		}
+		errorTysVecOffset = builder.EndVector(len(o.ErrorTys))
 	}
-	attributesVecOffset := builder.EndVector(len(o.Attributes))
-	generated.JobStartErrorTysVector(builder, len(o.ErrorTys))
-	for i := len(o.ErrorTys) - 1; i >= 0; i-- {
-		builder.PrependInt32(o.ErrorTys[i])
-	}
-	errorTysVecOffset := builder.EndVector(len(o.ErrorTys))
+	var paramsVecOffset flatbuffers.UOffsetT
 	paramsOffsets := make([]flatbuffers.UOffsetT, len(o.Params))
 	for i := range o.Params {
 		paramsOffsets[i] = o.Params[i].SerializeTo(builder)
 	}
 	generated.JobStartParamsVector(builder, len(o.Params))
-	for i := len(paramsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Params) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(paramsOffsets[i])
 	}
-	paramsVecOffset := builder.EndVector(len(o.Params))
+	paramsVecOffset = builder.EndVector(len(o.Params))
+	var tasksVecOffset flatbuffers.UOffsetT
 	tasksOffsets := make([]flatbuffers.UOffsetT, len(o.Tasks))
 	for i := range o.Tasks {
 		tasksOffsets[i] = o.Tasks[i].SerializeTo(builder)
 	}
 	generated.JobStartTasksVector(builder, len(o.Tasks))
-	for i := len(tasksOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Tasks) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(tasksOffsets[i])
 	}
-	tasksVecOffset := builder.EndVector(len(o.Tasks))
+	tasksVecOffset = builder.EndVector(len(o.Tasks))
 	userIdOffset := o.UserId.SerializeTo(builder)
 	generated.JobStart(builder)
 	generated.JobAddAttributes(builder, attributesVecOffset)
@@ -385,8 +415,11 @@ type ParamIndices struct {
 
 func ParamIndicesFromFbs(fbs *generated.ParamIndices) *ParamIndices {
 	o := &ParamIndices{}
-	for i := 0; i < fbs.IdxsLength(); i++ {
-		o.Idxs = append(o.Idxs, fbs.Idxs(i))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Idxs = []int32{}
+		for i := 0; i < fbs.IdxsLength(); i++ {
+			o.Idxs = append(o.Idxs, fbs.Idxs(i))
+		}
 	}
 	return o
 }
@@ -407,11 +440,12 @@ func (o *ParamIndices) ToBytes() []byte {
 
 // SerializeTo writes the ParamIndices into a FlatBuffer builder and returns the offset.
 func (o *ParamIndices) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var idxsVecOffset flatbuffers.UOffsetT
 	generated.ParamIndicesStartIdxsVector(builder, len(o.Idxs))
 	for i := len(o.Idxs) - 1; i >= 0; i-- {
 		builder.PrependInt32(o.Idxs[i])
 	}
-	idxsVecOffset := builder.EndVector(len(o.Idxs))
+	idxsVecOffset = builder.EndVector(len(o.Idxs))
 	generated.ParamIndicesStart(builder)
 	generated.ParamIndicesAddIdxs(builder, idxsVecOffset)
 	return generated.ParamIndicesEnd(builder)
@@ -437,23 +471,32 @@ type RunSpec struct {
 
 func RunSpecFromFbs(fbs *generated.RunSpec) *RunSpec {
 	o := &RunSpec{}
-	for i := 0; i < fbs.AttributesLength(); i++ {
-		var item generated.Attr
-		if fbs.Attributes(&item, i) {
-			o.Attributes = append(o.Attributes, *attr.AttrFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(16) != 0 {
+		o.Attributes = []attr.Attr{}
+		for i := 0; i < fbs.AttributesLength(); i++ {
+			var item generated.Attr
+			if fbs.Attributes(&item, i) {
+				o.Attributes = append(o.Attributes, *attr.AttrFromFbs(&item))
+			}
 		}
 	}
 	o.Notify = fbs.Notify()
-	for i := 0; i < fbs.ParamIndicesLength(); i++ {
-		var item generated.ParamIndices
-		if fbs.ParamIndices(&item, i) {
-			o.ParamIndices = append(o.ParamIndices, *ParamIndicesFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.ParamIndices = []ParamIndices{}
+		for i := 0; i < fbs.ParamIndicesLength(); i++ {
+			var item generated.ParamIndices
+			if fbs.ParamIndices(&item, i) {
+				o.ParamIndices = append(o.ParamIndices, *ParamIndicesFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.ParamsLength(); i++ {
-		var item generated.TaskParameter
-		if fbs.Params(&item, i) {
-			o.Params = append(o.Params, *TaskParameterFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		o.Params = []TaskParameter{}
+		for i := 0; i < fbs.ParamsLength(); i++ {
+			var item generated.TaskParameter
+			if fbs.Params(&item, i) {
+				o.Params = append(o.Params, *TaskParameterFromFbs(&item))
+			}
 		}
 	}
 	o.Persist = fbs.Persist()
@@ -480,33 +523,38 @@ func (o *RunSpec) ToBytes() []byte {
 
 // SerializeTo writes the RunSpec into a FlatBuffer builder and returns the offset.
 func (o *RunSpec) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	attributesOffsets := make([]flatbuffers.UOffsetT, len(o.Attributes))
-	for i := range o.Attributes {
-		attributesOffsets[i] = o.Attributes[i].SerializeTo(builder)
+	var attributesVecOffset flatbuffers.UOffsetT
+	if o.Attributes != nil {
+		attributesOffsets := make([]flatbuffers.UOffsetT, len(o.Attributes))
+		for i := range o.Attributes {
+			attributesOffsets[i] = o.Attributes[i].SerializeTo(builder)
+		}
+		generated.RunSpecStartAttributesVector(builder, len(o.Attributes))
+		for i := len(o.Attributes) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(attributesOffsets[i])
+		}
+		attributesVecOffset = builder.EndVector(len(o.Attributes))
 	}
-	generated.RunSpecStartAttributesVector(builder, len(o.Attributes))
-	for i := len(attributesOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(attributesOffsets[i])
-	}
-	attributesVecOffset := builder.EndVector(len(o.Attributes))
+	var paramIndicesVecOffset flatbuffers.UOffsetT
 	paramIndicesOffsets := make([]flatbuffers.UOffsetT, len(o.ParamIndices))
 	for i := range o.ParamIndices {
 		paramIndicesOffsets[i] = o.ParamIndices[i].SerializeTo(builder)
 	}
 	generated.RunSpecStartParamIndicesVector(builder, len(o.ParamIndices))
-	for i := len(paramIndicesOffsets) - 1; i >= 0; i-- {
+	for i := len(o.ParamIndices) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(paramIndicesOffsets[i])
 	}
-	paramIndicesVecOffset := builder.EndVector(len(o.ParamIndices))
+	paramIndicesVecOffset = builder.EndVector(len(o.ParamIndices))
+	var paramsVecOffset flatbuffers.UOffsetT
 	paramsOffsets := make([]flatbuffers.UOffsetT, len(o.Params))
 	for i := range o.Params {
 		paramsOffsets[i] = o.Params[i].SerializeTo(builder)
 	}
 	generated.RunSpecStartParamsVector(builder, len(o.Params))
-	for i := len(paramsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Params) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(paramsOffsets[i])
 	}
-	paramsVecOffset := builder.EndVector(len(o.Params))
+	paramsVecOffset = builder.EndVector(len(o.Params))
 	schematicOffset := o.Schematic.SerializeTo(builder)
 	generated.RunSpecStart(builder)
 	generated.RunSpecAddAttributes(builder, attributesVecOffset)
@@ -528,26 +576,35 @@ type Schematic struct {
 
 func SchematicFromFbs(fbs *generated.Schematic) *Schematic {
 	o := &Schematic{}
-	for i := 0; i < fbs.AttributesLength(); i++ {
-		var item generated.AttributePair
-		if fbs.Attributes(&item, i) {
-			o.Attributes = append(o.Attributes, *data.AttributePairFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.Attributes = []data.AttributePair{}
+		for i := 0; i < fbs.AttributesLength(); i++ {
+			var item generated.AttributePair
+			if fbs.Attributes(&item, i) {
+				o.Attributes = append(o.Attributes, *data.AttributePairFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.EdgesLength(); i++ {
-		var item generated.Edge
-		if fbs.Edges(&item, i) {
-			o.Edges = append(o.Edges, *EdgeFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Edges = []Edge{}
+		for i := 0; i < fbs.EdgesLength(); i++ {
+			var item generated.Edge
+			if fbs.Edges(&item, i) {
+				o.Edges = append(o.Edges, *EdgeFromFbs(&item))
+			}
 		}
 	}
 	if s := fbs.Name(); s != nil {
 		str := string(s)
 		o.Name = &str
 	}
-	for i := 0; i < fbs.NodesLength(); i++ {
-		var item generated.Node
-		if fbs.Nodes(&item, i) {
-			o.Nodes = append(o.Nodes, *NodeFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Nodes = []Node{}
+		for i := 0; i < fbs.NodesLength(); i++ {
+			var item generated.Node
+			if fbs.Nodes(&item, i) {
+				o.Nodes = append(o.Nodes, *NodeFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -569,37 +626,40 @@ func (o *Schematic) ToBytes() []byte {
 
 // SerializeTo writes the Schematic into a FlatBuffer builder and returns the offset.
 func (o *Schematic) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var attributesVecOffset flatbuffers.UOffsetT
 	attributesOffsets := make([]flatbuffers.UOffsetT, len(o.Attributes))
 	for i := range o.Attributes {
 		attributesOffsets[i] = o.Attributes[i].SerializeTo(builder)
 	}
 	generated.SchematicStartAttributesVector(builder, len(o.Attributes))
-	for i := len(attributesOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Attributes) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(attributesOffsets[i])
 	}
-	attributesVecOffset := builder.EndVector(len(o.Attributes))
+	attributesVecOffset = builder.EndVector(len(o.Attributes))
+	var edgesVecOffset flatbuffers.UOffsetT
 	edgesOffsets := make([]flatbuffers.UOffsetT, len(o.Edges))
 	for i := range o.Edges {
 		edgesOffsets[i] = o.Edges[i].SerializeTo(builder)
 	}
 	generated.SchematicStartEdgesVector(builder, len(o.Edges))
-	for i := len(edgesOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Edges) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(edgesOffsets[i])
 	}
-	edgesVecOffset := builder.EndVector(len(o.Edges))
+	edgesVecOffset = builder.EndVector(len(o.Edges))
 	var nameOffset flatbuffers.UOffsetT
 	if o.Name != nil {
 		nameOffset = builder.CreateString(*o.Name)
 	}
+	var nodesVecOffset flatbuffers.UOffsetT
 	nodesOffsets := make([]flatbuffers.UOffsetT, len(o.Nodes))
 	for i := range o.Nodes {
 		nodesOffsets[i] = o.Nodes[i].SerializeTo(builder)
 	}
 	generated.SchematicStartNodesVector(builder, len(o.Nodes))
-	for i := len(nodesOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Nodes) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(nodesOffsets[i])
 	}
-	nodesVecOffset := builder.EndVector(len(o.Nodes))
+	nodesVecOffset = builder.EndVector(len(o.Nodes))
 	generated.SchematicStart(builder)
 	generated.SchematicAddAttributes(builder, attributesVecOffset)
 	generated.SchematicAddEdges(builder, edgesVecOffset)
@@ -638,10 +698,13 @@ func TaskFromFbs(fbs *generated.Task) *Task {
 	o.BarrierCount = fbs.BarrierCount()
 	o.Created = fbs.Created()
 	o.Discard = fbs.Discard()
-	for i := 0; i < fbs.DownstreamLength(); i++ {
-		var item generated.ObjectId
-		if fbs.Downstream(&item, i) {
-			o.Downstream = append(o.Downstream, *id.ObjectIdFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(26) != 0 {
+		o.Downstream = []id.ObjectId{}
+		for i := 0; i < fbs.DownstreamLength(); i++ {
+			var item generated.ObjectId
+			if fbs.Downstream(&item, i) {
+				o.Downstream = append(o.Downstream, *id.ObjectIdFromFbs(&item))
+			}
 		}
 	}
 	o.End = fbs.End()
@@ -675,10 +738,13 @@ func TaskFromFbs(fbs *generated.Task) *Task {
 	if fbsVal := fbs.Task(nil); fbsVal != nil {
 		o.Task = *id.ObjectIdFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.UpstreamLength(); i++ {
-		var item generated.ObjectId
-		if fbs.Upstream(&item, i) {
-			o.Upstream = append(o.Upstream, *id.ObjectIdFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(24) != 0 {
+		o.Upstream = []id.ObjectId{}
+		for i := 0; i < fbs.UpstreamLength(); i++ {
+			var item generated.ObjectId
+			if fbs.Upstream(&item, i) {
+				o.Upstream = append(o.Upstream, *id.ObjectIdFromFbs(&item))
+			}
 		}
 	}
 	if fbsVal := fbs.UserId(nil); fbsVal != nil {
@@ -703,15 +769,16 @@ func (o *Task) ToBytes() []byte {
 
 // SerializeTo writes the Task into a FlatBuffer builder and returns the offset.
 func (o *Task) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var downstreamVecOffset flatbuffers.UOffsetT
 	downstreamOffsets := make([]flatbuffers.UOffsetT, len(o.Downstream))
 	for i := range o.Downstream {
 		downstreamOffsets[i] = o.Downstream[i].SerializeTo(builder)
 	}
 	generated.TaskStartDownstreamVector(builder, len(o.Downstream))
-	for i := len(downstreamOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Downstream) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(downstreamOffsets[i])
 	}
-	downstreamVecOffset := builder.EndVector(len(o.Downstream))
+	downstreamVecOffset = builder.EndVector(len(o.Downstream))
 	jobIdOffset := o.JobId.SerializeTo(builder)
 	var lastUpdatedByPodOffset flatbuffers.UOffsetT
 	if o.LastUpdatedByPod != nil {
@@ -729,15 +796,16 @@ func (o *Task) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 		schematicIdOffset = o.SchematicId.SerializeTo(builder)
 	}
 	taskOffset := o.Task.SerializeTo(builder)
+	var upstreamVecOffset flatbuffers.UOffsetT
 	upstreamOffsets := make([]flatbuffers.UOffsetT, len(o.Upstream))
 	for i := range o.Upstream {
 		upstreamOffsets[i] = o.Upstream[i].SerializeTo(builder)
 	}
 	generated.TaskStartUpstreamVector(builder, len(o.Upstream))
-	for i := len(upstreamOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Upstream) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(upstreamOffsets[i])
 	}
-	upstreamVecOffset := builder.EndVector(len(o.Upstream))
+	upstreamVecOffset = builder.EndVector(len(o.Upstream))
 	userIdOffset := o.UserId.SerializeTo(builder)
 	generated.TaskStart(builder)
 	generated.TaskAddBarrierCount(builder, o.BarrierCount)
@@ -770,10 +838,13 @@ type TaskList struct {
 
 func TaskListFromFbs(fbs *generated.TaskList) *TaskList {
 	o := &TaskList{}
-	for i := 0; i < fbs.TasksLength(); i++ {
-		var item generated.Task
-		if fbs.Tasks(&item, i) {
-			o.Tasks = append(o.Tasks, *TaskFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Tasks = []Task{}
+		for i := 0; i < fbs.TasksLength(); i++ {
+			var item generated.Task
+			if fbs.Tasks(&item, i) {
+				o.Tasks = append(o.Tasks, *TaskFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -795,15 +866,16 @@ func (o *TaskList) ToBytes() []byte {
 
 // SerializeTo writes the TaskList into a FlatBuffer builder and returns the offset.
 func (o *TaskList) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var tasksVecOffset flatbuffers.UOffsetT
 	tasksOffsets := make([]flatbuffers.UOffsetT, len(o.Tasks))
 	for i := range o.Tasks {
 		tasksOffsets[i] = o.Tasks[i].SerializeTo(builder)
 	}
 	generated.TaskListStartTasksVector(builder, len(o.Tasks))
-	for i := len(tasksOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Tasks) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(tasksOffsets[i])
 	}
-	tasksVecOffset := builder.EndVector(len(o.Tasks))
+	tasksVecOffset = builder.EndVector(len(o.Tasks))
 	generated.TaskListStart(builder)
 	generated.TaskListAddTasks(builder, tasksVecOffset)
 	return generated.TaskListEnd(builder)

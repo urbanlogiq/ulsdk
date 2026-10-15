@@ -4,7 +4,11 @@
 
 package file
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/urbanlogiq/ulsdk/types/generated"
+)
 
 func TestDefaultFooter(t *testing.T) {
 	o := &Footer{}
@@ -23,4 +27,31 @@ func TestRoundTripFooter(t *testing.T) {
 	if result == nil {
 		t.Fatal("expected non-nil result")
 	}
+}
+
+func TestVectorPresenceFooter(t *testing.T) {
+	o := &Footer{}
+	var fbs *generated.Footer
+	fbs = generated.GetSizePrefixedRootAsFooter(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		t.Errorf("CustomMetadata: nil vector is written")
+	}
+	o.CustomMetadata = emptyOf(o.CustomMetadata)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsFooter(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(12) == 0 {
+		t.Errorf("CustomMetadata: empty vector is not written")
+	}
+	got, err := FooterFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.CustomMetadata == nil {
+		t.Errorf("CustomMetadata: empty vector is read back as nil")
+	}
+}
+
+// emptyOf returns an empty, non-nil slice of the type of its argument.
+func emptyOf[T any](_ []T) []T {
+	return []T{}
 }

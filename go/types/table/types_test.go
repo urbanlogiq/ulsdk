@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/id"
 	"github.com/urbanlogiq/ulsdk/types/schema"
 )
@@ -53,6 +54,28 @@ func TestDefaultChangeSet(t *testing.T) {
 }
 
 
+func TestVectorPresenceChangeSet(t *testing.T) {
+	o := &ChangeSet{}
+	var fbs *generated.ChangeSet
+	fbs = generated.GetSizePrefixedRootAsChangeSet(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		t.Errorf("Attributes: nil vector is written")
+	}
+	o.Attributes = emptyOf(o.Attributes)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsChangeSet(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(12) == 0 {
+		t.Errorf("Attributes: empty vector is not written")
+	}
+	got, err := ChangeSetFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Attributes == nil {
+		t.Errorf("Attributes: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultDelete(t *testing.T) {
 	o := &Delete{}
 	if o == nil {
@@ -68,6 +91,28 @@ func TestDefaultDiffStream(t *testing.T) {
 	}
 }
 
+
+func TestVectorPresenceDiffStream(t *testing.T) {
+	o := &DiffStream{}
+	var fbs *generated.DiffStream
+	fbs = generated.GetSizePrefixedRootAsDiffStream(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		t.Errorf("Attributes: nil vector is written")
+	}
+	o.Attributes = emptyOf(o.Attributes)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsDiffStream(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(8) == 0 {
+		t.Errorf("Attributes: empty vector is not written")
+	}
+	got, err := DiffStreamFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Attributes == nil {
+		t.Errorf("Attributes: empty vector is read back as nil")
+	}
+}
 
 func TestDefaultHistory(t *testing.T) {
 	o := &History{}
@@ -190,3 +235,8 @@ func TestDefaultSet(t *testing.T) {
 	}
 }
 
+
+// emptyOf returns an empty, non-nil slice of the type of its argument.
+func emptyOf[T any](_ []T) []T {
+	return []T{}
+}

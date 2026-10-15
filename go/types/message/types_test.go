@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/schema"
 	"github.com/urbanlogiq/ulsdk/types/sparse_tensor"
 	"github.com/urbanlogiq/ulsdk/types/tensor"
@@ -89,6 +90,28 @@ func TestUnionMessageHeader(t *testing.T) {
 	}
 }
 
+func TestVectorPresenceMessage(t *testing.T) {
+	o := &Message{}
+	var fbs *generated.Message
+	fbs = generated.GetSizePrefixedRootAsMessage(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		t.Errorf("CustomMetadata: nil vector is written")
+	}
+	o.CustomMetadata = emptyOf(o.CustomMetadata)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsMessage(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(12) == 0 {
+		t.Errorf("CustomMetadata: empty vector is not written")
+	}
+	got, err := MessageFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.CustomMetadata == nil {
+		t.Errorf("CustomMetadata: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultRecordBatch(t *testing.T) {
 	o := &RecordBatch{}
 	if o == nil {
@@ -106,4 +129,31 @@ func TestRoundTripRecordBatch(t *testing.T) {
 	if result == nil {
 		t.Fatal("expected non-nil result")
 	}
+}
+
+func TestVectorPresenceRecordBatch(t *testing.T) {
+	o := &RecordBatch{}
+	var fbs *generated.RecordBatch
+	fbs = generated.GetSizePrefixedRootAsRecordBatch(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		t.Errorf("VariadicBufferCounts: nil vector is written")
+	}
+	o.VariadicBufferCounts = emptyOf(o.VariadicBufferCounts)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsRecordBatch(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(12) == 0 {
+		t.Errorf("VariadicBufferCounts: empty vector is not written")
+	}
+	got, err := RecordBatchFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.VariadicBufferCounts == nil {
+		t.Errorf("VariadicBufferCounts: empty vector is read back as nil")
+	}
+}
+
+// emptyOf returns an empty, non-nil slice of the type of its argument.
+func emptyOf[T any](_ []T) []T {
+	return []T{}
 }

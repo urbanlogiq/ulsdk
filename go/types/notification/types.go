@@ -236,10 +236,13 @@ type Inbox struct {
 
 func InboxFromFbs(fbs *generated.Inbox) *Inbox {
 	o := &Inbox{}
-	for i := 0; i < fbs.ItemsLength(); i++ {
-		var item generated.InboxItem
-		if fbs.Items(&item, i) {
-			o.Items = append(o.Items, *InboxItemFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Items = []InboxItem{}
+		for i := 0; i < fbs.ItemsLength(); i++ {
+			var item generated.InboxItem
+			if fbs.Items(&item, i) {
+				o.Items = append(o.Items, *InboxItemFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -261,15 +264,16 @@ func (o *Inbox) ToBytes() []byte {
 
 // SerializeTo writes the Inbox into a FlatBuffer builder and returns the offset.
 func (o *Inbox) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var itemsVecOffset flatbuffers.UOffsetT
 	itemsOffsets := make([]flatbuffers.UOffsetT, len(o.Items))
 	for i := range o.Items {
 		itemsOffsets[i] = o.Items[i].SerializeTo(builder)
 	}
 	generated.InboxStartItemsVector(builder, len(o.Items))
-	for i := len(itemsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Items) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(itemsOffsets[i])
 	}
-	itemsVecOffset := builder.EndVector(len(o.Items))
+	itemsVecOffset = builder.EndVector(len(o.Items))
 	generated.InboxStart(builder)
 	generated.InboxAddItems(builder, itemsVecOffset)
 	return generated.InboxEnd(builder)

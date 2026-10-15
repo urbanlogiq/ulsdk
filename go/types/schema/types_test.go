@@ -7,6 +7,8 @@ package schema
 import (
 	"fmt"
 	"testing"
+
+	"github.com/urbanlogiq/ulsdk/types/generated"
 )
 
 func TestDefaultBinary(t *testing.T) {
@@ -198,6 +200,38 @@ func TestUnionFieldType(t *testing.T) {
 		if fmt.Sprintf("%T", got.Type) != fmt.Sprintf("%T", v) {
 			t.Fatalf("got %T, want %T", got.Type, v)
 		}
+	}
+}
+
+func TestVectorPresenceField(t *testing.T) {
+	o := &Field{}
+	var fbs *generated.Field
+	fbs = generated.GetSizePrefixedRootAsField(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(14) != 0 {
+		t.Errorf("Children: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(16) != 0 {
+		t.Errorf("CustomMetadata: nil vector is written")
+	}
+	o.Children = emptyOf(o.Children)
+	o.CustomMetadata = emptyOf(o.CustomMetadata)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsField(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(14) == 0 {
+		t.Errorf("Children: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(16) == 0 {
+		t.Errorf("CustomMetadata: empty vector is not written")
+	}
+	got, err := FieldFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Children == nil {
+		t.Errorf("Children: empty vector is read back as nil")
+	}
+	if got.CustomMetadata == nil {
+		t.Errorf("CustomMetadata: empty vector is read back as nil")
 	}
 }
 
@@ -505,6 +539,48 @@ func TestRoundTripSchema(t *testing.T) {
 	}
 }
 
+func TestVectorPresenceSchema(t *testing.T) {
+	o := &Schema{}
+	var fbs *generated.Schema
+	fbs = generated.GetSizePrefixedRootAsSchema(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		t.Errorf("CustomMetadata: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		t.Errorf("Features: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		t.Errorf("Fields: nil vector is written")
+	}
+	o.CustomMetadata = emptyOf(o.CustomMetadata)
+	o.Features = emptyOf(o.Features)
+	o.Fields = emptyOf(o.Fields)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsSchema(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(8) == 0 {
+		t.Errorf("CustomMetadata: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(10) == 0 {
+		t.Errorf("Features: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(6) == 0 {
+		t.Errorf("Fields: empty vector is not written")
+	}
+	got, err := SchemaFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.CustomMetadata == nil {
+		t.Errorf("CustomMetadata: empty vector is read back as nil")
+	}
+	if got.Features == nil {
+		t.Errorf("Features: empty vector is read back as nil")
+	}
+	if got.Fields == nil {
+		t.Errorf("Fields: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultStruct(t *testing.T) {
 	o := &Struct{}
 	if o == nil {
@@ -581,6 +657,28 @@ func TestRoundTripUnion(t *testing.T) {
 	}
 }
 
+func TestVectorPresenceUnion(t *testing.T) {
+	o := &Union{}
+	var fbs *generated.Union
+	fbs = generated.GetSizePrefixedRootAsUnion(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		t.Errorf("TypeIds: nil vector is written")
+	}
+	o.TypeIds = emptyOf(o.TypeIds)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsUnion(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(6) == 0 {
+		t.Errorf("TypeIds: empty vector is not written")
+	}
+	got, err := UnionFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.TypeIds == nil {
+		t.Errorf("TypeIds: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultUtf8(t *testing.T) {
 	o := &Utf8{}
 	if o == nil {
@@ -617,4 +715,9 @@ func TestRoundTripUtf8view(t *testing.T) {
 	if result == nil {
 		t.Fatal("expected non-nil result")
 	}
+}
+
+// emptyOf returns an empty, non-nil slice of the type of its argument.
+func emptyOf[T any](_ []T) []T {
+	return []T{}
 }

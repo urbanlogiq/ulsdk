@@ -319,8 +319,11 @@ type Point struct {
 
 func PointFromFbs(fbs *generated.Point) *Point {
 	o := &Point{}
-	for i := 0; i < fbs.PointGeoLength(); i++ {
-		o.PointGeo = append(o.PointGeo, fbs.PointGeo(i))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.PointGeo = []float32{}
+		for i := 0; i < fbs.PointGeoLength(); i++ {
+			o.PointGeo = append(o.PointGeo, fbs.PointGeo(i))
+		}
 	}
 	return o
 }
@@ -341,11 +344,12 @@ func (o *Point) ToBytes() []byte {
 
 // SerializeTo writes the Point into a FlatBuffer builder and returns the offset.
 func (o *Point) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var pointGeoVecOffset flatbuffers.UOffsetT
 	generated.PointStartPointGeoVector(builder, len(o.PointGeo))
 	for i := len(o.PointGeo) - 1; i >= 0; i-- {
 		builder.PrependFloat32(o.PointGeo[i])
 	}
-	pointGeoVecOffset := builder.EndVector(len(o.PointGeo))
+	pointGeoVecOffset = builder.EndVector(len(o.PointGeo))
 	generated.PointStart(builder)
 	generated.PointAddPointGeo(builder, pointGeoVecOffset)
 	return generated.PointEnd(builder)
@@ -357,10 +361,13 @@ type Line struct {
 
 func LineFromFbs(fbs *generated.Line) *Line {
 	o := &Line{}
-	for i := 0; i < fbs.LineGeoLength(); i++ {
-		var item generated.Point
-		if fbs.LineGeo(&item, i) {
-			o.LineGeo = append(o.LineGeo, *PointFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.LineGeo = []Point{}
+		for i := 0; i < fbs.LineGeoLength(); i++ {
+			var item generated.Point
+			if fbs.LineGeo(&item, i) {
+				o.LineGeo = append(o.LineGeo, *PointFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -382,15 +389,16 @@ func (o *Line) ToBytes() []byte {
 
 // SerializeTo writes the Line into a FlatBuffer builder and returns the offset.
 func (o *Line) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var lineGeoVecOffset flatbuffers.UOffsetT
 	lineGeoOffsets := make([]flatbuffers.UOffsetT, len(o.LineGeo))
 	for i := range o.LineGeo {
 		lineGeoOffsets[i] = o.LineGeo[i].SerializeTo(builder)
 	}
 	generated.LineStartLineGeoVector(builder, len(o.LineGeo))
-	for i := len(lineGeoOffsets) - 1; i >= 0; i-- {
+	for i := len(o.LineGeo) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(lineGeoOffsets[i])
 	}
-	lineGeoVecOffset := builder.EndVector(len(o.LineGeo))
+	lineGeoVecOffset = builder.EndVector(len(o.LineGeo))
 	generated.LineStart(builder)
 	generated.LineAddLineGeo(builder, lineGeoVecOffset)
 	return generated.LineEnd(builder)
@@ -402,10 +410,13 @@ type MultiLine struct {
 
 func MultiLineFromFbs(fbs *generated.MultiLine) *MultiLine {
 	o := &MultiLine{}
-	for i := 0; i < fbs.MultilineGeoLength(); i++ {
-		var item generated.Line
-		if fbs.MultilineGeo(&item, i) {
-			o.MultilineGeo = append(o.MultilineGeo, *LineFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.MultilineGeo = []Line{}
+		for i := 0; i < fbs.MultilineGeoLength(); i++ {
+			var item generated.Line
+			if fbs.MultilineGeo(&item, i) {
+				o.MultilineGeo = append(o.MultilineGeo, *LineFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -427,15 +438,16 @@ func (o *MultiLine) ToBytes() []byte {
 
 // SerializeTo writes the MultiLine into a FlatBuffer builder and returns the offset.
 func (o *MultiLine) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var multilineGeoVecOffset flatbuffers.UOffsetT
 	multilineGeoOffsets := make([]flatbuffers.UOffsetT, len(o.MultilineGeo))
 	for i := range o.MultilineGeo {
 		multilineGeoOffsets[i] = o.MultilineGeo[i].SerializeTo(builder)
 	}
 	generated.MultiLineStartMultilineGeoVector(builder, len(o.MultilineGeo))
-	for i := len(multilineGeoOffsets) - 1; i >= 0; i-- {
+	for i := len(o.MultilineGeo) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(multilineGeoOffsets[i])
 	}
-	multilineGeoVecOffset := builder.EndVector(len(o.MultilineGeo))
+	multilineGeoVecOffset = builder.EndVector(len(o.MultilineGeo))
 	generated.MultiLineStart(builder)
 	generated.MultiLineAddMultilineGeo(builder, multilineGeoVecOffset)
 	return generated.MultiLineEnd(builder)
@@ -450,10 +462,13 @@ type Polygon struct {
 
 func PolygonFromFbs(fbs *generated.Polygon) *Polygon {
 	o := &Polygon{}
-	for i := 0; i < fbs.PolygonGeoLength(); i++ {
-		var item generated.Line
-		if fbs.PolygonGeo(&item, i) {
-			o.PolygonGeo = append(o.PolygonGeo, *LineFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.PolygonGeo = []Line{}
+		for i := 0; i < fbs.PolygonGeoLength(); i++ {
+			var item generated.Line
+			if fbs.PolygonGeo(&item, i) {
+				o.PolygonGeo = append(o.PolygonGeo, *LineFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -475,15 +490,16 @@ func (o *Polygon) ToBytes() []byte {
 
 // SerializeTo writes the Polygon into a FlatBuffer builder and returns the offset.
 func (o *Polygon) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var polygonGeoVecOffset flatbuffers.UOffsetT
 	polygonGeoOffsets := make([]flatbuffers.UOffsetT, len(o.PolygonGeo))
 	for i := range o.PolygonGeo {
 		polygonGeoOffsets[i] = o.PolygonGeo[i].SerializeTo(builder)
 	}
 	generated.PolygonStartPolygonGeoVector(builder, len(o.PolygonGeo))
-	for i := len(polygonGeoOffsets) - 1; i >= 0; i-- {
+	for i := len(o.PolygonGeo) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(polygonGeoOffsets[i])
 	}
-	polygonGeoVecOffset := builder.EndVector(len(o.PolygonGeo))
+	polygonGeoVecOffset = builder.EndVector(len(o.PolygonGeo))
 	generated.PolygonStart(builder)
 	generated.PolygonAddPolygonGeo(builder, polygonGeoVecOffset)
 	return generated.PolygonEnd(builder)
@@ -495,10 +511,13 @@ type MultiPolygon struct {
 
 func MultiPolygonFromFbs(fbs *generated.MultiPolygon) *MultiPolygon {
 	o := &MultiPolygon{}
-	for i := 0; i < fbs.MultipolygonGeoLength(); i++ {
-		var item generated.Polygon
-		if fbs.MultipolygonGeo(&item, i) {
-			o.MultipolygonGeo = append(o.MultipolygonGeo, *PolygonFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.MultipolygonGeo = []Polygon{}
+		for i := 0; i < fbs.MultipolygonGeoLength(); i++ {
+			var item generated.Polygon
+			if fbs.MultipolygonGeo(&item, i) {
+				o.MultipolygonGeo = append(o.MultipolygonGeo, *PolygonFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -520,15 +539,16 @@ func (o *MultiPolygon) ToBytes() []byte {
 
 // SerializeTo writes the MultiPolygon into a FlatBuffer builder and returns the offset.
 func (o *MultiPolygon) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var multipolygonGeoVecOffset flatbuffers.UOffsetT
 	multipolygonGeoOffsets := make([]flatbuffers.UOffsetT, len(o.MultipolygonGeo))
 	for i := range o.MultipolygonGeo {
 		multipolygonGeoOffsets[i] = o.MultipolygonGeo[i].SerializeTo(builder)
 	}
 	generated.MultiPolygonStartMultipolygonGeoVector(builder, len(o.MultipolygonGeo))
-	for i := len(multipolygonGeoOffsets) - 1; i >= 0; i-- {
+	for i := len(o.MultipolygonGeo) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(multipolygonGeoOffsets[i])
 	}
-	multipolygonGeoVecOffset := builder.EndVector(len(o.MultipolygonGeo))
+	multipolygonGeoVecOffset = builder.EndVector(len(o.MultipolygonGeo))
 	generated.MultiPolygonStart(builder)
 	generated.MultiPolygonAddMultipolygonGeo(builder, multipolygonGeoVecOffset)
 	return generated.MultiPolygonEnd(builder)
@@ -540,10 +560,13 @@ type MultiPoint struct {
 
 func MultiPointFromFbs(fbs *generated.MultiPoint) *MultiPoint {
 	o := &MultiPoint{}
-	for i := 0; i < fbs.PointGeoLength(); i++ {
-		var item generated.Point
-		if fbs.PointGeo(&item, i) {
-			o.PointGeo = append(o.PointGeo, *PointFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.PointGeo = []Point{}
+		for i := 0; i < fbs.PointGeoLength(); i++ {
+			var item generated.Point
+			if fbs.PointGeo(&item, i) {
+				o.PointGeo = append(o.PointGeo, *PointFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -565,15 +588,16 @@ func (o *MultiPoint) ToBytes() []byte {
 
 // SerializeTo writes the MultiPoint into a FlatBuffer builder and returns the offset.
 func (o *MultiPoint) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var pointGeoVecOffset flatbuffers.UOffsetT
 	pointGeoOffsets := make([]flatbuffers.UOffsetT, len(o.PointGeo))
 	for i := range o.PointGeo {
 		pointGeoOffsets[i] = o.PointGeo[i].SerializeTo(builder)
 	}
 	generated.MultiPointStartPointGeoVector(builder, len(o.PointGeo))
-	for i := len(pointGeoOffsets) - 1; i >= 0; i-- {
+	for i := len(o.PointGeo) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(pointGeoOffsets[i])
 	}
-	pointGeoVecOffset := builder.EndVector(len(o.PointGeo))
+	pointGeoVecOffset = builder.EndVector(len(o.PointGeo))
 	generated.MultiPointStart(builder)
 	generated.MultiPointAddPointGeo(builder, pointGeoVecOffset)
 	return generated.MultiPointEnd(builder)

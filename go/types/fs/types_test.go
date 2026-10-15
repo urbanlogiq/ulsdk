@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/urbanlogiq/ulsdk/types/crypto"
+	"github.com/urbanlogiq/ulsdk/types/generated"
 )
 
 func TestDefaultChunk(t *testing.T) {
@@ -41,6 +42,28 @@ func TestDefaultDirectory(t *testing.T) {
 	}
 }
 
+
+func TestVectorPresenceDirectory(t *testing.T) {
+	o := &Directory{}
+	var fbs *generated.Directory
+	fbs = generated.GetSizePrefixedRootAsDirectory(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		t.Errorf("Notifications: nil vector is written")
+	}
+	o.Notifications = emptyOf(o.Notifications)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsDirectory(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(6) == 0 {
+		t.Errorf("Notifications: empty vector is not written")
+	}
+	got, err := DirectoryFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Notifications == nil {
+		t.Errorf("Notifications: empty vector is read back as nil")
+	}
+}
 
 func TestDefaultDirectoryEntry(t *testing.T) {
 	o := &DirectoryEntry{}
@@ -95,6 +118,28 @@ func TestUnionFileDigest(t *testing.T) {
 		if fmt.Sprintf("%T", got.Digest) != fmt.Sprintf("%T", v) {
 			t.Fatalf("got %T, want %T", got.Digest, v)
 		}
+	}
+}
+
+func TestVectorPresenceFile(t *testing.T) {
+	o := &File{}
+	var fbs *generated.File
+	fbs = generated.GetSizePrefixedRootAsFile(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(20) != 0 {
+		t.Errorf("Chunks: nil vector is written")
+	}
+	o.Chunks = emptyOf(o.Chunks)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsFile(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(20) == 0 {
+		t.Errorf("Chunks: empty vector is not written")
+	}
+	got, err := FileFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Chunks == nil {
+		t.Errorf("Chunks: empty vector is read back as nil")
 	}
 }
 
@@ -159,6 +204,28 @@ func TestUnionListSlotEntry(t *testing.T) {
 	}
 }
 
+func TestVectorPresenceListSlot(t *testing.T) {
+	o := &ListSlot{}
+	var fbs *generated.ListSlot
+	fbs = generated.GetSizePrefixedRootAsListSlot(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(18) != 0 {
+		t.Errorf("Attributes: nil vector is written")
+	}
+	o.Attributes = emptyOf(o.Attributes)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsListSlot(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(18) == 0 {
+		t.Errorf("Attributes: empty vector is not written")
+	}
+	got, err := ListSlotFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Attributes == nil {
+		t.Errorf("Attributes: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultMoveRequest(t *testing.T) {
 	o := &MoveRequest{}
 	if o == nil {
@@ -191,6 +258,28 @@ func TestDefaultSlot(t *testing.T) {
 }
 
 
+func TestVectorPresenceSlot(t *testing.T) {
+	o := &Slot{}
+	var fbs *generated.Slot
+	fbs = generated.GetSizePrefixedRootAsSlot(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		t.Errorf("Attributes: nil vector is written")
+	}
+	o.Attributes = emptyOf(o.Attributes)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsSlot(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(12) == 0 {
+		t.Errorf("Attributes: empty vector is not written")
+	}
+	got, err := SlotFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Attributes == nil {
+		t.Errorf("Attributes: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultTopLevelDirectory(t *testing.T) {
 	o := &TopLevelDirectory{}
 	if o == nil {
@@ -198,3 +287,8 @@ func TestDefaultTopLevelDirectory(t *testing.T) {
 	}
 }
 
+
+// emptyOf returns an empty, non-nil slice of the type of its argument.
+func emptyOf[T any](_ []T) []T {
+	return []T{}
+}

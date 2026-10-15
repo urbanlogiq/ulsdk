@@ -4,7 +4,11 @@
 
 package registry
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/urbanlogiq/ulsdk/types/generated"
+)
 
 func TestDefaultProjectResult(t *testing.T) {
 	o := &ProjectResult{}
@@ -38,6 +42,28 @@ func TestDefaultRegistrySpec(t *testing.T) {
 }
 
 
+func TestVectorPresenceRegistrySpec(t *testing.T) {
+	o := &RegistrySpec{}
+	var fbs *generated.RegistrySpec
+	fbs = generated.GetSizePrefixedRootAsRegistrySpec(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(18) != 0 {
+		t.Errorf("Relations: nil vector is written")
+	}
+	o.Relations = emptyOf(o.Relations)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsRegistrySpec(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(18) == 0 {
+		t.Errorf("Relations: empty vector is not written")
+	}
+	got, err := RegistrySpecFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Relations == nil {
+		t.Errorf("Relations: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultRegistryTable(t *testing.T) {
 	o := &RegistryTable{}
 	if o == nil {
@@ -53,3 +79,8 @@ func TestDefaultRegistryTables(t *testing.T) {
 	}
 }
 
+
+// emptyOf returns an empty, non-nil slice of the type of its argument.
+func emptyOf[T any](_ []T) []T {
+	return []T{}
+}

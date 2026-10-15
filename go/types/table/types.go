@@ -269,9 +269,8 @@ type Append struct {
 
 func AppendFromFbs(fbs *generated.Append) *Append {
 	o := &Append{}
-	o.Content = make([]byte, fbs.ContentLength())
-	for i := 0; i < fbs.ContentLength(); i++ {
-		o.Content[i] = fbs.Content(i)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Content = append([]byte{}, fbs.ContentBytes()...)
 	}
 	return o
 }
@@ -292,7 +291,8 @@ func (o *Append) ToBytes() []byte {
 
 // SerializeTo writes the Append into a FlatBuffer builder and returns the offset.
 func (o *Append) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	contentOffset := builder.CreateByteVector(o.Content)
+	var contentOffset flatbuffers.UOffsetT
+	contentOffset = builder.CreateByteVector(o.Content)
 	generated.AppendStart(builder)
 	generated.AppendAddContent(builder, contentOffset)
 	return generated.AppendEnd(builder)
@@ -386,16 +386,22 @@ type ChangeSet struct {
 
 func ChangeSetFromFbs(fbs *generated.ChangeSet) *ChangeSet {
 	o := &ChangeSet{}
-	for i := 0; i < fbs.AttributesLength(); i++ {
-		var item generated.Attr
-		if fbs.Attributes(&item, i) {
-			o.Attributes = append(o.Attributes, *attr.AttrFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		o.Attributes = []attr.Attr{}
+		for i := 0; i < fbs.AttributesLength(); i++ {
+			var item generated.Attr
+			if fbs.Attributes(&item, i) {
+				o.Attributes = append(o.Attributes, *attr.AttrFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.OpsLength(); i++ {
-		var item generated.ChangeOpEntry
-		if fbs.Ops(&item, i) {
-			o.Ops = append(o.Ops, *ChangeOpEntryFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		o.Ops = []ChangeOpEntry{}
+		for i := 0; i < fbs.OpsLength(); i++ {
+			var item generated.ChangeOpEntry
+			if fbs.Ops(&item, i) {
+				o.Ops = append(o.Ops, *ChangeOpEntryFromFbs(&item))
+			}
 		}
 	}
 	if fbsVal := fbs.Revision(nil); fbsVal != nil {
@@ -424,24 +430,28 @@ func (o *ChangeSet) ToBytes() []byte {
 
 // SerializeTo writes the ChangeSet into a FlatBuffer builder and returns the offset.
 func (o *ChangeSet) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	attributesOffsets := make([]flatbuffers.UOffsetT, len(o.Attributes))
-	for i := range o.Attributes {
-		attributesOffsets[i] = o.Attributes[i].SerializeTo(builder)
+	var attributesVecOffset flatbuffers.UOffsetT
+	if o.Attributes != nil {
+		attributesOffsets := make([]flatbuffers.UOffsetT, len(o.Attributes))
+		for i := range o.Attributes {
+			attributesOffsets[i] = o.Attributes[i].SerializeTo(builder)
+		}
+		generated.ChangeSetStartAttributesVector(builder, len(o.Attributes))
+		for i := len(o.Attributes) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(attributesOffsets[i])
+		}
+		attributesVecOffset = builder.EndVector(len(o.Attributes))
 	}
-	generated.ChangeSetStartAttributesVector(builder, len(o.Attributes))
-	for i := len(attributesOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(attributesOffsets[i])
-	}
-	attributesVecOffset := builder.EndVector(len(o.Attributes))
+	var opsVecOffset flatbuffers.UOffsetT
 	opsOffsets := make([]flatbuffers.UOffsetT, len(o.Ops))
 	for i := range o.Ops {
 		opsOffsets[i] = o.Ops[i].SerializeTo(builder)
 	}
 	generated.ChangeSetStartOpsVector(builder, len(o.Ops))
-	for i := len(opsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Ops) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(opsOffsets[i])
 	}
-	opsVecOffset := builder.EndVector(len(o.Ops))
+	opsVecOffset = builder.EndVector(len(o.Ops))
 	revisionOffset := o.Revision.SerializeTo(builder)
 	whoOffset := o.Who.SerializeTo(builder)
 	generated.ChangeSetStart(builder)
@@ -464,19 +474,25 @@ type DiffStream struct {
 
 func DiffStreamFromFbs(fbs *generated.DiffStream) *DiffStream {
 	o := &DiffStream{}
-	for i := 0; i < fbs.AttributesLength(); i++ {
-		var item generated.Attr
-		if fbs.Attributes(&item, i) {
-			o.Attributes = append(o.Attributes, *attr.AttrFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.Attributes = []attr.Attr{}
+		for i := 0; i < fbs.AttributesLength(); i++ {
+			var item generated.Attr
+			if fbs.Attributes(&item, i) {
+				o.Attributes = append(o.Attributes, *attr.AttrFromFbs(&item))
+			}
 		}
 	}
 	if fbsVal := fbs.Base(nil); fbsVal != nil {
 		o.Base = *id.ContentIdFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.SeqLength(); i++ {
-		var item generated.OpEntry
-		if fbs.Seq(&item, i) {
-			o.Seq = append(o.Seq, *OpEntryFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Seq = []OpEntry{}
+		for i := 0; i < fbs.SeqLength(); i++ {
+			var item generated.OpEntry
+			if fbs.Seq(&item, i) {
+				o.Seq = append(o.Seq, *OpEntryFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -498,25 +514,29 @@ func (o *DiffStream) ToBytes() []byte {
 
 // SerializeTo writes the DiffStream into a FlatBuffer builder and returns the offset.
 func (o *DiffStream) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	attributesOffsets := make([]flatbuffers.UOffsetT, len(o.Attributes))
-	for i := range o.Attributes {
-		attributesOffsets[i] = o.Attributes[i].SerializeTo(builder)
+	var attributesVecOffset flatbuffers.UOffsetT
+	if o.Attributes != nil {
+		attributesOffsets := make([]flatbuffers.UOffsetT, len(o.Attributes))
+		for i := range o.Attributes {
+			attributesOffsets[i] = o.Attributes[i].SerializeTo(builder)
+		}
+		generated.DiffStreamStartAttributesVector(builder, len(o.Attributes))
+		for i := len(o.Attributes) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(attributesOffsets[i])
+		}
+		attributesVecOffset = builder.EndVector(len(o.Attributes))
 	}
-	generated.DiffStreamStartAttributesVector(builder, len(o.Attributes))
-	for i := len(attributesOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(attributesOffsets[i])
-	}
-	attributesVecOffset := builder.EndVector(len(o.Attributes))
 	baseOffset := o.Base.SerializeTo(builder)
+	var seqVecOffset flatbuffers.UOffsetT
 	seqOffsets := make([]flatbuffers.UOffsetT, len(o.Seq))
 	for i := range o.Seq {
 		seqOffsets[i] = o.Seq[i].SerializeTo(builder)
 	}
 	generated.DiffStreamStartSeqVector(builder, len(o.Seq))
-	for i := len(seqOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Seq) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(seqOffsets[i])
 	}
-	seqVecOffset := builder.EndVector(len(o.Seq))
+	seqVecOffset = builder.EndVector(len(o.Seq))
 	generated.DiffStreamStart(builder)
 	generated.DiffStreamAddAttributes(builder, attributesVecOffset)
 	generated.DiffStreamAddBase(builder, baseOffset)
@@ -531,10 +551,13 @@ type History struct {
 
 func HistoryFromFbs(fbs *generated.History) *History {
 	o := &History{}
-	for i := 0; i < fbs.ChangesLength(); i++ {
-		var item generated.ChangeSet
-		if fbs.Changes(&item, i) {
-			o.Changes = append(o.Changes, *ChangeSetFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Changes = []ChangeSet{}
+		for i := 0; i < fbs.ChangesLength(); i++ {
+			var item generated.ChangeSet
+			if fbs.Changes(&item, i) {
+				o.Changes = append(o.Changes, *ChangeSetFromFbs(&item))
+			}
 		}
 	}
 	if fbsVal := fbs.ContinuationId(nil); fbsVal != nil {
@@ -559,15 +582,16 @@ func (o *History) ToBytes() []byte {
 
 // SerializeTo writes the History into a FlatBuffer builder and returns the offset.
 func (o *History) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var changesVecOffset flatbuffers.UOffsetT
 	changesOffsets := make([]flatbuffers.UOffsetT, len(o.Changes))
 	for i := range o.Changes {
 		changesOffsets[i] = o.Changes[i].SerializeTo(builder)
 	}
 	generated.HistoryStartChangesVector(builder, len(o.Changes))
-	for i := len(changesOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Changes) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(changesOffsets[i])
 	}
-	changesVecOffset := builder.EndVector(len(o.Changes))
+	changesVecOffset = builder.EndVector(len(o.Changes))
 	var continuationIdOffset flatbuffers.UOffsetT
 	if o.ContinuationId != nil {
 		continuationIdOffset = o.ContinuationId.SerializeTo(builder)
@@ -675,10 +699,13 @@ type NewTableList struct {
 
 func NewTableListFromFbs(fbs *generated.NewTableList) *NewTableList {
 	o := &NewTableList{}
-	for i := 0; i < fbs.TablesLength(); i++ {
-		var item generated.NewTable
-		if fbs.Tables(&item, i) {
-			o.Tables = append(o.Tables, *NewTableFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Tables = []NewTable{}
+		for i := 0; i < fbs.TablesLength(); i++ {
+			var item generated.NewTable
+			if fbs.Tables(&item, i) {
+				o.Tables = append(o.Tables, *NewTableFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -700,15 +727,16 @@ func (o *NewTableList) ToBytes() []byte {
 
 // SerializeTo writes the NewTableList into a FlatBuffer builder and returns the offset.
 func (o *NewTableList) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var tablesVecOffset flatbuffers.UOffsetT
 	tablesOffsets := make([]flatbuffers.UOffsetT, len(o.Tables))
 	for i := range o.Tables {
 		tablesOffsets[i] = o.Tables[i].SerializeTo(builder)
 	}
 	generated.NewTableListStartTablesVector(builder, len(o.Tables))
-	for i := len(tablesOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Tables) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(tablesOffsets[i])
 	}
-	tablesVecOffset := builder.EndVector(len(o.Tables))
+	tablesVecOffset = builder.EndVector(len(o.Tables))
 	generated.NewTableListStart(builder)
 	generated.NewTableListAddTables(builder, tablesVecOffset)
 	return generated.NewTableListEnd(builder)
@@ -722,10 +750,13 @@ type NewTableListResult struct {
 
 func NewTableListResultFromFbs(fbs *generated.NewTableListResult) *NewTableListResult {
 	o := &NewTableListResult{}
-	for i := 0; i < fbs.ResultsLength(); i++ {
-		var item generated.NewTableResult
-		if fbs.Results(&item, i) {
-			o.Results = append(o.Results, *NewTableResultFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Results = []NewTableResult{}
+		for i := 0; i < fbs.ResultsLength(); i++ {
+			var item generated.NewTableResult
+			if fbs.Results(&item, i) {
+				o.Results = append(o.Results, *NewTableResultFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -747,15 +778,16 @@ func (o *NewTableListResult) ToBytes() []byte {
 
 // SerializeTo writes the NewTableListResult into a FlatBuffer builder and returns the offset.
 func (o *NewTableListResult) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var resultsVecOffset flatbuffers.UOffsetT
 	resultsOffsets := make([]flatbuffers.UOffsetT, len(o.Results))
 	for i := range o.Results {
 		resultsOffsets[i] = o.Results[i].SerializeTo(builder)
 	}
 	generated.NewTableListResultStartResultsVector(builder, len(o.Results))
-	for i := len(resultsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Results) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(resultsOffsets[i])
 	}
-	resultsVecOffset := builder.EndVector(len(o.Results))
+	resultsVecOffset = builder.EndVector(len(o.Results))
 	generated.NewTableListResultStart(builder)
 	generated.NewTableListResultAddResults(builder, resultsVecOffset)
 	return generated.NewTableListResultEnd(builder)

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/schema"
 )
 
@@ -92,6 +93,28 @@ func TestDefaultSparseTensorIndexCOO(t *testing.T) {
 }
 
 
+func TestVectorPresenceSparseTensorIndexCOO(t *testing.T) {
+	o := &SparseTensorIndexCOO{}
+	var fbs *generated.SparseTensorIndexCOO
+	fbs = generated.GetSizePrefixedRootAsSparseTensorIndexCOO(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		t.Errorf("IndicesStrides: nil vector is written")
+	}
+	o.IndicesStrides = emptyOf(o.IndicesStrides)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsSparseTensorIndexCOO(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(6) == 0 {
+		t.Errorf("IndicesStrides: empty vector is not written")
+	}
+	got, err := SparseTensorIndexCOOFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.IndicesStrides == nil {
+		t.Errorf("IndicesStrides: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultSparseTensorIndexCSF(t *testing.T) {
 	o := &SparseTensorIndexCSF{}
 	if o == nil {
@@ -99,3 +122,8 @@ func TestDefaultSparseTensorIndexCSF(t *testing.T) {
 	}
 }
 
+
+// emptyOf returns an empty, non-nil slice of the type of its argument.
+func emptyOf[T any](_ []T) []T {
+	return []T{}
+}

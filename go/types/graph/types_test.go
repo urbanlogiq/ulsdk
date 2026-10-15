@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/urbanlogiq/ulsdk/types/entity"
+	"github.com/urbanlogiq/ulsdk/types/generated"
 )
 
 func TestDefaultEdgeList(t *testing.T) {
@@ -82,6 +83,28 @@ func TestDefaultGraphQuery(t *testing.T) {
 }
 
 
+func TestVectorPresenceGraphQuery(t *testing.T) {
+	o := &GraphQuery{}
+	var fbs *generated.GraphQuery
+	fbs = generated.GetSizePrefixedRootAsGraphQuery(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		t.Errorf("OrderBy: nil vector is written")
+	}
+	o.OrderBy = emptyOf(o.OrderBy)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsGraphQuery(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(8) == 0 {
+		t.Errorf("OrderBy: empty vector is not written")
+	}
+	got, err := GraphQueryFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.OrderBy == nil {
+		t.Errorf("OrderBy: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultNodeIdPair(t *testing.T) {
 	o := &NodeIdPair{}
 	if o == nil {
@@ -114,6 +137,68 @@ func TestRoundTripNodeQuery(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestVectorPresenceNodeQuery(t *testing.T) {
+	o := &NodeQuery{}
+	var fbs *generated.NodeQuery
+	fbs = generated.GetSizePrefixedRootAsNodeQuery(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		t.Errorf("Descriptions: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		t.Errorf("EntityTys: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		t.Errorf("NodeIds: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		t.Errorf("Projections: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		t.Errorf("StreamIds: nil vector is written")
+	}
+	o.Descriptions = emptyOf(o.Descriptions)
+	o.EntityTys = emptyOf(o.EntityTys)
+	o.NodeIds = emptyOf(o.NodeIds)
+	o.Projections = emptyOf(o.Projections)
+	o.StreamIds = emptyOf(o.StreamIds)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsNodeQuery(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(8) == 0 {
+		t.Errorf("Descriptions: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(6) == 0 {
+		t.Errorf("EntityTys: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(10) == 0 {
+		t.Errorf("NodeIds: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(12) == 0 {
+		t.Errorf("Projections: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(4) == 0 {
+		t.Errorf("StreamIds: empty vector is not written")
+	}
+	got, err := NodeQueryFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Descriptions == nil {
+		t.Errorf("Descriptions: empty vector is read back as nil")
+	}
+	if got.EntityTys == nil {
+		t.Errorf("EntityTys: empty vector is read back as nil")
+	}
+	if got.NodeIds == nil {
+		t.Errorf("NodeIds: empty vector is read back as nil")
+	}
+	if got.Projections == nil {
+		t.Errorf("Projections: empty vector is read back as nil")
+	}
+	if got.StreamIds == nil {
+		t.Errorf("StreamIds: empty vector is read back as nil")
 	}
 }
 
@@ -155,4 +240,9 @@ func TestUnionQueryPathElementElement(t *testing.T) {
 			t.Fatalf("got %T, want %T", got.Element, v)
 		}
 	}
+}
+
+// emptyOf returns an empty, non-nil slice of the type of its argument.
+func emptyOf[T any](_ []T) []T {
+	return []T{}
 }

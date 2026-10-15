@@ -674,8 +674,11 @@ type Union struct {
 func UnionFromFbs(fbs *generated.Union) *Union {
 	o := &Union{}
 	o.Mode = int16(fbs.Mode())
-	for i := 0; i < fbs.TypeIdsLength(); i++ {
-		o.TypeIds = append(o.TypeIds, fbs.TypeIds(i))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.TypeIds = []int32{}
+		for i := 0; i < fbs.TypeIdsLength(); i++ {
+			o.TypeIds = append(o.TypeIds, fbs.TypeIds(i))
+		}
 	}
 	return o
 }
@@ -696,11 +699,14 @@ func (o *Union) ToBytes() []byte {
 
 // SerializeTo writes the Union into a FlatBuffer builder and returns the offset.
 func (o *Union) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	generated.UnionStartTypeIdsVector(builder, len(o.TypeIds))
-	for i := len(o.TypeIds) - 1; i >= 0; i-- {
-		builder.PrependInt32(o.TypeIds[i])
+	var typeIdsVecOffset flatbuffers.UOffsetT
+	if o.TypeIds != nil {
+		generated.UnionStartTypeIdsVector(builder, len(o.TypeIds))
+		for i := len(o.TypeIds) - 1; i >= 0; i-- {
+			builder.PrependInt32(o.TypeIds[i])
+		}
+		typeIdsVecOffset = builder.EndVector(len(o.TypeIds))
 	}
-	typeIdsVecOffset := builder.EndVector(len(o.TypeIds))
 	generated.UnionStart(builder)
 	generated.UnionAddMode(builder, generated.UnionMode(o.Mode))
 	generated.UnionAddTypeIds(builder, typeIdsVecOffset)
@@ -1211,16 +1217,22 @@ type Field struct {
 
 func FieldFromFbs(fbs *generated.Field) *Field {
 	o := &Field{}
-	for i := 0; i < fbs.ChildrenLength(); i++ {
-		var item generated.Field
-		if fbs.Children(&item, i) {
-			o.Children = append(o.Children, *FieldFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(14) != 0 {
+		o.Children = []Field{}
+		for i := 0; i < fbs.ChildrenLength(); i++ {
+			var item generated.Field
+			if fbs.Children(&item, i) {
+				o.Children = append(o.Children, *FieldFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.CustomMetadataLength(); i++ {
-		var item generated.KeyValue
-		if fbs.CustomMetadata(&item, i) {
-			o.CustomMetadata = append(o.CustomMetadata, *KeyValueFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(16) != 0 {
+		o.CustomMetadata = []KeyValue{}
+		for i := 0; i < fbs.CustomMetadataLength(); i++ {
+			var item generated.KeyValue
+			if fbs.CustomMetadata(&item, i) {
+				o.CustomMetadata = append(o.CustomMetadata, *KeyValueFromFbs(&item))
+			}
 		}
 	}
 	if fbsVal := fbs.Dictionary(nil); fbsVal != nil {
@@ -1358,24 +1370,30 @@ func (o *Field) ToBytes() []byte {
 
 // SerializeTo writes the Field into a FlatBuffer builder and returns the offset.
 func (o *Field) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	childrenOffsets := make([]flatbuffers.UOffsetT, len(o.Children))
-	for i := range o.Children {
-		childrenOffsets[i] = o.Children[i].SerializeTo(builder)
+	var childrenVecOffset flatbuffers.UOffsetT
+	if o.Children != nil {
+		childrenOffsets := make([]flatbuffers.UOffsetT, len(o.Children))
+		for i := range o.Children {
+			childrenOffsets[i] = o.Children[i].SerializeTo(builder)
+		}
+		generated.FieldStartChildrenVector(builder, len(o.Children))
+		for i := len(o.Children) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(childrenOffsets[i])
+		}
+		childrenVecOffset = builder.EndVector(len(o.Children))
 	}
-	generated.FieldStartChildrenVector(builder, len(o.Children))
-	for i := len(childrenOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(childrenOffsets[i])
+	var customMetadataVecOffset flatbuffers.UOffsetT
+	if o.CustomMetadata != nil {
+		customMetadataOffsets := make([]flatbuffers.UOffsetT, len(o.CustomMetadata))
+		for i := range o.CustomMetadata {
+			customMetadataOffsets[i] = o.CustomMetadata[i].SerializeTo(builder)
+		}
+		generated.FieldStartCustomMetadataVector(builder, len(o.CustomMetadata))
+		for i := len(o.CustomMetadata) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(customMetadataOffsets[i])
+		}
+		customMetadataVecOffset = builder.EndVector(len(o.CustomMetadata))
 	}
-	childrenVecOffset := builder.EndVector(len(o.Children))
-	customMetadataOffsets := make([]flatbuffers.UOffsetT, len(o.CustomMetadata))
-	for i := range o.CustomMetadata {
-		customMetadataOffsets[i] = o.CustomMetadata[i].SerializeTo(builder)
-	}
-	generated.FieldStartCustomMetadataVector(builder, len(o.CustomMetadata))
-	for i := len(customMetadataOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(customMetadataOffsets[i])
-	}
-	customMetadataVecOffset := builder.EndVector(len(o.CustomMetadata))
 	var dictionaryOffset flatbuffers.UOffsetT
 	if o.Dictionary != nil {
 		dictionaryOffset = o.Dictionary.SerializeTo(builder)
@@ -1572,20 +1590,29 @@ type Schema struct {
 
 func SchemaFromFbs(fbs *generated.Schema) *Schema {
 	o := &Schema{}
-	for i := 0; i < fbs.CustomMetadataLength(); i++ {
-		var item generated.KeyValue
-		if fbs.CustomMetadata(&item, i) {
-			o.CustomMetadata = append(o.CustomMetadata, *KeyValueFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.CustomMetadata = []KeyValue{}
+		for i := 0; i < fbs.CustomMetadataLength(); i++ {
+			var item generated.KeyValue
+			if fbs.CustomMetadata(&item, i) {
+				o.CustomMetadata = append(o.CustomMetadata, *KeyValueFromFbs(&item))
+			}
 		}
 	}
 	o.Endianness = int16(fbs.Endianness())
-	for i := 0; i < fbs.FeaturesLength(); i++ {
-		o.Features = append(o.Features, int64(fbs.Features(i)))
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		o.Features = []int64{}
+		for i := 0; i < fbs.FeaturesLength(); i++ {
+			o.Features = append(o.Features, int64(fbs.Features(i)))
+		}
 	}
-	for i := 0; i < fbs.FieldsLength(); i++ {
-		var item generated.Field
-		if fbs.Fields(&item, i) {
-			o.Fields = append(o.Fields, *FieldFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Fields = []Field{}
+		for i := 0; i < fbs.FieldsLength(); i++ {
+			var item generated.Field
+			if fbs.Fields(&item, i) {
+				o.Fields = append(o.Fields, *FieldFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -1607,29 +1634,38 @@ func (o *Schema) ToBytes() []byte {
 
 // SerializeTo writes the Schema into a FlatBuffer builder and returns the offset.
 func (o *Schema) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	customMetadataOffsets := make([]flatbuffers.UOffsetT, len(o.CustomMetadata))
-	for i := range o.CustomMetadata {
-		customMetadataOffsets[i] = o.CustomMetadata[i].SerializeTo(builder)
+	var customMetadataVecOffset flatbuffers.UOffsetT
+	if o.CustomMetadata != nil {
+		customMetadataOffsets := make([]flatbuffers.UOffsetT, len(o.CustomMetadata))
+		for i := range o.CustomMetadata {
+			customMetadataOffsets[i] = o.CustomMetadata[i].SerializeTo(builder)
+		}
+		generated.SchemaStartCustomMetadataVector(builder, len(o.CustomMetadata))
+		for i := len(o.CustomMetadata) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(customMetadataOffsets[i])
+		}
+		customMetadataVecOffset = builder.EndVector(len(o.CustomMetadata))
 	}
-	generated.SchemaStartCustomMetadataVector(builder, len(o.CustomMetadata))
-	for i := len(customMetadataOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(customMetadataOffsets[i])
+	var featuresVecOffset flatbuffers.UOffsetT
+	if o.Features != nil {
+		generated.SchemaStartFeaturesVector(builder, len(o.Features))
+		for i := len(o.Features) - 1; i >= 0; i-- {
+			builder.PrependInt64(o.Features[i])
+		}
+		featuresVecOffset = builder.EndVector(len(o.Features))
 	}
-	customMetadataVecOffset := builder.EndVector(len(o.CustomMetadata))
-	generated.SchemaStartFeaturesVector(builder, len(o.Features))
-	for i := len(o.Features) - 1; i >= 0; i-- {
-		builder.PrependInt64(o.Features[i])
+	var fieldsVecOffset flatbuffers.UOffsetT
+	if o.Fields != nil {
+		fieldsOffsets := make([]flatbuffers.UOffsetT, len(o.Fields))
+		for i := range o.Fields {
+			fieldsOffsets[i] = o.Fields[i].SerializeTo(builder)
+		}
+		generated.SchemaStartFieldsVector(builder, len(o.Fields))
+		for i := len(o.Fields) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(fieldsOffsets[i])
+		}
+		fieldsVecOffset = builder.EndVector(len(o.Fields))
 	}
-	featuresVecOffset := builder.EndVector(len(o.Features))
-	fieldsOffsets := make([]flatbuffers.UOffsetT, len(o.Fields))
-	for i := range o.Fields {
-		fieldsOffsets[i] = o.Fields[i].SerializeTo(builder)
-	}
-	generated.SchemaStartFieldsVector(builder, len(o.Fields))
-	for i := len(fieldsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(fieldsOffsets[i])
-	}
-	fieldsVecOffset := builder.EndVector(len(o.Fields))
 	generated.SchemaStart(builder)
 	generated.SchemaAddCustomMetadata(builder, customMetadataVecOffset)
 	generated.SchemaAddEndianness(builder, generated.Endianness(o.Endianness))

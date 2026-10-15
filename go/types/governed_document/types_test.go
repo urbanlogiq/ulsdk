@@ -4,7 +4,11 @@
 
 package governed_document
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/urbanlogiq/ulsdk/types/generated"
+)
 
 func TestDefaultDocumentField(t *testing.T) {
 	o := &DocumentField{}
@@ -21,3 +25,30 @@ func TestDefaultGovernedDocument(t *testing.T) {
 	}
 }
 
+
+func TestVectorPresenceGovernedDocument(t *testing.T) {
+	o := &GovernedDocument{}
+	var fbs *generated.GovernedDocument
+	fbs = generated.GetSizePrefixedRootAsGovernedDocument(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(22) != 0 {
+		t.Errorf("Fields: nil vector is written")
+	}
+	o.Fields = emptyOf(o.Fields)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsGovernedDocument(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(22) == 0 {
+		t.Errorf("Fields: empty vector is not written")
+	}
+	got, err := GovernedDocumentFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Fields == nil {
+		t.Errorf("Fields: empty vector is read back as nil")
+	}
+}
+
+// emptyOf returns an empty, non-nil slice of the type of its argument.
+func emptyOf[T any](_ []T) []T {
+	return []T{}
+}

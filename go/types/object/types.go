@@ -67,10 +67,13 @@ type DataCatalogObject struct {
 
 func DataCatalogObjectFromFbs(fbs *generated.DataCatalogObject) *DataCatalogObject {
 	o := &DataCatalogObject{}
-	for i := 0; i < fbs.AttributesLength(); i++ {
-		var item generated.AttributePair
-		if fbs.Attributes(&item, i) {
-			o.Attributes = append(o.Attributes, *data.AttributePairFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(20) != 0 {
+		o.Attributes = []data.AttributePair{}
+		for i := 0; i < fbs.AttributesLength(); i++ {
+			var item generated.AttributePair
+			if fbs.Attributes(&item, i) {
+				o.Attributes = append(o.Attributes, *data.AttributePairFromFbs(&item))
+			}
 		}
 	}
 	if s := fbs.Comment(); s != nil {
@@ -79,22 +82,26 @@ func DataCatalogObjectFromFbs(fbs *generated.DataCatalogObject) *DataCatalogObje
 	}
 	o.DefaultMode = fbs.DefaultMode()
 	o.Flags = fbs.Flags()
-	o.Obj = make([]byte, fbs.ObjLength())
-	for i := 0; i < fbs.ObjLength(); i++ {
-		o.Obj[i] = fbs.Obj(i)
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Obj = append([]byte{}, fbs.ObjBytes()...)
 	}
-	for i := 0; i < fbs.ParentsLength(); i++ {
-		var item generated.ContentId
-		if fbs.Parents(&item, i) {
-			o.Parents = append(o.Parents, *id.ContentIdFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.Parents = []id.ContentId{}
+		for i := 0; i < fbs.ParentsLength(); i++ {
+			var item generated.ContentId
+			if fbs.Parents(&item, i) {
+				o.Parents = append(o.Parents, *id.ContentIdFromFbs(&item))
+			}
 		}
 	}
-	o.Signature = make([]byte, fbs.SignatureLength())
-	for i := 0; i < fbs.SignatureLength(); i++ {
-		o.Signature[i] = fbs.Signature(i)
+	if tbl := fbs.Table(); tbl.Offset(26) != 0 {
+		o.Signature = append([]byte{}, fbs.SignatureBytes()...)
 	}
-	for i := 0; i < fbs.TagsLength(); i++ {
-		o.Tags = append(o.Tags, string(fbs.Tags(i)))
+	if tbl := fbs.Table(); tbl.Offset(16) != 0 {
+		o.Tags = []string{}
+		for i := 0; i < fbs.TagsLength(); i++ {
+			o.Tags = append(o.Tags, string(fbs.Tags(i)))
+		}
 	}
 	o.Time = fbs.Time()
 	o.Ty = int16(fbs.Ty())
@@ -121,39 +128,50 @@ func (o *DataCatalogObject) ToBytes() []byte {
 
 // SerializeTo writes the DataCatalogObject into a FlatBuffer builder and returns the offset.
 func (o *DataCatalogObject) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	attributesOffsets := make([]flatbuffers.UOffsetT, len(o.Attributes))
-	for i := range o.Attributes {
-		attributesOffsets[i] = o.Attributes[i].SerializeTo(builder)
+	var attributesVecOffset flatbuffers.UOffsetT
+	if o.Attributes != nil {
+		attributesOffsets := make([]flatbuffers.UOffsetT, len(o.Attributes))
+		for i := range o.Attributes {
+			attributesOffsets[i] = o.Attributes[i].SerializeTo(builder)
+		}
+		generated.DataCatalogObjectStartAttributesVector(builder, len(o.Attributes))
+		for i := len(o.Attributes) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(attributesOffsets[i])
+		}
+		attributesVecOffset = builder.EndVector(len(o.Attributes))
 	}
-	generated.DataCatalogObjectStartAttributesVector(builder, len(o.Attributes))
-	for i := len(attributesOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(attributesOffsets[i])
-	}
-	attributesVecOffset := builder.EndVector(len(o.Attributes))
 	var commentOffset flatbuffers.UOffsetT
 	if o.Comment != nil {
 		commentOffset = builder.CreateString(*o.Comment)
 	}
-	objOffset := builder.CreateByteVector(o.Obj)
+	var objOffset flatbuffers.UOffsetT
+	objOffset = builder.CreateByteVector(o.Obj)
+	var parentsVecOffset flatbuffers.UOffsetT
 	parentsOffsets := make([]flatbuffers.UOffsetT, len(o.Parents))
 	for i := range o.Parents {
 		parentsOffsets[i] = o.Parents[i].SerializeTo(builder)
 	}
 	generated.DataCatalogObjectStartParentsVector(builder, len(o.Parents))
-	for i := len(parentsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Parents) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(parentsOffsets[i])
 	}
-	parentsVecOffset := builder.EndVector(len(o.Parents))
-	signatureOffset := builder.CreateByteVector(o.Signature)
-	tagsOffsets := make([]flatbuffers.UOffsetT, len(o.Tags))
-	for i, s := range o.Tags {
-		tagsOffsets[i] = builder.CreateString(s)
+	parentsVecOffset = builder.EndVector(len(o.Parents))
+	var signatureOffset flatbuffers.UOffsetT
+	if o.Signature != nil {
+		signatureOffset = builder.CreateByteVector(o.Signature)
 	}
-	generated.DataCatalogObjectStartTagsVector(builder, len(o.Tags))
-	for i := len(tagsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(tagsOffsets[i])
+	var tagsVecOffset flatbuffers.UOffsetT
+	if o.Tags != nil {
+		tagsOffsets := make([]flatbuffers.UOffsetT, len(o.Tags))
+		for i := range o.Tags {
+			tagsOffsets[i] = builder.CreateString(o.Tags[i])
+		}
+		generated.DataCatalogObjectStartTagsVector(builder, len(o.Tags))
+		for i := len(o.Tags) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(tagsOffsets[i])
+		}
+		tagsVecOffset = builder.EndVector(len(o.Tags))
 	}
-	tagsVecOffset := builder.EndVector(len(o.Tags))
 	userOffset := o.User.SerializeTo(builder)
 	generated.DataCatalogObjectStart(builder)
 	generated.DataCatalogObjectAddAttributes(builder, attributesVecOffset)
@@ -177,10 +195,13 @@ type ObjectIdList struct {
 
 func ObjectIdListFromFbs(fbs *generated.ObjectIdList) *ObjectIdList {
 	o := &ObjectIdList{}
-	for i := 0; i < fbs.IdsLength(); i++ {
-		var item generated.ObjectId
-		if fbs.Ids(&item, i) {
-			o.Ids = append(o.Ids, *id.ObjectIdFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Ids = []id.ObjectId{}
+		for i := 0; i < fbs.IdsLength(); i++ {
+			var item generated.ObjectId
+			if fbs.Ids(&item, i) {
+				o.Ids = append(o.Ids, *id.ObjectIdFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -202,15 +223,16 @@ func (o *ObjectIdList) ToBytes() []byte {
 
 // SerializeTo writes the ObjectIdList into a FlatBuffer builder and returns the offset.
 func (o *ObjectIdList) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var idsVecOffset flatbuffers.UOffsetT
 	idsOffsets := make([]flatbuffers.UOffsetT, len(o.Ids))
 	for i := range o.Ids {
 		idsOffsets[i] = o.Ids[i].SerializeTo(builder)
 	}
 	generated.ObjectIdListStartIdsVector(builder, len(o.Ids))
-	for i := len(idsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Ids) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(idsOffsets[i])
 	}
-	idsVecOffset := builder.EndVector(len(o.Ids))
+	idsVecOffset = builder.EndVector(len(o.Ids))
 	generated.ObjectIdListStart(builder)
 	generated.ObjectIdListAddIds(builder, idsVecOffset)
 	return generated.ObjectIdListEnd(builder)
@@ -226,9 +248,8 @@ func ObjectIdPairFromFbs(fbs *generated.ObjectIdPair) *ObjectIdPair {
 	if fbsVal := fbs.Id(nil); fbsVal != nil {
 		o.Id = *id.ObjectIdFromFbs(fbsVal)
 	}
-	o.Object = make([]byte, fbs.ObjectLength())
-	for i := 0; i < fbs.ObjectLength(); i++ {
-		o.Object[i] = fbs.Object(i)
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Object = append([]byte{}, fbs.ObjectBytes()...)
 	}
 	return o
 }
@@ -250,7 +271,10 @@ func (o *ObjectIdPair) ToBytes() []byte {
 // SerializeTo writes the ObjectIdPair into a FlatBuffer builder and returns the offset.
 func (o *ObjectIdPair) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	idOffset := o.Id.SerializeTo(builder)
-	objectOffset := builder.CreateByteVector(o.Object)
+	var objectOffset flatbuffers.UOffsetT
+	if o.Object != nil {
+		objectOffset = builder.CreateByteVector(o.Object)
+	}
 	generated.ObjectIdPairStart(builder)
 	generated.ObjectIdPairAddId(builder, idOffset)
 	generated.ObjectIdPairAddObject(builder, objectOffset)
@@ -263,10 +287,13 @@ type ObjectIdPairList struct {
 
 func ObjectIdPairListFromFbs(fbs *generated.ObjectIdPairList) *ObjectIdPairList {
 	o := &ObjectIdPairList{}
-	for i := 0; i < fbs.PairsLength(); i++ {
-		var item generated.ObjectIdPair
-		if fbs.Pairs(&item, i) {
-			o.Pairs = append(o.Pairs, *ObjectIdPairFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Pairs = []ObjectIdPair{}
+		for i := 0; i < fbs.PairsLength(); i++ {
+			var item generated.ObjectIdPair
+			if fbs.Pairs(&item, i) {
+				o.Pairs = append(o.Pairs, *ObjectIdPairFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -288,15 +315,16 @@ func (o *ObjectIdPairList) ToBytes() []byte {
 
 // SerializeTo writes the ObjectIdPairList into a FlatBuffer builder and returns the offset.
 func (o *ObjectIdPairList) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var pairsVecOffset flatbuffers.UOffsetT
 	pairsOffsets := make([]flatbuffers.UOffsetT, len(o.Pairs))
 	for i := range o.Pairs {
 		pairsOffsets[i] = o.Pairs[i].SerializeTo(builder)
 	}
 	generated.ObjectIdPairListStartPairsVector(builder, len(o.Pairs))
-	for i := len(pairsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Pairs) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(pairsOffsets[i])
 	}
-	pairsVecOffset := builder.EndVector(len(o.Pairs))
+	pairsVecOffset = builder.EndVector(len(o.Pairs))
 	generated.ObjectIdPairListStart(builder)
 	generated.ObjectIdPairListAddPairs(builder, pairsVecOffset)
 	return generated.ObjectIdPairListEnd(builder)
@@ -363,10 +391,13 @@ type ObjectSummaryList struct {
 
 func ObjectSummaryListFromFbs(fbs *generated.ObjectSummaryList) *ObjectSummaryList {
 	o := &ObjectSummaryList{}
-	for i := 0; i < fbs.PairsLength(); i++ {
-		var item generated.ObjectSummary
-		if fbs.Pairs(&item, i) {
-			o.Pairs = append(o.Pairs, *ObjectSummaryFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Pairs = []ObjectSummary{}
+		for i := 0; i < fbs.PairsLength(); i++ {
+			var item generated.ObjectSummary
+			if fbs.Pairs(&item, i) {
+				o.Pairs = append(o.Pairs, *ObjectSummaryFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -388,15 +419,16 @@ func (o *ObjectSummaryList) ToBytes() []byte {
 
 // SerializeTo writes the ObjectSummaryList into a FlatBuffer builder and returns the offset.
 func (o *ObjectSummaryList) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var pairsVecOffset flatbuffers.UOffsetT
 	pairsOffsets := make([]flatbuffers.UOffsetT, len(o.Pairs))
 	for i := range o.Pairs {
 		pairsOffsets[i] = o.Pairs[i].SerializeTo(builder)
 	}
 	generated.ObjectSummaryListStartPairsVector(builder, len(o.Pairs))
-	for i := len(pairsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Pairs) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(pairsOffsets[i])
 	}
-	pairsVecOffset := builder.EndVector(len(o.Pairs))
+	pairsVecOffset = builder.EndVector(len(o.Pairs))
 	generated.ObjectSummaryListStart(builder)
 	generated.ObjectSummaryListAddPairs(builder, pairsVecOffset)
 	return generated.ObjectSummaryListEnd(builder)

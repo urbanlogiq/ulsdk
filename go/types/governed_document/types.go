@@ -95,10 +95,13 @@ func GovernedDocumentFromFbs(fbs *generated.GovernedDocument) *GovernedDocument 
 		o.DocumentId = *id.ObjectIdFromFbs(fbsVal)
 	}
 	o.DocumentSha256 = string(fbs.DocumentSha256())
-	for i := 0; i < fbs.FieldsLength(); i++ {
-		var item generated.DocumentField
-		if fbs.Fields(&item, i) {
-			o.Fields = append(o.Fields, *DocumentFieldFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(22) != 0 {
+		o.Fields = []DocumentField{}
+		for i := 0; i < fbs.FieldsLength(); i++ {
+			var item generated.DocumentField
+			if fbs.Fields(&item, i) {
+				o.Fields = append(o.Fields, *DocumentFieldFromFbs(&item))
+			}
 		}
 	}
 	o.Key = string(fbs.Key())
@@ -141,15 +144,18 @@ func (o *GovernedDocument) SerializeTo(builder *flatbuffers.Builder) flatbuffers
 	}
 	documentIdOffset := o.DocumentId.SerializeTo(builder)
 	documentSha256Offset := builder.CreateString(o.DocumentSha256)
-	fieldsOffsets := make([]flatbuffers.UOffsetT, len(o.Fields))
-	for i := range o.Fields {
-		fieldsOffsets[i] = o.Fields[i].SerializeTo(builder)
+	var fieldsVecOffset flatbuffers.UOffsetT
+	if o.Fields != nil {
+		fieldsOffsets := make([]flatbuffers.UOffsetT, len(o.Fields))
+		for i := range o.Fields {
+			fieldsOffsets[i] = o.Fields[i].SerializeTo(builder)
+		}
+		generated.GovernedDocumentStartFieldsVector(builder, len(o.Fields))
+		for i := len(o.Fields) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(fieldsOffsets[i])
+		}
+		fieldsVecOffset = builder.EndVector(len(o.Fields))
 	}
-	generated.GovernedDocumentStartFieldsVector(builder, len(o.Fields))
-	for i := len(fieldsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(fieldsOffsets[i])
-	}
-	fieldsVecOffset := builder.EndVector(len(o.Fields))
 	keyOffset := builder.CreateString(o.Key)
 	kindOffset := builder.CreateString(o.Kind)
 	var namespaceOffset flatbuffers.UOffsetT

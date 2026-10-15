@@ -31,10 +31,13 @@ func AccessControlListFromFbs(fbs *generated.AccessControlList) *AccessControlLi
 	if fbsVal := fbs.Extends(nil); fbsVal != nil {
 		o.Extends = id.ObjectIdFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.RolesLength(); i++ {
-		var item generated.Role
-		if fbs.Roles(&item, i) {
-			o.Roles = append(o.Roles, *RoleFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Roles = []Role{}
+		for i := 0; i < fbs.RolesLength(); i++ {
+			var item generated.Role
+			if fbs.Roles(&item, i) {
+				o.Roles = append(o.Roles, *RoleFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -60,15 +63,16 @@ func (o *AccessControlList) SerializeTo(builder *flatbuffers.Builder) flatbuffer
 	if o.Extends != nil {
 		extendsOffset = o.Extends.SerializeTo(builder)
 	}
+	var rolesVecOffset flatbuffers.UOffsetT
 	rolesOffsets := make([]flatbuffers.UOffsetT, len(o.Roles))
 	for i := range o.Roles {
 		rolesOffsets[i] = o.Roles[i].SerializeTo(builder)
 	}
 	generated.AccessControlListStartRolesVector(builder, len(o.Roles))
-	for i := len(rolesOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Roles) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(rolesOffsets[i])
 	}
-	rolesVecOffset := builder.EndVector(len(o.Roles))
+	rolesVecOffset = builder.EndVector(len(o.Roles))
 	generated.AccessControlListStart(builder)
 	generated.AccessControlListAddExtends(builder, extendsOffset)
 	generated.AccessControlListAddRoles(builder, rolesVecOffset)

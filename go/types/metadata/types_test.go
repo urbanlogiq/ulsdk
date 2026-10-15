@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/graph"
 	"github.com/urbanlogiq/ulsdk/types/schema"
 )
@@ -28,6 +29,38 @@ func TestRoundTripCategoryRelationshipData(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestVectorPresenceCategoryRelationshipData(t *testing.T) {
+	o := &CategoryRelationshipData{}
+	var fbs *generated.CategoryRelationshipData
+	fbs = generated.GetSizePrefixedRootAsCategoryRelationshipData(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		t.Errorf("AssociatedFields: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		t.Errorf("Categories: nil vector is written")
+	}
+	o.AssociatedFields = emptyOf(o.AssociatedFields)
+	o.Categories = emptyOf(o.Categories)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsCategoryRelationshipData(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(6) == 0 {
+		t.Errorf("AssociatedFields: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(4) == 0 {
+		t.Errorf("Categories: empty vector is not written")
+	}
+	got, err := CategoryRelationshipDataFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.AssociatedFields == nil {
+		t.Errorf("AssociatedFields: empty vector is read back as nil")
+	}
+	if got.Categories == nil {
+		t.Errorf("Categories: empty vector is read back as nil")
 	}
 }
 
@@ -131,6 +164,38 @@ func TestRoundTripDates(t *testing.T) {
 	}
 }
 
+func TestVectorPresenceDates(t *testing.T) {
+	o := &Dates{}
+	var fbs *generated.Dates
+	fbs = generated.GetSizePrefixedRootAsDates(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		t.Errorf("UniqueValueCounts: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		t.Errorf("UniqueValues: nil vector is written")
+	}
+	o.UniqueValueCounts = emptyOf(o.UniqueValueCounts)
+	o.UniqueValues = emptyOf(o.UniqueValues)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsDates(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(10) == 0 {
+		t.Errorf("UniqueValueCounts: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(8) == 0 {
+		t.Errorf("UniqueValues: empty vector is not written")
+	}
+	got, err := DatesFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.UniqueValueCounts == nil {
+		t.Errorf("UniqueValueCounts: empty vector is read back as nil")
+	}
+	if got.UniqueValues == nil {
+		t.Errorf("UniqueValues: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultDatetimeRange(t *testing.T) {
 	o := &DatetimeRange{}
 	if o == nil {
@@ -150,6 +215,28 @@ func TestRoundTripDatetimeRange(t *testing.T) {
 	}
 }
 
+func TestVectorPresenceDatetimeRange(t *testing.T) {
+	o := &DatetimeRange{}
+	var fbs *generated.DatetimeRange
+	fbs = generated.GetSizePrefixedRootAsDatetimeRange(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		t.Errorf("Intervals: nil vector is written")
+	}
+	o.Intervals = emptyOf(o.Intervals)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsDatetimeRange(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(8) == 0 {
+		t.Errorf("Intervals: empty vector is not written")
+	}
+	got, err := DatetimeRangeFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Intervals == nil {
+		t.Errorf("Intervals: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultDetailSection(t *testing.T) {
 	o := &DetailSection{}
 	if o == nil {
@@ -166,6 +253,28 @@ func TestRoundTripDetailSection(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestVectorPresenceDetailSection(t *testing.T) {
+	o := &DetailSection{}
+	var fbs *generated.DetailSection
+	fbs = generated.GetSizePrefixedRootAsDetailSection(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		t.Errorf("Fields: nil vector is written")
+	}
+	o.Fields = emptyOf(o.Fields)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsDetailSection(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(4) == 0 {
+		t.Errorf("Fields: empty vector is not written")
+	}
+	got, err := DetailSectionFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Fields == nil {
+		t.Errorf("Fields: empty vector is read back as nil")
 	}
 }
 
@@ -204,6 +313,28 @@ func TestRoundTripDocuments(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestVectorPresenceDocuments(t *testing.T) {
+	o := &Documents{}
+	var fbs *generated.Documents
+	fbs = generated.GetSizePrefixedRootAsDocuments(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		t.Errorf("Documents: nil vector is written")
+	}
+	o.Documents = emptyOf(o.Documents)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsDocuments(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(4) == 0 {
+		t.Errorf("Documents: empty vector is not written")
+	}
+	got, err := DocumentsFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Documents == nil {
+		t.Errorf("Documents: empty vector is read back as nil")
 	}
 }
 
@@ -296,6 +427,28 @@ func TestRoundTripHierarchicalRelationship(t *testing.T) {
 	}
 }
 
+func TestVectorPresenceHierarchicalRelationship(t *testing.T) {
+	o := &HierarchicalRelationship{}
+	var fbs *generated.HierarchicalRelationship
+	fbs = generated.GetSizePrefixedRootAsHierarchicalRelationship(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		t.Errorf("Children: nil vector is written")
+	}
+	o.Children = emptyOf(o.Children)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsHierarchicalRelationship(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(6) == 0 {
+		t.Errorf("Children: empty vector is not written")
+	}
+	got, err := HierarchicalRelationshipFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Children == nil {
+		t.Errorf("Children: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultHierarchyRelationshipData(t *testing.T) {
 	o := &HierarchyRelationshipData{}
 	if o == nil {
@@ -312,6 +465,28 @@ func TestRoundTripHierarchyRelationshipData(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestVectorPresenceHierarchyRelationshipData(t *testing.T) {
+	o := &HierarchyRelationshipData{}
+	var fbs *generated.HierarchyRelationshipData
+	fbs = generated.GetSizePrefixedRootAsHierarchyRelationshipData(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		t.Errorf("Hierarchy: nil vector is written")
+	}
+	o.Hierarchy = emptyOf(o.Hierarchy)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsHierarchyRelationshipData(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(4) == 0 {
+		t.Errorf("Hierarchy: empty vector is not written")
+	}
+	got, err := HierarchyRelationshipDataFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Hierarchy == nil {
+		t.Errorf("Hierarchy: empty vector is read back as nil")
 	}
 }
 
@@ -350,6 +525,28 @@ func TestRoundTripIntRange(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestVectorPresenceIntRange(t *testing.T) {
+	o := &IntRange{}
+	var fbs *generated.IntRange
+	fbs = generated.GetSizePrefixedRootAsIntRange(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		t.Errorf("DisplayStrings: nil vector is written")
+	}
+	o.DisplayStrings = emptyOf(o.DisplayStrings)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsIntRange(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(12) == 0 {
+		t.Errorf("DisplayStrings: empty vector is not written")
+	}
+	got, err := IntRangeFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.DisplayStrings == nil {
+		t.Errorf("DisplayStrings: empty vector is read back as nil")
 	}
 }
 
@@ -414,6 +611,98 @@ func TestUnionMetadataTimeSource(t *testing.T) {
 	}
 }
 
+func TestVectorPresenceMetadata(t *testing.T) {
+	o := &Metadata{}
+	var fbs *generated.Metadata
+	fbs = generated.GetSizePrefixedRootAsMetadata(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(46) != 0 {
+		t.Errorf("ConceptBindings: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(36) != 0 {
+		t.Errorf("DetailSections: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(14) != 0 {
+		t.Errorf("FieldRelationships: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		t.Errorf("Fields: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(44) != 0 {
+		t.Errorf("ForeignKeys: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(32) != 0 {
+		t.Errorf("PromotedMetrics: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		t.Errorf("Summary: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(34) != 0 {
+		t.Errorf("VisualizeInExploreFields: nil vector is written")
+	}
+	o.ConceptBindings = emptyOf(o.ConceptBindings)
+	o.DetailSections = emptyOf(o.DetailSections)
+	o.FieldRelationships = emptyOf(o.FieldRelationships)
+	o.Fields = emptyOf(o.Fields)
+	o.ForeignKeys = emptyOf(o.ForeignKeys)
+	o.PromotedMetrics = emptyOf(o.PromotedMetrics)
+	o.Summary = emptyOf(o.Summary)
+	o.VisualizeInExploreFields = emptyOf(o.VisualizeInExploreFields)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsMetadata(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(46) == 0 {
+		t.Errorf("ConceptBindings: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(36) == 0 {
+		t.Errorf("DetailSections: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(14) == 0 {
+		t.Errorf("FieldRelationships: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(8) == 0 {
+		t.Errorf("Fields: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(44) == 0 {
+		t.Errorf("ForeignKeys: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(32) == 0 {
+		t.Errorf("PromotedMetrics: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(10) == 0 {
+		t.Errorf("Summary: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(34) == 0 {
+		t.Errorf("VisualizeInExploreFields: empty vector is not written")
+	}
+	got, err := MetadataFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.ConceptBindings == nil {
+		t.Errorf("ConceptBindings: empty vector is read back as nil")
+	}
+	if got.DetailSections == nil {
+		t.Errorf("DetailSections: empty vector is read back as nil")
+	}
+	if got.FieldRelationships == nil {
+		t.Errorf("FieldRelationships: empty vector is read back as nil")
+	}
+	if got.Fields == nil {
+		t.Errorf("Fields: empty vector is read back as nil")
+	}
+	if got.ForeignKeys == nil {
+		t.Errorf("ForeignKeys: empty vector is read back as nil")
+	}
+	if got.PromotedMetrics == nil {
+		t.Errorf("PromotedMetrics: empty vector is read back as nil")
+	}
+	if got.Summary == nil {
+		t.Errorf("Summary: empty vector is read back as nil")
+	}
+	if got.VisualizeInExploreFields == nil {
+		t.Errorf("VisualizeInExploreFields: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultNestedCategoryRelationshipData(t *testing.T) {
 	o := &NestedCategoryRelationshipData{}
 	if o == nil {
@@ -430,6 +719,28 @@ func TestRoundTripNestedCategoryRelationshipData(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestVectorPresenceNestedCategoryRelationshipData(t *testing.T) {
+	o := &NestedCategoryRelationshipData{}
+	var fbs *generated.NestedCategoryRelationshipData
+	fbs = generated.GetSizePrefixedRootAsNestedCategoryRelationshipData(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		t.Errorf("Categories: nil vector is written")
+	}
+	o.Categories = emptyOf(o.Categories)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsNestedCategoryRelationshipData(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(4) == 0 {
+		t.Errorf("Categories: empty vector is not written")
+	}
+	got, err := NestedCategoryRelationshipDataFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Categories == nil {
+		t.Errorf("Categories: empty vector is read back as nil")
 	}
 }
 
@@ -452,6 +763,28 @@ func TestRoundTripNestedCategoryRelationshipNode(t *testing.T) {
 	}
 }
 
+func TestVectorPresenceNestedCategoryRelationshipNode(t *testing.T) {
+	o := &NestedCategoryRelationshipNode{}
+	var fbs *generated.NestedCategoryRelationshipNode
+	fbs = generated.GetSizePrefixedRootAsNestedCategoryRelationshipNode(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		t.Errorf("ChildColumns: nil vector is written")
+	}
+	o.ChildColumns = emptyOf(o.ChildColumns)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsNestedCategoryRelationshipNode(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(6) == 0 {
+		t.Errorf("ChildColumns: empty vector is not written")
+	}
+	got, err := NestedCategoryRelationshipNodeFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.ChildColumns == nil {
+		t.Errorf("ChildColumns: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultNestedHierarchyRelationshipData(t *testing.T) {
 	o := &NestedHierarchyRelationshipData{}
 	if o == nil {
@@ -471,6 +804,28 @@ func TestRoundTripNestedHierarchyRelationshipData(t *testing.T) {
 	}
 }
 
+func TestVectorPresenceNestedHierarchyRelationshipData(t *testing.T) {
+	o := &NestedHierarchyRelationshipData{}
+	var fbs *generated.NestedHierarchyRelationshipData
+	fbs = generated.GetSizePrefixedRootAsNestedHierarchyRelationshipData(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		t.Errorf("Nodes: nil vector is written")
+	}
+	o.Nodes = emptyOf(o.Nodes)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsNestedHierarchyRelationshipData(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(4) == 0 {
+		t.Errorf("Nodes: empty vector is not written")
+	}
+	got, err := NestedHierarchyRelationshipDataFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Nodes == nil {
+		t.Errorf("Nodes: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultNestedHierarchyRelationshipNode(t *testing.T) {
 	o := &NestedHierarchyRelationshipNode{}
 	if o == nil {
@@ -487,6 +842,38 @@ func TestRoundTripNestedHierarchyRelationshipNode(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestVectorPresenceNestedHierarchyRelationshipNode(t *testing.T) {
+	o := &NestedHierarchyRelationshipNode{}
+	var fbs *generated.NestedHierarchyRelationshipNode
+	fbs = generated.GetSizePrefixedRootAsNestedHierarchyRelationshipNode(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		t.Errorf("ChildColumns: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		t.Errorf("ChildNodes: nil vector is written")
+	}
+	o.ChildColumns = emptyOf(o.ChildColumns)
+	o.ChildNodes = emptyOf(o.ChildNodes)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsNestedHierarchyRelationshipNode(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(8) == 0 {
+		t.Errorf("ChildColumns: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(6) == 0 {
+		t.Errorf("ChildNodes: empty vector is not written")
+	}
+	got, err := NestedHierarchyRelationshipNodeFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.ChildColumns == nil {
+		t.Errorf("ChildColumns: empty vector is read back as nil")
+	}
+	if got.ChildNodes == nil {
+		t.Errorf("ChildNodes: empty vector is read back as nil")
 	}
 }
 
@@ -606,6 +993,28 @@ func TestRoundTripStringCategories(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestVectorPresenceStringCategories(t *testing.T) {
+	o := &StringCategories{}
+	var fbs *generated.StringCategories
+	fbs = generated.GetSizePrefixedRootAsStringCategories(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		t.Errorf("Categories: nil vector is written")
+	}
+	o.Categories = emptyOf(o.Categories)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsStringCategories(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(4) == 0 {
+		t.Errorf("Categories: empty vector is not written")
+	}
+	got, err := StringCategoriesFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Categories == nil {
+		t.Errorf("Categories: empty vector is read back as nil")
 	}
 }
 
@@ -770,3 +1179,8 @@ func TestDefaultWorldGraphGeometry(t *testing.T) {
 	}
 }
 
+
+// emptyOf returns an empty, non-nil slice of the type of its argument.
+func emptyOf[T any](_ []T) []T {
+	return []T{}
+}

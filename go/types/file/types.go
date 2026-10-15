@@ -41,22 +41,31 @@ type Footer struct {
 
 func FooterFromFbs(fbs *generated.Footer) *Footer {
 	o := &Footer{}
-	for i := 0; i < fbs.CustomMetadataLength(); i++ {
-		var item generated.KeyValue
-		if fbs.CustomMetadata(&item, i) {
-			o.CustomMetadata = append(o.CustomMetadata, *schema.KeyValueFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		o.CustomMetadata = []schema.KeyValue{}
+		for i := 0; i < fbs.CustomMetadataLength(); i++ {
+			var item generated.KeyValue
+			if fbs.CustomMetadata(&item, i) {
+				o.CustomMetadata = append(o.CustomMetadata, *schema.KeyValueFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.DictionariesLength(); i++ {
-		var item generated.Block
-		if fbs.Dictionaries(&item, i) {
-			o.Dictionaries = append(o.Dictionaries, *BlockFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.Dictionaries = []Block{}
+		for i := 0; i < fbs.DictionariesLength(); i++ {
+			var item generated.Block
+			if fbs.Dictionaries(&item, i) {
+				o.Dictionaries = append(o.Dictionaries, *BlockFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.RecordBatchesLength(); i++ {
-		var item generated.Block
-		if fbs.RecordBatches(&item, i) {
-			o.RecordBatches = append(o.RecordBatches, *BlockFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		o.RecordBatches = []Block{}
+		for i := 0; i < fbs.RecordBatchesLength(); i++ {
+			var item generated.Block
+			if fbs.RecordBatches(&item, i) {
+				o.RecordBatches = append(o.RecordBatches, *BlockFromFbs(&item))
+			}
 		}
 	}
 	if fbsVal := fbs.Schema(nil); fbsVal != nil {
@@ -82,15 +91,18 @@ func (o *Footer) ToBytes() []byte {
 
 // SerializeTo writes the Footer into a FlatBuffer builder and returns the offset.
 func (o *Footer) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	customMetadataOffsets := make([]flatbuffers.UOffsetT, len(o.CustomMetadata))
-	for i := range o.CustomMetadata {
-		customMetadataOffsets[i] = o.CustomMetadata[i].SerializeTo(builder)
+	var customMetadataVecOffset flatbuffers.UOffsetT
+	if o.CustomMetadata != nil {
+		customMetadataOffsets := make([]flatbuffers.UOffsetT, len(o.CustomMetadata))
+		for i := range o.CustomMetadata {
+			customMetadataOffsets[i] = o.CustomMetadata[i].SerializeTo(builder)
+		}
+		generated.FooterStartCustomMetadataVector(builder, len(o.CustomMetadata))
+		for i := len(o.CustomMetadata) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(customMetadataOffsets[i])
+		}
+		customMetadataVecOffset = builder.EndVector(len(o.CustomMetadata))
 	}
-	generated.FooterStartCustomMetadataVector(builder, len(o.CustomMetadata))
-	for i := len(customMetadataOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(customMetadataOffsets[i])
-	}
-	customMetadataVecOffset := builder.EndVector(len(o.CustomMetadata))
 	var dictionariesVecOffset flatbuffers.UOffsetT // TODO: struct vector
 	var recordBatchesVecOffset flatbuffers.UOffsetT // TODO: struct vector
 	var schemaOffset flatbuffers.UOffsetT

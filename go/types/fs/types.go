@@ -33,10 +33,13 @@ func FileFromFbs(fbs *generated.File) *File {
 	if fbsVal := fbs.Blob(nil); fbsVal != nil {
 		o.Blob = id.GenericIdFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.ChunksLength(); i++ {
-		var item generated.Chunk
-		if fbs.Chunks(&item, i) {
-			o.Chunks = append(o.Chunks, *ChunkFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(20) != 0 {
+		o.Chunks = []Chunk{}
+		for i := 0; i < fbs.ChunksLength(); i++ {
+			var item generated.Chunk
+			if fbs.Chunks(&item, i) {
+				o.Chunks = append(o.Chunks, *ChunkFromFbs(&item))
+			}
 		}
 	}
 	if s := fbs.Container(); s != nil {
@@ -82,15 +85,18 @@ func (o *File) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	if o.Blob != nil {
 		blobOffset = o.Blob.SerializeTo(builder)
 	}
-	chunksOffsets := make([]flatbuffers.UOffsetT, len(o.Chunks))
-	for i := range o.Chunks {
-		chunksOffsets[i] = o.Chunks[i].SerializeTo(builder)
+	var chunksVecOffset flatbuffers.UOffsetT
+	if o.Chunks != nil {
+		chunksOffsets := make([]flatbuffers.UOffsetT, len(o.Chunks))
+		for i := range o.Chunks {
+			chunksOffsets[i] = o.Chunks[i].SerializeTo(builder)
+		}
+		generated.FileStartChunksVector(builder, len(o.Chunks))
+		for i := len(o.Chunks) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(chunksOffsets[i])
+		}
+		chunksVecOffset = builder.EndVector(len(o.Chunks))
 	}
-	generated.FileStartChunksVector(builder, len(o.Chunks))
-	for i := len(chunksOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(chunksOffsets[i])
-	}
-	chunksVecOffset := builder.EndVector(len(o.Chunks))
 	var containerOffset flatbuffers.UOffsetT
 	if o.Container != nil {
 		containerOffset = builder.CreateString(*o.Container)
@@ -136,16 +142,22 @@ type Directory struct {
 
 func DirectoryFromFbs(fbs *generated.Directory) *Directory {
 	o := &Directory{}
-	for i := 0; i < fbs.NotificationsLength(); i++ {
-		var item generated.B2cId
-		if fbs.Notifications(&item, i) {
-			o.Notifications = append(o.Notifications, *id.B2cidFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Notifications = []id.B2cid{}
+		for i := 0; i < fbs.NotificationsLength(); i++ {
+			var item generated.B2cId
+			if fbs.Notifications(&item, i) {
+				o.Notifications = append(o.Notifications, *id.B2cidFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.SlotsLength(); i++ {
-		var item generated.Slot
-		if fbs.Slots(&item, i) {
-			o.Slots = append(o.Slots, *SlotFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Slots = []Slot{}
+		for i := 0; i < fbs.SlotsLength(); i++ {
+			var item generated.Slot
+			if fbs.Slots(&item, i) {
+				o.Slots = append(o.Slots, *SlotFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -167,24 +179,28 @@ func (o *Directory) ToBytes() []byte {
 
 // SerializeTo writes the Directory into a FlatBuffer builder and returns the offset.
 func (o *Directory) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	notificationsOffsets := make([]flatbuffers.UOffsetT, len(o.Notifications))
-	for i := range o.Notifications {
-		notificationsOffsets[i] = o.Notifications[i].SerializeTo(builder)
+	var notificationsVecOffset flatbuffers.UOffsetT
+	if o.Notifications != nil {
+		notificationsOffsets := make([]flatbuffers.UOffsetT, len(o.Notifications))
+		for i := range o.Notifications {
+			notificationsOffsets[i] = o.Notifications[i].SerializeTo(builder)
+		}
+		generated.DirectoryStartNotificationsVector(builder, len(o.Notifications))
+		for i := len(o.Notifications) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(notificationsOffsets[i])
+		}
+		notificationsVecOffset = builder.EndVector(len(o.Notifications))
 	}
-	generated.DirectoryStartNotificationsVector(builder, len(o.Notifications))
-	for i := len(notificationsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(notificationsOffsets[i])
-	}
-	notificationsVecOffset := builder.EndVector(len(o.Notifications))
+	var slotsVecOffset flatbuffers.UOffsetT
 	slotsOffsets := make([]flatbuffers.UOffsetT, len(o.Slots))
 	for i := range o.Slots {
 		slotsOffsets[i] = o.Slots[i].SerializeTo(builder)
 	}
 	generated.DirectoryStartSlotsVector(builder, len(o.Slots))
-	for i := len(slotsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Slots) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(slotsOffsets[i])
 	}
-	slotsVecOffset := builder.EndVector(len(o.Slots))
+	slotsVecOffset = builder.EndVector(len(o.Slots))
 	generated.DirectoryStart(builder)
 	generated.DirectoryAddNotifications(builder, notificationsVecOffset)
 	generated.DirectoryAddSlots(builder, slotsVecOffset)
@@ -542,10 +558,13 @@ type DirectoryList struct {
 
 func DirectoryListFromFbs(fbs *generated.DirectoryList) *DirectoryList {
 	o := &DirectoryList{}
-	for i := 0; i < fbs.SlotsLength(); i++ {
-		var item generated.ListSlot
-		if fbs.Slots(&item, i) {
-			o.Slots = append(o.Slots, *ListSlotFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Slots = []ListSlot{}
+		for i := 0; i < fbs.SlotsLength(); i++ {
+			var item generated.ListSlot
+			if fbs.Slots(&item, i) {
+				o.Slots = append(o.Slots, *ListSlotFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -567,15 +586,16 @@ func (o *DirectoryList) ToBytes() []byte {
 
 // SerializeTo writes the DirectoryList into a FlatBuffer builder and returns the offset.
 func (o *DirectoryList) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var slotsVecOffset flatbuffers.UOffsetT
 	slotsOffsets := make([]flatbuffers.UOffsetT, len(o.Slots))
 	for i := range o.Slots {
 		slotsOffsets[i] = o.Slots[i].SerializeTo(builder)
 	}
 	generated.DirectoryListStartSlotsVector(builder, len(o.Slots))
-	for i := len(slotsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Slots) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(slotsOffsets[i])
 	}
-	slotsVecOffset := builder.EndVector(len(o.Slots))
+	slotsVecOffset = builder.EndVector(len(o.Slots))
 	generated.DirectoryListStart(builder)
 	generated.DirectoryListAddSlots(builder, slotsVecOffset)
 	return generated.DirectoryListEnd(builder)
@@ -594,10 +614,13 @@ type ListSlot struct {
 
 func ListSlotFromFbs(fbs *generated.ListSlot) *ListSlot {
 	o := &ListSlot{}
-	for i := 0; i < fbs.AttributesLength(); i++ {
-		var item generated.Attr
-		if fbs.Attributes(&item, i) {
-			o.Attributes = append(o.Attributes, *attr.AttrFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(18) != 0 {
+		o.Attributes = []attr.Attr{}
+		for i := 0; i < fbs.AttributesLength(); i++ {
+			var item generated.Attr
+			if fbs.Attributes(&item, i) {
+				o.Attributes = append(o.Attributes, *attr.AttrFromFbs(&item))
+			}
 		}
 	}
 	if tbl := new(flatbuffers.Table); fbs.Entry(tbl) {
@@ -649,15 +672,18 @@ func (o *ListSlot) ToBytes() []byte {
 
 // SerializeTo writes the ListSlot into a FlatBuffer builder and returns the offset.
 func (o *ListSlot) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	attributesOffsets := make([]flatbuffers.UOffsetT, len(o.Attributes))
-	for i := range o.Attributes {
-		attributesOffsets[i] = o.Attributes[i].SerializeTo(builder)
+	var attributesVecOffset flatbuffers.UOffsetT
+	if o.Attributes != nil {
+		attributesOffsets := make([]flatbuffers.UOffsetT, len(o.Attributes))
+		for i := range o.Attributes {
+			attributesOffsets[i] = o.Attributes[i].SerializeTo(builder)
+		}
+		generated.ListSlotStartAttributesVector(builder, len(o.Attributes))
+		for i := len(o.Attributes) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(attributesOffsets[i])
+		}
+		attributesVecOffset = builder.EndVector(len(o.Attributes))
 	}
-	generated.ListSlotStartAttributesVector(builder, len(o.Attributes))
-	for i := len(attributesOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(attributesOffsets[i])
-	}
-	attributesVecOffset := builder.EndVector(len(o.Attributes))
 	var entryType generated.ListEntry
 	var entryOffset flatbuffers.UOffsetT
 	switch v := o.Entry.(type) {
@@ -807,10 +833,13 @@ type Slot struct {
 
 func SlotFromFbs(fbs *generated.Slot) *Slot {
 	o := &Slot{}
-	for i := 0; i < fbs.AttributesLength(); i++ {
-		var item generated.Attr
-		if fbs.Attributes(&item, i) {
-			o.Attributes = append(o.Attributes, *attr.AttrFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		o.Attributes = []attr.Attr{}
+		for i := 0; i < fbs.AttributesLength(); i++ {
+			var item generated.Attr
+			if fbs.Attributes(&item, i) {
+				o.Attributes = append(o.Attributes, *attr.AttrFromFbs(&item))
+			}
 		}
 	}
 	if fbsVal := fbs.Id(nil); fbsVal != nil {
@@ -837,15 +866,18 @@ func (o *Slot) ToBytes() []byte {
 
 // SerializeTo writes the Slot into a FlatBuffer builder and returns the offset.
 func (o *Slot) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	attributesOffsets := make([]flatbuffers.UOffsetT, len(o.Attributes))
-	for i := range o.Attributes {
-		attributesOffsets[i] = o.Attributes[i].SerializeTo(builder)
+	var attributesVecOffset flatbuffers.UOffsetT
+	if o.Attributes != nil {
+		attributesOffsets := make([]flatbuffers.UOffsetT, len(o.Attributes))
+		for i := range o.Attributes {
+			attributesOffsets[i] = o.Attributes[i].SerializeTo(builder)
+		}
+		generated.SlotStartAttributesVector(builder, len(o.Attributes))
+		for i := len(o.Attributes) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(attributesOffsets[i])
+		}
+		attributesVecOffset = builder.EndVector(len(o.Attributes))
 	}
-	generated.SlotStartAttributesVector(builder, len(o.Attributes))
-	for i := len(attributesOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(attributesOffsets[i])
-	}
-	attributesVecOffset := builder.EndVector(len(o.Attributes))
 	idOffset := o.Id.SerializeTo(builder)
 	nameOffset := builder.CreateString(o.Name)
 	generated.SlotStart(builder)

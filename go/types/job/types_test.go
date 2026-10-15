@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/id"
 	"github.com/urbanlogiq/ulsdk/types/value"
 )
@@ -27,6 +28,28 @@ func TestDefaultDeprecatedTaskParameter(t *testing.T) {
 	}
 }
 
+
+func TestVectorPresenceDeprecatedTaskParameter(t *testing.T) {
+	o := &DeprecatedTaskParameter{}
+	var fbs *generated.DeprecatedTaskParameter
+	fbs = generated.GetSizePrefixedRootAsDeprecatedTaskParameter(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		t.Errorf("Value: nil vector is written")
+	}
+	o.Value = emptyOf(o.Value)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsDeprecatedTaskParameter(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(6) == 0 {
+		t.Errorf("Value: empty vector is not written")
+	}
+	got, err := DeprecatedTaskParameterFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Value == nil {
+		t.Errorf("Value: empty vector is read back as nil")
+	}
+}
 
 func TestDefaultEdge(t *testing.T) {
 	o := &Edge{}
@@ -63,6 +86,38 @@ func TestDefaultJob(t *testing.T) {
 }
 
 
+func TestVectorPresenceJob(t *testing.T) {
+	o := &Job{}
+	var fbs *generated.Job
+	fbs = generated.GetSizePrefixedRootAsJob(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(14) != 0 {
+		t.Errorf("Attributes: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		t.Errorf("ErrorTys: nil vector is written")
+	}
+	o.Attributes = emptyOf(o.Attributes)
+	o.ErrorTys = emptyOf(o.ErrorTys)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsJob(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(14) == 0 {
+		t.Errorf("Attributes: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(12) == 0 {
+		t.Errorf("ErrorTys: empty vector is not written")
+	}
+	got, err := JobFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Attributes == nil {
+		t.Errorf("Attributes: empty vector is read back as nil")
+	}
+	if got.ErrorTys == nil {
+		t.Errorf("ErrorTys: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultNode(t *testing.T) {
 	o := &Node{}
 	if o == nil {
@@ -86,6 +141,28 @@ func TestDefaultRunSpec(t *testing.T) {
 	}
 }
 
+
+func TestVectorPresenceRunSpec(t *testing.T) {
+	o := &RunSpec{}
+	var fbs *generated.RunSpec
+	fbs = generated.GetSizePrefixedRootAsRunSpec(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(16) != 0 {
+		t.Errorf("Attributes: nil vector is written")
+	}
+	o.Attributes = emptyOf(o.Attributes)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsRunSpec(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(16) == 0 {
+		t.Errorf("Attributes: empty vector is not written")
+	}
+	got, err := RunSpecFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Attributes == nil {
+		t.Errorf("Attributes: empty vector is read back as nil")
+	}
+}
 
 func TestDefaultSchematic(t *testing.T) {
 	o := &Schematic{}
@@ -134,4 +211,9 @@ func TestUnionTaskParameterValue(t *testing.T) {
 			t.Fatalf("got %T, want %T", got.Value, v)
 		}
 	}
+}
+
+// emptyOf returns an empty, non-nil slice of the type of its argument.
+func emptyOf[T any](_ []T) []T {
+	return []T{}
 }

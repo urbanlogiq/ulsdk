@@ -47,9 +47,8 @@ type ByteArray struct {
 
 func ByteArrayFromFbs(fbs *generated.ByteArray) *ByteArray {
 	o := &ByteArray{}
-	o.B = make([]byte, fbs.BLength())
-	for i := 0; i < fbs.BLength(); i++ {
-		o.B[i] = fbs.B(i)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.B = append([]byte{}, fbs.BBytes()...)
 	}
 	return o
 }
@@ -70,7 +69,10 @@ func (o *ByteArray) ToBytes() []byte {
 
 // SerializeTo writes the ByteArray into a FlatBuffer builder and returns the offset.
 func (o *ByteArray) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	bOffset := builder.CreateByteVector(o.B)
+	var bOffset flatbuffers.UOffsetT
+	if o.B != nil {
+		bOffset = builder.CreateByteVector(o.B)
+	}
 	generated.ByteArrayStart(builder)
 	generated.ByteArrayAddB(builder, bOffset)
 	return generated.ByteArrayEnd(builder)
@@ -341,8 +343,11 @@ func TileSettingsFromFbs(fbs *generated.TileSettings) *TileSettings {
 	if fbsVal := fbs.RecordCountStreamId(nil); fbsVal != nil {
 		o.RecordCountStreamId = id.ObjectIdFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.SelectedColumnsLength(); i++ {
-		o.SelectedColumns = append(o.SelectedColumns, string(fbs.SelectedColumns(i)))
+	if tbl := fbs.Table(); tbl.Offset(20) != 0 {
+		o.SelectedColumns = []string{}
+		for i := 0; i < fbs.SelectedColumnsLength(); i++ {
+			o.SelectedColumns = append(o.SelectedColumns, string(fbs.SelectedColumns(i)))
+		}
 	}
 	o.TextTileFontSize = fbs.TextTileFontSize()
 	o.Title = string(fbs.Title())
@@ -372,15 +377,16 @@ func (o *TileSettings) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOf
 	if o.RecordCountStreamId != nil {
 		recordCountStreamIdOffset = o.RecordCountStreamId.SerializeTo(builder)
 	}
+	var selectedColumnsVecOffset flatbuffers.UOffsetT
 	selectedColumnsOffsets := make([]flatbuffers.UOffsetT, len(o.SelectedColumns))
-	for i, s := range o.SelectedColumns {
-		selectedColumnsOffsets[i] = builder.CreateString(s)
+	for i := range o.SelectedColumns {
+		selectedColumnsOffsets[i] = builder.CreateString(o.SelectedColumns[i])
 	}
 	generated.TileSettingsStartSelectedColumnsVector(builder, len(o.SelectedColumns))
-	for i := len(selectedColumnsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.SelectedColumns) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(selectedColumnsOffsets[i])
 	}
-	selectedColumnsVecOffset := builder.EndVector(len(o.SelectedColumns))
+	selectedColumnsVecOffset = builder.EndVector(len(o.SelectedColumns))
 	titleOffset := builder.CreateString(o.Title)
 	generated.TileSettingsStart(builder)
 	generated.TileSettingsAddAggregation(builder, generated.AggregationTy(o.Aggregation))
@@ -448,10 +454,13 @@ type UserSettings struct {
 func UserSettingsFromFbs(fbs *generated.UserSettings) *UserSettings {
 	o := &UserSettings{}
 	o.IsTemplate = fbs.IsTemplate()
-	for i := 0; i < fbs.TileDataLength(); i++ {
-		var item generated.TileData
-		if fbs.TileData(&item, i) {
-			o.TileData = append(o.TileData, *TileDataFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.TileData = []TileData{}
+		for i := 0; i < fbs.TileDataLength(); i++ {
+			var item generated.TileData
+			if fbs.TileData(&item, i) {
+				o.TileData = append(o.TileData, *TileDataFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -473,15 +482,16 @@ func (o *UserSettings) ToBytes() []byte {
 
 // SerializeTo writes the UserSettings into a FlatBuffer builder and returns the offset.
 func (o *UserSettings) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var tileDataVecOffset flatbuffers.UOffsetT
 	tileDataOffsets := make([]flatbuffers.UOffsetT, len(o.TileData))
 	for i := range o.TileData {
 		tileDataOffsets[i] = o.TileData[i].SerializeTo(builder)
 	}
 	generated.UserSettingsStartTileDataVector(builder, len(o.TileData))
-	for i := len(tileDataOffsets) - 1; i >= 0; i-- {
+	for i := len(o.TileData) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(tileDataOffsets[i])
 	}
-	tileDataVecOffset := builder.EndVector(len(o.TileData))
+	tileDataVecOffset = builder.EndVector(len(o.TileData))
 	generated.UserSettingsStart(builder)
 	generated.UserSettingsAddIsTemplate(builder, o.IsTemplate)
 	generated.UserSettingsAddTileData(builder, tileDataVecOffset)
@@ -502,10 +512,13 @@ type WorkLog struct {
 
 func WorkLogFromFbs(fbs *generated.WorkLog) *WorkLog {
 	o := &WorkLog{}
-	for i := 0; i < fbs.InputStreamsLength(); i++ {
-		var item generated.PinnedObjectId
-		if fbs.InputStreams(&item, i) {
-			o.InputStreams = append(o.InputStreams, *id.PinnedObjectIdFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.InputStreams = []id.PinnedObjectId{}
+		for i := 0; i < fbs.InputStreamsLength(); i++ {
+			var item generated.PinnedObjectId
+			if fbs.InputStreams(&item, i) {
+				o.InputStreams = append(o.InputStreams, *id.PinnedObjectIdFromFbs(&item))
+			}
 		}
 	}
 	if fbsVal := fbs.JobId(nil); fbsVal != nil {
@@ -515,16 +528,22 @@ func WorkLogFromFbs(fbs *generated.WorkLog) *WorkLog {
 		str := string(s)
 		o.Name = &str
 	}
-	for i := 0; i < fbs.OutputStreamsLength(); i++ {
-		var item generated.PinnedObjectId
-		if fbs.OutputStreams(&item, i) {
-			o.OutputStreams = append(o.OutputStreams, *id.PinnedObjectIdFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		o.OutputStreams = []id.PinnedObjectId{}
+		for i := 0; i < fbs.OutputStreamsLength(); i++ {
+			var item generated.PinnedObjectId
+			if fbs.OutputStreams(&item, i) {
+				o.OutputStreams = append(o.OutputStreams, *id.PinnedObjectIdFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.ParamsLength(); i++ {
-		var item generated.WorklogParameter
-		if fbs.Params(&item, i) {
-			o.Params = append(o.Params, *WorklogParameterFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(14) != 0 {
+		o.Params = []WorklogParameter{}
+		for i := 0; i < fbs.ParamsLength(); i++ {
+			var item generated.WorklogParameter
+			if fbs.Params(&item, i) {
+				o.Params = append(o.Params, *WorklogParameterFromFbs(&item))
+			}
 		}
 	}
 	if fbsVal := fbs.Parent(nil); fbsVal != nil {
@@ -558,15 +577,18 @@ func (o *WorkLog) ToBytes() []byte {
 
 // SerializeTo writes the WorkLog into a FlatBuffer builder and returns the offset.
 func (o *WorkLog) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	inputStreamsOffsets := make([]flatbuffers.UOffsetT, len(o.InputStreams))
-	for i := range o.InputStreams {
-		inputStreamsOffsets[i] = o.InputStreams[i].SerializeTo(builder)
+	var inputStreamsVecOffset flatbuffers.UOffsetT
+	if o.InputStreams != nil {
+		inputStreamsOffsets := make([]flatbuffers.UOffsetT, len(o.InputStreams))
+		for i := range o.InputStreams {
+			inputStreamsOffsets[i] = o.InputStreams[i].SerializeTo(builder)
+		}
+		generated.WorkLogStartInputStreamsVector(builder, len(o.InputStreams))
+		for i := len(o.InputStreams) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(inputStreamsOffsets[i])
+		}
+		inputStreamsVecOffset = builder.EndVector(len(o.InputStreams))
 	}
-	generated.WorkLogStartInputStreamsVector(builder, len(o.InputStreams))
-	for i := len(inputStreamsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(inputStreamsOffsets[i])
-	}
-	inputStreamsVecOffset := builder.EndVector(len(o.InputStreams))
 	var jobIdOffset flatbuffers.UOffsetT
 	if o.JobId != nil {
 		jobIdOffset = o.JobId.SerializeTo(builder)
@@ -575,24 +597,26 @@ func (o *WorkLog) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT
 	if o.Name != nil {
 		nameOffset = builder.CreateString(*o.Name)
 	}
+	var outputStreamsVecOffset flatbuffers.UOffsetT
 	outputStreamsOffsets := make([]flatbuffers.UOffsetT, len(o.OutputStreams))
 	for i := range o.OutputStreams {
 		outputStreamsOffsets[i] = o.OutputStreams[i].SerializeTo(builder)
 	}
 	generated.WorkLogStartOutputStreamsVector(builder, len(o.OutputStreams))
-	for i := len(outputStreamsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.OutputStreams) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(outputStreamsOffsets[i])
 	}
-	outputStreamsVecOffset := builder.EndVector(len(o.OutputStreams))
+	outputStreamsVecOffset = builder.EndVector(len(o.OutputStreams))
+	var paramsVecOffset flatbuffers.UOffsetT
 	paramsOffsets := make([]flatbuffers.UOffsetT, len(o.Params))
 	for i := range o.Params {
 		paramsOffsets[i] = o.Params[i].SerializeTo(builder)
 	}
 	generated.WorkLogStartParamsVector(builder, len(o.Params))
-	for i := len(paramsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Params) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(paramsOffsets[i])
 	}
-	paramsVecOffset := builder.EndVector(len(o.Params))
+	paramsVecOffset = builder.EndVector(len(o.Params))
 	var parentOffset flatbuffers.UOffsetT
 	if o.Parent != nil {
 		parentOffset = o.Parent.SerializeTo(builder)

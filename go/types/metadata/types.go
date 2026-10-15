@@ -33,8 +33,11 @@ type StringCategories struct {
 
 func StringCategoriesFromFbs(fbs *generated.StringCategories) *StringCategories {
 	o := &StringCategories{}
-	for i := 0; i < fbs.CategoriesLength(); i++ {
-		o.Categories = append(o.Categories, string(fbs.Categories(i)))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Categories = []string{}
+		for i := 0; i < fbs.CategoriesLength(); i++ {
+			o.Categories = append(o.Categories, string(fbs.Categories(i)))
+		}
 	}
 	return o
 }
@@ -55,15 +58,18 @@ func (o *StringCategories) ToBytes() []byte {
 
 // SerializeTo writes the StringCategories into a FlatBuffer builder and returns the offset.
 func (o *StringCategories) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	categoriesOffsets := make([]flatbuffers.UOffsetT, len(o.Categories))
-	for i, s := range o.Categories {
-		categoriesOffsets[i] = builder.CreateString(s)
+	var categoriesVecOffset flatbuffers.UOffsetT
+	if o.Categories != nil {
+		categoriesOffsets := make([]flatbuffers.UOffsetT, len(o.Categories))
+		for i := range o.Categories {
+			categoriesOffsets[i] = builder.CreateString(o.Categories[i])
+		}
+		generated.StringCategoriesStartCategoriesVector(builder, len(o.Categories))
+		for i := len(o.Categories) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(categoriesOffsets[i])
+		}
+		categoriesVecOffset = builder.EndVector(len(o.Categories))
 	}
-	generated.StringCategoriesStartCategoriesVector(builder, len(o.Categories))
-	for i := len(categoriesOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(categoriesOffsets[i])
-	}
-	categoriesVecOffset := builder.EndVector(len(o.Categories))
 	generated.StringCategoriesStart(builder)
 	generated.StringCategoriesAddCategories(builder, categoriesVecOffset)
 	return generated.StringCategoriesEnd(builder)
@@ -122,10 +128,13 @@ type IntRange struct {
 func IntRangeFromFbs(fbs *generated.IntRange) *IntRange {
 	o := &IntRange{}
 	o.AggregationProtocol = uint32(fbs.AggregationProtocol())
-	for i := 0; i < fbs.DisplayStringsLength(); i++ {
-		var item generated.IntegerDisplayString
-		if fbs.DisplayStrings(&item, i) {
-			o.DisplayStrings = append(o.DisplayStrings, *IntegerDisplayStringFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		o.DisplayStrings = []IntegerDisplayString{}
+		for i := 0; i < fbs.DisplayStringsLength(); i++ {
+			var item generated.IntegerDisplayString
+			if fbs.DisplayStrings(&item, i) {
+				o.DisplayStrings = append(o.DisplayStrings, *IntegerDisplayStringFromFbs(&item))
+			}
 		}
 	}
 	if s := fbs.EnumName(); s != nil {
@@ -157,15 +166,18 @@ func (o *IntRange) ToBytes() []byte {
 
 // SerializeTo writes the IntRange into a FlatBuffer builder and returns the offset.
 func (o *IntRange) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	displayStringsOffsets := make([]flatbuffers.UOffsetT, len(o.DisplayStrings))
-	for i := range o.DisplayStrings {
-		displayStringsOffsets[i] = o.DisplayStrings[i].SerializeTo(builder)
+	var displayStringsVecOffset flatbuffers.UOffsetT
+	if o.DisplayStrings != nil {
+		displayStringsOffsets := make([]flatbuffers.UOffsetT, len(o.DisplayStrings))
+		for i := range o.DisplayStrings {
+			displayStringsOffsets[i] = o.DisplayStrings[i].SerializeTo(builder)
+		}
+		generated.IntRangeStartDisplayStringsVector(builder, len(o.DisplayStrings))
+		for i := len(o.DisplayStrings) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(displayStringsOffsets[i])
+		}
+		displayStringsVecOffset = builder.EndVector(len(o.DisplayStrings))
 	}
-	generated.IntRangeStartDisplayStringsVector(builder, len(o.DisplayStrings))
-	for i := len(displayStringsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(displayStringsOffsets[i])
-	}
-	displayStringsVecOffset := builder.EndVector(len(o.DisplayStrings))
 	var enumNameOffset flatbuffers.UOffsetT
 	if o.EnumName != nil {
 		enumNameOffset = builder.CreateString(*o.EnumName)
@@ -239,10 +251,13 @@ type DatetimeRange struct {
 
 func DatetimeRangeFromFbs(fbs *generated.DatetimeRange) *DatetimeRange {
 	o := &DatetimeRange{}
-	for i := 0; i < fbs.IntervalsLength(); i++ {
-		var item generated.TimeInterval
-		if fbs.Intervals(&item, i) {
-			o.Intervals = append(o.Intervals, *TimeIntervalFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.Intervals = []TimeInterval{}
+		for i := 0; i < fbs.IntervalsLength(); i++ {
+			var item generated.TimeInterval
+			if fbs.Intervals(&item, i) {
+				o.Intervals = append(o.Intervals, *TimeIntervalFromFbs(&item))
+			}
 		}
 	}
 	o.Max = fbs.Max()
@@ -266,15 +281,18 @@ func (o *DatetimeRange) ToBytes() []byte {
 
 // SerializeTo writes the DatetimeRange into a FlatBuffer builder and returns the offset.
 func (o *DatetimeRange) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	intervalsOffsets := make([]flatbuffers.UOffsetT, len(o.Intervals))
-	for i := range o.Intervals {
-		intervalsOffsets[i] = o.Intervals[i].SerializeTo(builder)
+	var intervalsVecOffset flatbuffers.UOffsetT
+	if o.Intervals != nil {
+		intervalsOffsets := make([]flatbuffers.UOffsetT, len(o.Intervals))
+		for i := range o.Intervals {
+			intervalsOffsets[i] = o.Intervals[i].SerializeTo(builder)
+		}
+		generated.DatetimeRangeStartIntervalsVector(builder, len(o.Intervals))
+		for i := len(o.Intervals) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(intervalsOffsets[i])
+		}
+		intervalsVecOffset = builder.EndVector(len(o.Intervals))
 	}
-	generated.DatetimeRangeStartIntervalsVector(builder, len(o.Intervals))
-	for i := len(intervalsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(intervalsOffsets[i])
-	}
-	intervalsVecOffset := builder.EndVector(len(o.Intervals))
 	generated.DatetimeRangeStart(builder)
 	generated.DatetimeRangeAddIntervals(builder, intervalsVecOffset)
 	generated.DatetimeRangeAddMax(builder, o.Max)
@@ -293,11 +311,17 @@ func DatesFromFbs(fbs *generated.Dates) *Dates {
 	o := &Dates{}
 	o.Max = fbs.Max()
 	o.Min = fbs.Min()
-	for i := 0; i < fbs.UniqueValueCountsLength(); i++ {
-		o.UniqueValueCounts = append(o.UniqueValueCounts, fbs.UniqueValueCounts(i))
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		o.UniqueValueCounts = []uint32{}
+		for i := 0; i < fbs.UniqueValueCountsLength(); i++ {
+			o.UniqueValueCounts = append(o.UniqueValueCounts, fbs.UniqueValueCounts(i))
+		}
 	}
-	for i := 0; i < fbs.UniqueValuesLength(); i++ {
-		o.UniqueValues = append(o.UniqueValues, fbs.UniqueValues(i))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.UniqueValues = []int64{}
+		for i := 0; i < fbs.UniqueValuesLength(); i++ {
+			o.UniqueValues = append(o.UniqueValues, fbs.UniqueValues(i))
+		}
 	}
 	return o
 }
@@ -318,16 +342,22 @@ func (o *Dates) ToBytes() []byte {
 
 // SerializeTo writes the Dates into a FlatBuffer builder and returns the offset.
 func (o *Dates) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	generated.DatesStartUniqueValueCountsVector(builder, len(o.UniqueValueCounts))
-	for i := len(o.UniqueValueCounts) - 1; i >= 0; i-- {
-		builder.PrependUint32(o.UniqueValueCounts[i])
+	var uniqueValueCountsVecOffset flatbuffers.UOffsetT
+	if o.UniqueValueCounts != nil {
+		generated.DatesStartUniqueValueCountsVector(builder, len(o.UniqueValueCounts))
+		for i := len(o.UniqueValueCounts) - 1; i >= 0; i-- {
+			builder.PrependUint32(o.UniqueValueCounts[i])
+		}
+		uniqueValueCountsVecOffset = builder.EndVector(len(o.UniqueValueCounts))
 	}
-	uniqueValueCountsVecOffset := builder.EndVector(len(o.UniqueValueCounts))
-	generated.DatesStartUniqueValuesVector(builder, len(o.UniqueValues))
-	for i := len(o.UniqueValues) - 1; i >= 0; i-- {
-		builder.PrependInt64(o.UniqueValues[i])
+	var uniqueValuesVecOffset flatbuffers.UOffsetT
+	if o.UniqueValues != nil {
+		generated.DatesStartUniqueValuesVector(builder, len(o.UniqueValues))
+		for i := len(o.UniqueValues) - 1; i >= 0; i-- {
+			builder.PrependInt64(o.UniqueValues[i])
+		}
+		uniqueValuesVecOffset = builder.EndVector(len(o.UniqueValues))
 	}
-	uniqueValuesVecOffset := builder.EndVector(len(o.UniqueValues))
 	generated.DatesStart(builder)
 	generated.DatesAddMax(builder, o.Max)
 	generated.DatesAddMin(builder, o.Min)
@@ -342,10 +372,13 @@ type NestedStringCategories struct {
 
 func NestedStringCategoriesFromFbs(fbs *generated.NestedStringCategories) *NestedStringCategories {
 	o := &NestedStringCategories{}
-	for i := 0; i < fbs.NestingTreeLength(); i++ {
-		var item generated.NestedStringCategoryNode
-		if fbs.NestingTree(&item, i) {
-			o.NestingTree = append(o.NestingTree, *NestedStringCategoryNodeFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.NestingTree = []NestedStringCategoryNode{}
+		for i := 0; i < fbs.NestingTreeLength(); i++ {
+			var item generated.NestedStringCategoryNode
+			if fbs.NestingTree(&item, i) {
+				o.NestingTree = append(o.NestingTree, *NestedStringCategoryNodeFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -367,15 +400,16 @@ func (o *NestedStringCategories) ToBytes() []byte {
 
 // SerializeTo writes the NestedStringCategories into a FlatBuffer builder and returns the offset.
 func (o *NestedStringCategories) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var nestingTreeVecOffset flatbuffers.UOffsetT
 	nestingTreeOffsets := make([]flatbuffers.UOffsetT, len(o.NestingTree))
 	for i := range o.NestingTree {
 		nestingTreeOffsets[i] = o.NestingTree[i].SerializeTo(builder)
 	}
 	generated.NestedStringCategoriesStartNestingTreeVector(builder, len(o.NestingTree))
-	for i := len(nestingTreeOffsets) - 1; i >= 0; i-- {
+	for i := len(o.NestingTree) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(nestingTreeOffsets[i])
 	}
-	nestingTreeVecOffset := builder.EndVector(len(o.NestingTree))
+	nestingTreeVecOffset = builder.EndVector(len(o.NestingTree))
 	generated.NestedStringCategoriesStart(builder)
 	generated.NestedStringCategoriesAddNestingTree(builder, nestingTreeVecOffset)
 	return generated.NestedStringCategoriesEnd(builder)
@@ -441,9 +475,8 @@ type RawGeom struct {
 
 func RawGeomFromFbs(fbs *generated.RawGeom) *RawGeom {
 	o := &RawGeom{}
-	o.Geom = make([]byte, fbs.GeomLength())
-	for i := 0; i < fbs.GeomLength(); i++ {
-		o.Geom[i] = fbs.Geom(i)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Geom = append([]byte{}, fbs.GeomBytes()...)
 	}
 	return o
 }
@@ -464,7 +497,8 @@ func (o *RawGeom) ToBytes() []byte {
 
 // SerializeTo writes the RawGeom into a FlatBuffer builder and returns the offset.
 func (o *RawGeom) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	geomOffset := builder.CreateByteVector(o.Geom)
+	var geomOffset flatbuffers.UOffsetT
+	geomOffset = builder.CreateByteVector(o.Geom)
 	generated.RawGeomStart(builder)
 	generated.RawGeomAddGeom(builder, geomOffset)
 	return generated.RawGeomEnd(builder)
@@ -557,8 +591,11 @@ type WorldGraphGeometry struct {
 
 func WorldGraphGeometryFromFbs(fbs *generated.WorldGraphGeometry) *WorldGraphGeometry {
 	o := &WorldGraphGeometry{}
-	for i := 0; i < fbs.EdgePathLength(); i++ {
-		o.EdgePath = append(o.EdgePath, int32(fbs.EdgePath(i)))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.EdgePath = []int32{}
+		for i := 0; i < fbs.EdgePathLength(); i++ {
+			o.EdgePath = append(o.EdgePath, int32(fbs.EdgePath(i)))
+		}
 	}
 	if fbsVal := fbs.StartStreamId(nil); fbsVal != nil {
 		o.StartStreamId = id.ObjectIdFromFbs(fbsVal)
@@ -582,11 +619,12 @@ func (o *WorldGraphGeometry) ToBytes() []byte {
 
 // SerializeTo writes the WorldGraphGeometry into a FlatBuffer builder and returns the offset.
 func (o *WorldGraphGeometry) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var edgePathVecOffset flatbuffers.UOffsetT
 	generated.WorldGraphGeometryStartEdgePathVector(builder, len(o.EdgePath))
 	for i := len(o.EdgePath) - 1; i >= 0; i-- {
 		builder.PrependInt32(o.EdgePath[i])
 	}
-	edgePathVecOffset := builder.EndVector(len(o.EdgePath))
+	edgePathVecOffset = builder.EndVector(len(o.EdgePath))
 	var startStreamIdOffset flatbuffers.UOffsetT
 	if o.StartStreamId != nil {
 		startStreamIdOffset = o.StartStreamId.SerializeTo(builder)
@@ -747,10 +785,13 @@ type HierarchyRelationshipData struct {
 
 func HierarchyRelationshipDataFromFbs(fbs *generated.HierarchyRelationshipData) *HierarchyRelationshipData {
 	o := &HierarchyRelationshipData{}
-	for i := 0; i < fbs.HierarchyLength(); i++ {
-		var item generated.HierarchicalRelationship
-		if fbs.Hierarchy(&item, i) {
-			o.Hierarchy = append(o.Hierarchy, *HierarchicalRelationshipFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Hierarchy = []HierarchicalRelationship{}
+		for i := 0; i < fbs.HierarchyLength(); i++ {
+			var item generated.HierarchicalRelationship
+			if fbs.Hierarchy(&item, i) {
+				o.Hierarchy = append(o.Hierarchy, *HierarchicalRelationshipFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -772,15 +813,18 @@ func (o *HierarchyRelationshipData) ToBytes() []byte {
 
 // SerializeTo writes the HierarchyRelationshipData into a FlatBuffer builder and returns the offset.
 func (o *HierarchyRelationshipData) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	hierarchyOffsets := make([]flatbuffers.UOffsetT, len(o.Hierarchy))
-	for i := range o.Hierarchy {
-		hierarchyOffsets[i] = o.Hierarchy[i].SerializeTo(builder)
+	var hierarchyVecOffset flatbuffers.UOffsetT
+	if o.Hierarchy != nil {
+		hierarchyOffsets := make([]flatbuffers.UOffsetT, len(o.Hierarchy))
+		for i := range o.Hierarchy {
+			hierarchyOffsets[i] = o.Hierarchy[i].SerializeTo(builder)
+		}
+		generated.HierarchyRelationshipDataStartHierarchyVector(builder, len(o.Hierarchy))
+		for i := len(o.Hierarchy) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(hierarchyOffsets[i])
+		}
+		hierarchyVecOffset = builder.EndVector(len(o.Hierarchy))
 	}
-	generated.HierarchyRelationshipDataStartHierarchyVector(builder, len(o.Hierarchy))
-	for i := len(hierarchyOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(hierarchyOffsets[i])
-	}
-	hierarchyVecOffset := builder.EndVector(len(o.Hierarchy))
 	generated.HierarchyRelationshipDataStart(builder)
 	generated.HierarchyRelationshipDataAddHierarchy(builder, hierarchyVecOffset)
 	return generated.HierarchyRelationshipDataEnd(builder)
@@ -793,11 +837,17 @@ type CategoryRelationshipData struct {
 
 func CategoryRelationshipDataFromFbs(fbs *generated.CategoryRelationshipData) *CategoryRelationshipData {
 	o := &CategoryRelationshipData{}
-	for i := 0; i < fbs.AssociatedFieldsLength(); i++ {
-		o.AssociatedFields = append(o.AssociatedFields, fbs.AssociatedFields(i))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.AssociatedFields = []int32{}
+		for i := 0; i < fbs.AssociatedFieldsLength(); i++ {
+			o.AssociatedFields = append(o.AssociatedFields, fbs.AssociatedFields(i))
+		}
 	}
-	for i := 0; i < fbs.CategoriesLength(); i++ {
-		o.Categories = append(o.Categories, fbs.Categories(i))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Categories = []int32{}
+		for i := 0; i < fbs.CategoriesLength(); i++ {
+			o.Categories = append(o.Categories, fbs.Categories(i))
+		}
 	}
 	return o
 }
@@ -818,16 +868,22 @@ func (o *CategoryRelationshipData) ToBytes() []byte {
 
 // SerializeTo writes the CategoryRelationshipData into a FlatBuffer builder and returns the offset.
 func (o *CategoryRelationshipData) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	generated.CategoryRelationshipDataStartAssociatedFieldsVector(builder, len(o.AssociatedFields))
-	for i := len(o.AssociatedFields) - 1; i >= 0; i-- {
-		builder.PrependInt32(o.AssociatedFields[i])
+	var associatedFieldsVecOffset flatbuffers.UOffsetT
+	if o.AssociatedFields != nil {
+		generated.CategoryRelationshipDataStartAssociatedFieldsVector(builder, len(o.AssociatedFields))
+		for i := len(o.AssociatedFields) - 1; i >= 0; i-- {
+			builder.PrependInt32(o.AssociatedFields[i])
+		}
+		associatedFieldsVecOffset = builder.EndVector(len(o.AssociatedFields))
 	}
-	associatedFieldsVecOffset := builder.EndVector(len(o.AssociatedFields))
-	generated.CategoryRelationshipDataStartCategoriesVector(builder, len(o.Categories))
-	for i := len(o.Categories) - 1; i >= 0; i-- {
-		builder.PrependInt32(o.Categories[i])
+	var categoriesVecOffset flatbuffers.UOffsetT
+	if o.Categories != nil {
+		generated.CategoryRelationshipDataStartCategoriesVector(builder, len(o.Categories))
+		for i := len(o.Categories) - 1; i >= 0; i-- {
+			builder.PrependInt32(o.Categories[i])
+		}
+		categoriesVecOffset = builder.EndVector(len(o.Categories))
 	}
-	categoriesVecOffset := builder.EndVector(len(o.Categories))
 	generated.CategoryRelationshipDataStart(builder)
 	generated.CategoryRelationshipDataAddAssociatedFields(builder, associatedFieldsVecOffset)
 	generated.CategoryRelationshipDataAddCategories(builder, categoriesVecOffset)
@@ -840,10 +896,13 @@ type NestedCategoryRelationshipData struct {
 
 func NestedCategoryRelationshipDataFromFbs(fbs *generated.NestedCategoryRelationshipData) *NestedCategoryRelationshipData {
 	o := &NestedCategoryRelationshipData{}
-	for i := 0; i < fbs.CategoriesLength(); i++ {
-		var item generated.NestedCategoryRelationshipNode
-		if fbs.Categories(&item, i) {
-			o.Categories = append(o.Categories, *NestedCategoryRelationshipNodeFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Categories = []NestedCategoryRelationshipNode{}
+		for i := 0; i < fbs.CategoriesLength(); i++ {
+			var item generated.NestedCategoryRelationshipNode
+			if fbs.Categories(&item, i) {
+				o.Categories = append(o.Categories, *NestedCategoryRelationshipNodeFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -865,15 +924,18 @@ func (o *NestedCategoryRelationshipData) ToBytes() []byte {
 
 // SerializeTo writes the NestedCategoryRelationshipData into a FlatBuffer builder and returns the offset.
 func (o *NestedCategoryRelationshipData) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	categoriesOffsets := make([]flatbuffers.UOffsetT, len(o.Categories))
-	for i := range o.Categories {
-		categoriesOffsets[i] = o.Categories[i].SerializeTo(builder)
+	var categoriesVecOffset flatbuffers.UOffsetT
+	if o.Categories != nil {
+		categoriesOffsets := make([]flatbuffers.UOffsetT, len(o.Categories))
+		for i := range o.Categories {
+			categoriesOffsets[i] = o.Categories[i].SerializeTo(builder)
+		}
+		generated.NestedCategoryRelationshipDataStartCategoriesVector(builder, len(o.Categories))
+		for i := len(o.Categories) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(categoriesOffsets[i])
+		}
+		categoriesVecOffset = builder.EndVector(len(o.Categories))
 	}
-	generated.NestedCategoryRelationshipDataStartCategoriesVector(builder, len(o.Categories))
-	for i := len(categoriesOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(categoriesOffsets[i])
-	}
-	categoriesVecOffset := builder.EndVector(len(o.Categories))
 	generated.NestedCategoryRelationshipDataStart(builder)
 	generated.NestedCategoryRelationshipDataAddCategories(builder, categoriesVecOffset)
 	return generated.NestedCategoryRelationshipDataEnd(builder)
@@ -885,10 +947,13 @@ type NestedHierarchyRelationshipData struct {
 
 func NestedHierarchyRelationshipDataFromFbs(fbs *generated.NestedHierarchyRelationshipData) *NestedHierarchyRelationshipData {
 	o := &NestedHierarchyRelationshipData{}
-	for i := 0; i < fbs.NodesLength(); i++ {
-		var item generated.NestedHierarchyRelationshipNode
-		if fbs.Nodes(&item, i) {
-			o.Nodes = append(o.Nodes, *NestedHierarchyRelationshipNodeFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Nodes = []NestedHierarchyRelationshipNode{}
+		for i := 0; i < fbs.NodesLength(); i++ {
+			var item generated.NestedHierarchyRelationshipNode
+			if fbs.Nodes(&item, i) {
+				o.Nodes = append(o.Nodes, *NestedHierarchyRelationshipNodeFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -910,15 +975,18 @@ func (o *NestedHierarchyRelationshipData) ToBytes() []byte {
 
 // SerializeTo writes the NestedHierarchyRelationshipData into a FlatBuffer builder and returns the offset.
 func (o *NestedHierarchyRelationshipData) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	nodesOffsets := make([]flatbuffers.UOffsetT, len(o.Nodes))
-	for i := range o.Nodes {
-		nodesOffsets[i] = o.Nodes[i].SerializeTo(builder)
+	var nodesVecOffset flatbuffers.UOffsetT
+	if o.Nodes != nil {
+		nodesOffsets := make([]flatbuffers.UOffsetT, len(o.Nodes))
+		for i := range o.Nodes {
+			nodesOffsets[i] = o.Nodes[i].SerializeTo(builder)
+		}
+		generated.NestedHierarchyRelationshipDataStartNodesVector(builder, len(o.Nodes))
+		for i := len(o.Nodes) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(nodesOffsets[i])
+		}
+		nodesVecOffset = builder.EndVector(len(o.Nodes))
 	}
-	generated.NestedHierarchyRelationshipDataStartNodesVector(builder, len(o.Nodes))
-	for i := len(nodesOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(nodesOffsets[i])
-	}
-	nodesVecOffset := builder.EndVector(len(o.Nodes))
 	generated.NestedHierarchyRelationshipDataStart(builder)
 	generated.NestedHierarchyRelationshipDataAddNodes(builder, nodesVecOffset)
 	return generated.NestedHierarchyRelationshipDataEnd(builder)
@@ -1181,8 +1249,11 @@ type DetailSection struct {
 
 func DetailSectionFromFbs(fbs *generated.DetailSection) *DetailSection {
 	o := &DetailSection{}
-	for i := 0; i < fbs.FieldsLength(); i++ {
-		o.Fields = append(o.Fields, fbs.Fields(i))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Fields = []int32{}
+		for i := 0; i < fbs.FieldsLength(); i++ {
+			o.Fields = append(o.Fields, fbs.Fields(i))
+		}
 	}
 	return o
 }
@@ -1203,11 +1274,14 @@ func (o *DetailSection) ToBytes() []byte {
 
 // SerializeTo writes the DetailSection into a FlatBuffer builder and returns the offset.
 func (o *DetailSection) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	generated.DetailSectionStartFieldsVector(builder, len(o.Fields))
-	for i := len(o.Fields) - 1; i >= 0; i-- {
-		builder.PrependInt32(o.Fields[i])
+	var fieldsVecOffset flatbuffers.UOffsetT
+	if o.Fields != nil {
+		generated.DetailSectionStartFieldsVector(builder, len(o.Fields))
+		for i := len(o.Fields) - 1; i >= 0; i-- {
+			builder.PrependInt32(o.Fields[i])
+		}
+		fieldsVecOffset = builder.EndVector(len(o.Fields))
 	}
-	fieldsVecOffset := builder.EndVector(len(o.Fields))
 	generated.DetailSectionStart(builder)
 	generated.DetailSectionAddFields(builder, fieldsVecOffset)
 	return generated.DetailSectionEnd(builder)
@@ -1287,10 +1361,13 @@ type Documents struct {
 
 func DocumentsFromFbs(fbs *generated.Documents) *Documents {
 	o := &Documents{}
-	for i := 0; i < fbs.DocumentsLength(); i++ {
-		var item generated.Document
-		if fbs.Documents(&item, i) {
-			o.Documents = append(o.Documents, *DocumentFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Documents = []Document{}
+		for i := 0; i < fbs.DocumentsLength(); i++ {
+			var item generated.Document
+			if fbs.Documents(&item, i) {
+				o.Documents = append(o.Documents, *DocumentFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -1312,15 +1389,18 @@ func (o *Documents) ToBytes() []byte {
 
 // SerializeTo writes the Documents into a FlatBuffer builder and returns the offset.
 func (o *Documents) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	documentsOffsets := make([]flatbuffers.UOffsetT, len(o.Documents))
-	for i := range o.Documents {
-		documentsOffsets[i] = o.Documents[i].SerializeTo(builder)
+	var documentsVecOffset flatbuffers.UOffsetT
+	if o.Documents != nil {
+		documentsOffsets := make([]flatbuffers.UOffsetT, len(o.Documents))
+		for i := range o.Documents {
+			documentsOffsets[i] = o.Documents[i].SerializeTo(builder)
+		}
+		generated.DocumentsStartDocumentsVector(builder, len(o.Documents))
+		for i := len(o.Documents) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(documentsOffsets[i])
+		}
+		documentsVecOffset = builder.EndVector(len(o.Documents))
 	}
-	generated.DocumentsStartDocumentsVector(builder, len(o.Documents))
-	for i := len(documentsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(documentsOffsets[i])
-	}
-	documentsVecOffset := builder.EndVector(len(o.Documents))
 	generated.DocumentsStart(builder)
 	generated.DocumentsAddDocuments(builder, documentsVecOffset)
 	return generated.DocumentsEnd(builder)
@@ -1339,10 +1419,13 @@ type FloatAggregate struct {
 func FloatAggregateFromFbs(fbs *generated.FloatAggregate) *FloatAggregate {
 	o := &FloatAggregate{}
 	o.Count = fbs.Count()
-	for i := 0; i < fbs.HistoLength(); i++ {
-		var item generated.FloatBucket
-		if fbs.Histo(&item, i) {
-			o.Histo = append(o.Histo, *FloatBucketFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(16) != 0 {
+		o.Histo = []FloatBucket{}
+		for i := 0; i < fbs.HistoLength(); i++ {
+			var item generated.FloatBucket
+			if fbs.Histo(&item, i) {
+				o.Histo = append(o.Histo, *FloatBucketFromFbs(&item))
+			}
 		}
 	}
 	o.Max = fbs.Max()
@@ -1510,8 +1593,11 @@ type HierarchicalRelationship struct {
 
 func HierarchicalRelationshipFromFbs(fbs *generated.HierarchicalRelationship) *HierarchicalRelationship {
 	o := &HierarchicalRelationship{}
-	for i := 0; i < fbs.ChildrenLength(); i++ {
-		o.Children = append(o.Children, fbs.Children(i))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Children = []int32{}
+		for i := 0; i < fbs.ChildrenLength(); i++ {
+			o.Children = append(o.Children, fbs.Children(i))
+		}
 	}
 	o.Parent = fbs.Parent()
 	return o
@@ -1533,11 +1619,14 @@ func (o *HierarchicalRelationship) ToBytes() []byte {
 
 // SerializeTo writes the HierarchicalRelationship into a FlatBuffer builder and returns the offset.
 func (o *HierarchicalRelationship) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	generated.HierarchicalRelationshipStartChildrenVector(builder, len(o.Children))
-	for i := len(o.Children) - 1; i >= 0; i-- {
-		builder.PrependInt32(o.Children[i])
+	var childrenVecOffset flatbuffers.UOffsetT
+	if o.Children != nil {
+		generated.HierarchicalRelationshipStartChildrenVector(builder, len(o.Children))
+		for i := len(o.Children) - 1; i >= 0; i-- {
+			builder.PrependInt32(o.Children[i])
+		}
+		childrenVecOffset = builder.EndVector(len(o.Children))
 	}
-	childrenVecOffset := builder.EndVector(len(o.Children))
 	generated.HierarchicalRelationshipStart(builder)
 	generated.HierarchicalRelationshipAddChildren(builder, childrenVecOffset)
 	generated.HierarchicalRelationshipAddParent(builder, o.Parent)
@@ -1557,10 +1646,13 @@ type IntAggregate struct {
 func IntAggregateFromFbs(fbs *generated.IntAggregate) *IntAggregate {
 	o := &IntAggregate{}
 	o.Count = fbs.Count()
-	for i := 0; i < fbs.HistoLength(); i++ {
-		var item generated.UIntBucket
-		if fbs.Histo(&item, i) {
-			o.Histo = append(o.Histo, *UIntBucketFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(16) != 0 {
+		o.Histo = []UIntBucket{}
+		for i := 0; i < fbs.HistoLength(); i++ {
+			var item generated.UIntBucket
+			if fbs.Histo(&item, i) {
+				o.Histo = append(o.Histo, *UIntBucketFromFbs(&item))
+			}
 		}
 	}
 	o.Max = fbs.Max()
@@ -1673,10 +1765,13 @@ type Metadata struct {
 func MetadataFromFbs(fbs *generated.Metadata) *Metadata {
 	o := &Metadata{}
 	o.AreaSelection = fbs.AreaSelection()
-	for i := 0; i < fbs.ConceptBindingsLength(); i++ {
-		var item generated.ConceptBinding
-		if fbs.ConceptBindings(&item, i) {
-			o.ConceptBindings = append(o.ConceptBindings, *ConceptBindingFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(46) != 0 {
+		o.ConceptBindings = []ConceptBinding{}
+		for i := 0; i < fbs.ConceptBindingsLength(); i++ {
+			var item generated.ConceptBinding
+			if fbs.ConceptBindings(&item, i) {
+				o.ConceptBindings = append(o.ConceptBindings, *ConceptBindingFromFbs(&item))
+			}
 		}
 	}
 	o.DatasetCategory = uint32(fbs.DatasetCategory())
@@ -1684,10 +1779,13 @@ func MetadataFromFbs(fbs *generated.Metadata) *Metadata {
 		str := string(s)
 		o.Description = &str
 	}
-	for i := 0; i < fbs.DetailSectionsLength(); i++ {
-		var item generated.DetailSection
-		if fbs.DetailSections(&item, i) {
-			o.DetailSections = append(o.DetailSections, *DetailSectionFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(36) != 0 {
+		o.DetailSections = []DetailSection{}
+		for i := 0; i < fbs.DetailSectionsLength(); i++ {
+			var item generated.DetailSection
+			if fbs.DetailSections(&item, i) {
+				o.DetailSections = append(o.DetailSections, *DetailSectionFromFbs(&item))
+			}
 		}
 	}
 	if s := fbs.DisplayName(); s != nil {
@@ -1696,22 +1794,31 @@ func MetadataFromFbs(fbs *generated.Metadata) *Metadata {
 	}
 	o.DoNotFilterGeometryByViewport = fbs.DoNotFilterGeometryByViewport()
 	o.EntityTy = int32(fbs.EntityTy())
-	for i := 0; i < fbs.FieldRelationshipsLength(); i++ {
-		var item generated.UlFieldRelationship
-		if fbs.FieldRelationships(&item, i) {
-			o.FieldRelationships = append(o.FieldRelationships, *UlFieldRelationshipFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(14) != 0 {
+		o.FieldRelationships = []UlFieldRelationship{}
+		for i := 0; i < fbs.FieldRelationshipsLength(); i++ {
+			var item generated.UlFieldRelationship
+			if fbs.FieldRelationships(&item, i) {
+				o.FieldRelationships = append(o.FieldRelationships, *UlFieldRelationshipFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.FieldsLength(); i++ {
-		var item generated.UlField
-		if fbs.Fields(&item, i) {
-			o.Fields = append(o.Fields, *UlFieldFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.Fields = []UlField{}
+		for i := 0; i < fbs.FieldsLength(); i++ {
+			var item generated.UlField
+			if fbs.Fields(&item, i) {
+				o.Fields = append(o.Fields, *UlFieldFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.ForeignKeysLength(); i++ {
-		var item generated.ForeignKey
-		if fbs.ForeignKeys(&item, i) {
-			o.ForeignKeys = append(o.ForeignKeys, *ForeignKeyFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(44) != 0 {
+		o.ForeignKeys = []ForeignKey{}
+		for i := 0; i < fbs.ForeignKeysLength(); i++ {
+			var item generated.ForeignKey
+			if fbs.ForeignKeys(&item, i) {
+				o.ForeignKeys = append(o.ForeignKeys, *ForeignKeyFromFbs(&item))
+			}
 		}
 	}
 	if tbl := new(flatbuffers.Table); fbs.GeometrySource(tbl) {
@@ -1736,14 +1843,20 @@ func MetadataFromFbs(fbs *generated.Metadata) *Metadata {
 	}
 	o.LocationDescriptionField = fbs.LocationDescriptionField()
 	o.NeedsCallerInputs = fbs.NeedsCallerInputs()
-	for i := 0; i < fbs.PromotedMetricsLength(); i++ {
-		o.PromotedMetrics = append(o.PromotedMetrics, fbs.PromotedMetrics(i))
+	if tbl := fbs.Table(); tbl.Offset(32) != 0 {
+		o.PromotedMetrics = []int32{}
+		for i := 0; i < fbs.PromotedMetricsLength(); i++ {
+			o.PromotedMetrics = append(o.PromotedMetrics, fbs.PromotedMetrics(i))
+		}
 	}
 	if fbsVal := fbs.Source(nil); fbsVal != nil {
 		o.Source = DatasetSourceFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.SummaryLength(); i++ {
-		o.Summary = append(o.Summary, fbs.Summary(i))
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		o.Summary = []int32{}
+		for i := 0; i < fbs.SummaryLength(); i++ {
+			o.Summary = append(o.Summary, fbs.Summary(i))
+		}
 	}
 	if tbl := new(flatbuffers.Table); fbs.TimeSource(tbl) {
 		switch fbs.TimeSourceType() {
@@ -1758,8 +1871,11 @@ func MetadataFromFbs(fbs *generated.Metadata) *Metadata {
 		}
 	}
 	o.UpdateCadence = uint32(fbs.UpdateCadence())
-	for i := 0; i < fbs.VisualizeInExploreFieldsLength(); i++ {
-		o.VisualizeInExploreFields = append(o.VisualizeInExploreFields, fbs.VisualizeInExploreFields(i))
+	if tbl := fbs.Table(); tbl.Offset(34) != 0 {
+		o.VisualizeInExploreFields = []int32{}
+		for i := 0; i < fbs.VisualizeInExploreFieldsLength(); i++ {
+			o.VisualizeInExploreFields = append(o.VisualizeInExploreFields, fbs.VisualizeInExploreFields(i))
+		}
 	}
 	return o
 }
@@ -1780,59 +1896,74 @@ func (o *Metadata) ToBytes() []byte {
 
 // SerializeTo writes the Metadata into a FlatBuffer builder and returns the offset.
 func (o *Metadata) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	conceptBindingsOffsets := make([]flatbuffers.UOffsetT, len(o.ConceptBindings))
-	for i := range o.ConceptBindings {
-		conceptBindingsOffsets[i] = o.ConceptBindings[i].SerializeTo(builder)
+	var conceptBindingsVecOffset flatbuffers.UOffsetT
+	if o.ConceptBindings != nil {
+		conceptBindingsOffsets := make([]flatbuffers.UOffsetT, len(o.ConceptBindings))
+		for i := range o.ConceptBindings {
+			conceptBindingsOffsets[i] = o.ConceptBindings[i].SerializeTo(builder)
+		}
+		generated.MetadataStartConceptBindingsVector(builder, len(o.ConceptBindings))
+		for i := len(o.ConceptBindings) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(conceptBindingsOffsets[i])
+		}
+		conceptBindingsVecOffset = builder.EndVector(len(o.ConceptBindings))
 	}
-	generated.MetadataStartConceptBindingsVector(builder, len(o.ConceptBindings))
-	for i := len(conceptBindingsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(conceptBindingsOffsets[i])
-	}
-	conceptBindingsVecOffset := builder.EndVector(len(o.ConceptBindings))
 	var descriptionOffset flatbuffers.UOffsetT
 	if o.Description != nil {
 		descriptionOffset = builder.CreateString(*o.Description)
 	}
-	detailSectionsOffsets := make([]flatbuffers.UOffsetT, len(o.DetailSections))
-	for i := range o.DetailSections {
-		detailSectionsOffsets[i] = o.DetailSections[i].SerializeTo(builder)
+	var detailSectionsVecOffset flatbuffers.UOffsetT
+	if o.DetailSections != nil {
+		detailSectionsOffsets := make([]flatbuffers.UOffsetT, len(o.DetailSections))
+		for i := range o.DetailSections {
+			detailSectionsOffsets[i] = o.DetailSections[i].SerializeTo(builder)
+		}
+		generated.MetadataStartDetailSectionsVector(builder, len(o.DetailSections))
+		for i := len(o.DetailSections) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(detailSectionsOffsets[i])
+		}
+		detailSectionsVecOffset = builder.EndVector(len(o.DetailSections))
 	}
-	generated.MetadataStartDetailSectionsVector(builder, len(o.DetailSections))
-	for i := len(detailSectionsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(detailSectionsOffsets[i])
-	}
-	detailSectionsVecOffset := builder.EndVector(len(o.DetailSections))
 	var displayNameOffset flatbuffers.UOffsetT
 	if o.DisplayName != nil {
 		displayNameOffset = builder.CreateString(*o.DisplayName)
 	}
-	fieldRelationshipsOffsets := make([]flatbuffers.UOffsetT, len(o.FieldRelationships))
-	for i := range o.FieldRelationships {
-		fieldRelationshipsOffsets[i] = o.FieldRelationships[i].SerializeTo(builder)
+	var fieldRelationshipsVecOffset flatbuffers.UOffsetT
+	if o.FieldRelationships != nil {
+		fieldRelationshipsOffsets := make([]flatbuffers.UOffsetT, len(o.FieldRelationships))
+		for i := range o.FieldRelationships {
+			fieldRelationshipsOffsets[i] = o.FieldRelationships[i].SerializeTo(builder)
+		}
+		generated.MetadataStartFieldRelationshipsVector(builder, len(o.FieldRelationships))
+		for i := len(o.FieldRelationships) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(fieldRelationshipsOffsets[i])
+		}
+		fieldRelationshipsVecOffset = builder.EndVector(len(o.FieldRelationships))
 	}
-	generated.MetadataStartFieldRelationshipsVector(builder, len(o.FieldRelationships))
-	for i := len(fieldRelationshipsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(fieldRelationshipsOffsets[i])
+	var fieldsVecOffset flatbuffers.UOffsetT
+	if o.Fields != nil {
+		fieldsOffsets := make([]flatbuffers.UOffsetT, len(o.Fields))
+		for i := range o.Fields {
+			fieldsOffsets[i] = o.Fields[i].SerializeTo(builder)
+		}
+		generated.MetadataStartFieldsVector(builder, len(o.Fields))
+		for i := len(o.Fields) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(fieldsOffsets[i])
+		}
+		fieldsVecOffset = builder.EndVector(len(o.Fields))
 	}
-	fieldRelationshipsVecOffset := builder.EndVector(len(o.FieldRelationships))
-	fieldsOffsets := make([]flatbuffers.UOffsetT, len(o.Fields))
-	for i := range o.Fields {
-		fieldsOffsets[i] = o.Fields[i].SerializeTo(builder)
+	var foreignKeysVecOffset flatbuffers.UOffsetT
+	if o.ForeignKeys != nil {
+		foreignKeysOffsets := make([]flatbuffers.UOffsetT, len(o.ForeignKeys))
+		for i := range o.ForeignKeys {
+			foreignKeysOffsets[i] = o.ForeignKeys[i].SerializeTo(builder)
+		}
+		generated.MetadataStartForeignKeysVector(builder, len(o.ForeignKeys))
+		for i := len(o.ForeignKeys) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(foreignKeysOffsets[i])
+		}
+		foreignKeysVecOffset = builder.EndVector(len(o.ForeignKeys))
 	}
-	generated.MetadataStartFieldsVector(builder, len(o.Fields))
-	for i := len(fieldsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(fieldsOffsets[i])
-	}
-	fieldsVecOffset := builder.EndVector(len(o.Fields))
-	foreignKeysOffsets := make([]flatbuffers.UOffsetT, len(o.ForeignKeys))
-	for i := range o.ForeignKeys {
-		foreignKeysOffsets[i] = o.ForeignKeys[i].SerializeTo(builder)
-	}
-	generated.MetadataStartForeignKeysVector(builder, len(o.ForeignKeys))
-	for i := len(foreignKeysOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(foreignKeysOffsets[i])
-	}
-	foreignKeysVecOffset := builder.EndVector(len(o.ForeignKeys))
 	var geometrySourceType generated.GeometrySource
 	var geometrySourceOffset flatbuffers.UOffsetT
 	switch v := o.GeometrySource.(type) {
@@ -1856,20 +1987,26 @@ func (o *Metadata) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 	default:
 		panic(fmt.Sprintf("Metadata.GeometrySource: %T is not a pointer to a GeometrySource variant", v))
 	}
-	generated.MetadataStartPromotedMetricsVector(builder, len(o.PromotedMetrics))
-	for i := len(o.PromotedMetrics) - 1; i >= 0; i-- {
-		builder.PrependInt32(o.PromotedMetrics[i])
+	var promotedMetricsVecOffset flatbuffers.UOffsetT
+	if o.PromotedMetrics != nil {
+		generated.MetadataStartPromotedMetricsVector(builder, len(o.PromotedMetrics))
+		for i := len(o.PromotedMetrics) - 1; i >= 0; i-- {
+			builder.PrependInt32(o.PromotedMetrics[i])
+		}
+		promotedMetricsVecOffset = builder.EndVector(len(o.PromotedMetrics))
 	}
-	promotedMetricsVecOffset := builder.EndVector(len(o.PromotedMetrics))
 	var sourceOffset flatbuffers.UOffsetT
 	if o.Source != nil {
 		sourceOffset = o.Source.SerializeTo(builder)
 	}
-	generated.MetadataStartSummaryVector(builder, len(o.Summary))
-	for i := len(o.Summary) - 1; i >= 0; i-- {
-		builder.PrependInt32(o.Summary[i])
+	var summaryVecOffset flatbuffers.UOffsetT
+	if o.Summary != nil {
+		generated.MetadataStartSummaryVector(builder, len(o.Summary))
+		for i := len(o.Summary) - 1; i >= 0; i-- {
+			builder.PrependInt32(o.Summary[i])
+		}
+		summaryVecOffset = builder.EndVector(len(o.Summary))
 	}
-	summaryVecOffset := builder.EndVector(len(o.Summary))
 	var timeSourceType generated.TimeSource
 	var timeSourceOffset flatbuffers.UOffsetT
 	switch v := o.TimeSource.(type) {
@@ -1885,11 +2022,14 @@ func (o *Metadata) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffset
 	default:
 		panic(fmt.Sprintf("Metadata.TimeSource: %T is not a pointer to a TimeSource variant", v))
 	}
-	generated.MetadataStartVisualizeInExploreFieldsVector(builder, len(o.VisualizeInExploreFields))
-	for i := len(o.VisualizeInExploreFields) - 1; i >= 0; i-- {
-		builder.PrependInt32(o.VisualizeInExploreFields[i])
+	var visualizeInExploreFieldsVecOffset flatbuffers.UOffsetT
+	if o.VisualizeInExploreFields != nil {
+		generated.MetadataStartVisualizeInExploreFieldsVector(builder, len(o.VisualizeInExploreFields))
+		for i := len(o.VisualizeInExploreFields) - 1; i >= 0; i-- {
+			builder.PrependInt32(o.VisualizeInExploreFields[i])
+		}
+		visualizeInExploreFieldsVecOffset = builder.EndVector(len(o.VisualizeInExploreFields))
 	}
-	visualizeInExploreFieldsVecOffset := builder.EndVector(len(o.VisualizeInExploreFields))
 	generated.MetadataStart(builder)
 	generated.MetadataAddAreaSelection(builder, o.AreaSelection)
 	generated.MetadataAddConceptBindings(builder, conceptBindingsVecOffset)
@@ -1927,8 +2067,11 @@ type NestedCategoryRelationshipNode struct {
 
 func NestedCategoryRelationshipNodeFromFbs(fbs *generated.NestedCategoryRelationshipNode) *NestedCategoryRelationshipNode {
 	o := &NestedCategoryRelationshipNode{}
-	for i := 0; i < fbs.ChildColumnsLength(); i++ {
-		o.ChildColumns = append(o.ChildColumns, fbs.ChildColumns(i))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.ChildColumns = []int32{}
+		for i := 0; i < fbs.ChildColumnsLength(); i++ {
+			o.ChildColumns = append(o.ChildColumns, fbs.ChildColumns(i))
+		}
 	}
 	o.Column = fbs.Column()
 	return o
@@ -1950,11 +2093,14 @@ func (o *NestedCategoryRelationshipNode) ToBytes() []byte {
 
 // SerializeTo writes the NestedCategoryRelationshipNode into a FlatBuffer builder and returns the offset.
 func (o *NestedCategoryRelationshipNode) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	generated.NestedCategoryRelationshipNodeStartChildColumnsVector(builder, len(o.ChildColumns))
-	for i := len(o.ChildColumns) - 1; i >= 0; i-- {
-		builder.PrependInt32(o.ChildColumns[i])
+	var childColumnsVecOffset flatbuffers.UOffsetT
+	if o.ChildColumns != nil {
+		generated.NestedCategoryRelationshipNodeStartChildColumnsVector(builder, len(o.ChildColumns))
+		for i := len(o.ChildColumns) - 1; i >= 0; i-- {
+			builder.PrependInt32(o.ChildColumns[i])
+		}
+		childColumnsVecOffset = builder.EndVector(len(o.ChildColumns))
 	}
-	childColumnsVecOffset := builder.EndVector(len(o.ChildColumns))
 	generated.NestedCategoryRelationshipNodeStart(builder)
 	generated.NestedCategoryRelationshipNodeAddChildColumns(builder, childColumnsVecOffset)
 	generated.NestedCategoryRelationshipNodeAddColumn(builder, o.Column)
@@ -1969,11 +2115,17 @@ type NestedHierarchyRelationshipNode struct {
 
 func NestedHierarchyRelationshipNodeFromFbs(fbs *generated.NestedHierarchyRelationshipNode) *NestedHierarchyRelationshipNode {
 	o := &NestedHierarchyRelationshipNode{}
-	for i := 0; i < fbs.ChildColumnsLength(); i++ {
-		o.ChildColumns = append(o.ChildColumns, fbs.ChildColumns(i))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.ChildColumns = []int32{}
+		for i := 0; i < fbs.ChildColumnsLength(); i++ {
+			o.ChildColumns = append(o.ChildColumns, fbs.ChildColumns(i))
+		}
 	}
-	for i := 0; i < fbs.ChildNodesLength(); i++ {
-		o.ChildNodes = append(o.ChildNodes, fbs.ChildNodes(i))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.ChildNodes = []int32{}
+		for i := 0; i < fbs.ChildNodesLength(); i++ {
+			o.ChildNodes = append(o.ChildNodes, fbs.ChildNodes(i))
+		}
 	}
 	if s := fbs.Label(); s != nil {
 		str := string(s)
@@ -1998,16 +2150,22 @@ func (o *NestedHierarchyRelationshipNode) ToBytes() []byte {
 
 // SerializeTo writes the NestedHierarchyRelationshipNode into a FlatBuffer builder and returns the offset.
 func (o *NestedHierarchyRelationshipNode) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	generated.NestedHierarchyRelationshipNodeStartChildColumnsVector(builder, len(o.ChildColumns))
-	for i := len(o.ChildColumns) - 1; i >= 0; i-- {
-		builder.PrependInt32(o.ChildColumns[i])
+	var childColumnsVecOffset flatbuffers.UOffsetT
+	if o.ChildColumns != nil {
+		generated.NestedHierarchyRelationshipNodeStartChildColumnsVector(builder, len(o.ChildColumns))
+		for i := len(o.ChildColumns) - 1; i >= 0; i-- {
+			builder.PrependInt32(o.ChildColumns[i])
+		}
+		childColumnsVecOffset = builder.EndVector(len(o.ChildColumns))
 	}
-	childColumnsVecOffset := builder.EndVector(len(o.ChildColumns))
-	generated.NestedHierarchyRelationshipNodeStartChildNodesVector(builder, len(o.ChildNodes))
-	for i := len(o.ChildNodes) - 1; i >= 0; i-- {
-		builder.PrependInt32(o.ChildNodes[i])
+	var childNodesVecOffset flatbuffers.UOffsetT
+	if o.ChildNodes != nil {
+		generated.NestedHierarchyRelationshipNodeStartChildNodesVector(builder, len(o.ChildNodes))
+		for i := len(o.ChildNodes) - 1; i >= 0; i-- {
+			builder.PrependInt32(o.ChildNodes[i])
+		}
+		childNodesVecOffset = builder.EndVector(len(o.ChildNodes))
 	}
-	childNodesVecOffset := builder.EndVector(len(o.ChildNodes))
 	var labelOffset flatbuffers.UOffsetT
 	if o.Label != nil {
 		labelOffset = builder.CreateString(*o.Label)
@@ -2026,8 +2184,11 @@ type NestedStringCategoryNode struct {
 
 func NestedStringCategoryNodeFromFbs(fbs *generated.NestedStringCategoryNode) *NestedStringCategoryNode {
 	o := &NestedStringCategoryNode{}
-	for i := 0; i < fbs.ChildValuesLength(); i++ {
-		o.ChildValues = append(o.ChildValues, string(fbs.ChildValues(i)))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.ChildValues = []string{}
+		for i := 0; i < fbs.ChildValuesLength(); i++ {
+			o.ChildValues = append(o.ChildValues, string(fbs.ChildValues(i)))
+		}
 	}
 	if s := fbs.Value(); s != nil {
 		str := string(s)
@@ -2052,15 +2213,16 @@ func (o *NestedStringCategoryNode) ToBytes() []byte {
 
 // SerializeTo writes the NestedStringCategoryNode into a FlatBuffer builder and returns the offset.
 func (o *NestedStringCategoryNode) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var childValuesVecOffset flatbuffers.UOffsetT
 	childValuesOffsets := make([]flatbuffers.UOffsetT, len(o.ChildValues))
-	for i, s := range o.ChildValues {
-		childValuesOffsets[i] = builder.CreateString(s)
+	for i := range o.ChildValues {
+		childValuesOffsets[i] = builder.CreateString(o.ChildValues[i])
 	}
 	generated.NestedStringCategoryNodeStartChildValuesVector(builder, len(o.ChildValues))
-	for i := len(childValuesOffsets) - 1; i >= 0; i-- {
+	for i := len(o.ChildValues) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(childValuesOffsets[i])
 	}
-	childValuesVecOffset := builder.EndVector(len(o.ChildValues))
+	childValuesVecOffset = builder.EndVector(len(o.ChildValues))
 	var valueOffset flatbuffers.UOffsetT
 	if o.Value != nil {
 		valueOffset = builder.CreateString(*o.Value)
@@ -2159,10 +2321,13 @@ type UIntAggregate struct {
 func UIntAggregateFromFbs(fbs *generated.UIntAggregate) *UIntAggregate {
 	o := &UIntAggregate{}
 	o.Count = fbs.Count()
-	for i := 0; i < fbs.HistoLength(); i++ {
-		var item generated.UIntBucket
-		if fbs.Histo(&item, i) {
-			o.Histo = append(o.Histo, *UIntBucketFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(16) != 0 {
+		o.Histo = []UIntBucket{}
+		for i := 0; i < fbs.HistoLength(); i++ {
+			var item generated.UIntBucket
+			if fbs.Histo(&item, i) {
+				o.Histo = append(o.Histo, *UIntBucketFromFbs(&item))
+			}
 		}
 	}
 	o.Max = fbs.Max()

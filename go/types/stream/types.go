@@ -61,21 +61,22 @@ func StreamFromFbs(fbs *generated.Stream) *Stream {
 	if fbsVal := fbs.MetadataRevision(nil); fbsVal != nil {
 		o.MetadataRevision = id.ContentIdFromFbs(fbsVal)
 	}
-	o.Options = make([]byte, fbs.OptionsLength())
-	for i := 0; i < fbs.OptionsLength(); i++ {
-		o.Options[i] = fbs.Options(i)
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Options = append([]byte{}, fbs.OptionsBytes()...)
 	}
-	o.Parameters = make([]byte, fbs.ParametersLength())
-	for i := 0; i < fbs.ParametersLength(); i++ {
-		o.Parameters[i] = fbs.Parameters(i)
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.Parameters = append([]byte{}, fbs.ParametersBytes()...)
 	}
 	if fbsVal := fbs.Schema(nil); fbsVal != nil {
 		o.Schema = *schema.SchemaFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.SubstreamsLength(); i++ {
-		var item generated.ObjectId
-		if fbs.Substreams(&item, i) {
-			o.Substreams = append(o.Substreams, *id.ObjectIdFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(22) != 0 {
+		o.Substreams = []id.ObjectId{}
+		for i := 0; i < fbs.SubstreamsLength(); i++ {
+			var item generated.ObjectId
+			if fbs.Substreams(&item, i) {
+				o.Substreams = append(o.Substreams, *id.ObjectIdFromFbs(&item))
+			}
 		}
 	}
 	o.Url = string(fbs.Url())
@@ -106,18 +107,27 @@ func (o *Stream) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT 
 	if o.MetadataRevision != nil {
 		metadataRevisionOffset = o.MetadataRevision.SerializeTo(builder)
 	}
-	optionsOffset := builder.CreateByteVector(o.Options)
-	parametersOffset := builder.CreateByteVector(o.Parameters)
+	var optionsOffset flatbuffers.UOffsetT
+	if o.Options != nil {
+		optionsOffset = builder.CreateByteVector(o.Options)
+	}
+	var parametersOffset flatbuffers.UOffsetT
+	if o.Parameters != nil {
+		parametersOffset = builder.CreateByteVector(o.Parameters)
+	}
 	schemaOffset := o.Schema.SerializeTo(builder)
-	substreamsOffsets := make([]flatbuffers.UOffsetT, len(o.Substreams))
-	for i := range o.Substreams {
-		substreamsOffsets[i] = o.Substreams[i].SerializeTo(builder)
+	var substreamsVecOffset flatbuffers.UOffsetT
+	if o.Substreams != nil {
+		substreamsOffsets := make([]flatbuffers.UOffsetT, len(o.Substreams))
+		for i := range o.Substreams {
+			substreamsOffsets[i] = o.Substreams[i].SerializeTo(builder)
+		}
+		generated.StreamStartSubstreamsVector(builder, len(o.Substreams))
+		for i := len(o.Substreams) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(substreamsOffsets[i])
+		}
+		substreamsVecOffset = builder.EndVector(len(o.Substreams))
 	}
-	generated.StreamStartSubstreamsVector(builder, len(o.Substreams))
-	for i := len(substreamsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(substreamsOffsets[i])
-	}
-	substreamsVecOffset := builder.EndVector(len(o.Substreams))
 	urlOffset := builder.CreateString(o.Url)
 	generated.StreamStart(builder)
 	generated.StreamAddFlags(builder, o.Flags)

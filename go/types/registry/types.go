@@ -154,10 +154,13 @@ type RegistryRelation struct {
 
 func RegistryRelationFromFbs(fbs *generated.RegistryRelation) *RegistryRelation {
 	o := &RegistryRelation{}
-	for i := 0; i < fbs.ColumnsLength(); i++ {
-		var item generated.RegistryField
-		if fbs.Columns(&item, i) {
-			o.Columns = append(o.Columns, *RegistryFieldFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		o.Columns = []RegistryField{}
+		for i := 0; i < fbs.ColumnsLength(); i++ {
+			var item generated.RegistryField
+			if fbs.Columns(&item, i) {
+				o.Columns = append(o.Columns, *RegistryFieldFromFbs(&item))
+			}
 		}
 	}
 	o.Name = string(fbs.Name())
@@ -186,15 +189,16 @@ func (o *RegistryRelation) ToBytes() []byte {
 
 // SerializeTo writes the RegistryRelation into a FlatBuffer builder and returns the offset.
 func (o *RegistryRelation) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var columnsVecOffset flatbuffers.UOffsetT
 	columnsOffsets := make([]flatbuffers.UOffsetT, len(o.Columns))
 	for i := range o.Columns {
 		columnsOffsets[i] = o.Columns[i].SerializeTo(builder)
 	}
 	generated.RegistryRelationStartColumnsVector(builder, len(o.Columns))
-	for i := len(columnsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Columns) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(columnsOffsets[i])
 	}
-	columnsVecOffset := builder.EndVector(len(o.Columns))
+	columnsVecOffset = builder.EndVector(len(o.Columns))
 	nameOffset := builder.CreateString(o.Name)
 	pointerOffset := builder.CreateString(o.Pointer)
 	var transformOffset flatbuffers.UOffsetT
@@ -226,19 +230,25 @@ type RegistrySpec struct {
 
 func RegistrySpecFromFbs(fbs *generated.RegistrySpec) *RegistrySpec {
 	o := &RegistrySpec{}
-	for i := 0; i < fbs.FieldsLength(); i++ {
-		var item generated.RegistryField
-		if fbs.Fields(&item, i) {
-			o.Fields = append(o.Fields, *RegistryFieldFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(16) != 0 {
+		o.Fields = []RegistryField{}
+		for i := 0; i < fbs.FieldsLength(); i++ {
+			var item generated.RegistryField
+			if fbs.Fields(&item, i) {
+				o.Fields = append(o.Fields, *RegistryFieldFromFbs(&item))
+			}
 		}
 	}
 	o.Key = string(fbs.Key())
 	o.Name = string(fbs.Name())
 	o.ObjectTy = int16(fbs.ObjectTy())
-	for i := 0; i < fbs.RelationsLength(); i++ {
-		var item generated.RegistryRelation
-		if fbs.Relations(&item, i) {
-			o.Relations = append(o.Relations, *RegistryRelationFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(18) != 0 {
+		o.Relations = []RegistryRelation{}
+		for i := 0; i < fbs.RelationsLength(); i++ {
+			var item generated.RegistryRelation
+			if fbs.Relations(&item, i) {
+				o.Relations = append(o.Relations, *RegistryRelationFromFbs(&item))
+			}
 		}
 	}
 	o.SourceField = string(fbs.SourceField())
@@ -264,26 +274,30 @@ func (o *RegistrySpec) ToBytes() []byte {
 
 // SerializeTo writes the RegistrySpec into a FlatBuffer builder and returns the offset.
 func (o *RegistrySpec) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var fieldsVecOffset flatbuffers.UOffsetT
 	fieldsOffsets := make([]flatbuffers.UOffsetT, len(o.Fields))
 	for i := range o.Fields {
 		fieldsOffsets[i] = o.Fields[i].SerializeTo(builder)
 	}
 	generated.RegistrySpecStartFieldsVector(builder, len(o.Fields))
-	for i := len(fieldsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Fields) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(fieldsOffsets[i])
 	}
-	fieldsVecOffset := builder.EndVector(len(o.Fields))
+	fieldsVecOffset = builder.EndVector(len(o.Fields))
 	keyOffset := builder.CreateString(o.Key)
 	nameOffset := builder.CreateString(o.Name)
-	relationsOffsets := make([]flatbuffers.UOffsetT, len(o.Relations))
-	for i := range o.Relations {
-		relationsOffsets[i] = o.Relations[i].SerializeTo(builder)
+	var relationsVecOffset flatbuffers.UOffsetT
+	if o.Relations != nil {
+		relationsOffsets := make([]flatbuffers.UOffsetT, len(o.Relations))
+		for i := range o.Relations {
+			relationsOffsets[i] = o.Relations[i].SerializeTo(builder)
+		}
+		generated.RegistrySpecStartRelationsVector(builder, len(o.Relations))
+		for i := len(o.Relations) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(relationsOffsets[i])
+		}
+		relationsVecOffset = builder.EndVector(len(o.Relations))
 	}
-	generated.RegistrySpecStartRelationsVector(builder, len(o.Relations))
-	for i := len(relationsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(relationsOffsets[i])
-	}
-	relationsVecOffset := builder.EndVector(len(o.Relations))
 	sourceFieldOffset := builder.CreateString(o.SourceField)
 	sourceFormatOffset := builder.CreateString(o.SourceFormat)
 	sourceHashFieldOffset := builder.CreateString(o.SourceHashField)
@@ -351,10 +365,13 @@ type RegistryTables struct {
 func RegistryTablesFromFbs(fbs *generated.RegistryTables) *RegistryTables {
 	o := &RegistryTables{}
 	o.Spec = string(fbs.Spec())
-	for i := 0; i < fbs.TablesLength(); i++ {
-		var item generated.RegistryTable
-		if fbs.Tables(&item, i) {
-			o.Tables = append(o.Tables, *RegistryTableFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.Tables = []RegistryTable{}
+		for i := 0; i < fbs.TablesLength(); i++ {
+			var item generated.RegistryTable
+			if fbs.Tables(&item, i) {
+				o.Tables = append(o.Tables, *RegistryTableFromFbs(&item))
+			}
 		}
 	}
 	o.Version = fbs.Version()
@@ -378,15 +395,16 @@ func (o *RegistryTables) ToBytes() []byte {
 // SerializeTo writes the RegistryTables into a FlatBuffer builder and returns the offset.
 func (o *RegistryTables) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	specOffset := builder.CreateString(o.Spec)
+	var tablesVecOffset flatbuffers.UOffsetT
 	tablesOffsets := make([]flatbuffers.UOffsetT, len(o.Tables))
 	for i := range o.Tables {
 		tablesOffsets[i] = o.Tables[i].SerializeTo(builder)
 	}
 	generated.RegistryTablesStartTablesVector(builder, len(o.Tables))
-	for i := len(tablesOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Tables) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(tablesOffsets[i])
 	}
-	tablesVecOffset := builder.EndVector(len(o.Tables))
+	tablesVecOffset = builder.EndVector(len(o.Tables))
 	generated.RegistryTablesStart(builder)
 	generated.RegistryTablesAddSpec(builder, specOffset)
 	generated.RegistryTablesAddTables(builder, tablesVecOffset)

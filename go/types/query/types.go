@@ -166,10 +166,13 @@ type DoUpdate struct {
 
 func DoUpdateFromFbs(fbs *generated.DoUpdate) *DoUpdate {
 	o := &DoUpdate{}
-	for i := 0; i < fbs.AssignmentsLength(); i++ {
-		var item generated.SetExpr
-		if fbs.Assignments(&item, i) {
-			o.Assignments = append(o.Assignments, *SetExprFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Assignments = []SetExpr{}
+		for i := 0; i < fbs.AssignmentsLength(); i++ {
+			var item generated.SetExpr
+			if fbs.Assignments(&item, i) {
+				o.Assignments = append(o.Assignments, *SetExprFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -191,15 +194,16 @@ func (o *DoUpdate) ToBytes() []byte {
 
 // SerializeTo writes the DoUpdate into a FlatBuffer builder and returns the offset.
 func (o *DoUpdate) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var assignmentsVecOffset flatbuffers.UOffsetT
 	assignmentsOffsets := make([]flatbuffers.UOffsetT, len(o.Assignments))
 	for i := range o.Assignments {
 		assignmentsOffsets[i] = o.Assignments[i].SerializeTo(builder)
 	}
 	generated.DoUpdateStartAssignmentsVector(builder, len(o.Assignments))
-	for i := len(assignmentsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Assignments) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(assignmentsOffsets[i])
 	}
-	assignmentsVecOffset := builder.EndVector(len(o.Assignments))
+	assignmentsVecOffset = builder.EndVector(len(o.Assignments))
 	generated.DoUpdateStart(builder)
 	generated.DoUpdateAddAssignments(builder, assignmentsVecOffset)
 	return generated.DoUpdateEnd(builder)
@@ -332,10 +336,13 @@ type Function struct {
 func FunctionFromFbs(fbs *generated.Function) *Function {
 	o := &Function{}
 	o.Fn = int16(fbs.Fn())
-	for i := 0; i < fbs.ParametersLength(); i++ {
-		var item generated.Expr
-		if fbs.Parameters(&item, i) {
-			o.Parameters = append(o.Parameters, *ExprFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Parameters = []Expr{}
+		for i := 0; i < fbs.ParametersLength(); i++ {
+			var item generated.Expr
+			if fbs.Parameters(&item, i) {
+				o.Parameters = append(o.Parameters, *ExprFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -357,15 +364,16 @@ func (o *Function) ToBytes() []byte {
 
 // SerializeTo writes the Function into a FlatBuffer builder and returns the offset.
 func (o *Function) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var parametersVecOffset flatbuffers.UOffsetT
 	parametersOffsets := make([]flatbuffers.UOffsetT, len(o.Parameters))
 	for i := range o.Parameters {
 		parametersOffsets[i] = o.Parameters[i].SerializeTo(builder)
 	}
 	generated.FunctionStartParametersVector(builder, len(o.Parameters))
-	for i := len(parametersOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Parameters) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(parametersOffsets[i])
 	}
-	parametersVecOffset := builder.EndVector(len(o.Parameters))
+	parametersVecOffset = builder.EndVector(len(o.Parameters))
 	generated.FunctionStart(builder)
 	generated.FunctionAddFn(builder, generated.Fn(o.Fn))
 	generated.FunctionAddParameters(builder, parametersVecOffset)
@@ -551,10 +559,13 @@ func CaseFromFbs(fbs *generated.Case) *Case {
 	if fbsVal := fbs.Else(nil); fbsVal != nil {
 		o.Else = ExprFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.WhenLength(); i++ {
-		var item generated.When
-		if fbs.When(&item, i) {
-			o.When = append(o.When, *WhenFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.When = []When{}
+		for i := 0; i < fbs.WhenLength(); i++ {
+			var item generated.When
+			if fbs.When(&item, i) {
+				o.When = append(o.When, *WhenFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -580,15 +591,16 @@ func (o *Case) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	if o.Else != nil {
 		elseOffset = o.Else.SerializeTo(builder)
 	}
+	var whenVecOffset flatbuffers.UOffsetT
 	whenOffsets := make([]flatbuffers.UOffsetT, len(o.When))
 	for i := range o.When {
 		whenOffsets[i] = o.When[i].SerializeTo(builder)
 	}
 	generated.CaseStartWhenVector(builder, len(o.When))
-	for i := len(whenOffsets) - 1; i >= 0; i-- {
+	for i := len(o.When) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(whenOffsets[i])
 	}
-	whenVecOffset := builder.EndVector(len(o.When))
+	whenVecOffset = builder.EndVector(len(o.When))
 	generated.CaseStart(builder)
 	generated.CaseAddElse(builder, elseOffset)
 	generated.CaseAddWhen(builder, whenVecOffset)
@@ -601,10 +613,13 @@ type OrderByExpr struct {
 
 func OrderByExprFromFbs(fbs *generated.OrderByExpr) *OrderByExpr {
 	o := &OrderByExpr{}
-	for i := 0; i < fbs.OrderByLength(); i++ {
-		var item generated.OrderBy
-		if fbs.OrderBy(&item, i) {
-			o.OrderBy = append(o.OrderBy, *graph.OrderByFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.OrderBy = []graph.OrderBy{}
+		for i := 0; i < fbs.OrderByLength(); i++ {
+			var item generated.OrderBy
+			if fbs.OrderBy(&item, i) {
+				o.OrderBy = append(o.OrderBy, *graph.OrderByFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -626,15 +641,16 @@ func (o *OrderByExpr) ToBytes() []byte {
 
 // SerializeTo writes the OrderByExpr into a FlatBuffer builder and returns the offset.
 func (o *OrderByExpr) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var orderByVecOffset flatbuffers.UOffsetT
 	orderByOffsets := make([]flatbuffers.UOffsetT, len(o.OrderBy))
 	for i := range o.OrderBy {
 		orderByOffsets[i] = o.OrderBy[i].SerializeTo(builder)
 	}
 	generated.OrderByExprStartOrderByVector(builder, len(o.OrderBy))
-	for i := len(orderByOffsets) - 1; i >= 0; i-- {
+	for i := len(o.OrderBy) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(orderByOffsets[i])
 	}
-	orderByVecOffset := builder.EndVector(len(o.OrderBy))
+	orderByVecOffset = builder.EndVector(len(o.OrderBy))
 	generated.OrderByExprStart(builder)
 	generated.OrderByExprAddOrderBy(builder, orderByVecOffset)
 	return generated.OrderByExprEnd(builder)
@@ -794,16 +810,22 @@ func WindowFromFbs(fbs *generated.Window) *Window {
 	if fbsVal := fbs.Fun(nil); fbsVal != nil {
 		o.Fun = *FunctionFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.OrderByLength(); i++ {
-		var item generated.OrderBy
-		if fbs.OrderBy(&item, i) {
-			o.OrderBy = append(o.OrderBy, *graph.OrderByFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.OrderBy = []graph.OrderBy{}
+		for i := 0; i < fbs.OrderByLength(); i++ {
+			var item generated.OrderBy
+			if fbs.OrderBy(&item, i) {
+				o.OrderBy = append(o.OrderBy, *graph.OrderByFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.PartitionLength(); i++ {
-		var item generated.Expr
-		if fbs.Partition(&item, i) {
-			o.Partition = append(o.Partition, *ExprFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Partition = []Expr{}
+		for i := 0; i < fbs.PartitionLength(); i++ {
+			var item generated.Expr
+			if fbs.Partition(&item, i) {
+				o.Partition = append(o.Partition, *ExprFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -830,24 +852,30 @@ func (o *Window) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT 
 		frameOffset = o.Frame.SerializeTo(builder)
 	}
 	funOffset := o.Fun.SerializeTo(builder)
-	orderByOffsets := make([]flatbuffers.UOffsetT, len(o.OrderBy))
-	for i := range o.OrderBy {
-		orderByOffsets[i] = o.OrderBy[i].SerializeTo(builder)
+	var orderByVecOffset flatbuffers.UOffsetT
+	if o.OrderBy != nil {
+		orderByOffsets := make([]flatbuffers.UOffsetT, len(o.OrderBy))
+		for i := range o.OrderBy {
+			orderByOffsets[i] = o.OrderBy[i].SerializeTo(builder)
+		}
+		generated.WindowStartOrderByVector(builder, len(o.OrderBy))
+		for i := len(o.OrderBy) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(orderByOffsets[i])
+		}
+		orderByVecOffset = builder.EndVector(len(o.OrderBy))
 	}
-	generated.WindowStartOrderByVector(builder, len(o.OrderBy))
-	for i := len(orderByOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(orderByOffsets[i])
+	var partitionVecOffset flatbuffers.UOffsetT
+	if o.Partition != nil {
+		partitionOffsets := make([]flatbuffers.UOffsetT, len(o.Partition))
+		for i := range o.Partition {
+			partitionOffsets[i] = o.Partition[i].SerializeTo(builder)
+		}
+		generated.WindowStartPartitionVector(builder, len(o.Partition))
+		for i := len(o.Partition) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(partitionOffsets[i])
+		}
+		partitionVecOffset = builder.EndVector(len(o.Partition))
 	}
-	orderByVecOffset := builder.EndVector(len(o.OrderBy))
-	partitionOffsets := make([]flatbuffers.UOffsetT, len(o.Partition))
-	for i := range o.Partition {
-		partitionOffsets[i] = o.Partition[i].SerializeTo(builder)
-	}
-	generated.WindowStartPartitionVector(builder, len(o.Partition))
-	for i := len(partitionOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(partitionOffsets[i])
-	}
-	partitionVecOffset := builder.EndVector(len(o.Partition))
 	generated.WindowStart(builder)
 	generated.WindowAddFrame(builder, frameOffset)
 	generated.WindowAddFun(builder, funOffset)
@@ -966,10 +994,13 @@ type Distinct struct {
 
 func DistinctFromFbs(fbs *generated.Distinct) *Distinct {
 	o := &Distinct{}
-	for i := 0; i < fbs.OnLength(); i++ {
-		var item generated.Expr
-		if fbs.On(&item, i) {
-			o.On = append(o.On, *ExprFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.On = []Expr{}
+		for i := 0; i < fbs.OnLength(); i++ {
+			var item generated.Expr
+			if fbs.On(&item, i) {
+				o.On = append(o.On, *ExprFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -991,15 +1022,18 @@ func (o *Distinct) ToBytes() []byte {
 
 // SerializeTo writes the Distinct into a FlatBuffer builder and returns the offset.
 func (o *Distinct) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	onOffsets := make([]flatbuffers.UOffsetT, len(o.On))
-	for i := range o.On {
-		onOffsets[i] = o.On[i].SerializeTo(builder)
+	var onVecOffset flatbuffers.UOffsetT
+	if o.On != nil {
+		onOffsets := make([]flatbuffers.UOffsetT, len(o.On))
+		for i := range o.On {
+			onOffsets[i] = o.On[i].SerializeTo(builder)
+		}
+		generated.DistinctStartOnVector(builder, len(o.On))
+		for i := len(o.On) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(onOffsets[i])
+		}
+		onVecOffset = builder.EndVector(len(o.On))
 	}
-	generated.DistinctStartOnVector(builder, len(o.On))
-	for i := len(onOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(onOffsets[i])
-	}
-	onVecOffset := builder.EndVector(len(o.On))
 	generated.DistinctStart(builder)
 	generated.DistinctAddOn(builder, onVecOffset)
 	return generated.DistinctEnd(builder)
@@ -1022,41 +1056,56 @@ func UnaryQueryElementFromFbs(fbs *generated.UnaryQueryElement) *UnaryQueryEleme
 	if fbsVal := fbs.Distinct(nil); fbsVal != nil {
 		o.Distinct = DistinctFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.FieldsLength(); i++ {
-		var item generated.Expr
-		if fbs.Fields(&item, i) {
-			o.Fields = append(o.Fields, *ExprFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		o.Fields = []Expr{}
+		for i := 0; i < fbs.FieldsLength(); i++ {
+			var item generated.Expr
+			if fbs.Fields(&item, i) {
+				o.Fields = append(o.Fields, *ExprFromFbs(&item))
+			}
 		}
 	}
 	if fbsVal := fbs.Filter(nil); fbsVal != nil {
 		o.Filter = FunctionFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.GroupByLength(); i++ {
-		var item generated.Expr
-		if fbs.GroupBy(&item, i) {
-			o.GroupBy = append(o.GroupBy, *ExprFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(14) != 0 {
+		o.GroupBy = []Expr{}
+		for i := 0; i < fbs.GroupByLength(); i++ {
+			var item generated.Expr
+			if fbs.GroupBy(&item, i) {
+				o.GroupBy = append(o.GroupBy, *ExprFromFbs(&item))
+			}
 		}
 	}
 	if fbsVal := fbs.Having(nil); fbsVal != nil {
 		o.Having = FunctionFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.JoinsLength(); i++ {
-		var item generated.Join
-		if fbs.Joins(&item, i) {
-			o.Joins = append(o.Joins, *JoinFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Joins = []Join{}
+		for i := 0; i < fbs.JoinsLength(); i++ {
+			var item generated.Join
+			if fbs.Joins(&item, i) {
+				o.Joins = append(o.Joins, *JoinFromFbs(&item))
+			}
 		}
 	}
 	o.Limit = fbs.Limit()
-	for i := 0; i < fbs.OrderByLength(); i++ {
-		var item generated.TableOrderBy
-		if fbs.OrderBy(&item, i) {
-			o.OrderBy = append(o.OrderBy, *TableOrderByFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		o.OrderBy = []TableOrderBy{}
+		for i := 0; i < fbs.OrderByLength(); i++ {
+			var item generated.TableOrderBy
+			if fbs.OrderBy(&item, i) {
+				o.OrderBy = append(o.OrderBy, *TableOrderByFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.SourcesLength(); i++ {
-		var item generated.TableSource
-		if fbs.Sources(&item, i) {
-			o.Sources = append(o.Sources, *TableSourceFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Sources = []TableSource{}
+		for i := 0; i < fbs.SourcesLength(); i++ {
+			var item generated.TableSource
+			if fbs.Sources(&item, i) {
+				o.Sources = append(o.Sources, *TableSourceFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -1082,59 +1131,72 @@ func (o *UnaryQueryElement) SerializeTo(builder *flatbuffers.Builder) flatbuffer
 	if o.Distinct != nil {
 		distinctOffset = o.Distinct.SerializeTo(builder)
 	}
-	fieldsOffsets := make([]flatbuffers.UOffsetT, len(o.Fields))
-	for i := range o.Fields {
-		fieldsOffsets[i] = o.Fields[i].SerializeTo(builder)
+	var fieldsVecOffset flatbuffers.UOffsetT
+	if o.Fields != nil {
+		fieldsOffsets := make([]flatbuffers.UOffsetT, len(o.Fields))
+		for i := range o.Fields {
+			fieldsOffsets[i] = o.Fields[i].SerializeTo(builder)
+		}
+		generated.UnaryQueryElementStartFieldsVector(builder, len(o.Fields))
+		for i := len(o.Fields) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(fieldsOffsets[i])
+		}
+		fieldsVecOffset = builder.EndVector(len(o.Fields))
 	}
-	generated.UnaryQueryElementStartFieldsVector(builder, len(o.Fields))
-	for i := len(fieldsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(fieldsOffsets[i])
-	}
-	fieldsVecOffset := builder.EndVector(len(o.Fields))
 	var filterOffset flatbuffers.UOffsetT
 	if o.Filter != nil {
 		filterOffset = o.Filter.SerializeTo(builder)
 	}
-	groupByOffsets := make([]flatbuffers.UOffsetT, len(o.GroupBy))
-	for i := range o.GroupBy {
-		groupByOffsets[i] = o.GroupBy[i].SerializeTo(builder)
+	var groupByVecOffset flatbuffers.UOffsetT
+	if o.GroupBy != nil {
+		groupByOffsets := make([]flatbuffers.UOffsetT, len(o.GroupBy))
+		for i := range o.GroupBy {
+			groupByOffsets[i] = o.GroupBy[i].SerializeTo(builder)
+		}
+		generated.UnaryQueryElementStartGroupByVector(builder, len(o.GroupBy))
+		for i := len(o.GroupBy) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(groupByOffsets[i])
+		}
+		groupByVecOffset = builder.EndVector(len(o.GroupBy))
 	}
-	generated.UnaryQueryElementStartGroupByVector(builder, len(o.GroupBy))
-	for i := len(groupByOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(groupByOffsets[i])
-	}
-	groupByVecOffset := builder.EndVector(len(o.GroupBy))
 	var havingOffset flatbuffers.UOffsetT
 	if o.Having != nil {
 		havingOffset = o.Having.SerializeTo(builder)
 	}
-	joinsOffsets := make([]flatbuffers.UOffsetT, len(o.Joins))
-	for i := range o.Joins {
-		joinsOffsets[i] = o.Joins[i].SerializeTo(builder)
+	var joinsVecOffset flatbuffers.UOffsetT
+	if o.Joins != nil {
+		joinsOffsets := make([]flatbuffers.UOffsetT, len(o.Joins))
+		for i := range o.Joins {
+			joinsOffsets[i] = o.Joins[i].SerializeTo(builder)
+		}
+		generated.UnaryQueryElementStartJoinsVector(builder, len(o.Joins))
+		for i := len(o.Joins) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(joinsOffsets[i])
+		}
+		joinsVecOffset = builder.EndVector(len(o.Joins))
 	}
-	generated.UnaryQueryElementStartJoinsVector(builder, len(o.Joins))
-	for i := len(joinsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(joinsOffsets[i])
+	var orderByVecOffset flatbuffers.UOffsetT
+	if o.OrderBy != nil {
+		orderByOffsets := make([]flatbuffers.UOffsetT, len(o.OrderBy))
+		for i := range o.OrderBy {
+			orderByOffsets[i] = o.OrderBy[i].SerializeTo(builder)
+		}
+		generated.UnaryQueryElementStartOrderByVector(builder, len(o.OrderBy))
+		for i := len(o.OrderBy) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(orderByOffsets[i])
+		}
+		orderByVecOffset = builder.EndVector(len(o.OrderBy))
 	}
-	joinsVecOffset := builder.EndVector(len(o.Joins))
-	orderByOffsets := make([]flatbuffers.UOffsetT, len(o.OrderBy))
-	for i := range o.OrderBy {
-		orderByOffsets[i] = o.OrderBy[i].SerializeTo(builder)
-	}
-	generated.UnaryQueryElementStartOrderByVector(builder, len(o.OrderBy))
-	for i := len(orderByOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(orderByOffsets[i])
-	}
-	orderByVecOffset := builder.EndVector(len(o.OrderBy))
+	var sourcesVecOffset flatbuffers.UOffsetT
 	sourcesOffsets := make([]flatbuffers.UOffsetT, len(o.Sources))
 	for i := range o.Sources {
 		sourcesOffsets[i] = o.Sources[i].SerializeTo(builder)
 	}
 	generated.UnaryQueryElementStartSourcesVector(builder, len(o.Sources))
-	for i := len(sourcesOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Sources) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(sourcesOffsets[i])
 	}
-	sourcesVecOffset := builder.EndVector(len(o.Sources))
+	sourcesVecOffset = builder.EndVector(len(o.Sources))
 	generated.UnaryQueryElementStart(builder)
 	generated.UnaryQueryElementAddDistinct(builder, distinctOffset)
 	generated.UnaryQueryElementAddFields(builder, fieldsVecOffset)
@@ -1437,9 +1499,8 @@ type Arrow struct {
 
 func ArrowFromFbs(fbs *generated.Arrow) *Arrow {
 	o := &Arrow{}
-	o.Value = make([]byte, fbs.ValueLength())
-	for i := 0; i < fbs.ValueLength(); i++ {
-		o.Value[i] = fbs.Value(i)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Value = append([]byte{}, fbs.ValueBytes()...)
 	}
 	return o
 }
@@ -1460,7 +1521,8 @@ func (o *Arrow) ToBytes() []byte {
 
 // SerializeTo writes the Arrow into a FlatBuffer builder and returns the offset.
 func (o *Arrow) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	valueOffset := builder.CreateByteVector(o.Value)
+	var valueOffset flatbuffers.UOffsetT
+	valueOffset = builder.CreateByteVector(o.Value)
 	generated.ArrowStart(builder)
 	generated.ArrowAddValue(builder, valueOffset)
 	return generated.ArrowEnd(builder)
@@ -1513,10 +1575,13 @@ type Query struct {
 
 func QueryFromFbs(fbs *generated.Query) *Query {
 	o := &Query{}
-	for i := 0; i < fbs.BoundSourcesLength(); i++ {
-		var item generated.TableSourceInstance
-		if fbs.BoundSources(&item, i) {
-			o.BoundSources = append(o.BoundSources, *TableSourceInstanceFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		o.BoundSources = []TableSourceInstance{}
+		for i := 0; i < fbs.BoundSourcesLength(); i++ {
+			var item generated.TableSourceInstance
+			if fbs.BoundSources(&item, i) {
+				o.BoundSources = append(o.BoundSources, *TableSourceInstanceFromFbs(&item))
+			}
 		}
 	}
 	if fbsVal := fbs.Explain(nil); fbsVal != nil {
@@ -1526,10 +1591,13 @@ func QueryFromFbs(fbs *generated.Query) *Query {
 	if fbsVal := fbs.Query(nil); fbsVal != nil {
 		o.Query = *QueryElementFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.ValuesLength(); i++ {
-		var item generated.ValueInstance
-		if fbs.Values(&item, i) {
-			o.Values = append(o.Values, *value.ValueInstanceFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Values = []value.ValueInstance{}
+		for i := 0; i < fbs.ValuesLength(); i++ {
+			var item generated.ValueInstance
+			if fbs.Values(&item, i) {
+				o.Values = append(o.Values, *value.ValueInstanceFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -1551,29 +1619,35 @@ func (o *Query) ToBytes() []byte {
 
 // SerializeTo writes the Query into a FlatBuffer builder and returns the offset.
 func (o *Query) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	boundSourcesOffsets := make([]flatbuffers.UOffsetT, len(o.BoundSources))
-	for i := range o.BoundSources {
-		boundSourcesOffsets[i] = o.BoundSources[i].SerializeTo(builder)
+	var boundSourcesVecOffset flatbuffers.UOffsetT
+	if o.BoundSources != nil {
+		boundSourcesOffsets := make([]flatbuffers.UOffsetT, len(o.BoundSources))
+		for i := range o.BoundSources {
+			boundSourcesOffsets[i] = o.BoundSources[i].SerializeTo(builder)
+		}
+		generated.QueryStartBoundSourcesVector(builder, len(o.BoundSources))
+		for i := len(o.BoundSources) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(boundSourcesOffsets[i])
+		}
+		boundSourcesVecOffset = builder.EndVector(len(o.BoundSources))
 	}
-	generated.QueryStartBoundSourcesVector(builder, len(o.BoundSources))
-	for i := len(boundSourcesOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(boundSourcesOffsets[i])
-	}
-	boundSourcesVecOffset := builder.EndVector(len(o.BoundSources))
 	var explainOffset flatbuffers.UOffsetT
 	if o.Explain != nil {
 		explainOffset = o.Explain.SerializeTo(builder)
 	}
 	queryOffset := o.Query.SerializeTo(builder)
-	valuesOffsets := make([]flatbuffers.UOffsetT, len(o.Values))
-	for i := range o.Values {
-		valuesOffsets[i] = o.Values[i].SerializeTo(builder)
+	var valuesVecOffset flatbuffers.UOffsetT
+	if o.Values != nil {
+		valuesOffsets := make([]flatbuffers.UOffsetT, len(o.Values))
+		for i := range o.Values {
+			valuesOffsets[i] = o.Values[i].SerializeTo(builder)
+		}
+		generated.QueryStartValuesVector(builder, len(o.Values))
+		for i := len(o.Values) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(valuesOffsets[i])
+		}
+		valuesVecOffset = builder.EndVector(len(o.Values))
 	}
-	generated.QueryStartValuesVector(builder, len(o.Values))
-	for i := len(valuesOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(valuesOffsets[i])
-	}
-	valuesVecOffset := builder.EndVector(len(o.Values))
 	generated.QueryStart(builder)
 	generated.QueryAddBoundSources(builder, boundSourcesVecOffset)
 	generated.QueryAddExplain(builder, explainOffset)
@@ -1626,10 +1700,13 @@ type Vector struct {
 
 func VectorFromFbs(fbs *generated.Vector) *Vector {
 	o := &Vector{}
-	for i := 0; i < fbs.IdsLength(); i++ {
-		var item generated.ObjectId
-		if fbs.Ids(&item, i) {
-			o.Ids = append(o.Ids, *id.ObjectIdFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.Ids = []id.ObjectId{}
+		for i := 0; i < fbs.IdsLength(); i++ {
+			var item generated.ObjectId
+			if fbs.Ids(&item, i) {
+				o.Ids = append(o.Ids, *id.ObjectIdFromFbs(&item))
+			}
 		}
 	}
 	if fbsVal := fbs.Limit(nil); fbsVal != nil {
@@ -1656,15 +1733,16 @@ func (o *Vector) ToBytes() []byte {
 
 // SerializeTo writes the Vector into a FlatBuffer builder and returns the offset.
 func (o *Vector) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var idsVecOffset flatbuffers.UOffsetT
 	idsOffsets := make([]flatbuffers.UOffsetT, len(o.Ids))
 	for i := range o.Ids {
 		idsOffsets[i] = o.Ids[i].SerializeTo(builder)
 	}
 	generated.VectorStartIdsVector(builder, len(o.Ids))
-	for i := len(idsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Ids) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(idsOffsets[i])
 	}
-	idsVecOffset := builder.EndVector(len(o.Ids))
+	idsVecOffset = builder.EndVector(len(o.Ids))
 	var limitOffset flatbuffers.UOffsetT
 	if o.Limit != nil {
 		limitOffset = o.Limit.SerializeTo(builder)
@@ -1762,10 +1840,13 @@ type Values struct {
 
 func ValuesFromFbs(fbs *generated.Values) *Values {
 	o := &Values{}
-	for i := 0; i < fbs.RowsLength(); i++ {
-		var item generated.ValueRow
-		if fbs.Rows(&item, i) {
-			o.Rows = append(o.Rows, *ValueRowFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Rows = []ValueRow{}
+		for i := 0; i < fbs.RowsLength(); i++ {
+			var item generated.ValueRow
+			if fbs.Rows(&item, i) {
+				o.Rows = append(o.Rows, *ValueRowFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -1787,15 +1868,16 @@ func (o *Values) ToBytes() []byte {
 
 // SerializeTo writes the Values into a FlatBuffer builder and returns the offset.
 func (o *Values) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var rowsVecOffset flatbuffers.UOffsetT
 	rowsOffsets := make([]flatbuffers.UOffsetT, len(o.Rows))
 	for i := range o.Rows {
 		rowsOffsets[i] = o.Rows[i].SerializeTo(builder)
 	}
 	generated.ValuesStartRowsVector(builder, len(o.Rows))
-	for i := len(rowsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Rows) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(rowsOffsets[i])
 	}
-	rowsVecOffset := builder.EndVector(len(o.Rows))
+	rowsVecOffset = builder.EndVector(len(o.Rows))
 	generated.ValuesStart(builder)
 	generated.ValuesAddRows(builder, rowsVecOffset)
 	return generated.ValuesEnd(builder)
@@ -1905,22 +1987,31 @@ func UpdateQueryElementFromFbs(fbs *generated.UpdateQueryElement) *UpdateQueryEl
 	if fbsVal := fbs.Filter(nil); fbsVal != nil {
 		o.Filter = FunctionFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.FromSourcesLength(); i++ {
-		var item generated.TableSource
-		if fbs.FromSources(&item, i) {
-			o.FromSources = append(o.FromSources, *TableSourceFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		o.FromSources = []TableSource{}
+		for i := 0; i < fbs.FromSourcesLength(); i++ {
+			var item generated.TableSource
+			if fbs.FromSources(&item, i) {
+				o.FromSources = append(o.FromSources, *TableSourceFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.JoinsLength(); i++ {
-		var item generated.Join
-		if fbs.Joins(&item, i) {
-			o.Joins = append(o.Joins, *JoinFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(14) != 0 {
+		o.Joins = []Join{}
+		for i := 0; i < fbs.JoinsLength(); i++ {
+			var item generated.Join
+			if fbs.Joins(&item, i) {
+				o.Joins = append(o.Joins, *JoinFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.SetsLength(); i++ {
-		var item generated.SetExpr
-		if fbs.Sets(&item, i) {
-			o.Sets = append(o.Sets, *SetExprFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.Sets = []SetExpr{}
+		for i := 0; i < fbs.SetsLength(); i++ {
+			var item generated.SetExpr
+			if fbs.Sets(&item, i) {
+				o.Sets = append(o.Sets, *SetExprFromFbs(&item))
+			}
 		}
 	}
 	if tbl := new(flatbuffers.Table); fbs.Source(tbl) {
@@ -1986,33 +2077,40 @@ func (o *UpdateQueryElement) SerializeTo(builder *flatbuffers.Builder) flatbuffe
 	if o.Filter != nil {
 		filterOffset = o.Filter.SerializeTo(builder)
 	}
-	fromSourcesOffsets := make([]flatbuffers.UOffsetT, len(o.FromSources))
-	for i := range o.FromSources {
-		fromSourcesOffsets[i] = o.FromSources[i].SerializeTo(builder)
+	var fromSourcesVecOffset flatbuffers.UOffsetT
+	if o.FromSources != nil {
+		fromSourcesOffsets := make([]flatbuffers.UOffsetT, len(o.FromSources))
+		for i := range o.FromSources {
+			fromSourcesOffsets[i] = o.FromSources[i].SerializeTo(builder)
+		}
+		generated.UpdateQueryElementStartFromSourcesVector(builder, len(o.FromSources))
+		for i := len(o.FromSources) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(fromSourcesOffsets[i])
+		}
+		fromSourcesVecOffset = builder.EndVector(len(o.FromSources))
 	}
-	generated.UpdateQueryElementStartFromSourcesVector(builder, len(o.FromSources))
-	for i := len(fromSourcesOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(fromSourcesOffsets[i])
+	var joinsVecOffset flatbuffers.UOffsetT
+	if o.Joins != nil {
+		joinsOffsets := make([]flatbuffers.UOffsetT, len(o.Joins))
+		for i := range o.Joins {
+			joinsOffsets[i] = o.Joins[i].SerializeTo(builder)
+		}
+		generated.UpdateQueryElementStartJoinsVector(builder, len(o.Joins))
+		for i := len(o.Joins) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(joinsOffsets[i])
+		}
+		joinsVecOffset = builder.EndVector(len(o.Joins))
 	}
-	fromSourcesVecOffset := builder.EndVector(len(o.FromSources))
-	joinsOffsets := make([]flatbuffers.UOffsetT, len(o.Joins))
-	for i := range o.Joins {
-		joinsOffsets[i] = o.Joins[i].SerializeTo(builder)
-	}
-	generated.UpdateQueryElementStartJoinsVector(builder, len(o.Joins))
-	for i := len(joinsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(joinsOffsets[i])
-	}
-	joinsVecOffset := builder.EndVector(len(o.Joins))
+	var setsVecOffset flatbuffers.UOffsetT
 	setsOffsets := make([]flatbuffers.UOffsetT, len(o.Sets))
 	for i := range o.Sets {
 		setsOffsets[i] = o.Sets[i].SerializeTo(builder)
 	}
 	generated.UpdateQueryElementStartSetsVector(builder, len(o.Sets))
-	for i := len(setsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Sets) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(setsOffsets[i])
 	}
-	setsVecOffset := builder.EndVector(len(o.Sets))
+	setsVecOffset = builder.EndVector(len(o.Sets))
 	var sourceType generated.TableSourceUnion
 	var sourceOffset flatbuffers.UOffsetT
 	switch v := o.Source.(type) {
@@ -2216,8 +2314,11 @@ func OnConflictFromFbs(fbs *generated.OnConflict) *OnConflict {
 			o.Action = DoUpdateFromFbs(&u)
 		}
 	}
-	for i := 0; i < fbs.ConflictTargetLength(); i++ {
-		o.ConflictTarget = append(o.ConflictTarget, string(fbs.ConflictTarget(i)))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.ConflictTarget = []string{}
+		for i := 0; i < fbs.ConflictTargetLength(); i++ {
+			o.ConflictTarget = append(o.ConflictTarget, string(fbs.ConflictTarget(i)))
+		}
 	}
 	return o
 }
@@ -2257,15 +2358,16 @@ func (o *OnConflict) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffs
 	default:
 		panic(fmt.Sprintf("OnConflict.Action: %T is not a pointer to a ConflictAction variant", v))
 	}
+	var conflictTargetVecOffset flatbuffers.UOffsetT
 	conflictTargetOffsets := make([]flatbuffers.UOffsetT, len(o.ConflictTarget))
-	for i, s := range o.ConflictTarget {
-		conflictTargetOffsets[i] = builder.CreateString(s)
+	for i := range o.ConflictTarget {
+		conflictTargetOffsets[i] = builder.CreateString(o.ConflictTarget[i])
 	}
 	generated.OnConflictStartConflictTargetVector(builder, len(o.ConflictTarget))
-	for i := len(conflictTargetOffsets) - 1; i >= 0; i-- {
+	for i := len(o.ConflictTarget) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(conflictTargetOffsets[i])
 	}
-	conflictTargetVecOffset := builder.EndVector(len(o.ConflictTarget))
+	conflictTargetVecOffset = builder.EndVector(len(o.ConflictTarget))
 	generated.OnConflictStart(builder)
 	if actionOffset != 0 {
 		generated.OnConflictAddActionType(builder, actionType)
@@ -2285,8 +2387,11 @@ type InsertQueryElement struct {
 
 func InsertQueryElementFromFbs(fbs *generated.InsertQueryElement) *InsertQueryElement {
 	o := &InsertQueryElement{}
-	for i := 0; i < fbs.ColumnsLength(); i++ {
-		o.Columns = append(o.Columns, string(fbs.Columns(i)))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Columns = []string{}
+		for i := 0; i < fbs.ColumnsLength(); i++ {
+			o.Columns = append(o.Columns, string(fbs.Columns(i)))
+		}
 	}
 	if tbl := new(flatbuffers.Table); fbs.Dest(tbl) {
 		switch fbs.DestType() {
@@ -2331,8 +2436,11 @@ func InsertQueryElementFromFbs(fbs *generated.InsertQueryElement) *InsertQueryEl
 	if fbsVal := fbs.OnConflict(nil); fbsVal != nil {
 		o.OnConflict = OnConflictFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.ReturningLength(); i++ {
-		o.Returning = append(o.Returning, string(fbs.Returning(i)))
+	if tbl := fbs.Table(); tbl.Offset(14) != 0 {
+		o.Returning = []string{}
+		for i := 0; i < fbs.ReturningLength(); i++ {
+			o.Returning = append(o.Returning, string(fbs.Returning(i)))
+		}
 	}
 	if fbsVal := fbs.Source(nil); fbsVal != nil {
 		o.Source = *QueryElementFromFbs(fbsVal)
@@ -2356,15 +2464,16 @@ func (o *InsertQueryElement) ToBytes() []byte {
 
 // SerializeTo writes the InsertQueryElement into a FlatBuffer builder and returns the offset.
 func (o *InsertQueryElement) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var columnsVecOffset flatbuffers.UOffsetT
 	columnsOffsets := make([]flatbuffers.UOffsetT, len(o.Columns))
-	for i, s := range o.Columns {
-		columnsOffsets[i] = builder.CreateString(s)
+	for i := range o.Columns {
+		columnsOffsets[i] = builder.CreateString(o.Columns[i])
 	}
 	generated.InsertQueryElementStartColumnsVector(builder, len(o.Columns))
-	for i := len(columnsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Columns) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(columnsOffsets[i])
 	}
-	columnsVecOffset := builder.EndVector(len(o.Columns))
+	columnsVecOffset = builder.EndVector(len(o.Columns))
 	var destType generated.TableSourceUnion
 	var destOffset flatbuffers.UOffsetT
 	switch v := o.Dest.(type) {
@@ -2412,15 +2521,18 @@ func (o *InsertQueryElement) SerializeTo(builder *flatbuffers.Builder) flatbuffe
 	if o.OnConflict != nil {
 		onConflictOffset = o.OnConflict.SerializeTo(builder)
 	}
-	returningOffsets := make([]flatbuffers.UOffsetT, len(o.Returning))
-	for i, s := range o.Returning {
-		returningOffsets[i] = builder.CreateString(s)
+	var returningVecOffset flatbuffers.UOffsetT
+	if o.Returning != nil {
+		returningOffsets := make([]flatbuffers.UOffsetT, len(o.Returning))
+		for i := range o.Returning {
+			returningOffsets[i] = builder.CreateString(o.Returning[i])
+		}
+		generated.InsertQueryElementStartReturningVector(builder, len(o.Returning))
+		for i := len(o.Returning) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(returningOffsets[i])
+		}
+		returningVecOffset = builder.EndVector(len(o.Returning))
 	}
-	generated.InsertQueryElementStartReturningVector(builder, len(o.Returning))
-	for i := len(returningOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(returningOffsets[i])
-	}
-	returningVecOffset := builder.EndVector(len(o.Returning))
 	sourceOffset := o.Source.SerializeTo(builder)
 	generated.InsertQueryElementStart(builder)
 	generated.InsertQueryElementAddColumns(builder, columnsVecOffset)
@@ -2441,10 +2553,13 @@ type AlterTableElement struct {
 
 func AlterTableElementFromFbs(fbs *generated.AlterTableElement) *AlterTableElement {
 	o := &AlterTableElement{}
-	for i := 0; i < fbs.OperationsLength(); i++ {
-		var item generated.AlterTableOperation
-		if fbs.Operations(&item, i) {
-			o.Operations = append(o.Operations, *AlterTableOperationFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Operations = []AlterTableOperation{}
+		for i := 0; i < fbs.OperationsLength(); i++ {
+			var item generated.AlterTableOperation
+			if fbs.Operations(&item, i) {
+				o.Operations = append(o.Operations, *AlterTableOperationFromFbs(&item))
+			}
 		}
 	}
 	if fbsVal := fbs.Target(nil); fbsVal != nil {
@@ -2469,15 +2584,16 @@ func (o *AlterTableElement) ToBytes() []byte {
 
 // SerializeTo writes the AlterTableElement into a FlatBuffer builder and returns the offset.
 func (o *AlterTableElement) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var operationsVecOffset flatbuffers.UOffsetT
 	operationsOffsets := make([]flatbuffers.UOffsetT, len(o.Operations))
 	for i := range o.Operations {
 		operationsOffsets[i] = o.Operations[i].SerializeTo(builder)
 	}
 	generated.AlterTableElementStartOperationsVector(builder, len(o.Operations))
-	for i := len(operationsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Operations) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(operationsOffsets[i])
 	}
-	operationsVecOffset := builder.EndVector(len(o.Operations))
+	operationsVecOffset = builder.EndVector(len(o.Operations))
 	targetOffset := o.Target.SerializeTo(builder)
 	generated.AlterTableElementStart(builder)
 	generated.AlterTableElementAddOperations(builder, operationsVecOffset)
@@ -2741,25 +2857,34 @@ type TableSource struct {
 
 func TableSourceFromFbs(fbs *generated.TableSource) *TableSource {
 	o := &TableSource{}
-	for i := 0; i < fbs.FieldsLength(); i++ {
-		var item generated.Expr
-		if fbs.Fields(&item, i) {
-			o.Fields = append(o.Fields, *ExprFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.Fields = []Expr{}
+		for i := 0; i < fbs.FieldsLength(); i++ {
+			var item generated.Expr
+			if fbs.Fields(&item, i) {
+				o.Fields = append(o.Fields, *ExprFromFbs(&item))
+			}
 		}
 	}
 	if fbsVal := fbs.Filter(nil); fbsVal != nil {
 		o.Filter = FunctionFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.GroupByLength(); i++ {
-		var item generated.Expr
-		if fbs.GroupBy(&item, i) {
-			o.GroupBy = append(o.GroupBy, *ExprFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(14) != 0 {
+		o.GroupBy = []Expr{}
+		for i := 0; i < fbs.GroupByLength(); i++ {
+			var item generated.Expr
+			if fbs.GroupBy(&item, i) {
+				o.GroupBy = append(o.GroupBy, *ExprFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.OrderByLength(); i++ {
-		var item generated.OrderBy
-		if fbs.OrderBy(&item, i) {
-			o.OrderBy = append(o.OrderBy, *graph.OrderByFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		o.OrderBy = []graph.OrderBy{}
+		for i := 0; i < fbs.OrderByLength(); i++ {
+			var item generated.OrderBy
+			if fbs.OrderBy(&item, i) {
+				o.OrderBy = append(o.OrderBy, *graph.OrderByFromFbs(&item))
+			}
 		}
 	}
 	if tbl := new(flatbuffers.Table); fbs.T(tbl) {
@@ -2821,37 +2946,46 @@ func (o *TableSource) ToBytes() []byte {
 
 // SerializeTo writes the TableSource into a FlatBuffer builder and returns the offset.
 func (o *TableSource) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	fieldsOffsets := make([]flatbuffers.UOffsetT, len(o.Fields))
-	for i := range o.Fields {
-		fieldsOffsets[i] = o.Fields[i].SerializeTo(builder)
+	var fieldsVecOffset flatbuffers.UOffsetT
+	if o.Fields != nil {
+		fieldsOffsets := make([]flatbuffers.UOffsetT, len(o.Fields))
+		for i := range o.Fields {
+			fieldsOffsets[i] = o.Fields[i].SerializeTo(builder)
+		}
+		generated.TableSourceStartFieldsVector(builder, len(o.Fields))
+		for i := len(o.Fields) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(fieldsOffsets[i])
+		}
+		fieldsVecOffset = builder.EndVector(len(o.Fields))
 	}
-	generated.TableSourceStartFieldsVector(builder, len(o.Fields))
-	for i := len(fieldsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(fieldsOffsets[i])
-	}
-	fieldsVecOffset := builder.EndVector(len(o.Fields))
 	var filterOffset flatbuffers.UOffsetT
 	if o.Filter != nil {
 		filterOffset = o.Filter.SerializeTo(builder)
 	}
-	groupByOffsets := make([]flatbuffers.UOffsetT, len(o.GroupBy))
-	for i := range o.GroupBy {
-		groupByOffsets[i] = o.GroupBy[i].SerializeTo(builder)
+	var groupByVecOffset flatbuffers.UOffsetT
+	if o.GroupBy != nil {
+		groupByOffsets := make([]flatbuffers.UOffsetT, len(o.GroupBy))
+		for i := range o.GroupBy {
+			groupByOffsets[i] = o.GroupBy[i].SerializeTo(builder)
+		}
+		generated.TableSourceStartGroupByVector(builder, len(o.GroupBy))
+		for i := len(o.GroupBy) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(groupByOffsets[i])
+		}
+		groupByVecOffset = builder.EndVector(len(o.GroupBy))
 	}
-	generated.TableSourceStartGroupByVector(builder, len(o.GroupBy))
-	for i := len(groupByOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(groupByOffsets[i])
+	var orderByVecOffset flatbuffers.UOffsetT
+	if o.OrderBy != nil {
+		orderByOffsets := make([]flatbuffers.UOffsetT, len(o.OrderBy))
+		for i := range o.OrderBy {
+			orderByOffsets[i] = o.OrderBy[i].SerializeTo(builder)
+		}
+		generated.TableSourceStartOrderByVector(builder, len(o.OrderBy))
+		for i := len(o.OrderBy) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(orderByOffsets[i])
+		}
+		orderByVecOffset = builder.EndVector(len(o.OrderBy))
 	}
-	groupByVecOffset := builder.EndVector(len(o.GroupBy))
-	orderByOffsets := make([]flatbuffers.UOffsetT, len(o.OrderBy))
-	for i := range o.OrderBy {
-		orderByOffsets[i] = o.OrderBy[i].SerializeTo(builder)
-	}
-	generated.TableSourceStartOrderByVector(builder, len(o.OrderBy))
-	for i := len(orderByOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(orderByOffsets[i])
-	}
-	orderByVecOffset := builder.EndVector(len(o.OrderBy))
 	var tType generated.TableSourceUnion
 	var tOffset flatbuffers.UOffsetT
 	switch v := o.T.(type) {
@@ -3029,10 +3163,13 @@ type ValueRow struct {
 
 func ValueRowFromFbs(fbs *generated.ValueRow) *ValueRow {
 	o := &ValueRow{}
-	for i := 0; i < fbs.RowLength(); i++ {
-		var item generated.Expr
-		if fbs.Row(&item, i) {
-			o.Row = append(o.Row, *ExprFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Row = []Expr{}
+		for i := 0; i < fbs.RowLength(); i++ {
+			var item generated.Expr
+			if fbs.Row(&item, i) {
+				o.Row = append(o.Row, *ExprFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -3054,15 +3191,16 @@ func (o *ValueRow) ToBytes() []byte {
 
 // SerializeTo writes the ValueRow into a FlatBuffer builder and returns the offset.
 func (o *ValueRow) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var rowVecOffset flatbuffers.UOffsetT
 	rowOffsets := make([]flatbuffers.UOffsetT, len(o.Row))
 	for i := range o.Row {
 		rowOffsets[i] = o.Row[i].SerializeTo(builder)
 	}
 	generated.ValueRowStartRowVector(builder, len(o.Row))
-	for i := len(rowOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Row) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(rowOffsets[i])
 	}
-	rowVecOffset := builder.EndVector(len(o.Row))
+	rowVecOffset = builder.EndVector(len(o.Row))
 	generated.ValueRowStart(builder)
 	generated.ValueRowAddRow(builder, rowVecOffset)
 	return generated.ValueRowEnd(builder)

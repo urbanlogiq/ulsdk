@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/graph"
 )
 
@@ -184,6 +185,28 @@ func TestRoundTripDistinct(t *testing.T) {
 	}
 }
 
+func TestVectorPresenceDistinct(t *testing.T) {
+	o := &Distinct{}
+	var fbs *generated.Distinct
+	fbs = generated.GetSizePrefixedRootAsDistinct(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		t.Errorf("On: nil vector is written")
+	}
+	o.On = emptyOf(o.On)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsDistinct(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(4) == 0 {
+		t.Errorf("On: empty vector is not written")
+	}
+	got, err := DistinctFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.On == nil {
+		t.Errorf("On: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultDoNothing(t *testing.T) {
 	o := &DoNothing{}
 	if o == nil {
@@ -348,6 +371,28 @@ func TestUnionInsertQueryElementDest(t *testing.T) {
 	}
 }
 
+func TestVectorPresenceInsertQueryElement(t *testing.T) {
+	o := &InsertQueryElement{}
+	var fbs *generated.InsertQueryElement
+	fbs = generated.GetSizePrefixedRootAsInsertQueryElement(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(14) != 0 {
+		t.Errorf("Returning: nil vector is written")
+	}
+	o.Returning = emptyOf(o.Returning)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsInsertQueryElement(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(14) == 0 {
+		t.Errorf("Returning: empty vector is not written")
+	}
+	got, err := InsertQueryElementFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Returning == nil {
+		t.Errorf("Returning: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultJoin(t *testing.T) {
 	o := &Join{}
 	if o == nil {
@@ -462,6 +507,38 @@ func TestDefaultQuery(t *testing.T) {
 }
 
 
+func TestVectorPresenceQuery(t *testing.T) {
+	o := &Query{}
+	var fbs *generated.Query
+	fbs = generated.GetSizePrefixedRootAsQuery(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		t.Errorf("BoundSources: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		t.Errorf("Values: nil vector is written")
+	}
+	o.BoundSources = emptyOf(o.BoundSources)
+	o.Values = emptyOf(o.Values)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsQuery(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(10) == 0 {
+		t.Errorf("BoundSources: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(6) == 0 {
+		t.Errorf("Values: empty vector is not written")
+	}
+	got, err := QueryFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.BoundSources == nil {
+		t.Errorf("BoundSources: empty vector is read back as nil")
+	}
+	if got.Values == nil {
+		t.Errorf("Values: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultQueryElement(t *testing.T) {
 	o := &QueryElement{}
 	if o == nil {
@@ -545,6 +622,48 @@ func TestUnionTableSourceT(t *testing.T) {
 	}
 }
 
+func TestVectorPresenceTableSource(t *testing.T) {
+	o := &TableSource{}
+	var fbs *generated.TableSource
+	fbs = generated.GetSizePrefixedRootAsTableSource(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		t.Errorf("Fields: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(14) != 0 {
+		t.Errorf("GroupBy: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		t.Errorf("OrderBy: nil vector is written")
+	}
+	o.Fields = emptyOf(o.Fields)
+	o.GroupBy = emptyOf(o.GroupBy)
+	o.OrderBy = emptyOf(o.OrderBy)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsTableSource(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(8) == 0 {
+		t.Errorf("Fields: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(14) == 0 {
+		t.Errorf("GroupBy: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(12) == 0 {
+		t.Errorf("OrderBy: empty vector is not written")
+	}
+	got, err := TableSourceFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Fields == nil {
+		t.Errorf("Fields: empty vector is read back as nil")
+	}
+	if got.GroupBy == nil {
+		t.Errorf("GroupBy: empty vector is read back as nil")
+	}
+	if got.OrderBy == nil {
+		t.Errorf("OrderBy: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultTableSourceInstance(t *testing.T) {
 	o := &TableSourceInstance{}
 	if o == nil {
@@ -591,6 +710,58 @@ func TestDefaultUnaryQueryElement(t *testing.T) {
 	}
 }
 
+
+func TestVectorPresenceUnaryQueryElement(t *testing.T) {
+	o := &UnaryQueryElement{}
+	var fbs *generated.UnaryQueryElement
+	fbs = generated.GetSizePrefixedRootAsUnaryQueryElement(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		t.Errorf("Fields: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(14) != 0 {
+		t.Errorf("GroupBy: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		t.Errorf("Joins: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		t.Errorf("OrderBy: nil vector is written")
+	}
+	o.Fields = emptyOf(o.Fields)
+	o.GroupBy = emptyOf(o.GroupBy)
+	o.Joins = emptyOf(o.Joins)
+	o.OrderBy = emptyOf(o.OrderBy)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsUnaryQueryElement(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(10) == 0 {
+		t.Errorf("Fields: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(14) == 0 {
+		t.Errorf("GroupBy: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(6) == 0 {
+		t.Errorf("Joins: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(12) == 0 {
+		t.Errorf("OrderBy: empty vector is not written")
+	}
+	got, err := UnaryQueryElementFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Fields == nil {
+		t.Errorf("Fields: empty vector is read back as nil")
+	}
+	if got.GroupBy == nil {
+		t.Errorf("GroupBy: empty vector is read back as nil")
+	}
+	if got.Joins == nil {
+		t.Errorf("Joins: empty vector is read back as nil")
+	}
+	if got.OrderBy == nil {
+		t.Errorf("OrderBy: empty vector is read back as nil")
+	}
+}
 
 func TestDefaultUnsetArgument(t *testing.T) {
 	o := &UnsetArgument{}
@@ -639,6 +810,38 @@ func TestUnionUpdateQueryElementSource(t *testing.T) {
 		if fmt.Sprintf("%T", got.Source) != fmt.Sprintf("%T", v) {
 			t.Fatalf("got %T, want %T", got.Source, v)
 		}
+	}
+}
+
+func TestVectorPresenceUpdateQueryElement(t *testing.T) {
+	o := &UpdateQueryElement{}
+	var fbs *generated.UpdateQueryElement
+	fbs = generated.GetSizePrefixedRootAsUpdateQueryElement(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		t.Errorf("FromSources: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(14) != 0 {
+		t.Errorf("Joins: nil vector is written")
+	}
+	o.FromSources = emptyOf(o.FromSources)
+	o.Joins = emptyOf(o.Joins)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsUpdateQueryElement(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(12) == 0 {
+		t.Errorf("FromSources: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(14) == 0 {
+		t.Errorf("Joins: empty vector is not written")
+	}
+	got, err := UpdateQueryElementFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.FromSources == nil {
+		t.Errorf("FromSources: empty vector is read back as nil")
+	}
+	if got.Joins == nil {
+		t.Errorf("Joins: empty vector is read back as nil")
 	}
 }
 
@@ -709,6 +912,38 @@ func TestDefaultWindow(t *testing.T) {
 }
 
 
+func TestVectorPresenceWindow(t *testing.T) {
+	o := &Window{}
+	var fbs *generated.Window
+	fbs = generated.GetSizePrefixedRootAsWindow(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		t.Errorf("OrderBy: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		t.Errorf("Partition: nil vector is written")
+	}
+	o.OrderBy = emptyOf(o.OrderBy)
+	o.Partition = emptyOf(o.Partition)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsWindow(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(8) == 0 {
+		t.Errorf("OrderBy: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(6) == 0 {
+		t.Errorf("Partition: empty vector is not written")
+	}
+	got, err := WindowFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.OrderBy == nil {
+		t.Errorf("OrderBy: empty vector is read back as nil")
+	}
+	if got.Partition == nil {
+		t.Errorf("Partition: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultWindowFrame(t *testing.T) {
 	o := &WindowFrame{}
 	if o == nil {
@@ -753,4 +988,9 @@ func TestRoundTripWorklogPartition(t *testing.T) {
 	if result == nil {
 		t.Fatal("expected non-nil result")
 	}
+}
+
+// emptyOf returns an empty, non-nil slice of the type of its argument.
+func emptyOf[T any](_ []T) []T {
+	return []T{}
 }

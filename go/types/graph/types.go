@@ -36,10 +36,13 @@ type GeomOp struct {
 
 func GeomOpFromFbs(fbs *generated.GeomOp) *GeomOp {
 	o := &GeomOp{}
-	for i := 0; i < fbs.GeomsLength(); i++ {
-		var item generated.Geom
-		if fbs.Geoms(&item, i) {
-			o.Geoms = append(o.Geoms, *GeomFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Geoms = []Geom{}
+		for i := 0; i < fbs.GeomsLength(); i++ {
+			var item generated.Geom
+			if fbs.Geoms(&item, i) {
+				o.Geoms = append(o.Geoms, *GeomFromFbs(&item))
+			}
 		}
 	}
 	o.Op = int16(fbs.Op())
@@ -63,15 +66,16 @@ func (o *GeomOp) ToBytes() []byte {
 
 // SerializeTo writes the GeomOp into a FlatBuffer builder and returns the offset.
 func (o *GeomOp) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var geomsVecOffset flatbuffers.UOffsetT
 	geomsOffsets := make([]flatbuffers.UOffsetT, len(o.Geoms))
 	for i := range o.Geoms {
 		geomsOffsets[i] = o.Geoms[i].SerializeTo(builder)
 	}
 	generated.GeomOpStartGeomsVector(builder, len(o.Geoms))
-	for i := len(geomsOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Geoms) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(geomsOffsets[i])
 	}
-	geomsVecOffset := builder.EndVector(len(o.Geoms))
+	geomsVecOffset = builder.EndVector(len(o.Geoms))
 	generated.GeomOpStart(builder)
 	generated.GeomOpAddGeoms(builder, geomsVecOffset)
 	generated.GeomOpAddOp(builder, generated.Fn(o.Op))
@@ -90,31 +94,46 @@ type NodeQuery struct {
 
 func NodeQueryFromFbs(fbs *generated.NodeQuery) *NodeQuery {
 	o := &NodeQuery{}
-	for i := 0; i < fbs.DescriptionsLength(); i++ {
-		o.Descriptions = append(o.Descriptions, string(fbs.Descriptions(i)))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.Descriptions = []string{}
+		for i := 0; i < fbs.DescriptionsLength(); i++ {
+			o.Descriptions = append(o.Descriptions, string(fbs.Descriptions(i)))
+		}
 	}
-	for i := 0; i < fbs.EntityTysLength(); i++ {
-		o.EntityTys = append(o.EntityTys, int32(fbs.EntityTys(i)))
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.EntityTys = []int32{}
+		for i := 0; i < fbs.EntityTysLength(); i++ {
+			o.EntityTys = append(o.EntityTys, int32(fbs.EntityTys(i)))
+		}
 	}
 	if fbsVal := fbs.GeomOp(nil); fbsVal != nil {
 		o.GeomOp = GeomOpFromFbs(fbsVal)
 	}
-	for i := 0; i < fbs.NodeIdsLength(); i++ {
-		var item generated.NodeIdPair
-		if fbs.NodeIds(&item, i) {
-			o.NodeIds = append(o.NodeIds, *NodeIdPairFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		o.NodeIds = []NodeIdPair{}
+		for i := 0; i < fbs.NodeIdsLength(); i++ {
+			var item generated.NodeIdPair
+			if fbs.NodeIds(&item, i) {
+				o.NodeIds = append(o.NodeIds, *NodeIdPairFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.ProjectionsLength(); i++ {
-		var item generated.Projection
-		if fbs.Projections(&item, i) {
-			o.Projections = append(o.Projections, *ProjectionFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
+		o.Projections = []Projection{}
+		for i := 0; i < fbs.ProjectionsLength(); i++ {
+			var item generated.Projection
+			if fbs.Projections(&item, i) {
+				o.Projections = append(o.Projections, *ProjectionFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.StreamIdsLength(); i++ {
-		var item generated.ObjectId
-		if fbs.StreamIds(&item, i) {
-			o.StreamIds = append(o.StreamIds, *id.ObjectIdFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.StreamIds = []id.ObjectId{}
+		for i := 0; i < fbs.StreamIdsLength(); i++ {
+			var item generated.ObjectId
+			if fbs.StreamIds(&item, i) {
+				o.StreamIds = append(o.StreamIds, *id.ObjectIdFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -136,51 +155,66 @@ func (o *NodeQuery) ToBytes() []byte {
 
 // SerializeTo writes the NodeQuery into a FlatBuffer builder and returns the offset.
 func (o *NodeQuery) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	descriptionsOffsets := make([]flatbuffers.UOffsetT, len(o.Descriptions))
-	for i, s := range o.Descriptions {
-		descriptionsOffsets[i] = builder.CreateString(s)
+	var descriptionsVecOffset flatbuffers.UOffsetT
+	if o.Descriptions != nil {
+		descriptionsOffsets := make([]flatbuffers.UOffsetT, len(o.Descriptions))
+		for i := range o.Descriptions {
+			descriptionsOffsets[i] = builder.CreateString(o.Descriptions[i])
+		}
+		generated.NodeQueryStartDescriptionsVector(builder, len(o.Descriptions))
+		for i := len(o.Descriptions) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(descriptionsOffsets[i])
+		}
+		descriptionsVecOffset = builder.EndVector(len(o.Descriptions))
 	}
-	generated.NodeQueryStartDescriptionsVector(builder, len(o.Descriptions))
-	for i := len(descriptionsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(descriptionsOffsets[i])
+	var entityTysVecOffset flatbuffers.UOffsetT
+	if o.EntityTys != nil {
+		generated.NodeQueryStartEntityTysVector(builder, len(o.EntityTys))
+		for i := len(o.EntityTys) - 1; i >= 0; i-- {
+			builder.PrependInt32(o.EntityTys[i])
+		}
+		entityTysVecOffset = builder.EndVector(len(o.EntityTys))
 	}
-	descriptionsVecOffset := builder.EndVector(len(o.Descriptions))
-	generated.NodeQueryStartEntityTysVector(builder, len(o.EntityTys))
-	for i := len(o.EntityTys) - 1; i >= 0; i-- {
-		builder.PrependInt32(o.EntityTys[i])
-	}
-	entityTysVecOffset := builder.EndVector(len(o.EntityTys))
 	var geomOpOffset flatbuffers.UOffsetT
 	if o.GeomOp != nil {
 		geomOpOffset = o.GeomOp.SerializeTo(builder)
 	}
-	nodeIdsOffsets := make([]flatbuffers.UOffsetT, len(o.NodeIds))
-	for i := range o.NodeIds {
-		nodeIdsOffsets[i] = o.NodeIds[i].SerializeTo(builder)
+	var nodeIdsVecOffset flatbuffers.UOffsetT
+	if o.NodeIds != nil {
+		nodeIdsOffsets := make([]flatbuffers.UOffsetT, len(o.NodeIds))
+		for i := range o.NodeIds {
+			nodeIdsOffsets[i] = o.NodeIds[i].SerializeTo(builder)
+		}
+		generated.NodeQueryStartNodeIdsVector(builder, len(o.NodeIds))
+		for i := len(o.NodeIds) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(nodeIdsOffsets[i])
+		}
+		nodeIdsVecOffset = builder.EndVector(len(o.NodeIds))
 	}
-	generated.NodeQueryStartNodeIdsVector(builder, len(o.NodeIds))
-	for i := len(nodeIdsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(nodeIdsOffsets[i])
+	var projectionsVecOffset flatbuffers.UOffsetT
+	if o.Projections != nil {
+		projectionsOffsets := make([]flatbuffers.UOffsetT, len(o.Projections))
+		for i := range o.Projections {
+			projectionsOffsets[i] = o.Projections[i].SerializeTo(builder)
+		}
+		generated.NodeQueryStartProjectionsVector(builder, len(o.Projections))
+		for i := len(o.Projections) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(projectionsOffsets[i])
+		}
+		projectionsVecOffset = builder.EndVector(len(o.Projections))
 	}
-	nodeIdsVecOffset := builder.EndVector(len(o.NodeIds))
-	projectionsOffsets := make([]flatbuffers.UOffsetT, len(o.Projections))
-	for i := range o.Projections {
-		projectionsOffsets[i] = o.Projections[i].SerializeTo(builder)
+	var streamIdsVecOffset flatbuffers.UOffsetT
+	if o.StreamIds != nil {
+		streamIdsOffsets := make([]flatbuffers.UOffsetT, len(o.StreamIds))
+		for i := range o.StreamIds {
+			streamIdsOffsets[i] = o.StreamIds[i].SerializeTo(builder)
+		}
+		generated.NodeQueryStartStreamIdsVector(builder, len(o.StreamIds))
+		for i := len(o.StreamIds) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(streamIdsOffsets[i])
+		}
+		streamIdsVecOffset = builder.EndVector(len(o.StreamIds))
 	}
-	generated.NodeQueryStartProjectionsVector(builder, len(o.Projections))
-	for i := len(projectionsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(projectionsOffsets[i])
-	}
-	projectionsVecOffset := builder.EndVector(len(o.Projections))
-	streamIdsOffsets := make([]flatbuffers.UOffsetT, len(o.StreamIds))
-	for i := range o.StreamIds {
-		streamIdsOffsets[i] = o.StreamIds[i].SerializeTo(builder)
-	}
-	generated.NodeQueryStartStreamIdsVector(builder, len(o.StreamIds))
-	for i := len(streamIdsOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(streamIdsOffsets[i])
-	}
-	streamIdsVecOffset := builder.EndVector(len(o.StreamIds))
 	generated.NodeQueryStart(builder)
 	generated.NodeQueryAddDescriptions(builder, descriptionsVecOffset)
 	generated.NodeQueryAddEntityTys(builder, entityTysVecOffset)
@@ -239,10 +273,13 @@ type EdgeList struct {
 
 func EdgeListFromFbs(fbs *generated.EdgeList) *EdgeList {
 	o := &EdgeList{}
-	for i := 0; i < fbs.EdgesLength(); i++ {
-		var item generated.GraphEdge
-		if fbs.Edges(&item, i) {
-			o.Edges = append(o.Edges, *entity.GraphEdgeFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Edges = []entity.GraphEdge{}
+		for i := 0; i < fbs.EdgesLength(); i++ {
+			var item generated.GraphEdge
+			if fbs.Edges(&item, i) {
+				o.Edges = append(o.Edges, *entity.GraphEdgeFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -264,15 +301,16 @@ func (o *EdgeList) ToBytes() []byte {
 
 // SerializeTo writes the EdgeList into a FlatBuffer builder and returns the offset.
 func (o *EdgeList) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var edgesVecOffset flatbuffers.UOffsetT
 	edgesOffsets := make([]flatbuffers.UOffsetT, len(o.Edges))
 	for i := range o.Edges {
 		edgesOffsets[i] = o.Edges[i].SerializeTo(builder)
 	}
 	generated.EdgeListStartEdgesVector(builder, len(o.Edges))
-	for i := len(edgesOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Edges) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(edgesOffsets[i])
 	}
-	edgesVecOffset := builder.EndVector(len(o.Edges))
+	edgesVecOffset = builder.EndVector(len(o.Edges))
 	generated.EdgeListStart(builder)
 	generated.EdgeListAddEdges(builder, edgesVecOffset)
 	return generated.EdgeListEnd(builder)
@@ -381,16 +419,22 @@ type GraphQuery struct {
 func GraphQueryFromFbs(fbs *generated.GraphQuery) *GraphQuery {
 	o := &GraphQuery{}
 	o.Limit = fbs.Limit()
-	for i := 0; i < fbs.OrderByLength(); i++ {
-		var item generated.OrderBy
-		if fbs.OrderBy(&item, i) {
-			o.OrderBy = append(o.OrderBy, *OrderByFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.OrderBy = []OrderBy{}
+		for i := 0; i < fbs.OrderByLength(); i++ {
+			var item generated.OrderBy
+			if fbs.OrderBy(&item, i) {
+				o.OrderBy = append(o.OrderBy, *OrderByFromFbs(&item))
+			}
 		}
 	}
-	for i := 0; i < fbs.PathLength(); i++ {
-		var item generated.QueryPathElement
-		if fbs.Path(&item, i) {
-			o.Path = append(o.Path, *QueryPathElementFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Path = []QueryPathElement{}
+		for i := 0; i < fbs.PathLength(); i++ {
+			var item generated.QueryPathElement
+			if fbs.Path(&item, i) {
+				o.Path = append(o.Path, *QueryPathElementFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -412,24 +456,28 @@ func (o *GraphQuery) ToBytes() []byte {
 
 // SerializeTo writes the GraphQuery into a FlatBuffer builder and returns the offset.
 func (o *GraphQuery) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	orderByOffsets := make([]flatbuffers.UOffsetT, len(o.OrderBy))
-	for i := range o.OrderBy {
-		orderByOffsets[i] = o.OrderBy[i].SerializeTo(builder)
+	var orderByVecOffset flatbuffers.UOffsetT
+	if o.OrderBy != nil {
+		orderByOffsets := make([]flatbuffers.UOffsetT, len(o.OrderBy))
+		for i := range o.OrderBy {
+			orderByOffsets[i] = o.OrderBy[i].SerializeTo(builder)
+		}
+		generated.GraphQueryStartOrderByVector(builder, len(o.OrderBy))
+		for i := len(o.OrderBy) - 1; i >= 0; i-- {
+			builder.PrependUOffsetT(orderByOffsets[i])
+		}
+		orderByVecOffset = builder.EndVector(len(o.OrderBy))
 	}
-	generated.GraphQueryStartOrderByVector(builder, len(o.OrderBy))
-	for i := len(orderByOffsets) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(orderByOffsets[i])
-	}
-	orderByVecOffset := builder.EndVector(len(o.OrderBy))
+	var pathVecOffset flatbuffers.UOffsetT
 	pathOffsets := make([]flatbuffers.UOffsetT, len(o.Path))
 	for i := range o.Path {
 		pathOffsets[i] = o.Path[i].SerializeTo(builder)
 	}
 	generated.GraphQueryStartPathVector(builder, len(o.Path))
-	for i := len(pathOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Path) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(pathOffsets[i])
 	}
-	pathVecOffset := builder.EndVector(len(o.Path))
+	pathVecOffset = builder.EndVector(len(o.Path))
 	generated.GraphQueryStart(builder)
 	generated.GraphQueryAddLimit(builder, o.Limit)
 	generated.GraphQueryAddOrderBy(builder, orderByVecOffset)
@@ -486,10 +534,13 @@ type NodeList struct {
 
 func NodeListFromFbs(fbs *generated.NodeList) *NodeList {
 	o := &NodeList{}
-	for i := 0; i < fbs.NodesLength(); i++ {
-		var item generated.GraphNode
-		if fbs.Nodes(&item, i) {
-			o.Nodes = append(o.Nodes, *entity.GraphNodeFromFbs(&item))
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Nodes = []entity.GraphNode{}
+		for i := 0; i < fbs.NodesLength(); i++ {
+			var item generated.GraphNode
+			if fbs.Nodes(&item, i) {
+				o.Nodes = append(o.Nodes, *entity.GraphNodeFromFbs(&item))
+			}
 		}
 	}
 	return o
@@ -511,15 +562,16 @@ func (o *NodeList) ToBytes() []byte {
 
 // SerializeTo writes the NodeList into a FlatBuffer builder and returns the offset.
 func (o *NodeList) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var nodesVecOffset flatbuffers.UOffsetT
 	nodesOffsets := make([]flatbuffers.UOffsetT, len(o.Nodes))
 	for i := range o.Nodes {
 		nodesOffsets[i] = o.Nodes[i].SerializeTo(builder)
 	}
 	generated.NodeListStartNodesVector(builder, len(o.Nodes))
-	for i := len(nodesOffsets) - 1; i >= 0; i-- {
+	for i := len(o.Nodes) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(nodesOffsets[i])
 	}
-	nodesVecOffset := builder.EndVector(len(o.Nodes))
+	nodesVecOffset = builder.EndVector(len(o.Nodes))
 	generated.NodeListStart(builder)
 	generated.NodeListAddNodes(builder, nodesVecOffset)
 	return generated.NodeListEnd(builder)

@@ -17,9 +17,8 @@ type Sha256 struct {
 
 func Sha256FromFbs(fbs *generated.Sha256) *Sha256 {
 	o := &Sha256{}
-	o.B = make([]byte, fbs.BLength())
-	for i := 0; i < fbs.BLength(); i++ {
-		o.B[i] = fbs.B(i)
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.B = append([]byte{}, fbs.BBytes()...)
 	}
 	return o
 }
@@ -40,7 +39,8 @@ func (o *Sha256) ToBytes() []byte {
 
 // SerializeTo writes the Sha256 into a FlatBuffer builder and returns the offset.
 func (o *Sha256) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	bOffset := builder.CreateByteVector(o.B)
+	var bOffset flatbuffers.UOffsetT
+	bOffset = builder.CreateByteVector(o.B)
 	generated.Sha256Start(builder)
 	generated.Sha256AddB(builder, bOffset)
 	return generated.Sha256End(builder)
@@ -59,9 +59,8 @@ type CryptHeader struct {
 func CryptHeaderFromFbs(fbs *generated.CryptHeader) *CryptHeader {
 	o := &CryptHeader{}
 	o.Kid = string(fbs.Kid())
-	o.Nonce = make([]byte, fbs.NonceLength())
-	for i := 0; i < fbs.NonceLength(); i++ {
-		o.Nonce[i] = fbs.Nonce(i)
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Nonce = append([]byte{}, fbs.NonceBytes()...)
 	}
 	o.PlaintextLen = fbs.PlaintextLen()
 	return o
@@ -84,7 +83,8 @@ func (o *CryptHeader) ToBytes() []byte {
 // SerializeTo writes the CryptHeader into a FlatBuffer builder and returns the offset.
 func (o *CryptHeader) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	kidOffset := builder.CreateString(o.Kid)
-	nonceOffset := builder.CreateByteVector(o.Nonce)
+	var nonceOffset flatbuffers.UOffsetT
+	nonceOffset = builder.CreateByteVector(o.Nonce)
 	generated.CryptHeaderStart(builder)
 	generated.CryptHeaderAddKid(builder, kidOffset)
 	generated.CryptHeaderAddNonce(builder, nonceOffset)
@@ -102,9 +102,8 @@ func EncryptedObjectFromFbs(fbs *generated.EncryptedObject) *EncryptedObject {
 	if fbsVal := fbs.Header(nil); fbsVal != nil {
 		o.Header = *CryptHeaderFromFbs(fbsVal)
 	}
-	o.Obj = make([]byte, fbs.ObjLength())
-	for i := 0; i < fbs.ObjLength(); i++ {
-		o.Obj[i] = fbs.Obj(i)
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Obj = append([]byte{}, fbs.ObjBytes()...)
 	}
 	return o
 }
@@ -126,7 +125,8 @@ func (o *EncryptedObject) ToBytes() []byte {
 // SerializeTo writes the EncryptedObject into a FlatBuffer builder and returns the offset.
 func (o *EncryptedObject) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	headerOffset := o.Header.SerializeTo(builder)
-	objOffset := builder.CreateByteVector(o.Obj)
+	var objOffset flatbuffers.UOffsetT
+	objOffset = builder.CreateByteVector(o.Obj)
 	generated.EncryptedObjectStart(builder)
 	generated.EncryptedObjectAddHeader(builder, headerOffset)
 	generated.EncryptedObjectAddObj(builder, objOffset)
@@ -141,9 +141,8 @@ type Signature struct {
 func SignatureFromFbs(fbs *generated.Signature) *Signature {
 	o := &Signature{}
 	o.Kid = string(fbs.Kid())
-	o.Sig = make([]byte, fbs.SigLength())
-	for i := 0; i < fbs.SigLength(); i++ {
-		o.Sig[i] = fbs.Sig(i)
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Sig = append([]byte{}, fbs.SigBytes()...)
 	}
 	return o
 }
@@ -165,7 +164,8 @@ func (o *Signature) ToBytes() []byte {
 // SerializeTo writes the Signature into a FlatBuffer builder and returns the offset.
 func (o *Signature) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	kidOffset := builder.CreateString(o.Kid)
-	sigOffset := builder.CreateByteVector(o.Sig)
+	var sigOffset flatbuffers.UOffsetT
+	sigOffset = builder.CreateByteVector(o.Sig)
 	generated.SignatureStart(builder)
 	generated.SignatureAddKid(builder, kidOffset)
 	generated.SignatureAddSig(builder, sigOffset)

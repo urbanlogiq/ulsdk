@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/schema"
 )
 
@@ -59,6 +60,28 @@ func TestUnionTensorType(t *testing.T) {
 	}
 }
 
+func TestVectorPresenceTensor(t *testing.T) {
+	o := &Tensor{}
+	var fbs *generated.Tensor
+	fbs = generated.GetSizePrefixedRootAsTensor(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		t.Errorf("Strides: nil vector is written")
+	}
+	o.Strides = emptyOf(o.Strides)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsTensor(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(10) == 0 {
+		t.Errorf("Strides: empty vector is not written")
+	}
+	got, err := TensorFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Strides == nil {
+		t.Errorf("Strides: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultTensorDim(t *testing.T) {
 	o := &TensorDim{}
 	if o == nil {
@@ -76,4 +99,9 @@ func TestRoundTripTensorDim(t *testing.T) {
 	if result == nil {
 		t.Fatal("expected non-nil result")
 	}
+}
+
+// emptyOf returns an empty, non-nil slice of the type of its argument.
+func emptyOf[T any](_ []T) []T {
+	return []T{}
 }
