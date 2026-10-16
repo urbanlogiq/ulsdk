@@ -53,6 +53,14 @@ public final class Organization {
         this._ssoDomain = value;
     }
 
+    Boolean _public;
+    public Boolean getPublic() {
+        return this._public;
+    }
+    public void setPublic(Boolean value) {
+        this._public = value;
+    }
+
     public java.util.Map<String, Object> toMap() {
         java.util.Map<String, Object> o = new java.util.HashMap();
         Object nameSerialized = null;
@@ -83,6 +91,12 @@ public final class Organization {
         }
         o.put("sso_domain", ssoDomainSerialized);
 
+        Object publicSerialized = null;
+        if (this._public != null) {
+            publicSerialized = this._public;
+        }
+        o.put("public", publicSerialized);
+
         return o;
     }
 
@@ -109,6 +123,13 @@ public final class Organization {
         if (ssoDomainValue != null) {
             this._ssoDomain = (String)ssoDomainValue;
         }
+        Object publicValue = null;
+        if (o.has("public") && !o.isNull("public")) {
+            publicValue = o.get("public");
+        }
+        if (publicValue != null) {
+            this._public = (boolean)publicValue;
+        }
     }
 
     public Organization() {
@@ -118,6 +139,7 @@ public final class Organization {
         this._dataOwnerId = "";
         this._parentId = null;
         this._ssoDomain = null;
+        this._public = null;
     }
 
     @Override

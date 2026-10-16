@@ -183,6 +183,7 @@ type CreateOrganizationRequest struct {
 	SsoDomain *string `json:"sso_domain,omitempty"`
 	AddToOrg bool `json:"add_to_org"`
 	AddDataOwner bool `json:"add_data_owner"`
+	Public *bool `json:"public,omitempty"`
 }
 
 type Organization struct {
@@ -192,6 +193,7 @@ type Organization struct {
 	DataOwnerId string `json:"data_owner_id"`
 	ParentId *string `json:"parent_id,omitempty"`
 	SsoDomain *string `json:"sso_domain,omitempty"`
+	Public *bool `json:"public,omitempty"`
 }
 
 type RenameOrganizationRequest struct {

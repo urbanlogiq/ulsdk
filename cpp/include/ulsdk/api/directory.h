@@ -398,6 +398,7 @@ struct CreateOrganizationRequest {
     std::optional<std::string> sso_domain_;
     bool add_to_org_;
     bool add_data_owner_;
+    std::optional<bool> public_;
 
     CreateOrganizationRequest() = default;
     CreateOrganizationRequest(const struct json_value_s *root);
@@ -417,6 +418,7 @@ struct Organization {
     std::string data_owner_id_;
     std::optional<std::string> parent_id_;
     std::optional<std::string> sso_domain_;
+    std::optional<bool> public_;
 
     Organization() = default;
     Organization(const struct json_value_s *root);

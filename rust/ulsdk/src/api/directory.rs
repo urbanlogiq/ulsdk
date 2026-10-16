@@ -261,6 +261,7 @@ pub struct CreateOrganizationRequest {
     sso_domain: Option<String>,
     add_to_org: bool,
     add_data_owner: bool,
+    public: Option<bool>,
 }
 
 #[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
@@ -271,6 +272,7 @@ pub struct Organization {
     data_owner_id: String,
     parent_id: Option<String>,
     sso_domain: Option<String>,
+    public: Option<bool>,
 }
 
 #[derive(Debug, Default, PartialEq, Serialize, Deserialize)]

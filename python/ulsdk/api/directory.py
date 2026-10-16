@@ -1697,6 +1697,7 @@ class CreateOrganizationRequest:
     sso_domain: "Optional[str]"
     add_to_org: "bool"
     add_data_owner: "bool"
+    public: "Optional[bool]"
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -1709,6 +1710,9 @@ class CreateOrganizationRequest:
             o["sso_domain"] = self.sso_domain
         o["add_to_org"] = self.add_to_org
         o["add_data_owner"] = self.add_data_owner
+        o["public"] = None
+        if self.public is not None:
+            o["public"] = self.public
         return o
 
     @classmethod
@@ -1718,6 +1722,7 @@ class CreateOrganizationRequest:
         sso_domain = None
         add_to_org = None
         add_data_owner = None
+        public = None
 
         for key in o:
             if key == "name":
@@ -1746,12 +1751,19 @@ class CreateOrganizationRequest:
                 add_data_owner_var = o[key]
                 assert type(add_data_owner_var) is bool
                 add_data_owner = add_data_owner_var
+            elif key == "public":
+                if o[key] is not None:
+                    public_var = o[key]
+                    assert type(public_var) is bool
+                    public = public_var
+                else:
+                    public = None
 
         assert name is not None
         assert add_to_org is not None
         assert add_data_owner is not None
 
-        return cls(name, parent_id, sso_domain, add_to_org, add_data_owner)
+        return cls(name, parent_id, sso_domain, add_to_org, add_data_owner, public)
 
     @classmethod
     def make_default(cls) -> Self:
@@ -1760,8 +1772,9 @@ class CreateOrganizationRequest:
         sso_domain = None
         add_to_org = True
         add_data_owner = True
+        public = None
 
-        return cls(name, parent_id, sso_domain, add_to_org, add_data_owner)
+        return cls(name, parent_id, sso_domain, add_to_org, add_data_owner, public)
 
 @dataclass
 class Organization:
@@ -1771,6 +1784,7 @@ class Organization:
     data_owner_id: "str"
     parent_id: "Optional[str]"
     sso_domain: "Optional[str]"
+    public: "Optional[bool]"
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -1784,6 +1798,9 @@ class Organization:
         o["sso_domain"] = None
         if self.sso_domain is not None:
             o["sso_domain"] = self.sso_domain
+        o["public"] = None
+        if self.public is not None:
+            o["public"] = self.public
         return o
 
     @classmethod
@@ -1794,6 +1811,7 @@ class Organization:
         data_owner_id = None
         parent_id = None
         sso_domain = None
+        public = None
 
         for key in o:
             if key == "name":
@@ -1826,13 +1844,20 @@ class Organization:
                     sso_domain = sso_domain_var
                 else:
                     sso_domain = None
+            elif key == "public":
+                if o[key] is not None:
+                    public_var = o[key]
+                    assert type(public_var) is bool
+                    public = public_var
+                else:
+                    public = None
 
         assert name is not None
         assert org_id is not None
         assert org_mgmt_id is not None
         assert data_owner_id is not None
 
-        return cls(name, org_id, org_mgmt_id, data_owner_id, parent_id, sso_domain)
+        return cls(name, org_id, org_mgmt_id, data_owner_id, parent_id, sso_domain, public)
 
     @classmethod
     def make_default(cls) -> Self:
@@ -1842,8 +1867,9 @@ class Organization:
         data_owner_id = ""
         parent_id = None
         sso_domain = None
+        public = None
 
-        return cls(name, org_id, org_mgmt_id, data_owner_id, parent_id, sso_domain)
+        return cls(name, org_id, org_mgmt_id, data_owner_id, parent_id, sso_domain, public)
 
 @dataclass
 class RenameOrganizationRequest:

@@ -3101,7 +3101,8 @@ CreateOrganizationRequest::CreateOrganizationRequest(const struct json_value_s *
     , parent_id_(std::nullopt)
     , sso_domain_(std::nullopt)
     , add_to_org_(false)
-    , add_data_owner_(false) {
+    , add_data_owner_(false)
+    , public_(std::nullopt) {
     if (root->type != json_type_object) {
         throw std::runtime_error("expected json value to be of type object");
     }
@@ -3165,6 +3166,20 @@ CreateOrganizationRequest::CreateOrganizationRequest(const struct json_value_s *
             } else {
                 throw std::runtime_error("expected field to be of type bool");
             }
+        } else if (std::strcmp(e->name->string, "public") == 0) {
+            const struct json_value_s *create_organization_request_value = e->value;
+
+            if (create_organization_request_value->type == json_type_null) {
+                public_ = std::nullopt;
+            } else {
+                if (create_organization_request_value->type == json_type_true) {
+                    public_ = true;
+                } else if (create_organization_request_value->type == json_type_false) {
+                    public_ = false;
+                } else {
+                    throw std::runtime_error("expected field to be of type bool");
+                }
+            }
         }
 
         e = e->next;
@@ -3186,6 +3201,9 @@ CreateOrganizationRequest::operator==(const CreateOrganizationRequest&rhs) const
         return false;
     }
     if (this->add_data_owner_ != rhs.add_data_owner_) {
+        return false;
+    }
+    if (this->public_ != rhs.public_) {
         return false;
     }
     return true;
@@ -3219,6 +3237,14 @@ to_bytes(const CreateOrganizationRequest &o) {
 
     ss << "\"add_data_owner\":";
     ss << (o.add_data_owner_ ? "true" : "false");
+    ss << ",";
+
+    if (o.public_.has_value()) {
+        ss << "\"public\":";
+        const auto &public__value = o.public_.value();
+        ss << (public__value ? "true" : "false");
+    }
+
     std::string str = ss.str();
     if (str.back() == ',') {
         str.pop_back();
@@ -3233,7 +3259,8 @@ Organization::Organization(const struct json_value_s *root)
     , org_mgmt_id_(std::string())
     , data_owner_id_(std::string())
     , parent_id_(std::nullopt)
-    , sso_domain_(std::nullopt) {
+    , sso_domain_(std::nullopt)
+    , public_(std::nullopt) {
     if (root->type != json_type_object) {
         throw std::runtime_error("expected json value to be of type object");
     }
@@ -3304,6 +3331,20 @@ Organization::Organization(const struct json_value_s *root)
                 const struct json_string_s *sso_domain__str = static_cast<const struct json_string_s *>(organization_value->payload);
                 sso_domain_ = std::string(sso_domain__str->string);
             }
+        } else if (std::strcmp(e->name->string, "public") == 0) {
+            const struct json_value_s *organization_value = e->value;
+
+            if (organization_value->type == json_type_null) {
+                public_ = std::nullopt;
+            } else {
+                if (organization_value->type == json_type_true) {
+                    public_ = true;
+                } else if (organization_value->type == json_type_false) {
+                    public_ = false;
+                } else {
+                    throw std::runtime_error("expected field to be of type bool");
+                }
+            }
         }
 
         e = e->next;
@@ -3328,6 +3369,9 @@ Organization::operator==(const Organization&rhs) const {
         return false;
     }
     if (this->sso_domain_ != rhs.sso_domain_) {
+        return false;
+    }
+    if (this->public_ != rhs.public_) {
         return false;
     }
     return true;
@@ -3364,6 +3408,13 @@ to_bytes(const Organization &o) {
         ss << "\"sso_domain\":";
         const auto &sso_domain__value = o.sso_domain_.value();
         ss << "\"" << sso_domain__value << "\"";
+        ss << ",";
+    }
+
+    if (o.public_.has_value()) {
+        ss << "\"public\":";
+        const auto &public__value = o.public_.value();
+        ss << (public__value ? "true" : "false");
     }
 
     std::string str = ss.str();

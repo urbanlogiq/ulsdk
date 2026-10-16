@@ -45,6 +45,14 @@ public final class CreateOrganizationRequest {
         this._addDataOwner = value;
     }
 
+    Boolean _public;
+    public Boolean getPublic() {
+        return this._public;
+    }
+    public void setPublic(Boolean value) {
+        this._public = value;
+    }
+
     public java.util.Map<String, Object> toMap() {
         java.util.Map<String, Object> o = new java.util.HashMap();
         Object nameSerialized = null;
@@ -71,6 +79,12 @@ public final class CreateOrganizationRequest {
         addDataOwnerSerialized = this._addDataOwner;
         o.put("add_data_owner", addDataOwnerSerialized);
 
+        Object publicSerialized = null;
+        if (this._public != null) {
+            publicSerialized = this._public;
+        }
+        o.put("public", publicSerialized);
+
         return o;
     }
 
@@ -95,6 +109,13 @@ public final class CreateOrganizationRequest {
         this._addToOrg = (boolean)addToOrgValue;
         Object addDataOwnerValue = o.get("add_data_owner");
         this._addDataOwner = (boolean)addDataOwnerValue;
+        Object publicValue = null;
+        if (o.has("public") && !o.isNull("public")) {
+            publicValue = o.get("public");
+        }
+        if (publicValue != null) {
+            this._public = (boolean)publicValue;
+        }
     }
 
     public CreateOrganizationRequest() {
@@ -103,6 +124,7 @@ public final class CreateOrganizationRequest {
         this._ssoDomain = null;
         this._addToOrg = true;
         this._addDataOwner = true;
+        this._public = null;
     }
 
     @Override

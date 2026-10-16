@@ -175,6 +175,7 @@ export interface CreateOrganizationRequest {
   ssoDomain?: string;
   addToOrg: boolean;
   addDataOwner: boolean;
+  public?: boolean;
 }
 
 export interface Organization {
@@ -184,6 +185,7 @@ export interface Organization {
   dataOwnerId: string;
   parentId?: string;
   ssoDomain?: string;
+  public?: boolean;
 }
 
 export interface RenameOrganizationRequest {
