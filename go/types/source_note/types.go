@@ -5,6 +5,7 @@
 package source_note
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/id"
@@ -59,7 +60,12 @@ func SourceNoteFromFbs(fbs *generated.SourceNote) *SourceNote {
 }
 
 // SourceNoteFromBytes deserializes a SourceNote from size-prefixed FlatBuffer bytes.
-func SourceNoteFromBytes(data []byte) (*SourceNote, error) {
+func SourceNoteFromBytes(data []byte) (o *SourceNote, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("SourceNote: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsSourceNote(data, 0)
 	return SourceNoteFromFbs(fbs), nil
 }

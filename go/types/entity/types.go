@@ -5,6 +5,7 @@
 package entity
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/id"
@@ -329,7 +330,12 @@ func PointFromFbs(fbs *generated.Point) *Point {
 }
 
 // PointFromBytes deserializes a Point from size-prefixed FlatBuffer bytes.
-func PointFromBytes(data []byte) (*Point, error) {
+func PointFromBytes(data []byte) (o *Point, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Point: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsPoint(data, 0)
 	return PointFromFbs(fbs), nil
 }
@@ -374,7 +380,12 @@ func LineFromFbs(fbs *generated.Line) *Line {
 }
 
 // LineFromBytes deserializes a Line from size-prefixed FlatBuffer bytes.
-func LineFromBytes(data []byte) (*Line, error) {
+func LineFromBytes(data []byte) (o *Line, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Line: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsLine(data, 0)
 	return LineFromFbs(fbs), nil
 }
@@ -423,7 +434,12 @@ func MultiLineFromFbs(fbs *generated.MultiLine) *MultiLine {
 }
 
 // MultiLineFromBytes deserializes a MultiLine from size-prefixed FlatBuffer bytes.
-func MultiLineFromBytes(data []byte) (*MultiLine, error) {
+func MultiLineFromBytes(data []byte) (o *MultiLine, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("MultiLine: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsMultiLine(data, 0)
 	return MultiLineFromFbs(fbs), nil
 }
@@ -475,7 +491,12 @@ func PolygonFromFbs(fbs *generated.Polygon) *Polygon {
 }
 
 // PolygonFromBytes deserializes a Polygon from size-prefixed FlatBuffer bytes.
-func PolygonFromBytes(data []byte) (*Polygon, error) {
+func PolygonFromBytes(data []byte) (o *Polygon, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Polygon: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsPolygon(data, 0)
 	return PolygonFromFbs(fbs), nil
 }
@@ -524,7 +545,12 @@ func MultiPolygonFromFbs(fbs *generated.MultiPolygon) *MultiPolygon {
 }
 
 // MultiPolygonFromBytes deserializes a MultiPolygon from size-prefixed FlatBuffer bytes.
-func MultiPolygonFromBytes(data []byte) (*MultiPolygon, error) {
+func MultiPolygonFromBytes(data []byte) (o *MultiPolygon, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("MultiPolygon: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsMultiPolygon(data, 0)
 	return MultiPolygonFromFbs(fbs), nil
 }
@@ -573,7 +599,12 @@ func MultiPointFromFbs(fbs *generated.MultiPoint) *MultiPoint {
 }
 
 // MultiPointFromBytes deserializes a MultiPoint from size-prefixed FlatBuffer bytes.
-func MultiPointFromBytes(data []byte) (*MultiPoint, error) {
+func MultiPointFromBytes(data []byte) (o *MultiPoint, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("MultiPoint: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsMultiPoint(data, 0)
 	return MultiPointFromFbs(fbs), nil
 }
@@ -624,11 +655,19 @@ type GraphEdge struct {
 
 func GraphEdgeFromFbs(fbs *generated.GraphEdge) *GraphEdge {
 	o := &GraphEdge{}
+	o.From = fbs.Get_From()
+	o.Kind = int32(fbs.Get_Kind())
+	o.To = fbs.Get_To()
 	return o
 }
 
 // GraphEdgeFromBytes deserializes a GraphEdge from size-prefixed FlatBuffer bytes.
-func GraphEdgeFromBytes(data []byte) (*GraphEdge, error) {
+func GraphEdgeFromBytes(data []byte) (o *GraphEdge, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("GraphEdge: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsGraphEdge(data, 0)
 	return GraphEdgeFromFbs(fbs), nil
 }
@@ -644,6 +683,9 @@ func (o *GraphEdge) ToBytes() []byte {
 // SerializeTo writes the GraphEdge into a FlatBuffer builder and returns the offset.
 func (o *GraphEdge) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	generated.GraphEdgeStart(builder)
+	generated.GraphEdgeAdd_From(builder, o.From)
+	generated.GraphEdgeAdd_Kind(builder, generated.EdgeTy(o.Kind))
+	generated.GraphEdgeAdd_To(builder, o.To)
 	return generated.GraphEdgeEnd(builder)
 }
 
@@ -660,11 +702,60 @@ type GraphNode struct {
 
 func GraphNodeFromFbs(fbs *generated.GraphNode) *GraphNode {
 	o := &GraphNode{}
+	if s := fbs.Get_Description(); s != nil {
+		str := string(s)
+		o.Description = &str
+	}
+	o.EntityType = int32(fbs.Get_EntityType())
+	if tbl := new(flatbuffers.Table); fbs.Get_Geom(tbl) {
+		switch fbs.Get_GeomType() {
+		case generated.GeometryPoint:
+			var u generated.Point
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Geom = PointFromFbs(&u)
+		case generated.GeometryLine:
+			var u generated.Line
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Geom = LineFromFbs(&u)
+		case generated.GeometryMultiLine:
+			var u generated.MultiLine
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Geom = MultiLineFromFbs(&u)
+		case generated.GeometryPolygon:
+			var u generated.Polygon
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Geom = PolygonFromFbs(&u)
+		case generated.GeometryMultiPolygon:
+			var u generated.MultiPolygon
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Geom = MultiPolygonFromFbs(&u)
+		case generated.GeometryMultiPoint:
+			var u generated.MultiPoint
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Geom = MultiPointFromFbs(&u)
+		}
+	}
+	if fbsVal := fbs.Get_Location(nil); fbsVal != nil {
+		o.Location = PointFromFbs(fbsVal)
+	}
+	if fbsVal := fbs.Get_NodeId(nil); fbsVal != nil {
+		o.NodeId = id.GenericIdFromFbs(fbsVal)
+	}
+	o.NodeType = int32(fbs.Get_NodeType())
+	if fbsVal := fbs.Get_Stream(nil); fbsVal != nil {
+		o.Stream = id.ObjectIdFromFbs(fbsVal)
+	}
+	o.Uid = fbs.Get_Uid()
 	return o
 }
 
 // GraphNodeFromBytes deserializes a GraphNode from size-prefixed FlatBuffer bytes.
-func GraphNodeFromBytes(data []byte) (*GraphNode, error) {
+func GraphNodeFromBytes(data []byte) (o *GraphNode, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("GraphNode: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsGraphNode(data, 0)
 	return GraphNodeFromFbs(fbs), nil
 }
@@ -679,6 +770,64 @@ func (o *GraphNode) ToBytes() []byte {
 
 // SerializeTo writes the GraphNode into a FlatBuffer builder and returns the offset.
 func (o *GraphNode) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var descriptionOffset flatbuffers.UOffsetT
+	if o.Description != nil {
+		descriptionOffset = builder.CreateString(*o.Description)
+	}
+	var geomType generated.Geometry
+	var geomOffset flatbuffers.UOffsetT
+	switch v := o.Geom.(type) {
+	case nil:
+	case *Point:
+		if v != nil {
+			geomType, geomOffset = generated.GeometryPoint, v.SerializeTo(builder)
+		}
+	case *Line:
+		if v != nil {
+			geomType, geomOffset = generated.GeometryLine, v.SerializeTo(builder)
+		}
+	case *MultiLine:
+		if v != nil {
+			geomType, geomOffset = generated.GeometryMultiLine, v.SerializeTo(builder)
+		}
+	case *Polygon:
+		if v != nil {
+			geomType, geomOffset = generated.GeometryPolygon, v.SerializeTo(builder)
+		}
+	case *MultiPolygon:
+		if v != nil {
+			geomType, geomOffset = generated.GeometryMultiPolygon, v.SerializeTo(builder)
+		}
+	case *MultiPoint:
+		if v != nil {
+			geomType, geomOffset = generated.GeometryMultiPoint, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("GraphNode.Geom: %T is not a pointer to a Geometry variant", v))
+	}
+	var locationOffset flatbuffers.UOffsetT
+	if o.Location != nil {
+		locationOffset = o.Location.SerializeTo(builder)
+	}
+	var nodeIdOffset flatbuffers.UOffsetT
+	if o.NodeId != nil {
+		nodeIdOffset = o.NodeId.SerializeTo(builder)
+	}
+	var streamOffset flatbuffers.UOffsetT
+	if o.Stream != nil {
+		streamOffset = o.Stream.SerializeTo(builder)
+	}
 	generated.GraphNodeStart(builder)
+	generated.GraphNodeAdd_Description(builder, descriptionOffset)
+	generated.GraphNodeAdd_EntityType(builder, generated.EntityTy(o.EntityType))
+	if geomOffset != 0 {
+		generated.GraphNodeAdd_GeomType(builder, geomType)
+		generated.GraphNodeAdd_Geom(builder, geomOffset)
+	}
+	generated.GraphNodeAdd_Location(builder, locationOffset)
+	generated.GraphNodeAdd_NodeId(builder, nodeIdOffset)
+	generated.GraphNodeAdd_NodeType(builder, generated.NodeTy(o.NodeType))
+	generated.GraphNodeAdd_Stream(builder, streamOffset)
+	generated.GraphNodeAdd_Uid(builder, o.Uid)
 	return generated.GraphNodeEnd(builder)
 }

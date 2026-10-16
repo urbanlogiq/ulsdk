@@ -357,6 +357,28 @@ func TestRoundTripFloatAggregate(t *testing.T) {
 	}
 }
 
+func TestVectorPresenceFloatAggregate(t *testing.T) {
+	o := &FloatAggregate{}
+	var fbs *generated.FloatAggregate
+	fbs = generated.GetSizePrefixedRootAsFloatAggregate(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(16) != 0 {
+		t.Errorf("Histo: nil vector is written")
+	}
+	o.Histo = emptyOf(o.Histo)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsFloatAggregate(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(16) == 0 {
+		t.Errorf("Histo: empty vector is not written")
+	}
+	got, err := FloatAggregateFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Histo == nil {
+		t.Errorf("Histo: empty vector is read back as nil")
+	}
+}
+
 func TestDefaultFloatRange(t *testing.T) {
 	o := &FloatRange{}
 	if o == nil {
@@ -506,6 +528,28 @@ func TestRoundTripIntAggregate(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestVectorPresenceIntAggregate(t *testing.T) {
+	o := &IntAggregate{}
+	var fbs *generated.IntAggregate
+	fbs = generated.GetSizePrefixedRootAsIntAggregate(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(16) != 0 {
+		t.Errorf("Histo: nil vector is written")
+	}
+	o.Histo = emptyOf(o.Histo)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsIntAggregate(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(16) == 0 {
+		t.Errorf("Histo: empty vector is not written")
+	}
+	got, err := IntAggregateFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Histo == nil {
+		t.Errorf("Histo: empty vector is read back as nil")
 	}
 }
 
@@ -1053,6 +1097,28 @@ func TestRoundTripUIntAggregate(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestVectorPresenceUIntAggregate(t *testing.T) {
+	o := &UIntAggregate{}
+	var fbs *generated.UIntAggregate
+	fbs = generated.GetSizePrefixedRootAsUIntAggregate(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(16) != 0 {
+		t.Errorf("Histo: nil vector is written")
+	}
+	o.Histo = emptyOf(o.Histo)
+	data := o.ToBytes()
+	fbs = generated.GetSizePrefixedRootAsUIntAggregate(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(16) == 0 {
+		t.Errorf("Histo: empty vector is not written")
+	}
+	got, err := UIntAggregateFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Histo == nil {
+		t.Errorf("Histo: empty vector is read back as nil")
 	}
 }
 

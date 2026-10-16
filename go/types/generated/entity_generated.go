@@ -1672,3 +1672,63 @@ func GraphEdgeAdd_To(builder *flatbuffers.Builder, _To int64) {
 func GraphEdgeEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
+
+// Get_EntityType exports _EntityType.
+func (rcv *GraphNode) Get_EntityType() EntityTy {
+	return rcv._EntityType()
+}
+
+// Get_NodeType exports _NodeType.
+func (rcv *GraphNode) Get_NodeType() NodeTy {
+	return rcv._NodeType()
+}
+
+// Get_Stream exports _Stream.
+func (rcv *GraphNode) Get_Stream(obj *ObjectId) *ObjectId {
+	return rcv._Stream(obj)
+}
+
+// Get_NodeId exports _NodeId.
+func (rcv *GraphNode) Get_NodeId(obj *GenericId) *GenericId {
+	return rcv._NodeId(obj)
+}
+
+// Get_Location exports _Location.
+func (rcv *GraphNode) Get_Location(obj *Point) *Point {
+	return rcv._Location(obj)
+}
+
+// Get_GeomType exports _GeomType.
+func (rcv *GraphNode) Get_GeomType() Geometry {
+	return rcv._GeomType()
+}
+
+// Get_Geom exports _Geom.
+func (rcv *GraphNode) Get_Geom(obj *flatbuffers.Table) bool {
+	return rcv._Geom(obj)
+}
+
+// Get_Description exports _Description.
+func (rcv *GraphNode) Get_Description() []byte {
+	return rcv._Description()
+}
+
+// Get_Uid exports _Uid.
+func (rcv *GraphNode) Get_Uid() uint64 {
+	return rcv._Uid()
+}
+
+// Get_Kind exports _Kind.
+func (rcv *GraphEdge) Get_Kind() EdgeTy {
+	return rcv._Kind()
+}
+
+// Get_From exports _From.
+func (rcv *GraphEdge) Get_From() int64 {
+	return rcv._From()
+}
+
+// Get_To exports _To.
+func (rcv *GraphEdge) Get_To() int64 {
+	return rcv._To()
+}

@@ -5,6 +5,7 @@
 package data
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/id"
@@ -183,7 +184,12 @@ func AttributePairFromFbs(fbs *generated.AttributePair) *AttributePair {
 }
 
 // AttributePairFromBytes deserializes a AttributePair from size-prefixed FlatBuffer bytes.
-func AttributePairFromBytes(data []byte) (*AttributePair, error) {
+func AttributePairFromBytes(data []byte) (o *AttributePair, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("AttributePair: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsAttributePair(data, 0)
 	return AttributePairFromFbs(fbs), nil
 }
@@ -225,7 +231,12 @@ func DirectionAndRoadNameFromFbs(fbs *generated.DirectionAndRoadName) *Direction
 }
 
 // DirectionAndRoadNameFromBytes deserializes a DirectionAndRoadName from size-prefixed FlatBuffer bytes.
-func DirectionAndRoadNameFromBytes(data []byte) (*DirectionAndRoadName, error) {
+func DirectionAndRoadNameFromBytes(data []byte) (o *DirectionAndRoadName, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("DirectionAndRoadName: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDirectionAndRoadName(data, 0)
 	return DirectionAndRoadNameFromFbs(fbs), nil
 }
@@ -267,7 +278,12 @@ func DirectionAndRoadNamesFromFbs(fbs *generated.DirectionAndRoadNames) *Directi
 }
 
 // DirectionAndRoadNamesFromBytes deserializes a DirectionAndRoadNames from size-prefixed FlatBuffer bytes.
-func DirectionAndRoadNamesFromBytes(data []byte) (*DirectionAndRoadNames, error) {
+func DirectionAndRoadNamesFromBytes(data []byte) (o *DirectionAndRoadNames, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("DirectionAndRoadNames: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDirectionAndRoadNames(data, 0)
 	return DirectionAndRoadNamesFromFbs(fbs), nil
 }
@@ -321,7 +337,12 @@ func NamedParameterFromFbs(fbs *generated.NamedParameter) *NamedParameter {
 }
 
 // NamedParameterFromBytes deserializes a NamedParameter from size-prefixed FlatBuffer bytes.
-func NamedParameterFromBytes(data []byte) (*NamedParameter, error) {
+func NamedParameterFromBytes(data []byte) (o *NamedParameter, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("NamedParameter: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNamedParameter(data, 0)
 	return NamedParameterFromFbs(fbs), nil
 }
@@ -382,7 +403,12 @@ func OutputSchemaFromFbs(fbs *generated.OutputSchema) *OutputSchema {
 }
 
 // OutputSchemaFromBytes deserializes a OutputSchema from size-prefixed FlatBuffer bytes.
-func OutputSchemaFromBytes(data []byte) (*OutputSchema, error) {
+func OutputSchemaFromBytes(data []byte) (o *OutputSchema, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("OutputSchema: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsOutputSchema(data, 0)
 	return OutputSchemaFromFbs(fbs), nil
 }
@@ -468,7 +494,12 @@ func SourceFromFbs(fbs *generated.Source) *Source {
 }
 
 // SourceFromBytes deserializes a Source from size-prefixed FlatBuffer bytes.
-func SourceFromBytes(data []byte) (*Source, error) {
+func SourceFromBytes(data []byte) (o *Source, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Source: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsSource(data, 0)
 	return SourceFromFbs(fbs), nil
 }

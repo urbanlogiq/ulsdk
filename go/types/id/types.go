@@ -39,7 +39,12 @@ func B2cidFromFbs(fbs *generated.B2cId) *B2cid {
 }
 
 // B2cidFromBytes deserializes a B2cid from size-prefixed FlatBuffer bytes.
-func B2cidFromBytes(data []byte) (*B2cid, error) {
+func B2cidFromBytes(data []byte) (o *B2cid, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("B2cid: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsB2cId(data, 0)
 	return B2cidFromFbs(fbs), nil
 }
@@ -81,7 +86,12 @@ func ColumnGroupIdFromFbs(fbs *generated.ColumnGroupId) *ColumnGroupId {
 }
 
 // ColumnGroupIdFromBytes deserializes a ColumnGroupId from size-prefixed FlatBuffer bytes.
-func ColumnGroupIdFromBytes(data []byte) (*ColumnGroupId, error) {
+func ColumnGroupIdFromBytes(data []byte) (o *ColumnGroupId, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ColumnGroupId: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsColumnGroupId(data, 0)
 	return ColumnGroupIdFromFbs(fbs), nil
 }
@@ -123,7 +133,12 @@ func ContentIdFromFbs(fbs *generated.ContentId) *ContentId {
 }
 
 // ContentIdFromBytes deserializes a ContentId from size-prefixed FlatBuffer bytes.
-func ContentIdFromBytes(data []byte) (*ContentId, error) {
+func ContentIdFromBytes(data []byte) (o *ContentId, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ContentId: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsContentId(data, 0)
 	return ContentIdFromFbs(fbs), nil
 }
@@ -165,7 +180,12 @@ func DataStateIdFromFbs(fbs *generated.DataStateId) *DataStateId {
 }
 
 // DataStateIdFromBytes deserializes a DataStateId from size-prefixed FlatBuffer bytes.
-func DataStateIdFromBytes(data []byte) (*DataStateId, error) {
+func DataStateIdFromBytes(data []byte) (o *DataStateId, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("DataStateId: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDataStateId(data, 0)
 	return DataStateIdFromFbs(fbs), nil
 }
@@ -207,7 +227,12 @@ func GenericIdFromFbs(fbs *generated.GenericId) *GenericId {
 }
 
 // GenericIdFromBytes deserializes a GenericId from size-prefixed FlatBuffer bytes.
-func GenericIdFromBytes(data []byte) (*GenericId, error) {
+func GenericIdFromBytes(data []byte) (o *GenericId, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("GenericId: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsGenericId(data, 0)
 	return GenericIdFromFbs(fbs), nil
 }
@@ -249,7 +274,12 @@ func GraphNodeIdFromFbs(fbs *generated.GraphNodeId) *GraphNodeId {
 }
 
 // GraphNodeIdFromBytes deserializes a GraphNodeId from size-prefixed FlatBuffer bytes.
-func GraphNodeIdFromBytes(data []byte) (*GraphNodeId, error) {
+func GraphNodeIdFromBytes(data []byte) (o *GraphNodeId, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("GraphNodeId: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsGraphNodeId(data, 0)
 	return GraphNodeIdFromFbs(fbs), nil
 }
@@ -291,7 +321,12 @@ func ObjectIdFromFbs(fbs *generated.ObjectId) *ObjectId {
 }
 
 // ObjectIdFromBytes deserializes a ObjectId from size-prefixed FlatBuffer bytes.
-func ObjectIdFromBytes(data []byte) (*ObjectId, error) {
+func ObjectIdFromBytes(data []byte) (o *ObjectId, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ObjectId: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsObjectId(data, 0)
 	return ObjectIdFromFbs(fbs), nil
 }
@@ -337,7 +372,12 @@ func PinnedObjectIdFromFbs(fbs *generated.PinnedObjectId) *PinnedObjectId {
 }
 
 // PinnedObjectIdFromBytes deserializes a PinnedObjectId from size-prefixed FlatBuffer bytes.
-func PinnedObjectIdFromBytes(data []byte) (*PinnedObjectId, error) {
+func PinnedObjectIdFromBytes(data []byte) (o *PinnedObjectId, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("PinnedObjectId: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsPinnedObjectId(data, 0)
 	return PinnedObjectIdFromFbs(fbs), nil
 }
@@ -377,7 +417,12 @@ func StreamIdFromFbs(fbs *generated.StreamId) *StreamId {
 }
 
 // StreamIdFromBytes deserializes a StreamId from size-prefixed FlatBuffer bytes.
-func StreamIdFromBytes(data []byte) (*StreamId, error) {
+func StreamIdFromBytes(data []byte) (o *StreamId, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("StreamId: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsStreamId(data, 0)
 	return StreamIdFromFbs(fbs), nil
 }

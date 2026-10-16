@@ -36,11 +36,25 @@ func TestVectorPresenceFooter(t *testing.T) {
 	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
 		t.Errorf("CustomMetadata: nil vector is written")
 	}
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		t.Errorf("Dictionaries: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(10) != 0 {
+		t.Errorf("RecordBatches: nil vector is written")
+	}
 	o.CustomMetadata = emptyOf(o.CustomMetadata)
+	o.Dictionaries = emptyOf(o.Dictionaries)
+	o.RecordBatches = emptyOf(o.RecordBatches)
 	data := o.ToBytes()
 	fbs = generated.GetSizePrefixedRootAsFooter(data, 0)
 	if tbl := fbs.Table(); tbl.Offset(12) == 0 {
 		t.Errorf("CustomMetadata: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(8) == 0 {
+		t.Errorf("Dictionaries: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(10) == 0 {
+		t.Errorf("RecordBatches: empty vector is not written")
 	}
 	got, err := FooterFromBytes(data)
 	if err != nil {
@@ -48,6 +62,12 @@ func TestVectorPresenceFooter(t *testing.T) {
 	}
 	if got.CustomMetadata == nil {
 		t.Errorf("CustomMetadata: empty vector is read back as nil")
+	}
+	if got.Dictionaries == nil {
+		t.Errorf("Dictionaries: empty vector is read back as nil")
+	}
+	if got.RecordBatches == nil {
+		t.Errorf("RecordBatches: empty vector is read back as nil")
 	}
 }
 

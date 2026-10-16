@@ -5,6 +5,7 @@
 package governed_document
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/id"
@@ -32,7 +33,12 @@ func DocumentFieldFromFbs(fbs *generated.DocumentField) *DocumentField {
 }
 
 // DocumentFieldFromBytes deserializes a DocumentField from size-prefixed FlatBuffer bytes.
-func DocumentFieldFromBytes(data []byte) (*DocumentField, error) {
+func DocumentFieldFromBytes(data []byte) (o *DocumentField, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("DocumentField: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDocumentField(data, 0)
 	return DocumentFieldFromFbs(fbs), nil
 }
@@ -119,7 +125,12 @@ func GovernedDocumentFromFbs(fbs *generated.GovernedDocument) *GovernedDocument 
 }
 
 // GovernedDocumentFromBytes deserializes a GovernedDocument from size-prefixed FlatBuffer bytes.
-func GovernedDocumentFromBytes(data []byte) (*GovernedDocument, error) {
+func GovernedDocumentFromBytes(data []byte) (o *GovernedDocument, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("GovernedDocument: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsGovernedDocument(data, 0)
 	return GovernedDocumentFromFbs(fbs), nil
 }

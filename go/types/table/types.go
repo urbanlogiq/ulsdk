@@ -39,7 +39,12 @@ func ModifyFromFbs(fbs *generated.Modify) *Modify {
 }
 
 // ModifyFromBytes deserializes a Modify from size-prefixed FlatBuffer bytes.
-func ModifyFromBytes(data []byte) (*Modify, error) {
+func ModifyFromBytes(data []byte) (o *Modify, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Modify: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsModify(data, 0)
 	return ModifyFromFbs(fbs), nil
 }
@@ -82,7 +87,12 @@ func DeleteFromFbs(fbs *generated.Delete) *Delete {
 }
 
 // DeleteFromBytes deserializes a Delete from size-prefixed FlatBuffer bytes.
-func DeleteFromBytes(data []byte) (*Delete, error) {
+func DeleteFromBytes(data []byte) (o *Delete, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Delete: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDelete(data, 0)
 	return DeleteFromFbs(fbs), nil
 }
@@ -116,7 +126,12 @@ func RestoreFromFbs(fbs *generated.Restore) *Restore {
 }
 
 // RestoreFromBytes deserializes a Restore from size-prefixed FlatBuffer bytes.
-func RestoreFromBytes(data []byte) (*Restore, error) {
+func RestoreFromBytes(data []byte) (o *Restore, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Restore: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsRestore(data, 0)
 	return RestoreFromFbs(fbs), nil
 }
@@ -162,7 +177,12 @@ func SetFromFbs(fbs *generated.Set) *Set {
 }
 
 // SetFromBytes deserializes a Set from size-prefixed FlatBuffer bytes.
-func SetFromBytes(data []byte) (*Set, error) {
+func SetFromBytes(data []byte) (o *Set, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Set: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsSet(data, 0)
 	return SetFromFbs(fbs), nil
 }
@@ -202,7 +222,12 @@ func RmRowFromFbs(fbs *generated.RmRow) *RmRow {
 }
 
 // RmRowFromBytes deserializes a RmRow from size-prefixed FlatBuffer bytes.
-func RmRowFromBytes(data []byte) (*RmRow, error) {
+func RmRowFromBytes(data []byte) (o *RmRow, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("RmRow: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsRmRow(data, 0)
 	return RmRowFromFbs(fbs), nil
 }
@@ -240,7 +265,12 @@ func RestoreRowFromFbs(fbs *generated.RestoreRow) *RestoreRow {
 }
 
 // RestoreRowFromBytes deserializes a RestoreRow from size-prefixed FlatBuffer bytes.
-func RestoreRowFromBytes(data []byte) (*RestoreRow, error) {
+func RestoreRowFromBytes(data []byte) (o *RestoreRow, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("RestoreRow: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsRestoreRow(data, 0)
 	return RestoreRowFromFbs(fbs), nil
 }
@@ -276,7 +306,12 @@ func AppendFromFbs(fbs *generated.Append) *Append {
 }
 
 // AppendFromBytes deserializes a Append from size-prefixed FlatBuffer bytes.
-func AppendFromBytes(data []byte) (*Append, error) {
+func AppendFromBytes(data []byte) (o *Append, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Append: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsAppend(data, 0)
 	return AppendFromFbs(fbs), nil
 }
@@ -334,7 +369,12 @@ func ChangeOpEntryFromFbs(fbs *generated.ChangeOpEntry) *ChangeOpEntry {
 }
 
 // ChangeOpEntryFromBytes deserializes a ChangeOpEntry from size-prefixed FlatBuffer bytes.
-func ChangeOpEntryFromBytes(data []byte) (*ChangeOpEntry, error) {
+func ChangeOpEntryFromBytes(data []byte) (o *ChangeOpEntry, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ChangeOpEntry: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsChangeOpEntry(data, 0)
 	return ChangeOpEntryFromFbs(fbs), nil
 }
@@ -415,7 +455,12 @@ func ChangeSetFromFbs(fbs *generated.ChangeSet) *ChangeSet {
 }
 
 // ChangeSetFromBytes deserializes a ChangeSet from size-prefixed FlatBuffer bytes.
-func ChangeSetFromBytes(data []byte) (*ChangeSet, error) {
+func ChangeSetFromBytes(data []byte) (o *ChangeSet, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ChangeSet: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsChangeSet(data, 0)
 	return ChangeSetFromFbs(fbs), nil
 }
@@ -499,7 +544,12 @@ func DiffStreamFromFbs(fbs *generated.DiffStream) *DiffStream {
 }
 
 // DiffStreamFromBytes deserializes a DiffStream from size-prefixed FlatBuffer bytes.
-func DiffStreamFromBytes(data []byte) (*DiffStream, error) {
+func DiffStreamFromBytes(data []byte) (o *DiffStream, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("DiffStream: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDiffStream(data, 0)
 	return DiffStreamFromFbs(fbs), nil
 }
@@ -567,7 +617,12 @@ func HistoryFromFbs(fbs *generated.History) *History {
 }
 
 // HistoryFromBytes deserializes a History from size-prefixed FlatBuffer bytes.
-func HistoryFromBytes(data []byte) (*History, error) {
+func HistoryFromBytes(data []byte) (o *History, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("History: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsHistory(data, 0)
 	return HistoryFromFbs(fbs), nil
 }
@@ -638,7 +693,12 @@ func NewTableFromFbs(fbs *generated.NewTable) *NewTable {
 }
 
 // NewTableFromBytes deserializes a NewTable from size-prefixed FlatBuffer bytes.
-func NewTableFromBytes(data []byte) (*NewTable, error) {
+func NewTableFromBytes(data []byte) (o *NewTable, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("NewTable: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNewTable(data, 0)
 	return NewTableFromFbs(fbs), nil
 }
@@ -712,7 +772,12 @@ func NewTableListFromFbs(fbs *generated.NewTableList) *NewTableList {
 }
 
 // NewTableListFromBytes deserializes a NewTableList from size-prefixed FlatBuffer bytes.
-func NewTableListFromBytes(data []byte) (*NewTableList, error) {
+func NewTableListFromBytes(data []byte) (o *NewTableList, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("NewTableList: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNewTableList(data, 0)
 	return NewTableListFromFbs(fbs), nil
 }
@@ -763,7 +828,12 @@ func NewTableListResultFromFbs(fbs *generated.NewTableListResult) *NewTableListR
 }
 
 // NewTableListResultFromBytes deserializes a NewTableListResult from size-prefixed FlatBuffer bytes.
-func NewTableListResultFromBytes(data []byte) (*NewTableListResult, error) {
+func NewTableListResultFromBytes(data []byte) (o *NewTableListResult, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("NewTableListResult: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNewTableListResult(data, 0)
 	return NewTableListResultFromFbs(fbs), nil
 }
@@ -818,7 +888,12 @@ func NewTableResultFromFbs(fbs *generated.NewTableResult) *NewTableResult {
 }
 
 // NewTableResultFromBytes deserializes a NewTableResult from size-prefixed FlatBuffer bytes.
-func NewTableResultFromBytes(data []byte) (*NewTableResult, error) {
+func NewTableResultFromBytes(data []byte) (o *NewTableResult, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("NewTableResult: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNewTableResult(data, 0)
 	return NewTableResultFromFbs(fbs), nil
 }
@@ -880,7 +955,12 @@ func OpEntryFromFbs(fbs *generated.OpEntry) *OpEntry {
 }
 
 // OpEntryFromBytes deserializes a OpEntry from size-prefixed FlatBuffer bytes.
-func OpEntryFromBytes(data []byte) (*OpEntry, error) {
+func OpEntryFromBytes(data []byte) (o *OpEntry, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("OpEntry: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsOpEntry(data, 0)
 	return OpEntryFromFbs(fbs), nil
 }

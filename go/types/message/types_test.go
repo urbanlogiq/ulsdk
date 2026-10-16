@@ -135,18 +135,38 @@ func TestVectorPresenceRecordBatch(t *testing.T) {
 	o := &RecordBatch{}
 	var fbs *generated.RecordBatch
 	fbs = generated.GetSizePrefixedRootAsRecordBatch(o.ToBytes(), 0)
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		t.Errorf("Buffers: nil vector is written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		t.Errorf("Nodes: nil vector is written")
+	}
 	if tbl := fbs.Table(); tbl.Offset(12) != 0 {
 		t.Errorf("VariadicBufferCounts: nil vector is written")
 	}
+	o.Buffers = emptyOf(o.Buffers)
+	o.Nodes = emptyOf(o.Nodes)
 	o.VariadicBufferCounts = emptyOf(o.VariadicBufferCounts)
 	data := o.ToBytes()
 	fbs = generated.GetSizePrefixedRootAsRecordBatch(data, 0)
+	if tbl := fbs.Table(); tbl.Offset(8) == 0 {
+		t.Errorf("Buffers: empty vector is not written")
+	}
+	if tbl := fbs.Table(); tbl.Offset(6) == 0 {
+		t.Errorf("Nodes: empty vector is not written")
+	}
 	if tbl := fbs.Table(); tbl.Offset(12) == 0 {
 		t.Errorf("VariadicBufferCounts: empty vector is not written")
 	}
 	got, err := RecordBatchFromBytes(data)
 	if err != nil {
 		t.Fatalf("deserialization failed: %v", err)
+	}
+	if got.Buffers == nil {
+		t.Errorf("Buffers: empty vector is read back as nil")
+	}
+	if got.Nodes == nil {
+		t.Errorf("Nodes: empty vector is read back as nil")
 	}
 	if got.VariadicBufferCounts == nil {
 		t.Errorf("VariadicBufferCounts: empty vector is read back as nil")

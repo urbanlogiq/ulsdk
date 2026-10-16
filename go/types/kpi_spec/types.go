@@ -5,6 +5,7 @@
 package kpi_spec
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/id"
@@ -77,7 +78,12 @@ func KpiSpecFromFbs(fbs *generated.KpiSpec) *KpiSpec {
 }
 
 // KpiSpecFromBytes deserializes a KpiSpec from size-prefixed FlatBuffer bytes.
-func KpiSpecFromBytes(data []byte) (*KpiSpec, error) {
+func KpiSpecFromBytes(data []byte) (o *KpiSpec, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("KpiSpec: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsKpiSpec(data, 0)
 	return KpiSpecFromFbs(fbs), nil
 }

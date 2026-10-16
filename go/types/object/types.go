@@ -5,6 +5,7 @@
 package object
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/data"
@@ -113,7 +114,12 @@ func DataCatalogObjectFromFbs(fbs *generated.DataCatalogObject) *DataCatalogObje
 }
 
 // DataCatalogObjectFromBytes deserializes a DataCatalogObject from size-prefixed FlatBuffer bytes.
-func DataCatalogObjectFromBytes(data []byte) (*DataCatalogObject, error) {
+func DataCatalogObjectFromBytes(data []byte) (o *DataCatalogObject, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("DataCatalogObject: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDataCatalogObject(data, 0)
 	return DataCatalogObjectFromFbs(fbs), nil
 }
@@ -208,7 +214,12 @@ func ObjectIdListFromFbs(fbs *generated.ObjectIdList) *ObjectIdList {
 }
 
 // ObjectIdListFromBytes deserializes a ObjectIdList from size-prefixed FlatBuffer bytes.
-func ObjectIdListFromBytes(data []byte) (*ObjectIdList, error) {
+func ObjectIdListFromBytes(data []byte) (o *ObjectIdList, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ObjectIdList: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsObjectIdList(data, 0)
 	return ObjectIdListFromFbs(fbs), nil
 }
@@ -255,7 +266,12 @@ func ObjectIdPairFromFbs(fbs *generated.ObjectIdPair) *ObjectIdPair {
 }
 
 // ObjectIdPairFromBytes deserializes a ObjectIdPair from size-prefixed FlatBuffer bytes.
-func ObjectIdPairFromBytes(data []byte) (*ObjectIdPair, error) {
+func ObjectIdPairFromBytes(data []byte) (o *ObjectIdPair, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ObjectIdPair: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsObjectIdPair(data, 0)
 	return ObjectIdPairFromFbs(fbs), nil
 }
@@ -300,7 +316,12 @@ func ObjectIdPairListFromFbs(fbs *generated.ObjectIdPairList) *ObjectIdPairList 
 }
 
 // ObjectIdPairListFromBytes deserializes a ObjectIdPairList from size-prefixed FlatBuffer bytes.
-func ObjectIdPairListFromBytes(data []byte) (*ObjectIdPairList, error) {
+func ObjectIdPairListFromBytes(data []byte) (o *ObjectIdPairList, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ObjectIdPairList: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsObjectIdPairList(data, 0)
 	return ObjectIdPairListFromFbs(fbs), nil
 }
@@ -355,7 +376,12 @@ func ObjectSummaryFromFbs(fbs *generated.ObjectSummary) *ObjectSummary {
 }
 
 // ObjectSummaryFromBytes deserializes a ObjectSummary from size-prefixed FlatBuffer bytes.
-func ObjectSummaryFromBytes(data []byte) (*ObjectSummary, error) {
+func ObjectSummaryFromBytes(data []byte) (o *ObjectSummary, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ObjectSummary: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsObjectSummary(data, 0)
 	return ObjectSummaryFromFbs(fbs), nil
 }
@@ -404,7 +430,12 @@ func ObjectSummaryListFromFbs(fbs *generated.ObjectSummaryList) *ObjectSummaryLi
 }
 
 // ObjectSummaryListFromBytes deserializes a ObjectSummaryList from size-prefixed FlatBuffer bytes.
-func ObjectSummaryListFromBytes(data []byte) (*ObjectSummaryList, error) {
+func ObjectSummaryListFromBytes(data []byte) (o *ObjectSummaryList, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ObjectSummaryList: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsObjectSummaryList(data, 0)
 	return ObjectSummaryListFromFbs(fbs), nil
 }

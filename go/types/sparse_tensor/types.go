@@ -80,7 +80,12 @@ func SparseTensorIndexCOOFromFbs(fbs *generated.SparseTensorIndexCOO) *SparseTen
 }
 
 // SparseTensorIndexCOOFromBytes deserializes a SparseTensorIndexCOO from size-prefixed FlatBuffer bytes.
-func SparseTensorIndexCOOFromBytes(data []byte) (*SparseTensorIndexCOO, error) {
+func SparseTensorIndexCOOFromBytes(data []byte) (o *SparseTensorIndexCOO, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("SparseTensorIndexCOO: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsSparseTensorIndexCOO(data, 0)
 	return SparseTensorIndexCOOFromFbs(fbs), nil
 }
@@ -105,6 +110,7 @@ func (o *SparseTensorIndexCOO) SerializeTo(builder *flatbuffers.Builder) flatbuf
 	}
 	indicesTypeOffset := o.IndicesType.SerializeTo(builder)
 	generated.SparseTensorIndexCOOStart(builder)
+	generated.SparseTensorIndexCOOAddIndicesBuffer(builder, o.IndicesBuffer.SerializeTo(builder))
 	generated.SparseTensorIndexCOOAddIndicesStrides(builder, indicesStridesVecOffset)
 	generated.SparseTensorIndexCOOAddIndicesType(builder, indicesTypeOffset)
 	generated.SparseTensorIndexCOOAddIsCanonical(builder, o.IsCanonical)
@@ -140,7 +146,12 @@ func SparseMatrixIndexCSXFromFbs(fbs *generated.SparseMatrixIndexCSX) *SparseMat
 }
 
 // SparseMatrixIndexCSXFromBytes deserializes a SparseMatrixIndexCSX from size-prefixed FlatBuffer bytes.
-func SparseMatrixIndexCSXFromBytes(data []byte) (*SparseMatrixIndexCSX, error) {
+func SparseMatrixIndexCSXFromBytes(data []byte) (o *SparseMatrixIndexCSX, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("SparseMatrixIndexCSX: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsSparseMatrixIndexCSX(data, 0)
 	return SparseMatrixIndexCSXFromFbs(fbs), nil
 }
@@ -159,7 +170,9 @@ func (o *SparseMatrixIndexCSX) SerializeTo(builder *flatbuffers.Builder) flatbuf
 	indptrTypeOffset := o.IndptrType.SerializeTo(builder)
 	generated.SparseMatrixIndexCSXStart(builder)
 	generated.SparseMatrixIndexCSXAddCompressedAxis(builder, generated.SparseMatrixCompressedAxis(o.CompressedAxis))
+	generated.SparseMatrixIndexCSXAddIndicesBuffer(builder, o.IndicesBuffer.SerializeTo(builder))
 	generated.SparseMatrixIndexCSXAddIndicesType(builder, indicesTypeOffset)
+	generated.SparseMatrixIndexCSXAddIndptrBuffer(builder, o.IndptrBuffer.SerializeTo(builder))
 	generated.SparseMatrixIndexCSXAddIndptrType(builder, indptrTypeOffset)
 	return generated.SparseMatrixIndexCSXEnd(builder)
 }
@@ -210,7 +223,12 @@ func SparseTensorIndexCSFFromFbs(fbs *generated.SparseTensorIndexCSF) *SparseTen
 }
 
 // SparseTensorIndexCSFFromBytes deserializes a SparseTensorIndexCSF from size-prefixed FlatBuffer bytes.
-func SparseTensorIndexCSFFromBytes(data []byte) (*SparseTensorIndexCSF, error) {
+func SparseTensorIndexCSFFromBytes(data []byte) (o *SparseTensorIndexCSF, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("SparseTensorIndexCSF: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsSparseTensorIndexCSF(data, 0)
 	return SparseTensorIndexCSFFromFbs(fbs), nil
 }
@@ -231,9 +249,19 @@ func (o *SparseTensorIndexCSF) SerializeTo(builder *flatbuffers.Builder) flatbuf
 		builder.PrependInt32(o.AxisOrder[i])
 	}
 	axisOrderVecOffset = builder.EndVector(len(o.AxisOrder))
-	var indicesBuffersVecOffset flatbuffers.UOffsetT // TODO: struct vector
+	var indicesBuffersVecOffset flatbuffers.UOffsetT
+	generated.SparseTensorIndexCSFStartIndicesBuffersVector(builder, len(o.IndicesBuffers))
+	for i := len(o.IndicesBuffers) - 1; i >= 0; i-- {
+		o.IndicesBuffers[i].SerializeTo(builder)
+	}
+	indicesBuffersVecOffset = builder.EndVector(len(o.IndicesBuffers))
 	indicesTypeOffset := o.IndicesType.SerializeTo(builder)
-	var indptrBuffersVecOffset flatbuffers.UOffsetT // TODO: struct vector
+	var indptrBuffersVecOffset flatbuffers.UOffsetT
+	generated.SparseTensorIndexCSFStartIndptrBuffersVector(builder, len(o.IndptrBuffers))
+	for i := len(o.IndptrBuffers) - 1; i >= 0; i-- {
+		o.IndptrBuffers[i].SerializeTo(builder)
+	}
+	indptrBuffersVecOffset = builder.EndVector(len(o.IndptrBuffers))
 	indptrTypeOffset := o.IndptrType.SerializeTo(builder)
 	generated.SparseTensorIndexCSFStart(builder)
 	generated.SparseTensorIndexCSFAddAxisOrder(builder, axisOrderVecOffset)
@@ -399,7 +427,12 @@ func SparseTensorFromFbs(fbs *generated.SparseTensor) *SparseTensor {
 }
 
 // SparseTensorFromBytes deserializes a SparseTensor from size-prefixed FlatBuffer bytes.
-func SparseTensorFromBytes(data []byte) (*SparseTensor, error) {
+func SparseTensorFromBytes(data []byte) (o *SparseTensor, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("SparseTensor: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsSparseTensor(data, 0)
 	return SparseTensorFromFbs(fbs), nil
 }
@@ -555,6 +588,7 @@ func (o *SparseTensor) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOf
 		panic(fmt.Sprintf("SparseTensor.Type: %T is not a pointer to a Type variant", v))
 	}
 	generated.SparseTensorStart(builder)
+	generated.SparseTensorAddData(builder, o.Data.SerializeTo(builder))
 	generated.SparseTensorAddNonZeroLength(builder, o.NonZeroLength)
 	generated.SparseTensorAddShape(builder, shapeVecOffset)
 	if sparseIndexOffset != 0 {

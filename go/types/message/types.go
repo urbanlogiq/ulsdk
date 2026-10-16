@@ -49,7 +49,12 @@ func BodyCompressionFromFbs(fbs *generated.BodyCompression) *BodyCompression {
 }
 
 // BodyCompressionFromBytes deserializes a BodyCompression from size-prefixed FlatBuffer bytes.
-func BodyCompressionFromBytes(data []byte) (*BodyCompression, error) {
+func BodyCompressionFromBytes(data []byte) (o *BodyCompression, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("BodyCompression: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsBodyCompression(data, 0)
 	return BodyCompressionFromFbs(fbs), nil
 }
@@ -116,7 +121,12 @@ func RecordBatchFromFbs(fbs *generated.RecordBatch) *RecordBatch {
 }
 
 // RecordBatchFromBytes deserializes a RecordBatch from size-prefixed FlatBuffer bytes.
-func RecordBatchFromBytes(data []byte) (*RecordBatch, error) {
+func RecordBatchFromBytes(data []byte) (o *RecordBatch, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("RecordBatch: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsRecordBatch(data, 0)
 	return RecordBatchFromFbs(fbs), nil
 }
@@ -131,12 +141,26 @@ func (o *RecordBatch) ToBytes() []byte {
 
 // SerializeTo writes the RecordBatch into a FlatBuffer builder and returns the offset.
 func (o *RecordBatch) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	var buffersVecOffset flatbuffers.UOffsetT // TODO: struct vector
+	var buffersVecOffset flatbuffers.UOffsetT
+	if o.Buffers != nil {
+		generated.RecordBatchStartBuffersVector(builder, len(o.Buffers))
+		for i := len(o.Buffers) - 1; i >= 0; i-- {
+			o.Buffers[i].SerializeTo(builder)
+		}
+		buffersVecOffset = builder.EndVector(len(o.Buffers))
+	}
 	var compressionOffset flatbuffers.UOffsetT
 	if o.Compression != nil {
 		compressionOffset = o.Compression.SerializeTo(builder)
 	}
-	var nodesVecOffset flatbuffers.UOffsetT // TODO: struct vector
+	var nodesVecOffset flatbuffers.UOffsetT
+	if o.Nodes != nil {
+		generated.RecordBatchStartNodesVector(builder, len(o.Nodes))
+		for i := len(o.Nodes) - 1; i >= 0; i-- {
+			o.Nodes[i].SerializeTo(builder)
+		}
+		nodesVecOffset = builder.EndVector(len(o.Nodes))
+	}
 	var variadicBufferCountsVecOffset flatbuffers.UOffsetT
 	if o.VariadicBufferCounts != nil {
 		generated.RecordBatchStartVariadicBufferCountsVector(builder, len(o.VariadicBufferCounts))
@@ -178,7 +202,12 @@ func DictionaryBatchFromFbs(fbs *generated.DictionaryBatch) *DictionaryBatch {
 }
 
 // DictionaryBatchFromBytes deserializes a DictionaryBatch from size-prefixed FlatBuffer bytes.
-func DictionaryBatchFromBytes(data []byte) (*DictionaryBatch, error) {
+func DictionaryBatchFromBytes(data []byte) (o *DictionaryBatch, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("DictionaryBatch: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDictionaryBatch(data, 0)
 	return DictionaryBatchFromFbs(fbs), nil
 }
@@ -240,6 +269,11 @@ func FieldNodeFromFbs(fbs *generated.FieldNode) *FieldNode {
 }
 
 
+// SerializeTo writes the FieldNode inline into a FlatBuffer builder and returns the offset.
+func (o *FieldNode) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return generated.CreateFieldNode(builder, o.Length, o.NullCount)
+}
+
 type Message struct {
 	BodyLength int64
 	CustomMetadata []schema.KeyValue
@@ -288,7 +322,12 @@ func MessageFromFbs(fbs *generated.Message) *Message {
 }
 
 // MessageFromBytes deserializes a Message from size-prefixed FlatBuffer bytes.
-func MessageFromBytes(data []byte) (*Message, error) {
+func MessageFromBytes(data []byte) (o *Message, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Message: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsMessage(data, 0)
 	return MessageFromFbs(fbs), nil
 }

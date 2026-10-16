@@ -54,7 +54,12 @@ func ByteArrayFromFbs(fbs *generated.ByteArray) *ByteArray {
 }
 
 // ByteArrayFromBytes deserializes a ByteArray from size-prefixed FlatBuffer bytes.
-func ByteArrayFromBytes(data []byte) (*ByteArray, error) {
+func ByteArrayFromBytes(data []byte) (o *ByteArray, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ByteArray: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsByteArray(data, 0)
 	return ByteArrayFromFbs(fbs), nil
 }
@@ -89,7 +94,12 @@ func ParameterFlagsFromFbs(fbs *generated.ParameterFlags) *ParameterFlags {
 }
 
 // ParameterFlagsFromBytes deserializes a ParameterFlags from size-prefixed FlatBuffer bytes.
-func ParameterFlagsFromBytes(data []byte) (*ParameterFlags, error) {
+func ParameterFlagsFromBytes(data []byte) (o *ParameterFlags, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ParameterFlags: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsParameterFlags(data, 0)
 	return ParameterFlagsFromFbs(fbs), nil
 }
@@ -124,7 +134,12 @@ func ContainerRefFromFbs(fbs *generated.ContainerRef) *ContainerRef {
 }
 
 // ContainerRefFromBytes deserializes a ContainerRef from size-prefixed FlatBuffer bytes.
-func ContainerRefFromBytes(data []byte) (*ContainerRef, error) {
+func ContainerRefFromBytes(data []byte) (o *ContainerRef, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ContainerRef: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsContainerRef(data, 0)
 	return ContainerRefFromFbs(fbs), nil
 }
@@ -172,7 +187,12 @@ func GitRefFromFbs(fbs *generated.GitRef) *GitRef {
 }
 
 // GitRefFromBytes deserializes a GitRef from size-prefixed FlatBuffer bytes.
-func GitRefFromBytes(data []byte) (*GitRef, error) {
+func GitRefFromBytes(data []byte) (o *GitRef, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("GitRef: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsGitRef(data, 0)
 	return GitRefFromFbs(fbs), nil
 }
@@ -212,7 +232,12 @@ func LayoutFromFbs(fbs *generated.Layout) *Layout {
 }
 
 // LayoutFromBytes deserializes a Layout from size-prefixed FlatBuffer bytes.
-func LayoutFromBytes(data []byte) (*Layout, error) {
+func LayoutFromBytes(data []byte) (o *Layout, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Layout: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsLayout(data, 0)
 	return LayoutFromFbs(fbs), nil
 }
@@ -265,7 +290,12 @@ func ProducerFromFbs(fbs *generated.Producer) *Producer {
 }
 
 // ProducerFromBytes deserializes a Producer from size-prefixed FlatBuffer bytes.
-func ProducerFromBytes(data []byte) (*Producer, error) {
+func ProducerFromBytes(data []byte) (o *Producer, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Producer: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsProducer(data, 0)
 	return ProducerFromFbs(fbs), nil
 }
@@ -356,7 +386,12 @@ func TileSettingsFromFbs(fbs *generated.TileSettings) *TileSettings {
 }
 
 // TileSettingsFromBytes deserializes a TileSettings from size-prefixed FlatBuffer bytes.
-func TileSettingsFromBytes(data []byte) (*TileSettings, error) {
+func TileSettingsFromBytes(data []byte) (o *TileSettings, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("TileSettings: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsTileSettings(data, 0)
 	return TileSettingsFromFbs(fbs), nil
 }
@@ -423,7 +458,12 @@ func TileDataFromFbs(fbs *generated.TileData) *TileData {
 }
 
 // TileDataFromBytes deserializes a TileData from size-prefixed FlatBuffer bytes.
-func TileDataFromBytes(data []byte) (*TileData, error) {
+func TileDataFromBytes(data []byte) (o *TileData, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("TileData: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsTileData(data, 0)
 	return TileDataFromFbs(fbs), nil
 }
@@ -467,7 +507,12 @@ func UserSettingsFromFbs(fbs *generated.UserSettings) *UserSettings {
 }
 
 // UserSettingsFromBytes deserializes a UserSettings from size-prefixed FlatBuffer bytes.
-func UserSettingsFromBytes(data []byte) (*UserSettings, error) {
+func UserSettingsFromBytes(data []byte) (o *UserSettings, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("UserSettings: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsUserSettings(data, 0)
 	return UserSettingsFromFbs(fbs), nil
 }
@@ -562,7 +607,12 @@ func WorkLogFromFbs(fbs *generated.WorkLog) *WorkLog {
 }
 
 // WorkLogFromBytes deserializes a WorkLog from size-prefixed FlatBuffer bytes.
-func WorkLogFromBytes(data []byte) (*WorkLog, error) {
+func WorkLogFromBytes(data []byte) (o *WorkLog, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("WorkLog: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsWorkLog(data, 0)
 	return WorkLogFromFbs(fbs), nil
 }
@@ -675,7 +725,12 @@ func WorklogParameterFromFbs(fbs *generated.WorklogParameter) *WorklogParameter 
 }
 
 // WorklogParameterFromBytes deserializes a WorklogParameter from size-prefixed FlatBuffer bytes.
-func WorklogParameterFromBytes(data []byte) (*WorklogParameter, error) {
+func WorklogParameterFromBytes(data []byte) (o *WorklogParameter, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("WorklogParameter: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsWorklogParameter(data, 0)
 	return WorklogParameterFromFbs(fbs), nil
 }

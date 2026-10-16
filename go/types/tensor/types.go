@@ -152,7 +152,12 @@ func TensorFromFbs(fbs *generated.Tensor) *Tensor {
 }
 
 // TensorFromBytes deserializes a Tensor from size-prefixed FlatBuffer bytes.
-func TensorFromBytes(data []byte) (*Tensor, error) {
+func TensorFromBytes(data []byte) (o *Tensor, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Tensor: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsTensor(data, 0)
 	return TensorFromFbs(fbs), nil
 }
@@ -297,6 +302,7 @@ func (o *Tensor) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT 
 		panic(fmt.Sprintf("Tensor.Type: %T is not a pointer to a Type variant", v))
 	}
 	generated.TensorStart(builder)
+	generated.TensorAddData(builder, o.Data.SerializeTo(builder))
 	generated.TensorAddShape(builder, shapeVecOffset)
 	generated.TensorAddStrides(builder, stridesVecOffset)
 	if typeOffset != 0 {
@@ -326,7 +332,12 @@ func TensorDimFromFbs(fbs *generated.TensorDim) *TensorDim {
 }
 
 // TensorDimFromBytes deserializes a TensorDim from size-prefixed FlatBuffer bytes.
-func TensorDimFromBytes(data []byte) (*TensorDim, error) {
+func TensorDimFromBytes(data []byte) (o *TensorDim, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("TensorDim: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsTensorDim(data, 0)
 	return TensorDimFromFbs(fbs), nil
 }

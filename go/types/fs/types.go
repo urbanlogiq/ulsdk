@@ -65,7 +65,12 @@ func FileFromFbs(fbs *generated.File) *File {
 }
 
 // FileFromBytes deserializes a File from size-prefixed FlatBuffer bytes.
-func FileFromBytes(data []byte) (*File, error) {
+func FileFromBytes(data []byte) (o *File, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("File: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsFile(data, 0)
 	return FileFromFbs(fbs), nil
 }
@@ -164,7 +169,12 @@ func DirectoryFromFbs(fbs *generated.Directory) *Directory {
 }
 
 // DirectoryFromBytes deserializes a Directory from size-prefixed FlatBuffer bytes.
-func DirectoryFromBytes(data []byte) (*Directory, error) {
+func DirectoryFromBytes(data []byte) (o *Directory, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Directory: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDirectory(data, 0)
 	return DirectoryFromFbs(fbs), nil
 }
@@ -222,7 +232,12 @@ func ObjectRefFromFbs(fbs *generated.ObjectRef) *ObjectRef {
 }
 
 // ObjectRefFromBytes deserializes a ObjectRef from size-prefixed FlatBuffer bytes.
-func ObjectRefFromBytes(data []byte) (*ObjectRef, error) {
+func ObjectRefFromBytes(data []byte) (o *ObjectRef, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ObjectRef: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsObjectRef(data, 0)
 	return ObjectRefFromFbs(fbs), nil
 }
@@ -275,7 +290,12 @@ func ListFileFromFbs(fbs *generated.ListFile) *ListFile {
 }
 
 // ListFileFromBytes deserializes a ListFile from size-prefixed FlatBuffer bytes.
-func ListFileFromBytes(data []byte) (*ListFile, error) {
+func ListFileFromBytes(data []byte) (o *ListFile, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ListFile: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsListFile(data, 0)
 	return ListFileFromFbs(fbs), nil
 }
@@ -311,7 +331,12 @@ func ListDirectoryFromFbs(fbs *generated.ListDirectory) *ListDirectory {
 }
 
 // ListDirectoryFromBytes deserializes a ListDirectory from size-prefixed FlatBuffer bytes.
-func ListDirectoryFromBytes(data []byte) (*ListDirectory, error) {
+func ListDirectoryFromBytes(data []byte) (o *ListDirectory, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ListDirectory: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsListDirectory(data, 0)
 	return ListDirectoryFromFbs(fbs), nil
 }
@@ -347,7 +372,12 @@ func ListObjectFromFbs(fbs *generated.ListObject) *ListObject {
 }
 
 // ListObjectFromBytes deserializes a ListObject from size-prefixed FlatBuffer bytes.
-func ListObjectFromBytes(data []byte) (*ListObject, error) {
+func ListObjectFromBytes(data []byte) (o *ListObject, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ListObject: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsListObject(data, 0)
 	return ListObjectFromFbs(fbs), nil
 }
@@ -383,7 +413,12 @@ func TopLevelDirectoryFromFbs(fbs *generated.TopLevelDirectory) *TopLevelDirecto
 }
 
 // TopLevelDirectoryFromBytes deserializes a TopLevelDirectory from size-prefixed FlatBuffer bytes.
-func TopLevelDirectoryFromBytes(data []byte) (*TopLevelDirectory, error) {
+func TopLevelDirectoryFromBytes(data []byte) (o *TopLevelDirectory, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("TopLevelDirectory: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsTopLevelDirectory(data, 0)
 	return TopLevelDirectoryFromFbs(fbs), nil
 }
@@ -441,7 +476,12 @@ func ChunkFromFbs(fbs *generated.Chunk) *Chunk {
 }
 
 // ChunkFromBytes deserializes a Chunk from size-prefixed FlatBuffer bytes.
-func ChunkFromBytes(data []byte) (*Chunk, error) {
+func ChunkFromBytes(data []byte) (o *Chunk, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Chunk: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsChunk(data, 0)
 	return ChunkFromFbs(fbs), nil
 }
@@ -508,7 +548,12 @@ func DirectoryEntryFromFbs(fbs *generated.DirectoryEntry) *DirectoryEntry {
 }
 
 // DirectoryEntryFromBytes deserializes a DirectoryEntry from size-prefixed FlatBuffer bytes.
-func DirectoryEntryFromBytes(data []byte) (*DirectoryEntry, error) {
+func DirectoryEntryFromBytes(data []byte) (o *DirectoryEntry, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("DirectoryEntry: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDirectoryEntry(data, 0)
 	return DirectoryEntryFromFbs(fbs), nil
 }
@@ -571,7 +616,12 @@ func DirectoryListFromFbs(fbs *generated.DirectoryList) *DirectoryList {
 }
 
 // DirectoryListFromBytes deserializes a DirectoryList from size-prefixed FlatBuffer bytes.
-func DirectoryListFromBytes(data []byte) (*DirectoryList, error) {
+func DirectoryListFromBytes(data []byte) (o *DirectoryList, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("DirectoryList: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDirectoryList(data, 0)
 	return DirectoryListFromFbs(fbs), nil
 }
@@ -657,7 +707,12 @@ func ListSlotFromFbs(fbs *generated.ListSlot) *ListSlot {
 }
 
 // ListSlotFromBytes deserializes a ListSlot from size-prefixed FlatBuffer bytes.
-func ListSlotFromBytes(data []byte) (*ListSlot, error) {
+func ListSlotFromBytes(data []byte) (o *ListSlot, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ListSlot: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsListSlot(data, 0)
 	return ListSlotFromFbs(fbs), nil
 }
@@ -752,7 +807,12 @@ func MoveRequestFromFbs(fbs *generated.MoveRequest) *MoveRequest {
 }
 
 // MoveRequestFromBytes deserializes a MoveRequest from size-prefixed FlatBuffer bytes.
-func MoveRequestFromBytes(data []byte) (*MoveRequest, error) {
+func MoveRequestFromBytes(data []byte) (o *MoveRequest, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("MoveRequest: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsMoveRequest(data, 0)
 	return MoveRequestFromFbs(fbs), nil
 }
@@ -801,7 +861,12 @@ func NewLinkFromFbs(fbs *generated.NewLink) *NewLink {
 }
 
 // NewLinkFromBytes deserializes a NewLink from size-prefixed FlatBuffer bytes.
-func NewLinkFromBytes(data []byte) (*NewLink, error) {
+func NewLinkFromBytes(data []byte) (o *NewLink, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("NewLink: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNewLink(data, 0)
 	return NewLinkFromFbs(fbs), nil
 }
@@ -851,7 +916,12 @@ func SlotFromFbs(fbs *generated.Slot) *Slot {
 }
 
 // SlotFromBytes deserializes a Slot from size-prefixed FlatBuffer bytes.
-func SlotFromBytes(data []byte) (*Slot, error) {
+func SlotFromBytes(data []byte) (o *Slot, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Slot: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsSlot(data, 0)
 	return SlotFromFbs(fbs), nil
 }

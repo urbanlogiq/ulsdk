@@ -122,7 +122,12 @@ func NullFromFbs(fbs *generated.Null) *Null {
 }
 
 // NullFromBytes deserializes a Null from size-prefixed FlatBuffer bytes.
-func NullFromBytes(data []byte) (*Null, error) {
+func NullFromBytes(data []byte) (o *Null, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Null: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNull(data, 0)
 	return NullFromFbs(fbs), nil
 }
@@ -154,7 +159,12 @@ func IntFromFbs(fbs *generated.Int) *Int {
 }
 
 // IntFromBytes deserializes a Int from size-prefixed FlatBuffer bytes.
-func IntFromBytes(data []byte) (*Int, error) {
+func IntFromBytes(data []byte) (o *Int, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Int: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsInt(data, 0)
 	return IntFromFbs(fbs), nil
 }
@@ -186,7 +196,12 @@ func FloatingPointFromFbs(fbs *generated.FloatingPoint) *FloatingPoint {
 }
 
 // FloatingPointFromBytes deserializes a FloatingPoint from size-prefixed FlatBuffer bytes.
-func FloatingPointFromBytes(data []byte) (*FloatingPoint, error) {
+func FloatingPointFromBytes(data []byte) (o *FloatingPoint, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("FloatingPoint: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsFloatingPoint(data, 0)
 	return FloatingPointFromFbs(fbs), nil
 }
@@ -217,7 +232,12 @@ func BinaryFromFbs(fbs *generated.Binary) *Binary {
 }
 
 // BinaryFromBytes deserializes a Binary from size-prefixed FlatBuffer bytes.
-func BinaryFromBytes(data []byte) (*Binary, error) {
+func BinaryFromBytes(data []byte) (o *Binary, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Binary: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsBinary(data, 0)
 	return BinaryFromFbs(fbs), nil
 }
@@ -247,7 +267,12 @@ func Utf8FromFbs(fbs *generated.Utf8) *Utf8 {
 }
 
 // Utf8FromBytes deserializes a Utf8 from size-prefixed FlatBuffer bytes.
-func Utf8FromBytes(data []byte) (*Utf8, error) {
+func Utf8FromBytes(data []byte) (o *Utf8, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Utf8: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsUtf8(data, 0)
 	return Utf8FromFbs(fbs), nil
 }
@@ -275,7 +300,12 @@ func BoolFromFbs(fbs *generated.Bool) *Bool {
 }
 
 // BoolFromBytes deserializes a Bool from size-prefixed FlatBuffer bytes.
-func BoolFromBytes(data []byte) (*Bool, error) {
+func BoolFromBytes(data []byte) (o *Bool, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Bool: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsBool(data, 0)
 	return BoolFromFbs(fbs), nil
 }
@@ -314,7 +344,12 @@ func DecimalFromFbs(fbs *generated.Decimal) *Decimal {
 }
 
 // DecimalFromBytes deserializes a Decimal from size-prefixed FlatBuffer bytes.
-func DecimalFromBytes(data []byte) (*Decimal, error) {
+func DecimalFromBytes(data []byte) (o *Decimal, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Decimal: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDecimal(data, 0)
 	return DecimalFromFbs(fbs), nil
 }
@@ -354,7 +389,12 @@ func DateFromFbs(fbs *generated.Date) *Date {
 }
 
 // DateFromBytes deserializes a Date from size-prefixed FlatBuffer bytes.
-func DateFromBytes(data []byte) (*Date, error) {
+func DateFromBytes(data []byte) (o *Date, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Date: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDate(data, 0)
 	return DateFromFbs(fbs), nil
 }
@@ -402,7 +442,12 @@ func TimeFromFbs(fbs *generated.Time) *Time {
 }
 
 // TimeFromBytes deserializes a Time from size-prefixed FlatBuffer bytes.
-func TimeFromBytes(data []byte) (*Time, error) {
+func TimeFromBytes(data []byte) (o *Time, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Time: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsTime(data, 0)
 	return TimeFromFbs(fbs), nil
 }
@@ -545,7 +590,12 @@ func TimestampFromFbs(fbs *generated.Timestamp) *Timestamp {
 }
 
 // TimestampFromBytes deserializes a Timestamp from size-prefixed FlatBuffer bytes.
-func TimestampFromBytes(data []byte) (*Timestamp, error) {
+func TimestampFromBytes(data []byte) (o *Timestamp, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Timestamp: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsTimestamp(data, 0)
 	return TimestampFromFbs(fbs), nil
 }
@@ -581,7 +631,12 @@ func IntervalFromFbs(fbs *generated.Interval) *Interval {
 }
 
 // IntervalFromBytes deserializes a Interval from size-prefixed FlatBuffer bytes.
-func IntervalFromBytes(data []byte) (*Interval, error) {
+func IntervalFromBytes(data []byte) (o *Interval, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Interval: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsInterval(data, 0)
 	return IntervalFromFbs(fbs), nil
 }
@@ -610,7 +665,12 @@ func ListFromFbs(fbs *generated.List) *List {
 }
 
 // ListFromBytes deserializes a List from size-prefixed FlatBuffer bytes.
-func ListFromBytes(data []byte) (*List, error) {
+func ListFromBytes(data []byte) (o *List, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("List: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsList(data, 0)
 	return ListFromFbs(fbs), nil
 }
@@ -642,7 +702,12 @@ func StructFromFbs(fbs *generated.Struct_) *Struct {
 }
 
 // StructFromBytes deserializes a Struct from size-prefixed FlatBuffer bytes.
-func StructFromBytes(data []byte) (*Struct, error) {
+func StructFromBytes(data []byte) (o *Struct, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Struct: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsStruct_(data, 0)
 	return StructFromFbs(fbs), nil
 }
@@ -684,7 +749,12 @@ func UnionFromFbs(fbs *generated.Union) *Union {
 }
 
 // UnionFromBytes deserializes a Union from size-prefixed FlatBuffer bytes.
-func UnionFromBytes(data []byte) (*Union, error) {
+func UnionFromBytes(data []byte) (o *Union, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Union: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsUnion(data, 0)
 	return UnionFromFbs(fbs), nil
 }
@@ -724,7 +794,12 @@ func FixedSizeBinaryFromFbs(fbs *generated.FixedSizeBinary) *FixedSizeBinary {
 }
 
 // FixedSizeBinaryFromBytes deserializes a FixedSizeBinary from size-prefixed FlatBuffer bytes.
-func FixedSizeBinaryFromBytes(data []byte) (*FixedSizeBinary, error) {
+func FixedSizeBinaryFromBytes(data []byte) (o *FixedSizeBinary, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("FixedSizeBinary: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsFixedSizeBinary(data, 0)
 	return FixedSizeBinaryFromFbs(fbs), nil
 }
@@ -755,7 +830,12 @@ func FixedSizeListFromFbs(fbs *generated.FixedSizeList) *FixedSizeList {
 }
 
 // FixedSizeListFromBytes deserializes a FixedSizeList from size-prefixed FlatBuffer bytes.
-func FixedSizeListFromBytes(data []byte) (*FixedSizeList, error) {
+func FixedSizeListFromBytes(data []byte) (o *FixedSizeList, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("FixedSizeList: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsFixedSizeList(data, 0)
 	return FixedSizeListFromFbs(fbs), nil
 }
@@ -812,7 +892,12 @@ func MapFromFbs(fbs *generated.Map) *Map {
 }
 
 // MapFromBytes deserializes a Map from size-prefixed FlatBuffer bytes.
-func MapFromBytes(data []byte) (*Map, error) {
+func MapFromBytes(data []byte) (o *Map, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Map: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsMap(data, 0)
 	return MapFromFbs(fbs), nil
 }
@@ -843,7 +928,12 @@ func DurationFromFbs(fbs *generated.Duration) *Duration {
 }
 
 // DurationFromBytes deserializes a Duration from size-prefixed FlatBuffer bytes.
-func DurationFromBytes(data []byte) (*Duration, error) {
+func DurationFromBytes(data []byte) (o *Duration, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Duration: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDuration(data, 0)
 	return DurationFromFbs(fbs), nil
 }
@@ -875,7 +965,12 @@ func LargeBinaryFromFbs(fbs *generated.LargeBinary) *LargeBinary {
 }
 
 // LargeBinaryFromBytes deserializes a LargeBinary from size-prefixed FlatBuffer bytes.
-func LargeBinaryFromBytes(data []byte) (*LargeBinary, error) {
+func LargeBinaryFromBytes(data []byte) (o *LargeBinary, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("LargeBinary: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsLargeBinary(data, 0)
 	return LargeBinaryFromFbs(fbs), nil
 }
@@ -906,7 +1001,12 @@ func LargeUtf8FromFbs(fbs *generated.LargeUtf8) *LargeUtf8 {
 }
 
 // LargeUtf8FromBytes deserializes a LargeUtf8 from size-prefixed FlatBuffer bytes.
-func LargeUtf8FromBytes(data []byte) (*LargeUtf8, error) {
+func LargeUtf8FromBytes(data []byte) (o *LargeUtf8, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("LargeUtf8: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsLargeUtf8(data, 0)
 	return LargeUtf8FromFbs(fbs), nil
 }
@@ -937,7 +1037,12 @@ func LargeListFromFbs(fbs *generated.LargeList) *LargeList {
 }
 
 // LargeListFromBytes deserializes a LargeList from size-prefixed FlatBuffer bytes.
-func LargeListFromBytes(data []byte) (*LargeList, error) {
+func LargeListFromBytes(data []byte) (o *LargeList, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("LargeList: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsLargeList(data, 0)
 	return LargeListFromFbs(fbs), nil
 }
@@ -971,7 +1076,12 @@ func RunEndEncodedFromFbs(fbs *generated.RunEndEncoded) *RunEndEncoded {
 }
 
 // RunEndEncodedFromBytes deserializes a RunEndEncoded from size-prefixed FlatBuffer bytes.
-func RunEndEncodedFromBytes(data []byte) (*RunEndEncoded, error) {
+func RunEndEncodedFromBytes(data []byte) (o *RunEndEncoded, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("RunEndEncoded: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsRunEndEncoded(data, 0)
 	return RunEndEncodedFromFbs(fbs), nil
 }
@@ -1007,7 +1117,12 @@ func BinaryViewFromFbs(fbs *generated.BinaryView) *BinaryView {
 }
 
 // BinaryViewFromBytes deserializes a BinaryView from size-prefixed FlatBuffer bytes.
-func BinaryViewFromBytes(data []byte) (*BinaryView, error) {
+func BinaryViewFromBytes(data []byte) (o *BinaryView, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("BinaryView: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsBinaryView(data, 0)
 	return BinaryViewFromFbs(fbs), nil
 }
@@ -1043,7 +1158,12 @@ func Utf8viewFromFbs(fbs *generated.Utf8View) *Utf8view {
 }
 
 // Utf8viewFromBytes deserializes a Utf8view from size-prefixed FlatBuffer bytes.
-func Utf8viewFromBytes(data []byte) (*Utf8view, error) {
+func Utf8viewFromBytes(data []byte) (o *Utf8view, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Utf8view: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsUtf8View(data, 0)
 	return Utf8viewFromFbs(fbs), nil
 }
@@ -1075,7 +1195,12 @@ func ListViewFromFbs(fbs *generated.ListView) *ListView {
 }
 
 // ListViewFromBytes deserializes a ListView from size-prefixed FlatBuffer bytes.
-func ListViewFromBytes(data []byte) (*ListView, error) {
+func ListViewFromBytes(data []byte) (o *ListView, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ListView: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsListView(data, 0)
 	return ListViewFromFbs(fbs), nil
 }
@@ -1106,7 +1231,12 @@ func LargeListViewFromFbs(fbs *generated.LargeListView) *LargeListView {
 }
 
 // LargeListViewFromBytes deserializes a LargeListView from size-prefixed FlatBuffer bytes.
-func LargeListViewFromBytes(data []byte) (*LargeListView, error) {
+func LargeListViewFromBytes(data []byte) (o *LargeListView, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("LargeListView: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsLargeListView(data, 0)
 	return LargeListViewFromFbs(fbs), nil
 }
@@ -1156,6 +1286,11 @@ func BufferFromFbs(fbs *generated.Buffer) *Buffer {
 }
 
 
+// SerializeTo writes the Buffer inline into a FlatBuffer builder and returns the offset.
+func (o *Buffer) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return generated.CreateBuffer(builder, o.Offset, o.Length)
+}
+
 type DictionaryEncoding struct {
 	DictionaryKind int16
 	Id int64
@@ -1175,7 +1310,12 @@ func DictionaryEncodingFromFbs(fbs *generated.DictionaryEncoding) *DictionaryEnc
 }
 
 // DictionaryEncodingFromBytes deserializes a DictionaryEncoding from size-prefixed FlatBuffer bytes.
-func DictionaryEncodingFromBytes(data []byte) (*DictionaryEncoding, error) {
+func DictionaryEncodingFromBytes(data []byte) (o *DictionaryEncoding, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("DictionaryEncoding: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDictionaryEncoding(data, 0)
 	return DictionaryEncodingFromFbs(fbs), nil
 }
@@ -1355,7 +1495,12 @@ func FieldFromFbs(fbs *generated.Field) *Field {
 }
 
 // FieldFromBytes deserializes a Field from size-prefixed FlatBuffer bytes.
-func FieldFromBytes(data []byte) (*Field, error) {
+func FieldFromBytes(data []byte) (o *Field, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Field: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsField(data, 0)
 	return FieldFromFbs(fbs), nil
 }
@@ -1549,7 +1694,12 @@ func KeyValueFromFbs(fbs *generated.KeyValue) *KeyValue {
 }
 
 // KeyValueFromBytes deserializes a KeyValue from size-prefixed FlatBuffer bytes.
-func KeyValueFromBytes(data []byte) (*KeyValue, error) {
+func KeyValueFromBytes(data []byte) (o *KeyValue, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("KeyValue: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsKeyValue(data, 0)
 	return KeyValueFromFbs(fbs), nil
 }
@@ -1619,7 +1769,12 @@ func SchemaFromFbs(fbs *generated.Schema) *Schema {
 }
 
 // SchemaFromBytes deserializes a Schema from size-prefixed FlatBuffer bytes.
-func SchemaFromBytes(data []byte) (*Schema, error) {
+func SchemaFromBytes(data []byte) (o *Schema, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Schema: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsSchema(data, 0)
 	return SchemaFromFbs(fbs), nil
 }

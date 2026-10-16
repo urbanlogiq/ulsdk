@@ -5,6 +5,7 @@
 package file
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/schema"
@@ -26,6 +27,11 @@ func BlockFromFbs(fbs *generated.Block) *Block {
 	return o
 }
 
+
+// SerializeTo writes the Block inline into a FlatBuffer builder and returns the offset.
+func (o *Block) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return generated.CreateBlock(builder, o.Offset, o.MetaDataLength, o.BodyLength)
+}
 
 // Footer -
 //  ----------------------------------------------------------------------
@@ -76,7 +82,12 @@ func FooterFromFbs(fbs *generated.Footer) *Footer {
 }
 
 // FooterFromBytes deserializes a Footer from size-prefixed FlatBuffer bytes.
-func FooterFromBytes(data []byte) (*Footer, error) {
+func FooterFromBytes(data []byte) (o *Footer, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Footer: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsFooter(data, 0)
 	return FooterFromFbs(fbs), nil
 }
@@ -103,8 +114,22 @@ func (o *Footer) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT 
 		}
 		customMetadataVecOffset = builder.EndVector(len(o.CustomMetadata))
 	}
-	var dictionariesVecOffset flatbuffers.UOffsetT // TODO: struct vector
-	var recordBatchesVecOffset flatbuffers.UOffsetT // TODO: struct vector
+	var dictionariesVecOffset flatbuffers.UOffsetT
+	if o.Dictionaries != nil {
+		generated.FooterStartDictionariesVector(builder, len(o.Dictionaries))
+		for i := len(o.Dictionaries) - 1; i >= 0; i-- {
+			o.Dictionaries[i].SerializeTo(builder)
+		}
+		dictionariesVecOffset = builder.EndVector(len(o.Dictionaries))
+	}
+	var recordBatchesVecOffset flatbuffers.UOffsetT
+	if o.RecordBatches != nil {
+		generated.FooterStartRecordBatchesVector(builder, len(o.RecordBatches))
+		for i := len(o.RecordBatches) - 1; i >= 0; i-- {
+			o.RecordBatches[i].SerializeTo(builder)
+		}
+		recordBatchesVecOffset = builder.EndVector(len(o.RecordBatches))
+	}
 	var schemaOffset flatbuffers.UOffsetT
 	if o.Schema != nil {
 		schemaOffset = o.Schema.SerializeTo(builder)

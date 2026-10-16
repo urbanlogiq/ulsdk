@@ -1768,3 +1768,8 @@ func DeprecatedRunSpecStartParamsVector(builder *flatbuffers.Builder, numElems i
 func DeprecatedRunSpecEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
+
+// Get_Id exports _Id.
+func (rcv *Task) Get_Id(obj *ObjectId) *ObjectId {
+	return rcv._Id(obj)
+}

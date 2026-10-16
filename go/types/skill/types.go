@@ -5,6 +5,7 @@
 package skill
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/id"
@@ -64,7 +65,12 @@ func SkillFromFbs(fbs *generated.Skill) *Skill {
 }
 
 // SkillFromBytes deserializes a Skill from size-prefixed FlatBuffer bytes.
-func SkillFromBytes(data []byte) (*Skill, error) {
+func SkillFromBytes(data []byte) (o *Skill, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Skill: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsSkill(data, 0)
 	return SkillFromFbs(fbs), nil
 }

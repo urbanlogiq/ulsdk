@@ -48,7 +48,12 @@ func ShareFromFbs(fbs *generated.Share) *Share {
 }
 
 // ShareFromBytes deserializes a Share from size-prefixed FlatBuffer bytes.
-func ShareFromBytes(data []byte) (*Share, error) {
+func ShareFromBytes(data []byte) (o *Share, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Share: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsShare(data, 0)
 	return ShareFromFbs(fbs), nil
 }
@@ -94,7 +99,12 @@ func JobCompleteFromFbs(fbs *generated.JobComplete) *JobComplete {
 }
 
 // JobCompleteFromBytes deserializes a JobComplete from size-prefixed FlatBuffer bytes.
-func JobCompleteFromBytes(data []byte) (*JobComplete, error) {
+func JobCompleteFromBytes(data []byte) (o *JobComplete, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("JobComplete: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsJobComplete(data, 0)
 	return JobCompleteFromFbs(fbs), nil
 }
@@ -139,7 +149,12 @@ func AccessRequestFromFbs(fbs *generated.AccessRequest) *AccessRequest {
 }
 
 // AccessRequestFromBytes deserializes a AccessRequest from size-prefixed FlatBuffer bytes.
-func AccessRequestFromBytes(data []byte) (*AccessRequest, error) {
+func AccessRequestFromBytes(data []byte) (o *AccessRequest, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("AccessRequest: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsAccessRequest(data, 0)
 	return AccessRequestFromFbs(fbs), nil
 }
@@ -187,7 +202,12 @@ func DriveChangeFromFbs(fbs *generated.DriveChange) *DriveChange {
 }
 
 // DriveChangeFromBytes deserializes a DriveChange from size-prefixed FlatBuffer bytes.
-func DriveChangeFromBytes(data []byte) (*DriveChange, error) {
+func DriveChangeFromBytes(data []byte) (o *DriveChange, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("DriveChange: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDriveChange(data, 0)
 	return DriveChangeFromFbs(fbs), nil
 }
@@ -249,7 +269,12 @@ func InboxFromFbs(fbs *generated.Inbox) *Inbox {
 }
 
 // InboxFromBytes deserializes a Inbox from size-prefixed FlatBuffer bytes.
-func InboxFromBytes(data []byte) (*Inbox, error) {
+func InboxFromBytes(data []byte) (o *Inbox, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Inbox: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsInbox(data, 0)
 	return InboxFromFbs(fbs), nil
 }
@@ -296,7 +321,12 @@ func InboxItemFromFbs(fbs *generated.InboxItem) *InboxItem {
 }
 
 // InboxItemFromBytes deserializes a InboxItem from size-prefixed FlatBuffer bytes.
-func InboxItemFromBytes(data []byte) (*InboxItem, error) {
+func InboxItemFromBytes(data []byte) (o *InboxItem, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("InboxItem: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsInboxItem(data, 0)
 	return InboxItemFromFbs(fbs), nil
 }
@@ -353,7 +383,12 @@ func NotificationFromFbs(fbs *generated.Notification) *Notification {
 }
 
 // NotificationFromBytes deserializes a Notification from size-prefixed FlatBuffer bytes.
-func NotificationFromBytes(data []byte) (*Notification, error) {
+func NotificationFromBytes(data []byte) (o *Notification, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Notification: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNotification(data, 0)
 	return NotificationFromFbs(fbs), nil
 }
@@ -418,7 +453,12 @@ func ResponseFromFbs(fbs *generated.Response) *Response {
 }
 
 // ResponseFromBytes deserializes a Response from size-prefixed FlatBuffer bytes.
-func ResponseFromBytes(data []byte) (*Response, error) {
+func ResponseFromBytes(data []byte) (o *Response, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Response: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsResponse(data, 0)
 	return ResponseFromFbs(fbs), nil
 }
@@ -458,7 +498,12 @@ func ShareDetailsFromFbs(fbs *generated.ShareDetails) *ShareDetails {
 }
 
 // ShareDetailsFromBytes deserializes a ShareDetails from size-prefixed FlatBuffer bytes.
-func ShareDetailsFromBytes(data []byte) (*ShareDetails, error) {
+func ShareDetailsFromBytes(data []byte) (o *ShareDetails, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ShareDetails: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsShareDetails(data, 0)
 	return ShareDetailsFromFbs(fbs), nil
 }

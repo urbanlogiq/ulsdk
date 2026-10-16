@@ -5,6 +5,7 @@
 package ontology_declaration
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/id"
@@ -70,7 +71,12 @@ func OntologyDeclarationFromFbs(fbs *generated.OntologyDeclaration) *OntologyDec
 }
 
 // OntologyDeclarationFromBytes deserializes a OntologyDeclaration from size-prefixed FlatBuffer bytes.
-func OntologyDeclarationFromBytes(data []byte) (*OntologyDeclaration, error) {
+func OntologyDeclarationFromBytes(data []byte) (o *OntologyDeclaration, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("OntologyDeclaration: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsOntologyDeclaration(data, 0)
 	return OntologyDeclarationFromFbs(fbs), nil
 }

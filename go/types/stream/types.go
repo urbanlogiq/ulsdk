@@ -5,6 +5,7 @@
 package stream
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/id"
@@ -84,7 +85,12 @@ func StreamFromFbs(fbs *generated.Stream) *Stream {
 }
 
 // StreamFromBytes deserializes a Stream from size-prefixed FlatBuffer bytes.
-func StreamFromBytes(data []byte) (*Stream, error) {
+func StreamFromBytes(data []byte) (o *Stream, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Stream: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsStream(data, 0)
 	return StreamFromFbs(fbs), nil
 }

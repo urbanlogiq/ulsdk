@@ -5,6 +5,7 @@
 package crypto
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 )
@@ -24,7 +25,12 @@ func Sha256FromFbs(fbs *generated.Sha256) *Sha256 {
 }
 
 // Sha256FromBytes deserializes a Sha256 from size-prefixed FlatBuffer bytes.
-func Sha256FromBytes(data []byte) (*Sha256, error) {
+func Sha256FromBytes(data []byte) (o *Sha256, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Sha256: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsSha256(data, 0)
 	return Sha256FromFbs(fbs), nil
 }
@@ -67,7 +73,12 @@ func CryptHeaderFromFbs(fbs *generated.CryptHeader) *CryptHeader {
 }
 
 // CryptHeaderFromBytes deserializes a CryptHeader from size-prefixed FlatBuffer bytes.
-func CryptHeaderFromBytes(data []byte) (*CryptHeader, error) {
+func CryptHeaderFromBytes(data []byte) (o *CryptHeader, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("CryptHeader: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsCryptHeader(data, 0)
 	return CryptHeaderFromFbs(fbs), nil
 }
@@ -109,7 +120,12 @@ func EncryptedObjectFromFbs(fbs *generated.EncryptedObject) *EncryptedObject {
 }
 
 // EncryptedObjectFromBytes deserializes a EncryptedObject from size-prefixed FlatBuffer bytes.
-func EncryptedObjectFromBytes(data []byte) (*EncryptedObject, error) {
+func EncryptedObjectFromBytes(data []byte) (o *EncryptedObject, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("EncryptedObject: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsEncryptedObject(data, 0)
 	return EncryptedObjectFromFbs(fbs), nil
 }
@@ -148,7 +164,12 @@ func SignatureFromFbs(fbs *generated.Signature) *Signature {
 }
 
 // SignatureFromBytes deserializes a Signature from size-prefixed FlatBuffer bytes.
-func SignatureFromBytes(data []byte) (*Signature, error) {
+func SignatureFromBytes(data []byte) (o *Signature, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Signature: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsSignature(data, 0)
 	return SignatureFromFbs(fbs), nil
 }

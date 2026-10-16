@@ -133,7 +133,12 @@ func AttrFromFbs(fbs *generated.Attr) *Attr {
 }
 
 // AttrFromBytes deserializes a Attr from size-prefixed FlatBuffer bytes.
-func AttrFromBytes(data []byte) (*Attr, error) {
+func AttrFromBytes(data []byte) (o *Attr, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Attr: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsAttr(data, 0)
 	return AttrFromFbs(fbs), nil
 }

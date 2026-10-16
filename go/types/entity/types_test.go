@@ -4,7 +4,10 @@
 
 package entity
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestDefaultGraphEdge(t *testing.T) {
 	o := &GraphEdge{}
@@ -41,6 +44,26 @@ func TestRoundTripGraphNode(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestUnionGraphNodeGeom(t *testing.T) {
+	for _, v := range []Geometry{
+		&Point{},
+		&Line{},
+		&MultiLine{},
+		&Polygon{},
+		&MultiPolygon{},
+		&MultiPoint{},
+	} {
+		o := &GraphNode{Geom: v}
+		got, err := GraphNodeFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Geom) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Geom, v)
+		}
 	}
 }
 

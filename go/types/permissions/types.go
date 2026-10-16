@@ -5,6 +5,7 @@
 package permissions
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/id"
@@ -44,7 +45,12 @@ func AccessControlListFromFbs(fbs *generated.AccessControlList) *AccessControlLi
 }
 
 // AccessControlListFromBytes deserializes a AccessControlList from size-prefixed FlatBuffer bytes.
-func AccessControlListFromBytes(data []byte) (*AccessControlList, error) {
+func AccessControlListFromBytes(data []byte) (o *AccessControlList, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("AccessControlList: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsAccessControlList(data, 0)
 	return AccessControlListFromFbs(fbs), nil
 }
@@ -94,7 +100,12 @@ func RoleFromFbs(fbs *generated.Role) *Role {
 }
 
 // RoleFromBytes deserializes a Role from size-prefixed FlatBuffer bytes.
-func RoleFromBytes(data []byte) (*Role, error) {
+func RoleFromBytes(data []byte) (o *Role, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Role: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsRole(data, 0)
 	return RoleFromFbs(fbs), nil
 }

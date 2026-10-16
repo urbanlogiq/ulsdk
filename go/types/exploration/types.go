@@ -5,6 +5,7 @@
 package exploration
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/id"
@@ -75,7 +76,12 @@ func ExplorationFromFbs(fbs *generated.Exploration) *Exploration {
 }
 
 // ExplorationFromBytes deserializes a Exploration from size-prefixed FlatBuffer bytes.
-func ExplorationFromBytes(data []byte) (*Exploration, error) {
+func ExplorationFromBytes(data []byte) (o *Exploration, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Exploration: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsExploration(data, 0)
 	return ExplorationFromFbs(fbs), nil
 }

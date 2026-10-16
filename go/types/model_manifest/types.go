@@ -5,6 +5,7 @@
 package model_manifest
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/id"
@@ -90,7 +91,12 @@ func ModelManifestFromFbs(fbs *generated.ModelManifest) *ModelManifest {
 }
 
 // ModelManifestFromBytes deserializes a ModelManifest from size-prefixed FlatBuffer bytes.
-func ModelManifestFromBytes(data []byte) (*ModelManifest, error) {
+func ModelManifestFromBytes(data []byte) (o *ModelManifest, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ModelManifest: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsModelManifest(data, 0)
 	return ModelManifestFromFbs(fbs), nil
 }

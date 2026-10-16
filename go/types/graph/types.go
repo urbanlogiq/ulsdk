@@ -51,7 +51,12 @@ func GeomOpFromFbs(fbs *generated.GeomOp) *GeomOp {
 }
 
 // GeomOpFromBytes deserializes a GeomOp from size-prefixed FlatBuffer bytes.
-func GeomOpFromBytes(data []byte) (*GeomOp, error) {
+func GeomOpFromBytes(data []byte) (o *GeomOp, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("GeomOp: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsGeomOp(data, 0)
 	return GeomOpFromFbs(fbs), nil
 }
@@ -140,7 +145,12 @@ func NodeQueryFromFbs(fbs *generated.NodeQuery) *NodeQuery {
 }
 
 // NodeQueryFromBytes deserializes a NodeQuery from size-prefixed FlatBuffer bytes.
-func NodeQueryFromBytes(data []byte) (*NodeQuery, error) {
+func NodeQueryFromBytes(data []byte) (o *NodeQuery, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("NodeQuery: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNodeQuery(data, 0)
 	return NodeQueryFromFbs(fbs), nil
 }
@@ -236,7 +246,12 @@ func EdgeQueryFromFbs(fbs *generated.EdgeQuery) *EdgeQuery {
 }
 
 // EdgeQueryFromBytes deserializes a EdgeQuery from size-prefixed FlatBuffer bytes.
-func EdgeQueryFromBytes(data []byte) (*EdgeQuery, error) {
+func EdgeQueryFromBytes(data []byte) (o *EdgeQuery, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("EdgeQuery: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsEdgeQuery(data, 0)
 	return EdgeQueryFromFbs(fbs), nil
 }
@@ -286,7 +301,12 @@ func EdgeListFromFbs(fbs *generated.EdgeList) *EdgeList {
 }
 
 // EdgeListFromBytes deserializes a EdgeList from size-prefixed FlatBuffer bytes.
-func EdgeListFromBytes(data []byte) (*EdgeList, error) {
+func EdgeListFromBytes(data []byte) (o *EdgeList, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("EdgeList: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsEdgeList(data, 0)
 	return EdgeListFromFbs(fbs), nil
 }
@@ -354,7 +374,12 @@ func GeomFromFbs(fbs *generated.Geom) *Geom {
 }
 
 // GeomFromBytes deserializes a Geom from size-prefixed FlatBuffer bytes.
-func GeomFromBytes(data []byte) (*Geom, error) {
+func GeomFromBytes(data []byte) (o *Geom, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Geom: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsGeom(data, 0)
 	return GeomFromFbs(fbs), nil
 }
@@ -441,7 +466,12 @@ func GraphQueryFromFbs(fbs *generated.GraphQuery) *GraphQuery {
 }
 
 // GraphQueryFromBytes deserializes a GraphQuery from size-prefixed FlatBuffer bytes.
-func GraphQueryFromBytes(data []byte) (*GraphQuery, error) {
+func GraphQueryFromBytes(data []byte) (o *GraphQuery, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("GraphQuery: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsGraphQuery(data, 0)
 	return GraphQueryFromFbs(fbs), nil
 }
@@ -502,7 +532,12 @@ func NodeIdPairFromFbs(fbs *generated.NodeIdPair) *NodeIdPair {
 }
 
 // NodeIdPairFromBytes deserializes a NodeIdPair from size-prefixed FlatBuffer bytes.
-func NodeIdPairFromBytes(data []byte) (*NodeIdPair, error) {
+func NodeIdPairFromBytes(data []byte) (o *NodeIdPair, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("NodeIdPair: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNodeIdPair(data, 0)
 	return NodeIdPairFromFbs(fbs), nil
 }
@@ -547,7 +582,12 @@ func NodeListFromFbs(fbs *generated.NodeList) *NodeList {
 }
 
 // NodeListFromBytes deserializes a NodeList from size-prefixed FlatBuffer bytes.
-func NodeListFromBytes(data []byte) (*NodeList, error) {
+func NodeListFromBytes(data []byte) (o *NodeList, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("NodeList: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNodeList(data, 0)
 	return NodeListFromFbs(fbs), nil
 }
@@ -594,7 +634,12 @@ func OrderByFromFbs(fbs *generated.OrderBy) *OrderBy {
 }
 
 // OrderByFromBytes deserializes a OrderBy from size-prefixed FlatBuffer bytes.
-func OrderByFromBytes(data []byte) (*OrderBy, error) {
+func OrderByFromBytes(data []byte) (o *OrderBy, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("OrderBy: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsOrderBy(data, 0)
 	return OrderByFromFbs(fbs), nil
 }
@@ -631,7 +676,12 @@ func ProjectionFromFbs(fbs *generated.Projection) *Projection {
 }
 
 // ProjectionFromBytes deserializes a Projection from size-prefixed FlatBuffer bytes.
-func ProjectionFromBytes(data []byte) (*Projection, error) {
+func ProjectionFromBytes(data []byte) (o *Projection, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Projection: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsProjection(data, 0)
 	return ProjectionFromFbs(fbs), nil
 }
@@ -675,7 +725,12 @@ func QueryPathElementFromFbs(fbs *generated.QueryPathElement) *QueryPathElement 
 }
 
 // QueryPathElementFromBytes deserializes a QueryPathElement from size-prefixed FlatBuffer bytes.
-func QueryPathElementFromBytes(data []byte) (*QueryPathElement, error) {
+func QueryPathElementFromBytes(data []byte) (o *QueryPathElement, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("QueryPathElement: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsQueryPathElement(data, 0)
 	return QueryPathElementFromFbs(fbs), nil
 }

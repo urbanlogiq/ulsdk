@@ -43,7 +43,12 @@ func StringCategoriesFromFbs(fbs *generated.StringCategories) *StringCategories 
 }
 
 // StringCategoriesFromBytes deserializes a StringCategories from size-prefixed FlatBuffer bytes.
-func StringCategoriesFromBytes(data []byte) (*StringCategories, error) {
+func StringCategoriesFromBytes(data []byte) (o *StringCategories, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("StringCategories: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsStringCategories(data, 0)
 	return StringCategoriesFromFbs(fbs), nil
 }
@@ -92,7 +97,12 @@ func NumericalFieldFormatFromFbs(fbs *generated.NumericalFieldFormat) *Numerical
 }
 
 // NumericalFieldFormatFromBytes deserializes a NumericalFieldFormat from size-prefixed FlatBuffer bytes.
-func NumericalFieldFormatFromBytes(data []byte) (*NumericalFieldFormat, error) {
+func NumericalFieldFormatFromBytes(data []byte) (o *NumericalFieldFormat, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("NumericalFieldFormat: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNumericalFieldFormat(data, 0)
 	return NumericalFieldFormatFromFbs(fbs), nil
 }
@@ -151,7 +161,12 @@ func IntRangeFromFbs(fbs *generated.IntRange) *IntRange {
 }
 
 // IntRangeFromBytes deserializes a IntRange from size-prefixed FlatBuffer bytes.
-func IntRangeFromBytes(data []byte) (*IntRange, error) {
+func IntRangeFromBytes(data []byte) (o *IntRange, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("IntRange: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsIntRange(data, 0)
 	return IntRangeFromFbs(fbs), nil
 }
@@ -216,7 +231,12 @@ func FloatRangeFromFbs(fbs *generated.FloatRange) *FloatRange {
 }
 
 // FloatRangeFromBytes deserializes a FloatRange from size-prefixed FlatBuffer bytes.
-func FloatRangeFromBytes(data []byte) (*FloatRange, error) {
+func FloatRangeFromBytes(data []byte) (o *FloatRange, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("FloatRange: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsFloatRange(data, 0)
 	return FloatRangeFromFbs(fbs), nil
 }
@@ -266,7 +286,12 @@ func DatetimeRangeFromFbs(fbs *generated.DatetimeRange) *DatetimeRange {
 }
 
 // DatetimeRangeFromBytes deserializes a DatetimeRange from size-prefixed FlatBuffer bytes.
-func DatetimeRangeFromBytes(data []byte) (*DatetimeRange, error) {
+func DatetimeRangeFromBytes(data []byte) (o *DatetimeRange, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("DatetimeRange: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDatetimeRange(data, 0)
 	return DatetimeRangeFromFbs(fbs), nil
 }
@@ -327,7 +352,12 @@ func DatesFromFbs(fbs *generated.Dates) *Dates {
 }
 
 // DatesFromBytes deserializes a Dates from size-prefixed FlatBuffer bytes.
-func DatesFromBytes(data []byte) (*Dates, error) {
+func DatesFromBytes(data []byte) (o *Dates, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Dates: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDates(data, 0)
 	return DatesFromFbs(fbs), nil
 }
@@ -385,7 +415,12 @@ func NestedStringCategoriesFromFbs(fbs *generated.NestedStringCategories) *Neste
 }
 
 // NestedStringCategoriesFromBytes deserializes a NestedStringCategories from size-prefixed FlatBuffer bytes.
-func NestedStringCategoriesFromBytes(data []byte) (*NestedStringCategories, error) {
+func NestedStringCategoriesFromBytes(data []byte) (o *NestedStringCategories, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("NestedStringCategories: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNestedStringCategories(data, 0)
 	return NestedStringCategoriesFromFbs(fbs), nil
 }
@@ -482,7 +517,12 @@ func RawGeomFromFbs(fbs *generated.RawGeom) *RawGeom {
 }
 
 // RawGeomFromBytes deserializes a RawGeom from size-prefixed FlatBuffer bytes.
-func RawGeomFromBytes(data []byte) (*RawGeom, error) {
+func RawGeomFromBytes(data []byte) (o *RawGeom, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("RawGeom: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsRawGeom(data, 0)
 	return RawGeomFromFbs(fbs), nil
 }
@@ -517,7 +557,12 @@ func NoGeometryFromFbs(fbs *generated.NoGeometry) *NoGeometry {
 }
 
 // NoGeometryFromBytes deserializes a NoGeometry from size-prefixed FlatBuffer bytes.
-func NoGeometryFromBytes(data []byte) (*NoGeometry, error) {
+func NoGeometryFromBytes(data []byte) (o *NoGeometry, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("NoGeometry: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNoGeometry(data, 0)
 	return NoGeometryFromFbs(fbs), nil
 }
@@ -547,7 +592,12 @@ func DatacatalogGeometryFromFbs(fbs *generated.DatacatalogGeometry) *Datacatalog
 }
 
 // DatacatalogGeometryFromBytes deserializes a DatacatalogGeometry from size-prefixed FlatBuffer bytes.
-func DatacatalogGeometryFromBytes(data []byte) (*DatacatalogGeometry, error) {
+func DatacatalogGeometryFromBytes(data []byte) (o *DatacatalogGeometry, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("DatacatalogGeometry: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDatacatalogGeometry(data, 0)
 	return DatacatalogGeometryFromFbs(fbs), nil
 }
@@ -604,7 +654,12 @@ func WorldGraphGeometryFromFbs(fbs *generated.WorldGraphGeometry) *WorldGraphGeo
 }
 
 // WorldGraphGeometryFromBytes deserializes a WorldGraphGeometry from size-prefixed FlatBuffer bytes.
-func WorldGraphGeometryFromBytes(data []byte) (*WorldGraphGeometry, error) {
+func WorldGraphGeometryFromBytes(data []byte) (o *WorldGraphGeometry, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("WorldGraphGeometry: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsWorldGraphGeometry(data, 0)
 	return WorldGraphGeometryFromFbs(fbs), nil
 }
@@ -655,7 +710,12 @@ func DatacatalogLatLngGeometryFromFbs(fbs *generated.DatacatalogLatLngGeometry) 
 }
 
 // DatacatalogLatLngGeometryFromBytes deserializes a DatacatalogLatLngGeometry from size-prefixed FlatBuffer bytes.
-func DatacatalogLatLngGeometryFromBytes(data []byte) (*DatacatalogLatLngGeometry, error) {
+func DatacatalogLatLngGeometryFromBytes(data []byte) (o *DatacatalogLatLngGeometry, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("DatacatalogLatLngGeometry: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDatacatalogLatLngGeometry(data, 0)
 	return DatacatalogLatLngGeometryFromFbs(fbs), nil
 }
@@ -705,7 +765,12 @@ func NoTimeFromFbs(fbs *generated.NoTime) *NoTime {
 }
 
 // NoTimeFromBytes deserializes a NoTime from size-prefixed FlatBuffer bytes.
-func NoTimeFromBytes(data []byte) (*NoTime, error) {
+func NoTimeFromBytes(data []byte) (o *NoTime, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("NoTime: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNoTime(data, 0)
 	return NoTimeFromFbs(fbs), nil
 }
@@ -737,7 +802,12 @@ func ColumnTimeFromFbs(fbs *generated.ColumnTime) *ColumnTime {
 }
 
 // ColumnTimeFromBytes deserializes a ColumnTime from size-prefixed FlatBuffer bytes.
-func ColumnTimeFromBytes(data []byte) (*ColumnTime, error) {
+func ColumnTimeFromBytes(data []byte) (o *ColumnTime, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ColumnTime: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsColumnTime(data, 0)
 	return ColumnTimeFromFbs(fbs), nil
 }
@@ -798,7 +868,12 @@ func HierarchyRelationshipDataFromFbs(fbs *generated.HierarchyRelationshipData) 
 }
 
 // HierarchyRelationshipDataFromBytes deserializes a HierarchyRelationshipData from size-prefixed FlatBuffer bytes.
-func HierarchyRelationshipDataFromBytes(data []byte) (*HierarchyRelationshipData, error) {
+func HierarchyRelationshipDataFromBytes(data []byte) (o *HierarchyRelationshipData, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("HierarchyRelationshipData: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsHierarchyRelationshipData(data, 0)
 	return HierarchyRelationshipDataFromFbs(fbs), nil
 }
@@ -853,7 +928,12 @@ func CategoryRelationshipDataFromFbs(fbs *generated.CategoryRelationshipData) *C
 }
 
 // CategoryRelationshipDataFromBytes deserializes a CategoryRelationshipData from size-prefixed FlatBuffer bytes.
-func CategoryRelationshipDataFromBytes(data []byte) (*CategoryRelationshipData, error) {
+func CategoryRelationshipDataFromBytes(data []byte) (o *CategoryRelationshipData, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("CategoryRelationshipData: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsCategoryRelationshipData(data, 0)
 	return CategoryRelationshipDataFromFbs(fbs), nil
 }
@@ -909,7 +989,12 @@ func NestedCategoryRelationshipDataFromFbs(fbs *generated.NestedCategoryRelation
 }
 
 // NestedCategoryRelationshipDataFromBytes deserializes a NestedCategoryRelationshipData from size-prefixed FlatBuffer bytes.
-func NestedCategoryRelationshipDataFromBytes(data []byte) (*NestedCategoryRelationshipData, error) {
+func NestedCategoryRelationshipDataFromBytes(data []byte) (o *NestedCategoryRelationshipData, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("NestedCategoryRelationshipData: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNestedCategoryRelationshipData(data, 0)
 	return NestedCategoryRelationshipDataFromFbs(fbs), nil
 }
@@ -960,7 +1045,12 @@ func NestedHierarchyRelationshipDataFromFbs(fbs *generated.NestedHierarchyRelati
 }
 
 // NestedHierarchyRelationshipDataFromBytes deserializes a NestedHierarchyRelationshipData from size-prefixed FlatBuffer bytes.
-func NestedHierarchyRelationshipDataFromBytes(data []byte) (*NestedHierarchyRelationshipData, error) {
+func NestedHierarchyRelationshipDataFromBytes(data []byte) (o *NestedHierarchyRelationshipData, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("NestedHierarchyRelationshipData: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNestedHierarchyRelationshipData(data, 0)
 	return NestedHierarchyRelationshipDataFromFbs(fbs), nil
 }
@@ -1073,7 +1163,12 @@ func ConceptBindingFromFbs(fbs *generated.ConceptBinding) *ConceptBinding {
 }
 
 // ConceptBindingFromBytes deserializes a ConceptBinding from size-prefixed FlatBuffer bytes.
-func ConceptBindingFromBytes(data []byte) (*ConceptBinding, error) {
+func ConceptBindingFromBytes(data []byte) (o *ConceptBinding, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ConceptBinding: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsConceptBinding(data, 0)
 	return ConceptBindingFromFbs(fbs), nil
 }
@@ -1137,7 +1232,12 @@ func ContactInfoFromFbs(fbs *generated.ContactInfo) *ContactInfo {
 }
 
 // ContactInfoFromBytes deserializes a ContactInfo from size-prefixed FlatBuffer bytes.
-func ContactInfoFromBytes(data []byte) (*ContactInfo, error) {
+func ContactInfoFromBytes(data []byte) (o *ContactInfo, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ContactInfo: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsContactInfo(data, 0)
 	return ContactInfoFromFbs(fbs), nil
 }
@@ -1205,7 +1305,12 @@ func DatasetSourceFromFbs(fbs *generated.DatasetSource) *DatasetSource {
 }
 
 // DatasetSourceFromBytes deserializes a DatasetSource from size-prefixed FlatBuffer bytes.
-func DatasetSourceFromBytes(data []byte) (*DatasetSource, error) {
+func DatasetSourceFromBytes(data []byte) (o *DatasetSource, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("DatasetSource: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDatasetSource(data, 0)
 	return DatasetSourceFromFbs(fbs), nil
 }
@@ -1259,7 +1364,12 @@ func DetailSectionFromFbs(fbs *generated.DetailSection) *DetailSection {
 }
 
 // DetailSectionFromBytes deserializes a DetailSection from size-prefixed FlatBuffer bytes.
-func DetailSectionFromBytes(data []byte) (*DetailSection, error) {
+func DetailSectionFromBytes(data []byte) (o *DetailSection, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("DetailSection: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDetailSection(data, 0)
 	return DetailSectionFromFbs(fbs), nil
 }
@@ -1316,7 +1426,12 @@ func DocumentFromFbs(fbs *generated.Document) *Document {
 }
 
 // DocumentFromBytes deserializes a Document from size-prefixed FlatBuffer bytes.
-func DocumentFromBytes(data []byte) (*Document, error) {
+func DocumentFromBytes(data []byte) (o *Document, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Document: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDocument(data, 0)
 	return DocumentFromFbs(fbs), nil
 }
@@ -1374,7 +1489,12 @@ func DocumentsFromFbs(fbs *generated.Documents) *Documents {
 }
 
 // DocumentsFromBytes deserializes a Documents from size-prefixed FlatBuffer bytes.
-func DocumentsFromBytes(data []byte) (*Documents, error) {
+func DocumentsFromBytes(data []byte) (o *Documents, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Documents: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDocuments(data, 0)
 	return DocumentsFromFbs(fbs), nil
 }
@@ -1437,7 +1557,12 @@ func FloatAggregateFromFbs(fbs *generated.FloatAggregate) *FloatAggregate {
 }
 
 // FloatAggregateFromBytes deserializes a FloatAggregate from size-prefixed FlatBuffer bytes.
-func FloatAggregateFromBytes(data []byte) (*FloatAggregate, error) {
+func FloatAggregateFromBytes(data []byte) (o *FloatAggregate, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("FloatAggregate: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsFloatAggregate(data, 0)
 	return FloatAggregateFromFbs(fbs), nil
 }
@@ -1452,7 +1577,14 @@ func (o *FloatAggregate) ToBytes() []byte {
 
 // SerializeTo writes the FloatAggregate into a FlatBuffer builder and returns the offset.
 func (o *FloatAggregate) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	var histoVecOffset flatbuffers.UOffsetT // TODO: struct vector
+	var histoVecOffset flatbuffers.UOffsetT
+	if o.Histo != nil {
+		generated.FloatAggregateStartHistoVector(builder, len(o.Histo))
+		for i := len(o.Histo) - 1; i >= 0; i-- {
+			o.Histo[i].SerializeTo(builder)
+		}
+		histoVecOffset = builder.EndVector(len(o.Histo))
+	}
 	generated.FloatAggregateStart(builder)
 	generated.FloatAggregateAddCount(builder, o.Count)
 	generated.FloatAggregateAddHisto(builder, histoVecOffset)
@@ -1477,6 +1609,11 @@ func FloatBucketFromFbs(fbs *generated.FloatBucket) *FloatBucket {
 }
 
 
+// SerializeTo writes the FloatBucket inline into a FlatBuffer builder and returns the offset.
+func (o *FloatBucket) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return generated.CreateFloatBucket(builder, o.Count, o.Max)
+}
+
 // ForeignKey -
 //  A column of this dataset that holds the key of a row in another dataset.
 //  Filters on this dataset can then narrow the other dataset: a row there
@@ -1498,7 +1635,12 @@ func ForeignKeyFromFbs(fbs *generated.ForeignKey) *ForeignKey {
 }
 
 // ForeignKeyFromBytes deserializes a ForeignKey from size-prefixed FlatBuffer bytes.
-func ForeignKeyFromBytes(data []byte) (*ForeignKey, error) {
+func ForeignKeyFromBytes(data []byte) (o *ForeignKey, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ForeignKey: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsForeignKey(data, 0)
 	return ForeignKeyFromFbs(fbs), nil
 }
@@ -1548,7 +1690,12 @@ func GeometryDataFromFbs(fbs *generated.GeometryData) *GeometryData {
 }
 
 // GeometryDataFromBytes deserializes a GeometryData from size-prefixed FlatBuffer bytes.
-func GeometryDataFromBytes(data []byte) (*GeometryData, error) {
+func GeometryDataFromBytes(data []byte) (o *GeometryData, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("GeometryData: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsGeometryData(data, 0)
 	return GeometryDataFromFbs(fbs), nil
 }
@@ -1604,7 +1751,12 @@ func HierarchicalRelationshipFromFbs(fbs *generated.HierarchicalRelationship) *H
 }
 
 // HierarchicalRelationshipFromBytes deserializes a HierarchicalRelationship from size-prefixed FlatBuffer bytes.
-func HierarchicalRelationshipFromBytes(data []byte) (*HierarchicalRelationship, error) {
+func HierarchicalRelationshipFromBytes(data []byte) (o *HierarchicalRelationship, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("HierarchicalRelationship: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsHierarchicalRelationship(data, 0)
 	return HierarchicalRelationshipFromFbs(fbs), nil
 }
@@ -1664,7 +1816,12 @@ func IntAggregateFromFbs(fbs *generated.IntAggregate) *IntAggregate {
 }
 
 // IntAggregateFromBytes deserializes a IntAggregate from size-prefixed FlatBuffer bytes.
-func IntAggregateFromBytes(data []byte) (*IntAggregate, error) {
+func IntAggregateFromBytes(data []byte) (o *IntAggregate, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("IntAggregate: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsIntAggregate(data, 0)
 	return IntAggregateFromFbs(fbs), nil
 }
@@ -1679,7 +1836,14 @@ func (o *IntAggregate) ToBytes() []byte {
 
 // SerializeTo writes the IntAggregate into a FlatBuffer builder and returns the offset.
 func (o *IntAggregate) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	var histoVecOffset flatbuffers.UOffsetT // TODO: struct vector
+	var histoVecOffset flatbuffers.UOffsetT
+	if o.Histo != nil {
+		generated.IntAggregateStartHistoVector(builder, len(o.Histo))
+		for i := len(o.Histo) - 1; i >= 0; i-- {
+			o.Histo[i].SerializeTo(builder)
+		}
+		histoVecOffset = builder.EndVector(len(o.Histo))
+	}
 	generated.IntAggregateStart(builder)
 	generated.IntAggregateAddCount(builder, o.Count)
 	generated.IntAggregateAddHisto(builder, histoVecOffset)
@@ -1704,6 +1868,11 @@ func IntBucketFromFbs(fbs *generated.IntBucket) *IntBucket {
 }
 
 
+// SerializeTo writes the IntBucket inline into a FlatBuffer builder and returns the offset.
+func (o *IntBucket) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return generated.CreateIntBucket(builder, o.Count, o.Max)
+}
+
 type IntegerDisplayString struct {
 	DisplayName string
 	Value int64
@@ -1717,7 +1886,12 @@ func IntegerDisplayStringFromFbs(fbs *generated.IntegerDisplayString) *IntegerDi
 }
 
 // IntegerDisplayStringFromBytes deserializes a IntegerDisplayString from size-prefixed FlatBuffer bytes.
-func IntegerDisplayStringFromBytes(data []byte) (*IntegerDisplayString, error) {
+func IntegerDisplayStringFromBytes(data []byte) (o *IntegerDisplayString, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("IntegerDisplayString: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsIntegerDisplayString(data, 0)
 	return IntegerDisplayStringFromFbs(fbs), nil
 }
@@ -1881,7 +2055,12 @@ func MetadataFromFbs(fbs *generated.Metadata) *Metadata {
 }
 
 // MetadataFromBytes deserializes a Metadata from size-prefixed FlatBuffer bytes.
-func MetadataFromBytes(data []byte) (*Metadata, error) {
+func MetadataFromBytes(data []byte) (o *Metadata, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Metadata: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsMetadata(data, 0)
 	return MetadataFromFbs(fbs), nil
 }
@@ -2078,7 +2257,12 @@ func NestedCategoryRelationshipNodeFromFbs(fbs *generated.NestedCategoryRelation
 }
 
 // NestedCategoryRelationshipNodeFromBytes deserializes a NestedCategoryRelationshipNode from size-prefixed FlatBuffer bytes.
-func NestedCategoryRelationshipNodeFromBytes(data []byte) (*NestedCategoryRelationshipNode, error) {
+func NestedCategoryRelationshipNodeFromBytes(data []byte) (o *NestedCategoryRelationshipNode, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("NestedCategoryRelationshipNode: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNestedCategoryRelationshipNode(data, 0)
 	return NestedCategoryRelationshipNodeFromFbs(fbs), nil
 }
@@ -2135,7 +2319,12 @@ func NestedHierarchyRelationshipNodeFromFbs(fbs *generated.NestedHierarchyRelati
 }
 
 // NestedHierarchyRelationshipNodeFromBytes deserializes a NestedHierarchyRelationshipNode from size-prefixed FlatBuffer bytes.
-func NestedHierarchyRelationshipNodeFromBytes(data []byte) (*NestedHierarchyRelationshipNode, error) {
+func NestedHierarchyRelationshipNodeFromBytes(data []byte) (o *NestedHierarchyRelationshipNode, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("NestedHierarchyRelationshipNode: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNestedHierarchyRelationshipNode(data, 0)
 	return NestedHierarchyRelationshipNodeFromFbs(fbs), nil
 }
@@ -2198,7 +2387,12 @@ func NestedStringCategoryNodeFromFbs(fbs *generated.NestedStringCategoryNode) *N
 }
 
 // NestedStringCategoryNodeFromBytes deserializes a NestedStringCategoryNode from size-prefixed FlatBuffer bytes.
-func NestedStringCategoryNodeFromBytes(data []byte) (*NestedStringCategoryNode, error) {
+func NestedStringCategoryNodeFromBytes(data []byte) (o *NestedStringCategoryNode, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("NestedStringCategoryNode: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNestedStringCategoryNode(data, 0)
 	return NestedStringCategoryNodeFromFbs(fbs), nil
 }
@@ -2249,7 +2443,12 @@ func StringAggregateFromFbs(fbs *generated.StringAggregate) *StringAggregate {
 }
 
 // StringAggregateFromBytes deserializes a StringAggregate from size-prefixed FlatBuffer bytes.
-func StringAggregateFromBytes(data []byte) (*StringAggregate, error) {
+func StringAggregateFromBytes(data []byte) (o *StringAggregate, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("StringAggregate: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsStringAggregate(data, 0)
 	return StringAggregateFromFbs(fbs), nil
 }
@@ -2287,7 +2486,12 @@ func TimeIntervalFromFbs(fbs *generated.TimeInterval) *TimeInterval {
 }
 
 // TimeIntervalFromBytes deserializes a TimeInterval from size-prefixed FlatBuffer bytes.
-func TimeIntervalFromBytes(data []byte) (*TimeInterval, error) {
+func TimeIntervalFromBytes(data []byte) (o *TimeInterval, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("TimeInterval: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsTimeInterval(data, 0)
 	return TimeIntervalFromFbs(fbs), nil
 }
@@ -2339,7 +2543,12 @@ func UIntAggregateFromFbs(fbs *generated.UIntAggregate) *UIntAggregate {
 }
 
 // UIntAggregateFromBytes deserializes a UIntAggregate from size-prefixed FlatBuffer bytes.
-func UIntAggregateFromBytes(data []byte) (*UIntAggregate, error) {
+func UIntAggregateFromBytes(data []byte) (o *UIntAggregate, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("UIntAggregate: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsUIntAggregate(data, 0)
 	return UIntAggregateFromFbs(fbs), nil
 }
@@ -2354,7 +2563,14 @@ func (o *UIntAggregate) ToBytes() []byte {
 
 // SerializeTo writes the UIntAggregate into a FlatBuffer builder and returns the offset.
 func (o *UIntAggregate) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	var histoVecOffset flatbuffers.UOffsetT // TODO: struct vector
+	var histoVecOffset flatbuffers.UOffsetT
+	if o.Histo != nil {
+		generated.UIntAggregateStartHistoVector(builder, len(o.Histo))
+		for i := len(o.Histo) - 1; i >= 0; i-- {
+			o.Histo[i].SerializeTo(builder)
+		}
+		histoVecOffset = builder.EndVector(len(o.Histo))
+	}
 	generated.UIntAggregateStart(builder)
 	generated.UIntAggregateAddCount(builder, o.Count)
 	generated.UIntAggregateAddHisto(builder, histoVecOffset)
@@ -2378,6 +2594,11 @@ func UIntBucketFromFbs(fbs *generated.UIntBucket) *UIntBucket {
 	return o
 }
 
+
+// SerializeTo writes the UIntBucket inline into a FlatBuffer builder and returns the offset.
+func (o *UIntBucket) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return generated.CreateUIntBucket(builder, o.Count, o.Max)
+}
 
 type UlField struct {
 	BreakdownDisplayName *string
@@ -2560,7 +2781,12 @@ func UlFieldFromFbs(fbs *generated.UlField) *UlField {
 }
 
 // UlFieldFromBytes deserializes a UlField from size-prefixed FlatBuffer bytes.
-func UlFieldFromBytes(data []byte) (*UlField, error) {
+func UlFieldFromBytes(data []byte) (o *UlField, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("UlField: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsUlField(data, 0)
 	return UlFieldFromFbs(fbs), nil
 }
@@ -2797,7 +3023,12 @@ func UlFieldRelationshipFromFbs(fbs *generated.UlFieldRelationship) *UlFieldRela
 }
 
 // UlFieldRelationshipFromBytes deserializes a UlFieldRelationship from size-prefixed FlatBuffer bytes.
-func UlFieldRelationshipFromBytes(data []byte) (*UlFieldRelationship, error) {
+func UlFieldRelationshipFromBytes(data []byte) (o *UlFieldRelationship, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("UlFieldRelationship: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsUlFieldRelationship(data, 0)
 	return UlFieldRelationshipFromFbs(fbs), nil
 }

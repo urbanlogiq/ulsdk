@@ -23,7 +23,12 @@ func VboolFromFbs(fbs *generated.VBool) *Vbool {
 }
 
 // VboolFromBytes deserializes a Vbool from size-prefixed FlatBuffer bytes.
-func VboolFromBytes(data []byte) (*Vbool, error) {
+func VboolFromBytes(data []byte) (o *Vbool, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Vbool: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVBool(data, 0)
 	return VboolFromFbs(fbs), nil
 }
@@ -52,7 +57,12 @@ func VunitFromFbs(fbs *generated.VUnit) *Vunit {
 }
 
 // VunitFromBytes deserializes a Vunit from size-prefixed FlatBuffer bytes.
-func VunitFromBytes(data []byte) (*Vunit, error) {
+func VunitFromBytes(data []byte) (o *Vunit, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Vunit: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVUnit(data, 0)
 	return VunitFromFbs(fbs), nil
 }
@@ -82,7 +92,12 @@ func VcharFromFbs(fbs *generated.VChar) *Vchar {
 }
 
 // VcharFromBytes deserializes a Vchar from size-prefixed FlatBuffer bytes.
-func VcharFromBytes(data []byte) (*Vchar, error) {
+func VcharFromBytes(data []byte) (o *Vchar, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Vchar: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVChar(data, 0)
 	return VcharFromFbs(fbs), nil
 }
@@ -111,7 +126,12 @@ func VnullFromFbs(fbs *generated.VNull) *Vnull {
 }
 
 // VnullFromBytes deserializes a Vnull from size-prefixed FlatBuffer bytes.
-func VnullFromBytes(data []byte) (*Vnull, error) {
+func VnullFromBytes(data []byte) (o *Vnull, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Vnull: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVNull(data, 0)
 	return VnullFromFbs(fbs), nil
 }
@@ -141,7 +161,12 @@ func Vi8FromFbs(fbs *generated.VI8) *Vi8 {
 }
 
 // Vi8FromBytes deserializes a Vi8 from size-prefixed FlatBuffer bytes.
-func Vi8FromBytes(data []byte) (*Vi8, error) {
+func Vi8FromBytes(data []byte) (o *Vi8, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Vi8: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVI8(data, 0)
 	return Vi8FromFbs(fbs), nil
 }
@@ -172,7 +197,12 @@ func Vu8FromFbs(fbs *generated.VU8) *Vu8 {
 }
 
 // Vu8FromBytes deserializes a Vu8 from size-prefixed FlatBuffer bytes.
-func Vu8FromBytes(data []byte) (*Vu8, error) {
+func Vu8FromBytes(data []byte) (o *Vu8, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Vu8: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVU8(data, 0)
 	return Vu8FromFbs(fbs), nil
 }
@@ -203,7 +233,12 @@ func Vi16FromFbs(fbs *generated.VI16) *Vi16 {
 }
 
 // Vi16FromBytes deserializes a Vi16 from size-prefixed FlatBuffer bytes.
-func Vi16FromBytes(data []byte) (*Vi16, error) {
+func Vi16FromBytes(data []byte) (o *Vi16, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Vi16: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVI16(data, 0)
 	return Vi16FromFbs(fbs), nil
 }
@@ -234,7 +269,12 @@ func Vu16FromFbs(fbs *generated.VU16) *Vu16 {
 }
 
 // Vu16FromBytes deserializes a Vu16 from size-prefixed FlatBuffer bytes.
-func Vu16FromBytes(data []byte) (*Vu16, error) {
+func Vu16FromBytes(data []byte) (o *Vu16, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Vu16: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVU16(data, 0)
 	return Vu16FromFbs(fbs), nil
 }
@@ -265,7 +305,12 @@ func Vi32FromFbs(fbs *generated.VI32) *Vi32 {
 }
 
 // Vi32FromBytes deserializes a Vi32 from size-prefixed FlatBuffer bytes.
-func Vi32FromBytes(data []byte) (*Vi32, error) {
+func Vi32FromBytes(data []byte) (o *Vi32, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Vi32: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVI32(data, 0)
 	return Vi32FromFbs(fbs), nil
 }
@@ -296,7 +341,12 @@ func Vu32FromFbs(fbs *generated.VU32) *Vu32 {
 }
 
 // Vu32FromBytes deserializes a Vu32 from size-prefixed FlatBuffer bytes.
-func Vu32FromBytes(data []byte) (*Vu32, error) {
+func Vu32FromBytes(data []byte) (o *Vu32, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Vu32: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVU32(data, 0)
 	return Vu32FromFbs(fbs), nil
 }
@@ -327,7 +377,12 @@ func Vf32FromFbs(fbs *generated.VF32) *Vf32 {
 }
 
 // Vf32FromBytes deserializes a Vf32 from size-prefixed FlatBuffer bytes.
-func Vf32FromBytes(data []byte) (*Vf32, error) {
+func Vf32FromBytes(data []byte) (o *Vf32, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Vf32: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVF32(data, 0)
 	return Vf32FromFbs(fbs), nil
 }
@@ -358,7 +413,12 @@ func VisizeFromFbs(fbs *generated.VIsize) *Visize {
 }
 
 // VisizeFromBytes deserializes a Visize from size-prefixed FlatBuffer bytes.
-func VisizeFromBytes(data []byte) (*Visize, error) {
+func VisizeFromBytes(data []byte) (o *Visize, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Visize: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVIsize(data, 0)
 	return VisizeFromFbs(fbs), nil
 }
@@ -389,7 +449,12 @@ func VusizeFromFbs(fbs *generated.VUsize) *Vusize {
 }
 
 // VusizeFromBytes deserializes a Vusize from size-prefixed FlatBuffer bytes.
-func VusizeFromBytes(data []byte) (*Vusize, error) {
+func VusizeFromBytes(data []byte) (o *Vusize, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Vusize: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVUsize(data, 0)
 	return VusizeFromFbs(fbs), nil
 }
@@ -420,7 +485,12 @@ func Vi64FromFbs(fbs *generated.VI64) *Vi64 {
 }
 
 // Vi64FromBytes deserializes a Vi64 from size-prefixed FlatBuffer bytes.
-func Vi64FromBytes(data []byte) (*Vi64, error) {
+func Vi64FromBytes(data []byte) (o *Vi64, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Vi64: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVI64(data, 0)
 	return Vi64FromFbs(fbs), nil
 }
@@ -451,7 +521,12 @@ func Vu64FromFbs(fbs *generated.VU64) *Vu64 {
 }
 
 // Vu64FromBytes deserializes a Vu64 from size-prefixed FlatBuffer bytes.
-func Vu64FromBytes(data []byte) (*Vu64, error) {
+func Vu64FromBytes(data []byte) (o *Vu64, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Vu64: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVU64(data, 0)
 	return Vu64FromFbs(fbs), nil
 }
@@ -482,7 +557,12 @@ func Vf64FromFbs(fbs *generated.VF64) *Vf64 {
 }
 
 // Vf64FromBytes deserializes a Vf64 from size-prefixed FlatBuffer bytes.
-func Vf64FromBytes(data []byte) (*Vf64, error) {
+func Vf64FromBytes(data []byte) (o *Vf64, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Vf64: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVF64(data, 0)
 	return Vf64FromFbs(fbs), nil
 }
@@ -513,7 +593,12 @@ func VstrFromFbs(fbs *generated.VStr) *Vstr {
 }
 
 // VstrFromBytes deserializes a Vstr from size-prefixed FlatBuffer bytes.
-func VstrFromBytes(data []byte) (*Vstr, error) {
+func VstrFromBytes(data []byte) (o *Vstr, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Vstr: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVStr(data, 0)
 	return VstrFromFbs(fbs), nil
 }
@@ -547,7 +632,12 @@ func VbytesFromFbs(fbs *generated.VBytes) *Vbytes {
 }
 
 // VbytesFromBytes deserializes a Vbytes from size-prefixed FlatBuffer bytes.
-func VbytesFromBytes(data []byte) (*Vbytes, error) {
+func VbytesFromBytes(data []byte) (o *Vbytes, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Vbytes: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVBytes(data, 0)
 	return VbytesFromFbs(fbs), nil
 }
@@ -588,7 +678,12 @@ func VarrayFromFbs(fbs *generated.VArray) *Varray {
 }
 
 // VarrayFromBytes deserializes a Varray from size-prefixed FlatBuffer bytes.
-func VarrayFromBytes(data []byte) (*Varray, error) {
+func VarrayFromBytes(data []byte) (o *Varray, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Varray: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVArray(data, 0)
 	return VarrayFromFbs(fbs), nil
 }
@@ -631,6 +726,11 @@ func Point2DFromFbs(fbs *generated.Point2D) *Point2D {
 }
 
 
+// SerializeTo writes the Point2D inline into a FlatBuffer builder and returns the offset.
+func (o *Point2D) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return generated.CreatePoint2D(builder, o.X, o.Y)
+}
+
 type Tri2D struct {
 	P0 *Point2D
 	P1 *Point2D
@@ -652,6 +752,23 @@ func Tri2DFromFbs(fbs *generated.Tri2D) *Tri2D {
 }
 
 
+// SerializeTo writes the Tri2D inline into a FlatBuffer builder and returns the offset.
+func (o *Tri2D) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var p0 Point2D
+	if o.P0 != nil {
+		p0 = *o.P0
+	}
+	var p1 Point2D
+	if o.P1 != nil {
+		p1 = *o.P1
+	}
+	var p2 Point2D
+	if o.P2 != nil {
+		p2 = *o.P2
+	}
+	return generated.CreateTri2D(builder, p0.X, p0.Y, p1.X, p1.Y, p2.X, p2.Y)
+}
+
 type Vtri2D struct {
 	V Tri2D
 }
@@ -665,7 +782,12 @@ func Vtri2DFromFbs(fbs *generated.VTri2D) *Vtri2D {
 }
 
 // Vtri2DFromBytes deserializes a Vtri2D from size-prefixed FlatBuffer bytes.
-func Vtri2DFromBytes(data []byte) (*Vtri2D, error) {
+func Vtri2DFromBytes(data []byte) (o *Vtri2D, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Vtri2D: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVTri2D(data, 0)
 	return Vtri2DFromFbs(fbs), nil
 }
@@ -681,6 +803,7 @@ func (o *Vtri2D) ToBytes() []byte {
 // SerializeTo writes the Vtri2D into a FlatBuffer builder and returns the offset.
 func (o *Vtri2D) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	generated.VTri2DStart(builder)
+	generated.VTri2DAddV(builder, o.V.SerializeTo(builder))
 	return generated.VTri2DEnd(builder)
 }
 
@@ -699,7 +822,12 @@ func VfixedSizeBytesFromFbs(fbs *generated.VFixedSizeBytes) *VfixedSizeBytes {
 }
 
 // VfixedSizeBytesFromBytes deserializes a VfixedSizeBytes from size-prefixed FlatBuffer bytes.
-func VfixedSizeBytesFromBytes(data []byte) (*VfixedSizeBytes, error) {
+func VfixedSizeBytesFromBytes(data []byte) (o *VfixedSizeBytes, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("VfixedSizeBytes: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVFixedSizeBytes(data, 0)
 	return VfixedSizeBytesFromFbs(fbs), nil
 }
@@ -733,7 +861,12 @@ func VtimestampMsUtcFromFbs(fbs *generated.VTimestampMsUtc) *VtimestampMsUtc {
 }
 
 // VtimestampMsUtcFromBytes deserializes a VtimestampMsUtc from size-prefixed FlatBuffer bytes.
-func VtimestampMsUtcFromBytes(data []byte) (*VtimestampMsUtc, error) {
+func VtimestampMsUtcFromBytes(data []byte) (o *VtimestampMsUtc, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("VtimestampMsUtc: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVTimestampMsUtc(data, 0)
 	return VtimestampMsUtcFromFbs(fbs), nil
 }
@@ -764,7 +897,12 @@ func VtimestampMsFromFbs(fbs *generated.VTimestampMs) *VtimestampMs {
 }
 
 // VtimestampMsFromBytes deserializes a VtimestampMs from size-prefixed FlatBuffer bytes.
-func VtimestampMsFromBytes(data []byte) (*VtimestampMs, error) {
+func VtimestampMsFromBytes(data []byte) (o *VtimestampMs, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("VtimestampMs: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVTimestampMs(data, 0)
 	return VtimestampMsFromFbs(fbs), nil
 }
@@ -795,7 +933,12 @@ func VtimestampNsUtcFromFbs(fbs *generated.VTimestampNsUtc) *VtimestampNsUtc {
 }
 
 // VtimestampNsUtcFromBytes deserializes a VtimestampNsUtc from size-prefixed FlatBuffer bytes.
-func VtimestampNsUtcFromBytes(data []byte) (*VtimestampNsUtc, error) {
+func VtimestampNsUtcFromBytes(data []byte) (o *VtimestampNsUtc, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("VtimestampNsUtc: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVTimestampNsUtc(data, 0)
 	return VtimestampNsUtcFromFbs(fbs), nil
 }
@@ -826,7 +969,12 @@ func VtimestampNsFromFbs(fbs *generated.VTimestampNs) *VtimestampNs {
 }
 
 // VtimestampNsFromBytes deserializes a VtimestampNs from size-prefixed FlatBuffer bytes.
-func VtimestampNsFromBytes(data []byte) (*VtimestampNs, error) {
+func VtimestampNsFromBytes(data []byte) (o *VtimestampNs, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("VtimestampNs: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVTimestampNs(data, 0)
 	return VtimestampNsFromFbs(fbs), nil
 }
@@ -859,7 +1007,12 @@ func VplaceholderFromFbs(fbs *generated.VPlaceholder) *Vplaceholder {
 }
 
 // VplaceholderFromBytes deserializes a Vplaceholder from size-prefixed FlatBuffer bytes.
-func VplaceholderFromBytes(data []byte) (*Vplaceholder, error) {
+func VplaceholderFromBytes(data []byte) (o *Vplaceholder, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Vplaceholder: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsVPlaceholder(data, 0)
 	return VplaceholderFromFbs(fbs), nil
 }
@@ -1039,7 +1192,12 @@ func ValueInstanceFromFbs(fbs *generated.ValueInstance) *ValueInstance {
 }
 
 // ValueInstanceFromBytes deserializes a ValueInstance from size-prefixed FlatBuffer bytes.
-func ValueInstanceFromBytes(data []byte) (*ValueInstance, error) {
+func ValueInstanceFromBytes(data []byte) (o *ValueInstance, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ValueInstance: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsValueInstance(data, 0)
 	return ValueInstanceFromFbs(fbs), nil
 }

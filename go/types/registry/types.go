@@ -5,6 +5,7 @@
 package registry
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/id"
@@ -60,7 +61,12 @@ func ProjectResultFromFbs(fbs *generated.ProjectResult) *ProjectResult {
 }
 
 // ProjectResultFromBytes deserializes a ProjectResult from size-prefixed FlatBuffer bytes.
-func ProjectResultFromBytes(data []byte) (*ProjectResult, error) {
+func ProjectResultFromBytes(data []byte) (o *ProjectResult, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ProjectResult: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsProjectResult(data, 0)
 	return ProjectResultFromFbs(fbs), nil
 }
@@ -109,7 +115,12 @@ func RegistryFieldFromFbs(fbs *generated.RegistryField) *RegistryField {
 }
 
 // RegistryFieldFromBytes deserializes a RegistryField from size-prefixed FlatBuffer bytes.
-func RegistryFieldFromBytes(data []byte) (*RegistryField, error) {
+func RegistryFieldFromBytes(data []byte) (o *RegistryField, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("RegistryField: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsRegistryField(data, 0)
 	return RegistryFieldFromFbs(fbs), nil
 }
@@ -174,7 +185,12 @@ func RegistryRelationFromFbs(fbs *generated.RegistryRelation) *RegistryRelation 
 }
 
 // RegistryRelationFromBytes deserializes a RegistryRelation from size-prefixed FlatBuffer bytes.
-func RegistryRelationFromBytes(data []byte) (*RegistryRelation, error) {
+func RegistryRelationFromBytes(data []byte) (o *RegistryRelation, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("RegistryRelation: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsRegistryRelation(data, 0)
 	return RegistryRelationFromFbs(fbs), nil
 }
@@ -259,7 +275,12 @@ func RegistrySpecFromFbs(fbs *generated.RegistrySpec) *RegistrySpec {
 }
 
 // RegistrySpecFromBytes deserializes a RegistrySpec from size-prefixed FlatBuffer bytes.
-func RegistrySpecFromBytes(data []byte) (*RegistrySpec, error) {
+func RegistrySpecFromBytes(data []byte) (o *RegistrySpec, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("RegistrySpec: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsRegistrySpec(data, 0)
 	return RegistrySpecFromFbs(fbs), nil
 }
@@ -331,7 +352,12 @@ func RegistryTableFromFbs(fbs *generated.RegistryTable) *RegistryTable {
 }
 
 // RegistryTableFromBytes deserializes a RegistryTable from size-prefixed FlatBuffer bytes.
-func RegistryTableFromBytes(data []byte) (*RegistryTable, error) {
+func RegistryTableFromBytes(data []byte) (o *RegistryTable, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("RegistryTable: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsRegistryTable(data, 0)
 	return RegistryTableFromFbs(fbs), nil
 }
@@ -379,7 +405,12 @@ func RegistryTablesFromFbs(fbs *generated.RegistryTables) *RegistryTables {
 }
 
 // RegistryTablesFromBytes deserializes a RegistryTables from size-prefixed FlatBuffer bytes.
-func RegistryTablesFromBytes(data []byte) (*RegistryTables, error) {
+func RegistryTablesFromBytes(data []byte) (o *RegistryTables, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("RegistryTables: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsRegistryTables(data, 0)
 	return RegistryTablesFromFbs(fbs), nil
 }

@@ -5,6 +5,7 @@
 package mission
 
 import (
+	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
 	"github.com/urbanlogiq/ulsdk/types/id"
@@ -71,7 +72,12 @@ func MissionFromFbs(fbs *generated.Mission) *Mission {
 }
 
 // MissionFromBytes deserializes a Mission from size-prefixed FlatBuffer bytes.
-func MissionFromBytes(data []byte) (*Mission, error) {
+func MissionFromBytes(data []byte) (o *Mission, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Mission: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsMission(data, 0)
 	return MissionFromFbs(fbs), nil
 }

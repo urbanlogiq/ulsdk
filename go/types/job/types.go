@@ -47,7 +47,12 @@ func EmbeddedTableFromFbs(fbs *generated.EmbeddedTable) *EmbeddedTable {
 }
 
 // EmbeddedTableFromBytes deserializes a EmbeddedTable from size-prefixed FlatBuffer bytes.
-func EmbeddedTableFromBytes(data []byte) (*EmbeddedTable, error) {
+func EmbeddedTableFromBytes(data []byte) (o *EmbeddedTable, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("EmbeddedTable: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsEmbeddedTable(data, 0)
 	return EmbeddedTableFromFbs(fbs), nil
 }
@@ -122,7 +127,12 @@ func DeprecatedRunSpecFromFbs(fbs *generated.DeprecatedRunSpec) *DeprecatedRunSp
 }
 
 // DeprecatedRunSpecFromBytes deserializes a DeprecatedRunSpec from size-prefixed FlatBuffer bytes.
-func DeprecatedRunSpecFromBytes(data []byte) (*DeprecatedRunSpec, error) {
+func DeprecatedRunSpecFromBytes(data []byte) (o *DeprecatedRunSpec, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("DeprecatedRunSpec: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDeprecatedRunSpec(data, 0)
 	return DeprecatedRunSpecFromFbs(fbs), nil
 }
@@ -187,7 +197,12 @@ func DeprecatedTaskParameterFromFbs(fbs *generated.DeprecatedTaskParameter) *Dep
 }
 
 // DeprecatedTaskParameterFromBytes deserializes a DeprecatedTaskParameter from size-prefixed FlatBuffer bytes.
-func DeprecatedTaskParameterFromBytes(data []byte) (*DeprecatedTaskParameter, error) {
+func DeprecatedTaskParameterFromBytes(data []byte) (o *DeprecatedTaskParameter, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("DeprecatedTaskParameter: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsDeprecatedTaskParameter(data, 0)
 	return DeprecatedTaskParameterFromFbs(fbs), nil
 }
@@ -232,7 +247,12 @@ func EdgeFromFbs(fbs *generated.Edge) *Edge {
 }
 
 // EdgeFromBytes deserializes a Edge from size-prefixed FlatBuffer bytes.
-func EdgeFromBytes(data []byte) (*Edge, error) {
+func EdgeFromBytes(data []byte) (o *Edge, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Edge: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsEdge(data, 0)
 	return EdgeFromFbs(fbs), nil
 }
@@ -305,7 +325,12 @@ func JobFromFbs(fbs *generated.Job) *Job {
 }
 
 // JobFromBytes deserializes a Job from size-prefixed FlatBuffer bytes.
-func JobFromBytes(data []byte) (*Job, error) {
+func JobFromBytes(data []byte) (o *Job, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Job: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsJob(data, 0)
 	return JobFromFbs(fbs), nil
 }
@@ -386,7 +411,12 @@ func NodeFromFbs(fbs *generated.Node) *Node {
 }
 
 // NodeFromBytes deserializes a Node from size-prefixed FlatBuffer bytes.
-func NodeFromBytes(data []byte) (*Node, error) {
+func NodeFromBytes(data []byte) (o *Node, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Node: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsNode(data, 0)
 	return NodeFromFbs(fbs), nil
 }
@@ -425,7 +455,12 @@ func ParamIndicesFromFbs(fbs *generated.ParamIndices) *ParamIndices {
 }
 
 // ParamIndicesFromBytes deserializes a ParamIndices from size-prefixed FlatBuffer bytes.
-func ParamIndicesFromBytes(data []byte) (*ParamIndices, error) {
+func ParamIndicesFromBytes(data []byte) (o *ParamIndices, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ParamIndices: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsParamIndices(data, 0)
 	return ParamIndicesFromFbs(fbs), nil
 }
@@ -508,7 +543,12 @@ func RunSpecFromFbs(fbs *generated.RunSpec) *RunSpec {
 }
 
 // RunSpecFromBytes deserializes a RunSpec from size-prefixed FlatBuffer bytes.
-func RunSpecFromBytes(data []byte) (*RunSpec, error) {
+func RunSpecFromBytes(data []byte) (o *RunSpec, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("RunSpec: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsRunSpec(data, 0)
 	return RunSpecFromFbs(fbs), nil
 }
@@ -611,7 +651,12 @@ func SchematicFromFbs(fbs *generated.Schematic) *Schematic {
 }
 
 // SchematicFromBytes deserializes a Schematic from size-prefixed FlatBuffer bytes.
-func SchematicFromBytes(data []byte) (*Schematic, error) {
+func SchematicFromBytes(data []byte) (o *Schematic, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Schematic: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsSchematic(data, 0)
 	return SchematicFromFbs(fbs), nil
 }
@@ -695,6 +740,9 @@ type Task struct {
 
 func TaskFromFbs(fbs *generated.Task) *Task {
 	o := &Task{}
+	if fbsVal := fbs.Get_Id(nil); fbsVal != nil {
+		o.Id = *id.ObjectIdFromFbs(fbsVal)
+	}
 	o.BarrierCount = fbs.BarrierCount()
 	o.Created = fbs.Created()
 	o.Discard = fbs.Discard()
@@ -754,7 +802,12 @@ func TaskFromFbs(fbs *generated.Task) *Task {
 }
 
 // TaskFromBytes deserializes a Task from size-prefixed FlatBuffer bytes.
-func TaskFromBytes(data []byte) (*Task, error) {
+func TaskFromBytes(data []byte) (o *Task, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Task: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsTask(data, 0)
 	return TaskFromFbs(fbs), nil
 }
@@ -769,6 +822,7 @@ func (o *Task) ToBytes() []byte {
 
 // SerializeTo writes the Task into a FlatBuffer builder and returns the offset.
 func (o *Task) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	idOffset := o.Id.SerializeTo(builder)
 	var downstreamVecOffset flatbuffers.UOffsetT
 	downstreamOffsets := make([]flatbuffers.UOffsetT, len(o.Downstream))
 	for i := range o.Downstream {
@@ -808,6 +862,7 @@ func (o *Task) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	upstreamVecOffset = builder.EndVector(len(o.Upstream))
 	userIdOffset := o.UserId.SerializeTo(builder)
 	generated.TaskStart(builder)
+	generated.TaskAdd_Id(builder, idOffset)
 	generated.TaskAddBarrierCount(builder, o.BarrierCount)
 	generated.TaskAddCreated(builder, o.Created)
 	generated.TaskAddDiscard(builder, o.Discard)
@@ -851,7 +906,12 @@ func TaskListFromFbs(fbs *generated.TaskList) *TaskList {
 }
 
 // TaskListFromBytes deserializes a TaskList from size-prefixed FlatBuffer bytes.
-func TaskListFromBytes(data []byte) (*TaskList, error) {
+func TaskListFromBytes(data []byte) (o *TaskList, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("TaskList: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsTaskList(data, 0)
 	return TaskListFromFbs(fbs), nil
 }
@@ -909,7 +969,12 @@ func TaskParameterFromFbs(fbs *generated.TaskParameter) *TaskParameter {
 }
 
 // TaskParameterFromBytes deserializes a TaskParameter from size-prefixed FlatBuffer bytes.
-func TaskParameterFromBytes(data []byte) (*TaskParameter, error) {
+func TaskParameterFromBytes(data []byte) (o *TaskParameter, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("TaskParameter: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
 	fbs := generated.GetSizePrefixedRootAsTaskParameter(data, 0)
 	return TaskParameterFromFbs(fbs), nil
 }
