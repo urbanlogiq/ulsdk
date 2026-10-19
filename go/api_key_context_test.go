@@ -111,9 +111,9 @@ func TestGetEndpoint(t *testing.T) {
 		path   string
 		want   string
 	}{
-		{RegionCA, EnvironmentProd, "/v1/api/foo", "https://api.urbanlogiq.ca/v1/api/foo"},
+		{RegionCA, EnvironmentProd, "/v1/api/foo", "https://home.urbanlogiq.ca/v1/api/foo"},
 		{RegionCA, EnvironmentStage, "/v1/api/foo", "https://stage.urbanlogiq.ca/v1/api/foo"},
-		{RegionUS, EnvironmentProd, "/v1/api/foo", "https://api.urbanlogiq.us/v1/api/foo"},
+		{RegionUS, EnvironmentProd, "/v1/api/foo", "https://home.urbanlogiq.us/v1/api/foo"},
 		{RegionUS, EnvironmentStage, "/v1/api/foo", "https://stage.urbanlogiq.us/v1/api/foo"},
 	}
 	for _, tt := range tests {

@@ -17,7 +17,7 @@ function getEndpoint(
   environment: Environment,
   path: string
 ): string {
-  const subdomain = environment === Environment.Prod ? 'api' : 'stage';
+  const subdomain = environment === Environment.Prod ? 'home' : 'stage';
   const tld = region === Region.CA ? 'ca' : 'us';
   return `https://${subdomain}.urbanlogiq.${tld}${path}`;
 }

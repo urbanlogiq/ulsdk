@@ -86,15 +86,15 @@ func GetEndpoint(region Region, environment Environment, path string) string {
 	var base string
 	switch {
 	case region == RegionCA && environment == EnvironmentProd:
-		base = "https://api.urbanlogiq.ca"
+		base = "https://home.urbanlogiq.ca"
 	case region == RegionCA && environment == EnvironmentStage:
 		base = "https://stage.urbanlogiq.ca"
 	case region == RegionUS && environment == EnvironmentProd:
-		base = "https://api.urbanlogiq.us"
+		base = "https://home.urbanlogiq.us"
 	case region == RegionUS && environment == EnvironmentStage:
 		base = "https://stage.urbanlogiq.us"
 	default:
-		base = "https://api.urbanlogiq.ca"
+		base = "https://home.urbanlogiq.ca"
 	}
 	return base + path
 }
