@@ -116,6 +116,7 @@ const (
 	RoadUserTyMULTI_TRAILER_TRUCKS_SIX_AXLES RoadUserTy = 42
 	RoadUserTyMULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES RoadUserTy = 43
 	RoadUserTyMULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES RoadUserTy = 44
+	RoadUserTyTRAINS RoadUserTy = 45
 )
 
 type StatisticTy int32

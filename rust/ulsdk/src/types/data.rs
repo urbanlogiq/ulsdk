@@ -355,6 +355,7 @@ pub enum RoadUserTy {
     MULTI_TRAILER_TRUCKS_SIX_AXLES = 42,
     MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES = 43,
     MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES = 44,
+    TRAINS = 45,
 }
 
 impl TryFrom<i32> for RoadUserTy {
@@ -422,6 +423,7 @@ impl RoadUserTy {
             Self::MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES => {
                 Some("MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES")
             }
+            Self::TRAINS => Some("TRAINS"),
             _ => None,
         }
     }
@@ -497,6 +499,7 @@ impl From<RoadUserTy> for FbsRoadUserTy {
             RoadUserTy::MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES => {
                 FbsRoadUserTy::MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES
             }
+            RoadUserTy::TRAINS => FbsRoadUserTy::TRAINS,
         }
     }
 }
@@ -549,6 +552,7 @@ impl From<FbsRoadUserTy> for RoadUserTy {
             42 => Self::MULTI_TRAILER_TRUCKS_SIX_AXLES,
             43 => Self::MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES,
             44 => Self::MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES,
+            45 => Self::TRAINS,
             _ => panic!("Invalid value {} when constructing RoadUserTy", fbs.0),
         }
     }

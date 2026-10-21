@@ -374,13 +374,13 @@ pub const ENUM_MIN_ROAD_USER_TY: i32 = 0;
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
-pub const ENUM_MAX_ROAD_USER_TY: i32 = 44;
+pub const ENUM_MAX_ROAD_USER_TY: i32 = 45;
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_ROAD_USER_TY: [RoadUserTy; 45] = [
+pub const ENUM_VALUES_ROAD_USER_TY: [RoadUserTy; 46] = [
     RoadUserTy::BIKES,
     RoadUserTy::BUSES,
     RoadUserTy::CARS,
@@ -426,6 +426,7 @@ pub const ENUM_VALUES_ROAD_USER_TY: [RoadUserTy; 45] = [
     RoadUserTy::MULTI_TRAILER_TRUCKS_SIX_AXLES,
     RoadUserTy::MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES,
     RoadUserTy::MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES,
+    RoadUserTy::TRAINS,
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
@@ -478,9 +479,10 @@ impl RoadUserTy {
     pub const MULTI_TRAILER_TRUCKS_SIX_AXLES: Self = Self(42);
     pub const MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES: Self = Self(43);
     pub const MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES: Self = Self(44);
+    pub const TRAINS: Self = Self(45);
 
     pub const ENUM_MIN: i32 = 0;
-    pub const ENUM_MAX: i32 = 44;
+    pub const ENUM_MAX: i32 = 45;
     pub const ENUM_VALUES: &'static [Self] = &[
         Self::BIKES,
         Self::BUSES,
@@ -527,6 +529,7 @@ impl RoadUserTy {
         Self::MULTI_TRAILER_TRUCKS_SIX_AXLES,
         Self::MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES,
         Self::MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES,
+        Self::TRAINS,
     ];
     /// Returns the variant's name or "" if unknown.
     pub fn variant_name(self) -> Option<&'static str> {
@@ -586,6 +589,7 @@ impl RoadUserTy {
             Self::MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES => {
                 Some("MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES")
             }
+            Self::TRAINS => Some("TRAINS"),
             _ => None,
         }
     }

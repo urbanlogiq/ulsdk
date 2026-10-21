@@ -175,6 +175,7 @@ const (
 	RoadUserTyMULTI_TRAILER_TRUCKS_SIX_AXLES           RoadUserTy = 42
 	RoadUserTyMULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES    RoadUserTy = 43
 	RoadUserTyMULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES  RoadUserTy = 44
+	RoadUserTyTRAINS                                   RoadUserTy = 45
 )
 
 var EnumNamesRoadUserTy = map[RoadUserTy]string{
@@ -223,6 +224,7 @@ var EnumNamesRoadUserTy = map[RoadUserTy]string{
 	RoadUserTyMULTI_TRAILER_TRUCKS_SIX_AXLES:           "MULTI_TRAILER_TRUCKS_SIX_AXLES",
 	RoadUserTyMULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES:    "MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES",
 	RoadUserTyMULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES:  "MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES",
+	RoadUserTyTRAINS:                                   "TRAINS",
 }
 
 var EnumValuesRoadUserTy = map[string]RoadUserTy{
@@ -271,6 +273,7 @@ var EnumValuesRoadUserTy = map[string]RoadUserTy{
 	"MULTI_TRAILER_TRUCKS_SIX_AXLES":           RoadUserTyMULTI_TRAILER_TRUCKS_SIX_AXLES,
 	"MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES":    RoadUserTyMULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES,
 	"MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES":  RoadUserTyMULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES,
+	"TRAINS":                                   RoadUserTyTRAINS,
 }
 
 func (v RoadUserTy) String() string {

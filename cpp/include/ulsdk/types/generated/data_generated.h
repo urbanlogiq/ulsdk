@@ -214,11 +214,12 @@ enum class RoadUserTy : int32_t {
   MULTI_TRAILER_TRUCKS_SIX_AXLES = 42,
   MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES = 43,
   MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES = 44,
+  TRAINS = 45,
   MIN = BIKES,
-  MAX = MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES
+  MAX = TRAINS
 };
 
-inline const RoadUserTy (&EnumValuesRoadUserTy())[45] {
+inline const RoadUserTy (&EnumValuesRoadUserTy())[46] {
   static const RoadUserTy values[] = {
     RoadUserTy::BIKES,
     RoadUserTy::BUSES,
@@ -264,13 +265,14 @@ inline const RoadUserTy (&EnumValuesRoadUserTy())[45] {
     RoadUserTy::SIX_PLUS_AXLE_SINGLE_TRAILER_TRUCKS,
     RoadUserTy::MULTI_TRAILER_TRUCKS_SIX_AXLES,
     RoadUserTy::MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES,
-    RoadUserTy::MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES
+    RoadUserTy::MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES,
+    RoadUserTy::TRAINS
   };
   return values;
 }
 
 inline const char * const *EnumNamesRoadUserTy() {
-  static const char * const names[46] = {
+  static const char * const names[47] = {
     "BIKES",
     "BUSES",
     "CARS",
@@ -316,13 +318,14 @@ inline const char * const *EnumNamesRoadUserTy() {
     "MULTI_TRAILER_TRUCKS_SIX_AXLES",
     "MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES",
     "MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES",
+    "TRAINS",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameRoadUserTy(RoadUserTy e) {
-  if (::flatbuffers::IsOutRange(e, RoadUserTy::BIKES, RoadUserTy::MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES)) return "";
+  if (::flatbuffers::IsOutRange(e, RoadUserTy::BIKES, RoadUserTy::TRAINS)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesRoadUserTy()[index];
 }

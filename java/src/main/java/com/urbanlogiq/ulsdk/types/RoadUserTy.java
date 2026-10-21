@@ -50,4 +50,5 @@ public final class RoadUserTy {
     public static final int MULTI_TRAILER_TRUCKS_SIX_AXLES = com.urbanlogiq.ulsdk.types.generated.RoadUserTy.MULTI_TRAILER_TRUCKS_SIX_AXLES;
     public static final int MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES = com.urbanlogiq.ulsdk.types.generated.RoadUserTy.MULTI_TRAILER_TRUCKS_SEVEN_PLUS_AXLES;
     public static final int MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES = com.urbanlogiq.ulsdk.types.generated.RoadUserTy.MULTI_TRAILER_TRUCKS_SIX_OR_FEWER_AXLES;
+    public static final int TRAINS = com.urbanlogiq.ulsdk.types.generated.RoadUserTy.TRAINS;
 }
