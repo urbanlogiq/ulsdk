@@ -211,6 +211,7 @@ const (
 	FnCumeDist Fn = 201
 	FnStX Fn = 202
 	FnStY Fn = 203
+	FnDenseRank Fn = 204
 	FnCorrelationId Fn = 32763
 	FnUlTimezone Fn = 32764
 	FnUlArrayContains Fn = 32765

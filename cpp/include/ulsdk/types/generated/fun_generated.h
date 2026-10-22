@@ -218,6 +218,7 @@ enum class Fn : int16_t {
   CumeDist = 201,
   StX = 202,
   StY = 203,
+  DenseRank = 204,
   CorrelationId = 32763,
   UlTimezone = 32764,
   UlArrayContains = 32765,
@@ -226,7 +227,7 @@ enum class Fn : int16_t {
   MAX = UlArrayAny
 };
 
-inline const Fn (&EnumValuesFn())[208] {
+inline const Fn (&EnumValuesFn())[209] {
   static const Fn values[] = {
     Fn::None,
     Fn::True,
@@ -432,6 +433,7 @@ inline const Fn (&EnumValuesFn())[208] {
     Fn::CumeDist,
     Fn::StX,
     Fn::StY,
+    Fn::DenseRank,
     Fn::CorrelationId,
     Fn::UlTimezone,
     Fn::UlArrayContains,
@@ -646,6 +648,7 @@ inline const char *EnumNameFn(Fn e) {
     case Fn::CumeDist: return "CumeDist";
     case Fn::StX: return "StX";
     case Fn::StY: return "StY";
+    case Fn::DenseRank: return "DenseRank";
     case Fn::CorrelationId: return "CorrelationId";
     case Fn::UlTimezone: return "UlTimezone";
     case Fn::UlArrayContains: return "UlArrayContains";

@@ -40,7 +40,7 @@ pub const ENUM_MAX_FN: i16 = 32766;
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_FN: [Fn; 208] = [
+pub const ENUM_VALUES_FN: [Fn; 209] = [
     Fn::None,
     Fn::True,
     Fn::False,
@@ -245,6 +245,7 @@ pub const ENUM_VALUES_FN: [Fn; 208] = [
     Fn::CumeDist,
     Fn::StX,
     Fn::StY,
+    Fn::DenseRank,
     Fn::CorrelationId,
     Fn::UlTimezone,
     Fn::UlArrayContains,
@@ -460,6 +461,7 @@ impl Fn {
     pub const CumeDist: Self = Self(201);
     pub const StX: Self = Self(202);
     pub const StY: Self = Self(203);
+    pub const DenseRank: Self = Self(204);
     pub const CorrelationId: Self = Self(32763);
     pub const UlTimezone: Self = Self(32764);
     pub const UlArrayContains: Self = Self(32765);
@@ -672,6 +674,7 @@ impl Fn {
         Self::CumeDist,
         Self::StX,
         Self::StY,
+        Self::DenseRank,
         Self::CorrelationId,
         Self::UlTimezone,
         Self::UlArrayContains,
@@ -884,6 +887,7 @@ impl Fn {
             Self::CumeDist => Some("CumeDist"),
             Self::StX => Some("StX"),
             Self::StY => Some("StY"),
+            Self::DenseRank => Some("DenseRank"),
             Self::CorrelationId => Some("CorrelationId"),
             Self::UlTimezone => Some("UlTimezone"),
             Self::UlArrayContains => Some("UlArrayContains"),

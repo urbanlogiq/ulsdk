@@ -211,6 +211,7 @@ export enum Fn {
   CumeDist = 201,
   StX = 202,
   StY = 203,
+  DenseRank = 204,
   CorrelationId = 32763,
   UlTimezone = 32764,
   UlArrayContains = 32765,

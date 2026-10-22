@@ -209,6 +209,7 @@ public final class Fn {
     public static final short CumeDist = com.urbanlogiq.ulsdk.types.generated.Fn.CumeDist;
     public static final short StX = com.urbanlogiq.ulsdk.types.generated.Fn.StX;
     public static final short StY = com.urbanlogiq.ulsdk.types.generated.Fn.StY;
+    public static final short DenseRank = com.urbanlogiq.ulsdk.types.generated.Fn.DenseRank;
     public static final short CorrelationId = com.urbanlogiq.ulsdk.types.generated.Fn.CorrelationId;
     public static final short UlTimezone = com.urbanlogiq.ulsdk.types.generated.Fn.UlTimezone;
     public static final short UlArrayContains = com.urbanlogiq.ulsdk.types.generated.Fn.UlArrayContains;

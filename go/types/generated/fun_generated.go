@@ -213,6 +213,7 @@ const (
 	FnCumeDist             Fn = 201
 	FnStX                  Fn = 202
 	FnStY                  Fn = 203
+	FnDenseRank            Fn = 204
 	FnCorrelationId        Fn = 32763
 	FnUlTimezone           Fn = 32764
 	FnUlArrayContains      Fn = 32765
@@ -424,6 +425,7 @@ var EnumNamesFn = map[Fn]string{
 	FnCumeDist:             "CumeDist",
 	FnStX:                  "StX",
 	FnStY:                  "StY",
+	FnDenseRank:            "DenseRank",
 	FnCorrelationId:        "CorrelationId",
 	FnUlTimezone:           "UlTimezone",
 	FnUlArrayContains:      "UlArrayContains",
@@ -635,6 +637,7 @@ var EnumValuesFn = map[string]Fn{
 	"CumeDist":             FnCumeDist,
 	"StX":                  FnStX,
 	"StY":                  FnStY,
+	"DenseRank":            FnDenseRank,
 	"CorrelationId":        FnCorrelationId,
 	"UlTimezone":           FnUlTimezone,
 	"UlArrayContains":      FnUlArrayContains,

@@ -212,6 +212,7 @@ public final class Fn {
   public static final short CumeDist = 201;
   public static final short StX = 202;
   public static final short StY = 203;
+  public static final short DenseRank = 204;
   public static final short CorrelationId = 32763;
   public static final short UlTimezone = 32764;
   public static final short UlArrayContains = 32765;
