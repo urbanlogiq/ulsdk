@@ -9,6 +9,7 @@ import (
 	"github.com/urbanlogiq/ulsdk"
 	"github.com/urbanlogiq/ulsdk/types/id"
 	"github.com/urbanlogiq/ulsdk/types/job"
+	"github.com/urbanlogiq/ulsdk/types/object"
 	"testing"
 	"time"
 )
@@ -94,6 +95,38 @@ func TestGetTask(t *testing.T) {
 		result, err := GetTask(
 			ctx,
 			p0,
+		)
+		if err != nil {
+			time.Sleep(time.Duration(i+1) * time.Second)
+			continue
+		}
+		_ = result
+		success = true
+		break
+	}
+	if !success {
+		t.Fatal("test was unable to complete with retries")
+	}
+}
+
+func TestSetGraphContinuation(t *testing.T) {
+	ctx := ulsdk.NewTestContextFromEnv()
+	if ctx == nil {
+		t.Skip("credentials not set, skipping API test")
+	}
+
+	p0 := id.ObjectId{}
+	body := &job.ContinuationSpec{}
+
+	success := false
+	for i := 0; i < 5; i++ {
+		expected := &object.ObjectIdList{}
+		expectedBytes := expected.ToBytes()
+		ctx.SetResponse(expectedBytes)
+		result, err := SetGraphContinuation(
+			ctx,
+			p0,
+			body,
 		)
 		if err != nil {
 			time.Sleep(time.Duration(i+1) * time.Second)

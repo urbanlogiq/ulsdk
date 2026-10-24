@@ -73,6 +73,195 @@ EmbeddedTable::operator==(const EmbeddedTable &rhs) const {
     return true;
 }
 
+::flatbuffers::Offset<::Schematic>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Schematic &o) {
+    std::vector<::flatbuffers::Offset<::AttributePair>> attributes_offsets = std::vector<::flatbuffers::Offset<::AttributePair>>();
+    attributes_offsets.reserve(o.attributes_.size());
+    for (const auto &i: o.attributes_) {
+        attributes_offsets.push_back(serialize_to(builder, i));
+    }
+    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::AttributePair>>> attributes_offset = builder.CreateVector(attributes_offsets);
+    std::vector<::flatbuffers::Offset<::Edge>> edges_offsets = std::vector<::flatbuffers::Offset<::Edge>>();
+    edges_offsets.reserve(o.edges_.size());
+    for (const auto &i: o.edges_) {
+        edges_offsets.push_back(serialize_to(builder, i));
+    }
+    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::Edge>>> edges_offset = builder.CreateVector(edges_offsets);
+    std::optional<::flatbuffers::Offset<::flatbuffers::String>> name_offset = std::nullopt;
+    if (o.name_.has_value()) {
+        const ::flatbuffers::Offset<::flatbuffers::String> name_offset_val = builder.CreateString(o.name_.value());
+        name_offset = std::make_optional(name_offset_val);
+    }
+    std::vector<::flatbuffers::Offset<::Node>> nodes_offsets = std::vector<::flatbuffers::Offset<::Node>>();
+    nodes_offsets.reserve(o.nodes_.size());
+    for (const auto &i: o.nodes_) {
+        nodes_offsets.push_back(serialize_to(builder, i));
+    }
+    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::Node>>> nodes_offset = builder.CreateVector(nodes_offsets);
+
+    ::SchematicBuilder instance_builder = ::SchematicBuilder(builder);
+    instance_builder.add_attributes(attributes_offset);
+    instance_builder.add_edges(edges_offset);
+    if (name_offset.has_value()) {
+        instance_builder.add_name(name_offset.value());
+    }
+    instance_builder.add_nodes(nodes_offset);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const Schematic &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+Schematic::Schematic()
+    : attributes_()
+    , edges_()
+    , name_(std::nullopt)
+    , nodes_() {
+}
+
+Schematic::Schematic(const std::vector<uint8_t> &bytes)
+    : Schematic(::flatbuffers::GetSizePrefixedRoot<::Schematic>(bytes.data())) {
+}
+
+Schematic::Schematic(const ::Schematic *root) 
+    : attributes_()
+    , edges_()
+    , name_(std::nullopt)
+    , nodes_() {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    const auto &attributes_vector = root->attributes();
+    if (attributes_vector != nullptr) {
+        attributes_.reserve(attributes_vector->size());
+        for (const auto &i: *attributes_vector) {
+            attributes_.emplace_back(i);
+        }
+    }
+    const auto &edges_vector = root->edges();
+    if (edges_vector != nullptr) {
+        edges_.reserve(edges_vector->size());
+        for (const auto &i: *edges_vector) {
+            edges_.emplace_back(i);
+        }
+    }
+    if (root->name() != nullptr) {
+        name_ = std::string(*root->name()->begin(), *root->name()->end());
+    }
+    const auto &nodes_vector = root->nodes();
+    if (nodes_vector != nullptr) {
+        nodes_.reserve(nodes_vector->size());
+        for (const auto &i: *nodes_vector) {
+            nodes_.emplace_back(i);
+        }
+    }
+}
+
+bool
+Schematic::operator==(const Schematic &rhs) const {
+    if (this->attributes_ != rhs.attributes_) {
+        return false;
+    }
+    if (this->edges_ != rhs.edges_) {
+        return false;
+    }
+    if (this->name_ != rhs.name_) {
+        return false;
+    }
+    if (this->nodes_ != rhs.nodes_) {
+        return false;
+    }
+    return true;
+}
+
+::flatbuffers::Offset<::ContinuationSpec>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ContinuationSpec &o) {
+    std::vector<::flatbuffers::Offset<::ParamIndices>> param_indices_offsets = std::vector<::flatbuffers::Offset<::ParamIndices>>();
+    param_indices_offsets.reserve(o.param_indices_.size());
+    for (const auto &i: o.param_indices_) {
+        param_indices_offsets.push_back(serialize_to(builder, i));
+    }
+    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::ParamIndices>>> param_indices_offset = builder.CreateVector(param_indices_offsets);
+    std::vector<::flatbuffers::Offset<::TaskParameter>> params_offsets = std::vector<::flatbuffers::Offset<::TaskParameter>>();
+    params_offsets.reserve(o.params_.size());
+    for (const auto &i: o.params_) {
+        params_offsets.push_back(serialize_to(builder, i));
+    }
+    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::TaskParameter>>> params_offset = builder.CreateVector(params_offsets);
+    const ::flatbuffers::Offset<::Schematic> schematic_offset = serialize_to(builder, o.schematic_);
+
+    ::ContinuationSpecBuilder instance_builder = ::ContinuationSpecBuilder(builder);
+    instance_builder.add_param_indices(param_indices_offset);
+    instance_builder.add_params(params_offset);
+    instance_builder.add_schematic(schematic_offset);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const ContinuationSpec &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+ContinuationSpec::ContinuationSpec()
+    : param_indices_()
+    , params_()
+    , schematic_() {
+}
+
+ContinuationSpec::ContinuationSpec(const std::vector<uint8_t> &bytes)
+    : ContinuationSpec(::flatbuffers::GetSizePrefixedRoot<::ContinuationSpec>(bytes.data())) {
+}
+
+ContinuationSpec::ContinuationSpec(const ::ContinuationSpec *root) 
+    : param_indices_()
+    , params_()
+    , schematic_() {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    const auto &param_indices_vector = root->param_indices();
+    if (param_indices_vector != nullptr) {
+        param_indices_.reserve(param_indices_vector->size());
+        for (const auto &i: *param_indices_vector) {
+            param_indices_.emplace_back(i);
+        }
+    }
+    const auto &params_vector = root->params();
+    if (params_vector != nullptr) {
+        params_.reserve(params_vector->size());
+        for (const auto &i: *params_vector) {
+            params_.emplace_back(i);
+        }
+    }
+    if (root->schematic() != nullptr) {
+        schematic_ = decltype(schematic_)(root->schematic());
+    }
+}
+
+bool
+ContinuationSpec::operator==(const ContinuationSpec &rhs) const {
+    if (this->param_indices_ != rhs.param_indices_) {
+        return false;
+    }
+    if (this->params_ != rhs.params_) {
+        return false;
+    }
+    if (this->schematic_ != rhs.schematic_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::DeprecatedRunSpec>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DeprecatedRunSpec &o) {
     std::vector<::flatbuffers::Offset<::ParamIndices>> param_indices_offsets = std::vector<::flatbuffers::Offset<::ParamIndices>>();
@@ -653,113 +842,6 @@ RunSpec::operator==(const RunSpec &rhs) const {
         return false;
     }
     if (this->schematic_ != rhs.schematic_) {
-        return false;
-    }
-    return true;
-}
-
-::flatbuffers::Offset<::Schematic>
-serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Schematic &o) {
-    std::vector<::flatbuffers::Offset<::AttributePair>> attributes_offsets = std::vector<::flatbuffers::Offset<::AttributePair>>();
-    attributes_offsets.reserve(o.attributes_.size());
-    for (const auto &i: o.attributes_) {
-        attributes_offsets.push_back(serialize_to(builder, i));
-    }
-    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::AttributePair>>> attributes_offset = builder.CreateVector(attributes_offsets);
-    std::vector<::flatbuffers::Offset<::Edge>> edges_offsets = std::vector<::flatbuffers::Offset<::Edge>>();
-    edges_offsets.reserve(o.edges_.size());
-    for (const auto &i: o.edges_) {
-        edges_offsets.push_back(serialize_to(builder, i));
-    }
-    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::Edge>>> edges_offset = builder.CreateVector(edges_offsets);
-    std::optional<::flatbuffers::Offset<::flatbuffers::String>> name_offset = std::nullopt;
-    if (o.name_.has_value()) {
-        const ::flatbuffers::Offset<::flatbuffers::String> name_offset_val = builder.CreateString(o.name_.value());
-        name_offset = std::make_optional(name_offset_val);
-    }
-    std::vector<::flatbuffers::Offset<::Node>> nodes_offsets = std::vector<::flatbuffers::Offset<::Node>>();
-    nodes_offsets.reserve(o.nodes_.size());
-    for (const auto &i: o.nodes_) {
-        nodes_offsets.push_back(serialize_to(builder, i));
-    }
-    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::Node>>> nodes_offset = builder.CreateVector(nodes_offsets);
-
-    ::SchematicBuilder instance_builder = ::SchematicBuilder(builder);
-    instance_builder.add_attributes(attributes_offset);
-    instance_builder.add_edges(edges_offset);
-    if (name_offset.has_value()) {
-        instance_builder.add_name(name_offset.value());
-    }
-    instance_builder.add_nodes(nodes_offset);
-    return instance_builder.Finish();
-}
-
-std::vector<uint8_t> to_bytes(const Schematic &o) {
-    ::flatbuffers::FlatBufferBuilder builder;
-    const auto offset = serialize_to(builder, o);
-    builder.FinishSizePrefixed(offset);
-    const auto span = builder.GetBufferSpan();
-    return std::vector<uint8_t>(span.begin(), span.end());
-}
-
-Schematic::Schematic()
-    : attributes_()
-    , edges_()
-    , name_(std::nullopt)
-    , nodes_() {
-}
-
-Schematic::Schematic(const std::vector<uint8_t> &bytes)
-    : Schematic(::flatbuffers::GetSizePrefixedRoot<::Schematic>(bytes.data())) {
-}
-
-Schematic::Schematic(const ::Schematic *root) 
-    : attributes_()
-    , edges_()
-    , name_(std::nullopt)
-    , nodes_() {
-    if (root == nullptr) {
-        throw std::runtime_error("cannot deserialize flatbuffer type");
-    }
-
-    const auto &attributes_vector = root->attributes();
-    if (attributes_vector != nullptr) {
-        attributes_.reserve(attributes_vector->size());
-        for (const auto &i: *attributes_vector) {
-            attributes_.emplace_back(i);
-        }
-    }
-    const auto &edges_vector = root->edges();
-    if (edges_vector != nullptr) {
-        edges_.reserve(edges_vector->size());
-        for (const auto &i: *edges_vector) {
-            edges_.emplace_back(i);
-        }
-    }
-    if (root->name() != nullptr) {
-        name_ = std::string(*root->name()->begin(), *root->name()->end());
-    }
-    const auto &nodes_vector = root->nodes();
-    if (nodes_vector != nullptr) {
-        nodes_.reserve(nodes_vector->size());
-        for (const auto &i: *nodes_vector) {
-            nodes_.emplace_back(i);
-        }
-    }
-}
-
-bool
-Schematic::operator==(const Schematic &rhs) const {
-    if (this->attributes_ != rhs.attributes_) {
-        return false;
-    }
-    if (this->edges_ != rhs.edges_) {
-        return false;
-    }
-    if (this->name_ != rhs.name_) {
-        return false;
-    }
-    if (this->nodes_ != rhs.nodes_) {
         return false;
     }
     return true;

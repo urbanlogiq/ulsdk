@@ -13,6 +13,14 @@ import (
 	"github.com/urbanlogiq/ulsdk/types/value"
 )
 
+func TestDefaultContinuationSpec(t *testing.T) {
+	o := &ContinuationSpec{}
+	if o == nil {
+		t.Fatal("expected non-nil")
+	}
+}
+
+
 func TestDefaultDeprecatedRunSpec(t *testing.T) {
 	o := &DeprecatedRunSpec{}
 	if o == nil {

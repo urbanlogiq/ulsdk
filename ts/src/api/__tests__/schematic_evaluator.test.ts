@@ -4,6 +4,7 @@
 
 import * as schematic_evaluator from '../schematic_evaluator';
 import { TestContext } from '../../test_context';
+import { ContinuationSpecT as ContinuationSpec } from '../../types/generated/continuation-spec';
 import { ObjectIdT as ObjectId } from '../../types/generated/object-id';
 import { RunSpecT as RunSpec } from '../../types/generated/run-spec';
 
@@ -50,6 +51,24 @@ describe('getTask', () => {
           await schematic_evaluator.getTask(
         ctx,
         p0
+      );
+    } catch (_) {
+      // Expected for mock tests with empty/invalid responses
+    }
+  });
+});
+
+describe('setGraphContinuation', () => {
+  it('testSetGraphContinuation', async () => {
+    const ctx = new TestContext();
+    const p0 = new ObjectId();
+    const body = new ContinuationSpec();
+    ctx.setResponse(new Uint8Array(0));
+    try {
+          await schematic_evaluator.setGraphContinuation(
+        ctx,
+        p0,
+        body
       );
     } catch (_) {
       // Expected for mock tests with empty/invalid responses

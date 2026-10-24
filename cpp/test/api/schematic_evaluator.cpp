@@ -104,4 +104,32 @@ test_get_task(ul::RequestContext &rctx) {
 
 ApiTest test_get_task_obj(test_get_task, "schematic_evaluator::get_task", &idempotent_api_test_root);
 
+ul::Result<ul::Void>
+test_set_graph_continuation(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    ::ul::types::ContinuationSpec body = ::ul::types::ContinuationSpec();
+    const ::ul::types::ObjectIdList expected = ::ul::types::ObjectIdList();
+    const std::vector<uint8_t> expected_bytes = ::ul::types::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::schematic_evaluator::set_graph_continuation(
+        ctx,
+        p0,
+        body
+    );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::types::ObjectIdList result_value = std::get<::ul::types::ObjectIdList>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
+}
+
+ApiTest test_set_graph_continuation_obj(test_set_graph_continuation, "schematic_evaluator::set_graph_continuation", &idempotent_api_test_root);
+
 } // namespace schematic_evaluator

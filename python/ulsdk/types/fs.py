@@ -94,6 +94,7 @@ from .id import (
     StreamId,
 )
 from .job import (
+    ContinuationSpec,
     DeprecatedRunSpec,
     DeprecatedTaskParameter,
     Edge,
@@ -191,6 +192,7 @@ from .generated.Chunk import Chunk as FbsChunk
 from .generated.ColumnGroupId import ColumnGroupId as FbsColumnGroupId
 from .generated.ContainerRef import ContainerRef as FbsContainerRef
 from .generated.ContentId import ContentId as FbsContentId
+from .generated.ContinuationSpec import ContinuationSpec as FbsContinuationSpec
 from .generated.CryptHeader import CryptHeader as FbsCryptHeader
 from .generated.DataCatalogObject import DataCatalogObject as FbsDataCatalogObject
 from .generated.DataStateId import DataStateId as FbsDataStateId

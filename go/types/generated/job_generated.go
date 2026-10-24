@@ -1521,6 +1521,117 @@ func RunSpecStartAttributesVector(builder *flatbuffers.Builder, numElems int) fl
 func RunSpecEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
+/// Insert this graph immediately after a task in its existing job.
+/// Parameter indices refer to this request's parameter array.
+type ContinuationSpec struct {
+	_tab flatbuffers.Table
+}
+
+func GetRootAsContinuationSpec(buf []byte, offset flatbuffers.UOffsetT) *ContinuationSpec {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &ContinuationSpec{}
+	x.Init(buf, n+offset)
+	return x
+}
+
+func FinishContinuationSpecBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.Finish(offset)
+}
+
+func GetSizePrefixedRootAsContinuationSpec(buf []byte, offset flatbuffers.UOffsetT) *ContinuationSpec {
+	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
+	x := &ContinuationSpec{}
+	x.Init(buf, n+offset+flatbuffers.SizeUint32)
+	return x
+}
+
+func FinishSizePrefixedContinuationSpecBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.FinishSizePrefixed(offset)
+}
+
+func (rcv *ContinuationSpec) Init(buf []byte, i flatbuffers.UOffsetT) {
+	rcv._tab.Bytes = buf
+	rcv._tab.Pos = i
+}
+
+func (rcv *ContinuationSpec) Table() flatbuffers.Table {
+	return rcv._tab
+}
+
+func (rcv *ContinuationSpec) Schematic(obj *Schematic) *Schematic {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		x := rcv._tab.Indirect(o + rcv._tab.Pos)
+		if obj == nil {
+			obj = new(Schematic)
+		}
+		obj.Init(rcv._tab.Bytes, x)
+		return obj
+	}
+	return nil
+}
+
+func (rcv *ContinuationSpec) ParamIndices(obj *ParamIndices, j int) bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
+	if o != 0 {
+		x := rcv._tab.Vector(o)
+		x += flatbuffers.UOffsetT(j) * 4
+		x = rcv._tab.Indirect(x)
+		obj.Init(rcv._tab.Bytes, x)
+		return true
+	}
+	return false
+}
+
+func (rcv *ContinuationSpec) ParamIndicesLength() int {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
+	if o != 0 {
+		return rcv._tab.VectorLen(o)
+	}
+	return 0
+}
+
+func (rcv *ContinuationSpec) Params(obj *TaskParameter, j int) bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
+	if o != 0 {
+		x := rcv._tab.Vector(o)
+		x += flatbuffers.UOffsetT(j) * 4
+		x = rcv._tab.Indirect(x)
+		obj.Init(rcv._tab.Bytes, x)
+		return true
+	}
+	return false
+}
+
+func (rcv *ContinuationSpec) ParamsLength() int {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
+	if o != 0 {
+		return rcv._tab.VectorLen(o)
+	}
+	return 0
+}
+
+func ContinuationSpecStart(builder *flatbuffers.Builder) {
+	builder.StartObject(3)
+}
+func ContinuationSpecAddSchematic(builder *flatbuffers.Builder, schematic flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(schematic), 0)
+}
+func ContinuationSpecAddParamIndices(builder *flatbuffers.Builder, paramIndices flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(1, flatbuffers.UOffsetT(paramIndices), 0)
+}
+func ContinuationSpecStartParamIndicesVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+	return builder.StartVector(4, numElems, 4)
+}
+func ContinuationSpecAddParams(builder *flatbuffers.Builder, params flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(2, flatbuffers.UOffsetT(params), 0)
+}
+func ContinuationSpecStartParamsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+	return builder.StartVector(4, numElems, 4)
+}
+func ContinuationSpecEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return builder.EndObject()
+}
 type DeprecatedTaskParameter struct {
 	_tab flatbuffers.Table
 }

@@ -62,7 +62,7 @@ use crate::types::generated::id_generated::{
     PinnedObjectId as FbsPinnedObjectId, StreamId as FbsStreamId,
 };
 use crate::types::generated::job_generated::{
-    DeprecatedRunSpec as FbsDeprecatedRunSpec,
+    ContinuationSpec as FbsContinuationSpec, DeprecatedRunSpec as FbsDeprecatedRunSpec,
     DeprecatedTaskParameter as FbsDeprecatedTaskParameter, Edge as FbsEdge,
     EmbeddedTable as FbsEmbeddedTable, Job as FbsJob, Node as FbsNode,
     ParamIndices as FbsParamIndices, RunSpec as FbsRunSpec, Schematic as FbsSchematic,
@@ -345,6 +345,174 @@ impl TaskParameterValue {
                 (offset, ty)
             }
         }
+    }
+}
+
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+pub struct Schematic {
+    pub attributes: Vec<AttributePair>,
+    pub edges: Vec<Edge>,
+    pub name: Option<String>,
+    pub nodes: Vec<Node>,
+}
+
+impl Schematic {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsSchematic<'a>> {
+        use crate::types::generated::job_generated::SchematicBuilder as FbsSchematicBuilder;
+
+        let mut attributes_offsets = Vec::with_capacity(self.attributes.len());
+        for val in self.attributes.iter() {
+            let offset = val.serialize_to(builder);
+            attributes_offsets.push(offset);
+        }
+        let attributes_offset = builder.create_vector(&attributes_offsets);
+        let mut edges_offsets = Vec::with_capacity(self.edges.len());
+        for val in self.edges.iter() {
+            let offset = val.serialize_to(builder);
+            edges_offsets.push(offset);
+        }
+        let edges_offset = builder.create_vector(&edges_offsets);
+        let name_offset = self.name.as_ref().map(|s| builder.create_string(s));
+        let mut nodes_offsets = Vec::with_capacity(self.nodes.len());
+        for val in self.nodes.iter() {
+            let offset = val.serialize_to(builder);
+            nodes_offsets.push(offset);
+        }
+        let nodes_offset = builder.create_vector(&nodes_offsets);
+
+        let mut bldr = FbsSchematicBuilder::new(builder);
+        bldr.add_attributes(attributes_offset);
+        bldr.add_edges(edges_offset);
+        if let Some(offset) = name_offset {
+            bldr.add_name(offset);
+        }
+        bldr.add_nodes(nodes_offset);
+        bldr.finish()
+    }
+}
+
+impl From<FbsSchematic<'_>> for Schematic {
+    fn from(fbs: FbsSchematic<'_>) -> Self {
+        let mut attributes = Vec::new();
+        for elem in fbs.attributes() {
+            attributes.push(elem.into());
+        }
+
+        let mut edges = Vec::new();
+        for elem in fbs.edges() {
+            edges.push(elem.into());
+        }
+
+        let name = fbs.name().map(ToOwned::to_owned);
+        let mut nodes = Vec::new();
+        for elem in fbs.nodes() {
+            nodes.push(elem.into());
+        }
+
+        Self {
+            attributes,
+            edges,
+            name,
+            nodes,
+        }
+    }
+}
+
+impl crate::FbsSerde for Schematic {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsSchematic>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
+/// Insert this graph immediately after a task in its existing job.
+/// Parameter indices refer to this request's parameter array.
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+pub struct ContinuationSpec {
+    pub param_indices: Vec<ParamIndices>,
+    pub params: Vec<TaskParameter>,
+    pub schematic: Schematic,
+}
+
+impl ContinuationSpec {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsContinuationSpec<'a>> {
+        use crate::types::generated::job_generated::ContinuationSpecBuilder as FbsContinuationSpecBuilder;
+
+        let mut param_indices_offsets = Vec::with_capacity(self.param_indices.len());
+        for val in self.param_indices.iter() {
+            let offset = val.serialize_to(builder);
+            param_indices_offsets.push(offset);
+        }
+        let param_indices_offset = builder.create_vector(&param_indices_offsets);
+        let mut params_offsets = Vec::with_capacity(self.params.len());
+        for val in self.params.iter() {
+            let offset = val.serialize_to(builder);
+            params_offsets.push(offset);
+        }
+        let params_offset = builder.create_vector(&params_offsets);
+        let schematic_offset = self.schematic.serialize_to(builder);
+
+        let mut bldr = FbsContinuationSpecBuilder::new(builder);
+        bldr.add_param_indices(param_indices_offset);
+        bldr.add_params(params_offset);
+        bldr.add_schematic(schematic_offset);
+        bldr.finish()
+    }
+}
+
+impl From<FbsContinuationSpec<'_>> for ContinuationSpec {
+    fn from(fbs: FbsContinuationSpec<'_>) -> Self {
+        let mut param_indices = Vec::new();
+        for elem in fbs.param_indices() {
+            param_indices.push(elem.into());
+        }
+
+        let mut params = Vec::new();
+        for elem in fbs.params() {
+            params.push(elem.into());
+        }
+
+        let schematic = Schematic::from(fbs.schematic());
+        Self {
+            param_indices,
+            params,
+            schematic,
+        }
+    }
+}
+
+impl crate::FbsSerde for ContinuationSpec {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsContinuationSpec>(&opts, bytes)?;
+        Ok(Self::from(fbs))
     }
 }
 
@@ -928,97 +1096,6 @@ impl Default for RunSpec {
     }
 }
 
-#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
-pub struct Schematic {
-    pub attributes: Vec<AttributePair>,
-    pub edges: Vec<Edge>,
-    pub name: Option<String>,
-    pub nodes: Vec<Node>,
-}
-
-impl Schematic {
-    pub fn serialize_to<'a>(
-        &self,
-        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
-    ) -> flatbuffers::WIPOffset<FbsSchematic<'a>> {
-        use crate::types::generated::job_generated::SchematicBuilder as FbsSchematicBuilder;
-
-        let mut attributes_offsets = Vec::with_capacity(self.attributes.len());
-        for val in self.attributes.iter() {
-            let offset = val.serialize_to(builder);
-            attributes_offsets.push(offset);
-        }
-        let attributes_offset = builder.create_vector(&attributes_offsets);
-        let mut edges_offsets = Vec::with_capacity(self.edges.len());
-        for val in self.edges.iter() {
-            let offset = val.serialize_to(builder);
-            edges_offsets.push(offset);
-        }
-        let edges_offset = builder.create_vector(&edges_offsets);
-        let name_offset = self.name.as_ref().map(|s| builder.create_string(s));
-        let mut nodes_offsets = Vec::with_capacity(self.nodes.len());
-        for val in self.nodes.iter() {
-            let offset = val.serialize_to(builder);
-            nodes_offsets.push(offset);
-        }
-        let nodes_offset = builder.create_vector(&nodes_offsets);
-
-        let mut bldr = FbsSchematicBuilder::new(builder);
-        bldr.add_attributes(attributes_offset);
-        bldr.add_edges(edges_offset);
-        if let Some(offset) = name_offset {
-            bldr.add_name(offset);
-        }
-        bldr.add_nodes(nodes_offset);
-        bldr.finish()
-    }
-}
-
-impl From<FbsSchematic<'_>> for Schematic {
-    fn from(fbs: FbsSchematic<'_>) -> Self {
-        let mut attributes = Vec::new();
-        for elem in fbs.attributes() {
-            attributes.push(elem.into());
-        }
-
-        let mut edges = Vec::new();
-        for elem in fbs.edges() {
-            edges.push(elem.into());
-        }
-
-        let name = fbs.name().map(ToOwned::to_owned);
-        let mut nodes = Vec::new();
-        for elem in fbs.nodes() {
-            nodes.push(elem.into());
-        }
-
-        Self {
-            attributes,
-            edges,
-            name,
-            nodes,
-        }
-    }
-}
-
-impl crate::FbsSerde for Schematic {
-    fn to_fbs_bytes(&self) -> Vec<u8> {
-        let mut bldr = flatbuffers::FlatBufferBuilder::new();
-        let offset = self.serialize_to(&mut bldr);
-        bldr.finish_size_prefixed(offset, None);
-        bldr.finished_data().to_vec()
-    }
-
-    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
-        let opts = flatbuffers::VerifierOptions {
-            max_tables: 100_000_000,
-            ..Default::default()
-        };
-        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsSchematic>(&opts, bytes)?;
-        Ok(Self::from(fbs))
-    }
-}
-
 #[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Task {
     pub _id: ObjectId,
@@ -1356,6 +1433,14 @@ impl crate::FbsSerde for TaskParameter {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_continuation_spec() {
+        let t0 = ContinuationSpec::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = ContinuationSpec::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
 
     #[test]
     fn test_deprecated_run_spec() {

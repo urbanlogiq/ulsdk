@@ -87,6 +87,7 @@ from .id import (
     StreamId,
 )
 from .job import (
+    ContinuationSpec,
     DeprecatedRunSpec,
     DeprecatedTaskParameter,
     Edge,
@@ -183,6 +184,7 @@ from .generated.ByteArray import ByteArray as FbsByteArray
 from .generated.ColumnGroupId import ColumnGroupId as FbsColumnGroupId
 from .generated.ContainerRef import ContainerRef as FbsContainerRef
 from .generated.ContentId import ContentId as FbsContentId
+from .generated.ContinuationSpec import ContinuationSpec as FbsContinuationSpec
 from .generated.DataCatalogObject import DataCatalogObject as FbsDataCatalogObject
 from .generated.DataStateId import DataStateId as FbsDataStateId
 from .generated.Date import Date as FbsDate

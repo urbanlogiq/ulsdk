@@ -4,8 +4,10 @@
 
 import * as flatbuffers from 'flatbuffers/js/flatbuffers';
 import { RequestContext } from '../../request_context';
+import { ContinuationSpec as FbsContinuationSpec, ContinuationSpecT as ContinuationSpec } from '../../types/generated/continuation-spec';
 import { Job as FbsJob, JobT as Job } from '../../types/generated/job';
 import { ObjectId as FbsObjectId, ObjectIdT as ObjectId } from '../../types/generated/object-id';
+import { ObjectIdList as FbsObjectIdList, ObjectIdListT as ObjectIdList } from '../../types/generated/object-id-list';
 import { RunSpec as FbsRunSpec, RunSpecT as RunSpec } from '../../types/generated/run-spec';
 import { Task as FbsTask, TaskT as Task } from '../../types/generated/task';
 
@@ -87,5 +89,36 @@ export async function getTask(
   const buf = new flatbuffers.ByteBuffer(res);
   buf.setPosition(buf.position() + flatbuffers.SIZE_PREFIX_LENGTH);
   const fbs = FbsTask.getRootAsTask(buf);
+  return fbs.unpack();
+}
+
+/**
+ * Insert an inline graph immediately after this task. Exact repeats return 409.
+ *
+ * @param ctx - A request context object
+ * @param id - The task after which to insert the graph
+ * @param continuation - The inline schematic and its parameters
+ * @returns The created task IDs in schematic node order
+ */
+export async function setGraphContinuation(
+  ctx: RequestContext,
+  id: ObjectId,
+  continuation: ContinuationSpec
+): Promise<ObjectIdList> {
+  let path = '/v1/api/ulv2/schematicevaluator/tasks/:id/continuations';
+  path = path.replace(':id', id.toString());
+
+  const params: [string, string][] = [];
+  const headers: Record<string, string> = {};
+
+  let body: Uint8Array | null = null;
+  const __builder = new flatbuffers.Builder();
+  const __offset = continuation.pack(__builder);
+  __builder.finishSizePrefixed(__offset);
+  body = __builder.asUint8Array();
+  const res = await ctx.post(path, body, 'application/octet-stream', params, headers);
+  const buf = new flatbuffers.ByteBuffer(res);
+  buf.setPosition(buf.position() + flatbuffers.SIZE_PREFIX_LENGTH);
+  const fbs = FbsObjectIdList.getRootAsObjectIdList(buf);
   return fbs.unpack();
 }

@@ -22,6 +22,7 @@
 namespace ul {
 namespace types {
 
+struct ContinuationSpec;
 struct DeprecatedRunSpec;
 struct DeprecatedTaskParameter;
 struct Edge;
@@ -53,6 +54,39 @@ struct EmbeddedTable {
     EmbeddedTable(const std::vector<uint8_t> &bytes);
     bool operator==(const EmbeddedTable &rhs) const;
     bool operator!=(const EmbeddedTable &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+struct Schematic {
+    std::vector<AttributePair> attributes_;
+    std::vector<Edge> edges_;
+    std::optional<std::string> name_;
+    std::vector<Node> nodes_;
+
+    Schematic();
+    Schematic(const ::Schematic *root);
+    Schematic(const std::vector<uint8_t> &bytes);
+    bool operator==(const Schematic &rhs) const;
+    bool operator!=(const Schematic &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+///
+/// Insert this graph immediately after a task in its existing job.
+/// Parameter indices refer to this request's parameter array.
+///
+struct ContinuationSpec {
+    std::vector<ParamIndices> param_indices_;
+    std::vector<TaskParameter> params_;
+    Schematic schematic_;
+
+    ContinuationSpec();
+    ContinuationSpec(const ::ContinuationSpec *root);
+    ContinuationSpec(const std::vector<uint8_t> &bytes);
+    bool operator==(const ContinuationSpec &rhs) const;
+    bool operator!=(const ContinuationSpec &rhs) const {
         return !(*this == rhs);
     }
 };
@@ -169,21 +203,6 @@ struct RunSpec {
     }
 };
 
-struct Schematic {
-    std::vector<AttributePair> attributes_;
-    std::vector<Edge> edges_;
-    std::optional<std::string> name_;
-    std::vector<Node> nodes_;
-
-    Schematic();
-    Schematic(const ::Schematic *root);
-    Schematic(const std::vector<uint8_t> &bytes);
-    bool operator==(const Schematic &rhs) const;
-    bool operator!=(const Schematic &rhs) const {
-        return !(*this == rhs);
-    }
-};
-
 struct Task {
     ObjectId _id_;
     int32_t barrier_count_;
@@ -247,6 +266,12 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TaskParameterValue
 ::flatbuffers::Offset<::EmbeddedTable>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const EmbeddedTable &);
 
+::flatbuffers::Offset<::Schematic>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Schematic &);
+
+::flatbuffers::Offset<::ContinuationSpec>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ContinuationSpec &);
+
 ::flatbuffers::Offset<::DeprecatedRunSpec>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DeprecatedRunSpec &);
 
@@ -268,9 +293,6 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ParamIndices &);
 ::flatbuffers::Offset<::RunSpec>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const RunSpec &);
 
-::flatbuffers::Offset<::Schematic>
-serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Schematic &);
-
 ::flatbuffers::Offset<::Task>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Task &);
 
@@ -283,6 +305,12 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TaskParameter &);
 
 std::vector<uint8_t>
 to_bytes(const EmbeddedTable &o);
+
+std::vector<uint8_t>
+to_bytes(const Schematic &o);
+
+std::vector<uint8_t>
+to_bytes(const ContinuationSpec &o);
 
 std::vector<uint8_t>
 to_bytes(const DeprecatedRunSpec &o);
@@ -304,9 +332,6 @@ to_bytes(const ParamIndices &o);
 
 std::vector<uint8_t>
 to_bytes(const RunSpec &o);
-
-std::vector<uint8_t>
-to_bytes(const Schematic &o);
 
 std::vector<uint8_t>
 to_bytes(const Task &o);

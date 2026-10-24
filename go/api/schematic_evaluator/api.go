@@ -9,6 +9,7 @@ import (
 	"github.com/urbanlogiq/ulsdk/api"
 	"github.com/urbanlogiq/ulsdk/types/id"
 	"github.com/urbanlogiq/ulsdk/types/job"
+	"github.com/urbanlogiq/ulsdk/types/object"
 	"strings"
 )
 
@@ -74,6 +75,28 @@ func GetTask(ctx api.RequestContext, idParam id.ObjectId) (*job.Task, error) {
 		return nil, err
 	}
 	result, err := job.TaskFromBytes(res)
+	if err != nil {
+		return nil, fmt.Errorf("failed to deserialize response: %w", err)
+	}
+	return result, nil
+}
+
+// SetGraphContinuation -
+// Insert an inline graph immediately after this task. Exact repeats return 409.
+func SetGraphContinuation(ctx api.RequestContext, idParam id.ObjectId, continuation *job.ContinuationSpec) (*object.ObjectIdList, error) {
+	path := "/v1/api/ulv2/schematicevaluator/tasks/:id/continuations"
+	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
+
+	params := [][2]string{}
+
+	headers := map[string]string{}
+
+	bodyBytes := continuation.ToBytes()
+	res, err := ctx.Post(path, bodyBytes, "application/octet-stream", params, headers)
+	if err != nil {
+		return nil, err
+	}
+	result, err := object.ObjectIdListFromBytes(res)
 	if err != nil {
 		return nil, fmt.Errorf("failed to deserialize response: %w", err)
 	}

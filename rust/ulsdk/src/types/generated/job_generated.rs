@@ -3047,6 +3047,224 @@ impl core::fmt::Debug for RunSpec<'_> {
         ds.finish()
     }
 }
+pub enum ContinuationSpecOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+/// Insert this graph immediately after a task in its existing job.
+/// Parameter indices refer to this request's parameter array.
+pub struct ContinuationSpec<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for ContinuationSpec<'a> {
+    type Inner = ContinuationSpec<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> ContinuationSpec<'a> {
+    pub const VT_SCHEMATIC: flatbuffers::VOffsetT = 4;
+    pub const VT_PARAM_INDICES: flatbuffers::VOffsetT = 6;
+    pub const VT_PARAMS: flatbuffers::VOffsetT = 8;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        ContinuationSpec { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args ContinuationSpecArgs<'args>,
+    ) -> flatbuffers::WIPOffset<ContinuationSpec<'bldr>> {
+        let mut builder = ContinuationSpecBuilder::new(_fbb);
+        if let Some(x) = args.params {
+            builder.add_params(x);
+        }
+        if let Some(x) = args.param_indices {
+            builder.add_param_indices(x);
+        }
+        if let Some(x) = args.schematic {
+            builder.add_schematic(x);
+        }
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn schematic(&self) -> Schematic<'a> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<Schematic>>(
+                    ContinuationSpec::VT_SCHEMATIC,
+                    None,
+                )
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn param_indices(
+        &self,
+    ) -> flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ParamIndices<'a>>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<
+                    flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ParamIndices>>,
+                >>(ContinuationSpec::VT_PARAM_INDICES, None)
+                .unwrap()
+        }
+    }
+    #[inline]
+    pub fn params(
+        &self,
+    ) -> flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<TaskParameter<'a>>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<
+                    flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<TaskParameter>>,
+                >>(ContinuationSpec::VT_PARAMS, None)
+                .unwrap()
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for ContinuationSpec<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<Schematic>>(
+                "schematic",
+                Self::VT_SCHEMATIC,
+                true,
+            )?
+            .visit_field::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<ParamIndices>>,
+            >>("param_indices", Self::VT_PARAM_INDICES, true)?
+            .visit_field::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<TaskParameter>>,
+            >>("params", Self::VT_PARAMS, true)?
+            .finish();
+        Ok(())
+    }
+}
+pub struct ContinuationSpecArgs<'a> {
+    pub schematic: Option<flatbuffers::WIPOffset<Schematic<'a>>>,
+    pub param_indices: Option<
+        flatbuffers::WIPOffset<
+            flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ParamIndices<'a>>>,
+        >,
+    >,
+    pub params: Option<
+        flatbuffers::WIPOffset<
+            flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<TaskParameter<'a>>>,
+        >,
+    >,
+}
+impl<'a> Default for ContinuationSpecArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        ContinuationSpecArgs {
+            schematic: None,     // required field
+            param_indices: None, // required field
+            params: None,        // required field
+        }
+    }
+}
+
+impl Serialize for ContinuationSpec<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("ContinuationSpec", 3)?;
+        s.serialize_field("schematic", &self.schematic())?;
+        s.serialize_field("param_indices", &self.param_indices())?;
+        s.serialize_field("params", &self.params())?;
+        s.end()
+    }
+}
+
+pub struct ContinuationSpecBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ContinuationSpecBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_schematic(&mut self, schematic: flatbuffers::WIPOffset<Schematic<'b>>) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<Schematic>>(
+                ContinuationSpec::VT_SCHEMATIC,
+                schematic,
+            );
+    }
+    #[inline]
+    pub fn add_param_indices(
+        &mut self,
+        param_indices: flatbuffers::WIPOffset<
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<ParamIndices<'b>>>,
+        >,
+    ) {
+        self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(
+            ContinuationSpec::VT_PARAM_INDICES,
+            param_indices,
+        );
+    }
+    #[inline]
+    pub fn add_params(
+        &mut self,
+        params: flatbuffers::WIPOffset<
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<TaskParameter<'b>>>,
+        >,
+    ) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(ContinuationSpec::VT_PARAMS, params);
+    }
+    #[inline]
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> ContinuationSpecBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        ContinuationSpecBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<ContinuationSpec<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_
+            .required(o, ContinuationSpec::VT_SCHEMATIC, "schematic");
+        self.fbb_
+            .required(o, ContinuationSpec::VT_PARAM_INDICES, "param_indices");
+        self.fbb_.required(o, ContinuationSpec::VT_PARAMS, "params");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for ContinuationSpec<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("ContinuationSpec");
+        ds.field("schematic", &self.schematic());
+        ds.field("param_indices", &self.param_indices());
+        ds.field("params", &self.params());
+        ds.finish()
+    }
+}
 pub enum DeprecatedTaskParameterOffset {}
 #[derive(Copy, Clone, PartialEq)]
 

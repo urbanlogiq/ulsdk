@@ -101,3 +101,35 @@ def test_get_task():
         if success:
             break
     assert success, "test was unable to complete with retries"
+
+def test_set_graph_continuation():
+    user = os.environ["CA_USER"] if "CA_USER" in os.environ else None
+    access_key = os.environ["CA_ACCESS_KEY"] if "CA_ACCESS_KEY" in os.environ else None
+    secret_key = os.environ["CA_SECRET_KEY"] if "CA_SECRET_KEY" in os.environ else None
+
+    if user == None or access_key is None or secret_key is None:
+        raise Exception("cannot run test as no credentials are specified")
+    key = SigningKey(UUID(user), Region.CA, access_key, secret_key)
+    key_ctx = ApiKeyContext(key, Environment.Stage)
+    ctx = TestContext(key_ctx)
+    p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
+    body = ContinuationSpec.make_default()
+    success = False
+    for i in range(5):
+        expected = ObjectIdList.make_default();
+        expected_bytes = expected.to_bytes();
+        ctx.set_response(expected_bytes);
+        try:
+            result = set_graph_continuation(
+                ctx,
+                p0,
+                body
+            )
+            success = True
+        except Exception as e:
+            time.sleep(i + 1)
+            continue
+        assert result == expected
+        if success:
+            break
+    assert success, "test was unable to complete with retries"

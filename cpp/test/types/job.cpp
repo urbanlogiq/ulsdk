@@ -7,6 +7,16 @@
 #include "test.h"
 
 bool
+test_continuation_spec() {
+    ::ul::types::ContinuationSpec t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::ContinuationSpec deserialized = ::ul::types::ContinuationSpec(bytes);
+    return true;
+}
+
+TypeTest test_continuation_spec_obj(test_continuation_spec, "ContinuationSpec");
+
+bool
 test_deprecated_run_spec() {
     ::ul::types::DeprecatedRunSpec t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);

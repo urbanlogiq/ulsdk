@@ -92,6 +92,196 @@ const (
 	TaskRunFlagsPodLocked TaskRunFlags = 1
 )
 
+type Schematic struct {
+	Attributes []data.AttributePair
+	Edges []Edge
+	Name *string
+	Nodes []Node
+}
+
+func SchematicFromFbs(fbs *generated.Schematic) *Schematic {
+	o := &Schematic{}
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.Attributes = []data.AttributePair{}
+		for i := 0; i < fbs.AttributesLength(); i++ {
+			var item generated.AttributePair
+			if fbs.Attributes(&item, i) {
+				o.Attributes = append(o.Attributes, *data.AttributePairFromFbs(&item))
+			}
+		}
+	}
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.Edges = []Edge{}
+		for i := 0; i < fbs.EdgesLength(); i++ {
+			var item generated.Edge
+			if fbs.Edges(&item, i) {
+				o.Edges = append(o.Edges, *EdgeFromFbs(&item))
+			}
+		}
+	}
+	if s := fbs.Name(); s != nil {
+		str := string(s)
+		o.Name = &str
+	}
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Nodes = []Node{}
+		for i := 0; i < fbs.NodesLength(); i++ {
+			var item generated.Node
+			if fbs.Nodes(&item, i) {
+				o.Nodes = append(o.Nodes, *NodeFromFbs(&item))
+			}
+		}
+	}
+	return o
+}
+
+// SchematicFromBytes deserializes a Schematic from size-prefixed FlatBuffer bytes.
+func SchematicFromBytes(data []byte) (o *Schematic, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Schematic: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
+	fbs := generated.GetSizePrefixedRootAsSchematic(data, 0)
+	return SchematicFromFbs(fbs), nil
+}
+
+// ToBytes serializes the Schematic to size-prefixed FlatBuffer bytes.
+func (o *Schematic) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the Schematic into a FlatBuffer builder and returns the offset.
+func (o *Schematic) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var attributesVecOffset flatbuffers.UOffsetT
+	attributesOffsets := make([]flatbuffers.UOffsetT, len(o.Attributes))
+	for i := range o.Attributes {
+		attributesOffsets[i] = o.Attributes[i].SerializeTo(builder)
+	}
+	generated.SchematicStartAttributesVector(builder, len(o.Attributes))
+	for i := len(o.Attributes) - 1; i >= 0; i-- {
+		builder.PrependUOffsetT(attributesOffsets[i])
+	}
+	attributesVecOffset = builder.EndVector(len(o.Attributes))
+	var edgesVecOffset flatbuffers.UOffsetT
+	edgesOffsets := make([]flatbuffers.UOffsetT, len(o.Edges))
+	for i := range o.Edges {
+		edgesOffsets[i] = o.Edges[i].SerializeTo(builder)
+	}
+	generated.SchematicStartEdgesVector(builder, len(o.Edges))
+	for i := len(o.Edges) - 1; i >= 0; i-- {
+		builder.PrependUOffsetT(edgesOffsets[i])
+	}
+	edgesVecOffset = builder.EndVector(len(o.Edges))
+	var nameOffset flatbuffers.UOffsetT
+	if o.Name != nil {
+		nameOffset = builder.CreateString(*o.Name)
+	}
+	var nodesVecOffset flatbuffers.UOffsetT
+	nodesOffsets := make([]flatbuffers.UOffsetT, len(o.Nodes))
+	for i := range o.Nodes {
+		nodesOffsets[i] = o.Nodes[i].SerializeTo(builder)
+	}
+	generated.SchematicStartNodesVector(builder, len(o.Nodes))
+	for i := len(o.Nodes) - 1; i >= 0; i-- {
+		builder.PrependUOffsetT(nodesOffsets[i])
+	}
+	nodesVecOffset = builder.EndVector(len(o.Nodes))
+	generated.SchematicStart(builder)
+	generated.SchematicAddAttributes(builder, attributesVecOffset)
+	generated.SchematicAddEdges(builder, edgesVecOffset)
+	generated.SchematicAddName(builder, nameOffset)
+	generated.SchematicAddNodes(builder, nodesVecOffset)
+	return generated.SchematicEnd(builder)
+}
+
+// ContinuationSpec -
+//  Insert this graph immediately after a task in its existing job.
+//  Parameter indices refer to this request's parameter array.
+type ContinuationSpec struct {
+	ParamIndices []ParamIndices
+	Params []TaskParameter
+	Schematic Schematic
+}
+
+func ContinuationSpecFromFbs(fbs *generated.ContinuationSpec) *ContinuationSpec {
+	o := &ContinuationSpec{}
+	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
+		o.ParamIndices = []ParamIndices{}
+		for i := 0; i < fbs.ParamIndicesLength(); i++ {
+			var item generated.ParamIndices
+			if fbs.ParamIndices(&item, i) {
+				o.ParamIndices = append(o.ParamIndices, *ParamIndicesFromFbs(&item))
+			}
+		}
+	}
+	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
+		o.Params = []TaskParameter{}
+		for i := 0; i < fbs.ParamsLength(); i++ {
+			var item generated.TaskParameter
+			if fbs.Params(&item, i) {
+				o.Params = append(o.Params, *TaskParameterFromFbs(&item))
+			}
+		}
+	}
+	if fbsVal := fbs.Schematic(nil); fbsVal != nil {
+		o.Schematic = *SchematicFromFbs(fbsVal)
+	}
+	return o
+}
+
+// ContinuationSpecFromBytes deserializes a ContinuationSpec from size-prefixed FlatBuffer bytes.
+func ContinuationSpecFromBytes(data []byte) (o *ContinuationSpec, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("ContinuationSpec: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
+	fbs := generated.GetSizePrefixedRootAsContinuationSpec(data, 0)
+	return ContinuationSpecFromFbs(fbs), nil
+}
+
+// ToBytes serializes the ContinuationSpec to size-prefixed FlatBuffer bytes.
+func (o *ContinuationSpec) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the ContinuationSpec into a FlatBuffer builder and returns the offset.
+func (o *ContinuationSpec) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var paramIndicesVecOffset flatbuffers.UOffsetT
+	paramIndicesOffsets := make([]flatbuffers.UOffsetT, len(o.ParamIndices))
+	for i := range o.ParamIndices {
+		paramIndicesOffsets[i] = o.ParamIndices[i].SerializeTo(builder)
+	}
+	generated.ContinuationSpecStartParamIndicesVector(builder, len(o.ParamIndices))
+	for i := len(o.ParamIndices) - 1; i >= 0; i-- {
+		builder.PrependUOffsetT(paramIndicesOffsets[i])
+	}
+	paramIndicesVecOffset = builder.EndVector(len(o.ParamIndices))
+	var paramsVecOffset flatbuffers.UOffsetT
+	paramsOffsets := make([]flatbuffers.UOffsetT, len(o.Params))
+	for i := range o.Params {
+		paramsOffsets[i] = o.Params[i].SerializeTo(builder)
+	}
+	generated.ContinuationSpecStartParamsVector(builder, len(o.Params))
+	for i := len(o.Params) - 1; i >= 0; i-- {
+		builder.PrependUOffsetT(paramsOffsets[i])
+	}
+	paramsVecOffset = builder.EndVector(len(o.Params))
+	schematicOffset := o.Schematic.SerializeTo(builder)
+	generated.ContinuationSpecStart(builder)
+	generated.ContinuationSpecAddParamIndices(builder, paramIndicesVecOffset)
+	generated.ContinuationSpecAddParams(builder, paramsVecOffset)
+	generated.ContinuationSpecAddSchematic(builder, schematicOffset)
+	return generated.ContinuationSpecEnd(builder)
+}
+
 type DeprecatedRunSpec struct {
 	ParamIndices []ParamIndices
 	Params []DeprecatedTaskParameter
@@ -605,112 +795,6 @@ func (o *RunSpec) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT
 	generated.RunSpecAddPriority(builder, generated.TaskPriority(o.Priority))
 	generated.RunSpecAddSchematic(builder, schematicOffset)
 	return generated.RunSpecEnd(builder)
-}
-
-type Schematic struct {
-	Attributes []data.AttributePair
-	Edges []Edge
-	Name *string
-	Nodes []Node
-}
-
-func SchematicFromFbs(fbs *generated.Schematic) *Schematic {
-	o := &Schematic{}
-	if tbl := fbs.Table(); tbl.Offset(8) != 0 {
-		o.Attributes = []data.AttributePair{}
-		for i := 0; i < fbs.AttributesLength(); i++ {
-			var item generated.AttributePair
-			if fbs.Attributes(&item, i) {
-				o.Attributes = append(o.Attributes, *data.AttributePairFromFbs(&item))
-			}
-		}
-	}
-	if tbl := fbs.Table(); tbl.Offset(6) != 0 {
-		o.Edges = []Edge{}
-		for i := 0; i < fbs.EdgesLength(); i++ {
-			var item generated.Edge
-			if fbs.Edges(&item, i) {
-				o.Edges = append(o.Edges, *EdgeFromFbs(&item))
-			}
-		}
-	}
-	if s := fbs.Name(); s != nil {
-		str := string(s)
-		o.Name = &str
-	}
-	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
-		o.Nodes = []Node{}
-		for i := 0; i < fbs.NodesLength(); i++ {
-			var item generated.Node
-			if fbs.Nodes(&item, i) {
-				o.Nodes = append(o.Nodes, *NodeFromFbs(&item))
-			}
-		}
-	}
-	return o
-}
-
-// SchematicFromBytes deserializes a Schematic from size-prefixed FlatBuffer bytes.
-func SchematicFromBytes(data []byte) (o *Schematic, err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			o, err = nil, fmt.Errorf("Schematic: invalid FlatBuffer bytes: %v", r)
-		}
-	}()
-	fbs := generated.GetSizePrefixedRootAsSchematic(data, 0)
-	return SchematicFromFbs(fbs), nil
-}
-
-// ToBytes serializes the Schematic to size-prefixed FlatBuffer bytes.
-func (o *Schematic) ToBytes() []byte {
-	builder := flatbuffers.NewBuilder(256)
-	offset := o.SerializeTo(builder)
-	builder.FinishSizePrefixed(offset)
-	return builder.FinishedBytes()
-}
-
-// SerializeTo writes the Schematic into a FlatBuffer builder and returns the offset.
-func (o *Schematic) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	var attributesVecOffset flatbuffers.UOffsetT
-	attributesOffsets := make([]flatbuffers.UOffsetT, len(o.Attributes))
-	for i := range o.Attributes {
-		attributesOffsets[i] = o.Attributes[i].SerializeTo(builder)
-	}
-	generated.SchematicStartAttributesVector(builder, len(o.Attributes))
-	for i := len(o.Attributes) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(attributesOffsets[i])
-	}
-	attributesVecOffset = builder.EndVector(len(o.Attributes))
-	var edgesVecOffset flatbuffers.UOffsetT
-	edgesOffsets := make([]flatbuffers.UOffsetT, len(o.Edges))
-	for i := range o.Edges {
-		edgesOffsets[i] = o.Edges[i].SerializeTo(builder)
-	}
-	generated.SchematicStartEdgesVector(builder, len(o.Edges))
-	for i := len(o.Edges) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(edgesOffsets[i])
-	}
-	edgesVecOffset = builder.EndVector(len(o.Edges))
-	var nameOffset flatbuffers.UOffsetT
-	if o.Name != nil {
-		nameOffset = builder.CreateString(*o.Name)
-	}
-	var nodesVecOffset flatbuffers.UOffsetT
-	nodesOffsets := make([]flatbuffers.UOffsetT, len(o.Nodes))
-	for i := range o.Nodes {
-		nodesOffsets[i] = o.Nodes[i].SerializeTo(builder)
-	}
-	generated.SchematicStartNodesVector(builder, len(o.Nodes))
-	for i := len(o.Nodes) - 1; i >= 0; i-- {
-		builder.PrependUOffsetT(nodesOffsets[i])
-	}
-	nodesVecOffset = builder.EndVector(len(o.Nodes))
-	generated.SchematicStart(builder)
-	generated.SchematicAddAttributes(builder, attributesVecOffset)
-	generated.SchematicAddEdges(builder, edgesVecOffset)
-	generated.SchematicAddName(builder, nameOffset)
-	generated.SchematicAddNodes(builder, nodesVecOffset)
-	return generated.SchematicEnd(builder)
 }
 
 type Task struct {

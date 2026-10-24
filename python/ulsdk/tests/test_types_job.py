@@ -4,6 +4,12 @@
 
 from ..types.job import *
 
+def test_continuation_spec():
+    _t0 = ContinuationSpec.make_default()
+    _b = _t0.to_bytes()
+    _t1 = ContinuationSpec.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_deprecated_run_spec():
     _t0 = DeprecatedRunSpec.make_default()
     _b = _t0.to_bytes()

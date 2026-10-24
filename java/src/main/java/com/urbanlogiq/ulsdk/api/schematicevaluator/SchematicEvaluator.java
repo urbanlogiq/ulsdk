@@ -73,4 +73,29 @@ public final class SchematicEvaluator {
         byte[] res = ctx.get(path, params, headers);
         return new com.urbanlogiq.ulsdk.types.Task(res);
     }
+
+    /**
+     * Insert an inline graph immediately after this task. Exact repeats return 409.
+     * 
+     * @param ctx A request context object
+     * @param id The task after which to insert the graph
+     * @param continuation The inline schematic and its parameters
+     * @return The created task IDs in schematic node order
+     */
+    public static com.urbanlogiq.ulsdk.types.ObjectIdList setGraphContinuation(
+        com.urbanlogiq.ulsdk.RequestContext ctx,
+        com.urbanlogiq.ulsdk.types.ObjectId id,
+        com.urbanlogiq.ulsdk.types.ContinuationSpec continuation
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/schematicevaluator/tasks/:id/continuations";
+        path = path.replace(":id", id.toString());
+
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+
+        byte[] body = null;
+        body = continuation.toBytes();
+        byte[] res = ctx.post(path, body, "application/octet-stream", params, headers);
+        return new com.urbanlogiq.ulsdk.types.ObjectIdList(res);
+    }
 }

@@ -9,6 +9,7 @@
 #include "ulsdk/request_context.h"
 #include "ulsdk/types/id.h"
 #include "ulsdk/types/job.h"
+#include "ulsdk/types/object.h"
 #include "ulsdk/ulsdk.h"
 
 
@@ -49,6 +50,19 @@ Result<::ul::types::Task>
 get_task(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id
+);
+
+/**
+ * Insert an inline graph immediately after this task. Exact repeats return 409.
+ * @param id The task after which to insert the graph
+ * @param continuation The inline schematic and its parameters
+ * @return The created task IDs in schematic node order
+ */
+Result<::ul::types::ObjectIdList>
+set_graph_continuation(
+    ul::RequestContext &ctx,
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ContinuationSpec &continuation
 );
 
 } // namespace schematic_evaluator

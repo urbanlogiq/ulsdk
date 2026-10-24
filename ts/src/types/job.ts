@@ -4,6 +4,7 @@
 
 import * as flatbuffers from 'flatbuffers/js/flatbuffers';
 
+import { ContinuationSpec as FbsContinuationSpec, ContinuationSpecT as FbsContinuationSpecT } from './generated/continuation-spec';
 import { DeprecatedRunSpec as FbsDeprecatedRunSpec, DeprecatedRunSpecT as FbsDeprecatedRunSpecT } from './generated/deprecated-run-spec';
 import { DeprecatedTaskParameter as FbsDeprecatedTaskParameter, DeprecatedTaskParameterT as FbsDeprecatedTaskParameterT } from './generated/deprecated-task-parameter';
 import { Edge as FbsEdge, EdgeT as FbsEdgeT } from './generated/edge';
@@ -172,6 +173,173 @@ export type TaskParameterValue = ObjectId | EmbeddedTable | ValueInstance;
 export { TaskPriority } from './generated/task-priority';
 
 export { TaskRunFlags } from './generated/task-run-flags';
+
+export class Schematic {
+  private _attributes!: AttributePair[];
+
+  private _edges!: Edge[];
+
+  private _name!: string | null;
+
+  private _nodes!: Node[];
+
+  constructor(arg?: FbsSchematic | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsSchematic.getSizePrefixedRootAsSchematic(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsSchematic) {
+      this._initFromFbs(arg);
+    } else {
+      this._attributes = [];
+      this._edges = [];
+      this._name = null;
+      this._nodes = [];
+    }
+  }
+
+  private _initFromFbs(fbs: FbsSchematic): void {
+    this._attributes = Array.from({ length: fbs.attributesLength() }, (_, i) => {
+      const item = fbs.attributes(i);
+      return item ? new AttributePair(item) : new AttributePair();
+    });
+    this._edges = Array.from({ length: fbs.edgesLength() }, (_, i) => {
+      const item = fbs.edges(i);
+      return item ? new Edge(item) : new Edge();
+    });
+    this._name = fbs.name();
+    this._nodes = Array.from({ length: fbs.nodesLength() }, (_, i) => {
+      const item = fbs.nodes(i);
+      return item ? new Node(item) : new Node();
+    });
+  }
+
+  get attributes(): AttributePair[] {
+    return this._attributes;
+  }
+
+  set attributes(value: AttributePair[]) {
+    this._attributes = value;
+  }
+
+  get edges(): Edge[] {
+    return this._edges;
+  }
+
+  set edges(value: Edge[]) {
+    this._edges = value;
+  }
+
+  get name(): string | null {
+    return this._name;
+  }
+
+  set name(value: string | null) {
+    this._name = value;
+  }
+
+  get nodes(): Node[] {
+    return this._nodes;
+  }
+
+  set nodes(value: Node[]) {
+    this._nodes = value;
+  }
+
+  toFbsT(): FbsSchematicT {
+    const t = new FbsSchematicT();
+    t.attributes = this._attributes.map(item => item.toFbsT());
+    t.edges = this._edges.map(item => item.toFbsT());
+    t.name = this._name;
+    t.nodes = this._nodes.map(item => item.toFbsT());
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+}
+
+/**
+ *  Insert this graph immediately after a task in its existing job.
+ *  Parameter indices refer to this request's parameter array.
+ */
+export class ContinuationSpec {
+  private _paramIndices!: ParamIndices[];
+
+  private _params!: TaskParameter[];
+
+  private _schematic!: Schematic;
+
+  constructor(arg?: FbsContinuationSpec | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsContinuationSpec.getSizePrefixedRootAsContinuationSpec(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsContinuationSpec) {
+      this._initFromFbs(arg);
+    } else {
+      this._paramIndices = [];
+      this._params = [];
+      this._schematic = new Schematic();
+    }
+  }
+
+  private _initFromFbs(fbs: FbsContinuationSpec): void {
+    this._paramIndices = Array.from({ length: fbs.paramIndicesLength() }, (_, i) => {
+      const item = fbs.paramIndices(i);
+      return item ? new ParamIndices(item) : new ParamIndices();
+    });
+    this._params = Array.from({ length: fbs.paramsLength() }, (_, i) => {
+      const item = fbs.params(i);
+      return item ? new TaskParameter(item) : new TaskParameter();
+    });
+    const schematicVal = fbs.schematic();
+    this._schematic = schematicVal ? new Schematic(schematicVal) : new Schematic();
+  }
+
+  get paramIndices(): ParamIndices[] {
+    return this._paramIndices;
+  }
+
+  set paramIndices(value: ParamIndices[]) {
+    this._paramIndices = value;
+  }
+
+  get params(): TaskParameter[] {
+    return this._params;
+  }
+
+  set params(value: TaskParameter[]) {
+    this._params = value;
+  }
+
+  get schematic(): Schematic {
+    return this._schematic;
+  }
+
+  set schematic(value: Schematic) {
+    this._schematic = value;
+  }
+
+  toFbsT(): FbsContinuationSpecT {
+    const t = new FbsContinuationSpecT();
+    t.paramIndices = this._paramIndices.map(item => item.toFbsT());
+    t.params = this._params.map(item => item.toFbsT());
+    t.schematic = this._schematic.toFbsT();
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+}
 
 export class DeprecatedRunSpec {
   private _paramIndices!: ParamIndices[];
@@ -763,95 +931,6 @@ export class RunSpec {
     t.persist = this._persist;
     t.priority = this._priority;
     t.schematic = this._schematic.toFbsT();
-    return t;
-  }
-
-  toBytes(): Uint8Array {
-    const builder = new flatbuffers.Builder();
-    const offset = this.toFbsT().pack(builder);
-    builder.finishSizePrefixed(offset);
-    return builder.asUint8Array();
-  }
-}
-
-export class Schematic {
-  private _attributes!: AttributePair[];
-
-  private _edges!: Edge[];
-
-  private _name!: string | null;
-
-  private _nodes!: Node[];
-
-  constructor(arg?: FbsSchematic | Uint8Array) {
-    if (arg instanceof Uint8Array) {
-      const buf = new flatbuffers.ByteBuffer(arg);
-      const fbs = FbsSchematic.getSizePrefixedRootAsSchematic(buf);
-      this._initFromFbs(fbs);
-    } else if (arg instanceof FbsSchematic) {
-      this._initFromFbs(arg);
-    } else {
-      this._attributes = [];
-      this._edges = [];
-      this._name = null;
-      this._nodes = [];
-    }
-  }
-
-  private _initFromFbs(fbs: FbsSchematic): void {
-    this._attributes = Array.from({ length: fbs.attributesLength() }, (_, i) => {
-      const item = fbs.attributes(i);
-      return item ? new AttributePair(item) : new AttributePair();
-    });
-    this._edges = Array.from({ length: fbs.edgesLength() }, (_, i) => {
-      const item = fbs.edges(i);
-      return item ? new Edge(item) : new Edge();
-    });
-    this._name = fbs.name();
-    this._nodes = Array.from({ length: fbs.nodesLength() }, (_, i) => {
-      const item = fbs.nodes(i);
-      return item ? new Node(item) : new Node();
-    });
-  }
-
-  get attributes(): AttributePair[] {
-    return this._attributes;
-  }
-
-  set attributes(value: AttributePair[]) {
-    this._attributes = value;
-  }
-
-  get edges(): Edge[] {
-    return this._edges;
-  }
-
-  set edges(value: Edge[]) {
-    this._edges = value;
-  }
-
-  get name(): string | null {
-    return this._name;
-  }
-
-  set name(value: string | null) {
-    this._name = value;
-  }
-
-  get nodes(): Node[] {
-    return this._nodes;
-  }
-
-  set nodes(value: Node[]) {
-    this._nodes = value;
-  }
-
-  toFbsT(): FbsSchematicT {
-    const t = new FbsSchematicT();
-    t.attributes = this._attributes.map(item => item.toFbsT());
-    t.edges = this._edges.map(item => item.toFbsT());
-    t.name = this._name;
-    t.nodes = this._nodes.map(item => item.toFbsT());
     return t;
   }
 

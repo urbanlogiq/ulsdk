@@ -62,7 +62,7 @@ use crate::types::generated::id_generated::{
     PinnedObjectId as FbsPinnedObjectId, StreamId as FbsStreamId,
 };
 use crate::types::generated::job_generated::{
-    DeprecatedRunSpec as FbsDeprecatedRunSpec,
+    ContinuationSpec as FbsContinuationSpec, DeprecatedRunSpec as FbsDeprecatedRunSpec,
     DeprecatedTaskParameter as FbsDeprecatedTaskParameter, Edge as FbsEdge,
     EmbeddedTable as FbsEmbeddedTable, Job as FbsJob, Node as FbsNode,
     ParamIndices as FbsParamIndices, RunSpec as FbsRunSpec, Schematic as FbsSchematic,
@@ -111,9 +111,9 @@ use crate::types::id::{
     ObjectNamespace, PinnedObjectId, StreamId,
 };
 use crate::types::job::{
-    DeprecatedRunSpec, DeprecatedTaskParameter, Edge, EmbeddedTable, Job, Node, ParamIndices,
-    RunSpec, Schematic, Status, Task, TaskErrorTy, TaskList, TaskParameter, TaskParameterValue,
-    TaskPriority, TaskRunFlags,
+    ContinuationSpec, DeprecatedRunSpec, DeprecatedTaskParameter, Edge, EmbeddedTable, Job, Node,
+    ParamIndices, RunSpec, Schematic, Status, Task, TaskErrorTy, TaskList, TaskParameter,
+    TaskParameterValue, TaskPriority, TaskRunFlags,
 };
 use crate::types::object::{
     DataCatalogObject, DataCatalogObjectFlags, DataCatalogObjectTy, ObjectIdList, ObjectIdPair,

@@ -128,6 +128,7 @@ from .generated.Bool import Bool as FbsBool
 from .generated.Buffer import Buffer as FbsBuffer
 from .generated.ColumnGroupId import ColumnGroupId as FbsColumnGroupId
 from .generated.ContentId import ContentId as FbsContentId
+from .generated.ContinuationSpec import ContinuationSpec as FbsContinuationSpec
 from .generated.DataStateId import DataStateId as FbsDataStateId
 from .generated.Date import Date as FbsDate
 from .generated.Decimal import Decimal as FbsDecimal
@@ -334,6 +335,233 @@ class TaskParameterValue:
         if type(self.value) is not type(other.value):
             return False
         return self.value == other.value
+
+@dataclass
+class Schematic:
+    attributes: "List[AttributePair]"
+
+    edges: "List[Edge]"
+
+    name: Optional["str"]
+
+    nodes: "List[Node]"
+
+    @classmethod
+    def from_fbs(cls, o: FbsSchematic) -> Self:
+        attributes = list()
+        if not o.AttributesIsNone():
+            for i in range(o.AttributesLength()):
+                attributes_val = None
+                attributes_obj = o.Attributes(i)
+                if attributes_obj is not None:
+                    attributes_val = AttributePair.from_fbs(attributes_obj)
+                attributes.append(attributes_val)
+        edges = list()
+        if not o.EdgesIsNone():
+            for i in range(o.EdgesLength()):
+                edges_val = None
+                edges_obj = o.Edges(i)
+                if edges_obj is not None:
+                    edges_val = Edge.from_fbs(edges_obj)
+                edges.append(edges_val)
+        name = None
+        name_str = o.Name()
+        if name_str is not None:
+            name = name_str.decode('utf-8')
+        nodes = list()
+        if not o.NodesIsNone():
+            for i in range(o.NodesLength()):
+                nodes_val = None
+                nodes_obj = o.Nodes(i)
+                if nodes_obj is not None:
+                    nodes_val = Node.from_fbs(nodes_obj)
+                nodes.append(nodes_val)
+        return cls(attributes, edges, name, nodes)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsSchematic.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.Schematic import (
+            Start,
+            AddAttributes,
+            StartAttributesVector,
+            AddEdges,
+            StartEdgesVector,
+            AddName,
+            AddNodes,
+            StartNodesVector,
+            End,
+        )
+        attributes_offsets = list()
+        for value in self.attributes:
+            attributes_offsets.append(value.serialize_to(builder))
+        StartAttributesVector(builder, len(self.attributes))
+        for i in reversed(range(len(self.attributes))):
+            builder.PrependUOffsetTRelative(attributes_offsets[i])
+        attributes_offset = builder.EndVector()
+        edges_offsets = list()
+        for value in self.edges:
+            edges_offsets.append(value.serialize_to(builder))
+        StartEdgesVector(builder, len(self.edges))
+        for i in reversed(range(len(self.edges))):
+            builder.PrependUOffsetTRelative(edges_offsets[i])
+        edges_offset = builder.EndVector()
+        name_offset = None
+        if self.name is not None:
+            name_offset = builder.CreateString(self.name)
+        nodes_offsets = list()
+        for value in self.nodes:
+            nodes_offsets.append(value.serialize_to(builder))
+        StartNodesVector(builder, len(self.nodes))
+        for i in reversed(range(len(self.nodes))):
+            builder.PrependUOffsetTRelative(nodes_offsets[i])
+        nodes_offset = builder.EndVector()
+
+        Start(builder)
+        AddAttributes(builder, attributes_offset)
+        AddEdges(builder, edges_offset)
+        if name_offset is not None:
+            AddName(builder, name_offset)
+        AddNodes(builder, nodes_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        attributes = []
+        edges = []
+        name = ""
+        nodes = []
+        return cls(attributes, edges, name, nodes)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        if len(self.attributes) != len(other.attributes):
+            return False
+        for i in range(len(self.attributes)):
+            eq = eq and self.attributes[i] == other.attributes[i]
+        if len(self.edges) != len(other.edges):
+            return False
+        for i in range(len(self.edges)):
+            eq = eq and self.edges[i] == other.edges[i]
+        eq = eq and self.name == other.name
+        if len(self.nodes) != len(other.nodes):
+            return False
+        for i in range(len(self.nodes)):
+            eq = eq and self.nodes[i] == other.nodes[i]
+
+        return eq
+
+@dataclass
+class ContinuationSpec:
+    """ Insert this graph immediately after a task in its existing job.
+     Parameter indices refer to this request's parameter array.
+    """
+
+    param_indices: "List[ParamIndices]"
+
+    params: "List[TaskParameter]"
+
+    schematic: "Schematic"
+
+    @classmethod
+    def from_fbs(cls, o: FbsContinuationSpec) -> Self:
+        param_indices = list()
+        if not o.ParamIndicesIsNone():
+            for i in range(o.ParamIndicesLength()):
+                param_indices_val = None
+                param_indices_obj = o.ParamIndices(i)
+                if param_indices_obj is not None:
+                    param_indices_val = ParamIndices.from_fbs(param_indices_obj)
+                param_indices.append(param_indices_val)
+        params = list()
+        if not o.ParamsIsNone():
+            for i in range(o.ParamsLength()):
+                params_val = None
+                params_obj = o.Params(i)
+                if params_obj is not None:
+                    params_val = TaskParameter.from_fbs(params_obj)
+                params.append(params_val)
+        schematic_obj = o.Schematic()
+        if schematic_obj is not None:
+            schematic = Schematic.from_fbs(schematic_obj)
+        else:
+            raise ValueError("Schematic is required")
+        return cls(param_indices, params, schematic)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsContinuationSpec.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.ContinuationSpec import (
+            Start,
+            AddParamIndices,
+            StartParamIndicesVector,
+            AddParams,
+            StartParamsVector,
+            AddSchematic,
+            End,
+        )
+        param_indices_offsets = list()
+        for value in self.param_indices:
+            param_indices_offsets.append(value.serialize_to(builder))
+        StartParamIndicesVector(builder, len(self.param_indices))
+        for i in reversed(range(len(self.param_indices))):
+            builder.PrependUOffsetTRelative(param_indices_offsets[i])
+        param_indices_offset = builder.EndVector()
+        params_offsets = list()
+        for value in self.params:
+            params_offsets.append(value.serialize_to(builder))
+        StartParamsVector(builder, len(self.params))
+        for i in reversed(range(len(self.params))):
+            builder.PrependUOffsetTRelative(params_offsets[i])
+        params_offset = builder.EndVector()
+        schematic_offset = self.schematic.serialize_to(builder)
+
+        Start(builder)
+        AddParamIndices(builder, param_indices_offset)
+        AddParams(builder, params_offset)
+        AddSchematic(builder, schematic_offset)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        param_indices = []
+        params = []
+        schematic = Schematic.make_default()
+        return cls(param_indices, params, schematic)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        if len(self.param_indices) != len(other.param_indices):
+            return False
+        for i in range(len(self.param_indices)):
+            eq = eq and self.param_indices[i] == other.param_indices[i]
+        if len(self.params) != len(other.params):
+            return False
+        for i in range(len(self.params)):
+            eq = eq and self.params[i] == other.params[i]
+        eq = eq and self.schematic == other.schematic
+
+        return eq
 
 @dataclass
 class DeprecatedRunSpec:
@@ -1029,131 +1257,6 @@ class RunSpec:
         eq = eq and self.persist == other.persist
         eq = eq and self.priority == other.priority
         eq = eq and self.schematic == other.schematic
-
-        return eq
-
-@dataclass
-class Schematic:
-    attributes: "List[AttributePair]"
-
-    edges: "List[Edge]"
-
-    name: Optional["str"]
-
-    nodes: "List[Node]"
-
-    @classmethod
-    def from_fbs(cls, o: FbsSchematic) -> Self:
-        attributes = list()
-        if not o.AttributesIsNone():
-            for i in range(o.AttributesLength()):
-                attributes_val = None
-                attributes_obj = o.Attributes(i)
-                if attributes_obj is not None:
-                    attributes_val = AttributePair.from_fbs(attributes_obj)
-                attributes.append(attributes_val)
-        edges = list()
-        if not o.EdgesIsNone():
-            for i in range(o.EdgesLength()):
-                edges_val = None
-                edges_obj = o.Edges(i)
-                if edges_obj is not None:
-                    edges_val = Edge.from_fbs(edges_obj)
-                edges.append(edges_val)
-        name = None
-        name_str = o.Name()
-        if name_str is not None:
-            name = name_str.decode('utf-8')
-        nodes = list()
-        if not o.NodesIsNone():
-            for i in range(o.NodesLength()):
-                nodes_val = None
-                nodes_obj = o.Nodes(i)
-                if nodes_obj is not None:
-                    nodes_val = Node.from_fbs(nodes_obj)
-                nodes.append(nodes_val)
-        return cls(attributes, edges, name, nodes)
-
-    @classmethod
-    def from_bytes(cls, data: bytes) -> Self:
-        deprefixed = RemoveSizePrefix(data, 0)
-        o = FbsSchematic.GetRootAs(deprefixed[0], deprefixed[1])
-        return cls.from_fbs(o)
-
-    def serialize_to(self, builder: Builder) -> int:
-        from .generated.Schematic import (
-            Start,
-            AddAttributes,
-            StartAttributesVector,
-            AddEdges,
-            StartEdgesVector,
-            AddName,
-            AddNodes,
-            StartNodesVector,
-            End,
-        )
-        attributes_offsets = list()
-        for value in self.attributes:
-            attributes_offsets.append(value.serialize_to(builder))
-        StartAttributesVector(builder, len(self.attributes))
-        for i in reversed(range(len(self.attributes))):
-            builder.PrependUOffsetTRelative(attributes_offsets[i])
-        attributes_offset = builder.EndVector()
-        edges_offsets = list()
-        for value in self.edges:
-            edges_offsets.append(value.serialize_to(builder))
-        StartEdgesVector(builder, len(self.edges))
-        for i in reversed(range(len(self.edges))):
-            builder.PrependUOffsetTRelative(edges_offsets[i])
-        edges_offset = builder.EndVector()
-        name_offset = None
-        if self.name is not None:
-            name_offset = builder.CreateString(self.name)
-        nodes_offsets = list()
-        for value in self.nodes:
-            nodes_offsets.append(value.serialize_to(builder))
-        StartNodesVector(builder, len(self.nodes))
-        for i in reversed(range(len(self.nodes))):
-            builder.PrependUOffsetTRelative(nodes_offsets[i])
-        nodes_offset = builder.EndVector()
-
-        Start(builder)
-        AddAttributes(builder, attributes_offset)
-        AddEdges(builder, edges_offset)
-        if name_offset is not None:
-            AddName(builder, name_offset)
-        AddNodes(builder, nodes_offset)
-        return End(builder)
-
-    def to_bytes(self) -> bytes:
-        builder = Builder(0)
-        offset = self.serialize_to(builder)
-        builder.FinishSizePrefixed(offset)
-        return builder.Output()
-
-    @classmethod
-    def make_default(cls) -> Self:
-        attributes = []
-        edges = []
-        name = ""
-        nodes = []
-        return cls(attributes, edges, name, nodes)
-
-    def __eq__(self, other) -> bool:
-        eq = True
-        if len(self.attributes) != len(other.attributes):
-            return False
-        for i in range(len(self.attributes)):
-            eq = eq and self.attributes[i] == other.attributes[i]
-        if len(self.edges) != len(other.edges):
-            return False
-        for i in range(len(self.edges)):
-            eq = eq and self.edges[i] == other.edges[i]
-        eq = eq and self.name == other.name
-        if len(self.nodes) != len(other.nodes):
-            return False
-        for i in range(len(self.nodes)):
-            eq = eq and self.nodes[i] == other.nodes[i]
 
         return eq
 

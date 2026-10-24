@@ -15,7 +15,8 @@ use crate::request_context::{ParamMap, RequestContext};
 use crate::{FbsSerde, read_arrow_ipc, read_arrow_schema, write_arrow_ipc};
 
 use crate::types::id::ObjectId;
-use crate::types::job::{Job, RunSpec, Task};
+use crate::types::job::{ContinuationSpec, Job, RunSpec, Task};
+use crate::types::object::ObjectIdList;
 
 /// Create a new schematic evaluator job
 ///
@@ -76,6 +77,30 @@ pub async fn get_task(
     let path = "/v1/api/ulv2/schematicevaluator/tasks/:id".replace(":id", &id.to_string());
     let res = ctx.get(&path, None, None).await?;
     crate::types::Task::from_fbs_bytes(res.as_slice()).map_err(Error::from)
+}
+
+/// Insert an inline graph immediately after this task. Exact repeats return 409.
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+/// * `id` - The task after which to insert the graph
+/// * `continuation` - The inline schematic and its parameters
+///
+/// Returns
+/// * The created task IDs in schematic node order
+pub async fn set_graph_continuation(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+    continuation: ContinuationSpec,
+) -> Result<ObjectIdList, Error> {
+    let path =
+        "/v1/api/ulv2/schematicevaluator/tasks/:id/continuations".replace(":id", &id.to_string());
+    let body = Bytes::from(continuation.to_fbs_bytes());
+    let res = ctx
+        .post(&path, body, "application/octet-stream", None, None)
+        .await?;
+    crate::types::ObjectIdList::from_fbs_bytes(res.as_slice()).map_err(Error::from)
 }
 
 #[cfg(test)]
@@ -188,6 +213,46 @@ mod tests {
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
             ctx.set_response(expected_bytes.clone());
             let result = get_task(&ctx, p0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
+    }
+
+    #[tokio::test]
+    async fn test_set_graph_continuation() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let body = crate::types::ContinuationSpec::default();
+            let expected = ObjectIdList::default();
+            let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
+            ctx.set_response(expected_bytes.clone());
+            let result = set_graph_continuation(&ctx, p0, body).await;
             let result = match result {
                 Ok(r) => r,
                 Err(e) => {

@@ -15,7 +15,13 @@ from urllib.parse import quote_plus
 from uuid import UUID
 from ..request_context import RequestContext
 from ..types.id import ObjectId
-from ..types.job import Job, RunSpec, Task
+from ..types.job import (
+    ContinuationSpec,
+    Job,
+    RunSpec,
+    Task,
+)
+from ..types.object import ObjectIdList
 
 def create_job(
     ctx: RequestContext,
@@ -86,3 +92,28 @@ def get_task(
     headers = dict()
     res = ctx.get(path, params=params, headers=headers)
     return Task.from_bytes(res)
+
+def set_graph_continuation(
+    ctx: RequestContext,
+    id_: "ObjectId",
+    continuation: ContinuationSpec,
+) -> ObjectIdList:
+    """Insert an inline graph immediately after this task. Exact repeats return 409.
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+    id_: "ObjectId" -- The task after which to insert the graph
+    continuation: ContinuationSpec -- The inline schematic and its parameters
+
+    Returns:
+    The created task IDs in schematic node order
+    """
+
+    path = "/v1/api/ulv2/schematicevaluator/tasks/:id/continuations"
+    path = path.replace(":id", str(id_), 1)
+
+    params = dict()
+    headers = dict()
+    body = continuation.to_bytes()
+    res = ctx.post(path, body=body, mimetype="application/octet-stream", params=params, headers=headers)
+    return ObjectIdList.from_bytes(res)

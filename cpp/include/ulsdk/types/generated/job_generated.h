@@ -51,6 +51,9 @@ struct JobBuilder;
 struct RunSpec;
 struct RunSpecBuilder;
 
+struct ContinuationSpec;
+struct ContinuationSpecBuilder;
+
 struct DeprecatedTaskParameter;
 struct DeprecatedTaskParameterBuilder;
 
@@ -1389,6 +1392,97 @@ inline ::flatbuffers::Offset<RunSpec> CreateRunSpecDirect(
       priority,
       notify,
       attributes__);
+}
+
+/// Insert this graph immediately after a task in its existing job.
+/// Parameter indices refer to this request's parameter array.
+struct ContinuationSpec FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ContinuationSpecBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SCHEMATIC = 4,
+    VT_PARAM_INDICES = 6,
+    VT_PARAMS = 8
+  };
+  const Schematic *schematic() const {
+    return GetPointer<const Schematic *>(VT_SCHEMATIC);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<ParamIndices>> *param_indices() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<ParamIndices>> *>(VT_PARAM_INDICES);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<TaskParameter>> *params() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<TaskParameter>> *>(VT_PARAMS);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_SCHEMATIC) &&
+           verifier.VerifyTable(schematic()) &&
+           VerifyOffsetRequired(verifier, VT_PARAM_INDICES) &&
+           verifier.VerifyVector(param_indices()) &&
+           verifier.VerifyVectorOfTables(param_indices()) &&
+           VerifyOffsetRequired(verifier, VT_PARAMS) &&
+           verifier.VerifyVector(params()) &&
+           verifier.VerifyVectorOfTables(params()) &&
+           verifier.EndTable();
+  }
+};
+
+struct ContinuationSpecBuilder {
+  typedef ContinuationSpec Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_schematic(::flatbuffers::Offset<Schematic> schematic) {
+    fbb_.AddOffset(ContinuationSpec::VT_SCHEMATIC, schematic);
+  }
+  void add_param_indices(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ParamIndices>>> param_indices) {
+    fbb_.AddOffset(ContinuationSpec::VT_PARAM_INDICES, param_indices);
+  }
+  void add_params(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<TaskParameter>>> params) {
+    fbb_.AddOffset(ContinuationSpec::VT_PARAMS, params);
+  }
+  explicit ContinuationSpecBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<ContinuationSpec> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<ContinuationSpec>(end);
+    fbb_.Required(o, ContinuationSpec::VT_SCHEMATIC);
+    fbb_.Required(o, ContinuationSpec::VT_PARAM_INDICES);
+    fbb_.Required(o, ContinuationSpec::VT_PARAMS);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<ContinuationSpec> CreateContinuationSpec(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<Schematic> schematic = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ParamIndices>>> param_indices = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<TaskParameter>>> params = 0) {
+  ContinuationSpecBuilder builder_(_fbb);
+  builder_.add_params(params);
+  builder_.add_param_indices(param_indices);
+  builder_.add_schematic(schematic);
+  return builder_.Finish();
+}
+
+struct ContinuationSpec::Traits {
+  using type = ContinuationSpec;
+  static auto constexpr Create = CreateContinuationSpec;
+};
+
+inline ::flatbuffers::Offset<ContinuationSpec> CreateContinuationSpecDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<Schematic> schematic = 0,
+    const std::vector<::flatbuffers::Offset<ParamIndices>> *param_indices = nullptr,
+    const std::vector<::flatbuffers::Offset<TaskParameter>> *params = nullptr) {
+  auto param_indices__ = param_indices ? _fbb.CreateVector<::flatbuffers::Offset<ParamIndices>>(*param_indices) : 0;
+  auto params__ = params ? _fbb.CreateVector<::flatbuffers::Offset<TaskParameter>>(*params) : 0;
+  return CreateContinuationSpec(
+      _fbb,
+      schematic,
+      param_indices__,
+      params__);
 }
 
 struct DeprecatedTaskParameter FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

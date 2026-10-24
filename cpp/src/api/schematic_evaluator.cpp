@@ -93,6 +93,28 @@ get_task(
     return ::ul::types::Task(std::get<std::vector<uint8_t>>(res));
 }
 
+Result<::ul::types::ObjectIdList>
+set_graph_continuation(
+    ul::RequestContext &ctx,
+    const ::ul::types::ObjectId &id,
+    const ::ul::types::ContinuationSpec &continuation
+) {
+    std::string path = "/v1/api/ulv2/schematicevaluator/tasks/:id/continuations";
+    const size_t id_idx = path.find(":id");
+    path.replace(id_idx, 3, id.to_string());
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+    const std::vector<uint8_t> body = ::ul::types::to_bytes(continuation);
+    const Result<std::vector<uint8_t>> res = ctx.post(path, body, "application/octet-stream", params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<::ul::types::ObjectIdList>(error);
+    }
+    return ::ul::types::ObjectIdList(std::get<std::vector<uint8_t>>(res));
+}
+
 } // namespace schematic_evaluator
 } // namespace api
 } // namespace ul
