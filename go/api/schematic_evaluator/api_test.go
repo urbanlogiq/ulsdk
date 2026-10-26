@@ -5,6 +5,7 @@
 package schematic_evaluator
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/urbanlogiq/ulsdk"
 	"github.com/urbanlogiq/ulsdk/types/id"
@@ -15,6 +16,7 @@ import (
 )
 
 var _ = fmt.Sprintf
+var _ = json.Marshal
 
 func TestCreateJob(t *testing.T) {
 	ctx := ulsdk.NewTestContextFromEnv()
@@ -65,6 +67,63 @@ func TestGetJob(t *testing.T) {
 			ctx,
 			p0,
 			q0,
+		)
+		if err != nil {
+			time.Sleep(time.Duration(i+1) * time.Second)
+			continue
+		}
+		_ = result
+		success = true
+		break
+	}
+	if !success {
+		t.Fatal("test was unable to complete with retries")
+	}
+}
+
+func TestCancelJob(t *testing.T) {
+	ctx := ulsdk.NewTestContextFromEnv()
+	if ctx == nil {
+		t.Skip("credentials not set, skipping API test")
+	}
+
+	p0 := id.ObjectId{}
+
+	success := false
+	for i := 0; i < 5; i++ {
+		err := CancelJob(
+			ctx,
+			p0,
+		)
+		if err != nil {
+			time.Sleep(time.Duration(i+1) * time.Second)
+			continue
+		}
+		success = true
+		break
+	}
+	if !success {
+		t.Fatal("test was unable to complete with retries")
+	}
+}
+
+func TestGetHealth(t *testing.T) {
+	ctx := ulsdk.NewTestContextFromEnv()
+	if ctx == nil {
+		t.Skip("credentials not set, skipping API test")
+	}
+
+
+	success := false
+	for i := 0; i < 5; i++ {
+		expected := &EvaluatorHealth{}
+		expectedBytes, err := json.Marshal(expected)
+		if err != nil {
+			t.Fatalf("failed to marshal expected: %v", err)
+		}
+		ctx.SetResponse(expectedBytes)
+		result, err := GetHealth(
+			ctx,
 		)
 		if err != nil {
 			time.Sleep(time.Duration(i+1) * time.Second)

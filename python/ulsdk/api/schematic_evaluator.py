@@ -23,11 +23,253 @@ from ..types.job import (
 )
 from ..types.object import ObjectIdList
 
+@dataclass
+class EvaluatorQuota:
+    kind: "str"
+    required_pods: "int"
+    admitted_pods: "int"
+
+    def to_dict(self) -> Dict[str, Any]:
+        o = dict()
+        o["kind"] = self.kind
+        o["required_pods"] = self.required_pods
+        o["admitted_pods"] = self.admitted_pods
+        return o
+
+    @classmethod
+    def from_dict(cls, o: Dict[str, Any]) -> Self:
+        kind = None
+        required_pods = None
+        admitted_pods = None
+
+        for key in o:
+            if key == "kind":
+                kind_var = o[key]
+                assert type(kind_var) is str
+                kind = kind_var
+            elif key == "required_pods":
+                required_pods_var = o[key]
+                assert type(required_pods_var) is int
+                required_pods = required_pods_var
+            elif key == "admitted_pods":
+                admitted_pods_var = o[key]
+                assert type(admitted_pods_var) is int
+                admitted_pods = admitted_pods_var
+
+        assert kind is not None
+        assert required_pods is not None
+        assert admitted_pods is not None
+
+        return cls(kind, required_pods, admitted_pods)
+
+    @classmethod
+    def make_default(cls) -> Self:
+        kind = ""
+        required_pods = 0
+        admitted_pods = 0
+
+        return cls(kind, required_pods, admitted_pods)
+
+@dataclass
+class EvaluatorPool:
+    kind: "str"
+    size: "int"
+    busy: "int"
+
+    def to_dict(self) -> Dict[str, Any]:
+        o = dict()
+        o["kind"] = self.kind
+        o["size"] = self.size
+        o["busy"] = self.busy
+        return o
+
+    @classmethod
+    def from_dict(cls, o: Dict[str, Any]) -> Self:
+        kind = None
+        size = None
+        busy = None
+
+        for key in o:
+            if key == "kind":
+                kind_var = o[key]
+                assert type(kind_var) is str
+                kind = kind_var
+            elif key == "size":
+                size_var = o[key]
+                assert type(size_var) is int
+                size = size_var
+            elif key == "busy":
+                busy_var = o[key]
+                assert type(busy_var) is int
+                busy = busy_var
+
+        assert kind is not None
+        assert size is not None
+        assert busy is not None
+
+        return cls(kind, size, busy)
+
+    @classmethod
+    def make_default(cls) -> Self:
+        kind = ""
+        size = 0
+        busy = 0
+
+        return cls(kind, size, busy)
+
+@dataclass
+class EvaluatorOutstanding:
+    other: "int"
+    archive: "int"
+    program: "int"
+
+    def to_dict(self) -> Dict[str, Any]:
+        o = dict()
+        o["other"] = self.other
+        o["archive"] = self.archive
+        o["program"] = self.program
+        return o
+
+    @classmethod
+    def from_dict(cls, o: Dict[str, Any]) -> Self:
+        other = None
+        archive = None
+        program = None
+
+        for key in o:
+            if key == "other":
+                other_var = o[key]
+                assert type(other_var) is int
+                other = other_var
+            elif key == "archive":
+                archive_var = o[key]
+                assert type(archive_var) is int
+                archive = archive_var
+            elif key == "program":
+                program_var = o[key]
+                assert type(program_var) is int
+                program = program_var
+
+        assert other is not None
+        assert archive is not None
+        assert program is not None
+
+        return cls(other, archive, program)
+
+    @classmethod
+    def make_default(cls) -> Self:
+        other = 0
+        archive = 0
+        program = 0
+
+        return cls(other, archive, program)
+
+@dataclass
+class EvaluatorHealth:
+    kernel: "bool"
+    launcher: "str"
+    capacity_ready: "bool"
+    capacity_error: "str"
+    quotas: "List[EvaluatorQuota]"
+    pools: "List[EvaluatorPool]"
+    outstanding: "EvaluatorOutstanding"
+
+    def to_dict(self) -> Dict[str, Any]:
+        o = dict()
+        o["kernel"] = self.kernel
+        o["launcher"] = self.launcher
+        o["capacity_ready"] = self.capacity_ready
+        o["capacity_error"] = self.capacity_error
+        quotas_list = []
+        for item in self.quotas:
+            quotas_var = item.to_dict()
+            quotas_list.append(quotas_var)
+        o["quotas"] = quotas_list
+        pools_list = []
+        for item in self.pools:
+            pools_var = item.to_dict()
+            pools_list.append(pools_var)
+        o["pools"] = pools_list
+        o["outstanding"] = self.outstanding.to_dict()
+        return o
+
+    @classmethod
+    def from_dict(cls, o: Dict[str, Any]) -> Self:
+        kernel = None
+        launcher = None
+        capacity_ready = None
+        capacity_error = None
+        quotas = None
+        pools = None
+        outstanding = None
+
+        for key in o:
+            if key == "kernel":
+                kernel_var = o[key]
+                assert type(kernel_var) is bool
+                kernel = kernel_var
+            elif key == "launcher":
+                launcher_var = o[key]
+                assert type(launcher_var) is str
+                launcher = launcher_var
+            elif key == "capacity_ready":
+                capacity_ready_var = o[key]
+                assert type(capacity_ready_var) is bool
+                capacity_ready = capacity_ready_var
+            elif key == "capacity_error":
+                capacity_error_var = o[key]
+                assert type(capacity_error_var) is str
+                capacity_error = capacity_error_var
+            elif key == "quotas":
+                quotas_var = o[key]
+                assert type(quotas_var) is list
+                quotas = []
+                for item in quotas_var:
+                    quotas_item_var = item
+                    assert type(quotas_item_var) is dict
+                    quotas_item = EvaluatorQuota.from_dict(quotas_item_var)
+                    quotas.append(quotas_item)
+            elif key == "pools":
+                pools_var = o[key]
+                assert type(pools_var) is list
+                pools = []
+                for item in pools_var:
+                    pools_item_var = item
+                    assert type(pools_item_var) is dict
+                    pools_item = EvaluatorPool.from_dict(pools_item_var)
+                    pools.append(pools_item)
+            elif key == "outstanding":
+                outstanding_var = o[key]
+                assert type(outstanding_var) is dict
+                outstanding = EvaluatorOutstanding.from_dict(outstanding_var)
+
+        assert kernel is not None
+        assert launcher is not None
+        assert capacity_ready is not None
+        assert capacity_error is not None
+        assert quotas is not None
+        assert pools is not None
+        assert outstanding is not None
+
+        return cls(kernel, launcher, capacity_ready, capacity_error, quotas, pools, outstanding)
+
+    @classmethod
+    def make_default(cls) -> Self:
+        kernel = True
+        launcher = ""
+        capacity_ready = True
+        capacity_error = ""
+        quotas = []
+        pools = []
+        outstanding = EvaluatorOutstanding.make_default()
+
+        return cls(kernel, launcher, capacity_ready, capacity_error, quotas, pools, outstanding)
+
 def create_job(
     ctx: RequestContext,
     job: RunSpec,
 ) -> ObjectId:
-    """Create a new schematic evaluator job
+    """Create a new schematic evaluator job. An optional Idempotency-Key HTTP header (1 to 256 bytes) returns the same job for the same caller and RunSpec. Reusing a key with another RunSpec is refused.
 
     Arguments:
     ctx: RequestContext -- A request context object
@@ -70,6 +312,44 @@ def get_job(
     headers = dict()
     res = ctx.get(path, params=params, headers=headers)
     return Job.from_bytes(res)
+
+def cancel_job(
+    ctx: RequestContext,
+    id_: "ObjectId",
+) -> None:
+    """Cancel the job with the given ID: every task of it that has not ended is ended with `cancelled`. The intent is recorded at once and carried out by the evaluator; a task that completed before the intent arrived stays complete.
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+    id_: "ObjectId" -- The ID of the job to cancel
+    """
+
+    path = "/v1/api/ulv2/schematicevaluator/jobs/:id"
+    path = path.replace(":id", str(id_), 1)
+
+    params = dict()
+    headers = dict()
+    ctx.delete(path, params=params, headers=headers)
+    return
+
+def get_health(
+    ctx: RequestContext,
+) -> EvaluatorHealth:
+    """The evaluator's own state: whether the answering pod runs the kernel, its pools by task kind, the work still outstanding by kind, and the launcher it starts bundle runs with.
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+
+    Returns:
+    The evaluator's state
+    """
+
+    path = "/v1/api/ulv2/schematicevaluator/health"
+    params = dict()
+    headers = dict()
+    res = ctx.get(path, params=params, headers=headers)
+    res_dict = json.loads(res)
+    return EvaluatorHealth.from_dict(res_dict)
 
 def get_task(
     ctx: RequestContext,

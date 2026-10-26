@@ -79,6 +79,42 @@ test_get_job(ul::RequestContext &rctx) {
 ApiTest test_get_job_obj(test_get_job, "schematic_evaluator::get_job", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
+test_cancel_job(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    return ul::api::schematic_evaluator::cancel_job(
+        ctx,
+        p0
+    );
+}
+
+ApiTest test_cancel_job_obj(test_cancel_job, "schematic_evaluator::cancel_job", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
+test_get_health(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::api::schematic_evaluator::EvaluatorHealth expected = ::ul::api::schematic_evaluator::EvaluatorHealth();
+    const std::vector<uint8_t> expected_bytes = ::ul::api::schematic_evaluator::to_bytes(expected);
+    ctx.set_response(expected_bytes);
+    auto result = ul::api::schematic_evaluator::get_health(
+        ctx
+    );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    const ::ul::api::schematic_evaluator::EvaluatorHealth result_value = std::get<::ul::api::schematic_evaluator::EvaluatorHealth>(result);
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
+}
+
+ApiTest test_get_health_obj(test_get_health, "schematic_evaluator::get_health", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
 test_get_task(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");

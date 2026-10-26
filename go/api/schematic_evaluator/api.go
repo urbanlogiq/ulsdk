@@ -5,6 +5,7 @@
 package schematic_evaluator
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/urbanlogiq/ulsdk/api"
 	"github.com/urbanlogiq/ulsdk/types/id"
@@ -15,8 +16,36 @@ import (
 
 var _ = fmt.Errorf
 
+type EvaluatorQuota struct {
+	Kind string `json:"kind"`
+	RequiredPods int64 `json:"required_pods"`
+	AdmittedPods int64 `json:"admitted_pods"`
+}
+
+type EvaluatorPool struct {
+	Kind string `json:"kind"`
+	Size int64 `json:"size"`
+	Busy int64 `json:"busy"`
+}
+
+type EvaluatorOutstanding struct {
+	Other int64 `json:"other"`
+	Archive int64 `json:"archive"`
+	Program int64 `json:"program"`
+}
+
+type EvaluatorHealth struct {
+	Kernel bool `json:"kernel"`
+	Launcher string `json:"launcher"`
+	CapacityReady bool `json:"capacity_ready"`
+	CapacityError string `json:"capacity_error"`
+	Quotas []EvaluatorQuota `json:"quotas"`
+	Pools []EvaluatorPool `json:"pools"`
+	Outstanding EvaluatorOutstanding `json:"outstanding"`
+}
+
 // CreateJob -
-// Create a new schematic evaluator job
+// Create a new schematic evaluator job. An optional Idempotency-Key HTTP header (1 to 256 bytes) returns the same job for the same caller and RunSpec. Reusing a key with another RunSpec is refused.
 func CreateJob(ctx api.RequestContext, job *job.RunSpec) (*id.ObjectId, error) {
 	path := "/v1/api/ulv2/schematicevaluator/jobs"
 
@@ -58,6 +87,40 @@ func GetJob(ctx api.RequestContext, idParam id.ObjectId, timeout *int64) (*job.J
 		return nil, fmt.Errorf("failed to deserialize response: %w", err)
 	}
 	return result, nil
+}
+
+// CancelJob -
+// Cancel the job with the given ID: every task of it that has not ended is ended with `cancelled`. The intent is recorded at once and carried out by the evaluator; a task that completed before the intent arrived stays complete.
+func CancelJob(ctx api.RequestContext, idParam id.ObjectId) error {
+	path := "/v1/api/ulv2/schematicevaluator/jobs/:id"
+	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
+
+	params := [][2]string{}
+
+	headers := map[string]string{}
+
+	_, err := ctx.Delete(path, params, headers)
+	return err
+}
+
+// GetHealth -
+// The evaluator's own state: whether the answering pod runs the kernel, its pools by task kind, the work still outstanding by kind, and the launcher it starts bundle runs with.
+func GetHealth(ctx api.RequestContext) (*EvaluatorHealth, error) {
+	path := "/v1/api/ulv2/schematicevaluator/health"
+
+	params := [][2]string{}
+
+	headers := map[string]string{}
+
+	res, err := ctx.Get(path, params, headers)
+	if err != nil {
+		return nil, err
+	}
+	var result EvaluatorHealth
+	if err := json.Unmarshal(res, &result); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal JSON response: %w", err)
+	}
+	return &result, nil
 }
 
 // GetTask -

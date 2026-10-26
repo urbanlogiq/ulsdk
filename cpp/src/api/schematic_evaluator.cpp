@@ -29,6 +29,447 @@ namespace ul {
 namespace api {
 namespace schematic_evaluator {
 
+EvaluatorQuota::EvaluatorQuota(const struct json_value_s *root)
+    : kind_(std::string())
+    , required_pods_(0)
+    , admitted_pods_(0) {
+    if (root->type != json_type_object) {
+        throw std::runtime_error("expected json value to be of type object");
+    }
+
+    const struct json_object_s *object = static_cast<const struct json_object_s *>(root->payload);
+    const struct json_object_element_s *e = object->start;
+
+    while (e != nullptr) {
+        if (std::strcmp(e->name->string, "kind") == 0) {
+            const struct json_value_s *evaluator_quota_value = e->value;
+
+            if (evaluator_quota_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *kind__str = static_cast<const struct json_string_s *>(evaluator_quota_value->payload);
+            kind_ = std::string(kind__str->string);
+        } else if (std::strcmp(e->name->string, "required_pods") == 0) {
+            const struct json_value_s *evaluator_quota_value = e->value;
+
+            if (evaluator_quota_value->type != json_type_number) {
+                throw std::runtime_error("expected field to be of type number");
+            }
+
+            const struct json_number_s *required_pods__num = static_cast<const struct json_number_s *>(evaluator_quota_value->payload);
+            required_pods_ = std::stoll(required_pods__num->number);
+        } else if (std::strcmp(e->name->string, "admitted_pods") == 0) {
+            const struct json_value_s *evaluator_quota_value = e->value;
+
+            if (evaluator_quota_value->type != json_type_number) {
+                throw std::runtime_error("expected field to be of type number");
+            }
+
+            const struct json_number_s *admitted_pods__num = static_cast<const struct json_number_s *>(evaluator_quota_value->payload);
+            admitted_pods_ = std::stoll(admitted_pods__num->number);
+        }
+
+        e = e->next;
+    }
+}
+
+bool
+EvaluatorQuota::operator==(const EvaluatorQuota&rhs) const {
+    if (this->kind_ != rhs.kind_) {
+        return false;
+    }
+    if (this->required_pods_ != rhs.required_pods_) {
+        return false;
+    }
+    if (this->admitted_pods_ != rhs.admitted_pods_) {
+        return false;
+    }
+    return true;
+}
+
+std::vector<uint8_t>
+to_bytes(const EvaluatorQuota &o) {
+    std::stringstream ss;
+    ss << "{";
+    ss << "\"kind\":";
+    ss << "\"" << o.kind_ << "\"";
+    ss << ",";
+
+    ss << "\"required_pods\":";
+    ss << o.required_pods_;
+    ss << ",";
+
+    ss << "\"admitted_pods\":";
+    ss << o.admitted_pods_;
+    std::string str = ss.str();
+    if (str.back() == ',') {
+        str.pop_back();
+    }
+    str.push_back('}');
+    return std::vector<uint8_t>(str.begin(), str.end());
+}
+
+EvaluatorPool::EvaluatorPool(const struct json_value_s *root)
+    : kind_(std::string())
+    , size_(0)
+    , busy_(0) {
+    if (root->type != json_type_object) {
+        throw std::runtime_error("expected json value to be of type object");
+    }
+
+    const struct json_object_s *object = static_cast<const struct json_object_s *>(root->payload);
+    const struct json_object_element_s *e = object->start;
+
+    while (e != nullptr) {
+        if (std::strcmp(e->name->string, "kind") == 0) {
+            const struct json_value_s *evaluator_pool_value = e->value;
+
+            if (evaluator_pool_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *kind__str = static_cast<const struct json_string_s *>(evaluator_pool_value->payload);
+            kind_ = std::string(kind__str->string);
+        } else if (std::strcmp(e->name->string, "size") == 0) {
+            const struct json_value_s *evaluator_pool_value = e->value;
+
+            if (evaluator_pool_value->type != json_type_number) {
+                throw std::runtime_error("expected field to be of type number");
+            }
+
+            const struct json_number_s *size__num = static_cast<const struct json_number_s *>(evaluator_pool_value->payload);
+            size_ = std::stoll(size__num->number);
+        } else if (std::strcmp(e->name->string, "busy") == 0) {
+            const struct json_value_s *evaluator_pool_value = e->value;
+
+            if (evaluator_pool_value->type != json_type_number) {
+                throw std::runtime_error("expected field to be of type number");
+            }
+
+            const struct json_number_s *busy__num = static_cast<const struct json_number_s *>(evaluator_pool_value->payload);
+            busy_ = std::stoll(busy__num->number);
+        }
+
+        e = e->next;
+    }
+}
+
+bool
+EvaluatorPool::operator==(const EvaluatorPool&rhs) const {
+    if (this->kind_ != rhs.kind_) {
+        return false;
+    }
+    if (this->size_ != rhs.size_) {
+        return false;
+    }
+    if (this->busy_ != rhs.busy_) {
+        return false;
+    }
+    return true;
+}
+
+std::vector<uint8_t>
+to_bytes(const EvaluatorPool &o) {
+    std::stringstream ss;
+    ss << "{";
+    ss << "\"kind\":";
+    ss << "\"" << o.kind_ << "\"";
+    ss << ",";
+
+    ss << "\"size\":";
+    ss << o.size_;
+    ss << ",";
+
+    ss << "\"busy\":";
+    ss << o.busy_;
+    std::string str = ss.str();
+    if (str.back() == ',') {
+        str.pop_back();
+    }
+    str.push_back('}');
+    return std::vector<uint8_t>(str.begin(), str.end());
+}
+
+EvaluatorOutstanding::EvaluatorOutstanding(const struct json_value_s *root)
+    : other_(0)
+    , archive_(0)
+    , program_(0) {
+    if (root->type != json_type_object) {
+        throw std::runtime_error("expected json value to be of type object");
+    }
+
+    const struct json_object_s *object = static_cast<const struct json_object_s *>(root->payload);
+    const struct json_object_element_s *e = object->start;
+
+    while (e != nullptr) {
+        if (std::strcmp(e->name->string, "other") == 0) {
+            const struct json_value_s *evaluator_outstanding_value = e->value;
+
+            if (evaluator_outstanding_value->type != json_type_number) {
+                throw std::runtime_error("expected field to be of type number");
+            }
+
+            const struct json_number_s *other__num = static_cast<const struct json_number_s *>(evaluator_outstanding_value->payload);
+            other_ = std::stoll(other__num->number);
+        } else if (std::strcmp(e->name->string, "archive") == 0) {
+            const struct json_value_s *evaluator_outstanding_value = e->value;
+
+            if (evaluator_outstanding_value->type != json_type_number) {
+                throw std::runtime_error("expected field to be of type number");
+            }
+
+            const struct json_number_s *archive__num = static_cast<const struct json_number_s *>(evaluator_outstanding_value->payload);
+            archive_ = std::stoll(archive__num->number);
+        } else if (std::strcmp(e->name->string, "program") == 0) {
+            const struct json_value_s *evaluator_outstanding_value = e->value;
+
+            if (evaluator_outstanding_value->type != json_type_number) {
+                throw std::runtime_error("expected field to be of type number");
+            }
+
+            const struct json_number_s *program__num = static_cast<const struct json_number_s *>(evaluator_outstanding_value->payload);
+            program_ = std::stoll(program__num->number);
+        }
+
+        e = e->next;
+    }
+}
+
+bool
+EvaluatorOutstanding::operator==(const EvaluatorOutstanding&rhs) const {
+    if (this->other_ != rhs.other_) {
+        return false;
+    }
+    if (this->archive_ != rhs.archive_) {
+        return false;
+    }
+    if (this->program_ != rhs.program_) {
+        return false;
+    }
+    return true;
+}
+
+std::vector<uint8_t>
+to_bytes(const EvaluatorOutstanding &o) {
+    std::stringstream ss;
+    ss << "{";
+    ss << "\"other\":";
+    ss << o.other_;
+    ss << ",";
+
+    ss << "\"archive\":";
+    ss << o.archive_;
+    ss << ",";
+
+    ss << "\"program\":";
+    ss << o.program_;
+    std::string str = ss.str();
+    if (str.back() == ',') {
+        str.pop_back();
+    }
+    str.push_back('}');
+    return std::vector<uint8_t>(str.begin(), str.end());
+}
+
+EvaluatorHealth::EvaluatorHealth(const struct json_value_s *root)
+    : kernel_(false)
+    , launcher_(std::string())
+    , capacity_ready_(false)
+    , capacity_error_(std::string())
+    , quotas_()
+    , pools_()
+    , outstanding_(EvaluatorOutstanding()) {
+    if (root->type != json_type_object) {
+        throw std::runtime_error("expected json value to be of type object");
+    }
+
+    const struct json_object_s *object = static_cast<const struct json_object_s *>(root->payload);
+    const struct json_object_element_s *e = object->start;
+
+    while (e != nullptr) {
+        if (std::strcmp(e->name->string, "kernel") == 0) {
+            const struct json_value_s *evaluator_health_value = e->value;
+
+            if (evaluator_health_value->type == json_type_true) {
+                kernel_ = true;
+            } else if (evaluator_health_value->type == json_type_false) {
+                kernel_ = false;
+            } else {
+                throw std::runtime_error("expected field to be of type bool");
+            }
+        } else if (std::strcmp(e->name->string, "launcher") == 0) {
+            const struct json_value_s *evaluator_health_value = e->value;
+
+            if (evaluator_health_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *launcher__str = static_cast<const struct json_string_s *>(evaluator_health_value->payload);
+            launcher_ = std::string(launcher__str->string);
+        } else if (std::strcmp(e->name->string, "capacity_ready") == 0) {
+            const struct json_value_s *evaluator_health_value = e->value;
+
+            if (evaluator_health_value->type == json_type_true) {
+                capacity_ready_ = true;
+            } else if (evaluator_health_value->type == json_type_false) {
+                capacity_ready_ = false;
+            } else {
+                throw std::runtime_error("expected field to be of type bool");
+            }
+        } else if (std::strcmp(e->name->string, "capacity_error") == 0) {
+            const struct json_value_s *evaluator_health_value = e->value;
+
+            if (evaluator_health_value->type != json_type_string) {
+                throw std::runtime_error("expected field to be of type string");
+            }
+
+            const struct json_string_s *capacity_error__str = static_cast<const struct json_string_s *>(evaluator_health_value->payload);
+            capacity_error_ = std::string(capacity_error__str->string);
+        } else if (std::strcmp(e->name->string, "quotas") == 0) {
+            const struct json_value_s *evaluator_health_value = e->value;
+
+            if (evaluator_health_value->type != json_type_array) {
+                throw std::runtime_error("expected field to be of type array");
+            }
+
+            const struct json_array_s *quotas__array = static_cast<const struct json_array_s *>(evaluator_health_value->payload);
+            const struct json_array_element_s *quotas__element = quotas__array->start;
+            std::vector<EvaluatorQuota> quotas__vec = std::vector<EvaluatorQuota>();
+            while (quotas__element != nullptr) {
+                const struct json_value_s *evaluator_health_value_0 = quotas__element->value;
+                EvaluatorQuota quotas__value;
+            if (evaluator_health_value_0->type != json_type_object) {
+                throw std::runtime_error("expected field to be of type object");
+            }
+
+            quotas__value = EvaluatorQuota(evaluator_health_value_0);
+                quotas__vec.push_back(quotas__value);
+                quotas__element = quotas__element->next;
+            }
+            quotas_ = quotas__vec;
+        } else if (std::strcmp(e->name->string, "pools") == 0) {
+            const struct json_value_s *evaluator_health_value = e->value;
+
+            if (evaluator_health_value->type != json_type_array) {
+                throw std::runtime_error("expected field to be of type array");
+            }
+
+            const struct json_array_s *pools__array = static_cast<const struct json_array_s *>(evaluator_health_value->payload);
+            const struct json_array_element_s *pools__element = pools__array->start;
+            std::vector<EvaluatorPool> pools__vec = std::vector<EvaluatorPool>();
+            while (pools__element != nullptr) {
+                const struct json_value_s *evaluator_health_value_0 = pools__element->value;
+                EvaluatorPool pools__value;
+            if (evaluator_health_value_0->type != json_type_object) {
+                throw std::runtime_error("expected field to be of type object");
+            }
+
+            pools__value = EvaluatorPool(evaluator_health_value_0);
+                pools__vec.push_back(pools__value);
+                pools__element = pools__element->next;
+            }
+            pools_ = pools__vec;
+        } else if (std::strcmp(e->name->string, "outstanding") == 0) {
+            const struct json_value_s *evaluator_health_value = e->value;
+
+            if (evaluator_health_value->type != json_type_object) {
+                throw std::runtime_error("expected field to be of type object");
+            }
+
+            outstanding_ = EvaluatorOutstanding(evaluator_health_value);
+        }
+
+        e = e->next;
+    }
+}
+
+bool
+EvaluatorHealth::operator==(const EvaluatorHealth&rhs) const {
+    if (this->kernel_ != rhs.kernel_) {
+        return false;
+    }
+    if (this->launcher_ != rhs.launcher_) {
+        return false;
+    }
+    if (this->capacity_ready_ != rhs.capacity_ready_) {
+        return false;
+    }
+    if (this->capacity_error_ != rhs.capacity_error_) {
+        return false;
+    }
+    if (this->quotas_ != rhs.quotas_) {
+        return false;
+    }
+    if (this->pools_ != rhs.pools_) {
+        return false;
+    }
+    if (this->outstanding_ != rhs.outstanding_) {
+        return false;
+    }
+    return true;
+}
+
+std::vector<uint8_t>
+to_bytes(const EvaluatorHealth &o) {
+    std::stringstream ss;
+    ss << "{";
+    ss << "\"kernel\":";
+    ss << (o.kernel_ ? "true" : "false");
+    ss << ",";
+
+    ss << "\"launcher\":";
+    ss << "\"" << o.launcher_ << "\"";
+    ss << ",";
+
+    ss << "\"capacity_ready\":";
+    ss << (o.capacity_ready_ ? "true" : "false");
+    ss << ",";
+
+    ss << "\"capacity_error\":";
+    ss << "\"" << o.capacity_error_ << "\"";
+    ss << ",";
+
+    ss << "\"quotas\":";
+    ss << "[";
+    for (const auto &i : o.quotas_) {
+        const std::vector<uint8_t> i_serialized = to_bytes(i);
+        const std::string i_str = std::string(i_serialized.begin(), i_serialized.end());
+        ss << i_str;
+        ss << ",";
+    }
+    if (!o.quotas_.empty()) {
+        ss.seekp(-1, ss.cur);
+    }
+    ss << "]";
+    ss << ",";
+
+    ss << "\"pools\":";
+    ss << "[";
+    for (const auto &i : o.pools_) {
+        const std::vector<uint8_t> i_serialized = to_bytes(i);
+        const std::string i_str = std::string(i_serialized.begin(), i_serialized.end());
+        ss << i_str;
+        ss << ",";
+    }
+    if (!o.pools_.empty()) {
+        ss.seekp(-1, ss.cur);
+    }
+    ss << "]";
+    ss << ",";
+
+    ss << "\"outstanding\":";
+    const std::vector<uint8_t> outstanding__serialized = to_bytes(o.outstanding_);
+    const std::string outstanding__str = std::string(outstanding__serialized.begin(), outstanding__serialized.end());
+    ss << outstanding__str;
+    std::string str = ss.str();
+    if (str.back() == ',') {
+        str.pop_back();
+    }
+    str.push_back('}');
+    return std::vector<uint8_t>(str.begin(), str.end());
+}
+
 Result<::ul::types::ObjectId>
 create_job(
     ul::RequestContext &ctx,
@@ -71,6 +512,48 @@ get_job(
         return Result<::ul::types::Job>(error);
     }
     return ::ul::types::Job(std::get<std::vector<uint8_t>>(res));
+}
+
+Result<Void>
+cancel_job(
+    ul::RequestContext &ctx,
+    const ::ul::types::ObjectId &id
+) {
+    std::string path = "/v1/api/ulv2/schematicevaluator/jobs/:id";
+    const size_t id_idx = path.find(":id");
+    path.replace(id_idx, 3, id.to_string());
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+    const auto res = ctx.del(path, params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<Void>(error);
+    }
+    return Result<Void>();
+}
+
+Result<EvaluatorHealth>
+get_health(
+    ul::RequestContext &ctx
+) {
+    std::string path = "/v1/api/ulv2/schematicevaluator/health";
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+    const Result<std::vector<uint8_t>> res = ctx.get(path, params, headers);
+    if (std::holds_alternative<Error>(res)) {
+        const auto error = std::get<Error>(res);
+        return Result<EvaluatorHealth>(error);
+    }
+    const std::vector<uint8_t> res_bytes = std::get<std::vector<uint8_t>>(res);
+    const ul::AutoRelease<struct json_value_s> root = ul::AutoRelease(json_parse_ex(res_bytes.data(), res_bytes.size(), json_parse_flags_allow_json5, NULL, NULL, NULL));
+    if (root == nullptr) {
+        return Result<EvaluatorHealth>(Error("failed to parse JSON"));
+    }
+    return EvaluatorHealth(root.get());
 }
 
 Result<::ul::types::Task>

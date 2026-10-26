@@ -8,6 +8,7 @@ import com.urbanlogiq.ulsdk.Environment;
 import com.urbanlogiq.ulsdk.Region;
 import java.util.UUID;
 import org.junitpioneer.jupiter.RetryingTest;
+import com.urbanlogiq.ulsdk.api.schematicevaluator.EvaluatorHealth;
 
 public final class TestApiSchematicEvaluator {
     @RetryingTest(maxAttempts = 5, suspendForMs = 200)
@@ -54,6 +55,46 @@ public final class TestApiSchematicEvaluator {
             ctx,
             p0,
             q0
+        );
+        org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
+    }
+
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
+    public void testCancelJob() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String caUser = System.getenv("CA_USER");
+        String caAccessKey = System.getenv("CA_ACCESS_KEY");
+        String caSecretKey = System.getenv("CA_SECRET_KEY");
+
+        if (caUser == null || caAccessKey == null || caSecretKey == null) {
+            throw new RuntimeException("user / key not present, cannot run tests");
+        }
+
+        com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
+        com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        com.urbanlogiq.ulsdk.api.schematicevaluator.SchematicEvaluator.cancelJob(
+            ctx,
+            p0
+        );
+    }
+
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
+    public void testGetHealth() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String caUser = System.getenv("CA_USER");
+        String caAccessKey = System.getenv("CA_ACCESS_KEY");
+        String caSecretKey = System.getenv("CA_SECRET_KEY");
+
+        if (caUser == null || caAccessKey == null || caSecretKey == null) {
+            throw new RuntimeException("user / key not present, cannot run tests");
+        }
+
+        com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
+        com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
+        com.urbanlogiq.ulsdk.api.schematicevaluator.EvaluatorHealth expected = new com.urbanlogiq.ulsdk.api.schematicevaluator.EvaluatorHealth();
+        byte[] expectedBytes = new org.json.JSONObject(expected.toMap()).toString().getBytes();
+        ctx.setResponse(expectedBytes);
+        com.urbanlogiq.ulsdk.api.schematicevaluator.EvaluatorHealth result = com.urbanlogiq.ulsdk.api.schematicevaluator.SchematicEvaluator.getHealth(
+            ctx
         );
         org.junit.jupiter.api.Assertions.assertTrue(result.equals(expected));
     }

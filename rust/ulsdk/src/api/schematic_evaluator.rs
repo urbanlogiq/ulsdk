@@ -18,7 +18,39 @@ use crate::types::id::ObjectId;
 use crate::types::job::{ContinuationSpec, Job, RunSpec, Task};
 use crate::types::object::ObjectIdList;
 
-/// Create a new schematic evaluator job
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct EvaluatorQuota {
+    kind: String,
+    required_pods: i64,
+    admitted_pods: i64,
+}
+
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct EvaluatorPool {
+    kind: String,
+    size: i64,
+    busy: i64,
+}
+
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct EvaluatorOutstanding {
+    other: i64,
+    archive: i64,
+    program: i64,
+}
+
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct EvaluatorHealth {
+    kernel: bool,
+    launcher: String,
+    capacity_ready: bool,
+    capacity_error: String,
+    quotas: Vec<EvaluatorQuota>,
+    pools: Vec<EvaluatorPool>,
+    outstanding: EvaluatorOutstanding,
+}
+
+/// Create a new schematic evaluator job. An optional Idempotency-Key HTTP header (1 to 256 bytes) returns the same job for the same caller and RunSpec. Reusing a key with another RunSpec is refused.
 ///
 /// # Arguments
 ///
@@ -59,6 +91,35 @@ pub async fn get_job(
 
     let res = ctx.get(&path, Some(params), None).await?;
     crate::types::Job::from_fbs_bytes(res.as_slice()).map_err(Error::from)
+}
+
+/// Cancel the job with the given ID: every task of it that has not ended is ended with `cancelled`. The intent is recorded at once and carried out by the evaluator; a task that completed before the intent arrived stays complete.
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+/// * `id` - The ID of the job to cancel
+pub async fn cancel_job(
+    ctx: &dyn RequestContext,
+    id: crate::types::id::ObjectId,
+) -> Result<(), Error> {
+    let path = "/v1/api/ulv2/schematicevaluator/jobs/:id".replace(":id", &id.to_string());
+    ctx.delete(&path, None, None).await?;
+    Ok(())
+}
+
+/// The evaluator's own state: whether the answering pod runs the kernel, its pools by task kind, the work still outstanding by kind, and the launcher it starts bundle runs with.
+///
+/// # Arguments
+///
+/// * `ctx` - A request context object
+///
+/// Returns
+/// * The evaluator's state
+pub async fn get_health(ctx: &dyn RequestContext) -> Result<EvaluatorHealth, Error> {
+    let path = "/v1/api/ulv2/schematicevaluator/health";
+    let res = ctx.get(&path, None, None).await?;
+    serde_json::from_slice(&res).map_err(Error::from)
 }
 
 /// Fetch the details of the task with the given ID.
@@ -174,6 +235,76 @@ mod tests {
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
             ctx.set_response(expected_bytes.clone());
             let result = get_job(&ctx, p0, q0).await;
+            let result = match result {
+                Ok(r) => r,
+                Err(e) => {
+                    if i < 4 {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                        continue;
+                    } else {
+                        Err(e).unwrap()
+                    }
+                }
+            };
+            assert_eq!(result, expected);
+            break;
+        }
+    }
+
+    #[tokio::test]
+    async fn test_cancel_job() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+
+        for i in 0..5 {
+            let p0 =
+                crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let result = cancel_job(&ctx, p0).await;
+            if let Err(e) = result {
+                if i < 4 {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
+                    continue;
+                } else {
+                    Err(e).unwrap()
+                }
+            } else {
+                break;
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn test_get_health() {
+        let user = std::env::var("CA_USER").expect("user not present, cannot run tests");
+        let access_key =
+            std::env::var("CA_ACCESS_KEY").expect("access key not present, cannot run tests");
+        let secret_key =
+            std::env::var("CA_SECRET_KEY").expect("secret key not present, cannot run tests");
+        let key = SigningKey::try_new(
+            Uuid::from_str(&user).unwrap(),
+            Region::CA,
+            access_key.as_str(),
+            secret_key.as_str(),
+        )
+        .unwrap();
+        let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
+
+        for i in 0..5 {
+            let expected = EvaluatorHealth::default();
+            let expected_bytes = serde_json::to_vec(&expected).unwrap();
+            ctx.set_response(expected_bytes.clone());
+            let result = get_health(&ctx).await;
             let result = match result {
                 Ok(r) => r,
                 Err(e) => {

@@ -11,8 +11,36 @@ import { ObjectIdList as FbsObjectIdList, ObjectIdListT as ObjectIdList } from '
 import { RunSpec as FbsRunSpec, RunSpecT as RunSpec } from '../../types/generated/run-spec';
 import { Task as FbsTask, TaskT as Task } from '../../types/generated/task';
 
+export interface EvaluatorQuota {
+  kind: string;
+  requiredPods: number;
+  admittedPods: number;
+}
+
+export interface EvaluatorPool {
+  kind: string;
+  size: number;
+  busy: number;
+}
+
+export interface EvaluatorOutstanding {
+  other: number;
+  archive: number;
+  program: number;
+}
+
+export interface EvaluatorHealth {
+  kernel: boolean;
+  launcher: string;
+  capacityReady: boolean;
+  capacityError: string;
+  quotas: EvaluatorQuota[];
+  pools: EvaluatorPool[];
+  outstanding: EvaluatorOutstanding;
+}
+
 /**
- * Create a new schematic evaluator job
+ * Create a new schematic evaluator job. An optional Idempotency-Key HTTP header (1 to 256 bytes) returns the same job for the same caller and RunSpec. Reusing a key with another RunSpec is refused.
  *
  * @param ctx - A request context object
  * @param job - The description of the job to create
@@ -66,6 +94,41 @@ export async function getJob(
   buf.setPosition(buf.position() + flatbuffers.SIZE_PREFIX_LENGTH);
   const fbs = FbsJob.getRootAsJob(buf);
   return fbs.unpack();
+}
+
+/**
+ * Cancel the job with the given ID: every task of it that has not ended is ended with `cancelled`. The intent is recorded at once and carried out by the evaluator; a task that completed before the intent arrived stays complete.
+ *
+ * @param ctx - A request context object
+ * @param id - The ID of the job to cancel
+ */
+export async function cancelJob(
+  ctx: RequestContext,
+  id: ObjectId
+): Promise<void> {
+  let path = '/v1/api/ulv2/schematicevaluator/jobs/:id';
+  path = path.replace(':id', id.toString());
+
+  const params: [string, string][] = [];
+  const headers: Record<string, string> = {};
+
+  await ctx.delete(path, params, headers);
+}
+
+/**
+ * The evaluator's own state: whether the answering pod runs the kernel, its pools by task kind, the work still outstanding by kind, and the launcher it starts bundle runs with.
+ * @returns The evaluator's state
+ */
+export async function getHealth(
+  ctx: RequestContext
+): Promise<EvaluatorHealth> {
+  let path = '/v1/api/ulv2/schematicevaluator/health';
+  const params: [string, string][] = [];
+  const headers: Record<string, string> = {};
+
+  const res = await ctx.get(path, params, headers);
+  const json = JSON.parse(new TextDecoder().decode(res));
+  return json;
 }
 
 /**

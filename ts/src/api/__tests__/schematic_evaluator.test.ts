@@ -42,6 +42,35 @@ describe('getJob', () => {
   });
 });
 
+describe('cancelJob', () => {
+  it('testCancelJob', async () => {
+    const ctx = new TestContext();
+    const p0 = new ObjectId();
+    try {
+          await schematic_evaluator.cancelJob(
+        ctx,
+        p0
+      );
+    } catch (_) {
+      // Expected for mock tests with empty/invalid responses
+    }
+  });
+});
+
+describe('getHealth', () => {
+  it('testGetHealth', async () => {
+    const ctx = new TestContext();
+    ctx.setResponse(new TextEncoder().encode('{}'));
+    try {
+          await schematic_evaluator.getHealth(
+        ctx
+      );
+    } catch (_) {
+      // Expected for mock tests with empty/invalid responses
+    }
+  });
+});
+
 describe('getTask', () => {
   it('testGetTask', async () => {
     const ctx = new TestContext();

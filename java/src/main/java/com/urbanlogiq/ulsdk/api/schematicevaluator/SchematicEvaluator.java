@@ -6,7 +6,7 @@ package com.urbanlogiq.ulsdk.api.schematicevaluator;
 
 public final class SchematicEvaluator {
     /**
-     * Create a new schematic evaluator job
+     * Create a new schematic evaluator job. An optional Idempotency-Key HTTP header (1 to 256 bytes) returns the same job for the same caller and RunSpec. Reusing a key with another RunSpec is refused.
      * 
      * @param ctx A request context object
      * @param job The description of the job to create
@@ -51,6 +51,43 @@ public final class SchematicEvaluator {
 
         byte[] res = ctx.get(path, params, headers);
         return new com.urbanlogiq.ulsdk.types.Job(res);
+    }
+
+    /**
+     * Cancel the job with the given ID: every task of it that has not ended is ended with `cancelled`. The intent is recorded at once and carried out by the evaluator; a task that completed before the intent arrived stays complete.
+     * 
+     * @param ctx A request context object
+     * @param id The ID of the job to cancel
+     */
+    public static void cancelJob(
+        com.urbanlogiq.ulsdk.RequestContext ctx,
+        com.urbanlogiq.ulsdk.types.ObjectId id
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/schematicevaluator/jobs/:id";
+        path = path.replace(":id", id.toString());
+
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+
+        ctx.delete(path, params, headers);
+        return;
+    }
+
+    /**
+     * The evaluator's own state: whether the answering pod runs the kernel, its pools by task kind, the work still outstanding by kind, and the launcher it starts bundle runs with.
+     * @return The evaluator's state
+     */
+    public static com.urbanlogiq.ulsdk.api.schematicevaluator.EvaluatorHealth getHealth(
+        com.urbanlogiq.ulsdk.RequestContext ctx
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/schematicevaluator/health";
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+
+        byte[] res = ctx.get(path, params, headers);
+        String jsonString = new String(res, java.nio.charset.StandardCharsets.UTF_8);
+        org.json.JSONObject json = new org.json.JSONObject(jsonString);
+        return new com.urbanlogiq.ulsdk.api.schematicevaluator.EvaluatorHealth(json);
     }
 
     /**

@@ -5,20 +5,92 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 
+#include "ulsdk/external/json.h"
 #include "ulsdk/request_context.h"
 #include "ulsdk/types/id.h"
 #include "ulsdk/types/job.h"
 #include "ulsdk/types/object.h"
 #include "ulsdk/ulsdk.h"
 
+struct json_value_s;
+
 
 namespace ul {
 namespace api {
 namespace schematic_evaluator {
 
+struct EvaluatorQuota {
+    std::string kind_;
+    int64_t required_pods_;
+    int64_t admitted_pods_;
+
+    EvaluatorQuota() = default;
+    EvaluatorQuota(const struct json_value_s *root);
+    bool operator==(const EvaluatorQuota &rhs) const;
+    bool operator!=(const EvaluatorQuota &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+std::vector<uint8_t>
+to_bytes(const EvaluatorQuota &o);
+
+struct EvaluatorPool {
+    std::string kind_;
+    int64_t size_;
+    int64_t busy_;
+
+    EvaluatorPool() = default;
+    EvaluatorPool(const struct json_value_s *root);
+    bool operator==(const EvaluatorPool &rhs) const;
+    bool operator!=(const EvaluatorPool &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+std::vector<uint8_t>
+to_bytes(const EvaluatorPool &o);
+
+struct EvaluatorOutstanding {
+    int64_t other_;
+    int64_t archive_;
+    int64_t program_;
+
+    EvaluatorOutstanding() = default;
+    EvaluatorOutstanding(const struct json_value_s *root);
+    bool operator==(const EvaluatorOutstanding &rhs) const;
+    bool operator!=(const EvaluatorOutstanding &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+std::vector<uint8_t>
+to_bytes(const EvaluatorOutstanding &o);
+
+struct EvaluatorHealth {
+    bool kernel_;
+    std::string launcher_;
+    bool capacity_ready_;
+    std::string capacity_error_;
+    std::vector<EvaluatorQuota> quotas_;
+    std::vector<EvaluatorPool> pools_;
+    EvaluatorOutstanding outstanding_;
+
+    EvaluatorHealth() = default;
+    EvaluatorHealth(const struct json_value_s *root);
+    bool operator==(const EvaluatorHealth &rhs) const;
+    bool operator!=(const EvaluatorHealth &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+std::vector<uint8_t>
+to_bytes(const EvaluatorHealth &o);
+
 /**
- * Create a new schematic evaluator job
+ * Create a new schematic evaluator job. An optional Idempotency-Key HTTP header (1 to 256 bytes) returns the same job for the same caller and RunSpec. Reusing a key with another RunSpec is refused.
  * @param job The description of the job to create
  * @return The ID of the newly created job
  */
@@ -39,6 +111,25 @@ get_job(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
     std::optional<int64_t> timeout
+);
+
+/**
+ * Cancel the job with the given ID: every task of it that has not ended is ended with `cancelled`. The intent is recorded at once and carried out by the evaluator; a task that completed before the intent arrived stays complete.
+ * @param id The ID of the job to cancel
+ */
+Result<Void>
+cancel_job(
+    ul::RequestContext &ctx,
+    const ::ul::types::ObjectId &id
+);
+
+/**
+ * The evaluator's own state: whether the answering pod runs the kernel, its pools by task kind, the work still outstanding by kind, and the launcher it starts bundle runs with.
+ * @return The evaluator's state
+ */
+Result<EvaluatorHealth>
+get_health(
+    ul::RequestContext &ctx
 );
 
 /**
