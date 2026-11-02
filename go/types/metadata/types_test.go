@@ -13,6 +13,25 @@ import (
 	"github.com/urbanlogiq/ulsdk/types/schema"
 )
 
+func TestDefaultBbox(t *testing.T) {
+	o := &Bbox{}
+	if o == nil {
+		t.Fatal("expected non-nil")
+	}
+}
+
+func TestRoundTripBbox(t *testing.T) {
+	o := &Bbox{}
+	data := o.ToBytes()
+	result, err := BboxFromBytes(data)
+	if err != nil {
+		t.Fatalf("deserialization failed: %v", err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
 func TestDefaultCategoryRelationshipData(t *testing.T) {
 	o := &CategoryRelationshipData{}
 	if o == nil {
@@ -1149,6 +1168,7 @@ func TestUnionUlFieldComponentData(t *testing.T) {
 		&DatetimeRange{},
 		&Dates{},
 		&NestedStringCategories{},
+		&Bbox{},
 	} {
 		o := &UlField{ComponentData: v}
 		got, err := UlFieldFromBytes(o.ToBytes())

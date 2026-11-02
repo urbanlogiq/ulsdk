@@ -25,6 +25,7 @@
 namespace ul {
 namespace types {
 
+struct Bbox;
 struct CategoryRelationshipData;
 struct ColumnTime;
 struct ConceptBinding;
@@ -75,7 +76,8 @@ typedef std::variant<
     std::shared_ptr<FloatRange>,
     std::shared_ptr<DatetimeRange>,
     std::shared_ptr<Dates>,
-    std::shared_ptr<NestedStringCategories>
+    std::shared_ptr<NestedStringCategories>,
+    std::shared_ptr<Bbox>
 > ComponentData;
 
 using ::DatasetCategory;
@@ -227,6 +229,25 @@ struct NestedStringCategories {
     NestedStringCategories(const std::vector<uint8_t> &bytes);
     bool operator==(const NestedStringCategories &rhs) const;
     bool operator!=(const NestedStringCategories &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
+///
+/// Minimum and maximum longitude and latitude, in WGS 84 degrees.
+/// Bounds do not wrap at 180 degrees longitude.
+///
+struct Bbox {
+    double lat_max_;
+    double lat_min_;
+    double lng_max_;
+    double lng_min_;
+
+    Bbox();
+    Bbox(const ::Bbox *root);
+    Bbox(const std::vector<uint8_t> &bytes);
+    bool operator==(const Bbox &rhs) const;
+    bool operator!=(const Bbox &rhs) const {
         return !(*this == rhs);
     }
 };
@@ -804,6 +825,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Dates &);
 ::flatbuffers::Offset<::NestedStringCategories>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const NestedStringCategories &);
 
+::flatbuffers::Offset<::Bbox>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Bbox &);
+
 ::flatbuffers::Offset<::RawGeom>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const RawGeom &);
 
@@ -921,6 +945,9 @@ to_bytes(const Dates &o);
 
 std::vector<uint8_t>
 to_bytes(const NestedStringCategories &o);
+
+std::vector<uint8_t>
+to_bytes(const Bbox &o);
 
 std::vector<uint8_t>
 to_bytes(const RawGeom &o);

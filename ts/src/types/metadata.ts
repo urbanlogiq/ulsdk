@@ -4,6 +4,7 @@
 
 import * as flatbuffers from 'flatbuffers/js/flatbuffers';
 
+import { Bbox as FbsBbox, BboxT as FbsBboxT } from './generated/bbox';
 import { CategoryRelationshipData as FbsCategoryRelationshipData, CategoryRelationshipDataT as FbsCategoryRelationshipDataT } from './generated/category-relationship-data';
 import { ColumnTime as FbsColumnTime, ColumnTimeT as FbsColumnTimeT } from './generated/column-time';
 import { ComponentData as FbsComponentData } from './generated/component-data';
@@ -726,7 +727,91 @@ export class NestedStringCategories {
   }
 }
 
-export type ComponentData = StringCategories | IntRange | FloatRange | DatetimeRange | Dates | NestedStringCategories;
+/**
+ *  Minimum and maximum longitude and latitude, in WGS 84 degrees.
+ *  Bounds do not wrap at 180 degrees longitude.
+ */
+export class Bbox {
+  private _latMax!: number;
+
+  private _latMin!: number;
+
+  private _lngMax!: number;
+
+  private _lngMin!: number;
+
+  constructor(arg?: FbsBbox | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsBbox.getSizePrefixedRootAsBbox(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsBbox) {
+      this._initFromFbs(arg);
+    } else {
+      this._latMax = 0;
+      this._latMin = 0;
+      this._lngMax = 0;
+      this._lngMin = 0;
+    }
+  }
+
+  private _initFromFbs(fbs: FbsBbox): void {
+    this._latMax = fbs.latMax();
+    this._latMin = fbs.latMin();
+    this._lngMax = fbs.lngMax();
+    this._lngMin = fbs.lngMin();
+  }
+
+  get latMax(): number {
+    return this._latMax;
+  }
+
+  set latMax(value: number) {
+    this._latMax = value;
+  }
+
+  get latMin(): number {
+    return this._latMin;
+  }
+
+  set latMin(value: number) {
+    this._latMin = value;
+  }
+
+  get lngMax(): number {
+    return this._lngMax;
+  }
+
+  set lngMax(value: number) {
+    this._lngMax = value;
+  }
+
+  get lngMin(): number {
+    return this._lngMin;
+  }
+
+  set lngMin(value: number) {
+    this._lngMin = value;
+  }
+
+  toFbsT(): FbsBboxT {
+    const t = new FbsBboxT();
+    t.latMax = this._latMax;
+    t.latMin = this._latMin;
+    t.lngMax = this._lngMax;
+    t.lngMin = this._lngMin;
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+}
+
+export type ComponentData = StringCategories | IntRange | FloatRange | DatetimeRange | Dates | NestedStringCategories | Bbox;
 
 export { DatasetCategory } from './generated/dataset-category';
 
@@ -3317,6 +3402,9 @@ export class UlField {
     } else if (componentDataTy === FbsComponentData.NestedStringCategories) {
       const componentDataFbsVal = fbs.componentData(new FbsNestedStringCategories());
       this._componentData = componentDataFbsVal ? new NestedStringCategories(componentDataFbsVal) : null;
+    } else if (componentDataTy === FbsComponentData.Bbox) {
+      const componentDataFbsVal = fbs.componentData(new FbsBbox());
+      this._componentData = componentDataFbsVal ? new Bbox(componentDataFbsVal) : null;
     } else {
       this._componentData = null;
     }
@@ -3522,6 +3610,9 @@ export class UlField {
       t.componentData = this._componentData.toFbsT();
     } else if (this._componentData instanceof NestedStringCategories) {
       t.componentDataType = FbsComponentData.NestedStringCategories;
+      t.componentData = this._componentData.toFbsT();
+    } else if (this._componentData instanceof Bbox) {
+      t.componentDataType = FbsComponentData.Bbox;
       t.componentData = this._componentData.toFbsT();
     }
     t.conceptAttr = this._conceptAttr ? this._conceptAttr.toFbsT() : null;

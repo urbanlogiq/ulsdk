@@ -81,7 +81,7 @@ use crate::types::generated::id_generated::{
     PinnedObjectId as FbsPinnedObjectId, StreamId as FbsStreamId,
 };
 use crate::types::generated::metadata_generated::{
-    AggregationFunction as FbsAggregationFunction,
+    AggregationFunction as FbsAggregationFunction, Bbox as FbsBbox,
     CategoryRelationshipData as FbsCategoryRelationshipData, ColumnTime as FbsColumnTime,
     ComponentData as FbsComponentData, ConceptBinding as FbsConceptBinding,
     ContactInfo as FbsContactInfo, DatacatalogGeometry as FbsDatacatalogGeometry,
@@ -1200,6 +1200,65 @@ impl crate::FbsSerde for NestedStringCategories {
     }
 }
 
+/// Minimum and maximum longitude and latitude, in WGS 84 degrees.
+/// Bounds do not wrap at 180 degrees longitude.
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+pub struct Bbox {
+    pub lat_max: OrderedFloat<f64>,
+    pub lat_min: OrderedFloat<f64>,
+    pub lng_max: OrderedFloat<f64>,
+    pub lng_min: OrderedFloat<f64>,
+}
+
+impl Bbox {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsBbox<'a>> {
+        use crate::types::generated::metadata_generated::BboxBuilder as FbsBboxBuilder;
+
+        let mut bldr = FbsBboxBuilder::new(builder);
+        bldr.add_lat_max(*self.lat_max);
+        bldr.add_lat_min(*self.lat_min);
+        bldr.add_lng_max(*self.lng_max);
+        bldr.add_lng_min(*self.lng_min);
+        bldr.finish()
+    }
+}
+
+impl From<FbsBbox<'_>> for Bbox {
+    fn from(fbs: FbsBbox<'_>) -> Self {
+        let lat_max = OrderedFloat(fbs.lat_max());
+        let lat_min = OrderedFloat(fbs.lat_min());
+        let lng_max = OrderedFloat(fbs.lng_max());
+        let lng_min = OrderedFloat(fbs.lng_min());
+        Self {
+            lat_max,
+            lat_min,
+            lng_max,
+            lng_min,
+        }
+    }
+}
+
+impl crate::FbsSerde for Bbox {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsBbox>(&opts, bytes)?;
+        Ok(Self::from(fbs))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum ComponentData {
     StringCategories(StringCategories),
@@ -1208,6 +1267,7 @@ pub enum ComponentData {
     DatetimeRange(DatetimeRange),
     Dates(Dates),
     NestedStringCategories(NestedStringCategories),
+    Bbox(Bbox),
 }
 
 impl Default for ComponentData {
@@ -1250,6 +1310,11 @@ impl ComponentData {
             Self::NestedStringCategories(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
                 let ty = FbsComponentData::NestedStringCategories;
+                (offset, ty)
+            }
+            Self::Bbox(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsComponentData::Bbox;
                 (offset, ty)
             }
         }
@@ -3892,6 +3957,9 @@ impl From<FbsUlField<'_>> for UlField {
                         fbs.component_data_as_nested_string_categories().unwrap(),
                     ))
                 }
+                FbsComponentData::Bbox => {
+                    ComponentData::Bbox(Bbox::from(fbs.component_data_as_bbox().unwrap()))
+                }
                 _ => unreachable!(),
             };
 
@@ -4138,6 +4206,14 @@ impl crate::FbsSerde for UlFieldRelationship {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_bbox() {
+        let t0 = Bbox::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = Bbox::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
 
     #[test]
     fn test_category_relationship_data() {

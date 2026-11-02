@@ -15,8 +15,9 @@ public final class ComponentData {
   public static final byte DatetimeRange = 4;
   public static final byte Dates = 5;
   public static final byte NestedStringCategories = 6;
+  public static final byte Bbox = 7;
 
-  public static final String[] names = { "NONE", "StringCategories", "IntRange", "FloatRange", "DatetimeRange", "Dates", "NestedStringCategories", };
+  public static final String[] names = { "NONE", "StringCategories", "IntRange", "FloatRange", "DatetimeRange", "Dates", "NestedStringCategories", "Bbox", };
 
   public static String name(int e) { return names[e]; }
 }

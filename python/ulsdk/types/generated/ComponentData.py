@@ -10,3 +10,4 @@ class ComponentData(object):
     DatetimeRange = 4
     Dates = 5
     NestedStringCategories = 6
+    Bbox = 7

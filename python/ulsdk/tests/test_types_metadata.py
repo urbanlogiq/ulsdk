@@ -4,6 +4,12 @@
 
 from ..types.metadata import *
 
+def test_bbox():
+    _t0 = Bbox.make_default()
+    _b = _t0.to_bytes()
+    _t1 = Bbox.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_category_relationship_data():
     _t0 = CategoryRelationshipData.make_default()
     _b = _t0.to_bytes()

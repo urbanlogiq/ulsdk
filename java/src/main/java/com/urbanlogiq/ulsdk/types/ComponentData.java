@@ -13,7 +13,8 @@ public final class ComponentData {
             && !(value instanceof com.urbanlogiq.ulsdk.types.FloatRange)
             && !(value instanceof com.urbanlogiq.ulsdk.types.DatetimeRange)
             && !(value instanceof com.urbanlogiq.ulsdk.types.Dates)
-            && !(value instanceof com.urbanlogiq.ulsdk.types.NestedStringCategories)) {
+            && !(value instanceof com.urbanlogiq.ulsdk.types.NestedStringCategories)
+            && !(value instanceof com.urbanlogiq.ulsdk.types.Bbox)) {
             throw new com.urbanlogiq.ulsdk.InvalidVariantException("ComponentData", value);
         }
 
@@ -51,6 +52,11 @@ public final class ComponentData {
             int offset = o.serializeTo(builder);
             byte ty = com.urbanlogiq.ulsdk.types.generated.ComponentData.NestedStringCategories;
             return new com.urbanlogiq.ulsdk.Pair<Integer, Byte>(offset, ty);
+        } else if (this._value instanceof com.urbanlogiq.ulsdk.types.Bbox) {
+            com.urbanlogiq.ulsdk.types.Bbox o = (com.urbanlogiq.ulsdk.types.Bbox)this._value;
+            int offset = o.serializeTo(builder);
+            byte ty = com.urbanlogiq.ulsdk.types.generated.ComponentData.Bbox;
+            return new com.urbanlogiq.ulsdk.Pair<Integer, Byte>(offset, ty);
         } else {
             throw new RuntimeException("unreachable variant");
         }
@@ -73,6 +79,8 @@ public final class ComponentData {
             this._value = new com.urbanlogiq.ulsdk.types.Dates((com.urbanlogiq.ulsdk.types.generated.Dates)o);
         } else if (ty == com.urbanlogiq.ulsdk.types.generated.ComponentData.NestedStringCategories) {
             this._value = new com.urbanlogiq.ulsdk.types.NestedStringCategories((com.urbanlogiq.ulsdk.types.generated.NestedStringCategories)o);
+        } else if (ty == com.urbanlogiq.ulsdk.types.generated.ComponentData.Bbox) {
+            this._value = new com.urbanlogiq.ulsdk.types.Bbox((com.urbanlogiq.ulsdk.types.generated.Bbox)o);
         }
     }
 

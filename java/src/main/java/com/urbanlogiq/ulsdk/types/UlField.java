@@ -129,6 +129,10 @@ public final class UlField {
             com.google.flatbuffers.Table componentDataFbsTable = o.componentData(new com.urbanlogiq.ulsdk.types.generated.NestedStringCategories());
             com.urbanlogiq.ulsdk.types.generated.NestedStringCategories componentDataFbsValue = (com.urbanlogiq.ulsdk.types.generated.NestedStringCategories)componentDataFbsTable;
             componentDataValue = new com.urbanlogiq.ulsdk.types.NestedStringCategories(componentDataFbsValue);
+        } else if (componentDataTy == com.urbanlogiq.ulsdk.types.generated.ComponentData.Bbox) {
+            com.google.flatbuffers.Table componentDataFbsTable = o.componentData(new com.urbanlogiq.ulsdk.types.generated.Bbox());
+            com.urbanlogiq.ulsdk.types.generated.Bbox componentDataFbsValue = (com.urbanlogiq.ulsdk.types.generated.Bbox)componentDataFbsTable;
+            componentDataValue = new com.urbanlogiq.ulsdk.types.Bbox(componentDataFbsValue);
         }
         if (componentDataValue != null) {
             this._componentData = new com.urbanlogiq.ulsdk.types.ComponentData(componentDataValue);

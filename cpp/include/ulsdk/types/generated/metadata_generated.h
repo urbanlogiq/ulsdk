@@ -79,6 +79,9 @@ struct DocumentBuilder;
 struct Documents;
 struct DocumentsBuilder;
 
+struct Bbox;
+struct BboxBuilder;
+
 struct RawGeom;
 struct RawGeomBuilder;
 
@@ -351,11 +354,12 @@ enum class ComponentData : uint8_t {
   DatetimeRange = 4,
   Dates = 5,
   NestedStringCategories = 6,
+  Bbox = 7,
   MIN = NONE,
-  MAX = NestedStringCategories
+  MAX = Bbox
 };
 
-inline const ComponentData (&EnumValuesComponentData())[7] {
+inline const ComponentData (&EnumValuesComponentData())[8] {
   static const ComponentData values[] = {
     ComponentData::NONE,
     ComponentData::StringCategories,
@@ -363,13 +367,14 @@ inline const ComponentData (&EnumValuesComponentData())[7] {
     ComponentData::FloatRange,
     ComponentData::DatetimeRange,
     ComponentData::Dates,
-    ComponentData::NestedStringCategories
+    ComponentData::NestedStringCategories,
+    ComponentData::Bbox
   };
   return values;
 }
 
 inline const char * const *EnumNamesComponentData() {
-  static const char * const names[8] = {
+  static const char * const names[9] = {
     "NONE",
     "StringCategories",
     "IntRange",
@@ -377,13 +382,14 @@ inline const char * const *EnumNamesComponentData() {
     "DatetimeRange",
     "Dates",
     "NestedStringCategories",
+    "Bbox",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameComponentData(ComponentData e) {
-  if (::flatbuffers::IsOutRange(e, ComponentData::NONE, ComponentData::NestedStringCategories)) return "";
+  if (::flatbuffers::IsOutRange(e, ComponentData::NONE, ComponentData::Bbox)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesComponentData()[index];
 }
@@ -414,6 +420,10 @@ template<> struct ComponentDataTraits<Dates> {
 
 template<> struct ComponentDataTraits<NestedStringCategories> {
   static const ComponentData enum_value = ComponentData::NestedStringCategories;
+};
+
+template<> struct ComponentDataTraits<Bbox> {
+  static const ComponentData enum_value = ComponentData::Bbox;
 };
 
 bool VerifyComponentData(::flatbuffers::Verifier &verifier, const void *obj, ComponentData type);
@@ -2451,6 +2461,85 @@ inline ::flatbuffers::Offset<Documents> CreateDocumentsDirect(
       documents__);
 }
 
+/// Minimum and maximum longitude and latitude, in WGS 84 degrees.
+/// Bounds do not wrap at 180 degrees longitude.
+struct Bbox FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef BboxBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_LNG_MIN = 4,
+    VT_LAT_MIN = 6,
+    VT_LNG_MAX = 8,
+    VT_LAT_MAX = 10
+  };
+  double lng_min() const {
+    return GetField<double>(VT_LNG_MIN, 0.0);
+  }
+  double lat_min() const {
+    return GetField<double>(VT_LAT_MIN, 0.0);
+  }
+  double lng_max() const {
+    return GetField<double>(VT_LNG_MAX, 0.0);
+  }
+  double lat_max() const {
+    return GetField<double>(VT_LAT_MAX, 0.0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<double>(verifier, VT_LNG_MIN, 8) &&
+           VerifyField<double>(verifier, VT_LAT_MIN, 8) &&
+           VerifyField<double>(verifier, VT_LNG_MAX, 8) &&
+           VerifyField<double>(verifier, VT_LAT_MAX, 8) &&
+           verifier.EndTable();
+  }
+};
+
+struct BboxBuilder {
+  typedef Bbox Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_lng_min(double lng_min) {
+    fbb_.AddElement<double>(Bbox::VT_LNG_MIN, lng_min, 0.0);
+  }
+  void add_lat_min(double lat_min) {
+    fbb_.AddElement<double>(Bbox::VT_LAT_MIN, lat_min, 0.0);
+  }
+  void add_lng_max(double lng_max) {
+    fbb_.AddElement<double>(Bbox::VT_LNG_MAX, lng_max, 0.0);
+  }
+  void add_lat_max(double lat_max) {
+    fbb_.AddElement<double>(Bbox::VT_LAT_MAX, lat_max, 0.0);
+  }
+  explicit BboxBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<Bbox> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<Bbox>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<Bbox> CreateBbox(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    double lng_min = 0.0,
+    double lat_min = 0.0,
+    double lng_max = 0.0,
+    double lat_max = 0.0) {
+  BboxBuilder builder_(_fbb);
+  builder_.add_lat_max(lat_max);
+  builder_.add_lng_max(lng_max);
+  builder_.add_lat_min(lat_min);
+  builder_.add_lng_min(lng_min);
+  return builder_.Finish();
+}
+
+struct Bbox::Traits {
+  using type = Bbox;
+  static auto constexpr Create = CreateBbox;
+};
+
 struct RawGeom FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef RawGeomBuilder Builder;
   struct Traits;
@@ -2727,6 +2816,9 @@ struct UlField FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const NestedStringCategories *component_data_as_NestedStringCategories() const {
     return component_data_type() == ComponentData::NestedStringCategories ? static_cast<const NestedStringCategories *>(component_data()) : nullptr;
   }
+  const Bbox *component_data_as_Bbox() const {
+    return component_data_type() == ComponentData::Bbox ? static_cast<const Bbox *>(component_data()) : nullptr;
+  }
   uint32_t flags() const {
     return GetField<uint32_t>(VT_FLAGS, 0);
   }
@@ -2886,6 +2978,10 @@ template<> inline const Dates *UlField::component_data_as<Dates>() const {
 
 template<> inline const NestedStringCategories *UlField::component_data_as<NestedStringCategories>() const {
   return component_data_as_NestedStringCategories();
+}
+
+template<> inline const Bbox *UlField::component_data_as<Bbox>() const {
+  return component_data_as_Bbox();
 }
 
 template<> inline const Null *UlField::storage_type_as<Null>() const {
@@ -4743,6 +4839,10 @@ inline bool VerifyComponentData(::flatbuffers::Verifier &verifier, const void *o
     }
     case ComponentData::NestedStringCategories: {
       auto ptr = reinterpret_cast<const NestedStringCategories *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case ComponentData::Bbox: {
+      auto ptr = reinterpret_cast<const Bbox *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

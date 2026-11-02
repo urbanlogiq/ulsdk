@@ -8,6 +8,7 @@
 
 import * as flatbuffers from 'flatbuffers/js/flatbuffers';
 
+import { Bbox, BboxT } from './bbox';
 import { Binary, BinaryT } from './binary';
 import { BinaryView, BinaryViewT } from './binary-view';
 import { Bool, BoolT } from './bool';
@@ -264,7 +265,7 @@ constructor(
   public fieldName: string|Uint8Array|null = null,
   public displayName: string|Uint8Array|null = null,
   public componentDataType: ComponentData = ComponentData.NONE,
-  public componentData: DatesT|DatetimeRangeT|FloatRangeT|IntRangeT|NestedStringCategoriesT|StringCategoriesT|null = null,
+  public componentData: BboxT|DatesT|DatetimeRangeT|FloatRangeT|IntRangeT|NestedStringCategoriesT|StringCategoriesT|null = null,
   public flags: number = 0,
   public unit: FieldUnit = FieldUnit.U_INVALID,
   public fieldType: UlFieldType = UlFieldType.FT_UNKNOWN,

@@ -197,6 +197,7 @@ const (
 	ComponentDataDatetimeRange          ComponentData = 4
 	ComponentDataDates                  ComponentData = 5
 	ComponentDataNestedStringCategories ComponentData = 6
+	ComponentDataBbox                   ComponentData = 7
 )
 
 var EnumNamesComponentData = map[ComponentData]string{
@@ -207,6 +208,7 @@ var EnumNamesComponentData = map[ComponentData]string{
 	ComponentDataDatetimeRange:          "DatetimeRange",
 	ComponentDataDates:                  "Dates",
 	ComponentDataNestedStringCategories: "NestedStringCategories",
+	ComponentDataBbox:                   "Bbox",
 }
 
 var EnumValuesComponentData = map[string]ComponentData{
@@ -217,6 +219,7 @@ var EnumValuesComponentData = map[string]ComponentData{
 	"DatetimeRange":          ComponentDataDatetimeRange,
 	"Dates":                  ComponentDataDates,
 	"NestedStringCategories": ComponentDataNestedStringCategories,
+	"Bbox":                   ComponentDataBbox,
 }
 
 func (v ComponentData) String() string {
@@ -2368,6 +2371,109 @@ func DocumentsStartDocumentsVector(builder *flatbuffers.Builder, numElems int) f
 	return builder.StartVector(4, numElems, 4)
 }
 func DocumentsEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return builder.EndObject()
+}
+/// Minimum and maximum longitude and latitude, in WGS 84 degrees.
+/// Bounds do not wrap at 180 degrees longitude.
+type Bbox struct {
+	_tab flatbuffers.Table
+}
+
+func GetRootAsBbox(buf []byte, offset flatbuffers.UOffsetT) *Bbox {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &Bbox{}
+	x.Init(buf, n+offset)
+	return x
+}
+
+func FinishBboxBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.Finish(offset)
+}
+
+func GetSizePrefixedRootAsBbox(buf []byte, offset flatbuffers.UOffsetT) *Bbox {
+	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
+	x := &Bbox{}
+	x.Init(buf, n+offset+flatbuffers.SizeUint32)
+	return x
+}
+
+func FinishSizePrefixedBboxBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.FinishSizePrefixed(offset)
+}
+
+func (rcv *Bbox) Init(buf []byte, i flatbuffers.UOffsetT) {
+	rcv._tab.Bytes = buf
+	rcv._tab.Pos = i
+}
+
+func (rcv *Bbox) Table() flatbuffers.Table {
+	return rcv._tab
+}
+
+func (rcv *Bbox) LngMin() float64 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		return rcv._tab.GetFloat64(o + rcv._tab.Pos)
+	}
+	return 0.0
+}
+
+func (rcv *Bbox) MutateLngMin(n float64) bool {
+	return rcv._tab.MutateFloat64Slot(4, n)
+}
+
+func (rcv *Bbox) LatMin() float64 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
+	if o != 0 {
+		return rcv._tab.GetFloat64(o + rcv._tab.Pos)
+	}
+	return 0.0
+}
+
+func (rcv *Bbox) MutateLatMin(n float64) bool {
+	return rcv._tab.MutateFloat64Slot(6, n)
+}
+
+func (rcv *Bbox) LngMax() float64 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
+	if o != 0 {
+		return rcv._tab.GetFloat64(o + rcv._tab.Pos)
+	}
+	return 0.0
+}
+
+func (rcv *Bbox) MutateLngMax(n float64) bool {
+	return rcv._tab.MutateFloat64Slot(8, n)
+}
+
+func (rcv *Bbox) LatMax() float64 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
+	if o != 0 {
+		return rcv._tab.GetFloat64(o + rcv._tab.Pos)
+	}
+	return 0.0
+}
+
+func (rcv *Bbox) MutateLatMax(n float64) bool {
+	return rcv._tab.MutateFloat64Slot(10, n)
+}
+
+func BboxStart(builder *flatbuffers.Builder) {
+	builder.StartObject(4)
+}
+func BboxAddLngMin(builder *flatbuffers.Builder, lngMin float64) {
+	builder.PrependFloat64Slot(0, lngMin, 0.0)
+}
+func BboxAddLatMin(builder *flatbuffers.Builder, latMin float64) {
+	builder.PrependFloat64Slot(1, latMin, 0.0)
+}
+func BboxAddLngMax(builder *flatbuffers.Builder, lngMax float64) {
+	builder.PrependFloat64Slot(2, lngMax, 0.0)
+}
+func BboxAddLatMax(builder *flatbuffers.Builder, latMax float64) {
+	builder.PrependFloat64Slot(3, latMax, 0.0)
+}
+func BboxEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
 type RawGeom struct {

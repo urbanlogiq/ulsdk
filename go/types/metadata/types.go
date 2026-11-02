@@ -450,7 +450,55 @@ func (o *NestedStringCategories) SerializeTo(builder *flatbuffers.Builder) flatb
 	return generated.NestedStringCategoriesEnd(builder)
 }
 
-// ComponentData is a union type. Possible concrete types: StringCategories, IntRange, FloatRange, DatetimeRange, Dates, NestedStringCategories
+// Bbox -
+//  Minimum and maximum longitude and latitude, in WGS 84 degrees.
+//  Bounds do not wrap at 180 degrees longitude.
+type Bbox struct {
+	LatMax float64
+	LatMin float64
+	LngMax float64
+	LngMin float64
+}
+
+func BboxFromFbs(fbs *generated.Bbox) *Bbox {
+	o := &Bbox{}
+	o.LatMax = fbs.LatMax()
+	o.LatMin = fbs.LatMin()
+	o.LngMax = fbs.LngMax()
+	o.LngMin = fbs.LngMin()
+	return o
+}
+
+// BboxFromBytes deserializes a Bbox from size-prefixed FlatBuffer bytes.
+func BboxFromBytes(data []byte) (o *Bbox, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("Bbox: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
+	fbs := generated.GetSizePrefixedRootAsBbox(data, 0)
+	return BboxFromFbs(fbs), nil
+}
+
+// ToBytes serializes the Bbox to size-prefixed FlatBuffer bytes.
+func (o *Bbox) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the Bbox into a FlatBuffer builder and returns the offset.
+func (o *Bbox) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	generated.BboxStart(builder)
+	generated.BboxAddLatMax(builder, o.LatMax)
+	generated.BboxAddLatMin(builder, o.LatMin)
+	generated.BboxAddLngMax(builder, o.LngMax)
+	generated.BboxAddLngMin(builder, o.LngMin)
+	return generated.BboxEnd(builder)
+}
+
+// ComponentData is a union type. Possible concrete types: StringCategories, IntRange, FloatRange, DatetimeRange, Dates, NestedStringCategories, Bbox
 // Assign a pointer to one of these types.
 type ComponentData interface{}
 
@@ -2646,6 +2694,10 @@ func UlFieldFromFbs(fbs *generated.UlField) *UlField {
 			var u generated.NestedStringCategories
 			u.Init(tbl.Bytes, tbl.Pos)
 			o.ComponentData = NestedStringCategoriesFromFbs(&u)
+		case generated.ComponentDataBbox:
+			var u generated.Bbox
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.ComponentData = BboxFromFbs(&u)
 		}
 	}
 	if fbsVal := fbs.ConceptAttr(nil); fbsVal != nil {
@@ -2832,6 +2884,10 @@ func (o *UlField) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT
 	case *NestedStringCategories:
 		if v != nil {
 			componentDataType, componentDataOffset = generated.ComponentDataNestedStringCategories, v.SerializeTo(builder)
+		}
+	case *Bbox:
+		if v != nil {
+			componentDataType, componentDataOffset = generated.ComponentDataBbox, v.SerializeTo(builder)
 		}
 	default:
 		panic(fmt.Sprintf("UlField.ComponentData: %T is not a pointer to a ComponentData variant", v))

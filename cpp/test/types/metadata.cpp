@@ -7,6 +7,16 @@
 #include "test.h"
 
 bool
+test_bbox() {
+    ::ul::types::Bbox t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::Bbox deserialized = ::ul::types::Bbox(bytes);
+    return true;
+}
+
+TypeTest test_bbox_obj(test_bbox, "Bbox");
+
+bool
 test_category_relationship_data() {
     ::ul::types::CategoryRelationshipData t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);

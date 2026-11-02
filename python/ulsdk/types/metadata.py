@@ -152,6 +152,7 @@ from .value import (
 )
 from .generated.AttributePair import AttributePair as FbsAttributePair
 from .generated.B2cId import B2cId as FbsB2cId
+from .generated.Bbox import Bbox as FbsBbox
 from .generated.Binary import Binary as FbsBinary
 from .generated.BinaryView import BinaryView as FbsBinaryView
 from .generated.Bool import Bool as FbsBool
@@ -971,6 +972,74 @@ class NestedStringCategories:
         return eq
 
 @dataclass
+class Bbox:
+    """ Minimum and maximum longitude and latitude, in WGS 84 degrees.
+     Bounds do not wrap at 180 degrees longitude.
+    """
+
+    lat_max: "float"
+
+    lat_min: "float"
+
+    lng_max: "float"
+
+    lng_min: "float"
+
+    @classmethod
+    def from_fbs(cls, o: FbsBbox) -> Self:
+        lat_max = o.LatMax()
+        lat_min = o.LatMin()
+        lng_max = o.LngMax()
+        lng_min = o.LngMin()
+        return cls(lat_max, lat_min, lng_max, lng_min)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        deprefixed = RemoveSizePrefix(data, 0)
+        o = FbsBbox.GetRootAs(deprefixed[0], deprefixed[1])
+        return cls.from_fbs(o)
+
+    def serialize_to(self, builder: Builder) -> int:
+        from .generated.Bbox import (
+            Start,
+            AddLatMax,
+            AddLatMin,
+            AddLngMax,
+            AddLngMin,
+            End,
+        )
+
+        Start(builder)
+        AddLatMax(builder, self.lat_max)
+        AddLatMin(builder, self.lat_min)
+        AddLngMax(builder, self.lng_max)
+        AddLngMin(builder, self.lng_min)
+        return End(builder)
+
+    def to_bytes(self) -> bytes:
+        builder = Builder(0)
+        offset = self.serialize_to(builder)
+        builder.FinishSizePrefixed(offset)
+        return builder.Output()
+
+    @classmethod
+    def make_default(cls) -> Self:
+        lat_max = 0.0
+        lat_min = 0.0
+        lng_max = 0.0
+        lng_min = 0.0
+        return cls(lat_max, lat_min, lng_max, lng_min)
+
+    def __eq__(self, other) -> bool:
+        eq = True
+        eq = eq and self.lat_max == other.lat_max
+        eq = eq and self.lat_min == other.lat_min
+        eq = eq and self.lng_max == other.lng_max
+        eq = eq and self.lng_min == other.lng_min
+
+        return eq
+
+@dataclass
 class ComponentData:
     value: Union[
         "StringCategories",
@@ -979,6 +1048,7 @@ class ComponentData:
         "DatetimeRange",
         "Dates",
         "NestedStringCategories",
+        "Bbox",
     ]
 
     def serialize_to(self, builder: Builder) -> Tuple[int, int]:
@@ -996,6 +1066,8 @@ class ComponentData:
             return (offset, ComponentData().Dates)
         elif isinstance(self.value, NestedStringCategories):
             return (offset, ComponentData().NestedStringCategories)
+        elif isinstance(self.value, Bbox):
+            return (offset, ComponentData().Bbox)
         raise ValueError("Invalid union type")
 
     @classmethod
@@ -1028,6 +1100,10 @@ class ComponentData:
             val = FbsNestedStringCategories();
             val.Init(source, pos)
             return cls(NestedStringCategories.from_fbs(val))
+        elif ty == ComponentData_ty_instance.Bbox:
+            val = FbsBbox();
+            val.Init(source, pos)
+            return cls(Bbox.from_fbs(val))
         else:
             raise ValueError("Invalid union type")
 

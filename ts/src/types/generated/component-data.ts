@@ -6,6 +6,7 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
 
+import { Bbox, BboxT } from './bbox';
 import { Dates, DatesT } from './dates';
 import { DatetimeRange, DatetimeRangeT } from './datetime-range';
 import { FloatRange, FloatRangeT } from './float-range';
@@ -21,13 +22,14 @@ export enum ComponentData {
   FloatRange = 3,
   DatetimeRange = 4,
   Dates = 5,
-  NestedStringCategories = 6
+  NestedStringCategories = 6,
+  Bbox = 7
 }
 
 export function unionToComponentData(
   type: ComponentData,
-  accessor: (obj:Dates|DatetimeRange|FloatRange|IntRange|NestedStringCategories|StringCategories) => Dates|DatetimeRange|FloatRange|IntRange|NestedStringCategories|StringCategories|null
-): Dates|DatetimeRange|FloatRange|IntRange|NestedStringCategories|StringCategories|null {
+  accessor: (obj:Bbox|Dates|DatetimeRange|FloatRange|IntRange|NestedStringCategories|StringCategories) => Bbox|Dates|DatetimeRange|FloatRange|IntRange|NestedStringCategories|StringCategories|null
+): Bbox|Dates|DatetimeRange|FloatRange|IntRange|NestedStringCategories|StringCategories|null {
   switch(ComponentData[type]) {
     case 'NONE': return null; 
     case 'StringCategories': return accessor(new StringCategories())! as StringCategories;
@@ -36,15 +38,16 @@ export function unionToComponentData(
     case 'DatetimeRange': return accessor(new DatetimeRange())! as DatetimeRange;
     case 'Dates': return accessor(new Dates())! as Dates;
     case 'NestedStringCategories': return accessor(new NestedStringCategories())! as NestedStringCategories;
+    case 'Bbox': return accessor(new Bbox())! as Bbox;
     default: return null;
   }
 }
 
 export function unionListToComponentData(
   type: ComponentData, 
-  accessor: (index: number, obj:Dates|DatetimeRange|FloatRange|IntRange|NestedStringCategories|StringCategories) => Dates|DatetimeRange|FloatRange|IntRange|NestedStringCategories|StringCategories|null, 
+  accessor: (index: number, obj:Bbox|Dates|DatetimeRange|FloatRange|IntRange|NestedStringCategories|StringCategories) => Bbox|Dates|DatetimeRange|FloatRange|IntRange|NestedStringCategories|StringCategories|null, 
   index: number
-): Dates|DatetimeRange|FloatRange|IntRange|NestedStringCategories|StringCategories|null {
+): Bbox|Dates|DatetimeRange|FloatRange|IntRange|NestedStringCategories|StringCategories|null {
   switch(ComponentData[type]) {
     case 'NONE': return null; 
     case 'StringCategories': return accessor(index, new StringCategories())! as StringCategories;
@@ -53,6 +56,7 @@ export function unionListToComponentData(
     case 'DatetimeRange': return accessor(index, new DatetimeRange())! as DatetimeRange;
     case 'Dates': return accessor(index, new Dates())! as Dates;
     case 'NestedStringCategories': return accessor(index, new NestedStringCategories())! as NestedStringCategories;
+    case 'Bbox': return accessor(index, new Bbox())! as Bbox;
     default: return null;
   }
 }

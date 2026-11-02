@@ -507,13 +507,13 @@ pub const ENUM_MIN_COMPONENT_DATA: u8 = 0;
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
-pub const ENUM_MAX_COMPONENT_DATA: u8 = 6;
+pub const ENUM_MAX_COMPONENT_DATA: u8 = 7;
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_COMPONENT_DATA: [ComponentData; 7] = [
+pub const ENUM_VALUES_COMPONENT_DATA: [ComponentData; 8] = [
     ComponentData::NONE,
     ComponentData::StringCategories,
     ComponentData::IntRange,
@@ -521,6 +521,7 @@ pub const ENUM_VALUES_COMPONENT_DATA: [ComponentData; 7] = [
     ComponentData::DatetimeRange,
     ComponentData::Dates,
     ComponentData::NestedStringCategories,
+    ComponentData::Bbox,
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
@@ -535,9 +536,10 @@ impl ComponentData {
     pub const DatetimeRange: Self = Self(4);
     pub const Dates: Self = Self(5);
     pub const NestedStringCategories: Self = Self(6);
+    pub const Bbox: Self = Self(7);
 
     pub const ENUM_MIN: u8 = 0;
-    pub const ENUM_MAX: u8 = 6;
+    pub const ENUM_MAX: u8 = 7;
     pub const ENUM_VALUES: &'static [Self] = &[
         Self::NONE,
         Self::StringCategories,
@@ -546,6 +548,7 @@ impl ComponentData {
         Self::DatetimeRange,
         Self::Dates,
         Self::NestedStringCategories,
+        Self::Bbox,
     ];
     /// Returns the variant's name or "" if unknown.
     pub fn variant_name(self) -> Option<&'static str> {
@@ -557,6 +560,7 @@ impl ComponentData {
             Self::DatetimeRange => Some("DatetimeRange"),
             Self::Dates => Some("Dates"),
             Self::NestedStringCategories => Some("NestedStringCategories"),
+            Self::Bbox => Some("Bbox"),
             _ => None,
         }
     }
@@ -5316,6 +5320,172 @@ impl core::fmt::Debug for Documents<'_> {
         ds.finish()
     }
 }
+pub enum BboxOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+/// Minimum and maximum longitude and latitude, in WGS 84 degrees.
+/// Bounds do not wrap at 180 degrees longitude.
+pub struct Bbox<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for Bbox<'a> {
+    type Inner = Bbox<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> Bbox<'a> {
+    pub const VT_LNG_MIN: flatbuffers::VOffsetT = 4;
+    pub const VT_LAT_MIN: flatbuffers::VOffsetT = 6;
+    pub const VT_LNG_MAX: flatbuffers::VOffsetT = 8;
+    pub const VT_LAT_MAX: flatbuffers::VOffsetT = 10;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        Bbox { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args BboxArgs,
+    ) -> flatbuffers::WIPOffset<Bbox<'bldr>> {
+        let mut builder = BboxBuilder::new(_fbb);
+        builder.add_lat_max(args.lat_max);
+        builder.add_lng_max(args.lng_max);
+        builder.add_lat_min(args.lat_min);
+        builder.add_lng_min(args.lng_min);
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn lng_min(&self) -> f64 {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe { self._tab.get::<f64>(Bbox::VT_LNG_MIN, Some(0.0)).unwrap() }
+    }
+    #[inline]
+    pub fn lat_min(&self) -> f64 {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe { self._tab.get::<f64>(Bbox::VT_LAT_MIN, Some(0.0)).unwrap() }
+    }
+    #[inline]
+    pub fn lng_max(&self) -> f64 {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe { self._tab.get::<f64>(Bbox::VT_LNG_MAX, Some(0.0)).unwrap() }
+    }
+    #[inline]
+    pub fn lat_max(&self) -> f64 {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe { self._tab.get::<f64>(Bbox::VT_LAT_MAX, Some(0.0)).unwrap() }
+    }
+}
+
+impl flatbuffers::Verifiable for Bbox<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<f64>("lng_min", Self::VT_LNG_MIN, false)?
+            .visit_field::<f64>("lat_min", Self::VT_LAT_MIN, false)?
+            .visit_field::<f64>("lng_max", Self::VT_LNG_MAX, false)?
+            .visit_field::<f64>("lat_max", Self::VT_LAT_MAX, false)?
+            .finish();
+        Ok(())
+    }
+}
+pub struct BboxArgs {
+    pub lng_min: f64,
+    pub lat_min: f64,
+    pub lng_max: f64,
+    pub lat_max: f64,
+}
+impl<'a> Default for BboxArgs {
+    #[inline]
+    fn default() -> Self {
+        BboxArgs {
+            lng_min: 0.0,
+            lat_min: 0.0,
+            lng_max: 0.0,
+            lat_max: 0.0,
+        }
+    }
+}
+
+impl Serialize for Bbox<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("Bbox", 4)?;
+        s.serialize_field("lng_min", &self.lng_min())?;
+        s.serialize_field("lat_min", &self.lat_min())?;
+        s.serialize_field("lng_max", &self.lng_max())?;
+        s.serialize_field("lat_max", &self.lat_max())?;
+        s.end()
+    }
+}
+
+pub struct BboxBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> BboxBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_lng_min(&mut self, lng_min: f64) {
+        self.fbb_.push_slot::<f64>(Bbox::VT_LNG_MIN, lng_min, 0.0);
+    }
+    #[inline]
+    pub fn add_lat_min(&mut self, lat_min: f64) {
+        self.fbb_.push_slot::<f64>(Bbox::VT_LAT_MIN, lat_min, 0.0);
+    }
+    #[inline]
+    pub fn add_lng_max(&mut self, lng_max: f64) {
+        self.fbb_.push_slot::<f64>(Bbox::VT_LNG_MAX, lng_max, 0.0);
+    }
+    #[inline]
+    pub fn add_lat_max(&mut self, lat_max: f64) {
+        self.fbb_.push_slot::<f64>(Bbox::VT_LAT_MAX, lat_max, 0.0);
+    }
+    #[inline]
+    pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> BboxBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        BboxBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<Bbox<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for Bbox<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("Bbox");
+        ds.field("lng_min", &self.lng_min());
+        ds.field("lat_min", &self.lat_min());
+        ds.field("lng_max", &self.lng_max());
+        ds.field("lat_max", &self.lat_max());
+        ds.finish()
+    }
+}
 pub enum RawGeomOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -6171,6 +6341,21 @@ impl<'a> UlField<'a> {
 
     #[inline]
     #[allow(non_snake_case)]
+    pub fn component_data_as_bbox(&self) -> Option<Bbox<'a>> {
+        if self.component_data_type() == ComponentData::Bbox {
+            self.component_data().map(|t| {
+                // Safety:
+                // Created from a valid Table for this object
+                // Which contains a valid union in this slot
+                unsafe { Bbox::init_from_table(t) }
+            })
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    #[allow(non_snake_case)]
     pub fn storage_type_as_null(&self) -> Option<Null<'a>> {
         if self.storage_type_type() == Type::Null {
             self.storage_type().map(|t| {
@@ -6578,6 +6763,7 @@ impl flatbuffers::Verifiable for UlField<'_> {
           ComponentData::DatetimeRange => v.verify_union_variant::<flatbuffers::ForwardsUOffset<DatetimeRange>>("ComponentData::DatetimeRange", pos),
           ComponentData::Dates => v.verify_union_variant::<flatbuffers::ForwardsUOffset<Dates>>("ComponentData::Dates", pos),
           ComponentData::NestedStringCategories => v.verify_union_variant::<flatbuffers::ForwardsUOffset<NestedStringCategories>>("ComponentData::NestedStringCategories", pos),
+          ComponentData::Bbox => v.verify_union_variant::<flatbuffers::ForwardsUOffset<Bbox>>("ComponentData::Bbox", pos),
           _ => Ok(()),
         }
      })?
@@ -6712,6 +6898,12 @@ impl Serialize for UlField<'_> {
                 let f = self.component_data_as_nested_string_categories().expect(
                     "Invalid union table, expected `ComponentData::NestedStringCategories`.",
                 );
+                s.serialize_field("component_data", &f)?;
+            }
+            ComponentData::Bbox => {
+                let f = self
+                    .component_data_as_bbox()
+                    .expect("Invalid union table, expected `ComponentData::Bbox`.");
                 s.serialize_field("component_data", &f)?;
             }
             _ => unimplemented!(),
@@ -7072,6 +7264,16 @@ impl core::fmt::Debug for UlField<'_> {
             }
             ComponentData::NestedStringCategories => {
                 if let Some(x) = self.component_data_as_nested_string_categories() {
+                    ds.field("component_data", &x)
+                } else {
+                    ds.field(
+                        "component_data",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            ComponentData::Bbox => {
+                if let Some(x) = self.component_data_as_bbox() {
                     ds.field("component_data", &x)
                 } else {
                     ds.field(

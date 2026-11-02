@@ -35,6 +35,10 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const ComponentData &o) 
         const std::shared_ptr<NestedStringCategories> &v = std::get<std::shared_ptr<NestedStringCategories>>(o);
         const auto offset = serialize_to(builder, *v);
         return std::make_pair(offset.Union(), ::ComponentData::NestedStringCategories);
+    } else if (std::holds_alternative<std::shared_ptr<Bbox>>(o)) {
+        const std::shared_ptr<Bbox> &v = std::get<std::shared_ptr<Bbox>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::ComponentData::Bbox);
     } else { 
         throw std::runtime_error("unreachable");
     }
@@ -641,6 +645,68 @@ NestedStringCategories::NestedStringCategories(const ::NestedStringCategories *r
 bool
 NestedStringCategories::operator==(const NestedStringCategories &rhs) const {
     if (this->nesting_tree_ != rhs.nesting_tree_) {
+        return false;
+    }
+    return true;
+}
+
+::flatbuffers::Offset<::Bbox>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Bbox &o) {
+
+    ::BboxBuilder instance_builder = ::BboxBuilder(builder);
+    instance_builder.add_lat_max(o.lat_max_);
+    instance_builder.add_lat_min(o.lat_min_);
+    instance_builder.add_lng_max(o.lng_max_);
+    instance_builder.add_lng_min(o.lng_min_);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const Bbox &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+Bbox::Bbox()
+    : lat_max_(0)
+    , lat_min_(0)
+    , lng_max_(0)
+    , lng_min_(0) {
+}
+
+Bbox::Bbox(const std::vector<uint8_t> &bytes)
+    : Bbox(::flatbuffers::GetSizePrefixedRoot<::Bbox>(bytes.data())) {
+}
+
+Bbox::Bbox(const ::Bbox *root) 
+    : lat_max_(0)
+    , lat_min_(0)
+    , lng_max_(0)
+    , lng_min_(0) {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    lat_max_ = root->lat_max();
+    lat_min_ = root->lat_min();
+    lng_max_ = root->lng_max();
+    lng_min_ = root->lng_min();
+}
+
+bool
+Bbox::operator==(const Bbox &rhs) const {
+    if (this->lat_max_ != rhs.lat_max_) {
+        return false;
+    }
+    if (this->lat_min_ != rhs.lat_min_) {
+        return false;
+    }
+    if (this->lng_max_ != rhs.lng_max_) {
+        return false;
+    }
+    if (this->lng_min_ != rhs.lng_min_) {
         return false;
     }
     return true;
@@ -3210,6 +3276,12 @@ UlField::UlField(const ::UlField *root)
             case ::ComponentData::NestedStringCategories: {
                 const auto component_data__local = static_cast<const ::NestedStringCategories *>(root->component_data());
                 std::shared_ptr<NestedStringCategories> component_data__shared = std::make_shared<NestedStringCategories>(component_data__local);
+                component_data_ = component_data__shared;
+                break;
+            }
+            case ::ComponentData::Bbox: {
+                const auto component_data__local = static_cast<const ::Bbox *>(root->component_data());
+                std::shared_ptr<Bbox> component_data__shared = std::make_shared<Bbox>(component_data__local);
                 component_data_ = component_data__shared;
                 break;
             }
