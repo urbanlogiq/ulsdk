@@ -8,13 +8,19 @@ import org.junit.jupiter.api.Test;
 public final class TestSparseTensorIndexCSF {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.SparseTensorIndexCSF();
+        var instance = new com.urbanlogiq.ulsdk.types.SparseTensorIndexCSF();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getAxisOrder());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getIndicesBuffers());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getIndicesType());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getIndptrBuffers());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getIndptrType());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.SparseTensorIndexCSF();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.SparseTensorIndexCSF(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.SparseTensorIndexCSF(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

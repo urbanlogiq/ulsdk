@@ -8,13 +8,19 @@ import org.junit.jupiter.api.Test;
 public final class TestUpdateQueryElement {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.UpdateQueryElement();
+        var instance = new com.urbanlogiq.ulsdk.types.UpdateQueryElement();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getFilter());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getFromSources());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getJoins());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getSets());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getSource());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.UpdateQueryElement();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.UpdateQueryElement(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.UpdateQueryElement(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

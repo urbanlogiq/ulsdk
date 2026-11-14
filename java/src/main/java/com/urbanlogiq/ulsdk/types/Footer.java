@@ -163,10 +163,6 @@ public final class Footer {
     }
 
     public Footer() {
-        this._customMetadata = new com.urbanlogiq.ulsdk.types.KeyValue[0];
-        this._dictionaries = new com.urbanlogiq.ulsdk.types.Block[0];
-        this._recordBatches = new com.urbanlogiq.ulsdk.types.Block[0];
-        this._schema = new com.urbanlogiq.ulsdk.types.Schema();
     }
 
     @Override

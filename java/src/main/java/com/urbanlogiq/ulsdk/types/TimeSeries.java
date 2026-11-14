@@ -136,7 +136,6 @@ public final class TimeSeries {
 
     public TimeSeries() {
         this._outputColumn = new String();
-        this._tz = new String();
     }
 
     @Override

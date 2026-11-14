@@ -197,14 +197,9 @@ public final class Mission {
     }
 
     public Mission() {
-        this._authoredBy = new String();
-        this._checkpoint = new String();
         this._document = new com.urbanlogiq.ulsdk.types.ObjectId();
-        this._documentCid = new com.urbanlogiq.ulsdk.types.ContentId();
         this._documentSha256 = new String();
         this._missionId = new String();
-        this._spec = new com.urbanlogiq.ulsdk.types.ObjectId();
-        this._specCid = new com.urbanlogiq.ulsdk.types.ContentId();
     }
 
     @Override

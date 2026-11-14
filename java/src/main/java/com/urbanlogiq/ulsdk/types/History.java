@@ -71,7 +71,6 @@ public final class History {
 
     public History() {
         this._changes = new com.urbanlogiq.ulsdk.types.ChangeSet[0];
-        this._continuationId = new com.urbanlogiq.ulsdk.types.ContentId();
     }
 
     @Override

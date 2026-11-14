@@ -81,7 +81,6 @@ public final class ForeignKey {
     public ForeignKey() {
         this._column = new String();
         this._referencedColumn = new String();
-        this._streamId = new com.urbanlogiq.ulsdk.types.ObjectId();
     }
 
     @Override

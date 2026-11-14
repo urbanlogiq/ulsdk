@@ -8,13 +8,17 @@ import org.junit.jupiter.api.Test;
 public final class TestIntRange {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.IntRange();
+        var instance = new com.urbanlogiq.ulsdk.types.IntRange();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getDisplayStrings());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getEnumName());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getFieldFormat());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.IntRange();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.IntRange(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.IntRange(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

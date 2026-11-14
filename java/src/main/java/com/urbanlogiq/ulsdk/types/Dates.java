@@ -97,8 +97,6 @@ public final class Dates {
     }
 
     public Dates() {
-        this._uniqueValueCounts = new long[0];
-        this._uniqueValues = new long[0];
     }
 
     @Override

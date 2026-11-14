@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestVI64 {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.VI64();
+        var instance = new com.urbanlogiq.ulsdk.types.VI64();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.VI64();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.VI64(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.VI64(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

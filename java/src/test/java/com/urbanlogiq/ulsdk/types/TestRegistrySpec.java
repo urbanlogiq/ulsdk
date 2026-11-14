@@ -8,13 +8,21 @@ import org.junit.jupiter.api.Test;
 public final class TestRegistrySpec {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.RegistrySpec();
+        var instance = new com.urbanlogiq.ulsdk.types.RegistrySpec();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getFields());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getKey());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getName());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getRelations());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getSourceField());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getSourceFormat());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getSourceHashField());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.RegistrySpec();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.RegistrySpec(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.RegistrySpec(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

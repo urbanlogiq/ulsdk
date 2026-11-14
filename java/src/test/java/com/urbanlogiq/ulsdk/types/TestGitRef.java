@@ -8,13 +8,16 @@ import org.junit.jupiter.api.Test;
 public final class TestGitRef {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.GitRef();
+        var instance = new com.urbanlogiq.ulsdk.types.GitRef();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getCommitish());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getRepo());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.GitRef();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.GitRef(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.GitRef(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

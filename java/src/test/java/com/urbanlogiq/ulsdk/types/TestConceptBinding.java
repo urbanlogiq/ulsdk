@@ -8,13 +8,16 @@ import org.junit.jupiter.api.Test;
 public final class TestConceptBinding {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.ConceptBinding();
+        var instance = new com.urbanlogiq.ulsdk.types.ConceptBinding();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getConcept());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getMappedBy());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.ConceptBinding();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.ConceptBinding(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.ConceptBinding(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestParamIndices {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.ParamIndices();
+        var instance = new com.urbanlogiq.ulsdk.types.ParamIndices();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getIdxs());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.ParamIndices();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.ParamIndices(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.ParamIndices(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

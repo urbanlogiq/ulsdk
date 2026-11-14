@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestMultiPoint {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.MultiPoint();
+        var instance = new com.urbanlogiq.ulsdk.types.MultiPoint();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getPointGeo());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.MultiPoint();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.MultiPoint(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.MultiPoint(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

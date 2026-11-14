@@ -164,7 +164,6 @@ public final class ValueInstance {
     }
 
     public ValueInstance() {
-        this._name = new String();
         this._v = new com.urbanlogiq.ulsdk.types.Value();
     }
 

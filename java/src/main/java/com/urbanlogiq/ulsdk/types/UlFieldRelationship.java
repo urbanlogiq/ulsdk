@@ -81,8 +81,6 @@ public final class UlFieldRelationship {
     }
 
     public UlFieldRelationship() {
-        this._relationshipData = new com.urbanlogiq.ulsdk.types.UlFieldRelationshipData();
-        this._relationshipDisplayName = new String();
     }
 
     @Override

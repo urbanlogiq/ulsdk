@@ -141,9 +141,6 @@ public final class Schema {
     }
 
     public Schema() {
-        this._customMetadata = new com.urbanlogiq.ulsdk.types.KeyValue[0];
-        this._features = new long[0];
-        this._fields = new com.urbanlogiq.ulsdk.types.Field[0];
     }
 
     @Override

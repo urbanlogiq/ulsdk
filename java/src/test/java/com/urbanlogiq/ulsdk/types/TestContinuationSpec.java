@@ -8,13 +8,17 @@ import org.junit.jupiter.api.Test;
 public final class TestContinuationSpec {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.ContinuationSpec();
+        var instance = new com.urbanlogiq.ulsdk.types.ContinuationSpec();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getParamIndices());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getParams());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getSchematic());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.ContinuationSpec();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.ContinuationSpec(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.ContinuationSpec(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

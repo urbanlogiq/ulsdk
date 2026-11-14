@@ -252,13 +252,6 @@ public final class UnaryQueryElement {
     }
 
     public UnaryQueryElement() {
-        this._distinct = new com.urbanlogiq.ulsdk.types.Distinct();
-        this._fields = new com.urbanlogiq.ulsdk.types.Expr[0];
-        this._filter = new com.urbanlogiq.ulsdk.types.Function();
-        this._groupBy = new com.urbanlogiq.ulsdk.types.Expr[0];
-        this._having = new com.urbanlogiq.ulsdk.types.Function();
-        this._joins = new com.urbanlogiq.ulsdk.types.Join[0];
-        this._orderBy = new com.urbanlogiq.ulsdk.types.TableOrderBy[0];
         this._sources = new com.urbanlogiq.ulsdk.types.TableSource[0];
     }
 

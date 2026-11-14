@@ -55,7 +55,6 @@ public final class NodeIdPair {
 
     public NodeIdPair() {
         this._nodeId = new com.urbanlogiq.ulsdk.types.GraphNodeId();
-        this._streamId = new com.urbanlogiq.ulsdk.types.ObjectId();
     }
 
     @Override

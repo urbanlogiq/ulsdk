@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestVTimestampMsUtc {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.VTimestampMsUtc();
+        var instance = new com.urbanlogiq.ulsdk.types.VTimestampMsUtc();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.VTimestampMsUtc();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.VTimestampMsUtc(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.VTimestampMsUtc(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

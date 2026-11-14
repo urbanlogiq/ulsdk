@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestNestedCategoryRelationshipNode {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.NestedCategoryRelationshipNode();
+        var instance = new com.urbanlogiq.ulsdk.types.NestedCategoryRelationshipNode();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getChildColumns());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.NestedCategoryRelationshipNode();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.NestedCategoryRelationshipNode(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.NestedCategoryRelationshipNode(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

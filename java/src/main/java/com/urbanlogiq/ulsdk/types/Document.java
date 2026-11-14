@@ -97,10 +97,6 @@ public final class Document {
     }
 
     public Document() {
-        this._displayName = new String();
-        this._filename = new String();
-        this._mimeType = new String();
-        this._url = new String();
     }
 
     @Override

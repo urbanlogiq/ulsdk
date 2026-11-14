@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestVTri2D {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.VTri2D();
+        var instance = new com.urbanlogiq.ulsdk.types.VTri2D();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getV());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.VTri2D();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.VTri2D(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.VTri2D(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

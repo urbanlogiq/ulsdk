@@ -55,7 +55,6 @@ public final class StringCategories {
     }
 
     public StringCategories() {
-        this._categories = new String[0];
     }
 
     @Override

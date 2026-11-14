@@ -84,9 +84,7 @@ public final class Producer {
     }
 
     public Producer() {
-        this._builderCodeRef = new com.urbanlogiq.ulsdk.types.GitRef();
         this._executor = new com.urbanlogiq.ulsdk.types.GitRef();
-        this._model = new com.urbanlogiq.ulsdk.types.ProducerRef();
     }
 
     @Override

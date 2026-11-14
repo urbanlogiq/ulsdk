@@ -239,15 +239,9 @@ public final class KpiSpec {
     }
 
     public KpiSpec() {
-        this._authoredBy = new String();
-        this._bronze = new com.urbanlogiq.ulsdk.types.ObjectId();
-        this._bronzeCid = new com.urbanlogiq.ulsdk.types.ContentId();
-        this._documentCid = new com.urbanlogiq.ulsdk.types.ContentId();
         this._documentId = new com.urbanlogiq.ulsdk.types.ObjectId();
         this._documentSha256 = new String();
         this._kpi = new String();
-        this._serviceSystem = new String();
-        this._title = new String();
     }
 
     @Override

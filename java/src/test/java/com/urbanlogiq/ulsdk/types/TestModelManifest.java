@@ -8,13 +8,23 @@ import org.junit.jupiter.api.Test;
 public final class TestModelManifest {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.ModelManifest();
+        var instance = new com.urbanlogiq.ulsdk.types.ModelManifest();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getAuthoredBy());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getBundle());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getBundleCid());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getManifest());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getManifestCid());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getManifestSha256());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getModelId());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getSilver());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getSources());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.ModelManifest();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.ModelManifest(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.ModelManifest(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

@@ -59,7 +59,6 @@ public final class Documents {
     }
 
     public Documents() {
-        this._documents = new com.urbanlogiq.ulsdk.types.Document[0];
     }
 
     @Override

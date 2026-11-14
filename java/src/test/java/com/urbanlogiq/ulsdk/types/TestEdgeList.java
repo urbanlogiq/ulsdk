@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestEdgeList {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.EdgeList();
+        var instance = new com.urbanlogiq.ulsdk.types.EdgeList();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getEdges());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.EdgeList();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.EdgeList(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.EdgeList(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

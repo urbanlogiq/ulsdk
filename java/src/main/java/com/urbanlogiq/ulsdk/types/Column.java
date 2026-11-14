@@ -65,7 +65,6 @@ public final class Column {
 
     public Column() {
         this._name = new String();
-        this._source = new com.urbanlogiq.ulsdk.types.NullableUint();
     }
 
     @Override

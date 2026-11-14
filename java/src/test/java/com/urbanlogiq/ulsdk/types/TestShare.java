@@ -8,13 +8,17 @@ import org.junit.jupiter.api.Test;
 public final class TestShare {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Share();
+        var instance = new com.urbanlogiq.ulsdk.types.Share();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getDest());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getMsg());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getObject());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Share();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Share(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Share(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

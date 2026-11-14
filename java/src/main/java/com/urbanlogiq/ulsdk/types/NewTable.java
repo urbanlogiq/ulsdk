@@ -130,10 +130,7 @@ public final class NewTable {
     }
 
     public NewTable() {
-        this._from = new com.urbanlogiq.ulsdk.types.TableFrom();
         this._name = new String();
-        this._parent = new com.urbanlogiq.ulsdk.types.ObjectId();
-        this._target = new com.urbanlogiq.ulsdk.types.ObjectId();
     }
 
     @Override

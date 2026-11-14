@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestNumericalFieldFormat {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.NumericalFieldFormat();
+        var instance = new com.urbanlogiq.ulsdk.types.NumericalFieldFormat();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.NumericalFieldFormat();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.NumericalFieldFormat(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.NumericalFieldFormat(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

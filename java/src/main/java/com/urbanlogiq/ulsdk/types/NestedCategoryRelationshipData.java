@@ -59,7 +59,6 @@ public final class NestedCategoryRelationshipData {
     }
 
     public NestedCategoryRelationshipData() {
-        this._categories = new com.urbanlogiq.ulsdk.types.NestedCategoryRelationshipNode[0];
     }
 
     @Override

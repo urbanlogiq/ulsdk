@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestMultiPolygon {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.MultiPolygon();
+        var instance = new com.urbanlogiq.ulsdk.types.MultiPolygon();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getMultipolygonGeo());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.MultiPolygon();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.MultiPolygon(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.MultiPolygon(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

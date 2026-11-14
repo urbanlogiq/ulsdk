@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestDirectionAndRoadNames {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.DirectionAndRoadNames();
+        var instance = new com.urbanlogiq.ulsdk.types.DirectionAndRoadNames();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getDirectionAndRoadNames());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.DirectionAndRoadNames();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.DirectionAndRoadNames(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.DirectionAndRoadNames(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

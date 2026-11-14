@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestMap {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Map();
+        var instance = new com.urbanlogiq.ulsdk.types.Map();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Map();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Map(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Map(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

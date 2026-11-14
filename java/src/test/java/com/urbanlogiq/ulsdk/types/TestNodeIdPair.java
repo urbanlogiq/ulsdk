@@ -8,13 +8,16 @@ import org.junit.jupiter.api.Test;
 public final class TestNodeIdPair {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.NodeIdPair();
+        var instance = new com.urbanlogiq.ulsdk.types.NodeIdPair();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getNodeId());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getStreamId());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.NodeIdPair();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.NodeIdPair(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.NodeIdPair(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

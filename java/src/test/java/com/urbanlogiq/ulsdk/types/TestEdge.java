@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestEdge {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Edge();
+        var instance = new com.urbanlogiq.ulsdk.types.Edge();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Edge();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Edge(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Edge(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

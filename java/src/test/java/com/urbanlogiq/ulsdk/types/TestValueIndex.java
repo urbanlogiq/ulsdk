@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestValueIndex {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.ValueIndex();
+        var instance = new com.urbanlogiq.ulsdk.types.ValueIndex();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.ValueIndex();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.ValueIndex(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.ValueIndex(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

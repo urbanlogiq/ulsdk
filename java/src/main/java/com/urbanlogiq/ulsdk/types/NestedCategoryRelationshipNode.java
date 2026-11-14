@@ -61,7 +61,6 @@ public final class NestedCategoryRelationshipNode {
     }
 
     public NestedCategoryRelationshipNode() {
-        this._childColumns = new int[0];
     }
 
     @Override

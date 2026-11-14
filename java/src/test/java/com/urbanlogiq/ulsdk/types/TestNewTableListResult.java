@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestNewTableListResult {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.NewTableListResult();
+        var instance = new com.urbanlogiq.ulsdk.types.NewTableListResult();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getResults());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.NewTableListResult();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.NewTableListResult(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.NewTableListResult(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

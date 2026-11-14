@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestDictionaryEncoding {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.DictionaryEncoding();
+        var instance = new com.urbanlogiq.ulsdk.types.DictionaryEncoding();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getIndexType());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.DictionaryEncoding();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.DictionaryEncoding(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.DictionaryEncoding(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

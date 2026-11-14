@@ -59,7 +59,6 @@ public final class HierarchyRelationshipData {
     }
 
     public HierarchyRelationshipData() {
-        this._hierarchy = new com.urbanlogiq.ulsdk.types.HierarchicalRelationship[0];
     }
 
     @Override

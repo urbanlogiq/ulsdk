@@ -91,7 +91,6 @@ public final class Slot {
     }
 
     public Slot() {
-        this._attributes = new com.urbanlogiq.ulsdk.types.Attr[0];
         this._id = new com.urbanlogiq.ulsdk.types.ObjectId();
         this._name = new String();
     }

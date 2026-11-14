@@ -8,13 +8,18 @@ import org.junit.jupiter.api.Test;
 public final class TestRunSpec {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.RunSpec();
+        var instance = new com.urbanlogiq.ulsdk.types.RunSpec();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getAttributes());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getParamIndices());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getParams());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getSchematic());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.RunSpec();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.RunSpec(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.RunSpec(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

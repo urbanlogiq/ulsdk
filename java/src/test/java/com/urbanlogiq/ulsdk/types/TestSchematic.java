@@ -8,13 +8,18 @@ import org.junit.jupiter.api.Test;
 public final class TestSchematic {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Schematic();
+        var instance = new com.urbanlogiq.ulsdk.types.Schematic();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getAttributes());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getEdges());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getName());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getNodes());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Schematic();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Schematic(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Schematic(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

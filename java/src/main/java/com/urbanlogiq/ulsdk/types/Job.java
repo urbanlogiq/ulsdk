@@ -172,8 +172,6 @@ public final class Job {
     }
 
     public Job() {
-        this._attributes = new com.urbanlogiq.ulsdk.types.Attr[0];
-        this._errorTys = new int[0];
         this._params = new com.urbanlogiq.ulsdk.types.TaskParameter[0];
         this._tasks = new com.urbanlogiq.ulsdk.types.Task[0];
         this._userId = new com.urbanlogiq.ulsdk.types.ObjectId();

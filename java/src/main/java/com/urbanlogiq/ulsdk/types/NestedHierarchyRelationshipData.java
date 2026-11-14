@@ -59,7 +59,6 @@ public final class NestedHierarchyRelationshipData {
     }
 
     public NestedHierarchyRelationshipData() {
-        this._nodes = new com.urbanlogiq.ulsdk.types.NestedHierarchyRelationshipNode[0];
     }
 
     @Override

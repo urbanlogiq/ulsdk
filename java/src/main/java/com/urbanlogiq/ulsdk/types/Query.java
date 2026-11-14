@@ -132,10 +132,7 @@ public final class Query {
     }
 
     public Query() {
-        this._boundSources = new com.urbanlogiq.ulsdk.types.TableSourceInstance[0];
-        this._explain = new com.urbanlogiq.ulsdk.types.Explain();
         this._query = new com.urbanlogiq.ulsdk.types.QueryElement();
-        this._values = new com.urbanlogiq.ulsdk.types.ValueInstance[0];
     }
 
     @Override

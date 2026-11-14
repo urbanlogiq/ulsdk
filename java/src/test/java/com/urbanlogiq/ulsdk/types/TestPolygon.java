@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestPolygon {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Polygon();
+        var instance = new com.urbanlogiq.ulsdk.types.Polygon();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getPolygonGeo());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Polygon();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Polygon(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Polygon(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

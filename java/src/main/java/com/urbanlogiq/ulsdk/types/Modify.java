@@ -77,7 +77,6 @@ public final class Modify {
 
     public Modify() {
         this._col = new String();
-        this._previous = new com.urbanlogiq.ulsdk.types.ValueInstance();
         this._row = new com.urbanlogiq.ulsdk.types.GenericId();
         this._value = new com.urbanlogiq.ulsdk.types.ValueInstance();
     }

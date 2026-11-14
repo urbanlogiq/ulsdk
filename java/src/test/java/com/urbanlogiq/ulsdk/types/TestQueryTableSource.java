@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestQueryTableSource {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.QueryTableSource();
+        var instance = new com.urbanlogiq.ulsdk.types.QueryTableSource();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getQ());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.QueryTableSource();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.QueryTableSource(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.QueryTableSource(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

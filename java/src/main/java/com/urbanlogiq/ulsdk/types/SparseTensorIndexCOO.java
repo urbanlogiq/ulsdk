@@ -135,7 +135,6 @@ public final class SparseTensorIndexCOO {
 
     public SparseTensorIndexCOO() {
         this._indicesBuffer = new com.urbanlogiq.ulsdk.types.Buffer();
-        this._indicesStrides = new long[0];
         this._indicesType = new com.urbanlogiq.ulsdk.types.Int();
     }
 

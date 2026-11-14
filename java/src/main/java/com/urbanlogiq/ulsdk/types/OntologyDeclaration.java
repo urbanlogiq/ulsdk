@@ -203,14 +203,10 @@ public final class OntologyDeclaration {
     }
 
     public OntologyDeclaration() {
-        this._authoredBy = new String();
-        this._bronze = new com.urbanlogiq.ulsdk.types.ObjectId();
-        this._bronzeCid = new com.urbanlogiq.ulsdk.types.ContentId();
         this._namespace = new String();
         this._ontologyId = new String();
         this._ontologyKey = new String();
         this._source = new com.urbanlogiq.ulsdk.types.ObjectId();
-        this._sourceCid = new com.urbanlogiq.ulsdk.types.ContentId();
         this._sourceSha256 = new String();
     }
 

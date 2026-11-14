@@ -8,13 +8,22 @@ import org.junit.jupiter.api.Test;
 public final class TestUlField {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.UlField();
+        var instance = new com.urbanlogiq.ulsdk.types.UlField();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getBreakdownDisplayName());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getComponentData());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getConceptAttr());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getDefault());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getDescription());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getDisplayName());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getFieldName());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getStorageType());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.UlField();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.UlField(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.UlField(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

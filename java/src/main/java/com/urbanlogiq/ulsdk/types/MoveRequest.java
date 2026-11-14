@@ -82,8 +82,6 @@ public final class MoveRequest {
     }
 
     public MoveRequest() {
-        this._destName = new String();
-        this._destRoot = new com.urbanlogiq.ulsdk.types.ObjectId();
         this._entry = new com.urbanlogiq.ulsdk.types.ObjectId();
     }
 

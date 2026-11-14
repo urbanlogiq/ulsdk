@@ -87,8 +87,6 @@ public final class DeprecatedTaskParameter {
 
     public DeprecatedTaskParameter() {
         this._key = new String();
-        this._obj = new com.urbanlogiq.ulsdk.types.ObjectId();
-        this._value = new byte[0];
     }
 
     @Override

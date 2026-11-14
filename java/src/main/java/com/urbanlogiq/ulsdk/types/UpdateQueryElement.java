@@ -199,9 +199,6 @@ public final class UpdateQueryElement {
     }
 
     public UpdateQueryElement() {
-        this._filter = new com.urbanlogiq.ulsdk.types.Function();
-        this._fromSources = new com.urbanlogiq.ulsdk.types.TableSource[0];
-        this._joins = new com.urbanlogiq.ulsdk.types.Join[0];
         this._sets = new com.urbanlogiq.ulsdk.types.SetExpr[0];
         this._source = new com.urbanlogiq.ulsdk.types.TableSourceUnion();
     }

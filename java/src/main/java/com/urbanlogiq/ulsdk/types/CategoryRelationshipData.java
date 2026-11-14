@@ -77,8 +77,6 @@ public final class CategoryRelationshipData {
     }
 
     public CategoryRelationshipData() {
-        this._associatedFields = new int[0];
-        this._categories = new int[0];
     }
 
     @Override

@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestDelete {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Delete();
+        var instance = new com.urbanlogiq.ulsdk.types.Delete();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getRow());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Delete();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Delete(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Delete(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

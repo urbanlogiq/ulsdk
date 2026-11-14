@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestDatetimeRange {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.DatetimeRange();
+        var instance = new com.urbanlogiq.ulsdk.types.DatetimeRange();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getIntervals());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.DatetimeRange();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.DatetimeRange(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.DatetimeRange(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

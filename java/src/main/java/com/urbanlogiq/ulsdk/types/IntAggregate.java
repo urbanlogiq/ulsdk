@@ -119,7 +119,6 @@ public final class IntAggregate {
     }
 
     public IntAggregate() {
-        this._histo = new com.urbanlogiq.ulsdk.types.UIntBucket[0];
     }
 
     @Override

@@ -118,7 +118,6 @@ public final class ChangeSet {
     }
 
     public ChangeSet() {
-        this._attributes = new com.urbanlogiq.ulsdk.types.Attr[0];
         this._ops = new com.urbanlogiq.ulsdk.types.ChangeOpEntry[0];
         this._revision = new com.urbanlogiq.ulsdk.types.ContentId();
         this._who = new com.urbanlogiq.ulsdk.types.B2cId();

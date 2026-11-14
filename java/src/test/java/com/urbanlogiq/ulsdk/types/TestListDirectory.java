@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestListDirectory {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.ListDirectory();
+        var instance = new com.urbanlogiq.ulsdk.types.ListDirectory();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.ListDirectory();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.ListDirectory(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.ListDirectory(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

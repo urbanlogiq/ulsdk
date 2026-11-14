@@ -197,11 +197,6 @@ public final class GraphNode {
     }
 
     public GraphNode() {
-        this.__description = new String();
-        this.__geom = new com.urbanlogiq.ulsdk.types.Geometry();
-        this.__location = new com.urbanlogiq.ulsdk.types.Point();
-        this.__nodeId = new com.urbanlogiq.ulsdk.types.GenericId();
-        this.__stream = new com.urbanlogiq.ulsdk.types.ObjectId();
     }
 
     @Override

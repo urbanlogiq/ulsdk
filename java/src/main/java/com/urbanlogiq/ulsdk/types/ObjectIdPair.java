@@ -59,7 +59,6 @@ public final class ObjectIdPair {
 
     public ObjectIdPair() {
         this._id = new com.urbanlogiq.ulsdk.types.ObjectId();
-        this._object = new byte[0];
     }
 
     @Override

@@ -85,7 +85,6 @@ public final class ObjectSummary {
     }
 
     public ObjectSummary() {
-        this._acl = new com.urbanlogiq.ulsdk.types.ObjectId();
         this._headRevision = new com.urbanlogiq.ulsdk.types.ContentId();
         this._id = new com.urbanlogiq.ulsdk.types.ObjectId();
     }

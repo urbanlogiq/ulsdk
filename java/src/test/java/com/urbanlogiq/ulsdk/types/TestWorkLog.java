@@ -8,13 +8,23 @@ import org.junit.jupiter.api.Test;
 public final class TestWorkLog {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.WorkLog();
+        var instance = new com.urbanlogiq.ulsdk.types.WorkLog();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getInputStreams());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getJobId());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getName());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getOutputStreams());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getParams());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getParent());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getProducer());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getSchematic());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getUserSettings());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.WorkLog();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.WorkLog(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.WorkLog(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

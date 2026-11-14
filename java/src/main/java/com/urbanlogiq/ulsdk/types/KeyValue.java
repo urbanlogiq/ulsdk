@@ -66,8 +66,6 @@ public final class KeyValue {
     }
 
     public KeyValue() {
-        this._key = new String();
-        this._value = new String();
     }
 
     @Override

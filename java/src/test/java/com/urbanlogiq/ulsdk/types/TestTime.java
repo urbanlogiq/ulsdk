@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestTime {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Time();
+        var instance = new com.urbanlogiq.ulsdk.types.Time();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Time();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Time(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Time(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

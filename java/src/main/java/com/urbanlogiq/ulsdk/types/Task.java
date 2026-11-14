@@ -359,12 +359,9 @@ public final class Task {
         this.__id = new com.urbanlogiq.ulsdk.types.ObjectId();
         this._downstream = new com.urbanlogiq.ulsdk.types.ObjectId[0];
         this._jobId = new com.urbanlogiq.ulsdk.types.ObjectId();
-        this._lastUpdatedByPod = new String();
-        this._message = new String();
         this._name = new String();
         this._output = new com.urbanlogiq.ulsdk.types.PinnedObjectId();
         this._params = new com.urbanlogiq.ulsdk.types.ParamIndices();
-        this._schematicId = new com.urbanlogiq.ulsdk.types.ObjectId();
         this._task = new com.urbanlogiq.ulsdk.types.ObjectId();
         this._upstream = new com.urbanlogiq.ulsdk.types.ObjectId[0];
         this._userId = new com.urbanlogiq.ulsdk.types.ObjectId();

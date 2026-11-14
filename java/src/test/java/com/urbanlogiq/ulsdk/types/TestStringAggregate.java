@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestStringAggregate {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.StringAggregate();
+        var instance = new com.urbanlogiq.ulsdk.types.StringAggregate();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getStr());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.StringAggregate();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.StringAggregate(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.StringAggregate(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

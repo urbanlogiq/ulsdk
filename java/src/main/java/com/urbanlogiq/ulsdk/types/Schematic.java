@@ -126,7 +126,6 @@ public final class Schematic {
     public Schematic() {
         this._attributes = new com.urbanlogiq.ulsdk.types.AttributePair[0];
         this._edges = new com.urbanlogiq.ulsdk.types.Edge[0];
-        this._name = new String();
         this._nodes = new com.urbanlogiq.ulsdk.types.Node[0];
     }
 

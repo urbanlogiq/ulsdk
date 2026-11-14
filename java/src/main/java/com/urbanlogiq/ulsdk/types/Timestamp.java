@@ -172,7 +172,6 @@ public final class Timestamp {
     }
 
     public Timestamp() {
-        this._timezone = new String();
     }
 
     @Override

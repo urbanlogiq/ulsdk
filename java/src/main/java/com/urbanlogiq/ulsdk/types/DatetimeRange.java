@@ -79,7 +79,6 @@ public final class DatetimeRange {
     }
 
     public DatetimeRange() {
-        this._intervals = new com.urbanlogiq.ulsdk.types.TimeInterval[0];
     }
 
     @Override

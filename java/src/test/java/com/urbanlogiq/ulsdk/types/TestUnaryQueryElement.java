@@ -8,13 +8,22 @@ import org.junit.jupiter.api.Test;
 public final class TestUnaryQueryElement {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.UnaryQueryElement();
+        var instance = new com.urbanlogiq.ulsdk.types.UnaryQueryElement();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getDistinct());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getFields());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getFilter());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getGroupBy());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getHaving());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getJoins());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getOrderBy());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getSources());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.UnaryQueryElement();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.UnaryQueryElement(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.UnaryQueryElement(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

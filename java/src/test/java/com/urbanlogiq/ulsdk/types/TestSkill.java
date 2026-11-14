@@ -8,13 +8,21 @@ import org.junit.jupiter.api.Test;
 public final class TestSkill {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Skill();
+        var instance = new com.urbanlogiq.ulsdk.types.Skill();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getAgent());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getAuthoredBy());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getDescription());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getDocumentCid());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getDocumentId());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getDocumentSha256());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getName());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Skill();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Skill(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Skill(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

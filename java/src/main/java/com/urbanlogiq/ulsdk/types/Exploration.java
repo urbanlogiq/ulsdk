@@ -224,15 +224,9 @@ public final class Exploration {
     }
 
     public Exploration() {
-        this._authoredBy = new String();
         this._explorationId = new String();
-        this._missionId = new String();
-        this._programCid = new com.urbanlogiq.ulsdk.types.ContentId();
         this._programId = new com.urbanlogiq.ulsdk.types.ObjectId();
         this._programSha256 = new String();
-        this._requestedBy = new String();
-        this._resultDigest = new String();
-        this._status = new String();
     }
 
     @Override

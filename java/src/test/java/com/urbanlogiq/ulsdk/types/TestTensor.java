@@ -8,13 +8,18 @@ import org.junit.jupiter.api.Test;
 public final class TestTensor {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Tensor();
+        var instance = new com.urbanlogiq.ulsdk.types.Tensor();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getData());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getShape());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getStrides());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getType());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Tensor();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Tensor(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Tensor(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

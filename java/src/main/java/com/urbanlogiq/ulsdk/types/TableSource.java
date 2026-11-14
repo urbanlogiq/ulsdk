@@ -198,10 +198,6 @@ public final class TableSource {
     }
 
     public TableSource() {
-        this._fields = new com.urbanlogiq.ulsdk.types.Expr[0];
-        this._filter = new com.urbanlogiq.ulsdk.types.Function();
-        this._groupBy = new com.urbanlogiq.ulsdk.types.Expr[0];
-        this._orderBy = new com.urbanlogiq.ulsdk.types.OrderBy[0];
         this._t = new com.urbanlogiq.ulsdk.types.TableSourceUnion();
     }
 

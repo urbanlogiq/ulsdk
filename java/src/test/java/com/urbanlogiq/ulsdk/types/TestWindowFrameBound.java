@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestWindowFrameBound {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.WindowFrameBound();
+        var instance = new com.urbanlogiq.ulsdk.types.WindowFrameBound();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.WindowFrameBound();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.WindowFrameBound(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.WindowFrameBound(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

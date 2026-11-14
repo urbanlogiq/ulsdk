@@ -8,13 +8,23 @@ import org.junit.jupiter.api.Test;
 public final class TestOntologyDeclaration {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.OntologyDeclaration();
+        var instance = new com.urbanlogiq.ulsdk.types.OntologyDeclaration();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getAuthoredBy());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getBronze());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getBronzeCid());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getNamespace());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getOntologyId());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getOntologyKey());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getSource());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getSourceCid());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getSourceSha256());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.OntologyDeclaration();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.OntologyDeclaration(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.OntologyDeclaration(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestTimeInterval {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.TimeInterval();
+        var instance = new com.urbanlogiq.ulsdk.types.TimeInterval();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.TimeInterval();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.TimeInterval(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.TimeInterval(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

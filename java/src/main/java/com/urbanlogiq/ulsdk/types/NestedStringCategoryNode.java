@@ -67,7 +67,6 @@ public final class NestedStringCategoryNode {
 
     public NestedStringCategoryNode() {
         this._childValues = new String[0];
-        this._value = new String();
     }
 
     @Override

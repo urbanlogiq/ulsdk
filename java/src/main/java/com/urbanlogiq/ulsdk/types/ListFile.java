@@ -65,7 +65,6 @@ public final class ListFile {
 
     public ListFile() {
         this._mime = new String();
-        this._virus = new String();
     }
 
     @Override

@@ -8,13 +8,17 @@ import org.junit.jupiter.api.Test;
 public final class TestForeignKey {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.ForeignKey();
+        var instance = new com.urbanlogiq.ulsdk.types.ForeignKey();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getColumn());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getReferencedColumn());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getStreamId());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.ForeignKey();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.ForeignKey(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.ForeignKey(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

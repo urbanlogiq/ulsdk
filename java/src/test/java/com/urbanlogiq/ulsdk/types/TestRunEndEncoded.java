@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestRunEndEncoded {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.RunEndEncoded();
+        var instance = new com.urbanlogiq.ulsdk.types.RunEndEncoded();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.RunEndEncoded();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.RunEndEncoded(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.RunEndEncoded(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

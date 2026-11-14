@@ -235,7 +235,6 @@ public final class TileSettings {
     public TileSettings() {
         this._fieldName = new String();
         this._metadataId = new com.urbanlogiq.ulsdk.types.ObjectId();
-        this._recordCountStreamId = new com.urbanlogiq.ulsdk.types.ObjectId();
         this._selectedColumns = new String[0];
         this._title = new String();
     }

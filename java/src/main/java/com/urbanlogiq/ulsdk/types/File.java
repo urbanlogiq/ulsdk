@@ -182,12 +182,7 @@ public final class File {
 
     public File() {
         this._account = new String();
-        this._blob = new com.urbanlogiq.ulsdk.types.GenericId();
-        this._chunks = new com.urbanlogiq.ulsdk.types.Chunk[0];
-        this._container = new String();
-        this._digest = new com.urbanlogiq.ulsdk.types.Digest();
         this._mime = new String();
-        this._virus = new String();
     }
 
     @Override

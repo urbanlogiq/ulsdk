@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestStringCategories {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.StringCategories();
+        var instance = new com.urbanlogiq.ulsdk.types.StringCategories();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getCategories());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.StringCategories();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.StringCategories(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.StringCategories(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestUtf8 {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Utf8();
+        var instance = new com.urbanlogiq.ulsdk.types.Utf8();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Utf8();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Utf8(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Utf8(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

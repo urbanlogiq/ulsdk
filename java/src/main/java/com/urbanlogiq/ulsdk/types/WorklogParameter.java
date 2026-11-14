@@ -75,7 +75,6 @@ public final class WorklogParameter {
 
     public WorklogParameter() {
         this._key = new String();
-        this._value = new com.urbanlogiq.ulsdk.types.ParameterValue();
     }
 
     @Override

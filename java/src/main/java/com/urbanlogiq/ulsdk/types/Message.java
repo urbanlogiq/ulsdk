@@ -121,8 +121,6 @@ public final class Message {
     }
 
     public Message() {
-        this._customMetadata = new com.urbanlogiq.ulsdk.types.KeyValue[0];
-        this._header = new com.urbanlogiq.ulsdk.types.MessageHeader();
     }
 
     @Override

@@ -89,7 +89,6 @@ public final class Directory {
     }
 
     public Directory() {
-        this._notifications = new com.urbanlogiq.ulsdk.types.B2cId[0];
         this._slots = new com.urbanlogiq.ulsdk.types.Slot[0];
     }
 

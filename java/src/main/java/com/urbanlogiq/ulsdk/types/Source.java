@@ -173,12 +173,7 @@ public final class Source {
     }
 
     public Source() {
-        this._metadata = new com.urbanlogiq.ulsdk.types.ObjectId();
-        this._metadataRevision = new com.urbanlogiq.ulsdk.types.ContentId();
         this._name = new String();
-        this._namedParameters = new com.urbanlogiq.ulsdk.types.NamedParameter[0];
-        this._options = new byte[0];
-        this._outputSchemas = new com.urbanlogiq.ulsdk.types.OutputSchema[0];
         this._url = new String();
     }
 

@@ -186,10 +186,6 @@ public final class RecordBatch {
     }
 
     public RecordBatch() {
-        this._buffers = new com.urbanlogiq.ulsdk.types.Buffer[0];
-        this._compression = new com.urbanlogiq.ulsdk.types.BodyCompression();
-        this._nodes = new com.urbanlogiq.ulsdk.types.FieldNode[0];
-        this._variadicBufferCounts = new long[0];
     }
 
     @Override

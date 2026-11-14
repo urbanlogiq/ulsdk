@@ -8,13 +8,16 @@ import org.junit.jupiter.api.Test;
 public final class TestWhen {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.When();
+        var instance = new com.urbanlogiq.ulsdk.types.When();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getCond());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getValue());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.When();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.When(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.When(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

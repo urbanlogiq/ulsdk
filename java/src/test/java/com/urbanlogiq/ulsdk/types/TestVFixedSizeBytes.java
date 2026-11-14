@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestVFixedSizeBytes {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.VFixedSizeBytes();
+        var instance = new com.urbanlogiq.ulsdk.types.VFixedSizeBytes();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getV());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.VFixedSizeBytes();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.VFixedSizeBytes(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.VFixedSizeBytes(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

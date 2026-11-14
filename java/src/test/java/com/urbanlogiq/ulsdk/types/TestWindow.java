@@ -8,13 +8,18 @@ import org.junit.jupiter.api.Test;
 public final class TestWindow {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Window();
+        var instance = new com.urbanlogiq.ulsdk.types.Window();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getFrame());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getFun());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getOrderBy());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getPartition());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Window();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Window(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Window(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

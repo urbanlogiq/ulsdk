@@ -226,7 +226,6 @@ public final class Tensor {
     public Tensor() {
         this._data = new com.urbanlogiq.ulsdk.types.Buffer();
         this._shape = new com.urbanlogiq.ulsdk.types.TensorDim[0];
-        this._strides = new long[0];
         this._type = new com.urbanlogiq.ulsdk.types.Type();
     }
 

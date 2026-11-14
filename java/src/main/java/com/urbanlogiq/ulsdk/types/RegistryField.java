@@ -97,7 +97,6 @@ public final class RegistryField {
     public RegistryField() {
         this._name = new String();
         this._pointer = new String();
-        this._transform = new String();
     }
 
     @Override

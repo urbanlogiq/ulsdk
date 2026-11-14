@@ -8,13 +8,16 @@ import org.junit.jupiter.api.Test;
 public final class TestCryptHeader {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.CryptHeader();
+        var instance = new com.urbanlogiq.ulsdk.types.CryptHeader();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getKid());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getNonce());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.CryptHeader();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.CryptHeader(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.CryptHeader(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

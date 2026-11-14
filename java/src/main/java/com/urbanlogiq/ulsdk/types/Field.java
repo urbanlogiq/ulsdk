@@ -289,11 +289,6 @@ public final class Field {
     }
 
     public Field() {
-        this._children = new com.urbanlogiq.ulsdk.types.Field[0];
-        this._customMetadata = new com.urbanlogiq.ulsdk.types.KeyValue[0];
-        this._dictionary = new com.urbanlogiq.ulsdk.types.DictionaryEncoding();
-        this._name = new String();
-        this._type = new com.urbanlogiq.ulsdk.types.Type();
     }
 
     @Override

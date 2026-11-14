@@ -8,13 +8,16 @@ import org.junit.jupiter.api.Test;
 public final class TestSignature {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Signature();
+        var instance = new com.urbanlogiq.ulsdk.types.Signature();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getKid());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getSig());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Signature();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Signature(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Signature(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

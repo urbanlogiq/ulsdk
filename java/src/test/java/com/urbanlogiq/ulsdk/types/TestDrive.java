@@ -8,13 +8,16 @@ import org.junit.jupiter.api.Test;
 public final class TestDrive {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Drive();
+        var instance = new com.urbanlogiq.ulsdk.types.Drive();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getPath());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getRoot());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Drive();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Drive(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Drive(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

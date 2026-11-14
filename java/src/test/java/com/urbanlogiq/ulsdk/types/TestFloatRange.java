@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestFloatRange {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.FloatRange();
+        var instance = new com.urbanlogiq.ulsdk.types.FloatRange();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getFieldFormat());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.FloatRange();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.FloatRange(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.FloatRange(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

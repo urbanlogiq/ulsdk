@@ -8,13 +8,19 @@ import org.junit.jupiter.api.Test;
 public final class TestGraphNode {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.GraphNode();
+        var instance = new com.urbanlogiq.ulsdk.types.GraphNode();
+        org.junit.jupiter.api.Assertions.assertNull(instance.get_description());
+        org.junit.jupiter.api.Assertions.assertNull(instance.get_geom());
+        org.junit.jupiter.api.Assertions.assertNull(instance.get_location());
+        org.junit.jupiter.api.Assertions.assertNull(instance.get_nodeId());
+        org.junit.jupiter.api.Assertions.assertNull(instance.get_stream());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.GraphNode();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.GraphNode(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.GraphNode(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

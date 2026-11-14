@@ -78,7 +78,6 @@ public final class AccessControlList {
     }
 
     public AccessControlList() {
-        this._extends_ = new com.urbanlogiq.ulsdk.types.ObjectId();
         this._roles = new com.urbanlogiq.ulsdk.types.Role[0];
     }
 

@@ -8,13 +8,19 @@ import org.junit.jupiter.api.Test;
 public final class TestContactInfo {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.ContactInfo();
+        var instance = new com.urbanlogiq.ulsdk.types.ContactInfo();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getAddress());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getEmail());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getName());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getPhone());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getUrl());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.ContactInfo();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.ContactInfo(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.ContactInfo(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

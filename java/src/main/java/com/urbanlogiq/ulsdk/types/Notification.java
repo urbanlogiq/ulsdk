@@ -77,7 +77,6 @@ public final class Notification {
 
     public Notification() {
         this._notification = new com.urbanlogiq.ulsdk.types.NotificationUnion();
-        this._sender = new com.urbanlogiq.ulsdk.types.B2cId();
     }
 
     @Override

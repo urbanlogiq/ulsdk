@@ -92,8 +92,6 @@ public final class Share {
     }
 
     public Share() {
-        this._dest = new String();
-        this._msg = new String();
         this._object = new com.urbanlogiq.ulsdk.types.ObjectId();
     }
 

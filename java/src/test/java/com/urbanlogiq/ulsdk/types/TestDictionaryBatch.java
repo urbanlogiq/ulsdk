@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestDictionaryBatch {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.DictionaryBatch();
+        var instance = new com.urbanlogiq.ulsdk.types.DictionaryBatch();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getData());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.DictionaryBatch();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.DictionaryBatch(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.DictionaryBatch(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

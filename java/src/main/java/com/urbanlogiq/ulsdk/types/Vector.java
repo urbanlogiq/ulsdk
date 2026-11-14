@@ -99,7 +99,6 @@ public final class Vector {
 
     public Vector() {
         this._ids = new com.urbanlogiq.ulsdk.types.ObjectId[0];
-        this._limit = new com.urbanlogiq.ulsdk.types.NullableUint();
         this._query = new String();
     }
 

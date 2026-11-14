@@ -244,15 +244,9 @@ public final class WorkLog {
     }
 
     public WorkLog() {
-        this._inputStreams = new com.urbanlogiq.ulsdk.types.PinnedObjectId[0];
-        this._jobId = new com.urbanlogiq.ulsdk.types.ObjectId();
-        this._name = new String();
         this._outputStreams = new com.urbanlogiq.ulsdk.types.PinnedObjectId[0];
         this._params = new com.urbanlogiq.ulsdk.types.WorklogParameter[0];
-        this._parent = new com.urbanlogiq.ulsdk.types.ObjectId();
-        this._producer = new com.urbanlogiq.ulsdk.types.Producer();
         this._schematic = new com.urbanlogiq.ulsdk.types.PinnedObjectId();
-        this._userSettings = new com.urbanlogiq.ulsdk.types.UserSettings();
     }
 
     @Override

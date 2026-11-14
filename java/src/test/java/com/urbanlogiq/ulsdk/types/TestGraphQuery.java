@@ -8,13 +8,16 @@ import org.junit.jupiter.api.Test;
 public final class TestGraphQuery {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.GraphQuery();
+        var instance = new com.urbanlogiq.ulsdk.types.GraphQuery();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getOrderBy());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getPath());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.GraphQuery();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.GraphQuery(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.GraphQuery(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

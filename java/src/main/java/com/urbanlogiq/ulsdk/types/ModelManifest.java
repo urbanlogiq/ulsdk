@@ -228,15 +228,9 @@ public final class ModelManifest {
     }
 
     public ModelManifest() {
-        this._authoredBy = new String();
-        this._bundle = new com.urbanlogiq.ulsdk.types.ObjectId();
-        this._bundleCid = new com.urbanlogiq.ulsdk.types.ContentId();
         this._manifest = new com.urbanlogiq.ulsdk.types.ObjectId();
-        this._manifestCid = new com.urbanlogiq.ulsdk.types.ContentId();
         this._manifestSha256 = new String();
         this._modelId = new String();
-        this._silver = new String();
-        this._sources = new String();
     }
 
     @Override

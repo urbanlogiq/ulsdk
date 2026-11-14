@@ -116,7 +116,6 @@ public final class RegistryRelation {
         this._columns = new com.urbanlogiq.ulsdk.types.RegistryField[0];
         this._name = new String();
         this._pointer = new String();
-        this._transform = new String();
     }
 
     @Override

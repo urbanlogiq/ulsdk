@@ -59,7 +59,6 @@ public final class DirectionAndRoadNames {
     }
 
     public DirectionAndRoadNames() {
-        this._directionAndRoadNames = new com.urbanlogiq.ulsdk.types.DirectionAndRoadName[0];
     }
 
     @Override

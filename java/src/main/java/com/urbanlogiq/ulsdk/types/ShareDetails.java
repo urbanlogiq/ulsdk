@@ -53,7 +53,6 @@ public final class ShareDetails {
     }
 
     public ShareDetails() {
-        this._msg = new String();
     }
 
     @Override

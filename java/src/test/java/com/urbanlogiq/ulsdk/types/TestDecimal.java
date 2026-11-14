@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestDecimal {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Decimal();
+        var instance = new com.urbanlogiq.ulsdk.types.Decimal();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Decimal();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Decimal(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Decimal(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

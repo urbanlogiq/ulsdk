@@ -61,8 +61,6 @@ public final class Drive {
     }
 
     public Drive() {
-        this._path = new String();
-        this._root = new com.urbanlogiq.ulsdk.types.ObjectId();
     }
 
     @Override

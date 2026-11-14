@@ -8,13 +8,16 @@ import org.junit.jupiter.api.Test;
 public final class TestEncryptedObject {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.EncryptedObject();
+        var instance = new com.urbanlogiq.ulsdk.types.EncryptedObject();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getHeader());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getObj());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.EncryptedObject();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.EncryptedObject(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.EncryptedObject(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

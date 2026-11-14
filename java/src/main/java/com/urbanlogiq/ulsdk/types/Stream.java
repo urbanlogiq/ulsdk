@@ -180,12 +180,7 @@ public final class Stream {
     }
 
     public Stream() {
-        this._metadata = new com.urbanlogiq.ulsdk.types.ObjectId();
-        this._metadataRevision = new com.urbanlogiq.ulsdk.types.ContentId();
-        this._options = new byte[0];
-        this._parameters = new byte[0];
         this._schema = new com.urbanlogiq.ulsdk.types.Schema();
-        this._substreams = new com.urbanlogiq.ulsdk.types.ObjectId[0];
         this._url = new String();
     }
 

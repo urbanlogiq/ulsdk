@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestGeometryData {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.GeometryData();
+        var instance = new com.urbanlogiq.ulsdk.types.GeometryData();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getData());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.GeometryData();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.GeometryData(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.GeometryData(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

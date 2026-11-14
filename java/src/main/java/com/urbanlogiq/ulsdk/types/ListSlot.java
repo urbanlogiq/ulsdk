@@ -162,10 +162,8 @@ public final class ListSlot {
     }
 
     public ListSlot() {
-        this._attributes = new com.urbanlogiq.ulsdk.types.Attr[0];
         this._entry = new com.urbanlogiq.ulsdk.types.ListEntry();
         this._id = new com.urbanlogiq.ulsdk.types.ObjectId();
-        this._lastModifiedBy = new com.urbanlogiq.ulsdk.types.B2cId();
         this._name = new String();
     }
 

@@ -8,13 +8,27 @@ import org.junit.jupiter.api.Test;
 public final class TestMetadata {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Metadata();
+        var instance = new com.urbanlogiq.ulsdk.types.Metadata();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getConceptBindings());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getDescription());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getDetailSections());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getDisplayName());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getFieldRelationships());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getFields());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getForeignKeys());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getGeometrySource());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getPromotedMetrics());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getSource());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getSummary());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getTimeSource());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getVisualizeInExploreFields());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Metadata();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Metadata(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Metadata(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

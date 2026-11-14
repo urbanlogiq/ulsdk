@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestVStr {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.VStr();
+        var instance = new com.urbanlogiq.ulsdk.types.VStr();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getV());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.VStr();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.VStr(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.VStr(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

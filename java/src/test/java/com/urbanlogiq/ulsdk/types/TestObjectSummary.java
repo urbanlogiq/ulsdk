@@ -8,13 +8,17 @@ import org.junit.jupiter.api.Test;
 public final class TestObjectSummary {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.ObjectSummary();
+        var instance = new com.urbanlogiq.ulsdk.types.ObjectSummary();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getAcl());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getHeadRevision());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getId());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.ObjectSummary();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.ObjectSummary(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.ObjectSummary(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

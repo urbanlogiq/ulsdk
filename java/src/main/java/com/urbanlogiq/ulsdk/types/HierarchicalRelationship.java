@@ -61,7 +61,6 @@ public final class HierarchicalRelationship {
     }
 
     public HierarchicalRelationship() {
-        this._children = new int[0];
     }
 
     @Override

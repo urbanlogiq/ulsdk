@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestVBool {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.VBool();
+        var instance = new com.urbanlogiq.ulsdk.types.VBool();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.VBool();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.VBool(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.VBool(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

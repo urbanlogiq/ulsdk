@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestGraphEdge {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.GraphEdge();
+        var instance = new com.urbanlogiq.ulsdk.types.GraphEdge();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.GraphEdge();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.GraphEdge(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.GraphEdge(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

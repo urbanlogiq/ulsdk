@@ -91,8 +91,6 @@ public final class Join {
     }
 
     public Join() {
-        this._destCol = new String();
-        this._srcCol = new String();
     }
 
     @Override

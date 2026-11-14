@@ -54,7 +54,6 @@ public final class AddCol {
     }
 
     public AddCol() {
-        this._default_ = new com.urbanlogiq.ulsdk.types.ValueInstance();
         this._field = new com.urbanlogiq.ulsdk.types.Field();
     }
 

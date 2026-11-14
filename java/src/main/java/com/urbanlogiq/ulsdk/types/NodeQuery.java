@@ -205,12 +205,6 @@ public final class NodeQuery {
     }
 
     public NodeQuery() {
-        this._descriptions = new String[0];
-        this._entityTys = new int[0];
-        this._geomOp = new com.urbanlogiq.ulsdk.types.GeomOp();
-        this._nodeIds = new com.urbanlogiq.ulsdk.types.NodeIdPair[0];
-        this._projections = new com.urbanlogiq.ulsdk.types.Projection[0];
-        this._streamIds = new com.urbanlogiq.ulsdk.types.ObjectId[0];
     }
 
     @Override

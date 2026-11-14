@@ -60,7 +60,6 @@ public final class DocumentField {
 
     public DocumentField() {
         this._name = new String();
-        this._value = new String();
     }
 
     @Override

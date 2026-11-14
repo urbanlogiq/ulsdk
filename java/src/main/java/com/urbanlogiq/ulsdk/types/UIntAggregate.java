@@ -119,7 +119,6 @@ public final class UIntAggregate {
     }
 
     public UIntAggregate() {
-        this._histo = new com.urbanlogiq.ulsdk.types.UIntBucket[0];
     }
 
     @Override

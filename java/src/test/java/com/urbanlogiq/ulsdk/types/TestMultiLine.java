@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestMultiLine {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.MultiLine();
+        var instance = new com.urbanlogiq.ulsdk.types.MultiLine();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getMultilineGeo());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.MultiLine();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.MultiLine(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.MultiLine(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

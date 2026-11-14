@@ -119,7 +119,6 @@ public final class FloatAggregate {
     }
 
     public FloatAggregate() {
-        this._histo = new com.urbanlogiq.ulsdk.types.FloatBucket[0];
     }
 
     @Override

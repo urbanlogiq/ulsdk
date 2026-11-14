@@ -8,13 +8,26 @@ import org.junit.jupiter.api.Test;
 public final class TestTask {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Task();
+        var instance = new com.urbanlogiq.ulsdk.types.Task();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.get_id());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getDownstream());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getJobId());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getLastUpdatedByPod());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getMessage());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getName());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getOutput());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getParams());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getSchematicId());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getTask());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getUpstream());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getUserId());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Task();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Task(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Task(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

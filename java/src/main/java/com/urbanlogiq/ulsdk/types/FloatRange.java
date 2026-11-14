@@ -73,7 +73,6 @@ public final class FloatRange {
     }
 
     public FloatRange() {
-        this._fieldFormat = new com.urbanlogiq.ulsdk.types.NumericalFieldFormat();
     }
 
     @Override

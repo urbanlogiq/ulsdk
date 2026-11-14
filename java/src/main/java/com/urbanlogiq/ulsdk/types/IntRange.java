@@ -135,9 +135,6 @@ public final class IntRange {
     }
 
     public IntRange() {
-        this._displayStrings = new com.urbanlogiq.ulsdk.types.IntegerDisplayString[0];
-        this._enumName = new String();
-        this._fieldFormat = new com.urbanlogiq.ulsdk.types.NumericalFieldFormat();
     }
 
     @Override

@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestMvdbPartition {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.MvdbPartition();
+        var instance = new com.urbanlogiq.ulsdk.types.MvdbPartition();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getPartition());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.MvdbPartition();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.MvdbPartition(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.MvdbPartition(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

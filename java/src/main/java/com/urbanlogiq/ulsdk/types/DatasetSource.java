@@ -90,9 +90,6 @@ public final class DatasetSource {
     }
 
     public DatasetSource() {
-        this._date = new String();
-        this._source = new String();
-        this._url = new String();
     }
 
     @Override

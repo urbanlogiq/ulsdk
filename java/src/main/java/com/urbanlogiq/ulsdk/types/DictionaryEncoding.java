@@ -91,7 +91,6 @@ public final class DictionaryEncoding {
     }
 
     public DictionaryEncoding() {
-        this._indexType = new com.urbanlogiq.ulsdk.types.Int();
     }
 
     @Override

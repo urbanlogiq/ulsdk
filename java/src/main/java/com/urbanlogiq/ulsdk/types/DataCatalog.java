@@ -88,8 +88,6 @@ public final class DataCatalog {
 
     public DataCatalog() {
         this._id = new com.urbanlogiq.ulsdk.types.ObjectId();
-        this._partition = new com.urbanlogiq.ulsdk.types.TablePartition();
-        this._revision = new com.urbanlogiq.ulsdk.types.ContentId();
     }
 
     @Override

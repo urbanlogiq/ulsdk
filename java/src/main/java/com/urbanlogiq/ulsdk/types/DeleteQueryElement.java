@@ -96,7 +96,6 @@ public final class DeleteQueryElement {
     }
 
     public DeleteQueryElement() {
-        this._filter = new com.urbanlogiq.ulsdk.types.Function();
         this._source = new com.urbanlogiq.ulsdk.types.TableSourceUnion();
     }
 

@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestRawGeom {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.RawGeom();
+        var instance = new com.urbanlogiq.ulsdk.types.RawGeom();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getGeom());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.RawGeom();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.RawGeom(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.RawGeom(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

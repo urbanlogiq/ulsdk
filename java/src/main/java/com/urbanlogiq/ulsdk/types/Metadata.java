@@ -531,19 +531,6 @@ public final class Metadata {
     }
 
     public Metadata() {
-        this._conceptBindings = new com.urbanlogiq.ulsdk.types.ConceptBinding[0];
-        this._description = new String();
-        this._detailSections = new com.urbanlogiq.ulsdk.types.DetailSection[0];
-        this._displayName = new String();
-        this._fieldRelationships = new com.urbanlogiq.ulsdk.types.UlFieldRelationship[0];
-        this._fields = new com.urbanlogiq.ulsdk.types.UlField[0];
-        this._foreignKeys = new com.urbanlogiq.ulsdk.types.ForeignKey[0];
-        this._geometrySource = new com.urbanlogiq.ulsdk.types.GeometrySource();
-        this._promotedMetrics = new int[0];
-        this._source = new com.urbanlogiq.ulsdk.types.DatasetSource();
-        this._summary = new int[0];
-        this._timeSource = new com.urbanlogiq.ulsdk.types.TimeSource();
-        this._visualizeInExploreFields = new int[0];
     }
 
     @Override

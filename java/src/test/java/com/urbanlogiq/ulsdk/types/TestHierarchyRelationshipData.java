@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestHierarchyRelationshipData {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.HierarchyRelationshipData();
+        var instance = new com.urbanlogiq.ulsdk.types.HierarchyRelationshipData();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getHierarchy());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.HierarchyRelationshipData();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.HierarchyRelationshipData(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.HierarchyRelationshipData(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

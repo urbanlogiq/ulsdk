@@ -76,7 +76,6 @@ public final class DictionaryBatch {
     }
 
     public DictionaryBatch() {
-        this._data = new com.urbanlogiq.ulsdk.types.RecordBatch();
     }
 
     @Override

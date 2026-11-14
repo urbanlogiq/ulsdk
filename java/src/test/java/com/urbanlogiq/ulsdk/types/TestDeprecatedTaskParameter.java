@@ -8,13 +8,17 @@ import org.junit.jupiter.api.Test;
 public final class TestDeprecatedTaskParameter {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.DeprecatedTaskParameter();
+        var instance = new com.urbanlogiq.ulsdk.types.DeprecatedTaskParameter();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getKey());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getObj());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getValue());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.DeprecatedTaskParameter();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.DeprecatedTaskParameter(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.DeprecatedTaskParameter(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

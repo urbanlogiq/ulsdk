@@ -186,7 +186,6 @@ public final class RegistrySpec {
         this._fields = new com.urbanlogiq.ulsdk.types.RegistryField[0];
         this._key = new String();
         this._name = new String();
-        this._relations = new com.urbanlogiq.ulsdk.types.RegistryRelation[0];
         this._sourceField = new String();
         this._sourceFormat = new String();
         this._sourceHashField = new String();

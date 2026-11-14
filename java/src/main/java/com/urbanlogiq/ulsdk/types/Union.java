@@ -67,7 +67,6 @@ public final class Union {
     }
 
     public Union() {
-        this._typeIds = new int[0];
     }
 
     @Override

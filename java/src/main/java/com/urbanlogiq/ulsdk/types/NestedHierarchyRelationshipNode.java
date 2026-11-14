@@ -95,9 +95,6 @@ public final class NestedHierarchyRelationshipNode {
     }
 
     public NestedHierarchyRelationshipNode() {
-        this._childColumns = new int[0];
-        this._childNodes = new int[0];
-        this._label = new String();
     }
 
     @Override

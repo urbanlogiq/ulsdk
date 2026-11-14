@@ -64,7 +64,6 @@ public final class TensorDim {
     }
 
     public TensorDim() {
-        this._name = new String();
     }
 
     @Override

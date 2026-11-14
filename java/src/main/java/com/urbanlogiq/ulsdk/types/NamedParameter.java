@@ -82,9 +82,7 @@ public final class NamedParameter {
     }
 
     public NamedParameter() {
-        this._description = new String();
         this._name = new String();
-        this._schema = new com.urbanlogiq.ulsdk.types.Schema();
     }
 
     @Override

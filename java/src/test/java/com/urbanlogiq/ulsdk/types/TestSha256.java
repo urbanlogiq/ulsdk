@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestSha256 {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Sha256();
+        var instance = new com.urbanlogiq.ulsdk.types.Sha256();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getB());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Sha256();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Sha256(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Sha256(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

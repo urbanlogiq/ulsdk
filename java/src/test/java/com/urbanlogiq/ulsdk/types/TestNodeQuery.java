@@ -8,13 +8,20 @@ import org.junit.jupiter.api.Test;
 public final class TestNodeQuery {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.NodeQuery();
+        var instance = new com.urbanlogiq.ulsdk.types.NodeQuery();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getDescriptions());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getEntityTys());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getGeomOp());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getNodeIds());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getProjections());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getStreamIds());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.NodeQuery();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.NodeQuery(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.NodeQuery(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

@@ -109,7 +109,6 @@ public final class DiffStream {
     }
 
     public DiffStream() {
-        this._attributes = new com.urbanlogiq.ulsdk.types.Attr[0];
         this._base = new com.urbanlogiq.ulsdk.types.ContentId();
         this._seq = new com.urbanlogiq.ulsdk.types.OpEntry[0];
     }

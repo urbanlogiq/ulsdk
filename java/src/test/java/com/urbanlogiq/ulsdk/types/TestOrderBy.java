@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestOrderBy {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.OrderBy();
+        var instance = new com.urbanlogiq.ulsdk.types.OrderBy();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getField());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.OrderBy();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.OrderBy(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.OrderBy(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

@@ -99,7 +99,6 @@ public final class GraphQuery {
     }
 
     public GraphQuery() {
-        this._orderBy = new com.urbanlogiq.ulsdk.types.OrderBy[0];
         this._path = new com.urbanlogiq.ulsdk.types.QueryPathElement[0];
     }
 

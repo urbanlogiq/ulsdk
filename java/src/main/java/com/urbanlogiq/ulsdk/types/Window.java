@@ -122,10 +122,7 @@ public final class Window {
     }
 
     public Window() {
-        this._frame = new com.urbanlogiq.ulsdk.types.WindowFrame();
         this._fun = new com.urbanlogiq.ulsdk.types.Function();
-        this._orderBy = new com.urbanlogiq.ulsdk.types.OrderBy[0];
-        this._partition = new com.urbanlogiq.ulsdk.types.Expr[0];
     }
 
     @Override

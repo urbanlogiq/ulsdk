@@ -163,7 +163,6 @@ public final class RunSpec {
     }
 
     public RunSpec() {
-        this._attributes = new com.urbanlogiq.ulsdk.types.Attr[0];
         this._paramIndices = new com.urbanlogiq.ulsdk.types.ParamIndices[0];
         this._params = new com.urbanlogiq.ulsdk.types.TaskParameter[0];
         this._schematic = new com.urbanlogiq.ulsdk.types.PinnedObjectId();

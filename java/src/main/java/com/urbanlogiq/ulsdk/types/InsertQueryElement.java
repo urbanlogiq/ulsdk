@@ -162,8 +162,6 @@ public final class InsertQueryElement {
     public InsertQueryElement() {
         this._columns = new String[0];
         this._dest = new com.urbanlogiq.ulsdk.types.TableSourceUnion();
-        this._onConflict = new com.urbanlogiq.ulsdk.types.OnConflict();
-        this._returning = new String[0];
         this._source = new com.urbanlogiq.ulsdk.types.QueryElement();
     }
 

@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestDate {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Date();
+        var instance = new com.urbanlogiq.ulsdk.types.Date();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Date();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Date(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Date(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

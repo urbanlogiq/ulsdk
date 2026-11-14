@@ -84,7 +84,6 @@ public final class AccessRequest {
     }
 
     public AccessRequest() {
-        this._msg = new String();
         this._object = new com.urbanlogiq.ulsdk.types.ObjectId();
     }
 

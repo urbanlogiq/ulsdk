@@ -256,12 +256,8 @@ public final class DataCatalogObject {
     }
 
     public DataCatalogObject() {
-        this._attributes = new com.urbanlogiq.ulsdk.types.AttributePair[0];
-        this._comment = new String();
         this._obj = new byte[0];
         this._parents = new com.urbanlogiq.ulsdk.types.ContentId[0];
-        this._signature = new byte[0];
-        this._tags = new String[0];
         this._user = new com.urbanlogiq.ulsdk.types.B2cId();
     }
 

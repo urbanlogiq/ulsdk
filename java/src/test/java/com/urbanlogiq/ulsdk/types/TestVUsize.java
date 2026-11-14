@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestVUsize {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.VUsize();
+        var instance = new com.urbanlogiq.ulsdk.types.VUsize();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.VUsize();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.VUsize(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.VUsize(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

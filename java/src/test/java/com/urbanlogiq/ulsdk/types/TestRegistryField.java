@@ -8,13 +8,17 @@ import org.junit.jupiter.api.Test;
 public final class TestRegistryField {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.RegistryField();
+        var instance = new com.urbanlogiq.ulsdk.types.RegistryField();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getName());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getPointer());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getTransform());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.RegistryField();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.RegistryField(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.RegistryField(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

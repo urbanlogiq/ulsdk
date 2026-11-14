@@ -47,7 +47,6 @@ public final class ByteArray {
     }
 
     public ByteArray() {
-        this._b = new byte[0];
     }
 
     @Override

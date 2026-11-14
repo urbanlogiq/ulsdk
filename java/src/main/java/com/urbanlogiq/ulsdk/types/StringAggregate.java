@@ -53,7 +53,6 @@ public final class StringAggregate {
     }
 
     public StringAggregate() {
-        this._str = new String();
     }
 
     @Override

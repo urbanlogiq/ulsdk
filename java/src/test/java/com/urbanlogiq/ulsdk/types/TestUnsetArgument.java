@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestUnsetArgument {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.UnsetArgument();
+        var instance = new com.urbanlogiq.ulsdk.types.UnsetArgument();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.UnsetArgument();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.UnsetArgument(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.UnsetArgument(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

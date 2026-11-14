@@ -82,7 +82,6 @@ public final class OnConflict {
     }
 
     public OnConflict() {
-        this._action = new com.urbanlogiq.ulsdk.types.ConflictAction();
         this._conflictTarget = new String[0];
     }
 

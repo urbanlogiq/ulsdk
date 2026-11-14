@@ -59,7 +59,6 @@ public final class PinnedObjectId {
 
     public PinnedObjectId() {
         this._b = new byte[0];
-        this._cid = new com.urbanlogiq.ulsdk.types.ContentId();
     }
 
     @Override

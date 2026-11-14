@@ -180,10 +180,6 @@ public final class Skill {
     }
 
     public Skill() {
-        this._agent = new String();
-        this._authoredBy = new String();
-        this._description = new String();
-        this._documentCid = new com.urbanlogiq.ulsdk.types.ContentId();
         this._documentId = new com.urbanlogiq.ulsdk.types.ObjectId();
         this._documentSha256 = new String();
         this._name = new String();

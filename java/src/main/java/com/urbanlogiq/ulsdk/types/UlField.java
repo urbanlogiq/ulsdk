@@ -345,14 +345,6 @@ public final class UlField {
     }
 
     public UlField() {
-        this._breakdownDisplayName = new String();
-        this._componentData = new com.urbanlogiq.ulsdk.types.ComponentData();
-        this._conceptAttr = new com.urbanlogiq.ulsdk.types.ConceptBinding();
-        this._default_ = new com.urbanlogiq.ulsdk.types.ValueInstance();
-        this._description = new String();
-        this._displayName = new String();
-        this._fieldName = new String();
-        this._storageType = new com.urbanlogiq.ulsdk.types.Type();
     }
 
     @Override

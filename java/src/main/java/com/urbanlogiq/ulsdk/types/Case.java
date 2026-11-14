@@ -70,7 +70,6 @@ public final class Case {
     }
 
     public Case() {
-        this._else_ = new com.urbanlogiq.ulsdk.types.Expr();
         this._when = new com.urbanlogiq.ulsdk.types.When[0];
     }
 

@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestB2cId {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.B2cId();
+        var instance = new com.urbanlogiq.ulsdk.types.B2cId();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getB());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.B2cId();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.B2cId(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.B2cId(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

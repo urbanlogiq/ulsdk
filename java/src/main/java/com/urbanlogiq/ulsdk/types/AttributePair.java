@@ -61,8 +61,6 @@ public final class AttributePair {
     }
 
     public AttributePair() {
-        this._key = new String();
-        this._value = new String();
     }
 
     @Override

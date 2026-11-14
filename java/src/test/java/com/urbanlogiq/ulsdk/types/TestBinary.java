@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestBinary {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Binary();
+        var instance = new com.urbanlogiq.ulsdk.types.Binary();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Binary();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Binary(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Binary(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

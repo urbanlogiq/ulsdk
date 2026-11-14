@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 public final class TestListView {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.ListView();
+        var instance = new com.urbanlogiq.ulsdk.types.ListView();
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.ListView();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.ListView(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.ListView(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

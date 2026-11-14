@@ -115,11 +115,6 @@ public final class ContactInfo {
     }
 
     public ContactInfo() {
-        this._address = new String();
-        this._email = new String();
-        this._name = new String();
-        this._phone = new String();
-        this._url = new String();
     }
 
     @Override

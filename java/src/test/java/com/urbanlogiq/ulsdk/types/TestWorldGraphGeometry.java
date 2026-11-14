@@ -8,13 +8,16 @@ import org.junit.jupiter.api.Test;
 public final class TestWorldGraphGeometry {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.WorldGraphGeometry();
+        var instance = new com.urbanlogiq.ulsdk.types.WorldGraphGeometry();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getEdgePath());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getStartStreamId());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.WorldGraphGeometry();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.WorldGraphGeometry(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.WorldGraphGeometry(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

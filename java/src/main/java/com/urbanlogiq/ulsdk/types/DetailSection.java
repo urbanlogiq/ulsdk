@@ -59,7 +59,6 @@ public final class DetailSection {
     }
 
     public DetailSection() {
-        this._fields = new int[0];
     }
 
     @Override

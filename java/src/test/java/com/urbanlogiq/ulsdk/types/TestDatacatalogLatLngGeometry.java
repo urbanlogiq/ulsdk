@@ -8,13 +8,16 @@ import org.junit.jupiter.api.Test;
 public final class TestDatacatalogLatLngGeometry {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.DatacatalogLatLngGeometry();
+        var instance = new com.urbanlogiq.ulsdk.types.DatacatalogLatLngGeometry();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getLatColumn());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getLngColumn());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.DatacatalogLatLngGeometry();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.DatacatalogLatLngGeometry(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.DatacatalogLatLngGeometry(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

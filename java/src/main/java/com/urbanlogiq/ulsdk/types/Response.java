@@ -43,7 +43,6 @@ public final class Response {
     }
 
     public Response() {
-        this._msg = new String();
     }
 
     @Override

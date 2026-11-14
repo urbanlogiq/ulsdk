@@ -91,8 +91,6 @@ public final class ConceptBinding {
     }
 
     public ConceptBinding() {
-        this._concept = new String();
-        this._mappedBy = new String();
     }
 
     @Override

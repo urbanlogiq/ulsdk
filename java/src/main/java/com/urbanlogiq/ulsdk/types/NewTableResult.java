@@ -97,8 +97,6 @@ public final class NewTableResult {
     }
 
     public NewTableResult() {
-        this._error = new String();
-        this._id = new com.urbanlogiq.ulsdk.types.ObjectId();
         this._name = new String();
     }
 

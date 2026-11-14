@@ -8,13 +8,16 @@ import org.junit.jupiter.api.Test;
 public final class TestAggregateFilter {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.AggregateFilter();
+        var instance = new com.urbanlogiq.ulsdk.types.AggregateFilter();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getCondition());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getFun());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.AggregateFilter();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.AggregateFilter(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.AggregateFilter(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

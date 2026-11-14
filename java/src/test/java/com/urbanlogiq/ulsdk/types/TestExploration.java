@@ -8,13 +8,23 @@ import org.junit.jupiter.api.Test;
 public final class TestExploration {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.Exploration();
+        var instance = new com.urbanlogiq.ulsdk.types.Exploration();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getAuthoredBy());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getExplorationId());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getMissionId());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getProgramCid());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getProgramId());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getProgramSha256());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getRequestedBy());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getResultDigest());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getStatus());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.Exploration();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.Exploration(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.Exploration(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

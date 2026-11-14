@@ -8,13 +8,23 @@ import org.junit.jupiter.api.Test;
 public final class TestKpiSpec {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.KpiSpec();
+        var instance = new com.urbanlogiq.ulsdk.types.KpiSpec();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getAuthoredBy());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getBronze());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getBronzeCid());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getDocumentCid());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getDocumentId());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getDocumentSha256());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getKpi());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getServiceSystem());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getTitle());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.KpiSpec();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.KpiSpec(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.KpiSpec(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

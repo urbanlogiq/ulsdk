@@ -8,13 +8,20 @@ import org.junit.jupiter.api.Test;
 public final class TestSourceNote {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.SourceNote();
+        var instance = new com.urbanlogiq.ulsdk.types.SourceNote();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getAuthoredBy());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getDocumentCid());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getDocumentId());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getDocumentSha256());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getSourceId());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getTitle());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.SourceNote();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.SourceNote(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.SourceNote(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

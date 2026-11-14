@@ -8,13 +8,16 @@ import org.junit.jupiter.api.Test;
 public final class TestTimeSeries {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.TimeSeries();
+        var instance = new com.urbanlogiq.ulsdk.types.TimeSeries();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getOutputColumn());
+        org.junit.jupiter.api.Assertions.assertNull(instance.getTz());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.TimeSeries();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.TimeSeries(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.TimeSeries(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

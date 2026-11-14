@@ -73,7 +73,6 @@ public final class Distinct {
     }
 
     public Distinct() {
-        this._on = new com.urbanlogiq.ulsdk.types.Expr[0];
     }
 
     @Override

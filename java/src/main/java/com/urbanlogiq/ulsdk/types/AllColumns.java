@@ -43,7 +43,6 @@ public final class AllColumns {
     }
 
     public AllColumns() {
-        this._source = new com.urbanlogiq.ulsdk.types.NullableUint();
     }
 
     @Override

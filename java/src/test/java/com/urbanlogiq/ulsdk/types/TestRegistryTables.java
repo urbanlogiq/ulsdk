@@ -8,13 +8,16 @@ import org.junit.jupiter.api.Test;
 public final class TestRegistryTables {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.RegistryTables();
+        var instance = new com.urbanlogiq.ulsdk.types.RegistryTables();
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getSpec());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getTables());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.RegistryTables();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.RegistryTables(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.RegistryTables(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

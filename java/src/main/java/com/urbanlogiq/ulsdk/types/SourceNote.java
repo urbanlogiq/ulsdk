@@ -160,12 +160,9 @@ public final class SourceNote {
     }
 
     public SourceNote() {
-        this._authoredBy = new String();
-        this._documentCid = new com.urbanlogiq.ulsdk.types.ContentId();
         this._documentId = new com.urbanlogiq.ulsdk.types.ObjectId();
         this._documentSha256 = new String();
         this._sourceId = new String();
-        this._title = new String();
     }
 
     @Override

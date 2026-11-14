@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 public final class TestTensorDim {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.TensorDim();
+        var instance = new com.urbanlogiq.ulsdk.types.TensorDim();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getName());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.TensorDim();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.TensorDim(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.TensorDim(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

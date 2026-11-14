@@ -8,13 +8,17 @@ import org.junit.jupiter.api.Test;
 public final class TestDiffStream {
     @Test
     public void testDefault() {
-        new com.urbanlogiq.ulsdk.types.DiffStream();
+        var instance = new com.urbanlogiq.ulsdk.types.DiffStream();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getAttributes());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getBase());
+        org.junit.jupiter.api.Assertions.assertNotNull(instance.getSeq());
     }
 
     @Test
-    public void testSerde() {
+    public void testSaveAndRead() {
         var instance = new com.urbanlogiq.ulsdk.types.DiffStream();
-        byte[] serialized = instance.toBytes();
-        var reconstituted = new com.urbanlogiq.ulsdk.types.DiffStream(serialized);
+        byte[] bytes = instance.toBytes();
+        var restored = new com.urbanlogiq.ulsdk.types.DiffStream(bytes);
+        org.junit.jupiter.api.Assertions.assertEquals(instance, restored);
     }
 }

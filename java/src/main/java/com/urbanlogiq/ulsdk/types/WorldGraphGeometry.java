@@ -86,7 +86,6 @@ public final class WorldGraphGeometry {
 
     public WorldGraphGeometry() {
         this._edgePath = new int[0];
-        this._startStreamId = new com.urbanlogiq.ulsdk.types.ObjectId();
     }
 
     @Override
