@@ -20,9 +20,9 @@ class Key:
     id_: "str"
     pubkey: "Optional[str]"
     created: "int"
-    last: "Optional[int]"
-    expiry: "Optional[int]"
-    comment: "Optional[str]"
+    last: "Optional[int]" = None
+    expiry: "Optional[int]" = None
+    comment: "Optional[str]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -183,8 +183,8 @@ class CreateKey:
 
 @dataclass
 class UpdateKey:
-    comment: "Optional[str]"
-    expiry: "Optional[int]"
+    comment: "Optional[str]" = None
+    expiry: "Optional[int]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()

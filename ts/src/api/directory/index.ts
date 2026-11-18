@@ -148,6 +148,7 @@ export interface UpdateUser {
 export interface CreateGroup {
   displayName: string;
   description?: string;
+  organization?: string;
 }
 
 export interface GroupMembership {

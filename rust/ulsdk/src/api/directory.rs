@@ -225,6 +225,7 @@ pub struct CreateGroup {
     #[serde(rename = "displayName")]
     display_name: String,
     description: Option<String>,
+    organization: Option<String>,
 }
 
 #[derive(Debug, Default, PartialEq, Serialize, Deserialize)]

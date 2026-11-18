@@ -29,6 +29,23 @@ namespace ul {
 namespace api {
 namespace schematic_evaluator {
 
+namespace {
+void write_json_string(std::ostream &out, const std::string &text) {
+    constexpr char hex[] = "0123456789abcdef";
+    out << '"';
+    for (unsigned char c : text) {
+        if (c == '"' || c == '\\') {
+            out << '\\' << c;
+        } else if (c < 0x20) {
+            out << "\\u00" << hex[c >> 4] << hex[c & 0xf];
+        } else {
+            out << c;
+        }
+    }
+    out << '"';
+}
+}
+
 EvaluatorQuota::EvaluatorQuota(const struct json_value_s *root)
     : kind_(std::string())
     , required_pods_(0)
@@ -93,7 +110,7 @@ to_bytes(const EvaluatorQuota &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"kind\":";
-    ss << "\"" << o.kind_ << "\"";
+    write_json_string(ss, o.kind_);
     ss << ",";
 
     ss << "\"required_pods\":";
@@ -174,7 +191,7 @@ to_bytes(const EvaluatorPool &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"kind\":";
-    ss << "\"" << o.kind_ << "\"";
+    write_json_string(ss, o.kind_);
     ss << ",";
 
     ss << "\"size\":";
@@ -419,7 +436,7 @@ to_bytes(const EvaluatorHealth &o) {
     ss << ",";
 
     ss << "\"launcher\":";
-    ss << "\"" << o.launcher_ << "\"";
+    write_json_string(ss, o.launcher_);
     ss << ",";
 
     ss << "\"capacity_ready\":";
@@ -427,7 +444,7 @@ to_bytes(const EvaluatorHealth &o) {
     ss << ",";
 
     ss << "\"capacity_error\":";
-    ss << "\"" << o.capacity_error_ << "\"";
+    write_json_string(ss, o.capacity_error_);
     ss << ",";
 
     ss << "\"quotas\":";

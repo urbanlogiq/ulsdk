@@ -19,7 +19,7 @@ from ..request_context import RequestContext
 class AdGroup:
     id_: "str"
     display_name: "str"
-    description: "Optional[str]"
+    description: "Optional[str]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()

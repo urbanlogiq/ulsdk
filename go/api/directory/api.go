@@ -156,6 +156,7 @@ type UpdateUserPayload struct {
 type CreateGroupPayload struct {
 	DisplayName string `json:"displayName"`
 	Description *string `json:"description,omitempty"`
+	Organization *string `json:"organization,omitempty"`
 }
 
 type GroupMembership struct {

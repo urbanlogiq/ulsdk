@@ -29,6 +29,23 @@ namespace ul {
 namespace api {
 namespace gate {
 
+namespace {
+void write_json_string(std::ostream &out, const std::string &text) {
+    constexpr char hex[] = "0123456789abcdef";
+    out << '"';
+    for (unsigned char c : text) {
+        if (c == '"' || c == '\\') {
+            out << '\\' << c;
+        } else if (c < 0x20) {
+            out << "\\u00" << hex[c >> 4] << hex[c & 0xf];
+        } else {
+            out << c;
+        }
+    }
+    out << '"';
+}
+}
+
 AdGroup::AdGroup(const struct json_value_s *root)
     : id_(std::string())
     , display_name_(std::string())
@@ -97,17 +114,17 @@ to_bytes(const AdGroup &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"id\":";
-    ss << "\"" << o.id_ << "\"";
+    write_json_string(ss, o.id_);
     ss << ",";
 
     ss << "\"displayName\":";
-    ss << "\"" << o.display_name_ << "\"";
+    write_json_string(ss, o.display_name_);
     ss << ",";
 
     if (o.description_.has_value()) {
         ss << "\"description\":";
         const auto &description__value = o.description_.value();
-        ss << "\"" << description__value << "\"";
+        write_json_string(ss, description__value);
     }
 
     std::string str = ss.str();
@@ -304,15 +321,15 @@ to_bytes(const AdUser &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"displayName\":";
-    ss << "\"" << o.display_name_ << "\"";
+    write_json_string(ss, o.display_name_);
     ss << ",";
 
     ss << "\"id\":";
-    ss << "\"" << o.id_ << "\"";
+    write_json_string(ss, o.id_);
     ss << ",";
 
     ss << "\"userPrincipalName\":";
-    ss << "\"" << o.user_principal_name_ << "\"";
+    write_json_string(ss, o.user_principal_name_);
     ss << ",";
 
     if (o.other_mails_.has_value()) {
@@ -320,7 +337,7 @@ to_bytes(const AdUser &o) {
         const auto &other_mails__value = o.other_mails_.value();
         ss << "[";
         for (const auto &i : other_mails__value) {
-            ss << "\"" << i << "\"";
+            write_json_string(ss, i);
             ss << ",";
         }
         if (!other_mails__value.empty()) {
@@ -333,19 +350,19 @@ to_bytes(const AdUser &o) {
     if (o.department_.has_value()) {
         ss << "\"department\":";
         const auto &department__value = o.department_.value();
-        ss << "\"" << department__value << "\"";
+        write_json_string(ss, department__value);
         ss << ",";
     }
 
     if (o.org_id_.has_value()) {
         ss << "\"orgId\":";
         const auto &org_id__value = o.org_id_.value();
-        ss << "\"" << org_id__value << "\"";
+        write_json_string(ss, org_id__value);
         ss << ",";
     }
 
     ss << "\"createdDateTime\":";
-    ss << "\"" << o.created_date_time_ << "\"";
+    write_json_string(ss, o.created_date_time_);
     ss << ",";
 
     if (o.groups_.has_value()) {

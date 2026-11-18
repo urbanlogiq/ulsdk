@@ -29,6 +29,23 @@ namespace ul {
 namespace api {
 namespace keys {
 
+namespace {
+void write_json_string(std::ostream &out, const std::string &text) {
+    constexpr char hex[] = "0123456789abcdef";
+    out << '"';
+    for (unsigned char c : text) {
+        if (c == '"' || c == '\\') {
+            out << '\\' << c;
+        } else if (c < 0x20) {
+            out << "\\u00" << hex[c >> 4] << hex[c & 0xf];
+        } else {
+            out << c;
+        }
+    }
+    out << '"';
+}
+}
+
 Key::Key(const struct json_value_s *root)
     : id_(std::string())
     , pubkey_(std::nullopt)
@@ -148,13 +165,13 @@ to_bytes(const Key &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"id\":";
-    ss << "\"" << o.id_ << "\"";
+    write_json_string(ss, o.id_);
     ss << ",";
 
     if (o.pubkey_.has_value()) {
         ss << "\"pubkey\":";
         const auto &pubkey__value = o.pubkey_.value();
-        ss << "\"" << pubkey__value << "\"";
+        write_json_string(ss, pubkey__value);
         ss << ",";
     }
 
@@ -179,7 +196,7 @@ to_bytes(const Key &o) {
     if (o.comment_.has_value()) {
         ss << "\"comment\":";
         const auto &comment__value = o.comment_.value();
-        ss << "\"" << comment__value << "\"";
+        write_json_string(ss, comment__value);
     }
 
     std::string str = ss.str();
@@ -311,11 +328,11 @@ to_bytes(const CreateKey &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"id\":";
-    ss << "\"" << o.id_ << "\"";
+    write_json_string(ss, o.id_);
     ss << ",";
 
     ss << "\"secretKey\":";
-    ss << "\"" << o.secret_key_ << "\"";
+    write_json_string(ss, o.secret_key_);
     std::string str = ss.str();
     if (str.back() == ',') {
         str.pop_back();
@@ -385,7 +402,7 @@ to_bytes(const UpdateKey &o) {
     if (o.comment_.has_value()) {
         ss << "\"comment\":";
         const auto &comment__value = o.comment_.value();
-        ss << "\"" << comment__value << "\"";
+        write_json_string(ss, comment__value);
         ss << ",";
     }
 

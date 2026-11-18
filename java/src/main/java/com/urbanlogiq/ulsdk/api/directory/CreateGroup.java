@@ -21,6 +21,14 @@ public final class CreateGroup {
         this._description = value;
     }
 
+    String _organization;
+    public String getOrganization() {
+        return this._organization;
+    }
+    public void setOrganization(String value) {
+        this._organization = value;
+    }
+
     public java.util.Map<String, Object> toMap() {
         java.util.Map<String, Object> o = new java.util.HashMap();
         Object displayNameSerialized = null;
@@ -32,6 +40,12 @@ public final class CreateGroup {
             descriptionSerialized = this._description;
         }
         o.put("description", descriptionSerialized);
+
+        Object organizationSerialized = null;
+        if (this._organization != null) {
+            organizationSerialized = this._organization;
+        }
+        o.put("organization", organizationSerialized);
 
         return o;
     }
@@ -46,11 +60,19 @@ public final class CreateGroup {
         if (descriptionValue != null) {
             this._description = (String)descriptionValue;
         }
+        Object organizationValue = null;
+        if (o.has("organization") && !o.isNull("organization")) {
+            organizationValue = o.get("organization");
+        }
+        if (organizationValue != null) {
+            this._organization = (String)organizationValue;
+        }
     }
 
     public CreateGroup() {
         this._displayName = "";
         this._description = null;
+        this._organization = null;
     }
 
     @Override

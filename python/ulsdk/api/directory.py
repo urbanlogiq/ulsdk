@@ -21,10 +21,10 @@ class Principal:
     principal_type: "str"
     display_name: "str"
     id_: "str"
-    email: "Optional[List[str]]"
-    description: "Optional[str]"
-    department: "Optional[str]"
-    account_enabled: "Optional[bool]"
+    email: "Optional[List[str]]" = None
+    description: "Optional[str]" = None
+    department: "Optional[str]" = None
+    account_enabled: "Optional[bool]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -128,7 +128,7 @@ class Principal:
 class AdGroup:
     id_: "str"
     display_name: "str"
-    description: "Optional[str]"
+    description: "Optional[str]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -350,13 +350,13 @@ class DisplayNames:
 
 @dataclass
 class DeviceDetail:
-    device_id: "Optional[str]"
-    display_name: "Optional[str]"
-    operating_system: "Optional[str]"
-    browser: "Optional[str]"
-    is_compliant: "Optional[bool]"
-    is_managed: "Optional[bool]"
-    trust_type: "Optional[str]"
+    device_id: "Optional[str]" = None
+    display_name: "Optional[str]" = None
+    operating_system: "Optional[str]" = None
+    browser: "Optional[str]" = None
+    is_compliant: "Optional[bool]" = None
+    is_managed: "Optional[bool]" = None
+    trust_type: "Optional[str]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -461,9 +461,9 @@ class DeviceDetail:
 
 @dataclass
 class Coordinates:
-    latitude: "Optional[float]"
-    longitude: "Optional[float]"
-    altitude: "Optional[float]"
+    latitude: "Optional[float]" = None
+    longitude: "Optional[float]" = None
+    altitude: "Optional[float]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -520,10 +520,10 @@ class Coordinates:
 
 @dataclass
 class Location:
-    city: "Optional[str]"
-    state: "Optional[str]"
-    country_or_region: "Optional[str]"
-    geo_coordinates: "Optional[Coordinates]"
+    city: "Optional[str]" = None
+    state: "Optional[str]" = None
+    country_or_region: "Optional[str]" = None
+    geo_coordinates: "Optional[Coordinates]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -592,13 +592,13 @@ class Location:
 
 @dataclass
 class AuditLogEntry:
-    id_: "Optional[str]"
-    user_principal_name: "Optional[str]"
-    user_id: "Optional[str]"
-    created_date_time: "Optional[str]"
-    ip_address: "Optional[str]"
-    device_detail: "Optional[DeviceDetail]"
-    location: "Optional[Location]"
+    id_: "Optional[str]" = None
+    user_principal_name: "Optional[str]" = None
+    user_id: "Optional[str]" = None
+    created_date_time: "Optional[str]" = None
+    ip_address: "Optional[str]" = None
+    device_detail: "Optional[DeviceDetail]" = None
+    location: "Optional[Location]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -759,9 +759,9 @@ class AdUserWithAuditLog:
     created_date_time: "str"
     groups: "Optional[List[AdGroup]]"
     account_enabled: "bool"
-    audit_log: "Optional[List[AuditLogEntry]]"
-    identities: "Optional[List[ObjectIdentity]]"
-    creation_type: "Optional[str]"
+    audit_log: "Optional[List[AuditLogEntry]]" = None
+    identities: "Optional[List[ObjectIdentity]]" = None
+    creation_type: "Optional[str]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -945,7 +945,7 @@ class GroupNamespace:
     holder_id: "str"
     aliases: "List[str]"
     preferred: "str"
-    label: "Optional[str]"
+    label: "Optional[str]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -1020,7 +1020,7 @@ class OwnNamespace:
     assigned_at: "str"
     assigned_by: "str"
     status: "str"
-    groups: "Optional[List[GroupNamespace]]"
+    groups: "Optional[List[GroupNamespace]]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -1155,7 +1155,7 @@ class Namespace:
     holder_kind: "str"
     preferred: "str"
     status: "str"
-    label: "Optional[str]"
+    label: "Optional[str]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -1220,10 +1220,10 @@ class Namespace:
 
 @dataclass
 class CreateUserRequest:
-    display_name: "Optional[str]"
-    user_principal_name: "Optional[str]"
-    org_id: "Optional[str]"
-    department: "Optional[str]"
+    display_name: "Optional[str]" = None
+    user_principal_name: "Optional[str]" = None
+    org_id: "Optional[str]" = None
+    department: "Optional[str]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -1330,8 +1330,8 @@ class CreateUser:
 
 @dataclass
 class UpdateCurrentUser:
-    display_name: "Optional[str]"
-    other_mails: "Optional[List[str]]"
+    display_name: "Optional[str]" = None
+    other_mails: "Optional[List[str]]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -1385,10 +1385,10 @@ class UpdateCurrentUser:
 
 @dataclass
 class UpdateUser:
-    display_name: "Optional[str]"
-    other_mails: "Optional[List[str]]"
-    org_id: "Optional[str]"
-    department: "Optional[str]"
+    display_name: "Optional[str]" = None
+    other_mails: "Optional[List[str]]" = None
+    org_id: "Optional[str]" = None
+    department: "Optional[str]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -1467,7 +1467,8 @@ class UpdateUser:
 @dataclass
 class CreateGroup:
     display_name: "str"
-    description: "Optional[str]"
+    description: "Optional[str]" = None
+    organization: "Optional[str]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -1475,12 +1476,16 @@ class CreateGroup:
         o["description"] = None
         if self.description is not None:
             o["description"] = self.description
+        o["organization"] = None
+        if self.organization is not None:
+            o["organization"] = self.organization
         return o
 
     @classmethod
     def from_dict(cls, o: Dict[str, Any]) -> Self:
         display_name = None
         description = None
+        organization = None
 
         for key in o:
             if key == "displayName":
@@ -1494,27 +1499,35 @@ class CreateGroup:
                     description = description_var
                 else:
                     description = None
+            elif key == "organization":
+                if o[key] is not None:
+                    organization_var = o[key]
+                    assert type(organization_var) is str
+                    organization = organization_var
+                else:
+                    organization = None
 
         assert display_name is not None
 
-        return cls(display_name, description)
+        return cls(display_name, description, organization)
 
     @classmethod
     def make_default(cls) -> Self:
         displayName = ""
         description = None
+        organization = None
 
-        return cls(displayName, description)
+        return cls(displayName, description, organization)
 
 @dataclass
 class GroupMembership:
     id_: "str"
     object_type: "str"
     display_name: "str"
-    user_principal_name: "Optional[str]"
-    other_mails: "Optional[List[str]]"
-    department: "Optional[str]"
-    created_date_time: "Optional[str]"
+    user_principal_name: "Optional[str]" = None
+    other_mails: "Optional[List[str]]" = None
+    department: "Optional[str]" = None
+    created_date_time: "Optional[str]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -1697,7 +1710,7 @@ class CreateOrganizationRequest:
     sso_domain: "Optional[str]"
     add_to_org: "bool"
     add_data_owner: "bool"
-    public: "Optional[bool]"
+    public: "Optional[bool]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()
@@ -1782,9 +1795,9 @@ class Organization:
     org_id: "str"
     org_mgmt_id: "str"
     data_owner_id: "str"
-    parent_id: "Optional[str]"
-    sso_domain: "Optional[str]"
-    public: "Optional[bool]"
+    parent_id: "Optional[str]" = None
+    sso_domain: "Optional[str]" = None
+    public: "Optional[bool]" = None
 
     def to_dict(self) -> Dict[str, Any]:
         o = dict()

@@ -331,6 +331,7 @@ to_bytes(const UpdateUser &o);
 struct CreateGroup {
     std::string display_name_;
     std::optional<std::string> description_;
+    std::optional<std::string> organization_;
 
     CreateGroup() = default;
     CreateGroup(const struct json_value_s *root);

@@ -29,6 +29,23 @@ namespace ul {
 namespace api {
 namespace directory {
 
+namespace {
+void write_json_string(std::ostream &out, const std::string &text) {
+    constexpr char hex[] = "0123456789abcdef";
+    out << '"';
+    for (unsigned char c : text) {
+        if (c == '"' || c == '\\') {
+            out << '\\' << c;
+        } else if (c < 0x20) {
+            out << "\\u00" << hex[c >> 4] << hex[c & 0xf];
+        } else {
+            out << c;
+        }
+    }
+    out << '"';
+}
+}
+
 Principal::Principal(const struct json_value_s *root)
     : principal_type_(std::string())
     , display_name_(std::string())
@@ -176,15 +193,15 @@ to_bytes(const Principal &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"principalType\":";
-    ss << "\"" << o.principal_type_ << "\"";
+    write_json_string(ss, o.principal_type_);
     ss << ",";
 
     ss << "\"displayName\":";
-    ss << "\"" << o.display_name_ << "\"";
+    write_json_string(ss, o.display_name_);
     ss << ",";
 
     ss << "\"id\":";
-    ss << "\"" << o.id_ << "\"";
+    write_json_string(ss, o.id_);
     ss << ",";
 
     if (o.email_.has_value()) {
@@ -192,7 +209,7 @@ to_bytes(const Principal &o) {
         const auto &email__value = o.email_.value();
         ss << "[";
         for (const auto &i : email__value) {
-            ss << "\"" << i << "\"";
+            write_json_string(ss, i);
             ss << ",";
         }
         if (!email__value.empty()) {
@@ -205,14 +222,14 @@ to_bytes(const Principal &o) {
     if (o.description_.has_value()) {
         ss << "\"description\":";
         const auto &description__value = o.description_.value();
-        ss << "\"" << description__value << "\"";
+        write_json_string(ss, description__value);
         ss << ",";
     }
 
     if (o.department_.has_value()) {
         ss << "\"department\":";
         const auto &department__value = o.department_.value();
-        ss << "\"" << department__value << "\"";
+        write_json_string(ss, department__value);
         ss << ",";
     }
 
@@ -298,17 +315,17 @@ to_bytes(const AdGroup &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"id\":";
-    ss << "\"" << o.id_ << "\"";
+    write_json_string(ss, o.id_);
     ss << ",";
 
     ss << "\"displayName\":";
-    ss << "\"" << o.display_name_ << "\"";
+    write_json_string(ss, o.display_name_);
     ss << ",";
 
     if (o.description_.has_value()) {
         ss << "\"description\":";
         const auto &description__value = o.description_.value();
-        ss << "\"" << description__value << "\"";
+        write_json_string(ss, description__value);
     }
 
     std::string str = ss.str();
@@ -505,15 +522,15 @@ to_bytes(const AdUser &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"displayName\":";
-    ss << "\"" << o.display_name_ << "\"";
+    write_json_string(ss, o.display_name_);
     ss << ",";
 
     ss << "\"id\":";
-    ss << "\"" << o.id_ << "\"";
+    write_json_string(ss, o.id_);
     ss << ",";
 
     ss << "\"userPrincipalName\":";
-    ss << "\"" << o.user_principal_name_ << "\"";
+    write_json_string(ss, o.user_principal_name_);
     ss << ",";
 
     if (o.other_mails_.has_value()) {
@@ -521,7 +538,7 @@ to_bytes(const AdUser &o) {
         const auto &other_mails__value = o.other_mails_.value();
         ss << "[";
         for (const auto &i : other_mails__value) {
-            ss << "\"" << i << "\"";
+            write_json_string(ss, i);
             ss << ",";
         }
         if (!other_mails__value.empty()) {
@@ -534,19 +551,19 @@ to_bytes(const AdUser &o) {
     if (o.department_.has_value()) {
         ss << "\"department\":";
         const auto &department__value = o.department_.value();
-        ss << "\"" << department__value << "\"";
+        write_json_string(ss, department__value);
         ss << ",";
     }
 
     if (o.org_id_.has_value()) {
         ss << "\"orgId\":";
         const auto &org_id__value = o.org_id_.value();
-        ss << "\"" << org_id__value << "\"";
+        write_json_string(ss, org_id__value);
         ss << ",";
     }
 
     ss << "\"createdDateTime\":";
-    ss << "\"" << o.created_date_time_ << "\"";
+    write_json_string(ss, o.created_date_time_);
     ss << ",";
 
     if (o.groups_.has_value()) {
@@ -627,11 +644,11 @@ to_bytes(const DisplayNames &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"displayName\":";
-    ss << "\"" << o.display_name_ << "\"";
+    write_json_string(ss, o.display_name_);
     ss << ",";
 
     ss << "\"id\":";
-    ss << "\"" << o.id_ << "\"";
+    write_json_string(ss, o.id_);
     std::string str = ss.str();
     if (str.back() == ',') {
         str.pop_back();
@@ -788,28 +805,28 @@ to_bytes(const DeviceDetail &o) {
     if (o.device_id_.has_value()) {
         ss << "\"deviceId\":";
         const auto &device_id__value = o.device_id_.value();
-        ss << "\"" << device_id__value << "\"";
+        write_json_string(ss, device_id__value);
         ss << ",";
     }
 
     if (o.display_name_.has_value()) {
         ss << "\"displayName\":";
         const auto &display_name__value = o.display_name_.value();
-        ss << "\"" << display_name__value << "\"";
+        write_json_string(ss, display_name__value);
         ss << ",";
     }
 
     if (o.operating_system_.has_value()) {
         ss << "\"operatingSystem\":";
         const auto &operating_system__value = o.operating_system_.value();
-        ss << "\"" << operating_system__value << "\"";
+        write_json_string(ss, operating_system__value);
         ss << ",";
     }
 
     if (o.browser_.has_value()) {
         ss << "\"browser\":";
         const auto &browser__value = o.browser_.value();
-        ss << "\"" << browser__value << "\"";
+        write_json_string(ss, browser__value);
         ss << ",";
     }
 
@@ -830,7 +847,7 @@ to_bytes(const DeviceDetail &o) {
     if (o.trust_type_.has_value()) {
         ss << "\"trustType\":";
         const auto &trust_type__value = o.trust_type_.value();
-        ss << "\"" << trust_type__value << "\"";
+        write_json_string(ss, trust_type__value);
     }
 
     std::string str = ss.str();
@@ -1038,21 +1055,21 @@ to_bytes(const Location &o) {
     if (o.city_.has_value()) {
         ss << "\"city\":";
         const auto &city__value = o.city_.value();
-        ss << "\"" << city__value << "\"";
+        write_json_string(ss, city__value);
         ss << ",";
     }
 
     if (o.state_.has_value()) {
         ss << "\"state\":";
         const auto &state__value = o.state_.value();
-        ss << "\"" << state__value << "\"";
+        write_json_string(ss, state__value);
         ss << ",";
     }
 
     if (o.country_or_region_.has_value()) {
         ss << "\"countryOrRegion\":";
         const auto &country_or_region__value = o.country_or_region_.value();
-        ss << "\"" << country_or_region__value << "\"";
+        write_json_string(ss, country_or_region__value);
         ss << ",";
     }
 
@@ -1216,35 +1233,35 @@ to_bytes(const AuditLogEntry &o) {
     if (o.id_.has_value()) {
         ss << "\"id\":";
         const auto &id__value = o.id_.value();
-        ss << "\"" << id__value << "\"";
+        write_json_string(ss, id__value);
         ss << ",";
     }
 
     if (o.user_principal_name_.has_value()) {
         ss << "\"userPrincipalName\":";
         const auto &user_principal_name__value = o.user_principal_name_.value();
-        ss << "\"" << user_principal_name__value << "\"";
+        write_json_string(ss, user_principal_name__value);
         ss << ",";
     }
 
     if (o.user_id_.has_value()) {
         ss << "\"userId\":";
         const auto &user_id__value = o.user_id_.value();
-        ss << "\"" << user_id__value << "\"";
+        write_json_string(ss, user_id__value);
         ss << ",";
     }
 
     if (o.created_date_time_.has_value()) {
         ss << "\"createdDateTime\":";
         const auto &created_date_time__value = o.created_date_time_.value();
-        ss << "\"" << created_date_time__value << "\"";
+        write_json_string(ss, created_date_time__value);
         ss << ",";
     }
 
     if (o.ip_address_.has_value()) {
         ss << "\"ipAddress\":";
         const auto &ip_address__value = o.ip_address_.value();
-        ss << "\"" << ip_address__value << "\"";
+        write_json_string(ss, ip_address__value);
         ss << ",";
     }
 
@@ -1337,15 +1354,15 @@ to_bytes(const ObjectIdentity &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"signInType\":";
-    ss << "\"" << o.sign_in_type_ << "\"";
+    write_json_string(ss, o.sign_in_type_);
     ss << ",";
 
     ss << "\"issuer\":";
-    ss << "\"" << o.issuer_ << "\"";
+    write_json_string(ss, o.issuer_);
     ss << ",";
 
     ss << "\"issuerAssignedId\":";
-    ss << "\"" << o.issuer_assigned_id_ << "\"";
+    write_json_string(ss, o.issuer_assigned_id_);
     std::string str = ss.str();
     if (str.back() == ',') {
         str.pop_back();
@@ -1617,15 +1634,15 @@ to_bytes(const AdUserWithAuditLog &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"displayName\":";
-    ss << "\"" << o.display_name_ << "\"";
+    write_json_string(ss, o.display_name_);
     ss << ",";
 
     ss << "\"id\":";
-    ss << "\"" << o.id_ << "\"";
+    write_json_string(ss, o.id_);
     ss << ",";
 
     ss << "\"userPrincipalName\":";
-    ss << "\"" << o.user_principal_name_ << "\"";
+    write_json_string(ss, o.user_principal_name_);
     ss << ",";
 
     if (o.other_mails_.has_value()) {
@@ -1633,7 +1650,7 @@ to_bytes(const AdUserWithAuditLog &o) {
         const auto &other_mails__value = o.other_mails_.value();
         ss << "[";
         for (const auto &i : other_mails__value) {
-            ss << "\"" << i << "\"";
+            write_json_string(ss, i);
             ss << ",";
         }
         if (!other_mails__value.empty()) {
@@ -1646,19 +1663,19 @@ to_bytes(const AdUserWithAuditLog &o) {
     if (o.department_.has_value()) {
         ss << "\"department\":";
         const auto &department__value = o.department_.value();
-        ss << "\"" << department__value << "\"";
+        write_json_string(ss, department__value);
         ss << ",";
     }
 
     if (o.org_id_.has_value()) {
         ss << "\"orgId\":";
         const auto &org_id__value = o.org_id_.value();
-        ss << "\"" << org_id__value << "\"";
+        write_json_string(ss, org_id__value);
         ss << ",";
     }
 
     ss << "\"createdDateTime\":";
-    ss << "\"" << o.created_date_time_ << "\"";
+    write_json_string(ss, o.created_date_time_);
     ss << ",";
 
     if (o.groups_.has_value()) {
@@ -1719,7 +1736,7 @@ to_bytes(const AdUserWithAuditLog &o) {
     if (o.creation_type_.has_value()) {
         ss << "\"creationType\":";
         const auto &creation_type__value = o.creation_type_.value();
-        ss << "\"" << creation_type__value << "\"";
+        write_json_string(ss, creation_type__value);
     }
 
     std::string str = ss.str();
@@ -1825,13 +1842,13 @@ to_bytes(const GroupNamespace &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"holderId\":";
-    ss << "\"" << o.holder_id_ << "\"";
+    write_json_string(ss, o.holder_id_);
     ss << ",";
 
     ss << "\"aliases\":";
     ss << "[";
     for (const auto &i : o.aliases_) {
-        ss << "\"" << i << "\"";
+        write_json_string(ss, i);
         ss << ",";
     }
     if (!o.aliases_.empty()) {
@@ -1841,13 +1858,13 @@ to_bytes(const GroupNamespace &o) {
     ss << ",";
 
     ss << "\"preferred\":";
-    ss << "\"" << o.preferred_ << "\"";
+    write_json_string(ss, o.preferred_);
     ss << ",";
 
     if (o.label_.has_value()) {
         ss << "\"label\":";
         const auto &label__value = o.label_.value();
-        ss << "\"" << label__value << "\"";
+        write_json_string(ss, label__value);
     }
 
     std::string str = ss.str();
@@ -2052,17 +2069,17 @@ to_bytes(const OwnNamespace &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"holderId\":";
-    ss << "\"" << o.holder_id_ << "\"";
+    write_json_string(ss, o.holder_id_);
     ss << ",";
 
     ss << "\"holderKind\":";
-    ss << "\"" << o.holder_kind_ << "\"";
+    write_json_string(ss, o.holder_kind_);
     ss << ",";
 
     ss << "\"aliases\":";
     ss << "[";
     for (const auto &i : o.aliases_) {
-        ss << "\"" << i << "\"";
+        write_json_string(ss, i);
         ss << ",";
     }
     if (!o.aliases_.empty()) {
@@ -2072,33 +2089,33 @@ to_bytes(const OwnNamespace &o) {
     ss << ",";
 
     ss << "\"preferred\":";
-    ss << "\"" << o.preferred_ << "\"";
+    write_json_string(ss, o.preferred_);
     ss << ",";
 
     if (o.label_.has_value()) {
         ss << "\"label\":";
         const auto &label__value = o.label_.value();
-        ss << "\"" << label__value << "\"";
+        write_json_string(ss, label__value);
         ss << ",";
     }
 
     if (o.sign_in_.has_value()) {
         ss << "\"signIn\":";
         const auto &sign_in__value = o.sign_in_.value();
-        ss << "\"" << sign_in__value << "\"";
+        write_json_string(ss, sign_in__value);
         ss << ",";
     }
 
     ss << "\"assignedAt\":";
-    ss << "\"" << o.assigned_at_ << "\"";
+    write_json_string(ss, o.assigned_at_);
     ss << ",";
 
     ss << "\"assignedBy\":";
-    ss << "\"" << o.assigned_by_ << "\"";
+    write_json_string(ss, o.assigned_by_);
     ss << ",";
 
     ss << "\"status\":";
-    ss << "\"" << o.status_ << "\"";
+    write_json_string(ss, o.status_);
     ss << ",";
 
     if (o.groups_.has_value()) {
@@ -2219,25 +2236,25 @@ to_bytes(const Namespace &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"holderId\":";
-    ss << "\"" << o.holder_id_ << "\"";
+    write_json_string(ss, o.holder_id_);
     ss << ",";
 
     ss << "\"holderKind\":";
-    ss << "\"" << o.holder_kind_ << "\"";
+    write_json_string(ss, o.holder_kind_);
     ss << ",";
 
     ss << "\"preferred\":";
-    ss << "\"" << o.preferred_ << "\"";
+    write_json_string(ss, o.preferred_);
     ss << ",";
 
     ss << "\"status\":";
-    ss << "\"" << o.status_ << "\"";
+    write_json_string(ss, o.status_);
     ss << ",";
 
     if (o.label_.has_value()) {
         ss << "\"label\":";
         const auto &label__value = o.label_.value();
-        ss << "\"" << label__value << "\"";
+        write_json_string(ss, label__value);
     }
 
     std::string str = ss.str();
@@ -2343,28 +2360,28 @@ to_bytes(const CreateUserRequest &o) {
     if (o.display_name_.has_value()) {
         ss << "\"displayName\":";
         const auto &display_name__value = o.display_name_.value();
-        ss << "\"" << display_name__value << "\"";
+        write_json_string(ss, display_name__value);
         ss << ",";
     }
 
     if (o.user_principal_name_.has_value()) {
         ss << "\"userPrincipalName\":";
         const auto &user_principal_name__value = o.user_principal_name_.value();
-        ss << "\"" << user_principal_name__value << "\"";
+        write_json_string(ss, user_principal_name__value);
         ss << ",";
     }
 
     if (o.org_id_.has_value()) {
         ss << "\"orgId\":";
         const auto &org_id__value = o.org_id_.value();
-        ss << "\"" << org_id__value << "\"";
+        write_json_string(ss, org_id__value);
         ss << ",";
     }
 
     if (o.department_.has_value()) {
         ss << "\"department\":";
         const auto &department__value = o.department_.value();
-        ss << "\"" << department__value << "\"";
+        write_json_string(ss, department__value);
     }
 
     std::string str = ss.str();
@@ -2431,7 +2448,7 @@ to_bytes(const CreateUser &o) {
     ss << ",";
 
     ss << "\"password\":";
-    ss << "\"" << o.password_ << "\"";
+    write_json_string(ss, o.password_);
     std::string str = ss.str();
     if (str.back() == ',') {
         str.pop_back();
@@ -2515,7 +2532,7 @@ to_bytes(const UpdateCurrentUser &o) {
     if (o.display_name_.has_value()) {
         ss << "\"displayName\":";
         const auto &display_name__value = o.display_name_.value();
-        ss << "\"" << display_name__value << "\"";
+        write_json_string(ss, display_name__value);
         ss << ",";
     }
 
@@ -2524,7 +2541,7 @@ to_bytes(const UpdateCurrentUser &o) {
         const auto &other_mails__value = o.other_mails_.value();
         ss << "[";
         for (const auto &i : other_mails__value) {
-            ss << "\"" << i << "\"";
+            write_json_string(ss, i);
             ss << ",";
         }
         if (!other_mails__value.empty()) {
@@ -2650,7 +2667,7 @@ to_bytes(const UpdateUser &o) {
     if (o.display_name_.has_value()) {
         ss << "\"displayName\":";
         const auto &display_name__value = o.display_name_.value();
-        ss << "\"" << display_name__value << "\"";
+        write_json_string(ss, display_name__value);
         ss << ",";
     }
 
@@ -2659,7 +2676,7 @@ to_bytes(const UpdateUser &o) {
         const auto &other_mails__value = o.other_mails_.value();
         ss << "[";
         for (const auto &i : other_mails__value) {
-            ss << "\"" << i << "\"";
+            write_json_string(ss, i);
             ss << ",";
         }
         if (!other_mails__value.empty()) {
@@ -2672,14 +2689,14 @@ to_bytes(const UpdateUser &o) {
     if (o.org_id_.has_value()) {
         ss << "\"orgId\":";
         const auto &org_id__value = o.org_id_.value();
-        ss << "\"" << org_id__value << "\"";
+        write_json_string(ss, org_id__value);
         ss << ",";
     }
 
     if (o.department_.has_value()) {
         ss << "\"department\":";
         const auto &department__value = o.department_.value();
-        ss << "\"" << department__value << "\"";
+        write_json_string(ss, department__value);
     }
 
     std::string str = ss.str();
@@ -2692,7 +2709,8 @@ to_bytes(const UpdateUser &o) {
 
 CreateGroup::CreateGroup(const struct json_value_s *root)
     : display_name_(std::string())
-    , description_(std::nullopt) {
+    , description_(std::nullopt)
+    , organization_(std::nullopt) {
     if (root->type != json_type_object) {
         throw std::runtime_error("expected json value to be of type object");
     }
@@ -2723,6 +2741,19 @@ CreateGroup::CreateGroup(const struct json_value_s *root)
                 const struct json_string_s *description__str = static_cast<const struct json_string_s *>(create_group_value->payload);
                 description_ = std::string(description__str->string);
             }
+        } else if (std::strcmp(e->name->string, "organization") == 0) {
+            const struct json_value_s *create_group_value = e->value;
+
+            if (create_group_value->type == json_type_null) {
+                organization_ = std::nullopt;
+            } else {
+                if (create_group_value->type != json_type_string) {
+                    throw std::runtime_error("expected field to be of type string");
+                }
+
+                const struct json_string_s *organization__str = static_cast<const struct json_string_s *>(create_group_value->payload);
+                organization_ = std::string(organization__str->string);
+            }
         }
 
         e = e->next;
@@ -2737,6 +2768,9 @@ CreateGroup::operator==(const CreateGroup&rhs) const {
     if (this->description_ != rhs.description_) {
         return false;
     }
+    if (this->organization_ != rhs.organization_) {
+        return false;
+    }
     return true;
 }
 
@@ -2745,13 +2779,20 @@ to_bytes(const CreateGroup &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"displayName\":";
-    ss << "\"" << o.display_name_ << "\"";
+    write_json_string(ss, o.display_name_);
     ss << ",";
 
     if (o.description_.has_value()) {
         ss << "\"description\":";
         const auto &description__value = o.description_.value();
-        ss << "\"" << description__value << "\"";
+        write_json_string(ss, description__value);
+        ss << ",";
+    }
+
+    if (o.organization_.has_value()) {
+        ss << "\"organization\":";
+        const auto &organization__value = o.organization_.value();
+        write_json_string(ss, organization__value);
     }
 
     std::string str = ss.str();
@@ -2908,21 +2949,21 @@ to_bytes(const GroupMembership &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"id\":";
-    ss << "\"" << o.id_ << "\"";
+    write_json_string(ss, o.id_);
     ss << ",";
 
     ss << "\"objectType\":";
-    ss << "\"" << o.object_type_ << "\"";
+    write_json_string(ss, o.object_type_);
     ss << ",";
 
     ss << "\"displayName\":";
-    ss << "\"" << o.display_name_ << "\"";
+    write_json_string(ss, o.display_name_);
     ss << ",";
 
     if (o.user_principal_name_.has_value()) {
         ss << "\"userPrincipalName\":";
         const auto &user_principal_name__value = o.user_principal_name_.value();
-        ss << "\"" << user_principal_name__value << "\"";
+        write_json_string(ss, user_principal_name__value);
         ss << ",";
     }
 
@@ -2931,7 +2972,7 @@ to_bytes(const GroupMembership &o) {
         const auto &other_mails__value = o.other_mails_.value();
         ss << "[";
         for (const auto &i : other_mails__value) {
-            ss << "\"" << i << "\"";
+            write_json_string(ss, i);
             ss << ",";
         }
         if (!other_mails__value.empty()) {
@@ -2944,14 +2985,14 @@ to_bytes(const GroupMembership &o) {
     if (o.department_.has_value()) {
         ss << "\"department\":";
         const auto &department__value = o.department_.value();
-        ss << "\"" << department__value << "\"";
+        write_json_string(ss, department__value);
         ss << ",";
     }
 
     if (o.created_date_time_.has_value()) {
         ss << "\"createdDateTime\":";
         const auto &created_date_time__value = o.created_date_time_.value();
-        ss << "\"" << created_date_time__value << "\"";
+        write_json_string(ss, created_date_time__value);
     }
 
     std::string str = ss.str();
@@ -3013,11 +3054,11 @@ to_bytes(const OrganizationSummary &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"name\":";
-    ss << "\"" << o.name_ << "\"";
+    write_json_string(ss, o.name_);
     ss << ",";
 
     ss << "\"org_id\":";
-    ss << "\"" << o.org_id_ << "\"";
+    write_json_string(ss, o.org_id_);
     std::string str = ss.str();
     if (str.back() == ',') {
         str.pop_back();
@@ -3214,20 +3255,20 @@ to_bytes(const CreateOrganizationRequest &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"name\":";
-    ss << "\"" << o.name_ << "\"";
+    write_json_string(ss, o.name_);
     ss << ",";
 
     if (o.parent_id_.has_value()) {
         ss << "\"parent_id\":";
         const auto &parent_id__value = o.parent_id_.value();
-        ss << "\"" << parent_id__value << "\"";
+        write_json_string(ss, parent_id__value);
         ss << ",";
     }
 
     if (o.sso_domain_.has_value()) {
         ss << "\"sso_domain\":";
         const auto &sso_domain__value = o.sso_domain_.value();
-        ss << "\"" << sso_domain__value << "\"";
+        write_json_string(ss, sso_domain__value);
         ss << ",";
     }
 
@@ -3382,32 +3423,32 @@ to_bytes(const Organization &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"name\":";
-    ss << "\"" << o.name_ << "\"";
+    write_json_string(ss, o.name_);
     ss << ",";
 
     ss << "\"org_id\":";
-    ss << "\"" << o.org_id_ << "\"";
+    write_json_string(ss, o.org_id_);
     ss << ",";
 
     ss << "\"org_mgmt_id\":";
-    ss << "\"" << o.org_mgmt_id_ << "\"";
+    write_json_string(ss, o.org_mgmt_id_);
     ss << ",";
 
     ss << "\"data_owner_id\":";
-    ss << "\"" << o.data_owner_id_ << "\"";
+    write_json_string(ss, o.data_owner_id_);
     ss << ",";
 
     if (o.parent_id_.has_value()) {
         ss << "\"parent_id\":";
         const auto &parent_id__value = o.parent_id_.value();
-        ss << "\"" << parent_id__value << "\"";
+        write_json_string(ss, parent_id__value);
         ss << ",";
     }
 
     if (o.sso_domain_.has_value()) {
         ss << "\"sso_domain\":";
         const auto &sso_domain__value = o.sso_domain_.value();
-        ss << "\"" << sso_domain__value << "\"";
+        write_json_string(ss, sso_domain__value);
         ss << ",";
     }
 
@@ -3463,7 +3504,7 @@ to_bytes(const RenameOrganizationRequest &o) {
     std::stringstream ss;
     ss << "{";
     ss << "\"name\":";
-    ss << "\"" << o.name_ << "\"";
+    write_json_string(ss, o.name_);
     std::string str = ss.str();
     if (str.back() == ',') {
         str.pop_back();
