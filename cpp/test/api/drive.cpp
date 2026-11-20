@@ -273,6 +273,38 @@ test_get_file(ul::RequestContext &rctx) {
 ApiTest test_get_file_obj(test_get_file, "drive::get_file", &idempotent_api_test_root);
 
 ul::Result<ul::Void>
+test_get_file_stream(ul::RequestContext &rctx) {
+    TestContext ctx(rctx);
+    const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");
+    const char *expected_str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    const uint8_t *expected_ptr = reinterpret_cast<const uint8_t *>(expected_str);
+    const std::vector<uint8_t> expected = std::vector(expected_ptr, expected_ptr + strlen(expected_str));
+    const std::vector<uint8_t> expected_bytes = std::vector(expected);
+    ctx.set_response(expected_bytes);
+    std::vector<uint8_t> result_value;
+    auto result = ul::api::drive::get_file_stream(
+        ctx,
+        p0,
+        [&result_value](const uint8_t *data, size_t size) {
+            result_value.insert(result_value.end(), data, data + size);
+            return true;
+        }
+    );
+
+    if (std::holds_alternative<ul::Error>(result)) {
+        ul::Error error = std::get<ul::Error>(result);
+        return ul::Result<ul::Void>(error);
+    }
+
+    if (result_value != expected) {
+        return ul::Result<ul::Void>(ul::Error("test failed; results not equal"));
+    }
+    return ul::Result<ul::Void>(ul::Void());
+}
+
+ApiTest test_get_file_stream_obj(test_get_file_stream, "drive::get_file_stream", &idempotent_api_test_root);
+
+ul::Result<ul::Void>
 test_put_file_chunk(ul::RequestContext &rctx) {
     TestContext ctx(rctx);
     const ::ul::types::ObjectId p0 = ::ul::types::ObjectId("00000000-0000-0000-0000-000000000000");

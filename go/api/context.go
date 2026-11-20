@@ -4,10 +4,37 @@
 
 package api
 
+import (
+	"bytes"
+	"io"
+)
+
 // RequestContext defines the interface for making authenticated API requests.
 type RequestContext interface {
 	Get(path string, params [][2]string, headers map[string]string) ([]byte, error)
 	Post(path string, body []byte, contentType string, params [][2]string, headers map[string]string) ([]byte, error)
 	Put(path string, body []byte, contentType string, params [][2]string, headers map[string]string) ([]byte, error)
 	Delete(path string, params [][2]string, headers map[string]string) ([]byte, error)
+}
+
+// StreamContext is a RequestContext that reads a response body in parts.
+type StreamContext interface {
+	RequestContext
+	// GetStream makes a GET request and returns the response body. The caller
+	// must close it.
+	GetStream(path string, params [][2]string, headers map[string]string) (io.ReadCloser, error)
+}
+
+// GetStream makes a GET request and returns the response body. The caller
+// must close it. A context that is not a StreamContext reads the complete
+// body into memory.
+func GetStream(ctx RequestContext, path string, params [][2]string, headers map[string]string) (io.ReadCloser, error) {
+	if stream, ok := ctx.(StreamContext); ok {
+		return stream.GetStream(path, params, headers)
+	}
+	res, err := ctx.Get(path, params, headers)
+	if err != nil {
+		return nil, err
+	}
+	return io.NopCloser(bytes.NewReader(res)), nil
 }

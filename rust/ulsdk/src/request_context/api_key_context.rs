@@ -13,7 +13,8 @@ use uuid::Uuid;
 use crate::error::Error;
 use crate::keys::Key;
 use crate::request_context::{
-    get_endpoint, Environment, File, ParamMap, Region, RequestContext, DELAYS,
+    body_stream, check_response, get_endpoint, ByteStream, Environment, File, ParamMap, Region,
+    RequestContext, DELAYS,
 };
 
 const REQUEST_TYPE: &str = "ul1_request";
@@ -36,6 +37,60 @@ impl ApiKeyContext {
 
     pub fn user_id(&self) -> Uuid {
         self.key.user_id()
+    }
+
+    /// Makes a signed GET request. Returns the response if its status is a
+    /// success.
+    async fn do_get(
+        &self,
+        path: &str,
+        params: Option<ParamMap>,
+        headers: Option<HeaderMap>,
+    ) -> Result<reqwest::Response, Error> {
+        let endpoint = get_endpoint(self.key.region(), self.environment, path);
+        let client = reqwest::Client::new();
+        let mut response = None;
+
+        let params = params.unwrap_or_default();
+
+        let mut query = Vec::new();
+        params
+            .iter()
+            .for_each(|(k, v)| query.push((k.to_owned(), v.to_owned())));
+
+        let mut headers = headers.unwrap_or_default();
+        let auth_header =
+            generate_auth_header(&self.key, "GET", path, &mut query, &mut headers, &[])?;
+
+        headers.insert(
+            HeaderName::from_static(HEADER_AUTHORIZATION),
+            HeaderValue::from_str(&auth_header).unwrap(),
+        );
+
+        for delay in DELAYS {
+            let r = client
+                .get(&endpoint)
+                .headers(headers.clone())
+                .query(&params)
+                .send()
+                .await?;
+
+            if r.status().is_server_error() {
+                response = Some(r);
+                sleep(Duration::from_millis(*delay)).await;
+            } else {
+                response = Some(r);
+                break;
+            }
+        }
+
+        let response = if let Some(r) = response {
+            r
+        } else {
+            return Err(Error::Unclassified("No error from endpoint".into()));
+        };
+
+        check_response(response, endpoint).await
     }
 }
 
@@ -189,65 +244,22 @@ impl RequestContext for ApiKeyContext {
         params: Option<ParamMap>,
         headers: Option<HeaderMap>,
     ) -> Result<Vec<u8>, Error> {
-        let endpoint = get_endpoint(self.key.region(), self.environment, path);
-        let client = reqwest::Client::new();
-        let mut response = None;
-
-        let params = params.unwrap_or_default();
-
-        let mut query = Vec::new();
-        params
-            .iter()
-            .for_each(|(k, v)| query.push((k.to_owned(), v.to_owned())));
-
-        let mut headers = headers.unwrap_or_default();
-        let auth_header =
-            generate_auth_header(&self.key, "GET", path, &mut query, &mut headers, &[])?;
-
-        headers.insert(
-            HeaderName::from_static(HEADER_AUTHORIZATION),
-            HeaderValue::from_str(&auth_header).unwrap(),
-        );
-
-        for delay in DELAYS {
-            let r = client
-                .get(&endpoint)
-                .headers(headers.clone())
-                .query(&params)
-                .send()
-                .await?;
-
-            if r.status().is_server_error() {
-                response = Some(r);
-                sleep(Duration::from_millis(*delay)).await;
-            } else {
-                response = Some(r);
-                break;
-            }
-        }
-
-        let response = if let Some(r) = response {
-            r
-        } else {
-            return Err(Error::Unclassified("No error from endpoint".into()));
-        };
-
-        if !response.status().is_success() {
-            let status = response.status();
-            let bytes = response.bytes().await?;
-            return Err(Error::FailedRequest(
-                endpoint.to_owned(),
-                "Unable to retrieve data from endpoint".to_owned(),
-                status,
-                unsafe { std::str::from_utf8_unchecked(&bytes) }.to_owned(),
-            ));
-        }
-
-        response
+        self.do_get(path, params, headers)
+            .await?
             .bytes()
             .await
             .map_err(Error::Reqwest)
             .map(|b| b.to_vec())
+    }
+
+    async fn get_stream(
+        &self,
+        path: &str,
+        params: Option<ParamMap>,
+        headers: Option<HeaderMap>,
+    ) -> Result<ByteStream, Error> {
+        let response = self.do_get(path, params, headers).await?;
+        Ok(body_stream(response))
     }
 
     async fn put(
@@ -314,7 +326,7 @@ impl RequestContext for ApiKeyContext {
                 endpoint.to_owned(),
                 "Unable to retrieve data from endpoint".to_owned(),
                 status,
-                unsafe { std::str::from_utf8_unchecked(&bytes) }.to_owned(),
+                String::from_utf8_lossy(&bytes).into_owned(),
             ));
         }
 
@@ -389,7 +401,7 @@ impl RequestContext for ApiKeyContext {
                 endpoint.to_owned(),
                 "Unable to retrieve data from endpoint".to_owned(),
                 status,
-                unsafe { std::str::from_utf8_unchecked(&bytes) }.to_owned(),
+                String::from_utf8_lossy(&bytes).into_owned(),
             ));
         }
 
@@ -490,7 +502,7 @@ impl RequestContext for ApiKeyContext {
                 endpoint.to_owned(),
                 "Unable to retrieve data from endpoint".to_owned(),
                 status,
-                unsafe { std::str::from_utf8_unchecked(&bytes) }.to_owned(),
+                String::from_utf8_lossy(&bytes).into_owned(),
             ));
         }
 

@@ -2,41 +2,45 @@
 
 #pragma once
 
-#include "ulsdk/ulsdk.h"
 #include "ulsdk/request_context.h"
+#include "ulsdk/ulsdk.h"
 
 namespace ul {
 class RequestContext;
 }
 
-typedef ul::Result<ul::Void> (*ApiTestFn)(ul::RequestContext &context);
+typedef ul::Result<ul::Void> (*ApiTestFn)(ul::RequestContext& context);
 typedef bool (*TypeTestFn)(void);
 
 struct ApiTest;
 struct TypeTest;
 
-extern ApiTest *idempotent_api_test_root;
-extern ApiTest *mutating_api_test_root;
-extern ApiTest *regression_test_root;
-extern TypeTest *type_test_root;
+extern ApiTest* idempotent_api_test_root;
+extern ApiTest* mutating_api_test_root;
+extern ApiTest* regression_test_root;
+extern TypeTest* type_test_root;
 
 struct ApiTest {
     ApiTestFn fn;
-    const char *name;
+    const char* name;
     // When non-null, the runner reports the test as skipped (with this
     // reason) instead of executing it. Set from the endpoint definition's
     // `ignore_tests` field in tools/ulsdkbuild.
-    const char *skip_reason;
-    ApiTest *next;
+    const char* skip_reason;
+    ApiTest* next;
 
-    ApiTest(ApiTestFn f, const char *n, ApiTest **root)
-        : fn(f), name(n), skip_reason(nullptr) {
+    ApiTest(ApiTestFn f, const char* n, ApiTest** root) :
+        fn(f),
+        name(n),
+        skip_reason(nullptr) {
         next = *root;
         *root = this;
     }
 
-    ApiTest(ApiTestFn f, const char *n, const char *skip, ApiTest **root)
-        : fn(f), name(n), skip_reason(skip) {
+    ApiTest(ApiTestFn f, const char* n, const char* skip, ApiTest** root) :
+        fn(f),
+        name(n),
+        skip_reason(skip) {
         next = *root;
         *root = this;
     }
@@ -44,16 +48,16 @@ struct ApiTest {
 
 struct TypeTest {
     TypeTestFn fn;
-    const char *name;
-    TypeTest *next;
+    const char* name;
+    TypeTest* next;
 
-    TypeTest(TypeTestFn f, const char *n) : fn(f), name(n) {
+    TypeTest(TypeTestFn f, const char* n) : fn(f), name(n) {
         next = type_test_root;
         type_test_root = this;
     }
 };
 
-struct MockContext : public ul::RequestContext {
+struct MockContext: public ul::RequestContext {
     std::string method_;
     std::string path_;
     std::string mimetype_;
@@ -62,7 +66,7 @@ struct MockContext : public ul::RequestContext {
     std::map<std::string, std::string> headers_;
 
     void clear() const {
-        MockContext *self = const_cast<MockContext *>(this);
+        MockContext* self = const_cast<MockContext*>(this);
 
         self->method_.clear();
         self->path_.clear();
@@ -86,7 +90,7 @@ struct MockContext : public ul::RequestContext {
         const std::map<std::string, std::string>& headers) const override {
         clear();
 
-        MockContext *self = const_cast<MockContext *>(this);
+        MockContext* self = const_cast<MockContext*>(this);
 
         self->method_ = "GET";
         self->path_ = path;
@@ -104,7 +108,7 @@ struct MockContext : public ul::RequestContext {
         const std::map<std::string, std::string>& headers) const override {
         clear();
 
-        MockContext *self = const_cast<MockContext *>(this);
+        MockContext* self = const_cast<MockContext*>(this);
 
         self->method_ = "PUT";
         self->path_ = path;
@@ -125,7 +129,7 @@ struct MockContext : public ul::RequestContext {
     ) const override {
         clear();
 
-        MockContext *self = const_cast<MockContext *>(this);
+        MockContext* self = const_cast<MockContext*>(this);
 
         self->method_ = "POST";
         self->path_ = path;
@@ -137,8 +141,10 @@ struct MockContext : public ul::RequestContext {
         return std::vector<uint8_t>();
     }
 
-    ul::Result<std::vector<uint8_t>>
-    upload(const std::string& path, const std::vector<ul::File>& files) const override {
+    ul::Result<std::vector<uint8_t>> upload(
+        const std::string& path,
+        const std::vector<ul::File>& files
+    ) const override {
         clear();
 
         return std::vector<uint8_t>();
@@ -150,7 +156,7 @@ struct MockContext : public ul::RequestContext {
         const std::map<std::string, std::string>& headers) const override {
         clear();
 
-        MockContext *self = const_cast<MockContext *>(this);
+        MockContext* self = const_cast<MockContext*>(this);
 
         self->method_ = "DELETE";
         self->path_ = path;
@@ -162,13 +168,13 @@ struct MockContext : public ul::RequestContext {
 };
 
 struct TestContext: public ul::RequestContext {
-    ul::RequestContext &context_;
+    ul::RequestContext& context_;
     std::vector<uint8_t> response_;
 
 public:
     TestContext() = delete;
 
-    TestContext(ul::RequestContext &context);
+    TestContext(ul::RequestContext& context);
     ~TestContext();
 
     void set_response(std::vector<uint8_t> response);
@@ -180,6 +186,13 @@ public:
     get(const std::string& path,
         const std::map<std::string, std::string>& params,
         const std::map<std::string, std::string>& headers) const override;
+
+    ul::Result<ul::Void> get_stream(
+        const std::string& path,
+        const std::map<std::string, std::string>& params,
+        const std::map<std::string, std::string>& headers,
+        const ul::BodySink& sink
+    ) const override;
 
     ul::Result<std::vector<uint8_t>>
     put(const std::string& path,
@@ -208,5 +221,4 @@ public:
 };
 
 std::vector<std::shared_ptr<::arrow::RecordBatch>>
-make_test_arrow_batches(std::vector<uint8_t> &serialized);
-
+make_test_arrow_batches(std::vector<uint8_t>& serialized);

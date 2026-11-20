@@ -12,6 +12,26 @@ export abstract class RequestContext {
     headers: Record<string, string>
   ): Promise<Uint8Array>;
 
+  /**
+   * Makes a GET request and returns the response body as a stream.
+   *
+   * This default reads the complete body into memory. Override it to read
+   * the body in parts.
+   */
+  async getStream(
+    path: string,
+    params: [string, string][],
+    headers: Record<string, string>
+  ): Promise<ReadableStream<Uint8Array>> {
+    const body = await this.get(path, params, headers);
+    return new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(body);
+        controller.close();
+      },
+    });
+  }
+
   abstract post(
     path: string,
     body: Uint8Array | null,

@@ -43,7 +43,7 @@ public final class Keys {
 
     /**
      * Updates an API key by id.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the key to update.
      * @param update_key The details with which to update the key.
@@ -67,7 +67,7 @@ public final class Keys {
 
     /**
      * Retrieves an API key by id.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the key to retrieve.
      * @return The key details. Note that the secret key is not stored and cannot be retrieved with this API.
@@ -90,7 +90,7 @@ public final class Keys {
 
     /**
      * Deletes an API key by id.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the key to delete
      */

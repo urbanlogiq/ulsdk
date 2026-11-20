@@ -143,7 +143,9 @@ func generateAuthHeader(
 	headers["authorization"] = authHeader
 }
 
-func (c *ApiKeyContext) doRequest(method, path string, body []byte, contentType string, params [][2]string, headers map[string]string) ([]byte, error) {
+// do makes an authenticated request and returns the response. The caller
+// must close its body.
+func (c *ApiKeyContext) do(method, path string, body []byte, contentType string, params [][2]string, headers map[string]string) (*http.Response, error) {
 	// Merge caller-provided headers into a mutable copy
 	mergedHeaders := make(map[string]string)
 	for k, v := range headers {
@@ -185,6 +187,12 @@ func (c *ApiKeyContext) doRequest(method, path string, body []byte, contentType 
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
 	}
+	return resp, nil
+}
+
+// readBody reads and closes the body of a response. It returns an error if
+// the status is not a success.
+func readBody(resp *http.Response) ([]byte, error) {
 	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
@@ -199,9 +207,32 @@ func (c *ApiKeyContext) doRequest(method, path string, body []byte, contentType 
 	return respBody, nil
 }
 
+func (c *ApiKeyContext) doRequest(method, path string, body []byte, contentType string, params [][2]string, headers map[string]string) ([]byte, error) {
+	resp, err := c.do(method, path, body, contentType, params, headers)
+	if err != nil {
+		return nil, err
+	}
+	return readBody(resp)
+}
+
 // Get makes an authenticated GET request.
 func (c *ApiKeyContext) Get(path string, params [][2]string, headers map[string]string) ([]byte, error) {
 	return c.doRequest("GET", path, nil, "", params, headers)
+}
+
+// GetStream makes an authenticated GET request and returns the response
+// body. The caller must close it.
+func (c *ApiKeyContext) GetStream(path string, params [][2]string, headers map[string]string) (io.ReadCloser, error) {
+	resp, err := c.do("GET", path, nil, "", params, headers)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		// The body of an error is small. readBody puts it in the error.
+		_, err := readBody(resp)
+		return nil, err
+	}
+	return resp.Body, nil
 }
 
 // Post makes an authenticated POST request.

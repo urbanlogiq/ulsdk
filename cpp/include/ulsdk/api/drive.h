@@ -140,14 +140,27 @@ copy(
 );
 
 /**
- * Retrieves a file by id.
- * @param id The ID of the file to retrieve
- * @return The contents of the file referenced by the specified ID
+ * Reads a file by ID.
+ * @param id The file ID
+ * @return The file contents
  */
 Result<std::vector<uint8_t>>
 get_file(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id
+);
+
+/**
+ * Reads a file by ID in parts. Use this function for a file that is too large to hold in memory.
+ * @param id The file ID
+ * @param sink Receives the response body in parts. Returns false to stop the request.
+ * @return The result of the request. `sink` receives: The file contents
+ */
+Result<Void>
+get_file_stream(
+    ul::RequestContext &ctx,
+    const ::ul::types::ObjectId &id,
+    const ul::BodySink &sink
 );
 
 /**

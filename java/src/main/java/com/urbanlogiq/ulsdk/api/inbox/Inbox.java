@@ -7,7 +7,7 @@ package com.urbanlogiq.ulsdk.api.inbox;
 public final class Inbox {
     /**
      * Fetch the contents of the specified inbox folder
-     * 
+     *
      * @param ctx A request context object
      * @param folder The name of the folder to fetch
      * @return The contents of the inbox folder
@@ -28,7 +28,7 @@ public final class Inbox {
 
     /**
      * Clear the status of all notifications in the specified folder
-     * 
+     *
      * @param ctx A request context object
      * @param folder The name of the folder to clear
      */
@@ -48,7 +48,7 @@ public final class Inbox {
 
     /**
      * Set the status of a notification in the specified folder
-     * 
+     *
      * @param ctx A request context object
      * @param folder The name of the folder to set the status in
      * @param id The ID of the notification to set the status for
@@ -76,7 +76,7 @@ public final class Inbox {
 
     /**
      * Clear the status of a notification in the specified folder
-     * 
+     *
      * @param ctx A request context object
      * @param folder The name of the folder to clear the status in
      * @param id The ID of the notification to clear the status for

@@ -26,6 +26,13 @@ public:
         const std::map<std::string, std::string>& params,
         const std::map<std::string, std::string>& headers) const override;
 
+    Result<Void> get_stream(
+        const std::string& path,
+        const std::map<std::string, std::string>& params,
+        const std::map<std::string, std::string>& headers,
+        const BodySink& sink
+    ) const override;
+
     Result<std::vector<uint8_t>>
     put(const std::string& path,
         const std::vector<uint8_t>& data,

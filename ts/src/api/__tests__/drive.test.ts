@@ -197,6 +197,22 @@ describe('getFile', () => {
   });
 });
 
+describe('getFileStream', () => {
+  it('testGetFileStream', async () => {
+    const ctx = new TestContext();
+    const p0 = new ObjectId();
+    ctx.setResponse(new Uint8Array(0));
+    try {
+          await drive.getFileStream(
+        ctx,
+        p0
+      );
+    } catch (_) {
+      // Expected for mock tests with empty/invalid responses
+    }
+  });
+});
+
 describe('putFileChunk', () => {
   it('testPutFileChunk', async () => {
     const ctx = new TestContext();

@@ -5,11 +5,13 @@
 package drive
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/urbanlogiq/ulsdk"
 	"github.com/urbanlogiq/ulsdk/types/fs"
 	"github.com/urbanlogiq/ulsdk/types/id"
 	"github.com/urbanlogiq/ulsdk/types/object"
+	"io"
 	"testing"
 	"time"
 )
@@ -338,6 +340,43 @@ func TestGetFile(t *testing.T) {
 			continue
 		}
 		_ = result
+		success = true
+		break
+	}
+	if !success {
+		t.Fatal("test was unable to complete with retries")
+	}
+}
+
+func TestGetFileStream(t *testing.T) {
+	ctx := ulsdk.NewTestContextFromEnv()
+	if ctx == nil {
+		t.Skip("credentials not set, skipping API test")
+	}
+
+	p0 := id.ObjectId{}
+
+	success := false
+	for i := 0; i < 5; i++ {
+		expected := []byte("Lorem ipsum dolor sit amet, consectetur adipiscing elit")
+		expectedBytes := expected
+		ctx.SetResponse(expectedBytes)
+		result, err := GetFileStream(
+			ctx,
+			p0,
+		)
+		if err != nil {
+			time.Sleep(time.Duration(i+1) * time.Second)
+			continue
+		}
+		data, err := io.ReadAll(result)
+		result.Close()
+		if err != nil {
+			t.Fatalf("failed to read the stream: %v", err)
+		}
+		if !bytes.Equal(data, expected) {
+			t.Fatalf("the stream has %d bytes, want %d", len(data), len(expected))
+		}
 		success = true
 		break
 	}

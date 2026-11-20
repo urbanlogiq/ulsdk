@@ -10,6 +10,7 @@ import (
 	"github.com/urbanlogiq/ulsdk/types/fs"
 	"github.com/urbanlogiq/ulsdk/types/id"
 	"github.com/urbanlogiq/ulsdk/types/object"
+	"io"
 	"strings"
 )
 
@@ -209,7 +210,7 @@ func Copy(ctx api.RequestContext, copyRequest *fs.MoveRequest) error {
 }
 
 // GetFile -
-// Retrieves a file by id.
+// Reads a file by ID.
 func GetFile(ctx api.RequestContext, idParam id.ObjectId) ([]byte, error) {
 	path := "/v1/api/ulv2/drive/file/:id"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
@@ -219,6 +220,24 @@ func GetFile(ctx api.RequestContext, idParam id.ObjectId) ([]byte, error) {
 	headers := map[string]string{}
 
 	res, err := ctx.Get(path, params, headers)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+// GetFileStream -
+// Reads a file by ID in parts. Use this function for a file that is too large to hold in memory.
+// The caller must close the stream.
+func GetFileStream(ctx api.RequestContext, idParam id.ObjectId) (io.ReadCloser, error) {
+	path := "/v1/api/ulv2/drive/file/:id"
+	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
+
+	params := [][2]string{}
+
+	headers := map[string]string{}
+
+	res, err := api.GetStream(ctx, path, params, headers)
 	if err != nil {
 		return nil, err
 	}

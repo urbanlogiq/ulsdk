@@ -264,6 +264,31 @@ public final class TestApiDrive {
     }
 
     @RetryingTest(maxAttempts = 5, suspendForMs = 200)
+    public void testGetFileStream() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String caUser = System.getenv("CA_USER");
+        String caAccessKey = System.getenv("CA_ACCESS_KEY");
+        String caSecretKey = System.getenv("CA_SECRET_KEY");
+
+        if (caUser == null || caAccessKey == null || caSecretKey == null) {
+            throw new RuntimeException("user / key not present, cannot run tests");
+        }
+
+        com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
+        com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
+        com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        byte[] expected = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".getBytes();
+        byte[] expectedBytes = expected.clone();
+        ctx.setResponse(expectedBytes);
+        java.io.InputStream result = com.urbanlogiq.ulsdk.api.drive.Drive.getFileStream(
+            ctx,
+            p0
+        );
+        try (java.io.InputStream stream = result) {
+            org.junit.jupiter.api.Assertions.assertArrayEquals(expected, stream.readAllBytes());
+        }
+    }
+
+    @RetryingTest(maxAttempts = 5, suspendForMs = 200)
     public void testPutFileChunk() throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String caUser = System.getenv("CA_USER");
         String caAccessKey = System.getenv("CA_ACCESS_KEY");

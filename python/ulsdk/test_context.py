@@ -1,7 +1,8 @@
 # Copyright (c), CommunityLogiq Software
 
+import io
 import uuid
-from typing import Dict, List, Optional, Union
+from typing import BinaryIO, Dict, List, Optional, Union
 from websockets.sync.client import ClientConnection
 
 from .api_key_context import ApiKeyContext
@@ -36,6 +37,18 @@ class TestContext(RequestContext):
         echo_path = "/v1/echo/"
         self._context.get(echo_path, params, headers, **kwargs)
         return self._response
+
+    def get_stream(
+        self,
+        path: str,
+        params: Optional[Dict] = None,
+        headers: Optional[Dict[str, str]] = None,
+        **kwargs,
+    ) -> BinaryIO:
+        echo_path = "/v1/echo/"
+        with self._context.get_stream(echo_path, params, headers, **kwargs) as echo:
+            echo.read()
+        return io.BytesIO(self._response)
 
     def put(
         self,

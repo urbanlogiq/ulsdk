@@ -1090,7 +1090,7 @@ mod tests {
                 crate::types::ContentId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
             let expected = DataCatalogObject::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_object_at_revision(&ctx, p0, p1).await;
             let result = match result {
                 Ok(r) => r,
@@ -1099,7 +1099,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1129,7 +1129,7 @@ mod tests {
                 crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
             let expected = ObjectId::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_acl(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -1138,7 +1138,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1168,7 +1168,7 @@ mod tests {
                 crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
             let expected = ObjectSummary::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_head_revision(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -1177,7 +1177,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1207,7 +1207,7 @@ mod tests {
                 crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
             let expected = DataCatalogObject::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_object(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -1216,7 +1216,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1247,7 +1247,7 @@ mod tests {
             let body = crate::types::DataCatalogObject::default();
             let expected = ContentId::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = update_object(&ctx, p0, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -1256,7 +1256,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1292,7 +1292,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -1319,14 +1319,14 @@ mod tests {
         for i in 0..5 {
             let p0 =
                 crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
-            let p1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let p1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let result = delete_attribute(&ctx, p0, p1).await;
             if let Err(e) = result {
                 if i < 4 {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -1354,7 +1354,7 @@ mod tests {
             let body = crate::types::ObjectIdList::default();
             let expected = ObjectSummaryList::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_object_summaries(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -1363,7 +1363,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1392,7 +1392,7 @@ mod tests {
             let body = crate::types::ObjectIdList::default();
             let expected = ObjectIdPairList::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = bulk_fetch_metadata(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -1401,7 +1401,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1430,7 +1430,7 @@ mod tests {
             let body = crate::types::ObjectIdList::default();
             let expected = ObjectIdPairList::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = bulk_fetch_objects(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -1439,7 +1439,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1467,7 +1467,7 @@ mod tests {
         for i in 0..5 {
             let expected = ObjectSummaryList::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = create_object(&ctx).await;
             let result = match result {
                 Ok(r) => r,
@@ -1476,7 +1476,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1502,10 +1502,10 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
 
         for i in 0..5 {
-            let q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let body = crate::types::Query::default();
             let (expected, expected_bytes) = crate::make_test_batches();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = query_aggregate_numeric(&ctx, q0, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -1514,7 +1514,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1539,10 +1539,10 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
 
         for i in 0..5 {
-            let q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let body = crate::types::Query::default();
             let (expected, expected_bytes) = crate::make_test_batches();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = query_aggregate_string(&ctx, q0, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -1551,7 +1551,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1577,10 +1577,10 @@ mod tests {
 
         for i in 0..5 {
             let q0 = 42;
-            let q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let body = crate::types::Query::default();
             let (expected, expected_bytes) = crate::make_test_batches();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = query_aggregate_histo(&ctx, q0, q1, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -1589,7 +1589,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1615,11 +1615,11 @@ mod tests {
 
         for i in 0..5 {
             let q0 = 42;
-            let q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
-            let q2 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            let q2 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let body = crate::types::Query::default();
             let (expected, expected_bytes) = crate::make_test_batches();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = query_aggregate_relative_histo(&ctx, q0, q1, q2, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -1628,7 +1628,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1656,7 +1656,7 @@ mod tests {
             let p0 = crate::types::PinnedObjectId::from_str("00000000-0000-0000-0000-000000000000")
                 .unwrap();
             let (expected, expected_bytes) = crate::make_test_batches();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = stream_get_arrow(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -1665,7 +1665,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1693,8 +1693,8 @@ mod tests {
             let p0 = crate::types::PinnedObjectId::from_str("00000000-0000-0000-0000-000000000000")
                 .unwrap();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-            let expected_bytes = expected.clone();
-            ctx.set_response(expected_bytes.clone());
+            let expected_bytes = expected;
+            ctx.set_response(expected_bytes.as_slice());
             let result = stream_get_parquet(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -1703,7 +1703,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1732,8 +1732,8 @@ mod tests {
             let p0 = crate::types::PinnedObjectId::from_str("00000000-0000-0000-0000-000000000000")
                 .unwrap();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-            let expected_bytes = expected.clone();
-            ctx.set_response(expected_bytes.clone());
+            let expected_bytes = expected;
+            ctx.set_response(expected_bytes.as_slice());
             let result = stream_get_csv(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -1742,7 +1742,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1771,8 +1771,8 @@ mod tests {
             let p0 = crate::types::PinnedObjectId::from_str("00000000-0000-0000-0000-000000000000")
                 .unwrap();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-            let expected_bytes = expected.clone();
-            ctx.set_response(expected_bytes.clone());
+            let expected_bytes = expected;
+            ctx.set_response(expected_bytes.as_slice());
             let result = stream_get_xlsx(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -1781,7 +1781,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1810,8 +1810,8 @@ mod tests {
             let p0 = crate::types::PinnedObjectId::from_str("00000000-0000-0000-0000-000000000000")
                 .unwrap();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-            let expected_bytes = expected.clone();
-            ctx.set_response(expected_bytes.clone());
+            let expected_bytes = expected;
+            ctx.set_response(expected_bytes.as_slice());
             let result = stream_get_json(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -1820,7 +1820,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1849,8 +1849,8 @@ mod tests {
             let p0 = crate::types::PinnedObjectId::from_str("00000000-0000-0000-0000-000000000000")
                 .unwrap();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-            let expected_bytes = expected.clone();
-            ctx.set_response(expected_bytes.clone());
+            let expected_bytes = expected;
+            ctx.set_response(expected_bytes.as_slice());
             let result = stream_get_text(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -1859,7 +1859,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1888,8 +1888,8 @@ mod tests {
             let p0 = crate::types::PinnedObjectId::from_str("00000000-0000-0000-0000-000000000000")
                 .unwrap();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-            let expected_bytes = expected.clone();
-            ctx.set_response(expected_bytes.clone());
+            let expected_bytes = expected;
+            ctx.set_response(expected_bytes.as_slice());
             let result = stream_get_html(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -1898,7 +1898,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1933,7 +1933,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -1967,7 +1967,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -2001,7 +2001,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -2030,7 +2030,7 @@ mod tests {
                 crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
             let expected = Metadata::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = generate_metadata(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -2039,7 +2039,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -2069,7 +2069,7 @@ mod tests {
                 crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
             let q0 = true;
             let q0 = Some(q0);
-            let q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let q1 = Some(q1);
             let q2 =
                 crate::types::ContentId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
@@ -2085,7 +2085,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -2118,7 +2118,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -2149,7 +2149,7 @@ mod tests {
                 crate::types::GenericId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
             let expected = History::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = table_row_history(&ctx, p0, p1).await;
             let result = match result {
                 Ok(r) => r,
@@ -2158,7 +2158,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -2188,7 +2188,7 @@ mod tests {
                 crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
             let expected = History::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = table_history(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -2197,7 +2197,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -2229,7 +2229,7 @@ mod tests {
                 crate::types::GenericId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
             let expected = ObjectId::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_table_attachments_directory(&ctx, p0, p1).await;
             let result = match result {
                 Ok(r) => r,
@@ -2238,7 +2238,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -2270,7 +2270,7 @@ mod tests {
                 crate::types::GenericId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
             let expected = ObjectId::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_or_create_table_attachments_directory(&ctx, p0, p1).await;
             let result = match result {
                 Ok(r) => r,
@@ -2279,7 +2279,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -2308,7 +2308,7 @@ mod tests {
             let body = crate::types::NewTable::default();
             let expected = ObjectId::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = create_table(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -2317,7 +2317,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -2346,7 +2346,7 @@ mod tests {
             let body = crate::types::NewTableList::default();
             let expected = NewTableListResult::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = create_tables(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -2355,7 +2355,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -2383,7 +2383,7 @@ mod tests {
         for i in 0..5 {
             let body = crate::types::Query::default();
             let (expected, expected_bytes) = crate::make_test_batches();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = schema_arrow(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -2392,7 +2392,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -2419,8 +2419,8 @@ mod tests {
         for i in 0..5 {
             let body = crate::types::Query::default();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-            let expected_bytes = expected.clone();
-            ctx.set_response(expected_bytes.clone());
+            let expected_bytes = expected;
+            ctx.set_response(expected_bytes.as_slice());
             let result = schema_raw(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -2429,7 +2429,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -2457,7 +2457,7 @@ mod tests {
         for i in 0..5 {
             let body = crate::types::Query::default();
             let (expected, expected_bytes) = crate::make_test_batches();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = schema_only(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -2466,7 +2466,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -2493,7 +2493,7 @@ mod tests {
         for i in 0..5 {
             let body = crate::types::Query::default();
             let (expected, expected_bytes) = crate::make_test_batches();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = query_arrow(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -2502,7 +2502,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -2529,8 +2529,8 @@ mod tests {
         for i in 0..5 {
             let body = crate::types::Query::default();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-            let expected_bytes = expected.clone();
-            ctx.set_response(expected_bytes.clone());
+            let expected_bytes = expected;
+            ctx.set_response(expected_bytes.as_slice());
             let result = query_parquet(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -2539,7 +2539,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -2567,8 +2567,8 @@ mod tests {
         for i in 0..5 {
             let body = crate::types::Query::default();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-            let expected_bytes = expected.clone();
-            ctx.set_response(expected_bytes.clone());
+            let expected_bytes = expected;
+            ctx.set_response(expected_bytes.as_slice());
             let result = query_csv(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -2577,7 +2577,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -2605,8 +2605,8 @@ mod tests {
         for i in 0..5 {
             let body = crate::types::Query::default();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-            let expected_bytes = expected.clone();
-            ctx.set_response(expected_bytes.clone());
+            let expected_bytes = expected;
+            ctx.set_response(expected_bytes.as_slice());
             let result = query_xlsx(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -2615,7 +2615,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -2643,8 +2643,8 @@ mod tests {
         for i in 0..5 {
             let body = crate::types::Query::default();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-            let expected_bytes = expected.clone();
-            ctx.set_response(expected_bytes.clone());
+            let expected_bytes = expected;
+            ctx.set_response(expected_bytes.as_slice());
             let result = query_json(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -2653,7 +2653,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -2681,8 +2681,8 @@ mod tests {
         for i in 0..5 {
             let body = crate::types::Query::default();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-            let expected_bytes = expected.clone();
-            ctx.set_response(expected_bytes.clone());
+            let expected_bytes = expected;
+            ctx.set_response(expected_bytes.as_slice());
             let result = query_text(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -2691,7 +2691,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -2719,8 +2719,8 @@ mod tests {
         for i in 0..5 {
             let body = crate::types::Query::default();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-            let expected_bytes = expected.clone();
-            ctx.set_response(expected_bytes.clone());
+            let expected_bytes = expected;
+            ctx.set_response(expected_bytes.as_slice());
             let result = query_html(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -2729,7 +2729,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };

@@ -8,13 +8,27 @@ import java.net.URISyntaxException;
 import com.urbanlogiq.ulsdk.Region;
 import com.urbanlogiq.ulsdk.Environment;
 import com.urbanlogiq.ulsdk.File;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public abstract class RequestContext {
     abstract Region region();
     abstract Environment environment();
 
     public abstract byte[] get(String path, List<Pair<String, String>> params, HashMap<String, String> headers) throws URISyntaxException, IOException, InterruptedException;
+
+    /**
+     * Makes a GET request and returns the response body as a stream. The
+     * caller must close the stream.
+     *
+     * This default reads the complete body into memory. Override it to read
+     * the body in parts.
+     */
+    public InputStream getStream(String path, List<Pair<String, String>> params, HashMap<String, String> headers) throws URISyntaxException, IOException, InterruptedException {
+        return new ByteArrayInputStream(this.get(path, params, headers));
+    }
+
     public abstract byte[] put(String path, byte[] body, String mimetype, List<Pair<String, String>> params, HashMap<String, String> headers) throws URISyntaxException, IOException, InterruptedException;
     public abstract byte[] post(String path, byte[] body, String mimetype, List<Pair<String, String>> params, HashMap<String, String> headers) throws URISyntaxException, IOException, InterruptedException;
     public abstract byte[] upload(String path, List<File> files) throws URISyntaxException, IOException, InterruptedException;

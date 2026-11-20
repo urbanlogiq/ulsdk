@@ -7,7 +7,7 @@ package com.urbanlogiq.ulsdk.api.datacatalog;
 public final class Datacatalog {
     /**
      * Fetch an object at a given content ID revision
-     * 
+     *
      * @param ctx A request context object
      * @param object_id The ID of the object to fetch content from
      * @param content_id The ID of the content to fetch
@@ -31,7 +31,7 @@ public final class Datacatalog {
 
     /**
      * Fetch the ID of the ACL object associated with the given object ID
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the object to fetch the ACL for
      * @return The ID of the object's ACL
@@ -52,7 +52,7 @@ public final class Datacatalog {
 
     /**
      * Fetch the head revision of the object with the given ID
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the object to fetch the head revision for
      * @return The summary for the head revision of the object
@@ -73,7 +73,7 @@ public final class Datacatalog {
 
     /**
      * Fetch the object with the given ID at its head revision
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the object to fetch
      * @return Object content
@@ -94,7 +94,7 @@ public final class Datacatalog {
 
     /**
      * Update the object with the given ID
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the object to update
      * @param object Object contents with which to update the specified object
@@ -119,7 +119,7 @@ public final class Datacatalog {
 
     /**
      * Update the attributes of the object with the given ID
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the object whose attributes will be updated
      * @param overwrite True to overwrite existing attributes or false to fail if there is a conflict.
@@ -147,7 +147,7 @@ public final class Datacatalog {
 
     /**
      * Delete the attribute with the given key from the object with the given ID
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the object whose attribute will be deleted
      * @param key The key of the attribute to delete
@@ -170,7 +170,7 @@ public final class Datacatalog {
 
     /**
      * Fetch a list of object summaries
-     * 
+     *
      * @param ctx A request context object
      * @param object_ids A list of object IDs to fetch summaries for
      * @return A list of object summaries
@@ -191,7 +191,7 @@ public final class Datacatalog {
 
     /**
      * Given a list of IDs for stream objects, fetch their metadata in bulk. Note that the returned DataCatalogObject instances only have a valid metadata `obj` field.
-     * 
+     *
      * @param ctx A request context object
      * @param stream_ids A list of IDs of stream objects to fetch metadata for
      * @return A list of metadata DataCatalogObjects
@@ -212,7 +212,7 @@ public final class Datacatalog {
 
     /**
      * Given a list of object IDs, fetch their contents in bulk
-     * 
+     *
      * @param ctx A request context object
      * @param object_ids A list of object IDs to fetch summaries for
      * @return A list of object contents with their IDs
@@ -250,7 +250,7 @@ public final class Datacatalog {
 
     /**
      * INTERNAL
-     * 
+     *
      * @param ctx A request context object
      * @param columns Comma separated list of columns to aggregate
      * @param query INTERNAL
@@ -275,7 +275,7 @@ public final class Datacatalog {
 
     /**
      * INTERNAL
-     * 
+     *
      * @param ctx A request context object
      * @param columns Comma separated list of columns to aggregate
      * @param query INTERNAL
@@ -300,7 +300,7 @@ public final class Datacatalog {
 
     /**
      * INTERNAL
-     * 
+     *
      * @param ctx A request context object
      * @param buckets Number of buckets
      * @param columns Comma separated list of columns to aggregate
@@ -328,7 +328,7 @@ public final class Datacatalog {
 
     /**
      * INTERNAL
-     * 
+     *
      * @param ctx A request context object
      * @param buckets Number of buckets
      * @param numerator_columns Comma separated list of columns to aggregate for the numerator value
@@ -359,7 +359,7 @@ public final class Datacatalog {
 
     /**
      * Fetch the stream with the given ID
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the stream to fetch
      * @return Stream data as requested
@@ -381,7 +381,7 @@ public final class Datacatalog {
 
     /**
      * Fetch the stream with the given ID
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the stream to fetch
      * @return Stream data as requested
@@ -403,7 +403,7 @@ public final class Datacatalog {
 
     /**
      * Fetch the stream with the given ID
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the stream to fetch
      * @return Stream data as requested
@@ -425,7 +425,7 @@ public final class Datacatalog {
 
     /**
      * Fetch the stream with the given ID
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the stream to fetch
      * @return Stream data as requested
@@ -447,7 +447,7 @@ public final class Datacatalog {
 
     /**
      * Fetch the stream with the given ID
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the stream to fetch
      * @return Stream data as requested
@@ -469,7 +469,7 @@ public final class Datacatalog {
 
     /**
      * Fetch the stream with the given ID
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the stream to fetch
      * @return Stream data as requested
@@ -491,7 +491,7 @@ public final class Datacatalog {
 
     /**
      * Fetch the stream with the given ID
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the stream to fetch
      * @return Stream data as requested
@@ -513,7 +513,7 @@ public final class Datacatalog {
 
     /**
      * Append data, in Apache Arrow format, to the specified stream
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the stream to append data to
      * @param data The Arrow record batches to append
@@ -546,7 +546,7 @@ public final class Datacatalog {
 
     /**
      * Append a diffstream to the specified stream
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the stream to append data to
      * @param data The Arrow record batches to append
@@ -570,7 +570,7 @@ public final class Datacatalog {
 
     /**
      * Append JSON data to the specified stream
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the stream to append data to
      * @param data The Arrow record batches to append
@@ -598,7 +598,7 @@ public final class Datacatalog {
 
     /**
      * Generate metadata for the specified stream
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the stream to generate metadata for
      * @return The metadata as generated from the stream data
@@ -623,7 +623,7 @@ public final class Datacatalog {
      * The `merge` option selects how the provided metadata is written:
      * - merge=true (the default): coalesce the provided metadata with the existing and the freshly-generated metadata. Fields omitted or left at their default are filled in from generated/previous metadata.
      * - merge=false: write the provided metadata verbatim (no regeneration or coalescing) after enforcing field-flag invariants, so intentional flag-off/false/zero values persist. The whole content is replaced, so a complete payload is required. Callers editing a metadata object read earlier should also pass expected_metadata_revision/expected_stream_revision so a stale write is rejected with 409 rather than overwriting a concurrent change.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the stream to update metadata for
      * @param merge Coalesce with existing/generated metadata (true, the default) or write verbatim (false)
@@ -671,7 +671,7 @@ public final class Datacatalog {
 
     /**
      * Compact the specified stream
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the stream to compact
      */
@@ -693,7 +693,7 @@ public final class Datacatalog {
 
     /**
      * Fetch the history of a row in a table
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the table to fetch the row history from
      * @param row The ID of the row to fetch the history for
@@ -717,7 +717,7 @@ public final class Datacatalog {
 
     /**
      * Fetch the history of a table
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the table to fetch the history from
      * @return The history of the table
@@ -738,7 +738,7 @@ public final class Datacatalog {
 
     /**
      * Fetch the directory ID for a row's file attachments location
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the table to fetch the attachments directory ID from
      * @param row The ID of the row to fetch the attachments directory ID for
@@ -762,7 +762,7 @@ public final class Datacatalog {
 
     /**
      * Fetch the directory ID for a row's file attachments location, creating it if it doesn't exist
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the table to fetch the attachments directory ID from
      * @param row The ID of the row to fetch the attachments directory ID for
@@ -788,7 +788,7 @@ public final class Datacatalog {
 
     /**
      * Create a new table
-     * 
+     *
      * @param ctx A request context object
      * @param new_table New table creation details
      * @return The ID of the newly created table
@@ -809,7 +809,7 @@ public final class Datacatalog {
 
     /**
      * Create many tables in one parent directory with a single directory update
-     * 
+     *
      * @param ctx A request context object
      * @param new_tables The tables to create; every entry must name the same parent directory
      * @return Per-entry results, in request order
@@ -830,7 +830,7 @@ public final class Datacatalog {
 
     /**
      * Evaluate the resulting schema of a query, returning an empty Arrow record batch
-     * 
+     *
      * @param ctx A request context object
      * @param query The query to execute
      * @return The result of the query
@@ -852,7 +852,7 @@ public final class Datacatalog {
 
     /**
      * Evaluate the resulting schema of a query, returning the raw, unparsed binary record batch
-     * 
+     *
      * @param ctx A request context object
      * @param query The query to execute
      * @return The result of the query
@@ -874,7 +874,7 @@ public final class Datacatalog {
 
     /**
      * Evaluate the resulting Arrow schema of a query, returning it as a parsed Schema (reliable even for a 0-row result)
-     * 
+     *
      * @param ctx A request context object
      * @param query The query to execute
      * @return The result of the query
@@ -897,7 +897,7 @@ public final class Datacatalog {
 
     /**
      * Query the datacatalog, returning data in Apache Arrow IPC Stream format
-     * 
+     *
      * @param ctx A request context object
      * @param query The query to execute
      * @return The result of the query
@@ -919,7 +919,7 @@ public final class Datacatalog {
 
     /**
      * Query the datacatalog, returning data in Apache Parquet format
-     * 
+     *
      * @param ctx A request context object
      * @param query The query to execute
      * @return The result of the query
@@ -941,7 +941,7 @@ public final class Datacatalog {
 
     /**
      * Query the datacatalog, returning data in CSV format
-     * 
+     *
      * @param ctx A request context object
      * @param query The query to execute
      * @return The result of the query
@@ -963,7 +963,7 @@ public final class Datacatalog {
 
     /**
      * Query the datacatalog, returning data in Excel (XLSX) format
-     * 
+     *
      * @param ctx A request context object
      * @param query The query to execute
      * @return The result of the query
@@ -985,7 +985,7 @@ public final class Datacatalog {
 
     /**
      * Query the datacatalog, returning data JSON
-     * 
+     *
      * @param ctx A request context object
      * @param query The query to execute
      * @return The result of the query
@@ -1007,7 +1007,7 @@ public final class Datacatalog {
 
     /**
      * Query the datacatalog, returning data in plain text
-     * 
+     *
      * @param ctx A request context object
      * @param query The query to execute
      * @return The result of the query
@@ -1029,7 +1029,7 @@ public final class Datacatalog {
 
     /**
      * Query the datacatalog, returning data in HTML
-     * 
+     *
      * @param ctx A request context object
      * @param query The query to execute
      * @return The result of the query

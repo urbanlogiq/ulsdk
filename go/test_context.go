@@ -5,6 +5,7 @@ package ulsdk
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/google/uuid"
@@ -63,6 +64,21 @@ func (c *TestContext) Get(path string, params [][2]string, headers map[string]st
 		return nil, err
 	}
 	return c.response, nil
+}
+
+// GetStream reads an authenticated GET to /v1/echo/ as a stream and returns
+// the canned response.
+func (c *TestContext) GetStream(path string, params [][2]string, headers map[string]string) (io.ReadCloser, error) {
+	echo, err := c.context.GetStream("/v1/echo/", params, headers)
+	if err != nil {
+		return nil, err
+	}
+	_, err = io.Copy(io.Discard, echo)
+	echo.Close()
+	if err != nil {
+		return nil, err
+	}
+	return io.NopCloser(bytes.NewReader(c.response)), nil
 }
 
 // Post sends the canned response to /v1/echo/ and verifies the echo matches.

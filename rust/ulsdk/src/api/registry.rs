@@ -131,10 +131,10 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
 
         for i in 0..5 {
-            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let expected = RegistryTables::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = tables(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -143,7 +143,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -169,12 +169,12 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
 
         for i in 0..5 {
-            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let p1 =
                 crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
             let expected = ProjectResult::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = project(&ctx, p0, p1).await;
             let result = match result {
                 Ok(r) => r,
@@ -183,7 +183,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -209,12 +209,12 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
 
         for i in 0..5 {
-            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let p1 =
                 crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
             let expected = ProjectResult::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = unlink(&ctx, p0, p1).await;
             let result = match result {
                 Ok(r) => r,
@@ -223,7 +223,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -249,10 +249,10 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
 
         for i in 0..5 {
-            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let body = crate::types::Query::default();
             let (expected, expected_bytes) = crate::make_test_batches();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = query_arrow(&ctx, p0, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -261,7 +261,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };

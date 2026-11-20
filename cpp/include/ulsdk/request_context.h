@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <functional>
 #include <map>
 #include <string>
 #include <variant>
@@ -16,6 +17,10 @@ struct File {
     std::vector<uint8_t> data;
 };
 
+/// Receives the next part of a response body. Returns false to stop the
+/// request.
+using BodySink = std::function<bool(const uint8_t* data, size_t size)>;
+
 Result<std::string>
 get_endpoint(Region region, Environment environment, const std::string& api);
 
@@ -29,6 +34,17 @@ struct RequestContext {
     get(const std::string& path,
         const std::map<std::string, std::string>& params,
         const std::map<std::string, std::string>& headers) const = 0;
+
+    /// Makes a GET request and passes the response body to `sink` in parts.
+    ///
+    /// This default reads the complete body into memory. Override it to read
+    /// the body in parts.
+    virtual Result<Void> get_stream(
+        const std::string& path,
+        const std::map<std::string, std::string>& params,
+        const std::map<std::string, std::string>& headers,
+        const BodySink& sink
+    ) const;
 
     virtual Result<std::vector<uint8_t>>
     put(const std::string& path,

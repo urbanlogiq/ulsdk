@@ -361,7 +361,7 @@ mod tests {
         for i in 0..5 {
             let expected = ObjectSummaryList::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = new_acl(&ctx).await;
             let result = match result {
                 Ok(r) => r,
@@ -370,7 +370,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -401,7 +401,7 @@ mod tests {
             let q0 = Some(q0);
             let expected = ObjectSummaryList::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = new_from(&ctx, q0).await;
             let result = match result {
                 Ok(r) => r,
@@ -410,7 +410,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -443,7 +443,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -478,7 +478,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -514,7 +514,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -548,7 +548,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -583,7 +583,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -618,7 +618,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -654,7 +654,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -689,7 +689,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -724,7 +724,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -758,7 +758,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -786,8 +786,8 @@ mod tests {
             let p0 =
                 crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-            let expected_bytes = expected.clone();
-            ctx.set_response(expected_bytes.clone());
+            let expected_bytes = expected;
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_permissions(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -796,7 +796,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -831,7 +831,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -866,7 +866,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;

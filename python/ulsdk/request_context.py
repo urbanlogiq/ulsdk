@@ -1,9 +1,12 @@
 # Copyright (c), CommunityLogiq Software
 
+import io
 import uuid
 from abc import ABC, abstractmethod
-from typing import Dict, List, NamedTuple, Optional, Union
+from typing import BinaryIO, Dict, List, NamedTuple, Optional, Union
 from urllib.parse import quote
+
+import requests
 from websockets.sync.client import ClientConnection
 
 from .keys import Environment, Region
@@ -34,6 +37,75 @@ class File(NamedTuple):
     data: bytes
 
 
+STREAM_BLOCK_SIZE = 1024 * 1024
+
+
+class _ResponseReader(io.RawIOBase):
+    """Read the body of a response in blocks. Close the response with the
+    reader."""
+
+    def __init__(self, response: requests.Response):
+        self._response = response
+        # Decode the body as `Response.content` does.
+        self._blocks = response.iter_content(STREAM_BLOCK_SIZE)
+        self._block = memoryview(b"")
+
+    def readable(self) -> bool:
+        return True
+
+    def readinto(self, buffer) -> int:
+        while not self._block:
+            block = next(self._blocks, None)
+            if block is None:
+                self._check_length()
+                return 0
+            self._block = memoryview(block)
+
+        with memoryview(buffer).cast("B") as target:
+            count = min(len(target), len(self._block))
+            target[:count] = self._block[:count]
+        self._block = self._block[count:]
+        return count
+
+    def _check_length(self) -> None:
+        """Fail if the body is shorter than the response declared. Not all
+        versions of the HTTP library do this check."""
+        declared = self._response.headers.get("content-length")
+        if declared is None or not declared.isdigit():
+            return
+        received = self._response.raw.tell()
+        if received < int(declared):
+            raise requests.ConnectionError(
+                f"The response ended after {received} of {declared} bytes",
+                response=self._response,
+            )
+
+    def close(self) -> None:
+        self._response.close()
+        super().close()
+
+
+def response_stream(response: requests.Response) -> BinaryIO:
+    """Return the body of a response as a readable binary stream. The request
+    must have `stream=True`. Closing the stream closes the response.
+
+    Raise an error for a status that is not a success. A redirect that the
+    request did not follow has no content."""
+    if 200 <= response.status_code < 300:
+        return io.BufferedReader(_ResponseReader(response), STREAM_BLOCK_SIZE)
+
+    try:
+        # Keep the error body for the caller, as the other requests do.
+        _ = response.content
+    finally:
+        response.close()
+    response.raise_for_status()
+    raise requests.HTTPError(
+        f"{response.status_code} is not a success status for url: {response.url}",
+        response=response,
+    )
+
+
 # A RequestContext is a superclass that enables code to use either signed
 # requests-with-api-keys, bearer tokens, or other authentication schemes.
 
@@ -59,6 +131,20 @@ class RequestContext(ABC):
         **kwargs,
     ) -> bytes:
         """Make a GET request to the given path with optional parameters and headers"""
+
+    def get_stream(
+        self,
+        path: str,
+        params: Optional[Dict] = None,
+        headers: Optional[Dict[str, str]] = None,
+        **kwargs,
+    ) -> BinaryIO:
+        """Make a GET request to the given path and return the response body as
+        a readable binary stream. Close the stream after use.
+
+        This default reads the complete body into memory. Override it to read
+        the body in parts."""
+        return io.BytesIO(self.get(path, params, headers, **kwargs))
 
     @abstractmethod
     def put(

@@ -2,7 +2,9 @@
 
 package com.urbanlogiq.ulsdk;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +36,16 @@ public final class TestContext extends RequestContext {
         byte[] response = this._response;
         this._response = null;
         return response;
+    }
+
+    public InputStream getStream(String path, List<Pair<String, String>> params, HashMap<String, String> headers) throws URISyntaxException, IOException, InterruptedException {
+        String echoPath = "/v1/echo/";
+        try (InputStream echo = this._context.getStream(echoPath, params, headers)) {
+            echo.readAllBytes();
+        }
+        byte[] response = this._response;
+        this._response = null;
+        return new ByteArrayInputStream(response);
     }
 
     public byte[] put(String path, byte[] body, String mimetype, List<Pair<String, String>> params, HashMap<String, String> headers) throws URISyntaxException, IOException, InterruptedException {

@@ -7,7 +7,7 @@ package com.urbanlogiq.ulsdk.api.drive;
 public final class Drive {
     /**
      * Retrieves a directory listing from a unix-style path rooted at `root` where `root` may be the UUID of any drive directory. Paths may include wildcards like `*`.
-     * 
+     *
      * @param ctx A request context object
      * @param root The root directory to list files for, or one of "me" or "union".
      * @param tail The unix-style path specifier to use for the file listing.
@@ -31,7 +31,7 @@ public final class Drive {
 
     /**
      * Retrieves a directory listing from a unix-style path rooted at the current user's home root. Paths may include wildcards like `*`.
-     * 
+     *
      * @param ctx A request context object
      * @param tail The unix-style path specifier to use for the file listing.
      * @return The directory listing
@@ -52,7 +52,7 @@ public final class Drive {
 
     /**
      * Retrieves a directory listing from a union of all the drive roots the user has access to. Paths may include wildcards like `*`.
-     * 
+     *
      * @param ctx A request context object
      * @param tail The unix-style path specifier to use for the file listing.
      * @param dedupe Deduplicate results of union queries
@@ -80,7 +80,7 @@ public final class Drive {
 
     /**
      * Creates a new file or directory at a specified path rooted at `root`.
-     * 
+     *
      * @param ctx A request context object
      * @param root The directory into which the new entry will be created
      * @param tail The name of the new entry
@@ -131,7 +131,7 @@ public final class Drive {
 
     /**
      * Creates a new file in the specified directory with the specified content. Please use the `put_file_chunk` endpoint to upload files larger than 1GB.
-     * 
+     *
      * @param ctx A request context object
      * @param root The directory into which the file will be uploaded
      * @param force Whether to overwrite the file if it already exists.
@@ -158,7 +158,7 @@ public final class Drive {
 
     /**
      * Removes the specified drive entries from their parent directories.
-     * 
+     *
      * @param ctx A request context object
      * @param object_ids A list of object IDs to delete
      */
@@ -178,7 +178,7 @@ public final class Drive {
 
     /**
      * Removes the specified drive entry from its parent directory.
-     * 
+     *
      * @param ctx A request context object
      * @param entry The ID of the entry to remove
      */
@@ -198,7 +198,7 @@ public final class Drive {
 
     /**
      * Moves a file or directory to a new location.
-     * 
+     *
      * @param ctx A request context object
      * @param move_request Details of the move operation.
      */
@@ -218,7 +218,7 @@ public final class Drive {
 
     /**
      * Copies a file or directory to a new location within the drive.
-     * 
+     *
      * @param ctx A request context object
      * @param copy_request Details of the copy operation.
      */
@@ -237,11 +237,11 @@ public final class Drive {
     }
 
     /**
-     * Retrieves a file by id.
-     * 
+     * Reads a file by ID.
+     *
      * @param ctx A request context object
-     * @param id The ID of the file to retrieve
-     * @return The contents of the file referenced by the specified ID
+     * @param id The file ID
+     * @return The file contents
      */
     public static byte[] getFile(
         com.urbanlogiq.ulsdk.RequestContext ctx,
@@ -258,8 +258,29 @@ public final class Drive {
     }
 
     /**
+     * Reads a file by ID in parts. Use this function for a file that is too large to hold in memory.
+     *
+     * @param ctx A request context object
+     * @param id The file ID
+     * @return The file contents. The caller must close the stream.
+     */
+    public static java.io.InputStream getFileStream(
+        com.urbanlogiq.ulsdk.RequestContext ctx,
+        com.urbanlogiq.ulsdk.types.ObjectId id
+    ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
+        String path = "/v1/api/ulv2/drive/file/:id";
+        path = path.replace(":id", id.toString());
+
+        java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
+        java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+
+        java.io.InputStream res = ctx.getStream(path, params, headers);
+        return res;
+    }
+
+    /**
      * Uploads a chunk of a file by file id and chunk index.
-     * 
+     *
      * @param ctx A request context object
      * @param file_id The ID of the file to which to set a file chunk
      * @param idx The index of the file chunk to set
@@ -290,7 +311,7 @@ public final class Drive {
 
     /**
      * Retrieves the id of the drive root directory for the specified principal (user or group).
-     * 
+     *
      * @param ctx A request context object
      * @param b2cid The principal (user or group) ID to retrieve the drive root directory for.
      * @return Drive directory root ID

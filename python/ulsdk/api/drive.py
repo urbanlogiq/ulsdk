@@ -6,6 +6,7 @@ from dataclasses import dataclass
 import json
 from pyarrow import RecordBatch, Schema, BufferOutputStream, RecordBatchStreamWriter, RecordBatchStreamReader
 from typing import Optional, Any, List, Dict
+from typing import BinaryIO
 import sys
 if sys.version_info.minor < 11:
     from typing_extensions import Self
@@ -254,14 +255,14 @@ def get_file(
     ctx: RequestContext,
     id_: "ObjectId",
 ) -> bytes:
-    """Retrieves a file by id.
+    """Reads a file by ID.
 
     Arguments:
     ctx: RequestContext -- A request context object
-    id_: "ObjectId" -- The ID of the file to retrieve
+    id_: "ObjectId" -- The file ID
 
     Returns:
-    The contents of the file referenced by the specified ID
+    The file contents
     """
 
     path = "/v1/api/ulv2/drive/file/:id"
@@ -270,6 +271,31 @@ def get_file(
     params = dict()
     headers = dict()
     res = ctx.get(path, params=params, headers=headers)
+    return res
+
+def get_file_stream(
+    ctx: RequestContext,
+    id_: "ObjectId",
+    **kwargs: Any,
+) -> BinaryIO:
+    """Reads a file by ID in parts. Use this function for a file that is too large to hold in memory.
+
+    Arguments:
+    ctx: RequestContext -- A request context object
+    id_: "ObjectId" -- The file ID
+    kwargs: Any -- Options for the request, such as `timeout`. The request context defines them.
+
+    Returns:
+    The file contents
+    Close the stream after use.
+    """
+
+    path = "/v1/api/ulv2/drive/file/:id"
+    path = path.replace(":id", str(id_), 1)
+
+    params = dict()
+    headers = dict()
+    res = ctx.get_stream(path, params=params, headers=headers, **kwargs)
     return res
 
 def put_file_chunk(

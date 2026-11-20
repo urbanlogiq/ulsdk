@@ -265,6 +265,23 @@ get_file(
 }
 
 Result<Void>
+get_file_stream(
+    ul::RequestContext &ctx,
+    const ::ul::types::ObjectId &id,
+    const ul::BodySink &sink
+) {
+    std::string path = "/v1/api/ulv2/drive/file/:id";
+    const size_t id_idx = path.find(":id");
+    path.replace(id_idx, 3, id.to_string());
+
+    std::map<std::string, std::string> params;
+
+    std::map<std::string, std::string> headers;
+    const Result<Void> res = ctx.get_stream(path, params, headers, sink);
+    return res;
+}
+
+Result<Void>
 put_file_chunk(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &file_id,

@@ -798,7 +798,7 @@ mod tests {
             let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
             let expected = Principal::default();
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_principal(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -807,7 +807,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -833,13 +833,13 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
 
         for i in 0..5 {
-            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let mut expected = Vec::with_capacity(5);
             for i in 0..5 {
                 expected.push(Principal::default());
             }
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_principals(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -848,7 +848,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -874,13 +874,13 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
 
         for i in 0..5 {
-            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let mut expected = Vec::with_capacity(5);
             for i in 0..5 {
                 expected.push(Principal::default());
             }
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = query_principals(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -889,7 +889,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -920,7 +920,7 @@ mod tests {
                 expected.push(AdUser::default());
             }
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_users(&ctx).await;
             let result = match result {
                 Ok(r) => r,
@@ -929,7 +929,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -960,7 +960,7 @@ mod tests {
                 expected.push(DisplayNames::default());
             }
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_users_display_names(&ctx).await;
             let result = match result {
                 Ok(r) => r,
@@ -969,7 +969,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -999,7 +999,7 @@ mod tests {
             let q0 = Some(q0);
             let expected = AdUserWithAuditLog::default();
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_current_user(&ctx, q0).await;
             let result = match result {
                 Ok(r) => r,
@@ -1008,7 +1008,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1036,7 +1036,7 @@ mod tests {
         for i in 0..5 {
             let expected = OwnNamespace::default();
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_own_namespace(&ctx).await;
             let result = match result {
                 Ok(r) => r,
@@ -1045,7 +1045,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1071,10 +1071,10 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
 
         for i in 0..5 {
-            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let expected = Namespace::default();
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_namespace(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -1083,7 +1083,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1112,7 +1112,7 @@ mod tests {
             let body = CreateUserRequest::default();
             let expected = CreateUser::default();
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = create_user(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -1121,7 +1121,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1154,7 +1154,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -1184,7 +1184,7 @@ mod tests {
             let q0 = Some(q0);
             let expected = AdUserWithAuditLog::default();
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_user(&ctx, p0, q0).await;
             let result = match result {
                 Ok(r) => r,
@@ -1193,7 +1193,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1229,7 +1229,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -1261,7 +1261,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -1291,7 +1291,7 @@ mod tests {
                 expected.push(AdGroup::default());
             }
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_groups(&ctx).await;
             let result = match result {
                 Ok(r) => r,
@@ -1300,7 +1300,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1329,7 +1329,7 @@ mod tests {
             let body = CreateGroup::default();
             let expected = AdGroup::default();
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = create_group(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -1338,7 +1338,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1370,7 +1370,7 @@ mod tests {
                 expected.push(GroupMembership::default());
             }
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_group_members(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -1379,7 +1379,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1412,7 +1412,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -1445,7 +1445,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -1478,7 +1478,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -1505,7 +1505,7 @@ mod tests {
         for i in 0..5 {
             let expected = OrganizationList::default();
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = list_organizations(&ctx).await;
             let result = match result {
                 Ok(r) => r,
@@ -1514,7 +1514,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1543,7 +1543,7 @@ mod tests {
             let body = CreateOrganizationRequest::default();
             let expected = Organization::default();
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = create_organization(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -1552,7 +1552,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1581,7 +1581,7 @@ mod tests {
             let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
             let expected = Organization::default();
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_organization(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -1590,7 +1590,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1624,7 +1624,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -1652,7 +1652,7 @@ mod tests {
             let p0 = crate::types::B2cId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
             let expected = Organization::default();
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_user_organization(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -1661,7 +1661,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -1695,7 +1695,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -1722,7 +1722,7 @@ mod tests {
         for i in 0..5 {
             let expected = FlushedGatewayPods::default();
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = flush_gateway_cache(&ctx).await;
             let result = match result {
                 Ok(r) => r,
@@ -1731,7 +1731,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };

@@ -9,7 +9,7 @@
 [package]
 edition = "2021"
 name = "ulsdk"
-version = "0.9.1"
+version = "0.10.0"
 build = false
 autolib = false
 autobins = false
@@ -97,6 +97,9 @@ version = "6.0"
 [target.'cfg(not(target_arch ="wasm32"))'.dependencies.ed25519-dalek]
 version = "3.0.0-pre.7"
 features = ["zeroize"]
+
+[target.'cfg(not(target_arch ="wasm32"))'.dependencies.futures-util]
+version = "0.3"
 
 [target.'cfg(not(target_arch ="wasm32"))'.dependencies.reqwest]
 version = "0.12.28"

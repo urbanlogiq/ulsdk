@@ -143,7 +143,7 @@ mod tests {
         for i in 0..5 {
             let expected = GetKeys::default();
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_keys(&ctx).await;
             let result = match result {
                 Ok(r) => r,
@@ -152,7 +152,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -202,7 +202,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             }
@@ -228,7 +228,7 @@ mod tests {
         for i in 0..5 {
             let expected = CreateKey::default();
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = create_key(&ctx).await;
             let result = match result {
                 Ok(r) => r,
@@ -237,7 +237,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -263,7 +263,7 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
 
         for i in 0..5 {
-            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let body = UpdateKey::default();
             let result = update_key(&ctx, p0, body).await;
             if let Err(e) = result {
@@ -271,7 +271,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -296,10 +296,10 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
 
         for i in 0..5 {
-            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let expected = Key::default();
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_key(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -308,7 +308,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -334,14 +334,14 @@ mod tests {
         let mut ctx = TestContext::new(ApiKeyContext::new(key, Environment::Stage));
 
         for i in 0..5 {
-            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".into();
+            let p0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let result = delete_key(&ctx, p0).await;
             if let Err(e) = result {
                 if i < 4 {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;

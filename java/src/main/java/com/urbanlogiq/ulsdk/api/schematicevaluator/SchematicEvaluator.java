@@ -7,7 +7,7 @@ package com.urbanlogiq.ulsdk.api.schematicevaluator;
 public final class SchematicEvaluator {
     /**
      * Create a new schematic evaluator job. An optional Idempotency-Key HTTP header (1 to 256 bytes) returns the same job for the same caller and RunSpec. Reusing a key with another RunSpec is refused.
-     * 
+     *
      * @param ctx A request context object
      * @param job The description of the job to create
      * @return The ID of the newly created job
@@ -28,7 +28,7 @@ public final class SchematicEvaluator {
 
     /**
      * Fetch the details of the job with the given ID. By default this will block until the job is complete.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the job to fetch
      * @param timeout Timeout in milliseconds to wait before returning a response
@@ -55,7 +55,7 @@ public final class SchematicEvaluator {
 
     /**
      * Cancel the job with the given ID: every task of it that has not ended is ended with `cancelled`. The intent is recorded at once and carried out by the evaluator; a task that completed before the intent arrived stays complete.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the job to cancel
      */
@@ -92,7 +92,7 @@ public final class SchematicEvaluator {
 
     /**
      * Fetch the details of the task with the given ID.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the task to fetch
      * @return The details of the task
@@ -113,7 +113,7 @@ public final class SchematicEvaluator {
 
     /**
      * Insert an inline graph immediately after this task. Exact repeats return 409.
-     * 
+     *
      * @param ctx A request context object
      * @param id The task after which to insert the graph
      * @param continuation The inline schematic and its parameters

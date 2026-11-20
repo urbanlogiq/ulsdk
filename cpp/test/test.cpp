@@ -40,6 +40,31 @@ ul::Result<std::vector<uint8_t>> TestContext::get(
     return ul::Result<std::vector<uint8_t>>(response_);
 }
 
+ul::Result<ul::Void> TestContext::get_stream(
+    const std::string& path,
+    const std::map<std::string, std::string>& params,
+    const std::map<std::string, std::string>& headers,
+    const ul::BodySink& sink
+) const {
+    const std::string echo_path = "/v1/echo/";
+    const ul::Result<ul::Void> res = context_.get_stream(
+        echo_path,
+        params,
+        headers,
+        [](const uint8_t*, size_t) { return true; }
+    );
+
+    if (std::holds_alternative<ul::Error>(res)) {
+        return res;
+    }
+
+    if (!response_.empty() && !sink(response_.data(), response_.size())) {
+        return ul::Result<ul::Void>(ul::Error("The sink stopped the request"));
+    }
+
+    return ul::Result<ul::Void>(ul::Void());
+}
+
 ul::Result<std::vector<uint8_t>> TestContext::put(
     const std::string& path,
     const std::vector<uint8_t>& data,

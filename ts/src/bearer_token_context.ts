@@ -66,14 +66,15 @@ export class BearerTokenContext extends RequestContext {
     };
   }
 
-  private async _request(
+  /** Makes a request. Returns the response if its status is a success. */
+  private async _doRequest(
     method: string,
     path: string,
     params: [string, string][],
     headers: Record<string, string>,
     body?: Uint8Array | null,
     contentType?: string
-  ): Promise<Uint8Array> {
+  ): Promise<Response> {
     const url =
       getEndpoint(this._region, this._environment, path) +
       buildQueryString(params);
@@ -101,6 +102,25 @@ export class BearerTokenContext extends RequestContext {
       );
     }
 
+    return response;
+  }
+
+  private async _request(
+    method: string,
+    path: string,
+    params: [string, string][],
+    headers: Record<string, string>,
+    body?: Uint8Array | null,
+    contentType?: string
+  ): Promise<Uint8Array> {
+    const response = await this._doRequest(
+      method,
+      path,
+      params,
+      headers,
+      body,
+      contentType
+    );
     const arrayBuffer = await response.arrayBuffer();
     return new Uint8Array(arrayBuffer);
   }
@@ -111,6 +131,23 @@ export class BearerTokenContext extends RequestContext {
     headers: Record<string, string>
   ): Promise<Uint8Array> {
     return this._request('GET', path, params, headers);
+  }
+
+  async getStream(
+    path: string,
+    params: [string, string][],
+    headers: Record<string, string>
+  ): Promise<ReadableStream<Uint8Array>> {
+    const response = await this._doRequest('GET', path, params, headers);
+    if (response.body) {
+      return response.body;
+    }
+    // A response without content has no body.
+    return new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.close();
+      },
+    });
   }
 
   async post(

@@ -8,7 +8,9 @@ use tokio::time::sleep;
 use uuid::Uuid;
 
 use crate::error::Error;
-use crate::request_context::{File, ParamMap, RequestContext, DELAYS};
+use crate::request_context::{
+    body_stream, check_response, ByteStream, File, ParamMap, RequestContext, DELAYS,
+};
 use crate::{Environment, Region};
 
 const SVC_PREFIX: &str = "/v1/api/";
@@ -85,24 +87,15 @@ impl ClusterContext {
         }
         headers
     }
-}
 
-#[async_trait]
-impl RequestContext for ClusterContext {
-    fn region(&self) -> Region {
-        unimplemented!()
-    }
-
-    fn environment(&self) -> Environment {
-        unimplemented!()
-    }
-
-    async fn get(
+    /// Makes a GET request. Returns the response if its status is a
+    /// success.
+    async fn do_get(
         &self,
         path: &str,
         params: Option<ParamMap>,
         headers: Option<HeaderMap>,
-    ) -> Result<Vec<u8>, Error> {
+    ) -> Result<reqwest::Response, Error> {
         let endpoint = self.route(path)?;
         let client = reqwest::Client::new();
         let headers = self.merge_headers(headers);
@@ -129,22 +122,42 @@ impl RequestContext for ClusterContext {
         let response =
             response.ok_or_else(|| Error::Unclassified("No response from endpoint".into()))?;
 
-        if !response.status().is_success() {
-            let status = response.status();
-            let bytes = response.bytes().await?;
-            return Err(Error::FailedRequest(
-                endpoint,
-                "Unable to retrieve data from endpoint".to_owned(),
-                status,
-                String::from_utf8_lossy(&bytes).into_owned(),
-            ));
-        }
+        check_response(response, endpoint).await
+    }
+}
 
-        response
+#[async_trait]
+impl RequestContext for ClusterContext {
+    fn region(&self) -> Region {
+        unimplemented!()
+    }
+
+    fn environment(&self) -> Environment {
+        unimplemented!()
+    }
+
+    async fn get(
+        &self,
+        path: &str,
+        params: Option<ParamMap>,
+        headers: Option<HeaderMap>,
+    ) -> Result<Vec<u8>, Error> {
+        self.do_get(path, params, headers)
+            .await?
             .bytes()
             .await
             .map_err(Error::Reqwest)
             .map(|b| b.to_vec())
+    }
+
+    async fn get_stream(
+        &self,
+        path: &str,
+        params: Option<ParamMap>,
+        headers: Option<HeaderMap>,
+    ) -> Result<ByteStream, Error> {
+        let response = self.do_get(path, params, headers).await?;
+        Ok(body_stream(response))
     }
 
     async fn put(

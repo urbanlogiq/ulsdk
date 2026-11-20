@@ -24,7 +24,7 @@ public final class Acl {
 
     /**
      * Create a new access control list that inherits from an existing ACL
-     * 
+     *
      * @param ctx A request context object
      * @param extends_ The ID of the access control list to inherit from
      * @return An object summary list containing a single entry with the new ACL.
@@ -49,7 +49,7 @@ public final class Acl {
 
     /**
      * Request access to an object
-     * 
+     *
      * @param ctx A request context object
      * @param request The access request object containing details about the permissions desired
      */
@@ -69,7 +69,7 @@ public final class Acl {
 
     /**
      * Share an object to a specific access control list principal with specified permissions.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the object that will be shared.
      * @param to The ID of the principal who will be granted access to the object.
@@ -97,7 +97,7 @@ public final class Acl {
 
     /**
      * Share an object to a specific access control list principal with specified permissions.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the object that will be shared.
      * @param to The ID of the principal who will be granted access to the object.
@@ -127,7 +127,7 @@ public final class Acl {
 
     /**
      * Share an object to a specific access control list principal with all permissions.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the object that will be shared.
      * @param to The ID of the principal who will be granted access to the object.
@@ -152,7 +152,7 @@ public final class Acl {
 
     /**
      * Share an object to a specific access control list principal with all permissions.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the object that will be shared.
      * @param to The ID of the principal who will be granted access to the object.
@@ -179,7 +179,7 @@ public final class Acl {
 
     /**
      * Grant an object to a specific access control list principal with specified permissions. Unlike the share operation, grant operations will fail with a 403 if the user performing the operation does not have the appropriate access.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the object to which access will be granted.
      * @param to The ID of the principal who will be granted access to the object.
@@ -207,7 +207,7 @@ public final class Acl {
 
     /**
      * Grant an object to a specific access control list principal with specified permissions. Unlike the share operation, grant operations will fail with a 403 if the user performing the operation does not have the appropriate access.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the object to which access will be granted.
      * @param to The ID of the principal who will be granted access to the object.
@@ -237,7 +237,7 @@ public final class Acl {
 
     /**
      * Grant an object to a specific access control list principal with all permissions. Unlike the share operation, grant operations will fail with a 403 if the user performing the operation does not have the appropriate access.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the object to which access will be granted.
      * @param to The ID of the principal who will be granted access to the object.
@@ -262,7 +262,7 @@ public final class Acl {
 
     /**
      * Grant an object to a specific access control list principal with all permissions. Unlike the share operation, grant operations will fail with a 403 if the user performing the operation does not have the appropriate access.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the object to which access will be granted.
      * @param to The ID of the principal who will be granted access to the object.
@@ -289,7 +289,7 @@ public final class Acl {
 
     /**
      * Revoke all access from a specified ACL to an object.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the object from which access will be revoked.
      * @param from The ID of the principal whose access will be revoked.
@@ -314,7 +314,7 @@ public final class Acl {
 
     /**
      * Get the permissions the caller has on the object with the given ID.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the object which will be queried for permissions.
      * @return The 32-bit integer bitmap corresponding to the permissions the caller has on the object.
@@ -335,7 +335,7 @@ public final class Acl {
 
     /**
      * Set the default mode of an object. This can only be done by an object's owner.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the object to which access will be granted.
      * @param permission The permission bitset (see the PermissionTy enum for more information).
@@ -360,7 +360,7 @@ public final class Acl {
 
     /**
      * Forcibly set an object's ACL to another ACL object. Note that the target ACL needs to contain the exact same permissions as the current ACL otherwise this method will return 400 Bad Request. This is a safeguard to ensure the user cannot lock themselves out of an object.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the object which will have its ACL set.
      * @param acl_id The ID of the ACL object which will be used as the object ACL.

@@ -266,11 +266,11 @@ export async function copy(
 }
 
 /**
- * Retrieves a file by id.
+ * Reads a file by ID.
  *
  * @param ctx - A request context object
- * @param id - The ID of the file to retrieve
- * @returns The contents of the file referenced by the specified ID
+ * @param id - The file ID
+ * @returns The file contents
  */
 export async function getFile(
   ctx: RequestContext,
@@ -283,6 +283,27 @@ export async function getFile(
   const headers: Record<string, string> = {};
 
   const res = await ctx.get(path, params, headers);
+  return res;
+}
+
+/**
+ * Reads a file by ID in parts. Use this function for a file that is too large to hold in memory.
+ *
+ * @param ctx - A request context object
+ * @param id - The file ID
+ * @returns The file contents
+ */
+export async function getFileStream(
+  ctx: RequestContext,
+  id: ObjectId
+): Promise<ReadableStream<Uint8Array>> {
+  let path = '/v1/api/ulv2/drive/file/:id';
+  path = path.replace(':id', id.toString());
+
+  const params: [string, string][] = [];
+  const headers: Record<string, string> = {};
+
+  const res = await ctx.getStream(path, params, headers);
   return res;
 }
 

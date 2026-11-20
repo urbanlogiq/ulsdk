@@ -7,7 +7,7 @@ package com.urbanlogiq.ulsdk.api.directory;
 public final class Directory {
     /**
      * Retrieves a single principal by id.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID (uuid-style) of the principal to search for
      * @return Details of the specified principal
@@ -30,7 +30,7 @@ public final class Directory {
 
     /**
      * Retrieves a list of principals specified by a comma-separated list of ids.
-     * 
+     *
      * @param ctx A request context object
      * @param ids The comma separated list of IDs (uuid-style) of the principals to search for
      * @return Details of all the specified principals
@@ -69,7 +69,7 @@ public final class Directory {
      * - displayName
      * - id
      * - description
-     * 
+     *
      * @param ctx A request context object
      * @param query The query string to search for
      * @return A list of all matching directory principals.
@@ -144,7 +144,7 @@ public final class Directory {
 
     /**
      * Retrieves details of the current user.
-     * 
+     *
      * @param ctx A request context object
      * @param audit_log Whether to include the user's audit log in the response.
      * @return The complete details of the specified user, including audit log if specified.
@@ -186,7 +186,7 @@ public final class Directory {
 
     /**
      * Looks up the holder of a namespace alias. A person holder is never named; a group's label is given.
-     * 
+     *
      * @param ctx A request context object
      * @param alias The alias to look up
      * @return The holder's id and kind (user or group), its preferred alias and status (active or orphaned), and a group's label.
@@ -209,7 +209,7 @@ public final class Directory {
 
     /**
      * Creates a new user in the directory.
-     * 
+     *
      * @param ctx A request context object
      * @param create_user_request The details which which to create the new user with
      * @return The details of the user along with their temporary, one-time-use password.
@@ -232,7 +232,7 @@ public final class Directory {
 
     /**
      * Updates the current user.
-     * 
+     *
      * @param ctx A request context object
      * @param update_user_request The details which which to update the current user
      */
@@ -252,7 +252,7 @@ public final class Directory {
 
     /**
      * Retrieves details of a user by id.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the user to retrieve details for
      * @param audit_log Whether to include the user's audit log in the response.
@@ -281,7 +281,7 @@ public final class Directory {
 
     /**
      * Updates a user by id.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the user to update
      * @param flush Whether to flush the gateway cache after the update. The default is true. A bulk caller passes false for every update and calls `flush_gateway_cache` once at the end.
@@ -311,7 +311,7 @@ public final class Directory {
 
     /**
      * Deletes a user by id.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the user to delete
      */
@@ -354,7 +354,7 @@ public final class Directory {
 
     /**
      * Creates a new group in the directory.
-     * 
+     *
      * @param ctx A request context object
      * @param create_group_request The group creation request details
      * @return Details of the created group
@@ -377,7 +377,7 @@ public final class Directory {
 
     /**
      * Retrieves a listing of all members of a group by group id.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the group to retrieve members for
      * @return The group membership list.
@@ -406,7 +406,7 @@ public final class Directory {
 
     /**
      * Deletes a group by id.
-     * 
+     *
      * @param ctx A request context object
      * @param id The ID of the group to delete
      */
@@ -426,7 +426,7 @@ public final class Directory {
 
     /**
      * Adds a member to a group.
-     * 
+     *
      * @param ctx A request context object
      * @param group The ID of the group to which to add the member
      * @param member The ID of the member to add
@@ -451,7 +451,7 @@ public final class Directory {
 
     /**
      * Removes a member from a group.
-     * 
+     *
      * @param ctx A request context object
      * @param group The ID of the group from which to remove the member
      * @param member The ID of the member to remove
@@ -491,7 +491,7 @@ public final class Directory {
 
     /**
      * Creates a new organization. Creates three AD groups (org, org mgmt, data owner) and records them in the organizations table. Requires `admin.org`; top-level organizations additionally require `admin.directory`; child organizations require membership in the parent's mgmt group.
-     * 
+     *
      * @param ctx A request context object
      * @param create_organization_request Organization creation details
      * @return Details of the created organization.
@@ -514,7 +514,7 @@ public final class Directory {
 
     /**
      * Fetches the details of a single organization by `org_id`.
-     * 
+     *
      * @param ctx A request context object
      * @param id The organization's `org_id` (B2cId).
      * @return The organization's details.
@@ -537,7 +537,7 @@ public final class Directory {
 
     /**
      * Renames an organization. Caller must belong to the organization's management group.
-     * 
+     *
      * @param ctx A request context object
      * @param id The organization's `org_id` (B2cId).
      * @param rename_organization_request New name for the organization.
@@ -561,7 +561,7 @@ public final class Directory {
 
     /**
      * Fetches the organization record for a specific user, from the user's organization attribute.
-     * 
+     *
      * @param ctx A request context object
      * @param id The user's B2cId.
      * @return The user's organization record.
@@ -584,7 +584,7 @@ public final class Directory {
 
     /**
      * Associates an existing AD group with an organization. Temporary migration-only endpoint — do not use from new code; will be removed once the backfill is done. Requires both `admin.directory` and `admin.org`. Idempotent: if the association already exists the request is a no-op.
-     * 
+     *
      * @param ctx A request context object
      * @param group The AD group's B2cId.
      * @param org The organization's `org_id` (B2cId).

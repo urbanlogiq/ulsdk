@@ -5,7 +5,7 @@ import hashlib
 import time
 import urllib.parse
 import uuid
-from typing import Dict, List, Optional, Union, cast
+from typing import BinaryIO, Dict, List, Optional, Union, cast
 
 import nacl.encoding
 import nacl.signing
@@ -14,7 +14,7 @@ from requests import Request, Session
 from websockets.sync.client import ClientConnection, connect
 
 from .keys import Environment, Key, Region
-from .request_context import File, RequestContext, _get_endpoint
+from .request_context import File, RequestContext, _get_endpoint, response_stream
 
 REQUEST_TYPE = "ul1_request"
 SIGNATURE_V1 = "UL1-ED25519"
@@ -164,6 +164,28 @@ class ApiKeyContext(RequestContext):
         copy_headers(response.headers, headers)
         response.raise_for_status()
         return response.content
+
+    def get_stream(
+        self,
+        path: str,
+        params: Optional[Dict] = None,
+        headers: Optional[Dict[str, str]] = None,
+        **kwargs,
+    ) -> BinaryIO:
+        if params is None:
+            params = dict()
+
+        if headers is None:
+            headers = dict()
+
+        endpoint = _get_endpoint(self._key.region, self._environment, path)
+        headers = _generate_auth_header(self._key, "GET", path, params, headers, None)
+        kwargs["headers"] = headers
+        kwargs["params"] = params
+        kwargs["stream"] = True
+        response = requests.get(endpoint, **kwargs)
+        copy_headers(response.headers, headers)
+        return response_stream(response)
 
     def put(
         self,

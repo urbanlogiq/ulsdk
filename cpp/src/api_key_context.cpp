@@ -167,7 +167,8 @@ static Result<std::string> canonicalize_query_string(
         const char* encoded =
             curl_easy_escape(curl, pair.second.c_str(), pair.second.size());
         if (encoded == nullptr) {
-            return Result<std::string>(Error("Failed to encode query parameter")
+            return Result<std::string>(
+                Error("Failed to encode query parameter")
             );
         }
         const std::string value(encoded);
@@ -354,20 +355,24 @@ Environment ApiKeyContext::environment() const {
     return environment_;
 }
 
-Result<std::vector<uint8_t>> ApiKeyContext::get(
+typedef size_t (*WriteCallback)(void*, size_t, size_t, void*);
+
+/// Makes a signed GET request. libcurl passes the response body to `write`
+/// with `userdata`.
+static Result<Void> do_get(
+    CurlHandle& curl,
+    const Key& key,
+    Environment environment,
     const std::string& path,
     const std::map<std::string, std::string>& params_map,
-    const std::map<std::string, std::string>& headers_map
-) const {
+    const std::map<std::string, std::string>& headers_map,
+    WriteCallback write,
+    void* userdata
+) {
     const Result<std::string> endpoint =
-        get_endpoint(key_.region_, environment_, path);
+        get_endpoint(key.region_, environment, path);
     if (std::holds_alternative<Error>(endpoint)) {
-        return Result<std::vector<uint8_t>>(std::get<Error>(endpoint));
-    }
-
-    CurlHandle curl;
-    if (!curl.ok()) {
-        return Result<std::vector<uint8_t>>(Error("Failed to initialize curl"));
+        return Result<Void>(std::get<Error>(endpoint));
     }
 
     const auto params = std::vector<std::pair<std::string, std::string>>(
@@ -381,7 +386,7 @@ Result<std::vector<uint8_t>> ApiKeyContext::get(
 
     const Result<std::string> auth_header_res = generate_auth_header(
         curl,
-        key_,
+        key,
         "GET",
         path,
         params,
@@ -389,7 +394,7 @@ Result<std::vector<uint8_t>> ApiKeyContext::get(
         std::vector<uint8_t>()
     );
     if (std::holds_alternative<Error>(auth_header_res)) {
-        return Result<std::vector<uint8_t>>(std::get<Error>(auth_header_res));
+        return Result<Void>(std::get<Error>(auth_header_res));
     }
 
     const std::string auth_header = std::get<std::string>(auth_header_res);
@@ -407,20 +412,117 @@ Result<std::vector<uint8_t>> ApiKeyContext::get(
     const std::string auth_header_str = auth_header_stream.str();
     slist.set(curl_slist_append(slist.get(), auth_header_str.c_str()));
 
-    std::vector<uint8_t> response;
     const std::string url =
         add_params(curl, std::get<std::string>(endpoint), params);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, slist.get());
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 0L);
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, userdata);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write);
 
     if (curl_easy_perform(curl) != CURLE_OK) {
-        return Result<std::vector<uint8_t>>(Error(curl.error_buffer()));
+        return Result<Void>(Error(curl.error_buffer()));
+    }
+
+    return Result<Void>(Void());
+}
+
+Result<std::vector<uint8_t>> ApiKeyContext::get(
+    const std::string& path,
+    const std::map<std::string, std::string>& params_map,
+    const std::map<std::string, std::string>& headers_map
+) const {
+    CurlHandle curl;
+    if (!curl.ok()) {
+        return Result<std::vector<uint8_t>>(Error("Failed to initialize curl"));
+    }
+
+    std::vector<uint8_t> response;
+    const Result<Void> res = do_get(
+        curl,
+        key_,
+        environment_,
+        path,
+        params_map,
+        headers_map,
+        write_callback,
+        &response
+    );
+    if (std::holds_alternative<Error>(res)) {
+        return Result<std::vector<uint8_t>>(std::get<Error>(res));
     }
 
     return raise_for_status(curl, response);
+}
+
+struct StreamState {
+    CURL* curl;
+    const BodySink& sink;
+    std::vector<uint8_t> error_body;
+};
+
+static bool is_success(CURL* curl) {
+    long code = 0;
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
+    return code >= 200 && code < 300;
+}
+
+static size_t
+stream_callback(void* ptr, size_t size, size_t nmemb, void* userdata) {
+    StreamState& state = *(StreamState*)userdata;
+    const uint8_t* data = (const uint8_t*)ptr;
+    const size_t total = size * nmemb;
+
+    if (!is_success(state.curl)) {
+        // Keep the body of an error for the caller, not for the sink.
+        state.error_body.insert(state.error_body.end(), data, data + total);
+        return total;
+    }
+
+    if (total > 0 && !state.sink(data, total)) {
+        // A size that is not `total` stops the request.
+        return 0;
+    }
+
+    return total;
+}
+
+Result<Void> ApiKeyContext::get_stream(
+    const std::string& path,
+    const std::map<std::string, std::string>& params_map,
+    const std::map<std::string, std::string>& headers_map,
+    const BodySink& sink
+) const {
+    CurlHandle curl;
+    if (!curl.ok()) {
+        return Result<Void>(Error("Failed to initialize curl"));
+    }
+
+    StreamState state {curl, sink, {}};
+    const Result<Void> res = do_get(
+        curl,
+        key_,
+        environment_,
+        path,
+        params_map,
+        headers_map,
+        stream_callback,
+        &state
+    );
+    if (std::holds_alternative<Error>(res)) {
+        return res;
+    }
+
+    if (!is_success(curl)) {
+        long code = 0;
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
+        return Result<Void>(Error(
+            (int)code,
+            std::string(state.error_body.begin(), state.error_body.end())
+        ));
+    }
+
+    return Result<Void>(Void());
 }
 
 Result<std::vector<uint8_t>> ApiKeyContext::put(

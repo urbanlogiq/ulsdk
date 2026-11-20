@@ -90,7 +90,7 @@ mod tests {
         for i in 0..5 {
             let expected = Bootstrap::default();
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = bootstrap(&ctx).await;
             let result = match result {
                 Ok(r) => r,
@@ -99,7 +99,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -149,7 +149,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             }

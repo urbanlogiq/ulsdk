@@ -7,6 +7,8 @@ mod test_context;
 
 use async_trait::async_trait;
 use bytes::Bytes;
+use futures_util::stream::{self, BoxStream};
+use futures_util::{StreamExt, TryStreamExt};
 use reqwest::header::HeaderMap;
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -29,6 +31,31 @@ pub struct File {
     pub data: Bytes,
 }
 
+/// The body of a response, in parts.
+pub type ByteStream = BoxStream<'static, Result<Bytes, Error>>;
+
+/// Reads the body of a response in parts.
+fn body_stream(response: reqwest::Response) -> ByteStream {
+    response.bytes_stream().map_err(Error::Reqwest).boxed()
+}
+
+async fn check_response(
+    response: reqwest::Response,
+    endpoint: String,
+) -> Result<reqwest::Response, Error> {
+    let status = response.status();
+    if !status.is_success() {
+        let bytes = response.bytes().await?;
+        return Err(Error::FailedRequest(
+            endpoint,
+            "Unable to retrieve data from endpoint".to_owned(),
+            status,
+            String::from_utf8_lossy(&bytes).into_owned(),
+        ));
+    }
+    Ok(response)
+}
+
 #[async_trait]
 pub trait RequestContext: Send + Sync {
     fn region(&self) -> Region;
@@ -39,6 +66,19 @@ pub trait RequestContext: Send + Sync {
         params: Option<ParamMap>,
         headers: Option<HeaderMap>,
     ) -> Result<Vec<u8>, Error>;
+    /// Makes a GET request and returns the response body as a stream.
+    ///
+    /// This default reads the complete body into memory. Override it to
+    /// read the body in parts.
+    async fn get_stream(
+        &self,
+        path: &str,
+        params: Option<ParamMap>,
+        headers: Option<HeaderMap>,
+    ) -> Result<ByteStream, Error> {
+        let body = self.get(path, params, headers).await?;
+        Ok(stream::once(async move { Ok(Bytes::from(body)) }).boxed())
+    }
     async fn put(
         &self,
         path: &str,
@@ -104,4 +144,196 @@ pub async fn get_bootstrap(ctx: &dyn RequestContext) -> Result<Bootstrap, Error>
     let bootstrap: Bootstrap = serde_json::from_slice(&raw)?;
 
     Ok(bootstrap)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::Mutex;
+    use std::time::Duration;
+    use tokio::io::{AsyncReadExt, AsyncWriteExt};
+    use tokio::net::{TcpListener, TcpStream};
+    use tokio::sync::oneshot;
+    use tokio::time::timeout;
+
+    const WAIT: Duration = Duration::from_secs(10);
+
+    /// A context without its own `get_stream`.
+    struct Buffered {
+        paths: Mutex<Vec<String>>,
+    }
+
+    #[async_trait]
+    impl RequestContext for Buffered {
+        fn region(&self) -> Region {
+            unimplemented!()
+        }
+
+        fn environment(&self) -> Environment {
+            unimplemented!()
+        }
+
+        async fn get(
+            &self,
+            path: &str,
+            _params: Option<ParamMap>,
+            _headers: Option<HeaderMap>,
+        ) -> Result<Vec<u8>, Error> {
+            self.paths.lock().unwrap().push(path.to_owned());
+            Ok(b"content".to_vec())
+        }
+
+        async fn put(
+            &self,
+            _path: &str,
+            _body: Bytes,
+            _mimetype: &str,
+            _params: Option<ParamMap>,
+            _headers: Option<HeaderMap>,
+        ) -> Result<Vec<u8>, Error> {
+            unimplemented!()
+        }
+
+        async fn post(
+            &self,
+            _path: &str,
+            _body: Bytes,
+            _mimetype: &str,
+            _params: Option<ParamMap>,
+            _headers: Option<HeaderMap>,
+        ) -> Result<Vec<u8>, Error> {
+            unimplemented!()
+        }
+
+        async fn upload(&self, _path: &str, _files: Vec<File>) -> Result<Vec<u8>, Error> {
+            unimplemented!()
+        }
+
+        async fn delete(
+            &self,
+            _path: &str,
+            _params: Option<ParamMap>,
+            _headers: Option<HeaderMap>,
+        ) -> Result<Vec<u8>, Error> {
+            unimplemented!()
+        }
+    }
+
+    async fn read_all(mut stream: ByteStream) -> Result<Vec<u8>, Error> {
+        let mut body = Vec::new();
+        while let Some(part) = stream.next().await {
+            body.extend_from_slice(&part?);
+        }
+        Ok(body)
+    }
+
+    #[tokio::test]
+    async fn the_default_stream_is_the_complete_body() {
+        let ctx = Buffered {
+            paths: Mutex::new(Vec::new()),
+        };
+        let file = crate::types::ObjectId::default();
+
+        let stream = crate::api::drive::get_file_stream(&ctx, file)
+            .await
+            .unwrap();
+
+        assert_eq!(read_all(stream).await.unwrap(), b"content");
+        assert_eq!(
+            *ctx.paths.lock().unwrap(),
+            [format!("/v1/api/ulv2/drive/file/{}", file)]
+        );
+    }
+
+    /// Sends response headers for one request. The body has `length` bytes.
+    async fn accept(listener: &TcpListener, status: u16, length: usize) -> TcpStream {
+        let (mut connection, _) = listener.accept().await.unwrap();
+        let mut request = Vec::new();
+        while !request.ends_with(b"\r\n\r\n") {
+            request.push(connection.read_u8().await.unwrap());
+        }
+        let head = format!(
+            "HTTP/1.1 {} Test\r\ncontent-length: {}\r\n\r\n",
+            status, length
+        );
+        connection.write_all(head.as_bytes()).await.unwrap();
+        connection
+    }
+
+    async fn request(listener: &TcpListener) -> ByteStream {
+        let url = format!("http://{}/", listener.local_addr().unwrap());
+        let client = reqwest::Client::builder().no_proxy().build().unwrap();
+        body_stream(client.get(url).send().await.unwrap())
+    }
+
+    #[tokio::test]
+    async fn a_body_stream_gives_the_body_in_parts() {
+        let body: Vec<u8> = (0..200_000u32).map(|i| (i % 251) as u8).collect();
+        let (first, rest) = body.split_at(100_000);
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let (read_first, wait_for_read) = oneshot::channel::<()>();
+
+        let server = async {
+            let mut connection = accept(&listener, 200, body.len()).await;
+            connection.write_all(first).await.unwrap();
+            // A client that reads the complete body first never sends this.
+            let read_in_time = timeout(WAIT, wait_for_read).await.is_ok();
+            connection.write_all(rest).await.unwrap();
+            read_in_time
+        };
+        let client = async {
+            let mut stream = request(&listener).await;
+            let mut received = Vec::new();
+            while received.len() < first.len() {
+                received.extend_from_slice(&stream.next().await.unwrap().unwrap());
+            }
+            // The server stops its wait after `WAIT`.
+            let _ = read_first.send(());
+            received.extend(read_all(stream).await.unwrap());
+            received
+        };
+
+        let (read_in_time, received) = tokio::join!(server, client);
+        assert!(read_in_time);
+        assert_eq!(received, body);
+    }
+
+    #[tokio::test]
+    async fn a_body_stream_fails_on_a_short_body() {
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+
+        let server = async {
+            let mut connection = accept(&listener, 200, 2000).await;
+            connection.write_all(&[7; 1000]).await.unwrap();
+        };
+        let client = async { read_all(request(&listener).await).await };
+
+        let (_, received) = tokio::join!(server, client);
+        assert!(matches!(received, Err(Error::Reqwest(_))));
+    }
+
+    #[tokio::test]
+    async fn an_error_body_can_contain_invalid_utf8() {
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let url = format!("http://{}/", listener.local_addr().unwrap());
+        let server = async {
+            let mut connection = accept(&listener, 400, 5).await;
+            connection.write_all(b"bad \xff").await.unwrap();
+        };
+        let client = async {
+            let client = reqwest::Client::builder().no_proxy().build().unwrap();
+            let response = client.get(&url).send().await.unwrap();
+            check_response(response, url.clone()).await
+        };
+
+        let (_, result) = timeout(WAIT, async { tokio::join!(server, client) })
+            .await
+            .unwrap();
+        let Error::FailedRequest(endpoint, _, status, body) = result.unwrap_err() else {
+            panic!("expected a request error");
+        };
+        assert_eq!(endpoint, url);
+        assert_eq!(status, reqwest::StatusCode::BAD_REQUEST);
+        assert_eq!(body, "bad \u{fffd}");
+    }
 }

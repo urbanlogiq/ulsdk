@@ -2,9 +2,13 @@
 
 use async_trait::async_trait;
 use bytes::Bytes;
+use futures_util::stream;
+use futures_util::StreamExt;
 
 use crate::error::Error;
-use crate::request_context::{ApiKeyContext, File, HeaderMap, ParamMap, RequestContext};
+use crate::request_context::{
+    ApiKeyContext, ByteStream, File, HeaderMap, ParamMap, RequestContext,
+};
 use crate::{Environment, Region};
 
 pub(crate) struct TestContext {
@@ -48,6 +52,23 @@ impl RequestContext for TestContext {
 
         self.context.get(echo_path, params, headers).await?;
         Ok(self.response.clone())
+    }
+
+    async fn get_stream(
+        &self,
+        _path: &str,
+        params: Option<ParamMap>,
+        headers: Option<HeaderMap>,
+    ) -> Result<ByteStream, Error> {
+        let echo_path = "/v1/echo/";
+
+        let mut echo = self.context.get_stream(echo_path, params, headers).await?;
+        while let Some(part) = echo.next().await {
+            part?;
+        }
+
+        let response = Bytes::from(self.response.clone());
+        Ok(stream::once(async move { Ok(response) }).boxed())
     }
 
     async fn put(

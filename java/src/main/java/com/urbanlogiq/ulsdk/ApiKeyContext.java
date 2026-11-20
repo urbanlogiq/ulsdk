@@ -4,6 +4,8 @@ package com.urbanlogiq.ulsdk;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.http.HttpHeaders;
 import java.net.http.HttpResponse;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -15,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+import javax.net.ssl.SSLSession;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
@@ -40,13 +44,13 @@ public final class ApiKeyContext extends RequestContext {
 
         query.sort((a, b) -> { return a.first().compareTo(b.first()); });
 
-        ArrayList<String> components = new ArrayList();
+        ArrayList<String> components = new ArrayList<>();
         for (Pair<String, String> pair : query) {
             if (pair.first() == "X-UL-Signature") {
                 continue;
             }
 
-            String component = pair.first() + "=" + URLEncoder.encode(pair.second());
+            String component = pair.first() + "=" + URLEncoder.encode(pair.second(), java.nio.charset.Charset.defaultCharset());
             components.add(component);
         }
 
@@ -54,13 +58,13 @@ public final class ApiKeyContext extends RequestContext {
     }
     
     private static String canonicalizeHeaders(List<String> signedHeaders, HashMap<String, String> headers) {
-        ArrayList<String> sortedSignedHeaders = new ArrayList();
+        ArrayList<String> sortedSignedHeaders = new ArrayList<>();
         for (String header : signedHeaders) {
             sortedSignedHeaders.add(header.toLowerCase());
         }
         sortedSignedHeaders.sort(null);
 
-        ArrayList<String> canonicalHeaderParts = new ArrayList();
+        ArrayList<String> canonicalHeaderParts = new ArrayList<>();
 
         for (String v : sortedSignedHeaders) {
             try {
@@ -89,7 +93,7 @@ public final class ApiKeyContext extends RequestContext {
             DigestUtils.sha256Hex(body)
         );
 
-        return new Pair(DigestUtils.sha256Hex(s), signedHeaders);
+        return new Pair<>(DigestUtils.sha256Hex(s), signedHeaders);
     }
 
     private static String generateAuthHeader(Key key, String method, String path, List<Pair<String, String>> query, HashMap<String, String> headers, byte[] body) {
@@ -138,7 +142,7 @@ public final class ApiKeyContext extends RequestContext {
         return this._environment;
     }
 
-    public byte[] get(String path, List<Pair<String, String>> params, HashMap<String, String> headers) throws URISyntaxException, IOException, InterruptedException {
+    private HttpRequest getRequest(String path, List<Pair<String, String>> params, HashMap<String, String> headers) throws URISyntaxException {
         String host = this.getHost(this.region(), this.environment());
         String authorizationHeader = generateAuthHeader(this._key, "GET", path, params, headers, new byte[0]);
 
@@ -150,7 +154,7 @@ public final class ApiKeyContext extends RequestContext {
 
         URI uri = new URI("https", host, path, query, null);
 
-        ArrayList<String> headerStrings = new ArrayList();
+        ArrayList<String> headerStrings = new ArrayList<>();
         for (String k : headers.keySet()) {
             headerStrings.add(k);
             headerStrings.add(headers.get(k));
@@ -161,16 +165,20 @@ public final class ApiKeyContext extends RequestContext {
         String[] headerStringsArray = new String[headerStrings.size()];
         headerStringsArray = headerStrings.toArray(headerStringsArray);
 
-        HttpClient client = HttpClient.newHttpClient();
         HttpRequest.Builder builder = HttpRequest.newBuilder().uri(uri);
 
         if (headerStringsArray.length > 0) {
             builder = builder.headers(headerStringsArray);
         }
 
-        HttpRequest request = builder
+        return builder
             .GET()
             .build();
+    }
+
+    public byte[] get(String path, List<Pair<String, String>> params, HashMap<String, String> headers) throws URISyntaxException, IOException, InterruptedException {
+        HttpRequest request = this.getRequest(path, params, headers);
+        HttpClient client = HttpClient.newHttpClient();
 
         HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
         int statusCode = response.statusCode();
@@ -180,6 +188,68 @@ public final class ApiKeyContext extends RequestContext {
         }
 
         return response.body();
+    }
+
+    public InputStream getStream(String path, List<Pair<String, String>> params, HashMap<String, String> headers) throws URISyntaxException, IOException, InterruptedException {
+        HttpRequest request = this.getRequest(path, params, headers);
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        int statusCode = response.statusCode();
+
+        if (statusCode < 200 || statusCode >= 300) {
+            // The body of an error is small. The exception holds it.
+            byte[] body;
+            try (InputStream stream = response.body()) {
+                body = stream.readAllBytes();
+            }
+            throw new FailedRequestException(new BufferedResponse(response, body));
+        }
+
+        return response.body();
+    }
+
+    /** A response with its body read into memory. */
+    private static final class BufferedResponse implements HttpResponse<byte[]> {
+        private final HttpResponse<?> _response;
+        private final byte[] _body;
+
+        BufferedResponse(HttpResponse<?> response, byte[] body) {
+            this._response = response;
+            this._body = body;
+        }
+
+        public int statusCode() {
+            return this._response.statusCode();
+        }
+
+        public HttpRequest request() {
+            return this._response.request();
+        }
+
+        public Optional<HttpResponse<byte[]>> previousResponse() {
+            return Optional.empty();
+        }
+
+        public HttpHeaders headers() {
+            return this._response.headers();
+        }
+
+        public byte[] body() {
+            return this._body;
+        }
+
+        public Optional<SSLSession> sslSession() {
+            return this._response.sslSession();
+        }
+
+        public URI uri() {
+            return this._response.uri();
+        }
+
+        public HttpClient.Version version() {
+            return this._response.version();
+        }
     }
 
     public byte[] put(String path, byte[] body, String mimetype, List<Pair<String, String>> params, HashMap<String, String> headers) throws URISyntaxException, IOException, InterruptedException {
@@ -198,7 +268,7 @@ public final class ApiKeyContext extends RequestContext {
 
         URI uri = new URI("https", host, path, query, null);
 
-        ArrayList<String> headerStrings = new ArrayList();
+        ArrayList<String> headerStrings = new ArrayList<>();
         for (String k : headers.keySet()) {
             headerStrings.add(k);
             headerStrings.add(headers.get(k));
@@ -246,7 +316,7 @@ public final class ApiKeyContext extends RequestContext {
 
         URI uri = new URI("https", host, path, query, null);
 
-        ArrayList<String> headerStrings = new ArrayList();
+        ArrayList<String> headerStrings = new ArrayList<>();
         for (String k : headers.keySet()) {
             headerStrings.add(k);
             headerStrings.add(headers.get(k));
@@ -306,8 +376,8 @@ public final class ApiKeyContext extends RequestContext {
 
         String mimetype = String.format("multipart/form-data; boundary=\"%s\"", boundary);
 
-        List<Pair<String, String>> params = new ArrayList();
-        HashMap<String, String> headers = new HashMap();
+        List<Pair<String, String>> params = new ArrayList<>();
+        HashMap<String, String> headers = new HashMap<>();
 
         return this.post(path, body.toByteArray(), mimetype, params, headers);
     }
@@ -324,7 +394,7 @@ public final class ApiKeyContext extends RequestContext {
 
         URI uri = new URI("https", host, path, query, null);
 
-        ArrayList<String> headerStrings = new ArrayList();
+        ArrayList<String> headerStrings = new ArrayList<>();
         for (String k : headers.keySet()) {
             headerStrings.add(k);
             headerStrings.add(headers.get(k));

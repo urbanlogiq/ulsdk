@@ -192,7 +192,7 @@ mod tests {
             let body = crate::types::RunSpec::default();
             let expected = ObjectId::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = create_job(&ctx, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -201,7 +201,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -233,7 +233,7 @@ mod tests {
             let q0 = Some(q0);
             let expected = Job::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_job(&ctx, p0, q0).await;
             let result = match result {
                 Ok(r) => r,
@@ -242,7 +242,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -276,7 +276,7 @@ mod tests {
                     tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                     continue;
                 } else {
-                    Err(e).unwrap()
+                    panic!("{:?}", e)
                 }
             } else {
                 break;
@@ -303,7 +303,7 @@ mod tests {
         for i in 0..5 {
             let expected = EvaluatorHealth::default();
             let expected_bytes = serde_json::to_vec(&expected).unwrap();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_health(&ctx).await;
             let result = match result {
                 Ok(r) => r,
@@ -312,7 +312,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -342,7 +342,7 @@ mod tests {
                 crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
             let expected = Task::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = get_task(&ctx, p0).await;
             let result = match result {
                 Ok(r) => r,
@@ -351,7 +351,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };
@@ -382,7 +382,7 @@ mod tests {
             let body = crate::types::ContinuationSpec::default();
             let expected = ObjectIdList::default();
             let expected_bytes: Vec<u8> = expected.to_fbs_bytes();
-            ctx.set_response(expected_bytes.clone());
+            ctx.set_response(expected_bytes.as_slice());
             let result = set_graph_continuation(&ctx, p0, body).await;
             let result = match result {
                 Ok(r) => r,
@@ -391,7 +391,7 @@ mod tests {
                         tokio::time::sleep(tokio::time::Duration::from_secs(i + 1));
                         continue;
                     } else {
-                        Err(e).unwrap()
+                        panic!("{:?}", e)
                     }
                 }
             };

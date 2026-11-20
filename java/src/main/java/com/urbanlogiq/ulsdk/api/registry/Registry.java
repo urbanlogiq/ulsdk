@@ -7,7 +7,7 @@ package com.urbanlogiq.ulsdk.api.registry;
 public final class Registry {
     /**
      * The registry's table streams by name, which a query binds its sources to
-     * 
+     *
      * @param ctx A request context object
      * @param name The registry's name (e.g. `models`)
      * @return The registry's spec name, version and table streams
@@ -28,7 +28,7 @@ public final class Registry {
 
     /**
      * Project one governed object into the registry: read its referenced source, verify the hash, extract the declared fields. Idempotent per (object, source hash).
-     * 
+     *
      * @param ctx A request context object
      * @param name The registry's name (e.g. `models`)
      * @param object_id The governed object to project
@@ -54,7 +54,7 @@ public final class Registry {
 
     /**
      * Tombstone one object's rows in the registry (its history stays); the caller must be able to modify the object.
-     * 
+     *
      * @param ctx A request context object
      * @param name The registry's name (e.g. `models`)
      * @param object_id The governed object to tombstone
@@ -78,7 +78,7 @@ public final class Registry {
 
     /**
      * Query the registry as the caller: the Query's bound sources name the registry's tables; rows are the newest per key and filtered by the objects' ACLs. Apache Arrow IPC stream out.
-     * 
+     *
      * @param ctx A request context object
      * @param name The registry's name (e.g. `models`)
      * @param query The query to execute; its table sources are registry table names
