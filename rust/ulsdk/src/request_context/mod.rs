@@ -158,9 +158,11 @@ mod tests {
 
     const WAIT: Duration = Duration::from_secs(10);
 
-    /// A context without its own `get_stream`.
+    /// A context without its own `get_stream`. It records the path and the
+    /// headers of each request.
+    #[derive(Default)]
     struct Buffered {
-        paths: Mutex<Vec<String>>,
+        requests: Mutex<Vec<(String, HeaderMap)>>,
     }
 
     #[async_trait]
@@ -177,9 +179,10 @@ mod tests {
             &self,
             path: &str,
             _params: Option<ParamMap>,
-            _headers: Option<HeaderMap>,
+            headers: Option<HeaderMap>,
         ) -> Result<Vec<u8>, Error> {
-            self.paths.lock().unwrap().push(path.to_owned());
+            let request = (path.to_owned(), headers.unwrap_or_default());
+            self.requests.lock().unwrap().push(request);
             Ok(b"content".to_vec())
         }
 
@@ -229,20 +232,40 @@ mod tests {
 
     #[tokio::test]
     async fn the_default_stream_is_the_complete_body() {
-        let ctx = Buffered {
-            paths: Mutex::new(Vec::new()),
-        };
+        let ctx = Buffered::default();
         let file = crate::types::ObjectId::default();
 
-        let stream = crate::api::drive::get_file_stream(&ctx, file)
+        let stream = crate::api::drive::get_file_stream(&ctx, file, None, None)
             .await
             .unwrap();
 
         assert_eq!(read_all(stream).await.unwrap(), b"content");
         assert_eq!(
-            *ctx.paths.lock().unwrap(),
-            [format!("/v1/api/ulv2/drive/file/{}", file)]
+            *ctx.requests.lock().unwrap(),
+            [(
+                format!("/v1/api/ulv2/drive/file/{}", file),
+                HeaderMap::new()
+            )]
         );
+    }
+
+    #[tokio::test]
+    async fn a_file_stream_sends_the_range_headers() {
+        use crate::api::drive::get_file_stream;
+        let ctx = Buffered::default();
+        let file = crate::types::ObjectId::default();
+
+        let stream = get_file_stream(&ctx, file, Some("bytes=6-"), Some("\"tag\"")).await;
+        let invalid = get_file_stream(&ctx, file, Some("bytes=0-\r\nx-other: 1"), None).await;
+
+        assert!(stream.is_ok());
+        assert!(matches!(invalid, Err(Error::Unclassified(_))));
+        let requests = ctx.requests.lock().unwrap();
+        assert_eq!(requests.len(), 1);
+        let headers = &requests[0].1;
+        assert_eq!(headers.len(), 2);
+        assert_eq!(headers["range"], "bytes=6-");
+        assert_eq!(headers["if-range"], "\"tag\"");
     }
 
     /// Sends response headers for one request. The body has `length` bytes.

@@ -262,17 +262,27 @@ public final class Drive {
      *
      * @param ctx A request context object
      * @param id The file ID
+     * @param byte_range The bytes to read, such as `bytes=1024-`.
+     * @param if_range The `ETag` of an earlier response. If the file changed, the response has all the bytes.
      * @return The file contents. The caller must close the stream.
      */
     public static java.io.InputStream getFileStream(
         com.urbanlogiq.ulsdk.RequestContext ctx,
-        com.urbanlogiq.ulsdk.types.ObjectId id
+        com.urbanlogiq.ulsdk.types.ObjectId id,
+        String byteRange,
+        String ifRange
     ) throws java.net.URISyntaxException, java.io.IOException, java.lang.InterruptedException {
         String path = "/v1/api/ulv2/drive/file/:id";
         path = path.replace(":id", id.toString());
 
         java.util.List<com.urbanlogiq.ulsdk.Pair<String, String>> params = new java.util.ArrayList<com.urbanlogiq.ulsdk.Pair<String, String>>();
         java.util.HashMap<String, String> headers = new java.util.HashMap<String, String>();
+        if (byteRange != null) {
+            headers.put("Range", byteRange);
+        }
+        if (ifRange != null) {
+            headers.put("If-Range", ifRange);
+        }
 
         java.io.InputStream res = ctx.getStream(path, params, headers);
         return res;

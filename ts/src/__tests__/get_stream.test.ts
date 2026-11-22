@@ -14,9 +14,15 @@ const PATH = '/v1/api/ulv2/drive/file/1234';
 /** A context without its own `getStream`. */
 class BufferedContext extends RequestContext {
   paths: string[] = [];
+  headers: Record<string, string>[] = [];
 
-  async get(path: string): Promise<Uint8Array> {
+  async get(
+    path: string,
+    _params: [string, string][],
+    headers: Record<string, string>
+  ): Promise<Uint8Array> {
     this.paths.push(path);
+    this.headers.push(headers);
     return new Uint8Array([1, 2, 3]);
   }
 
@@ -61,11 +67,34 @@ describe('getStream', () => {
   it('reads the complete body by default', async () => {
     const ctx = new BufferedContext();
 
-    const stream = await drive.getFileStream(ctx, new ObjectId());
+    const stream = await drive.getFileStream(ctx, new ObjectId(), null, null);
 
     expect(await readAll(stream)).toEqual([1, 2, 3]);
     expect(ctx.paths).toHaveLength(1);
     expect(ctx.paths[0]).toMatch(/^\/v1\/api\/ulv2\/drive\/file\//);
+    expect(ctx.headers).toEqual([{}]);
+  });
+
+  it('sends the range headers of a file read', async () => {
+    const ctx = new BufferedContext();
+
+    await drive.getFileStream(ctx, new ObjectId(), 'bytes=6-', '"tag"');
+
+    expect(ctx.headers).toEqual([{ Range: 'bytes=6-', 'If-Range': '"tag"' }]);
+  });
+
+  it('rejects a header value with a line break', async () => {
+    const fetch = vi.fn(async (_url: string, init: RequestInit) => {
+      // The runtime does this check when it makes the request.
+      new Headers(init.headers);
+      return new Response(null, { status: 204 });
+    });
+    vi.stubGlobal('fetch', fetch);
+    const range = 'bytes=0-\r\nx-other: 1';
+
+    await expect(
+      drive.getFileStream(context(), new ObjectId(), range, null)
+    ).rejects.toThrow(TypeError);
   });
 
   it('gives the body in parts', async () => {

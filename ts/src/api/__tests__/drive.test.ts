@@ -201,11 +201,15 @@ describe('getFileStream', () => {
   it('testGetFileStream', async () => {
     const ctx = new TestContext();
     const p0 = new ObjectId();
+    const q0: any = null;
+    const q1: any = null;
     ctx.setResponse(new Uint8Array(0));
     try {
           await drive.getFileStream(
         ctx,
-        p0
+        p0,
+        q0,
+        q1
       );
     } catch (_) {
       // Expected for mock tests with empty/invalid responses

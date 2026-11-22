@@ -268,6 +268,8 @@ Result<Void>
 get_file_stream(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
+    std::optional<std::string> byte_range,
+    std::optional<std::string> if_range,
     const ul::BodySink &sink
 ) {
     std::string path = "/v1/api/ulv2/drive/file/:id";
@@ -277,6 +279,12 @@ get_file_stream(
     std::map<std::string, std::string> params;
 
     std::map<std::string, std::string> headers;
+    if (byte_range.has_value()) {
+        headers["Range"] = byte_range.value();
+    }
+    if (if_range.has_value()) {
+        headers["If-Range"] = if_range.value();
+    }
     const Result<Void> res = ctx.get_stream(path, params, headers, sink);
     return res;
 }

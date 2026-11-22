@@ -284,6 +284,17 @@ static Result<std::string> generate_auth_header(
     std::vector<std::pair<std::string, std::string>>& headers,
     const std::vector<uint8_t>& body
 ) {
+    // libcurl sends each header line as given. A line break in a value would
+    // add a header to the request.
+    for (const auto& header : headers) {
+        if (header.second.find_first_of(std::string("\r\n\0", 3))
+            != std::string::npos) {
+            return Result<std::string>(
+                Error("Invalid value for header " + header.first)
+            );
+        }
+    }
+
     const unsigned long ts = time(nullptr);
 
     headers.push_back(std::make_pair(HEADER_X_UL_DATE, std::to_string(ts)));

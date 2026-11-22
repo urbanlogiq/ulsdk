@@ -5,7 +5,7 @@ import hashlib
 import time
 import urllib.parse
 import uuid
-from typing import BinaryIO, Dict, List, Optional, Union, cast
+from typing import Dict, List, Optional, Union, cast
 
 import nacl.encoding
 import nacl.signing
@@ -14,7 +14,13 @@ from requests import Request, Session
 from websockets.sync.client import ClientConnection, connect
 
 from .keys import Environment, Key, Region
-from .request_context import File, RequestContext, _get_endpoint, response_stream
+from .request_context import (
+    File,
+    RequestContext,
+    ResponseStream,
+    _get_endpoint,
+    response_stream,
+)
 
 REQUEST_TYPE = "ul1_request"
 SIGNATURE_V1 = "UL1-ED25519"
@@ -171,7 +177,7 @@ class ApiKeyContext(RequestContext):
         params: Optional[Dict] = None,
         headers: Optional[Dict[str, str]] = None,
         **kwargs,
-    ) -> BinaryIO:
+    ) -> ResponseStream:
         if params is None:
             params = dict()
 

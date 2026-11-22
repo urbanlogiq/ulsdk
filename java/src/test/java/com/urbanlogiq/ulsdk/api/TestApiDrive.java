@@ -276,12 +276,16 @@ public final class TestApiDrive {
         com.urbanlogiq.ulsdk.Key key = new com.urbanlogiq.ulsdk.Key(UUID.fromString(caUser), Region.CA, caAccessKey, caSecretKey);
         com.urbanlogiq.ulsdk.TestContext ctx = new com.urbanlogiq.ulsdk.TestContext(new ApiKeyContext(key, Environment.Stage));
         com.urbanlogiq.ulsdk.types.ObjectId p0 = new com.urbanlogiq.ulsdk.types.ObjectId("00000000-0000-0000-0000-000000000000");
+        String q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        String q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         byte[] expected = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".getBytes();
         byte[] expectedBytes = expected.clone();
         ctx.setResponse(expectedBytes);
         java.io.InputStream result = com.urbanlogiq.ulsdk.api.drive.Drive.getFileStream(
             ctx,
-            p0
+            p0,
+            q0,
+            q1
         );
         try (java.io.InputStream stream = result) {
             org.junit.jupiter.api.Assertions.assertArrayEquals(expected, stream.readAllBytes());

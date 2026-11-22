@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -90,7 +91,7 @@ func TestGetStreamReadsTheBodyInParts(t *testing.T) {
 	})
 
 	file := id.ObjectId{B: bytes.Repeat([]byte{7}, 16)}
-	stream, err := drive.GetFileStream(ctx, file)
+	stream, err := drive.GetFileStream(ctx, file, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -117,6 +118,45 @@ func TestGetStreamReadsTheBodyInParts(t *testing.T) {
 	}
 	if auth := request.Header.Get("authorization"); !strings.HasPrefix(auth, signatureV1) {
 		t.Errorf("authorization = %q, want a %s signature", auth, signatureV1)
+	}
+}
+
+func TestGetFileStreamSendsTheRangeHeaders(t *testing.T) {
+	var sent [][2]string
+	ctx := serve(t, func(w http.ResponseWriter, r *http.Request) {
+		sent = append(sent, [2]string{r.Header.Get("range"), r.Header.Get("if-range")})
+	})
+	file := id.ObjectId{B: bytes.Repeat([]byte{7}, 16)}
+	byteRange, tag := "bytes=6-", `"tag"`
+
+	for _, values := range [][2]*string{{nil, nil}, {&byteRange, &tag}} {
+		stream, err := drive.GetFileStream(ctx, file, values[0], values[1])
+		if err != nil {
+			t.Fatal(err)
+		}
+		stream.Close()
+	}
+
+	if want := [][2]string{{"", ""}, {byteRange, tag}}; !reflect.DeepEqual(sent, want) {
+		t.Errorf("range headers = %q, want %q", sent, want)
+	}
+}
+
+func TestGetFileStreamRejectsAHeaderValueWithALineBreak(t *testing.T) {
+	requests := 0
+	ctx := serve(t, func(w http.ResponseWriter, r *http.Request) {
+		requests++
+	})
+	file := id.ObjectId{B: bytes.Repeat([]byte{7}, 16)}
+	byteRange := "bytes=0-\r\nx-other: 1"
+
+	stream, err := drive.GetFileStream(ctx, file, &byteRange, nil)
+	if err == nil {
+		stream.Close()
+		t.Fatal("expected an error for a header value with a line break")
+	}
+	if requests != 0 {
+		t.Errorf("the server got %d requests, want none", requests)
 	}
 }
 

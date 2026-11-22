@@ -39,7 +39,7 @@ def new_acl(
 
 def new_from(
     ctx: RequestContext,
-    extends: Optional["ObjectId"],
+    extends: Optional["ObjectId"] = None,
 ) -> ObjectSummaryList:
     """Create a new access control list that inherits from an existing ACL
 

@@ -2073,7 +2073,7 @@ def get_users_display_names(
 
 def get_current_user(
     ctx: RequestContext,
-    audit_log: Optional[bool],
+    audit_log: Optional[bool] = None,
 ) -> AdUserWithAuditLog:
     """Retrieves details of the current user.
 
@@ -2180,7 +2180,7 @@ def update_current_user(
 def get_user(
     ctx: RequestContext,
     id_: "B2cId",
-    audit_log: Optional[bool],
+    audit_log: Optional[bool] = None,
 ) -> AdUserWithAuditLog:
     """Retrieves details of a user by id.
 

@@ -2,6 +2,9 @@
 
 #include "test.h"
 #include "ulsdk/api/datacatalog.h"
+#include "ulsdk/api/drive.h"
+#include "ulsdk/api_key_context.h"
+#include "ulsdk/keys.h"
 
 ul::Result<ul::Void>
 regression_test_parameter_replacement(ul::RequestContext&) {
@@ -58,5 +61,72 @@ ul::Result<ul::Void> derq_ingestion_test(ul::RequestContext& ctx) {
 ApiTest derq_ingestion_test_obj(
     derq_ingestion_test,
     "regression::derq_ingestion_test",
+    &regression_test_root
+);
+
+ul::Result<ul::Void> regression_test_range_headers(ul::RequestContext&) {
+    MockContext ctx;
+    const ul::types::ObjectId id("00000000-0000-0000-0000-000000000000");
+    const ul::BodySink sink = [](const uint8_t*, size_t) { return true; };
+
+    ul::api::drive::get_file_stream(ctx, id, "bytes=6-", "\"tag\"", sink);
+    const std::map<std::string, std::string> expected = {
+        {"Range", "bytes=6-"},
+        {"If-Range", "\"tag\""},
+    };
+    if (ctx.headers_ != expected) {
+        return ul::Error("The request does not have the range headers");
+    }
+
+    ul::api::drive::get_file_stream(ctx, id, std::nullopt, std::nullopt, sink);
+    if (!ctx.headers_.empty()) {
+        return ul::Error(
+            "The request has headers that the caller did not give"
+        );
+    }
+
+    return ul::Void();
+}
+
+ApiTest regression_test_range_headers_obj(
+    regression_test_range_headers,
+    "regression::test_range_headers",
+    &regression_test_root
+);
+
+ul::Result<ul::Void> regression_test_header_line_break(ul::RequestContext&) {
+    // The key is not valid. The context must fail before it makes a request.
+    const ul::Key key(
+        ul::Uuid("00000000-0000-0000-0000-000000000000"),
+        ul::Region::CA,
+        "test-access-key",
+        std::vector<uint8_t>(crypto_sign_SECRETKEYBYTES)
+    );
+    ul::ApiKeyContext ctx(key, ul::Environment::Stage);
+    const ul::types::ObjectId id("00000000-0000-0000-0000-000000000000");
+    const ul::BodySink sink = [](const uint8_t*, size_t) { return true; };
+
+    const auto result = ul::api::drive::get_file_stream(
+        ctx,
+        id,
+        "bytes=0-\r\nx-other: 1",
+        std::nullopt,
+        sink
+    );
+
+    if (!std::holds_alternative<ul::Error>(result)) {
+        return ul::Error("The context sent a header value with a line break");
+    }
+    const ul::Error error = std::get<ul::Error>(result);
+    if (error.message_ != "Invalid value for header Range") {
+        return ul::Error("Unexpected error: " + error.message_);
+    }
+
+    return ul::Void();
+}
+
+ApiTest regression_test_header_line_break_obj(
+    regression_test_header_line_break,
+    "regression::test_header_line_break",
     &regression_test_root
 );

@@ -3,7 +3,7 @@
 import io
 import uuid
 from abc import ABC, abstractmethod
-from typing import BinaryIO, Dict, List, NamedTuple, Optional, Union
+from typing import BinaryIO, Dict, List, Mapping, NamedTuple, Optional, Union
 from urllib.parse import quote
 
 import requests
@@ -85,14 +85,25 @@ class _ResponseReader(io.RawIOBase):
         super().close()
 
 
-def response_stream(response: requests.Response) -> BinaryIO:
+class ResponseStream(io.BufferedReader):
+    """The body of a response as a readable binary stream, with the status
+    and the headers of the response. Closing the stream closes the response."""
+
+    def __init__(self, response: requests.Response):
+        super().__init__(_ResponseReader(response), STREAM_BLOCK_SIZE)
+        self.status_code: int = response.status_code
+        # The names are not case-sensitive.
+        self.headers: Mapping[str, str] = response.headers
+
+
+def response_stream(response: requests.Response) -> ResponseStream:
     """Return the body of a response as a readable binary stream. The request
-    must have `stream=True`. Closing the stream closes the response.
+    must have `stream=True`.
 
     Raise an error for a status that is not a success. A redirect that the
     request did not follow has no content."""
     if 200 <= response.status_code < 300:
-        return io.BufferedReader(_ResponseReader(response), STREAM_BLOCK_SIZE)
+        return ResponseStream(response)
 
     try:
         # Keep the error body for the caller, as the other requests do.

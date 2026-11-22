@@ -351,6 +351,8 @@ def test_get_file_stream():
     key_ctx = ApiKeyContext(key, Environment.Stage)
     ctx = TestContext(key_ctx)
     p0 = ObjectId.from_uuid("00000000-0000-0000-0000-000000000000");
+    q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
     success = False
     for i in range(5):
         expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
@@ -359,7 +361,9 @@ def test_get_file_stream():
         try:
             result = get_file_stream(
                 ctx,
-                p0
+                p0,
+                q0,
+                q1
             )
             with result:
                 result = result.read()

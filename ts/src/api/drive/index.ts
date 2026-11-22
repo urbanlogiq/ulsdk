@@ -291,17 +291,27 @@ export async function getFile(
  *
  * @param ctx - A request context object
  * @param id - The file ID
+ * @param byteRange - The bytes to read, such as `bytes=1024-`.
+ * @param ifRange - The `ETag` of an earlier response. If the file changed, the response has all the bytes.
  * @returns The file contents
  */
 export async function getFileStream(
   ctx: RequestContext,
-  id: ObjectId
+  id: ObjectId,
+  byteRange: string | null,
+  ifRange: string | null
 ): Promise<ReadableStream<Uint8Array>> {
   let path = '/v1/api/ulv2/drive/file/:id';
   path = path.replace(':id', id.toString());
 
   const params: [string, string][] = [];
   const headers: Record<string, string> = {};
+  if (byteRange != null) {
+      headers['Range'] = byteRange;
+  }
+  if (ifRange != null) {
+      headers['If-Range'] = ifRange;
+  }
 
   const res = await ctx.getStream(path, params, headers);
   return res;

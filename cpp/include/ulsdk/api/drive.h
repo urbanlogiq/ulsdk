@@ -153,6 +153,8 @@ get_file(
 /**
  * Reads a file by ID in parts. Use this function for a file that is too large to hold in memory.
  * @param id The file ID
+ * @param byte_range The bytes to read, such as `bytes=1024-`.
+ * @param if_range The `ETag` of an earlier response. If the file changed, the response has all the bytes.
  * @param sink Receives the response body in parts. Returns false to stop the request.
  * @return The result of the request. `sink` receives: The file contents
  */
@@ -160,6 +162,8 @@ Result<Void>
 get_file_stream(
     ul::RequestContext &ctx,
     const ::ul::types::ObjectId &id,
+    std::optional<std::string> byte_range,
+    std::optional<std::string> if_range,
     const ul::BodySink &sink
 );
 

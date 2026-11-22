@@ -229,13 +229,19 @@ func GetFile(ctx api.RequestContext, idParam id.ObjectId) ([]byte, error) {
 // GetFileStream -
 // Reads a file by ID in parts. Use this function for a file that is too large to hold in memory.
 // The caller must close the stream.
-func GetFileStream(ctx api.RequestContext, idParam id.ObjectId) (io.ReadCloser, error) {
+func GetFileStream(ctx api.RequestContext, idParam id.ObjectId, byteRange *string, ifRange *string) (io.ReadCloser, error) {
 	path := "/v1/api/ulv2/drive/file/:id"
 	path = strings.Replace(path, ":id", fmt.Sprintf("%v", idParam), 1)
 
 	params := [][2]string{}
 
 	headers := map[string]string{}
+	if byteRange != nil {
+		headers["Range"] = *byteRange
+	}
+	if ifRange != nil {
+		headers["If-Range"] = *ifRange
+	}
 
 	res, err := api.GetStream(ctx, path, params, headers)
 	if err != nil {

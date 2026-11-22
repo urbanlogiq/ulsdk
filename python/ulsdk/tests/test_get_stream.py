@@ -144,6 +144,18 @@ def test_get_stream_fails_on_a_short_body():
                 stream.read()
 
 
+def test_get_stream_gives_the_status_and_headers_of_the_response():
+    def respond(handler: _Handler):
+        _send(handler, 206, b"tail", etag='"tag"', content_range="bytes 6-9/10")
+
+    with _serve(respond):
+        with _context().get_stream(PATH) as stream:
+            assert stream.status_code == 206
+            assert stream.headers["ETag"] == '"tag"'
+            assert stream.headers["content-range"] == "bytes 6-9/10"
+            assert stream.read() == b"tail"
+
+
 def test_get_stream_keeps_the_body_of_an_error():
     message = b'{"code": 404, "message": "no such file"}'
 
@@ -241,3 +253,35 @@ def test_get_file_stream_passes_the_request_options():
         assert stream.read() == b"content"
 
     assert calls == [(f"/v1/api/ulv2/drive/file/{id}", {"timeout": (1, 2)})]
+
+
+def test_get_file_stream_sends_the_range_headers():
+    body = _body(10)
+    id = ObjectId.from_uuid(uuid.UUID(int=7))
+
+    def respond(handler: _Handler):
+        if handler.headers["range"] is None:
+            _send(handler, 200, body, etag='"tag"')
+        else:
+            _send(handler, 206, body[6:], content_range="bytes 6-9/10")
+
+    with _serve(respond) as server:
+        with get_file_stream(_context(), id) as stream:
+            assert stream.read() == body
+        with get_file_stream(_context(), id, "bytes=6-", '"tag"') as stream:
+            assert stream.read() == body[6:]
+        with get_file_stream(_context(), id, if_range='"tag"', timeout=5) as stream:
+            assert stream.read() == body
+
+    sent = [(h["range"], h["if-range"]) for _, h in server.requests]  # type: ignore
+    assert sent == [(None, None), ("bytes=6-", '"tag"'), (None, '"tag"')]
+
+
+def test_get_file_stream_rejects_a_header_value_with_a_line_break():
+    id = ObjectId.from_uuid(uuid.UUID(int=7))
+
+    with _serve(lambda handler: _send(handler, 200, b"")) as server:
+        with pytest.raises(requests.RequestException):
+            get_file_stream(_context(), id, "bytes=0-\r\nx-other: 1")
+
+    assert server.requests == []  # type: ignore

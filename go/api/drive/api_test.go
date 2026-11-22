@@ -355,6 +355,10 @@ func TestGetFileStream(t *testing.T) {
 	}
 
 	p0 := id.ObjectId{}
+	q0_val := "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+	q0 := &q0_val
+	q1_val := "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+	q1 := &q1_val
 
 	success := false
 	for i := 0; i < 5; i++ {
@@ -364,6 +368,8 @@ func TestGetFileStream(t *testing.T) {
 		result, err := GetFileStream(
 			ctx,
 			p0,
+			q0,
+			q1,
 		)
 		if err != nil {
 			time.Sleep(time.Duration(i+1) * time.Second)

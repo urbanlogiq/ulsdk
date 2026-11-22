@@ -243,15 +243,29 @@ pub async fn get_file(
 ///
 /// * `ctx` - A request context object
 /// * `id` - The file ID
+/// * `byte_range` - The bytes to read, such as `bytes=1024-`.
+/// * `if_range` - The `ETag` of an earlier response. If the file changed, the response has all the bytes.
 ///
 /// Returns
 /// * The file contents
 pub async fn get_file_stream(
     ctx: &dyn RequestContext,
     id: crate::types::id::ObjectId,
+    byte_range: Option<&str>,
+    if_range: Option<&str>,
 ) -> Result<ByteStream, Error> {
     let path = "/v1/api/ulv2/drive/file/:id".replace(":id", &id.to_string());
-    let res = ctx.get_stream(&path, None, None).await?;
+    let mut headers = HeaderMap::new();
+    if let Some(val) = byte_range {
+        let value = HeaderValue::from_str(val).map_err(|e| Error::from(e.to_string()))?;
+        headers.insert(HeaderName::from_static("range"), value);
+    }
+    if let Some(val) = if_range {
+        let value = HeaderValue::from_str(val).map_err(|e| Error::from(e.to_string()))?;
+        headers.insert(HeaderName::from_static("if-range"), value);
+    }
+
+    let res = ctx.get_stream(&path, None, Some(headers)).await?;
     Ok(res)
 }
 
@@ -735,10 +749,14 @@ mod tests {
         for i in 0..5 {
             let p0 =
                 crate::types::ObjectId::from_str("00000000-0000-0000-0000-000000000000").unwrap();
+            let q0 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            let q0 = Some(q0);
+            let q1 = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            let q1 = Some(q1);
             let expected = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
             let expected_bytes = expected;
             ctx.set_response(expected_bytes.as_slice());
-            let result = get_file_stream(&ctx, p0).await;
+            let result = get_file_stream(&ctx, p0, q0, q1).await;
             let result = match result {
                 Ok(r) => r,
                 Err(e) => {

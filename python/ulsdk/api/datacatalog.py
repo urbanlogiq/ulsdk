@@ -668,11 +668,11 @@ def generate_metadata(
 def update_metadata(
     ctx: RequestContext,
     id_: "ObjectId",
-    merge: Optional[bool],
-    comment: Optional[str],
-    expected_metadata_revision: Optional["ContentId"],
-    expected_stream_revision: Optional["ContentId"],
-    metadata: Optional[Metadata],
+    merge: Optional[bool] = None,
+    comment: Optional[str] = None,
+    expected_metadata_revision: Optional["ContentId"] = None,
+    expected_stream_revision: Optional["ContentId"] = None,
+    metadata: Optional[Metadata] = None,
 ) -> None:
     """Given a stream ID and metadata, update the stream metadata and repoint the stream object at the new metadata revision.
     

@@ -276,6 +276,8 @@ def get_file(
 def get_file_stream(
     ctx: RequestContext,
     id_: "ObjectId",
+    byte_range: Optional[str] = None,
+    if_range: Optional[str] = None,
     **kwargs: Any,
 ) -> BinaryIO:
     """Reads a file by ID in parts. Use this function for a file that is too large to hold in memory.
@@ -283,6 +285,8 @@ def get_file_stream(
     Arguments:
     ctx: RequestContext -- A request context object
     id_: "ObjectId" -- The file ID
+    byte_range: Optional[str] -- The bytes to read, such as `bytes=1024-`.
+    if_range: Optional[str] -- The `ETag` of an earlier response. If the file changed, the response has all the bytes.
     kwargs: Any -- Options for the request, such as `timeout`. The request context defines them.
 
     Returns:
@@ -295,6 +299,11 @@ def get_file_stream(
 
     params = dict()
     headers = dict()
+    if byte_range is not None:
+        headers["Range"] = byte_range
+    if if_range is not None:
+        headers["If-Range"] = if_range
+
     res = ctx.get_stream(path, params=params, headers=headers, **kwargs)
     return res
 

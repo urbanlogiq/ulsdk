@@ -289,7 +289,7 @@ def create_job(
 def get_job(
     ctx: RequestContext,
     id_: "ObjectId",
-    timeout: Optional[int],
+    timeout: Optional[int] = None,
 ) -> Job:
     """Fetch the details of the job with the given ID. By default this will block until the job is complete.
 
