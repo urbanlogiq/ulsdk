@@ -15,6 +15,7 @@
 #include "ulsdk/types/Schema.h"
 #include "ulsdk/types/api.h"
 #include "ulsdk/types/attr.h"
+#include "ulsdk/types/data.h"
 #include "ulsdk/types/entity.h"
 #include "ulsdk/types/fun.h"
 #include "ulsdk/types/graph.h"

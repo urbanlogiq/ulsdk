@@ -27,6 +27,11 @@ use crate::types::Schema::{
 };
 use crate::types::api::SortOrder;
 use crate::types::attr::Attr;
+use crate::types::data::{
+    AttributePair, BinaryYesNo, DayOfWeek, DirectionAndRoadName, DirectionAndRoadNames,
+    DirectionTy, NamedParameter, NamedParameterFlags, OutputSchema, RoadUserTy, Source,
+    StatisticTy, TimeGranularity, TurnTy,
+};
 use crate::types::entity::{
     EdgeTy, EntityTy, Geometry, GraphEdge, GraphNode, Line, MultiLine, MultiPoint, MultiPolygon,
     NodeTy, Point, Polygon,
@@ -49,6 +54,14 @@ use crate::types::generated::Schema_generated::{
 };
 use crate::types::generated::api_generated::SortOrder as FbsSortOrder;
 use crate::types::generated::attr_generated::Attr as FbsAttr;
+use crate::types::generated::data_generated::{
+    AttributePair as FbsAttributePair, BinaryYesNo as FbsBinaryYesNo, DayOfWeek as FbsDayOfWeek,
+    DirectionAndRoadName as FbsDirectionAndRoadName,
+    DirectionAndRoadNames as FbsDirectionAndRoadNames, DirectionTy as FbsDirectionTy,
+    NamedParameter as FbsNamedParameter, NamedParameterFlags as FbsNamedParameterFlags,
+    OutputSchema as FbsOutputSchema, RoadUserTy as FbsRoadUserTy, Source as FbsSource,
+    StatisticTy as FbsStatisticTy, TimeGranularity as FbsTimeGranularity, TurnTy as FbsTurnTy,
+};
 use crate::types::generated::entity_generated::{
     EdgeTy as FbsEdgeTy, EntityTy as FbsEntityTy, Geometry as FbsGeometry,
     GraphEdge as FbsGraphEdge, GraphNode as FbsGraphNode, Line as FbsLine,
@@ -94,7 +107,9 @@ use crate::types::generated::query_generated::{
     ValueName as FbsValueName, ValueRow as FbsValueRow, Values as FbsValues, Vector as FbsVector,
     When as FbsWhen, Window as FbsWindow, WindowFrame as FbsWindowFrame,
     WindowFrameBound as FbsWindowFrameBound, WindowFrameBoundTy as FbsWindowFrameBoundTy,
-    WindowFrameUnits as FbsWindowFrameUnits, WorklogPartition as FbsWorklogPartition,
+    WindowFrameUnits as FbsWindowFrameUnits,
+    WorklogAttributePartition as FbsWorklogAttributePartition,
+    WorklogPartition as FbsWorklogPartition,
 };
 use crate::types::generated::table_generated::{
     Append as FbsAppend, ChangeOp as FbsChangeOp, ChangeOpEntry as FbsChangeOpEntry,
@@ -133,7 +148,7 @@ use crate::types::query::{
     TablePartition, TableSource, TableSourceInstance, TableSourceUnion, TimeSeries, TypeHint,
     UnaryQueryElement, UnsetArgument, UpdateQueryElement, ValueIndex, ValueName, ValueRow, Values,
     Vector, When, Window, WindowFrame, WindowFrameBound, WindowFrameBoundTy, WindowFrameUnits,
-    WorklogPartition,
+    WorklogAttributePartition, WorklogPartition,
 };
 use crate::types::value::{
     Point2D, Tri2D, VArray, VBool, VBytes, VChar, VF32, VF64, VFixedSizeBytes, VI8, VI16, VI32,

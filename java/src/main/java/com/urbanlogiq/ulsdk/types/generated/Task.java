@@ -39,7 +39,7 @@ public final class Task extends com.google.flatbuffers.Table {
   public ObjectId userId() { return userId(new ObjectId()); }
   public ObjectId userId(ObjectId obj) { int o = __offset(6); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }
   /**
-   * Task object, either a source or a stream
+   * Task object: a source, a stream, or a list of views
    */
   public ObjectId task() { return task(new ObjectId()); }
   public ObjectId task(ObjectId obj) { int o = __offset(8); return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null; }

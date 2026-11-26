@@ -196,21 +196,24 @@ func (v JoinTy) String() string {
 type TablePartition byte
 
 const (
-	TablePartitionNONE             TablePartition = 0
-	TablePartitionMvdbPartition    TablePartition = 1
-	TablePartitionWorklogPartition TablePartition = 2
+	TablePartitionNONE                      TablePartition = 0
+	TablePartitionMvdbPartition             TablePartition = 1
+	TablePartitionWorklogPartition          TablePartition = 2
+	TablePartitionWorklogAttributePartition TablePartition = 3
 )
 
 var EnumNamesTablePartition = map[TablePartition]string{
-	TablePartitionNONE:             "NONE",
-	TablePartitionMvdbPartition:    "MvdbPartition",
-	TablePartitionWorklogPartition: "WorklogPartition",
+	TablePartitionNONE:                      "NONE",
+	TablePartitionMvdbPartition:             "MvdbPartition",
+	TablePartitionWorklogPartition:          "WorklogPartition",
+	TablePartitionWorklogAttributePartition: "WorklogAttributePartition",
 }
 
 var EnumValuesTablePartition = map[string]TablePartition{
-	"NONE":             TablePartitionNONE,
-	"MvdbPartition":    TablePartitionMvdbPartition,
-	"WorklogPartition": TablePartitionWorklogPartition,
+	"NONE":                      TablePartitionNONE,
+	"MvdbPartition":             TablePartitionMvdbPartition,
+	"WorklogPartition":          TablePartitionWorklogPartition,
+	"WorklogAttributePartition": TablePartitionWorklogAttributePartition,
 }
 
 func (v TablePartition) String() string {
@@ -2021,6 +2024,74 @@ func WorklogPartitionAddIdx(builder *flatbuffers.Builder, idx uint32) {
 func WorklogPartitionEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
+/// Select the first worklog output with all these attributes.
+type WorklogAttributePartition struct {
+	_tab flatbuffers.Table
+}
+
+func GetRootAsWorklogAttributePartition(buf []byte, offset flatbuffers.UOffsetT) *WorklogAttributePartition {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &WorklogAttributePartition{}
+	x.Init(buf, n+offset)
+	return x
+}
+
+func FinishWorklogAttributePartitionBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.Finish(offset)
+}
+
+func GetSizePrefixedRootAsWorklogAttributePartition(buf []byte, offset flatbuffers.UOffsetT) *WorklogAttributePartition {
+	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
+	x := &WorklogAttributePartition{}
+	x.Init(buf, n+offset+flatbuffers.SizeUint32)
+	return x
+}
+
+func FinishSizePrefixedWorklogAttributePartitionBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.FinishSizePrefixed(offset)
+}
+
+func (rcv *WorklogAttributePartition) Init(buf []byte, i flatbuffers.UOffsetT) {
+	rcv._tab.Bytes = buf
+	rcv._tab.Pos = i
+}
+
+func (rcv *WorklogAttributePartition) Table() flatbuffers.Table {
+	return rcv._tab
+}
+
+func (rcv *WorklogAttributePartition) Attributes(obj *AttributePair, j int) bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		x := rcv._tab.Vector(o)
+		x += flatbuffers.UOffsetT(j) * 4
+		x = rcv._tab.Indirect(x)
+		obj.Init(rcv._tab.Bytes, x)
+		return true
+	}
+	return false
+}
+
+func (rcv *WorklogAttributePartition) AttributesLength() int {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		return rcv._tab.VectorLen(o)
+	}
+	return 0
+}
+
+func WorklogAttributePartitionStart(builder *flatbuffers.Builder) {
+	builder.StartObject(1)
+}
+func WorklogAttributePartitionAddAttributes(builder *flatbuffers.Builder, attributes flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(attributes), 0)
+}
+func WorklogAttributePartitionStartAttributesVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+	return builder.StartVector(4, numElems, 4)
+}
+func WorklogAttributePartitionEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return builder.EndObject()
+}
 type DataCatalog struct {
 	_tab flatbuffers.Table
 }
@@ -2180,6 +2251,7 @@ func QueryTableSourceAddQ(builder *flatbuffers.Builder, q flatbuffers.UOffsetT) 
 func QueryTableSourceEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
+/// A source supplied by index in Query.bound_sources or while data is loaded.
 type Placeholder struct {
 	_tab flatbuffers.Table
 }
@@ -2227,11 +2299,44 @@ func (rcv *Placeholder) MutateIdx(n uint32) bool {
 	return rcv._tab.MutateUint32Slot(4, n)
 }
 
+func (rcv *Placeholder) PartitionType() TablePartition {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
+	if o != 0 {
+		return TablePartition(rcv._tab.GetByte(o + rcv._tab.Pos))
+	}
+	return 0
+}
+
+func (rcv *Placeholder) MutatePartitionType(n TablePartition) bool {
+	return rcv._tab.MutateByteSlot(6, byte(n))
+}
+
+/// Select part of the supplied source. A worklog defaults to its first output.
+/// Worklog selections also accept a stream or an Arrow table directly.
+/// When set, this field must match any partition on the supplied source.
+func (rcv *Placeholder) Partition(obj *flatbuffers.Table) bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
+	if o != 0 {
+		rcv._tab.Union(obj, o)
+		return true
+	}
+	return false
+}
+
+/// Select part of the supplied source. A worklog defaults to its first output.
+/// Worklog selections also accept a stream or an Arrow table directly.
+/// When set, this field must match any partition on the supplied source.
 func PlaceholderStart(builder *flatbuffers.Builder) {
-	builder.StartObject(1)
+	builder.StartObject(3)
 }
 func PlaceholderAddIdx(builder *flatbuffers.Builder, idx uint32) {
 	builder.PrependUint32Slot(0, idx, 0)
+}
+func PlaceholderAddPartitionType(builder *flatbuffers.Builder, partitionType TablePartition) {
+	builder.PrependByteSlot(1, byte(partitionType), 0)
+}
+func PlaceholderAddPartition(builder *flatbuffers.Builder, partition flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(2, flatbuffers.UOffsetT(partition), 0)
 }
 func PlaceholderEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()

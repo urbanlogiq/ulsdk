@@ -9,7 +9,8 @@ public final class TablePartition {
 
     public TablePartition(Object value) {
         if (!(value instanceof com.urbanlogiq.ulsdk.types.MvdbPartition)
-            && !(value instanceof com.urbanlogiq.ulsdk.types.WorklogPartition)) {
+            && !(value instanceof com.urbanlogiq.ulsdk.types.WorklogPartition)
+            && !(value instanceof com.urbanlogiq.ulsdk.types.WorklogAttributePartition)) {
             throw new com.urbanlogiq.ulsdk.InvalidVariantException("TablePartition", value);
         }
 
@@ -27,6 +28,11 @@ public final class TablePartition {
             int offset = o.serializeTo(builder);
             byte ty = com.urbanlogiq.ulsdk.types.generated.TablePartition.WorklogPartition;
             return new com.urbanlogiq.ulsdk.Pair<Integer, Byte>(offset, ty);
+        } else if (this._value instanceof com.urbanlogiq.ulsdk.types.WorklogAttributePartition) {
+            com.urbanlogiq.ulsdk.types.WorklogAttributePartition o = (com.urbanlogiq.ulsdk.types.WorklogAttributePartition)this._value;
+            int offset = o.serializeTo(builder);
+            byte ty = com.urbanlogiq.ulsdk.types.generated.TablePartition.WorklogAttributePartition;
+            return new com.urbanlogiq.ulsdk.Pair<Integer, Byte>(offset, ty);
         } else {
             throw new RuntimeException("unreachable variant");
         }
@@ -41,6 +47,8 @@ public final class TablePartition {
             this._value = new com.urbanlogiq.ulsdk.types.MvdbPartition((com.urbanlogiq.ulsdk.types.generated.MvdbPartition)o);
         } else if (ty == com.urbanlogiq.ulsdk.types.generated.TablePartition.WorklogPartition) {
             this._value = new com.urbanlogiq.ulsdk.types.WorklogPartition((com.urbanlogiq.ulsdk.types.generated.WorklogPartition)o);
+        } else if (ty == com.urbanlogiq.ulsdk.types.generated.TablePartition.WorklogAttributePartition) {
+            this._value = new com.urbanlogiq.ulsdk.types.WorklogAttributePartition((com.urbanlogiq.ulsdk.types.generated.WorklogAttributePartition)o);
         }
     }
 

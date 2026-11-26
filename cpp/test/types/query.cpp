@@ -487,6 +487,16 @@ test_window_frame_bound() {
 TypeTest test_window_frame_bound_obj(test_window_frame_bound, "WindowFrameBound");
 
 bool
+test_worklog_attribute_partition() {
+    ::ul::types::WorklogAttributePartition t;
+    const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);
+    ::ul::types::WorklogAttributePartition deserialized = ::ul::types::WorklogAttributePartition(bytes);
+    return true;
+}
+
+TypeTest test_worklog_attribute_partition_obj(test_worklog_attribute_partition, "WorklogAttributePartition");
+
+bool
 test_worklog_partition() {
     ::ul::types::WorklogPartition t;
     const std::vector<uint8_t> bytes = ::ul::types::to_bytes(t);

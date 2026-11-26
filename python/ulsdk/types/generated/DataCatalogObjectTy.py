@@ -27,3 +27,4 @@ class DataCatalogObjectTy(object):
     Exploration = 21
     KpiSpec = 22
     GovernedDocument = 23
+    ViewList = 24

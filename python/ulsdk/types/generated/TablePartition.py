@@ -6,3 +6,4 @@ class TablePartition(object):
     NONE = 0
     MvdbPartition = 1
     WorklogPartition = 2
+    WorklogAttributePartition = 3

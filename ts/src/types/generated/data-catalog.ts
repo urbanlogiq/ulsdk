@@ -12,6 +12,7 @@ import { ContentId, ContentIdT } from './content-id';
 import { MvdbPartition, MvdbPartitionT } from './mvdb-partition';
 import { ObjectId, ObjectIdT } from './object-id';
 import { TablePartition, unionToTablePartition, unionListToTablePartition } from './table-partition';
+import { WorklogAttributePartition, WorklogAttributePartitionT } from './worklog-attribute-partition';
 import { WorklogPartition, WorklogPartitionT } from './worklog-partition';
 
 
@@ -113,7 +114,7 @@ export class DataCatalogT implements flatbuffers.IGeneratedObject {
 constructor(
   public id: ObjectIdT|null = null,
   public partitionType: TablePartition = TablePartition.NONE,
-  public partition: MvdbPartitionT|WorklogPartitionT|null = null,
+  public partition: MvdbPartitionT|WorklogAttributePartitionT|WorklogPartitionT|null = null,
   public revision: ContentIdT|null = null
 ){}
 

@@ -292,6 +292,12 @@ def test_window_frame_bound():
     _t1 = WindowFrameBound.from_bytes(_b)
     assert _t0 == _t1
 
+def test_worklog_attribute_partition():
+    _t0 = WorklogAttributePartition.make_default()
+    _b = _t0.to_bytes()
+    _t1 = WorklogAttributePartition.from_bytes(_b)
+    assert _t0 == _t1
+
 def test_worklog_partition():
     _t0 = WorklogPartition.make_default()
     _b = _t0.to_bytes()

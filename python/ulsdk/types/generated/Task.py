@@ -49,7 +49,7 @@ class Task(object):
             return obj
         return None
 
-    # Task object, either a source or a stream
+    # Task object: a source, a stream, or a list of views
     # Task
     def Task(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))

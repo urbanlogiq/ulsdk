@@ -5,6 +5,8 @@
 #define FLATBUFFERS_GENERATED_QUERY_H_
 
 #include "flatbuffers/flatbuffers.h"
+#include "flatbuffers/flexbuffers.h"
+#include "flatbuffers/flex_flat_util.h"
 
 // Ensure the included flatbuffers.h is the same version as when this file was
 // generated, otherwise it may not be compatible.
@@ -15,6 +17,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 #include "api_generated.h"
 #include "Schema_generated.h"
+#include "data_generated.h"
 #include "fun_generated.h"
 #include "graph_generated.h"
 #include "id_generated.h"
@@ -85,6 +88,9 @@ struct MvdbPartitionBuilder;
 
 struct WorklogPartition;
 struct WorklogPartitionBuilder;
+
+struct WorklogAttributePartition;
+struct WorklogAttributePartitionBuilder;
 
 struct DataCatalog;
 struct DataCatalogBuilder;
@@ -438,31 +444,34 @@ enum class TablePartition : uint8_t {
   NONE = 0,
   MvdbPartition = 1,
   WorklogPartition = 2,
+  WorklogAttributePartition = 3,
   MIN = NONE,
-  MAX = WorklogPartition
+  MAX = WorklogAttributePartition
 };
 
-inline const TablePartition (&EnumValuesTablePartition())[3] {
+inline const TablePartition (&EnumValuesTablePartition())[4] {
   static const TablePartition values[] = {
     TablePartition::NONE,
     TablePartition::MvdbPartition,
-    TablePartition::WorklogPartition
+    TablePartition::WorklogPartition,
+    TablePartition::WorklogAttributePartition
   };
   return values;
 }
 
 inline const char * const *EnumNamesTablePartition() {
-  static const char * const names[4] = {
+  static const char * const names[5] = {
     "NONE",
     "MvdbPartition",
     "WorklogPartition",
+    "WorklogAttributePartition",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameTablePartition(TablePartition e) {
-  if (::flatbuffers::IsOutRange(e, TablePartition::NONE, TablePartition::WorklogPartition)) return "";
+  if (::flatbuffers::IsOutRange(e, TablePartition::NONE, TablePartition::WorklogAttributePartition)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesTablePartition()[index];
 }
@@ -477,6 +486,10 @@ template<> struct TablePartitionTraits<MvdbPartition> {
 
 template<> struct TablePartitionTraits<WorklogPartition> {
   static const TablePartition enum_value = TablePartition::WorklogPartition;
+};
+
+template<> struct TablePartitionTraits<WorklogAttributePartition> {
+  static const TablePartition enum_value = TablePartition::WorklogAttributePartition;
 };
 
 bool VerifyTablePartition(::flatbuffers::Verifier &verifier, const void *obj, TablePartition type);
@@ -2323,6 +2336,66 @@ struct WorklogPartition::Traits {
   static auto constexpr Create = CreateWorklogPartition;
 };
 
+/// Select the first worklog output with all these attributes.
+struct WorklogAttributePartition FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef WorklogAttributePartitionBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_ATTRIBUTES = 4
+  };
+  const ::flatbuffers::Vector<::flatbuffers::Offset<AttributePair>> *attributes() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<AttributePair>> *>(VT_ATTRIBUTES);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_ATTRIBUTES) &&
+           verifier.VerifyVector(attributes()) &&
+           verifier.VerifyVectorOfTables(attributes()) &&
+           verifier.EndTable();
+  }
+};
+
+struct WorklogAttributePartitionBuilder {
+  typedef WorklogAttributePartition Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_attributes(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<AttributePair>>> attributes) {
+    fbb_.AddOffset(WorklogAttributePartition::VT_ATTRIBUTES, attributes);
+  }
+  explicit WorklogAttributePartitionBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<WorklogAttributePartition> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<WorklogAttributePartition>(end);
+    fbb_.Required(o, WorklogAttributePartition::VT_ATTRIBUTES);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<WorklogAttributePartition> CreateWorklogAttributePartition(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<AttributePair>>> attributes = 0) {
+  WorklogAttributePartitionBuilder builder_(_fbb);
+  builder_.add_attributes(attributes);
+  return builder_.Finish();
+}
+
+struct WorklogAttributePartition::Traits {
+  using type = WorklogAttributePartition;
+  static auto constexpr Create = CreateWorklogAttributePartition;
+};
+
+inline ::flatbuffers::Offset<WorklogAttributePartition> CreateWorklogAttributePartitionDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<::flatbuffers::Offset<AttributePair>> *attributes = nullptr) {
+  auto attributes__ = attributes ? _fbb.CreateVector<::flatbuffers::Offset<AttributePair>>(*attributes) : 0;
+  return CreateWorklogAttributePartition(
+      _fbb,
+      attributes__);
+}
+
 struct DataCatalog FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef DataCatalogBuilder Builder;
   struct Traits;
@@ -2349,6 +2422,9 @@ struct DataCatalog FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const WorklogPartition *partition_as_WorklogPartition() const {
     return partition_type() == TablePartition::WorklogPartition ? static_cast<const WorklogPartition *>(partition()) : nullptr;
   }
+  const WorklogAttributePartition *partition_as_WorklogAttributePartition() const {
+    return partition_type() == TablePartition::WorklogAttributePartition ? static_cast<const WorklogAttributePartition *>(partition()) : nullptr;
+  }
   const ContentId *revision() const {
     return GetPointer<const ContentId *>(VT_REVISION);
   }
@@ -2371,6 +2447,10 @@ template<> inline const MvdbPartition *DataCatalog::partition_as<MvdbPartition>(
 
 template<> inline const WorklogPartition *DataCatalog::partition_as<WorklogPartition>() const {
   return partition_as_WorklogPartition();
+}
+
+template<> inline const WorklogAttributePartition *DataCatalog::partition_as<WorklogAttributePartition>() const {
+  return partition_as_WorklogAttributePartition();
 }
 
 struct DataCatalogBuilder {
@@ -2469,21 +2549,58 @@ struct QueryTableSource::Traits {
   static auto constexpr Create = CreateQueryTableSource;
 };
 
+/// A source supplied by index in Query.bound_sources or while data is loaded.
 struct Placeholder FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef PlaceholderBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_IDX = 4
+    VT_IDX = 4,
+    VT_PARTITION_TYPE = 6,
+    VT_PARTITION = 8
   };
   uint32_t idx() const {
     return GetField<uint32_t>(VT_IDX, 0);
   }
+  TablePartition partition_type() const {
+    return static_cast<TablePartition>(GetField<uint8_t>(VT_PARTITION_TYPE, 0));
+  }
+  /// Select part of the supplied source. A worklog defaults to its first output.
+  /// Worklog selections also accept a stream or an Arrow table directly.
+  /// When set, this field must match any partition on the supplied source.
+  const void *partition() const {
+    return GetPointer<const void *>(VT_PARTITION);
+  }
+  template<typename T> const T *partition_as() const;
+  const MvdbPartition *partition_as_MvdbPartition() const {
+    return partition_type() == TablePartition::MvdbPartition ? static_cast<const MvdbPartition *>(partition()) : nullptr;
+  }
+  const WorklogPartition *partition_as_WorklogPartition() const {
+    return partition_type() == TablePartition::WorklogPartition ? static_cast<const WorklogPartition *>(partition()) : nullptr;
+  }
+  const WorklogAttributePartition *partition_as_WorklogAttributePartition() const {
+    return partition_type() == TablePartition::WorklogAttributePartition ? static_cast<const WorklogAttributePartition *>(partition()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_IDX, 4) &&
+           VerifyField<uint8_t>(verifier, VT_PARTITION_TYPE, 1) &&
+           VerifyOffset(verifier, VT_PARTITION) &&
+           VerifyTablePartition(verifier, partition(), partition_type()) &&
            verifier.EndTable();
   }
 };
+
+template<> inline const MvdbPartition *Placeholder::partition_as<MvdbPartition>() const {
+  return partition_as_MvdbPartition();
+}
+
+template<> inline const WorklogPartition *Placeholder::partition_as<WorklogPartition>() const {
+  return partition_as_WorklogPartition();
+}
+
+template<> inline const WorklogAttributePartition *Placeholder::partition_as<WorklogAttributePartition>() const {
+  return partition_as_WorklogAttributePartition();
+}
 
 struct PlaceholderBuilder {
   typedef Placeholder Table;
@@ -2491,6 +2608,12 @@ struct PlaceholderBuilder {
   ::flatbuffers::uoffset_t start_;
   void add_idx(uint32_t idx) {
     fbb_.AddElement<uint32_t>(Placeholder::VT_IDX, idx, 0);
+  }
+  void add_partition_type(TablePartition partition_type) {
+    fbb_.AddElement<uint8_t>(Placeholder::VT_PARTITION_TYPE, static_cast<uint8_t>(partition_type), 0);
+  }
+  void add_partition(::flatbuffers::Offset<void> partition) {
+    fbb_.AddOffset(Placeholder::VT_PARTITION, partition);
   }
   explicit PlaceholderBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -2505,9 +2628,13 @@ struct PlaceholderBuilder {
 
 inline ::flatbuffers::Offset<Placeholder> CreatePlaceholder(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    uint32_t idx = 0) {
+    uint32_t idx = 0,
+    TablePartition partition_type = TablePartition::NONE,
+    ::flatbuffers::Offset<void> partition = 0) {
   PlaceholderBuilder builder_(_fbb);
+  builder_.add_partition(partition);
   builder_.add_idx(idx);
+  builder_.add_partition_type(partition_type);
   return builder_.Finish();
 }
 
@@ -5021,6 +5148,10 @@ inline bool VerifyTablePartition(::flatbuffers::Verifier &verifier, const void *
     }
     case TablePartition::WorklogPartition: {
       auto ptr = reinterpret_cast<const WorklogPartition *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case TablePartition::WorklogAttributePartition: {
+      auto ptr = reinterpret_cast<const WorklogAttributePartition *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

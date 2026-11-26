@@ -503,8 +503,24 @@ func (rcv *File) MutateTier(n StorageTier) bool {
 	return rcv._tab.MutateInt8Slot(22, int8(n))
 }
 
+/// True if the file accepts appends. Only the server sets this value,
+/// when it creates the file (docs/architecture/04-fs.md).
+func (rcv *File) Appendable() bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(24))
+	if o != 0 {
+		return rcv._tab.GetBool(o + rcv._tab.Pos)
+	}
+	return false
+}
+
+/// True if the file accepts appends. Only the server sets this value,
+/// when it creates the file (docs/architecture/04-fs.md).
+func (rcv *File) MutateAppendable(n bool) bool {
+	return rcv._tab.MutateBoolSlot(24, n)
+}
+
 func FileStart(builder *flatbuffers.Builder) {
-	builder.StartObject(10)
+	builder.StartObject(11)
 }
 func FileAddMime(builder *flatbuffers.Builder, mime flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(mime), 0)
@@ -538,6 +554,9 @@ func FileStartChunksVector(builder *flatbuffers.Builder, numElems int) flatbuffe
 }
 func FileAddTier(builder *flatbuffers.Builder, tier StorageTier) {
 	builder.PrependInt8Slot(9, int8(tier), 0)
+}
+func FileAddAppendable(builder *flatbuffers.Builder, appendable bool) {
+	builder.PrependBoolSlot(10, appendable, false)
 }
 func FileEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()

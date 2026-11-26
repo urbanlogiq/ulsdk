@@ -59,6 +59,22 @@ from .Schema import (
 )
 from .api import SortOrder
 from .attr import Attr
+from .data import (
+    AttributePair,
+    BinaryYesNo,
+    DayOfWeek,
+    DirectionAndRoadName,
+    DirectionAndRoadNames,
+    DirectionTy,
+    NamedParameter,
+    NamedParameterFlags,
+    OutputSchema,
+    RoadUserTy,
+    Source,
+    StatisticTy,
+    TimeGranularity,
+    TurnTy,
+)
 from .entity import (
     EdgeTy,
     EntityTy,
@@ -164,6 +180,7 @@ from .query import (
     WindowFrameBound,
     WindowFrameBoundTy,
     WindowFrameUnits,
+    WorklogAttributePartition,
     WorklogPartition,
 )
 from .value import (
@@ -207,6 +224,7 @@ from .generated.AlterTableOperation import AlterTableOperation as FbsAlterTableO
 from .generated.Append import Append as FbsAppend
 from .generated.Arrow import Arrow as FbsArrow
 from .generated.Attr import Attr as FbsAttr
+from .generated.AttributePair import AttributePair as FbsAttributePair
 from .generated.B2cId import B2cId as FbsB2cId
 from .generated.Binary import Binary as FbsBinary
 from .generated.BinaryQueryElement import BinaryQueryElement as FbsBinaryQueryElement
@@ -227,6 +245,8 @@ from .generated.Delete import Delete as FbsDelete
 from .generated.DeleteQueryElement import DeleteQueryElement as FbsDeleteQueryElement
 from .generated.DictionaryEncoding import DictionaryEncoding as FbsDictionaryEncoding
 from .generated.DiffStream import DiffStream as FbsDiffStream
+from .generated.DirectionAndRoadName import DirectionAndRoadName as FbsDirectionAndRoadName
+from .generated.DirectionAndRoadNames import DirectionAndRoadNames as FbsDirectionAndRoadNames
 from .generated.Distinct import Distinct as FbsDistinct
 from .generated.DoNothing import DoNothing as FbsDoNothing
 from .generated.DoUpdate import DoUpdate as FbsDoUpdate
@@ -269,6 +289,7 @@ from .generated.MultiLine import MultiLine as FbsMultiLine
 from .generated.MultiPoint import MultiPoint as FbsMultiPoint
 from .generated.MultiPolygon import MultiPolygon as FbsMultiPolygon
 from .generated.MvdbPartition import MvdbPartition as FbsMvdbPartition
+from .generated.NamedParameter import NamedParameter as FbsNamedParameter
 from .generated.NewTable import NewTable as FbsNewTable
 from .generated.NewTableList import NewTableList as FbsNewTableList
 from .generated.NewTableListResult import NewTableListResult as FbsNewTableListResult
@@ -283,6 +304,7 @@ from .generated.OnConflict import OnConflict as FbsOnConflict
 from .generated.OpEntry import OpEntry as FbsOpEntry
 from .generated.OrderBy import OrderBy as FbsOrderBy
 from .generated.OrderByExpr import OrderByExpr as FbsOrderByExpr
+from .generated.OutputSchema import OutputSchema as FbsOutputSchema
 from .generated.Partition import Partition as FbsPartition
 from .generated.PinnedObjectId import PinnedObjectId as FbsPinnedObjectId
 from .generated.Placeholder import Placeholder as FbsPlaceholder
@@ -301,6 +323,7 @@ from .generated.RunEndEncoded import RunEndEncoded as FbsRunEndEncoded
 from .generated.Schema import Schema as FbsSchema
 from .generated.Set import Set as FbsSet
 from .generated.SetExpr import SetExpr as FbsSetExpr
+from .generated.Source import Source as FbsSource
 from .generated.StreamId import StreamId as FbsStreamId
 from .generated.Struct_ import Struct_ as FbsStruct_
 from .generated.TableOrderBy import TableOrderBy as FbsTableOrderBy
@@ -352,6 +375,7 @@ from .generated.When import When as FbsWhen
 from .generated.Window import Window as FbsWindow
 from .generated.WindowFrame import WindowFrame as FbsWindowFrame
 from .generated.WindowFrameBound import WindowFrameBound as FbsWindowFrameBound
+from .generated.WorklogAttributePartition import WorklogAttributePartition as FbsWorklogAttributePartition
 from .generated.WorklogPartition import WorklogPartition as FbsWorklogPartition
 from .generated.AlterTableOperationUnion import AlterTableOperationUnion as FbsAlterTableOperationUnion
 from .generated.ChangeOp import ChangeOp as FbsChangeOp

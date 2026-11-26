@@ -19,6 +19,7 @@
 use super::Schema_generated::*;
 use super::api_generated::*;
 use super::attr_generated::*;
+use super::data_generated::*;
 use super::entity_generated::*;
 use super::fun_generated::*;
 use super::graph_generated::*;

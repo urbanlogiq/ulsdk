@@ -21,6 +21,9 @@ import com.google.flatbuffers.UnionVector;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+/**
+ * A source supplied by index in Query.bound_sources or while data is loaded.
+ */
 @SuppressWarnings("unused")
 public final class Placeholder extends com.google.flatbuffers.Table {
   public static void ValidateVersion() { Constants.FLATBUFFERS_25_2_10(); }
@@ -30,16 +33,29 @@ public final class Placeholder extends com.google.flatbuffers.Table {
   public Placeholder __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public long idx() { int o = __offset(4); return o != 0 ? (long)bb.getInt(o + bb_pos) & 0xFFFFFFFFL : 0L; }
+  public byte partitionType() { int o = __offset(6); return o != 0 ? bb.get(o + bb_pos) : 0; }
+  /**
+   * Select part of the supplied source. A worklog defaults to its first output.
+   * Worklog selections also accept a stream or an Arrow table directly.
+   * When set, this field must match any partition on the supplied source.
+   */
+  public com.google.flatbuffers.Table partition(com.google.flatbuffers.Table obj) { int o = __offset(8); return o != 0 ? __union(obj, o + bb_pos) : null; }
 
   public static int createPlaceholder(FlatBufferBuilder builder,
-      long idx) {
-    builder.startTable(1);
+      long idx,
+      byte partitionType,
+      int partitionOffset) {
+    builder.startTable(3);
+    Placeholder.addPartition(builder, partitionOffset);
     Placeholder.addIdx(builder, idx);
+    Placeholder.addPartitionType(builder, partitionType);
     return Placeholder.endPlaceholder(builder);
   }
 
-  public static void startPlaceholder(FlatBufferBuilder builder) { builder.startTable(1); }
+  public static void startPlaceholder(FlatBufferBuilder builder) { builder.startTable(3); }
   public static void addIdx(FlatBufferBuilder builder, long idx) { builder.addInt(0, (int) idx, (int) 0L); }
+  public static void addPartitionType(FlatBufferBuilder builder, byte partitionType) { builder.addByte(1, partitionType, 0); }
+  public static void addPartition(FlatBufferBuilder builder, int partitionOffset) { builder.addOffset(2, partitionOffset, 0); }
   public static int endPlaceholder(FlatBufferBuilder builder) {
     int o = builder.endTable();
     return o;

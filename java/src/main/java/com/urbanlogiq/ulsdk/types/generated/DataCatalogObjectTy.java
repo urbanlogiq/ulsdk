@@ -32,8 +32,9 @@ public final class DataCatalogObjectTy {
   public static final short Exploration = 21;
   public static final short KpiSpec = 22;
   public static final short GovernedDocument = 23;
+  public static final short ViewList = 24;
 
-  public static final String[] names = { "Invalid", "WorkLog", "Schematic", "Node", "Stream", "Metadata", "Source", "UserProject", "UseCase", "UserPreferences", "AccessControlList", "DirectoryEntry", "Notification", "Model", "Ingestion", "View", "ModelManifest", "OntologyDeclaration", "Mission", "Skill", "SourceNote", "Exploration", "KpiSpec", "GovernedDocument", };
+  public static final String[] names = { "Invalid", "WorkLog", "Schematic", "Node", "Stream", "Metadata", "Source", "UserProject", "UseCase", "UserPreferences", "AccessControlList", "DirectoryEntry", "Notification", "Model", "Ingestion", "View", "ModelManifest", "OntologyDeclaration", "Mission", "Skill", "SourceNote", "Exploration", "KpiSpec", "GovernedDocument", "ViewList", };
 
   public static String name(int e) { return names[e]; }
 }

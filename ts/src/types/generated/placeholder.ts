@@ -8,8 +8,15 @@
 
 import * as flatbuffers from 'flatbuffers/js/flatbuffers';
 
+import { MvdbPartition, MvdbPartitionT } from './mvdb-partition';
+import { TablePartition, unionToTablePartition, unionListToTablePartition } from './table-partition';
+import { WorklogAttributePartition, WorklogAttributePartitionT } from './worklog-attribute-partition';
+import { WorklogPartition, WorklogPartitionT } from './worklog-partition';
 
 
+/**
+ * A source supplied by index in Query.bound_sources or while data is loaded.
+ */
 export class Placeholder implements flatbuffers.IUnpackableObject<PlaceholderT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
@@ -33,12 +40,35 @@ idx():number {
   return offset ? this.bb!.readUint32(this.bb_pos + offset) : 0;
 }
 
+partitionType():TablePartition {
+  const offset = this.bb!.__offset(this.bb_pos, 6);
+  return offset ? this.bb!.readUint8(this.bb_pos + offset) : TablePartition.NONE;
+}
+
+/**
+ * Select part of the supplied source. A worklog defaults to its first output.
+ * Worklog selections also accept a stream or an Arrow table directly.
+ * When set, this field must match any partition on the supplied source.
+ */
+partition<T extends flatbuffers.Table>(obj:any):any|null {
+  const offset = this.bb!.__offset(this.bb_pos, 8);
+  return offset ? this.bb!.__union(obj, this.bb_pos + offset) : null;
+}
+
 static startPlaceholder(builder:flatbuffers.Builder) {
-  builder.startObject(1);
+  builder.startObject(3);
 }
 
 static addIdx(builder:flatbuffers.Builder, idx:number) {
   builder.addFieldInt32(0, idx, 0);
+}
+
+static addPartitionType(builder:flatbuffers.Builder, partitionType:TablePartition) {
+  builder.addFieldInt8(1, partitionType, TablePartition.NONE);
+}
+
+static addPartition(builder:flatbuffers.Builder, partitionOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(2, partitionOffset, 0);
 }
 
 static endPlaceholder(builder:flatbuffers.Builder):flatbuffers.Offset {
@@ -46,33 +76,53 @@ static endPlaceholder(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 }
 
-static createPlaceholder(builder:flatbuffers.Builder, idx:number):flatbuffers.Offset {
+static createPlaceholder(builder:flatbuffers.Builder, idx:number, partitionType:TablePartition, partitionOffset:flatbuffers.Offset):flatbuffers.Offset {
   Placeholder.startPlaceholder(builder);
   Placeholder.addIdx(builder, idx);
+  Placeholder.addPartitionType(builder, partitionType);
+  Placeholder.addPartition(builder, partitionOffset);
   return Placeholder.endPlaceholder(builder);
 }
 
 unpack(): PlaceholderT {
   return new PlaceholderT(
-    this.idx()
+    this.idx(),
+    this.partitionType(),
+    (() => {
+      const temp = unionToTablePartition(this.partitionType(), this.partition.bind(this));
+      if(temp === null) { return null; }
+      return temp.unpack()
+  })()
   );
 }
 
 
 unpackTo(_o: PlaceholderT): void {
   _o.idx = this.idx();
+  _o.partitionType = this.partitionType();
+  _o.partition = (() => {
+      const temp = unionToTablePartition(this.partitionType(), this.partition.bind(this));
+      if(temp === null) { return null; }
+      return temp.unpack()
+  })();
 }
 }
 
 export class PlaceholderT implements flatbuffers.IGeneratedObject {
 constructor(
-  public idx: number = 0
+  public idx: number = 0,
+  public partitionType: TablePartition = TablePartition.NONE,
+  public partition: MvdbPartitionT|WorklogAttributePartitionT|WorklogPartitionT|null = null
 ){}
 
 
 pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  const partition = builder.createObjectOffset(this.partition);
+
   return Placeholder.createPlaceholder(builder,
-    this.idx
+    this.idx,
+    this.partitionType,
+    partition
   );
 }
 }

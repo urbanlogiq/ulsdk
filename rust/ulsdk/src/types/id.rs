@@ -112,6 +112,11 @@ impl B2cId {
         Self([0u8; 16])
     }
 
+    /// Make the ID from its bytes. A constant can use this function.
+    pub const fn from_bytes(bytes: [u8; 16]) -> Self {
+        Self(bytes)
+    }
+
     /// The reserved identity of the platform itself: the RFC 9562 Max UUID,
     /// `ffffffff-ffff-ffff-ffff-ffffffffffff`. No directory issues it (a
     /// version-4 GUID can never be all ones), so it cannot collide with a real
@@ -327,6 +332,11 @@ impl ContentId {
         Self([0u8; 16])
     }
 
+    /// Make the ID from its bytes. A constant can use this function.
+    pub const fn from_bytes(bytes: [u8; 16]) -> Self {
+        Self(bytes)
+    }
+
     pub fn serialize_to<'a>(
         &self,
         builder: &mut flatbuffers::FlatBufferBuilder<'a>,
@@ -535,6 +545,11 @@ impl GenericId {
         Self([0u8; 16])
     }
 
+    /// Make the ID from its bytes. A constant can use this function.
+    pub const fn from_bytes(bytes: [u8; 16]) -> Self {
+        Self(bytes)
+    }
+
     pub fn serialize_to<'a>(
         &self,
         builder: &mut flatbuffers::FlatBufferBuilder<'a>,
@@ -686,6 +701,11 @@ impl GraphNodeId {
         Self([0u8; 16])
     }
 
+    /// Make the ID from its bytes. A constant can use this function.
+    pub const fn from_bytes(bytes: [u8; 16]) -> Self {
+        Self(bytes)
+    }
+
     pub fn serialize_to<'a>(
         &self,
         builder: &mut flatbuffers::FlatBufferBuilder<'a>,
@@ -835,6 +855,11 @@ impl ObjectId {
 
     pub fn nil() -> Self {
         Self([0u8; 16])
+    }
+
+    /// Make the ID from its bytes. A constant can use this function.
+    pub const fn from_bytes(bytes: [u8; 16]) -> Self {
+        Self(bytes)
     }
 
     pub fn serialize_to<'a>(

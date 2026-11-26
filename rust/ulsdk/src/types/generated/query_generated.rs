@@ -18,6 +18,7 @@
 
 use super::Schema_generated::*;
 use super::api_generated::*;
+use super::data_generated::*;
 use super::entity_generated::*;
 use super::fun_generated::*;
 use super::graph_generated::*;
@@ -655,16 +656,17 @@ pub const ENUM_MIN_TABLE_PARTITION: u8 = 0;
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
-pub const ENUM_MAX_TABLE_PARTITION: u8 = 2;
+pub const ENUM_MAX_TABLE_PARTITION: u8 = 3;
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_TABLE_PARTITION: [TablePartition; 3] = [
+pub const ENUM_VALUES_TABLE_PARTITION: [TablePartition; 4] = [
     TablePartition::NONE,
     TablePartition::MvdbPartition,
     TablePartition::WorklogPartition,
+    TablePartition::WorklogAttributePartition,
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
@@ -675,17 +677,23 @@ impl TablePartition {
     pub const NONE: Self = Self(0);
     pub const MvdbPartition: Self = Self(1);
     pub const WorklogPartition: Self = Self(2);
+    pub const WorklogAttributePartition: Self = Self(3);
 
     pub const ENUM_MIN: u8 = 0;
-    pub const ENUM_MAX: u8 = 2;
-    pub const ENUM_VALUES: &'static [Self] =
-        &[Self::NONE, Self::MvdbPartition, Self::WorklogPartition];
+    pub const ENUM_MAX: u8 = 3;
+    pub const ENUM_VALUES: &'static [Self] = &[
+        Self::NONE,
+        Self::MvdbPartition,
+        Self::WorklogPartition,
+        Self::WorklogAttributePartition,
+    ];
     /// Returns the variant's name or "" if unknown.
     pub fn variant_name(self) -> Option<&'static str> {
         match self {
             Self::NONE => Some("NONE"),
             Self::MvdbPartition => Some("MvdbPartition"),
             Self::WorklogPartition => Some("WorklogPartition"),
+            Self::WorklogAttributePartition => Some("WorklogAttributePartition"),
             _ => None,
         }
     }
@@ -5136,6 +5144,145 @@ impl core::fmt::Debug for WorklogPartition<'_> {
         ds.finish()
     }
 }
+pub enum WorklogAttributePartitionOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+/// Select the first worklog output with all these attributes.
+pub struct WorklogAttributePartition<'a> {
+    pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for WorklogAttributePartition<'a> {
+    type Inner = WorklogAttributePartition<'a>;
+    #[inline]
+    unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+        Self {
+            _tab: flatbuffers::Table::new(buf, loc),
+        }
+    }
+}
+
+impl<'a> WorklogAttributePartition<'a> {
+    pub const VT_ATTRIBUTES: flatbuffers::VOffsetT = 4;
+
+    #[inline]
+    pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+        WorklogAttributePartition { _tab: table }
+    }
+    #[allow(unused_mut)]
+    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+        args: &'args WorklogAttributePartitionArgs<'args>,
+    ) -> flatbuffers::WIPOffset<WorklogAttributePartition<'bldr>> {
+        let mut builder = WorklogAttributePartitionBuilder::new(_fbb);
+        if let Some(x) = args.attributes {
+            builder.add_attributes(x);
+        }
+        builder.finish()
+    }
+
+    #[inline]
+    pub fn attributes(
+        &self,
+    ) -> flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<AttributePair<'a>>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<
+                    flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<AttributePair>>,
+                >>(WorklogAttributePartition::VT_ATTRIBUTES, None)
+                .unwrap()
+        }
+    }
+}
+
+impl flatbuffers::Verifiable for WorklogAttributePartition<'_> {
+    #[inline]
+    fn run_verifier(
+        v: &mut flatbuffers::Verifier,
+        pos: usize,
+    ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+        use self::flatbuffers::Verifiable;
+        v.visit_table(pos)?
+            .visit_field::<flatbuffers::ForwardsUOffset<
+                flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<AttributePair>>,
+            >>("attributes", Self::VT_ATTRIBUTES, true)?
+            .finish();
+        Ok(())
+    }
+}
+pub struct WorklogAttributePartitionArgs<'a> {
+    pub attributes: Option<
+        flatbuffers::WIPOffset<
+            flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<AttributePair<'a>>>,
+        >,
+    >,
+}
+impl<'a> Default for WorklogAttributePartitionArgs<'a> {
+    #[inline]
+    fn default() -> Self {
+        WorklogAttributePartitionArgs {
+            attributes: None, // required field
+        }
+    }
+}
+
+impl Serialize for WorklogAttributePartition<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("WorklogAttributePartition", 1)?;
+        s.serialize_field("attributes", &self.attributes())?;
+        s.end()
+    }
+}
+
+pub struct WorklogAttributePartitionBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+    fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> WorklogAttributePartitionBuilder<'a, 'b, A> {
+    #[inline]
+    pub fn add_attributes(
+        &mut self,
+        attributes: flatbuffers::WIPOffset<
+            flatbuffers::Vector<'b, flatbuffers::ForwardsUOffset<AttributePair<'b>>>,
+        >,
+    ) {
+        self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(
+            WorklogAttributePartition::VT_ATTRIBUTES,
+            attributes,
+        );
+    }
+    #[inline]
+    pub fn new(
+        _fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+    ) -> WorklogAttributePartitionBuilder<'a, 'b, A> {
+        let start = _fbb.start_table();
+        WorklogAttributePartitionBuilder {
+            fbb_: _fbb,
+            start_: start,
+        }
+    }
+    #[inline]
+    pub fn finish(self) -> flatbuffers::WIPOffset<WorklogAttributePartition<'a>> {
+        let o = self.fbb_.end_table(self.start_);
+        self.fbb_
+            .required(o, WorklogAttributePartition::VT_ATTRIBUTES, "attributes");
+        flatbuffers::WIPOffset::new(o.value())
+    }
+}
+
+impl core::fmt::Debug for WorklogAttributePartition<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut ds = f.debug_struct("WorklogAttributePartition");
+        ds.field("attributes", &self.attributes());
+        ds.finish()
+    }
+}
 pub enum DataCatalogOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -5257,6 +5404,23 @@ impl<'a> DataCatalog<'a> {
             None
         }
     }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn partition_as_worklog_attribute_partition(
+        &self,
+    ) -> Option<WorklogAttributePartition<'a>> {
+        if self.partition_type() == TablePartition::WorklogAttributePartition {
+            self.partition().map(|t| {
+                // Safety:
+                // Created from a valid Table for this object
+                // Which contains a valid union in this slot
+                unsafe { WorklogAttributePartition::init_from_table(t) }
+            })
+        } else {
+            None
+        }
+    }
 }
 
 impl flatbuffers::Verifiable for DataCatalog<'_> {
@@ -5267,33 +5431,17 @@ impl flatbuffers::Verifiable for DataCatalog<'_> {
     ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
         use self::flatbuffers::Verifiable;
         v.visit_table(pos)?
-            .visit_field::<flatbuffers::ForwardsUOffset<ObjectId>>("id", Self::VT_ID, true)?
-            .visit_union::<TablePartition, _>(
-                "partition_type",
-                Self::VT_PARTITION_TYPE,
-                "partition",
-                Self::VT_PARTITION,
-                false,
-                |key, v, pos| match key {
-                    TablePartition::MvdbPartition => v
-                        .verify_union_variant::<flatbuffers::ForwardsUOffset<MvdbPartition>>(
-                            "TablePartition::MvdbPartition",
-                            pos,
-                        ),
-                    TablePartition::WorklogPartition => v
-                        .verify_union_variant::<flatbuffers::ForwardsUOffset<WorklogPartition>>(
-                            "TablePartition::WorklogPartition",
-                            pos,
-                        ),
-                    _ => Ok(()),
-                },
-            )?
-            .visit_field::<flatbuffers::ForwardsUOffset<ContentId>>(
-                "revision",
-                Self::VT_REVISION,
-                false,
-            )?
-            .finish();
+     .visit_field::<flatbuffers::ForwardsUOffset<ObjectId>>("id", Self::VT_ID, true)?
+     .visit_union::<TablePartition, _>("partition_type", Self::VT_PARTITION_TYPE, "partition", Self::VT_PARTITION, false, |key, v, pos| {
+        match key {
+          TablePartition::MvdbPartition => v.verify_union_variant::<flatbuffers::ForwardsUOffset<MvdbPartition>>("TablePartition::MvdbPartition", pos),
+          TablePartition::WorklogPartition => v.verify_union_variant::<flatbuffers::ForwardsUOffset<WorklogPartition>>("TablePartition::WorklogPartition", pos),
+          TablePartition::WorklogAttributePartition => v.verify_union_variant::<flatbuffers::ForwardsUOffset<WorklogAttributePartition>>("TablePartition::WorklogAttributePartition", pos),
+          _ => Ok(()),
+        }
+     })?
+     .visit_field::<flatbuffers::ForwardsUOffset<ContentId>>("revision", Self::VT_REVISION, false)?
+     .finish();
         Ok(())
     }
 }
@@ -5335,6 +5483,12 @@ impl Serialize for DataCatalog<'_> {
                 let f = self
                     .partition_as_worklog_partition()
                     .expect("Invalid union table, expected `TablePartition::WorklogPartition`.");
+                s.serialize_field("partition", &f)?;
+            }
+            TablePartition::WorklogAttributePartition => {
+                let f = self.partition_as_worklog_attribute_partition().expect(
+                    "Invalid union table, expected `TablePartition::WorklogAttributePartition`.",
+                );
                 s.serialize_field("partition", &f)?;
             }
             _ => unimplemented!(),
@@ -5418,6 +5572,16 @@ impl core::fmt::Debug for DataCatalog<'_> {
             }
             TablePartition::WorklogPartition => {
                 if let Some(x) = self.partition_as_worklog_partition() {
+                    ds.field("partition", &x)
+                } else {
+                    ds.field(
+                        "partition",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            TablePartition::WorklogAttributePartition => {
+                if let Some(x) = self.partition_as_worklog_attribute_partition() {
                     ds.field("partition", &x)
                 } else {
                     ds.field(
@@ -5558,6 +5722,7 @@ impl core::fmt::Debug for QueryTableSource<'_> {
 pub enum PlaceholderOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
+/// A source supplied by index in Query.bound_sources or while data is loaded.
 pub struct Placeholder<'a> {
     pub _tab: flatbuffers::Table<'a>,
 }
@@ -5574,6 +5739,8 @@ impl<'a> flatbuffers::Follow<'a> for Placeholder<'a> {
 
 impl<'a> Placeholder<'a> {
     pub const VT_IDX: flatbuffers::VOffsetT = 4;
+    pub const VT_PARTITION_TYPE: flatbuffers::VOffsetT = 6;
+    pub const VT_PARTITION: flatbuffers::VOffsetT = 8;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -5585,7 +5752,11 @@ impl<'a> Placeholder<'a> {
         args: &'args PlaceholderArgs,
     ) -> flatbuffers::WIPOffset<Placeholder<'bldr>> {
         let mut builder = PlaceholderBuilder::new(_fbb);
+        if let Some(x) = args.partition {
+            builder.add_partition(x);
+        }
         builder.add_idx(args.idx);
+        builder.add_partition_type(args.partition_type);
         builder.finish()
     }
 
@@ -5595,6 +5766,79 @@ impl<'a> Placeholder<'a> {
         // Created from valid Table for this object
         // which contains a valid value in this slot
         unsafe { self._tab.get::<u32>(Placeholder::VT_IDX, Some(0)).unwrap() }
+    }
+    #[inline]
+    pub fn partition_type(&self) -> TablePartition {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<TablePartition>(Placeholder::VT_PARTITION_TYPE, Some(TablePartition::NONE))
+                .unwrap()
+        }
+    }
+    /// Select part of the supplied source. A worklog defaults to its first output.
+    /// Worklog selections also accept a stream or an Arrow table directly.
+    /// When set, this field must match any partition on the supplied source.
+    #[inline]
+    pub fn partition(&self) -> Option<flatbuffers::Table<'a>> {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<flatbuffers::ForwardsUOffset<flatbuffers::Table<'a>>>(
+                    Placeholder::VT_PARTITION,
+                    None,
+                )
+        }
+    }
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn partition_as_mvdb_partition(&self) -> Option<MvdbPartition<'a>> {
+        if self.partition_type() == TablePartition::MvdbPartition {
+            self.partition().map(|t| {
+                // Safety:
+                // Created from a valid Table for this object
+                // Which contains a valid union in this slot
+                unsafe { MvdbPartition::init_from_table(t) }
+            })
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn partition_as_worklog_partition(&self) -> Option<WorklogPartition<'a>> {
+        if self.partition_type() == TablePartition::WorklogPartition {
+            self.partition().map(|t| {
+                // Safety:
+                // Created from a valid Table for this object
+                // Which contains a valid union in this slot
+                unsafe { WorklogPartition::init_from_table(t) }
+            })
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    #[allow(non_snake_case)]
+    pub fn partition_as_worklog_attribute_partition(
+        &self,
+    ) -> Option<WorklogAttributePartition<'a>> {
+        if self.partition_type() == TablePartition::WorklogAttributePartition {
+            self.partition().map(|t| {
+                // Safety:
+                // Created from a valid Table for this object
+                // Which contains a valid union in this slot
+                unsafe { WorklogAttributePartition::init_from_table(t) }
+            })
+        } else {
+            None
+        }
     }
 }
 
@@ -5606,18 +5850,32 @@ impl flatbuffers::Verifiable for Placeholder<'_> {
     ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
         use self::flatbuffers::Verifiable;
         v.visit_table(pos)?
-            .visit_field::<u32>("idx", Self::VT_IDX, false)?
-            .finish();
+     .visit_field::<u32>("idx", Self::VT_IDX, false)?
+     .visit_union::<TablePartition, _>("partition_type", Self::VT_PARTITION_TYPE, "partition", Self::VT_PARTITION, false, |key, v, pos| {
+        match key {
+          TablePartition::MvdbPartition => v.verify_union_variant::<flatbuffers::ForwardsUOffset<MvdbPartition>>("TablePartition::MvdbPartition", pos),
+          TablePartition::WorklogPartition => v.verify_union_variant::<flatbuffers::ForwardsUOffset<WorklogPartition>>("TablePartition::WorklogPartition", pos),
+          TablePartition::WorklogAttributePartition => v.verify_union_variant::<flatbuffers::ForwardsUOffset<WorklogAttributePartition>>("TablePartition::WorklogAttributePartition", pos),
+          _ => Ok(()),
+        }
+     })?
+     .finish();
         Ok(())
     }
 }
 pub struct PlaceholderArgs {
     pub idx: u32,
+    pub partition_type: TablePartition,
+    pub partition: Option<flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>>,
 }
 impl<'a> Default for PlaceholderArgs {
     #[inline]
     fn default() -> Self {
-        PlaceholderArgs { idx: 0 }
+        PlaceholderArgs {
+            idx: 0,
+            partition_type: TablePartition::NONE,
+            partition: None,
+        }
     }
 }
 
@@ -5626,8 +5884,31 @@ impl Serialize for Placeholder<'_> {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("Placeholder", 1)?;
+        let mut s = serializer.serialize_struct("Placeholder", 3)?;
         s.serialize_field("idx", &self.idx())?;
+        s.serialize_field("partition_type", &self.partition_type())?;
+        match self.partition_type() {
+            TablePartition::NONE => (),
+            TablePartition::MvdbPartition => {
+                let f = self
+                    .partition_as_mvdb_partition()
+                    .expect("Invalid union table, expected `TablePartition::MvdbPartition`.");
+                s.serialize_field("partition", &f)?;
+            }
+            TablePartition::WorklogPartition => {
+                let f = self
+                    .partition_as_worklog_partition()
+                    .expect("Invalid union table, expected `TablePartition::WorklogPartition`.");
+                s.serialize_field("partition", &f)?;
+            }
+            TablePartition::WorklogAttributePartition => {
+                let f = self.partition_as_worklog_attribute_partition().expect(
+                    "Invalid union table, expected `TablePartition::WorklogAttributePartition`.",
+                );
+                s.serialize_field("partition", &f)?;
+            }
+            _ => unimplemented!(),
+        }
         s.end()
     }
 }
@@ -5640,6 +5921,22 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> PlaceholderBuilder<'a, 'b, A> {
     #[inline]
     pub fn add_idx(&mut self, idx: u32) {
         self.fbb_.push_slot::<u32>(Placeholder::VT_IDX, idx, 0);
+    }
+    #[inline]
+    pub fn add_partition_type(&mut self, partition_type: TablePartition) {
+        self.fbb_.push_slot::<TablePartition>(
+            Placeholder::VT_PARTITION_TYPE,
+            partition_type,
+            TablePartition::NONE,
+        );
+    }
+    #[inline]
+    pub fn add_partition(
+        &mut self,
+        partition: flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>,
+    ) {
+        self.fbb_
+            .push_slot_always::<flatbuffers::WIPOffset<_>>(Placeholder::VT_PARTITION, partition);
     }
     #[inline]
     pub fn new(
@@ -5662,6 +5959,43 @@ impl core::fmt::Debug for Placeholder<'_> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let mut ds = f.debug_struct("Placeholder");
         ds.field("idx", &self.idx());
+        ds.field("partition_type", &self.partition_type());
+        match self.partition_type() {
+            TablePartition::MvdbPartition => {
+                if let Some(x) = self.partition_as_mvdb_partition() {
+                    ds.field("partition", &x)
+                } else {
+                    ds.field(
+                        "partition",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            TablePartition::WorklogPartition => {
+                if let Some(x) = self.partition_as_worklog_partition() {
+                    ds.field("partition", &x)
+                } else {
+                    ds.field(
+                        "partition",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            TablePartition::WorklogAttributePartition => {
+                if let Some(x) = self.partition_as_worklog_attribute_partition() {
+                    ds.field("partition", &x)
+                } else {
+                    ds.field(
+                        "partition",
+                        &"InvalidFlatbuffer: Union discriminant does not match value.",
+                    )
+                }
+            }
+            _ => {
+                let x: Option<()> = None;
+                ds.field("partition", &x)
+            }
+        };
         ds.finish()
     }
 }

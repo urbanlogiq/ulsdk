@@ -4,6 +4,9 @@
 
 package com.urbanlogiq.ulsdk.types;
 
+/**
+ *  A source supplied by index in Query.bound_sources or while data is loaded.
+ */
 public final class Placeholder {
     long _idx;
     public long getIdx() {
@@ -13,8 +16,39 @@ public final class Placeholder {
         this._idx = value;
     }
 
+    /**
+     *  Select part of the supplied source. A worklog defaults to its first output.
+     *  Worklog selections also accept a stream or an Arrow table directly.
+     *  When set, this field must match any partition on the supplied source.
+     */
+    com.urbanlogiq.ulsdk.types.TablePartition _partition;
+    public com.urbanlogiq.ulsdk.types.TablePartition getPartition() {
+        return this._partition;
+    }
+    public void setPartition(com.urbanlogiq.ulsdk.types.TablePartition value) {
+        this._partition = value;
+    }
+
     public Placeholder(com.urbanlogiq.ulsdk.types.generated.Placeholder o) {
         this._idx = o.idx();
+        Object partitionValue = null;
+        var partitionTy = o.partitionType();
+        if (partitionTy == com.urbanlogiq.ulsdk.types.generated.TablePartition.MvdbPartition) {
+            com.google.flatbuffers.Table partitionFbsTable = o.partition(new com.urbanlogiq.ulsdk.types.generated.MvdbPartition());
+            com.urbanlogiq.ulsdk.types.generated.MvdbPartition partitionFbsValue = (com.urbanlogiq.ulsdk.types.generated.MvdbPartition)partitionFbsTable;
+            partitionValue = new com.urbanlogiq.ulsdk.types.MvdbPartition(partitionFbsValue);
+        } else if (partitionTy == com.urbanlogiq.ulsdk.types.generated.TablePartition.WorklogPartition) {
+            com.google.flatbuffers.Table partitionFbsTable = o.partition(new com.urbanlogiq.ulsdk.types.generated.WorklogPartition());
+            com.urbanlogiq.ulsdk.types.generated.WorklogPartition partitionFbsValue = (com.urbanlogiq.ulsdk.types.generated.WorklogPartition)partitionFbsTable;
+            partitionValue = new com.urbanlogiq.ulsdk.types.WorklogPartition(partitionFbsValue);
+        } else if (partitionTy == com.urbanlogiq.ulsdk.types.generated.TablePartition.WorklogAttributePartition) {
+            com.google.flatbuffers.Table partitionFbsTable = o.partition(new com.urbanlogiq.ulsdk.types.generated.WorklogAttributePartition());
+            com.urbanlogiq.ulsdk.types.generated.WorklogAttributePartition partitionFbsValue = (com.urbanlogiq.ulsdk.types.generated.WorklogAttributePartition)partitionFbsTable;
+            partitionValue = new com.urbanlogiq.ulsdk.types.WorklogAttributePartition(partitionFbsValue);
+        }
+        if (partitionValue != null) {
+            this._partition = new com.urbanlogiq.ulsdk.types.TablePartition(partitionValue);
+        }
     }
 
     public Placeholder(byte[] data) {
@@ -22,8 +56,16 @@ public final class Placeholder {
     }
 
     public int serializeTo(com.google.flatbuffers.FlatBufferBuilder builder) {
+        com.urbanlogiq.ulsdk.Pair<Integer, Byte> partitionPair = null;
+        if (this._partition != null) {
+            partitionPair = this._partition.serializeTo(builder);
+        }
         com.urbanlogiq.ulsdk.types.generated.Placeholder.startPlaceholder(builder);
         com.urbanlogiq.ulsdk.types.generated.Placeholder.addIdx(builder, this._idx);
+        if (partitionPair != null) {
+            com.urbanlogiq.ulsdk.types.generated.Placeholder.addPartition(builder, partitionPair.first());
+            com.urbanlogiq.ulsdk.types.generated.Placeholder.addPartitionType(builder, partitionPair.second());
+        }
         return com.urbanlogiq.ulsdk.types.generated.Placeholder.endPlaceholder(builder);
     }
 

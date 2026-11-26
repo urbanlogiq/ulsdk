@@ -11,8 +11,9 @@ public final class TablePartition {
   public static final byte NONE = 0;
   public static final byte MvdbPartition = 1;
   public static final byte WorklogPartition = 2;
+  public static final byte WorklogAttributePartition = 3;
 
-  public static final String[] names = { "NONE", "MvdbPartition", "WorklogPartition", };
+  public static final String[] names = { "NONE", "MvdbPartition", "WorklogPartition", "WorklogAttributePartition", };
 
   public static String name(int e) { return names[e]; }
 }

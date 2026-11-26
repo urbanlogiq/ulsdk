@@ -135,6 +135,10 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const TablePartition &o)
         const std::shared_ptr<WorklogPartition> &v = std::get<std::shared_ptr<WorklogPartition>>(o);
         const auto offset = serialize_to(builder, *v);
         return std::make_pair(offset.Union(), ::TablePartition::WorklogPartition);
+    } else if (std::holds_alternative<std::shared_ptr<WorklogAttributePartition>>(o)) {
+        const std::shared_ptr<WorklogAttributePartition> &v = std::get<std::shared_ptr<WorklogAttributePartition>>(o);
+        const auto offset = serialize_to(builder, *v);
+        return std::make_pair(offset.Union(), ::TablePartition::WorklogAttributePartition);
     } else { 
         throw std::runtime_error("unreachable");
     }
@@ -1818,6 +1822,59 @@ WorklogPartition::operator==(const WorklogPartition &rhs) const {
     return true;
 }
 
+::flatbuffers::Offset<::WorklogAttributePartition>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const WorklogAttributePartition &o) {
+    std::vector<::flatbuffers::Offset<::AttributePair>> attributes_offsets = std::vector<::flatbuffers::Offset<::AttributePair>>();
+    attributes_offsets.reserve(o.attributes_.size());
+    for (const auto &i: o.attributes_) {
+        attributes_offsets.push_back(serialize_to(builder, i));
+    }
+    const ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::AttributePair>>> attributes_offset = builder.CreateVector(attributes_offsets);
+
+    ::WorklogAttributePartitionBuilder instance_builder = ::WorklogAttributePartitionBuilder(builder);
+    instance_builder.add_attributes(attributes_offset);
+    return instance_builder.Finish();
+}
+
+std::vector<uint8_t> to_bytes(const WorklogAttributePartition &o) {
+    ::flatbuffers::FlatBufferBuilder builder;
+    const auto offset = serialize_to(builder, o);
+    builder.FinishSizePrefixed(offset);
+    const auto span = builder.GetBufferSpan();
+    return std::vector<uint8_t>(span.begin(), span.end());
+}
+
+WorklogAttributePartition::WorklogAttributePartition()
+    : attributes_() {
+}
+
+WorklogAttributePartition::WorklogAttributePartition(const std::vector<uint8_t> &bytes)
+    : WorklogAttributePartition(::flatbuffers::GetSizePrefixedRoot<::WorklogAttributePartition>(bytes.data())) {
+}
+
+WorklogAttributePartition::WorklogAttributePartition(const ::WorklogAttributePartition *root) 
+    : attributes_() {
+    if (root == nullptr) {
+        throw std::runtime_error("cannot deserialize flatbuffer type");
+    }
+
+    const auto &attributes_vector = root->attributes();
+    if (attributes_vector != nullptr) {
+        attributes_.reserve(attributes_vector->size());
+        for (const auto &i: *attributes_vector) {
+            attributes_.emplace_back(i);
+        }
+    }
+}
+
+bool
+WorklogAttributePartition::operator==(const WorklogAttributePartition &rhs) const {
+    if (this->attributes_ != rhs.attributes_) {
+        return false;
+    }
+    return true;
+}
+
 ::flatbuffers::Offset<::DataCatalog>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DataCatalog &o) {
     const ::flatbuffers::Offset<::ObjectId> id_offset = serialize_to(builder, o.id_);
@@ -1886,6 +1943,12 @@ DataCatalog::DataCatalog(const ::DataCatalog *root)
             case ::TablePartition::WorklogPartition: {
                 const auto partition__local = static_cast<const ::WorklogPartition *>(root->partition());
                 std::shared_ptr<WorklogPartition> partition__shared = std::make_shared<WorklogPartition>(partition__local);
+                partition_ = partition__shared;
+                break;
+            }
+            case ::TablePartition::WorklogAttributePartition: {
+                const auto partition__local = static_cast<const ::WorklogAttributePartition *>(root->partition());
+                std::shared_ptr<WorklogAttributePartition> partition__shared = std::make_shared<WorklogAttributePartition>(partition__local);
                 partition_ = partition__shared;
                 break;
             }
@@ -2264,9 +2327,19 @@ Vector::operator==(const Vector &rhs) const {
 
 ::flatbuffers::Offset<::Placeholder>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const Placeholder &o) {
+    std::optional<std::pair<::flatbuffers::Offset<void>, ::TablePartition>> partition_offset = std::nullopt;
+    if (o.partition_.has_value()) {
+        const std::pair<::flatbuffers::Offset<void>, ::TablePartition> partition_offset_val = serialize_to(builder, o.partition_.value());
+        partition_offset = std::make_optional(partition_offset_val);
+    }
 
     ::PlaceholderBuilder instance_builder = ::PlaceholderBuilder(builder);
     instance_builder.add_idx(o.idx_);
+    if (partition_offset.has_value()) {
+        const auto partition_opt = partition_offset.value();
+        instance_builder.add_partition(partition_opt.first);
+        instance_builder.add_partition_type(partition_opt.second);
+    }
     return instance_builder.Finish();
 }
 
@@ -2279,7 +2352,8 @@ std::vector<uint8_t> to_bytes(const Placeholder &o) {
 }
 
 Placeholder::Placeholder()
-    : idx_(0) {
+    : idx_(0)
+    , partition_(std::nullopt) {
 }
 
 Placeholder::Placeholder(const std::vector<uint8_t> &bytes)
@@ -2287,17 +2361,45 @@ Placeholder::Placeholder(const std::vector<uint8_t> &bytes)
 }
 
 Placeholder::Placeholder(const ::Placeholder *root) 
-    : idx_(0) {
+    : idx_(0)
+    , partition_(std::nullopt) {
     if (root == nullptr) {
         throw std::runtime_error("cannot deserialize flatbuffer type");
     }
 
     idx_ = root->idx();
+    if (root->partition() != nullptr) {
+        switch (root->partition_type()) {
+            case ::TablePartition::NONE: throw std::runtime_error("unexpected none variant");
+            case ::TablePartition::MvdbPartition: {
+                const auto partition__local = static_cast<const ::MvdbPartition *>(root->partition());
+                std::shared_ptr<MvdbPartition> partition__shared = std::make_shared<MvdbPartition>(partition__local);
+                partition_ = partition__shared;
+                break;
+            }
+            case ::TablePartition::WorklogPartition: {
+                const auto partition__local = static_cast<const ::WorklogPartition *>(root->partition());
+                std::shared_ptr<WorklogPartition> partition__shared = std::make_shared<WorklogPartition>(partition__local);
+                partition_ = partition__shared;
+                break;
+            }
+            case ::TablePartition::WorklogAttributePartition: {
+                const auto partition__local = static_cast<const ::WorklogAttributePartition *>(root->partition());
+                std::shared_ptr<WorklogAttributePartition> partition__shared = std::make_shared<WorklogAttributePartition>(partition__local);
+                partition_ = partition__shared;
+                break;
+            }
+            default: throw std::runtime_error("unknown union variant");
+        }
+    }
 }
 
 bool
 Placeholder::operator==(const Placeholder &rhs) const {
     if (this->idx_ != rhs.idx_) {
+        return false;
+    }
+    if (this->partition_ != rhs.partition_) {
         return false;
     }
     return true;

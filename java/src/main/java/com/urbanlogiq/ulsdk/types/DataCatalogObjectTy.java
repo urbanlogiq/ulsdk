@@ -29,4 +29,5 @@ public final class DataCatalogObjectTy {
     public static final short Exploration = com.urbanlogiq.ulsdk.types.generated.DataCatalogObjectTy.Exploration;
     public static final short KpiSpec = com.urbanlogiq.ulsdk.types.generated.DataCatalogObjectTy.KpiSpec;
     public static final short GovernedDocument = com.urbanlogiq.ulsdk.types.generated.DataCatalogObjectTy.GovernedDocument;
+    public static final short ViewList = com.urbanlogiq.ulsdk.types.generated.DataCatalogObjectTy.ViewList;
 }

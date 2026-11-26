@@ -183,6 +183,12 @@ import { WorklogParameter as FbsWorklogParameter } from './generated/worklog-par
 export class File {
   private _account!: string;
 
+/**
+ *  True if the file accepts appends. Only the server sets this value,
+ *  when it creates the file (docs/architecture/04-fs.md).
+ */
+  private _appendable!: boolean;
+
   private _blob!: GenericId | null;
 
   private _chunks!: Chunk[] | null;
@@ -208,6 +214,7 @@ export class File {
       this._initFromFbs(arg);
     } else {
       this._account = '';
+      this._appendable = false;
       this._blob = null;
       this._chunks = null;
       this._container = null;
@@ -221,6 +228,7 @@ export class File {
 
   private _initFromFbs(fbs: FbsFile): void {
     this._account = fbs.account() ?? '';
+    this._appendable = fbs.appendable();
     const blobVal = fbs.blob();
     this._blob = blobVal ? new GenericId(blobVal) : null;
     if (fbs.chunksLength() > 0) {
@@ -251,6 +259,14 @@ export class File {
 
   set account(value: string) {
     this._account = value;
+  }
+
+  get appendable(): boolean {
+    return this._appendable;
+  }
+
+  set appendable(value: boolean) {
+    this._appendable = value;
   }
 
   get blob(): GenericId | null {
@@ -320,6 +336,7 @@ export class File {
   toFbsT(): FbsFileT {
     const t = new FbsFileT();
     t.account = this._account;
+    t.appendable = this._appendable;
     t.blob = this._blob ? this._blob.toFbsT() : null;
     t.chunks = this._chunks ? this._chunks.map(item => item.toFbsT()) : [];
     t.container = this._container;

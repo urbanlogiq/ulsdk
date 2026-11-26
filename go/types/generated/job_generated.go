@@ -716,7 +716,7 @@ func (rcv *Task) UserId(obj *ObjectId) *ObjectId {
 /// User who created the job. This is the same as the user_id field in the
 /// job structure but duplicated for convenience when looking up task related
 /// information.
-/// Task object, either a source or a stream
+/// Task object: a source, a stream, or a list of views
 func (rcv *Task) Task(obj *ObjectId) *ObjectId {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
 	if o != 0 {
@@ -730,7 +730,7 @@ func (rcv *Task) Task(obj *ObjectId) *ObjectId {
 	return nil
 }
 
-/// Task object, either a source or a stream
+/// Task object: a source, a stream, or a list of views
 func (rcv *Task) Name() []byte {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
 	if o != 0 {

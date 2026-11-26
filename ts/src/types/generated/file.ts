@@ -96,8 +96,17 @@ tier():StorageTier {
   return offset ? this.bb!.readInt8(this.bb_pos + offset) : StorageTier.Hot;
 }
 
+/**
+ * True if the file accepts appends. Only the server sets this value,
+ * when it creates the file (docs/architecture/04-fs.md).
+ */
+appendable():boolean {
+  const offset = this.bb!.__offset(this.bb_pos, 24);
+  return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
+}
+
 static startFile(builder:flatbuffers.Builder) {
-  builder.startObject(10);
+  builder.startObject(11);
 }
 
 static addMime(builder:flatbuffers.Builder, mimeOffset:flatbuffers.Offset) {
@@ -152,6 +161,10 @@ static addTier(builder:flatbuffers.Builder, tier:StorageTier) {
   builder.addFieldInt8(9, tier, StorageTier.Hot);
 }
 
+static addAppendable(builder:flatbuffers.Builder, appendable:boolean) {
+  builder.addFieldInt8(10, +appendable, +false);
+}
+
 static endFile(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   builder.requiredField(offset, 4) // mime
@@ -175,7 +188,8 @@ unpack(): FileT {
     this.account(),
     this.container(),
     this.bb!.createObjList<Chunk, ChunkT>(this.chunks.bind(this), this.chunksLength()),
-    this.tier()
+    this.tier(),
+    this.appendable()
   );
 }
 
@@ -195,6 +209,7 @@ unpackTo(_o: FileT): void {
   _o.container = this.container();
   _o.chunks = this.bb!.createObjList<Chunk, ChunkT>(this.chunks.bind(this), this.chunksLength());
   _o.tier = this.tier();
+  _o.appendable = this.appendable();
 }
 }
 
@@ -209,7 +224,8 @@ constructor(
   public account: string|Uint8Array|null = null,
   public container: string|Uint8Array|null = null,
   public chunks: (ChunkT)[] = [],
-  public tier: StorageTier = StorageTier.Hot
+  public tier: StorageTier = StorageTier.Hot,
+  public appendable: boolean = false
 ){}
 
 
@@ -233,6 +249,7 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   File.addContainer(builder, container);
   File.addChunks(builder, chunks);
   File.addTier(builder, this.tier);
+  File.addAppendable(builder, this.appendable);
 
   return File.endFile(builder);
 }

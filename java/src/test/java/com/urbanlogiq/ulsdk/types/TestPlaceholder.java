@@ -9,6 +9,7 @@ public final class TestPlaceholder {
     @Test
     public void testDefault() {
         var instance = new com.urbanlogiq.ulsdk.types.Placeholder();
+        org.junit.jupiter.api.Assertions.assertNull(instance.getPartition());
     }
 
     @Test

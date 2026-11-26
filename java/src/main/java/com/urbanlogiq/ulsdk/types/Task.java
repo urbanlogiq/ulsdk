@@ -193,7 +193,7 @@ public final class Task {
     }
 
     /**
-     *  Task object, either a source or a stream
+     *  Task object: a source, a stream, or a list of views
      */
     com.urbanlogiq.ulsdk.types.ObjectId _task;
     public com.urbanlogiq.ulsdk.types.ObjectId getTask() {

@@ -243,6 +243,10 @@ impl From<FbsStorageTier> for StorageTier {
 #[derive(PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct File {
     pub account: String,
+    /// True if the file accepts appends. Only the server sets this value,
+    /// when it creates the file (docs/architecture/04-fs.md).
+    #[serde(default = "json_default_file_appendable")]
+    pub appendable: bool,
     pub blob: Option<GenericId>,
     pub chunks: Option<Vec<Chunk>>,
     pub container: Option<String>,
@@ -251,6 +255,10 @@ pub struct File {
     pub size: u64,
     pub tier: StorageTier,
     pub virus: Option<String>,
+}
+
+fn json_default_file_appendable() -> bool {
+    bool::default()
 }
 
 impl File {
@@ -278,6 +286,7 @@ impl File {
 
         let mut bldr = FbsFileBuilder::new(builder);
         bldr.add_account(account_offset);
+        bldr.add_appendable(self.appendable);
         if let Some(offset) = blob_offset {
             bldr.add_blob(offset);
         }
@@ -304,6 +313,7 @@ impl File {
 impl From<FbsFile<'_>> for File {
     fn from(fbs: FbsFile<'_>) -> Self {
         let account = fbs.account().to_owned();
+        let appendable = fbs.appendable();
         let blob = fbs.blob().map(GenericId::from);
         let chunks = if let Some(val) = fbs.chunks() {
             let mut chunks = Vec::new();
@@ -334,6 +344,7 @@ impl From<FbsFile<'_>> for File {
         let virus = fbs.virus().map(ToOwned::to_owned);
         Self {
             account,
+            appendable,
             blob,
             chunks,
             container,
@@ -368,6 +379,7 @@ impl Default for File {
     fn default() -> Self {
         Self {
             account: String::default(),
+            appendable: bool::default(),
             blob: None,
             chunks: None,
             container: None,

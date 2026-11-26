@@ -14,6 +14,7 @@
 #include "ulsdk/ulsdk.h"
 #include "ulsdk/types/Schema.h"
 #include "ulsdk/types/api.h"
+#include "ulsdk/types/data.h"
 #include "ulsdk/types/entity.h"
 #include "ulsdk/types/fun.h"
 #include "ulsdk/types/graph.h"
@@ -72,6 +73,7 @@ struct When;
 struct Window;
 struct WindowFrame;
 struct WindowFrameBound;
+struct WorklogAttributePartition;
 struct WorklogPartition;
 
 typedef std::variant<
@@ -114,7 +116,8 @@ typedef std::variant<
 using ::SetQuantifier;
 typedef std::variant<
     std::shared_ptr<MvdbPartition>,
-    std::shared_ptr<WorklogPartition>
+    std::shared_ptr<WorklogPartition>,
+    std::shared_ptr<WorklogAttributePartition>
 > TablePartition;
 
 typedef std::variant<
@@ -488,6 +491,21 @@ struct WorklogPartition {
     }
 };
 
+///
+/// Select the first worklog output with all these attributes.
+///
+struct WorklogAttributePartition {
+    std::vector<AttributePair> attributes_;
+
+    WorklogAttributePartition();
+    WorklogAttributePartition(const ::WorklogAttributePartition *root);
+    WorklogAttributePartition(const std::vector<uint8_t> &bytes);
+    bool operator==(const WorklogAttributePartition &rhs) const;
+    bool operator!=(const WorklogAttributePartition &rhs) const {
+        return !(*this == rhs);
+    }
+};
+
 struct DataCatalog {
     ObjectId id_;
     std::optional<TablePartition> partition_;
@@ -571,8 +589,12 @@ struct Vector {
     }
 };
 
+///
+/// A source supplied by index in Query.bound_sources or while data is loaded.
+///
 struct Placeholder {
     uint32_t idx_;
+    std::optional<TablePartition> partition_;
 
     Placeholder();
     Placeholder(const ::Placeholder *root);
@@ -929,6 +951,9 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const MvdbPartition &);
 ::flatbuffers::Offset<::WorklogPartition>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const WorklogPartition &);
 
+::flatbuffers::Offset<::WorklogAttributePartition>
+serialize_to(::flatbuffers::FlatBufferBuilder &builder, const WorklogAttributePartition &);
+
 ::flatbuffers::Offset<::DataCatalog>
 serialize_to(::flatbuffers::FlatBufferBuilder &builder, const DataCatalog &);
 
@@ -1076,6 +1101,9 @@ to_bytes(const MvdbPartition &o);
 
 std::vector<uint8_t>
 to_bytes(const WorklogPartition &o);
+
+std::vector<uint8_t>
+to_bytes(const WorklogAttributePartition &o);
 
 std::vector<uint8_t>
 to_bytes(const DataCatalog &o);

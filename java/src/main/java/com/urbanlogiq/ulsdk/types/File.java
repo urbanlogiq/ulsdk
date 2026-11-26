@@ -13,6 +13,18 @@ public final class File {
         this._account = value;
     }
 
+    /**
+     *  True if the file accepts appends. Only the server sets this value,
+     *  when it creates the file (docs/architecture/04-fs.md).
+     */
+    boolean _appendable;
+    public boolean getAppendable() {
+        return this._appendable;
+    }
+    public void setAppendable(boolean value) {
+        this._appendable = value;
+    }
+
     com.urbanlogiq.ulsdk.types.GenericId _blob;
     public com.urbanlogiq.ulsdk.types.GenericId getBlob() {
         return this._blob;
@@ -79,6 +91,7 @@ public final class File {
 
     public File(com.urbanlogiq.ulsdk.types.generated.File o) {
         this._account = o.account();
+        this._appendable = o.appendable();
         if (o.blob() != null) {
             this._blob = new com.urbanlogiq.ulsdk.types.GenericId(o.blob());
         }
@@ -151,6 +164,7 @@ public final class File {
         }
         com.urbanlogiq.ulsdk.types.generated.File.startFile(builder);
         com.urbanlogiq.ulsdk.types.generated.File.addAccount(builder, accountOffset);
+        com.urbanlogiq.ulsdk.types.generated.File.addAppendable(builder, this._appendable);
         if (blobOffset != null) {
             com.urbanlogiq.ulsdk.types.generated.File.addBlob(builder, blobOffset);
         }

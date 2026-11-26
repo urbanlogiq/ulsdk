@@ -26,6 +26,11 @@ use crate::types::Schema::{
     TimeUnit, Timestamp, Type, Union, UnionMode, Utf8, Utf8View,
 };
 use crate::types::api::SortOrder;
+use crate::types::data::{
+    AttributePair, BinaryYesNo, DayOfWeek, DirectionAndRoadName, DirectionAndRoadNames,
+    DirectionTy, NamedParameter, NamedParameterFlags, OutputSchema, RoadUserTy, Source,
+    StatisticTy, TimeGranularity, TurnTy,
+};
 use crate::types::entity::{
     EdgeTy, EntityTy, Geometry, GraphEdge, GraphNode, Line, MultiLine, MultiPoint, MultiPolygon,
     NodeTy, Point, Polygon,
@@ -47,6 +52,14 @@ use crate::types::generated::Schema_generated::{
     Utf8 as FbsUtf8, Utf8View as FbsUtf8View,
 };
 use crate::types::generated::api_generated::SortOrder as FbsSortOrder;
+use crate::types::generated::data_generated::{
+    AttributePair as FbsAttributePair, BinaryYesNo as FbsBinaryYesNo, DayOfWeek as FbsDayOfWeek,
+    DirectionAndRoadName as FbsDirectionAndRoadName,
+    DirectionAndRoadNames as FbsDirectionAndRoadNames, DirectionTy as FbsDirectionTy,
+    NamedParameter as FbsNamedParameter, NamedParameterFlags as FbsNamedParameterFlags,
+    OutputSchema as FbsOutputSchema, RoadUserTy as FbsRoadUserTy, Source as FbsSource,
+    StatisticTy as FbsStatisticTy, TimeGranularity as FbsTimeGranularity, TurnTy as FbsTurnTy,
+};
 use crate::types::generated::entity_generated::{
     EdgeTy as FbsEdgeTy, EntityTy as FbsEntityTy, Geometry as FbsGeometry,
     GraphEdge as FbsGraphEdge, GraphNode as FbsGraphNode, Line as FbsLine,
@@ -92,7 +105,9 @@ use crate::types::generated::query_generated::{
     ValueName as FbsValueName, ValueRow as FbsValueRow, Values as FbsValues, Vector as FbsVector,
     When as FbsWhen, Window as FbsWindow, WindowFrame as FbsWindowFrame,
     WindowFrameBound as FbsWindowFrameBound, WindowFrameBoundTy as FbsWindowFrameBoundTy,
-    WindowFrameUnits as FbsWindowFrameUnits, WorklogPartition as FbsWorklogPartition,
+    WindowFrameUnits as FbsWindowFrameUnits,
+    WorklogAttributePartition as FbsWorklogAttributePartition,
+    WorklogPartition as FbsWorklogPartition,
 };
 use crate::types::generated::value_generated::{
     Point2D as FbsPoint2D, Tri2D as FbsTri2D, VArray as FbsVArray, VBool as FbsVBool,
@@ -2247,10 +2262,68 @@ impl crate::FbsSerde for WorklogPartition {
     }
 }
 
+/// Select the first worklog output with all these attributes.
+#[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
+pub struct WorklogAttributePartition {
+    pub attributes: Vec<AttributePair>,
+}
+
+impl WorklogAttributePartition {
+    pub fn serialize_to<'a>(
+        &self,
+        builder: &mut flatbuffers::FlatBufferBuilder<'a>,
+    ) -> flatbuffers::WIPOffset<FbsWorklogAttributePartition<'a>> {
+        use crate::types::generated::query_generated::WorklogAttributePartitionBuilder as FbsWorklogAttributePartitionBuilder;
+
+        let mut attributes_offsets = Vec::with_capacity(self.attributes.len());
+        for val in self.attributes.iter() {
+            let offset = val.serialize_to(builder);
+            attributes_offsets.push(offset);
+        }
+        let attributes_offset = builder.create_vector(&attributes_offsets);
+
+        let mut bldr = FbsWorklogAttributePartitionBuilder::new(builder);
+        bldr.add_attributes(attributes_offset);
+        bldr.finish()
+    }
+}
+
+impl From<FbsWorklogAttributePartition<'_>> for WorklogAttributePartition {
+    fn from(fbs: FbsWorklogAttributePartition<'_>) -> Self {
+        let mut attributes = Vec::new();
+        for elem in fbs.attributes() {
+            attributes.push(elem.into());
+        }
+
+        Self { attributes }
+    }
+}
+
+impl crate::FbsSerde for WorklogAttributePartition {
+    fn to_fbs_bytes(&self) -> Vec<u8> {
+        let mut bldr = flatbuffers::FlatBufferBuilder::new();
+        let offset = self.serialize_to(&mut bldr);
+        bldr.finish_size_prefixed(offset, None);
+        bldr.finished_data().to_vec()
+    }
+
+    fn from_fbs_bytes(bytes: &[u8]) -> Result<Self, flatbuffers::InvalidFlatbuffer> {
+        let opts = flatbuffers::VerifierOptions {
+            max_tables: 100_000_000,
+            ..Default::default()
+        };
+        let fbs = flatbuffers::size_prefixed_root_with_opts::<FbsWorklogAttributePartition>(
+            &opts, bytes,
+        )?;
+        Ok(Self::from(fbs))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Hash, Eq, Serialize, Deserialize)]
 pub enum TablePartition {
     MvdbPartition(MvdbPartition),
     WorklogPartition(WorklogPartition),
+    WorklogAttributePartition(WorklogAttributePartition),
 }
 
 impl Default for TablePartition {
@@ -2273,6 +2346,11 @@ impl TablePartition {
             Self::WorklogPartition(val) => {
                 let offset = val.serialize_to(builder).as_union_value();
                 let ty = FbsTablePartition::WorklogPartition;
+                (offset, ty)
+            }
+            Self::WorklogAttributePartition(val) => {
+                let offset = val.serialize_to(builder).as_union_value();
+                let ty = FbsTablePartition::WorklogAttributePartition;
                 (offset, ty)
             }
         }
@@ -2322,6 +2400,11 @@ impl From<FbsDataCatalog<'_>> for DataCatalog {
                 FbsTablePartition::WorklogPartition => TablePartition::WorklogPartition(
                     WorklogPartition::from(fbs.partition_as_worklog_partition().unwrap()),
                 ),
+                FbsTablePartition::WorklogAttributePartition => {
+                    TablePartition::WorklogAttributePartition(WorklogAttributePartition::from(
+                        fbs.partition_as_worklog_attribute_partition().unwrap(),
+                    ))
+                }
                 _ => unreachable!(),
             };
 
@@ -2697,9 +2780,14 @@ impl crate::FbsSerde for Vector {
     }
 }
 
+/// A source supplied by index in Query.bound_sources or while data is loaded.
 #[derive(Default, PartialEq, Debug, Clone, Hash, Eq, Serialize, Deserialize)]
 pub struct Placeholder {
     pub idx: u32,
+    /// Select part of the supplied source. A worklog defaults to its first output.
+    /// Worklog selections also accept a stream or an Arrow table directly.
+    /// When set, this field must match any partition on the supplied source.
+    pub partition: Option<TablePartition>,
 }
 
 impl Placeholder {
@@ -2709,8 +2797,14 @@ impl Placeholder {
     ) -> flatbuffers::WIPOffset<FbsPlaceholder<'a>> {
         use crate::types::generated::query_generated::PlaceholderBuilder as FbsPlaceholderBuilder;
 
+        let partition_offset = self.partition.as_ref().map(|u| u.serialize_to(builder));
+
         let mut bldr = FbsPlaceholderBuilder::new(builder);
         bldr.add_idx(self.idx);
+        if let Some((offset, ty)) = partition_offset {
+            bldr.add_partition(offset);
+            bldr.add_partition_type(ty);
+        }
         bldr.finish()
     }
 }
@@ -2718,7 +2812,28 @@ impl Placeholder {
 impl From<FbsPlaceholder<'_>> for Placeholder {
     fn from(fbs: FbsPlaceholder<'_>) -> Self {
         let idx = fbs.idx();
-        Self { idx }
+        let partition = if let Some(val) = fbs.partition() {
+            let partition = match fbs.partition_type() {
+                FbsTablePartition::MvdbPartition => TablePartition::MvdbPartition(
+                    MvdbPartition::from(fbs.partition_as_mvdb_partition().unwrap()),
+                ),
+                FbsTablePartition::WorklogPartition => TablePartition::WorklogPartition(
+                    WorklogPartition::from(fbs.partition_as_worklog_partition().unwrap()),
+                ),
+                FbsTablePartition::WorklogAttributePartition => {
+                    TablePartition::WorklogAttributePartition(WorklogAttributePartition::from(
+                        fbs.partition_as_worklog_attribute_partition().unwrap(),
+                    ))
+                }
+                _ => unreachable!(),
+            };
+
+            Some(partition)
+        } else {
+            None
+        };
+
+        Self { idx, partition }
     }
 }
 
@@ -4571,6 +4686,14 @@ mod tests {
         let t0 = WindowFrameBound::default();
         let buf = t0.to_fbs_bytes();
         let t1 = WindowFrameBound::from_fbs_bytes(buf.as_slice()).unwrap();
+        assert_eq!(t0, t1);
+    }
+
+    #[test]
+    fn test_worklog_attribute_partition() {
+        let t0 = WorklogAttributePartition::default();
+        let buf = t0.to_fbs_bytes();
+        let t1 = WorklogAttributePartition::from_fbs_bytes(buf.as_slice()).unwrap();
         assert_eq!(t0, t1);
     }
 

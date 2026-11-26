@@ -7,36 +7,40 @@
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
 
 import { MvdbPartition, MvdbPartitionT } from './mvdb-partition';
+import { WorklogAttributePartition, WorklogAttributePartitionT } from './worklog-attribute-partition';
 import { WorklogPartition, WorklogPartitionT } from './worklog-partition';
 
 
 export enum TablePartition {
   NONE = 0,
   MvdbPartition = 1,
-  WorklogPartition = 2
+  WorklogPartition = 2,
+  WorklogAttributePartition = 3
 }
 
 export function unionToTablePartition(
   type: TablePartition,
-  accessor: (obj:MvdbPartition|WorklogPartition) => MvdbPartition|WorklogPartition|null
-): MvdbPartition|WorklogPartition|null {
+  accessor: (obj:MvdbPartition|WorklogAttributePartition|WorklogPartition) => MvdbPartition|WorklogAttributePartition|WorklogPartition|null
+): MvdbPartition|WorklogAttributePartition|WorklogPartition|null {
   switch(TablePartition[type]) {
     case 'NONE': return null; 
     case 'MvdbPartition': return accessor(new MvdbPartition())! as MvdbPartition;
     case 'WorklogPartition': return accessor(new WorklogPartition())! as WorklogPartition;
+    case 'WorklogAttributePartition': return accessor(new WorklogAttributePartition())! as WorklogAttributePartition;
     default: return null;
   }
 }
 
 export function unionListToTablePartition(
   type: TablePartition, 
-  accessor: (index: number, obj:MvdbPartition|WorklogPartition) => MvdbPartition|WorklogPartition|null, 
+  accessor: (index: number, obj:MvdbPartition|WorklogAttributePartition|WorklogPartition) => MvdbPartition|WorklogAttributePartition|WorklogPartition|null, 
   index: number
-): MvdbPartition|WorklogPartition|null {
+): MvdbPartition|WorklogAttributePartition|WorklogPartition|null {
   switch(TablePartition[type]) {
     case 'NONE': return null; 
     case 'MvdbPartition': return accessor(index, new MvdbPartition())! as MvdbPartition;
     case 'WorklogPartition': return accessor(index, new WorklogPartition())! as WorklogPartition;
+    case 'WorklogAttributePartition': return accessor(index, new WorklogAttributePartition())! as WorklogAttributePartition;
     default: return null;
   }
 }

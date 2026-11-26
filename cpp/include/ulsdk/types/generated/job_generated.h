@@ -735,7 +735,7 @@ struct Task FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ObjectId *user_id() const {
     return GetPointer<const ObjectId *>(VT_USER_ID);
   }
-  /// Task object, either a source or a stream
+  /// Task object: a source, a stream, or a list of views
   const ObjectId *task() const {
     return GetPointer<const ObjectId *>(VT_TASK);
   }

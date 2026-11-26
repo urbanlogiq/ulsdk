@@ -1132,7 +1132,7 @@ pub struct Task {
     pub start: u64,
     /// Task status
     pub status: Status,
-    /// Task object, either a source or a stream
+    /// Task object: a source, a stream, or a list of views
     pub task: ObjectId,
     /// The upstream nodes that enabled this task
     pub upstream: Vec<ObjectId>,

@@ -123,6 +123,7 @@ func TestUnionDataCatalogPartition(t *testing.T) {
 	for _, v := range []TablePartition{
 		&MvdbPartition{},
 		&WorklogPartition{},
+		&WorklogAttributePartition{},
 	} {
 		o := &DataCatalog{Partition: v}
 		got, err := DataCatalogFromBytes(o.ToBytes())
@@ -496,6 +497,23 @@ func TestRoundTripPlaceholder(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestUnionPlaceholderPartition(t *testing.T) {
+	for _, v := range []TablePartition{
+		&MvdbPartition{},
+		&WorklogPartition{},
+		&WorklogAttributePartition{},
+	} {
+		o := &Placeholder{Partition: v}
+		got, err := PlaceholderFromBytes(o.ToBytes())
+		if err != nil {
+			t.Fatalf("%T: deserialization failed: %v", v, err)
+		}
+		if fmt.Sprintf("%T", got.Partition) != fmt.Sprintf("%T", v) {
+			t.Fatalf("got %T, want %T", got.Partition, v)
+		}
 	}
 }
 
@@ -970,6 +988,14 @@ func TestRoundTripWindowFrameBound(t *testing.T) {
 		t.Fatal("expected non-nil result")
 	}
 }
+
+func TestDefaultWorklogAttributePartition(t *testing.T) {
+	o := &WorklogAttributePartition{}
+	if o == nil {
+		t.Fatal("expected non-nil")
+	}
+}
+
 
 func TestDefaultWorklogPartition(t *testing.T) {
 	o := &WorklogPartition{}

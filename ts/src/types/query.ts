@@ -58,6 +58,7 @@ import { When as FbsWhen, WhenT as FbsWhenT } from './generated/when';
 import { Window as FbsWindow, WindowT as FbsWindowT } from './generated/window';
 import { WindowFrame as FbsWindowFrame, WindowFrameT as FbsWindowFrameT } from './generated/window-frame';
 import { WindowFrameBound as FbsWindowFrameBound, WindowFrameBoundT as FbsWindowFrameBoundT } from './generated/window-frame-bound';
+import { WorklogAttributePartition as FbsWorklogAttributePartition, WorklogAttributePartitionT as FbsWorklogAttributePartitionT } from './generated/worklog-attribute-partition';
 import { WorklogPartition as FbsWorklogPartition, WorklogPartitionT as FbsWorklogPartitionT } from './generated/worklog-partition';
 
 import { Binary, BinaryView, Bool, Buffer, Date, DateUnit, Decimal, DictionaryEncoding, DictionaryKind, Duration, Endianness, Feature, Field, FixedSizeBinary, FixedSizeList, FloatingPoint, Int, Interval, IntervalUnit, KeyValue, LargeBinary, LargeList, LargeListView, LargeUtf8, List, ListView, Map, MetadataVersion, Null, Precision, RunEndEncoded, Schema, Struct_, Time, TimeUnit, Timestamp, Type, Union, UnionMode, Utf8, Utf8View } from './Schema';
@@ -104,6 +105,21 @@ import { Utf8 as FbsUtf8 } from './generated/utf8';
 import { Utf8View as FbsUtf8View } from './generated/utf8-view';
 import { SortOrder } from './api';
 import { SortOrder as FbsSortOrder } from './generated/sort-order';
+import { AttributePair, BinaryYesNo, DayOfWeek, DirectionAndRoadName, DirectionAndRoadNames, DirectionTy, NamedParameter, NamedParameterFlags, OutputSchema, RoadUserTy, Source, StatisticTy, TimeGranularity, TurnTy } from './data';
+import { AttributePair as FbsAttributePair } from './generated/attribute-pair';
+import { BinaryYesNo as FbsBinaryYesNo } from './generated/binary-yes-no';
+import { DayOfWeek as FbsDayOfWeek } from './generated/day-of-week';
+import { DirectionAndRoadName as FbsDirectionAndRoadName } from './generated/direction-and-road-name';
+import { DirectionAndRoadNames as FbsDirectionAndRoadNames } from './generated/direction-and-road-names';
+import { DirectionTy as FbsDirectionTy } from './generated/direction-ty';
+import { NamedParameter as FbsNamedParameter } from './generated/named-parameter';
+import { NamedParameterFlags as FbsNamedParameterFlags } from './generated/named-parameter-flags';
+import { OutputSchema as FbsOutputSchema } from './generated/output-schema';
+import { RoadUserTy as FbsRoadUserTy } from './generated/road-user-ty';
+import { Source as FbsSource } from './generated/source';
+import { StatisticTy as FbsStatisticTy } from './generated/statistic-ty';
+import { TimeGranularity as FbsTimeGranularity } from './generated/time-granularity';
+import { TurnTy as FbsTurnTy } from './generated/turn-ty';
 import { EdgeTy, EntityTy, Geometry, GraphEdge, GraphNode, Line, MultiLine, MultiPoint, MultiPolygon, NodeTy, Point, Polygon } from './entity';
 import { EdgeTy as FbsEdgeTy } from './generated/edge-ty';
 import { EntityTy as FbsEntityTy } from './generated/entity-ty';
@@ -1739,7 +1755,54 @@ export class WorklogPartition {
   }
 }
 
-export type TablePartition = MvdbPartition | WorklogPartition;
+/**
+ *  Select the first worklog output with all these attributes.
+ */
+export class WorklogAttributePartition {
+  private _attributes!: AttributePair[];
+
+  constructor(arg?: FbsWorklogAttributePartition | Uint8Array) {
+    if (arg instanceof Uint8Array) {
+      const buf = new flatbuffers.ByteBuffer(arg);
+      const fbs = FbsWorklogAttributePartition.getSizePrefixedRootAsWorklogAttributePartition(buf);
+      this._initFromFbs(fbs);
+    } else if (arg instanceof FbsWorklogAttributePartition) {
+      this._initFromFbs(arg);
+    } else {
+      this._attributes = [];
+    }
+  }
+
+  private _initFromFbs(fbs: FbsWorklogAttributePartition): void {
+    this._attributes = Array.from({ length: fbs.attributesLength() }, (_, i) => {
+      const item = fbs.attributes(i);
+      return item ? new AttributePair(item) : new AttributePair();
+    });
+  }
+
+  get attributes(): AttributePair[] {
+    return this._attributes;
+  }
+
+  set attributes(value: AttributePair[]) {
+    this._attributes = value;
+  }
+
+  toFbsT(): FbsWorklogAttributePartitionT {
+    const t = new FbsWorklogAttributePartitionT();
+    t.attributes = this._attributes.map(item => item.toFbsT());
+    return t;
+  }
+
+  toBytes(): Uint8Array {
+    const builder = new flatbuffers.Builder();
+    const offset = this.toFbsT().pack(builder);
+    builder.finishSizePrefixed(offset);
+    return builder.asUint8Array();
+  }
+}
+
+export type TablePartition = MvdbPartition | WorklogPartition | WorklogAttributePartition;
 
 export class DataCatalog {
   private _id!: ObjectId;
@@ -1775,6 +1838,9 @@ export class DataCatalog {
     } else if (partitionTy === FbsTablePartition.WorklogPartition) {
       const partitionFbsVal = fbs.partition(new FbsWorklogPartition());
       this._partition = partitionFbsVal ? new WorklogPartition(partitionFbsVal) : null;
+    } else if (partitionTy === FbsTablePartition.WorklogAttributePartition) {
+      const partitionFbsVal = fbs.partition(new FbsWorklogAttributePartition());
+      this._partition = partitionFbsVal ? new WorklogAttributePartition(partitionFbsVal) : null;
     } else {
       this._partition = null;
     }
@@ -1814,6 +1880,9 @@ export class DataCatalog {
       t.partition = this._partition.toFbsT();
     } else if (this._partition instanceof WorklogPartition) {
       t.partitionType = FbsTablePartition.WorklogPartition;
+      t.partition = this._partition.toFbsT();
+    } else if (this._partition instanceof WorklogAttributePartition) {
+      t.partitionType = FbsTablePartition.WorklogAttributePartition;
       t.partition = this._partition.toFbsT();
     }
     t.revision = this._revision ? this._revision.toFbsT() : null;
@@ -2179,8 +2248,18 @@ export class Vector {
   }
 }
 
+/**
+ *  A source supplied by index in Query.bound_sources or while data is loaded.
+ */
 export class Placeholder {
   private _idx!: number;
+
+/**
+ *  Select part of the supplied source. A worklog defaults to its first output.
+ *  Worklog selections also accept a stream or an Arrow table directly.
+ *  When set, this field must match any partition on the supplied source.
+ */
+  private _partition!: TablePartition | null;
 
   constructor(arg?: FbsPlaceholder | Uint8Array) {
     if (arg instanceof Uint8Array) {
@@ -2191,11 +2270,25 @@ export class Placeholder {
       this._initFromFbs(arg);
     } else {
       this._idx = 0;
+      this._partition = null;
     }
   }
 
   private _initFromFbs(fbs: FbsPlaceholder): void {
     this._idx = fbs.idx();
+    const partitionTy = fbs.partitionType();
+    if (partitionTy === FbsTablePartition.MvdbPartition) {
+      const partitionFbsVal = fbs.partition(new FbsMvdbPartition());
+      this._partition = partitionFbsVal ? new MvdbPartition(partitionFbsVal) : null;
+    } else if (partitionTy === FbsTablePartition.WorklogPartition) {
+      const partitionFbsVal = fbs.partition(new FbsWorklogPartition());
+      this._partition = partitionFbsVal ? new WorklogPartition(partitionFbsVal) : null;
+    } else if (partitionTy === FbsTablePartition.WorklogAttributePartition) {
+      const partitionFbsVal = fbs.partition(new FbsWorklogAttributePartition());
+      this._partition = partitionFbsVal ? new WorklogAttributePartition(partitionFbsVal) : null;
+    } else {
+      this._partition = null;
+    }
   }
 
   get idx(): number {
@@ -2206,9 +2299,27 @@ export class Placeholder {
     this._idx = value;
   }
 
+  get partition(): TablePartition | null {
+    return this._partition;
+  }
+
+  set partition(value: TablePartition | null) {
+    this._partition = value;
+  }
+
   toFbsT(): FbsPlaceholderT {
     const t = new FbsPlaceholderT();
     t.idx = this._idx;
+    if (this._partition instanceof MvdbPartition) {
+      t.partitionType = FbsTablePartition.MvdbPartition;
+      t.partition = this._partition.toFbsT();
+    } else if (this._partition instanceof WorklogPartition) {
+      t.partitionType = FbsTablePartition.WorklogPartition;
+      t.partition = this._partition.toFbsT();
+    } else if (this._partition instanceof WorklogAttributePartition) {
+      t.partitionType = FbsTablePartition.WorklogAttributePartition;
+      t.partition = this._partition.toFbsT();
+    }
     return t;
   }
 

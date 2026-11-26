@@ -89,6 +89,7 @@ serialize_to(::flatbuffers::FlatBufferBuilder &builder, const File &o) {
 
     ::FileBuilder instance_builder = ::FileBuilder(builder);
     instance_builder.add_account(account_offset);
+    instance_builder.add_appendable(o.appendable_);
     if (blob_offset.has_value()) {
         instance_builder.add_blob(blob_offset.value());
     }
@@ -122,6 +123,7 @@ std::vector<uint8_t> to_bytes(const File &o) {
 
 File::File()
     : account_()
+    , appendable_(false)
     , blob_(std::nullopt)
     , chunks_(std::nullopt)
     , container_(std::nullopt)
@@ -138,6 +140,7 @@ File::File(const std::vector<uint8_t> &bytes)
 
 File::File(const ::File *root) 
     : account_()
+    , appendable_(false)
     , blob_(std::nullopt)
     , chunks_(std::nullopt)
     , container_(std::nullopt)
@@ -151,6 +154,7 @@ File::File(const ::File *root)
     }
 
         account_ = std::string(*root->account()->begin(), *root->account()->end());
+    appendable_ = root->appendable();
     if (root->blob() != nullptr) {
         blob_ = decltype(blob_)(root->blob());
     }
@@ -189,6 +193,9 @@ File::File(const ::File *root)
 bool
 File::operator==(const File &rhs) const {
     if (this->account_ != rhs.account_) {
+        return false;
+    }
+    if (this->appendable_ != rhs.appendable_) {
         return false;
     }
     if (this->blob_ != rhs.blob_) {

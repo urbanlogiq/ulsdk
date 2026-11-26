@@ -42,13 +42,13 @@ pub const ENUM_MIN_DATA_CATALOG_OBJECT_TY: i16 = 0;
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
-pub const ENUM_MAX_DATA_CATALOG_OBJECT_TY: i16 = 23;
+pub const ENUM_MAX_DATA_CATALOG_OBJECT_TY: i16 = 24;
 #[deprecated(
     since = "2.0.0",
     note = "Use associated constants instead. This will no longer be generated in 2021."
 )]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_DATA_CATALOG_OBJECT_TY: [DataCatalogObjectTy; 24] = [
+pub const ENUM_VALUES_DATA_CATALOG_OBJECT_TY: [DataCatalogObjectTy; 25] = [
     DataCatalogObjectTy::Invalid,
     DataCatalogObjectTy::WorkLog,
     DataCatalogObjectTy::Schematic,
@@ -73,6 +73,7 @@ pub const ENUM_VALUES_DATA_CATALOG_OBJECT_TY: [DataCatalogObjectTy; 24] = [
     DataCatalogObjectTy::Exploration,
     DataCatalogObjectTy::KpiSpec,
     DataCatalogObjectTy::GovernedDocument,
+    DataCatalogObjectTy::ViewList,
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
@@ -104,9 +105,10 @@ impl DataCatalogObjectTy {
     pub const Exploration: Self = Self(21);
     pub const KpiSpec: Self = Self(22);
     pub const GovernedDocument: Self = Self(23);
+    pub const ViewList: Self = Self(24);
 
     pub const ENUM_MIN: i16 = 0;
-    pub const ENUM_MAX: i16 = 23;
+    pub const ENUM_MAX: i16 = 24;
     pub const ENUM_VALUES: &'static [Self] = &[
         Self::Invalid,
         Self::WorkLog,
@@ -132,6 +134,7 @@ impl DataCatalogObjectTy {
         Self::Exploration,
         Self::KpiSpec,
         Self::GovernedDocument,
+        Self::ViewList,
     ];
     /// Returns the variant's name or "" if unknown.
     pub fn variant_name(self) -> Option<&'static str> {
@@ -160,6 +163,7 @@ impl DataCatalogObjectTy {
             Self::Exploration => Some("Exploration"),
             Self::KpiSpec => Some("KpiSpec"),
             Self::GovernedDocument => Some("GovernedDocument"),
+            Self::ViewList => Some("ViewList"),
             _ => None,
         }
     }

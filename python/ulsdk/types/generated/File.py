@@ -119,8 +119,17 @@ class File(object):
             return self._tab.Get(flatbuffers.number_types.Int8Flags, o + self._tab.Pos)
         return 0
 
+    # True if the file accepts appends. Only the server sets this value,
+    # when it creates the file (docs/architecture/04-fs.md).
+    # File
+    def Appendable(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(24))
+        if o != 0:
+            return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
+        return False
+
 def FileStart(builder):
-    builder.StartObject(10)
+    builder.StartObject(11)
 
 def Start(builder):
     FileStart(builder)
@@ -190,6 +199,12 @@ def FileAddTier(builder, tier):
 
 def AddTier(builder, tier):
     FileAddTier(builder, tier)
+
+def FileAddAppendable(builder, appendable):
+    builder.PrependBoolSlot(10, appendable, 0)
+
+def AddAppendable(builder, appendable):
+    FileAddAppendable(builder, appendable)
 
 def FileEnd(builder):
     return builder.EndObject()

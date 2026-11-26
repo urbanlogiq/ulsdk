@@ -8,6 +8,7 @@ import (
 	"fmt"
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/urbanlogiq/ulsdk/types/generated"
+	"github.com/urbanlogiq/ulsdk/types/data"
 	"github.com/urbanlogiq/ulsdk/types/graph"
 	"github.com/urbanlogiq/ulsdk/types/id"
 	"github.com/urbanlogiq/ulsdk/types/schema"
@@ -1544,7 +1545,63 @@ func (o *WorklogPartition) SerializeTo(builder *flatbuffers.Builder) flatbuffers
 	return generated.WorklogPartitionEnd(builder)
 }
 
-// TablePartition is a union type. Possible concrete types: MvdbPartition, WorklogPartition
+// WorklogAttributePartition -
+//  Select the first worklog output with all these attributes.
+type WorklogAttributePartition struct {
+	Attributes []data.AttributePair
+}
+
+func WorklogAttributePartitionFromFbs(fbs *generated.WorklogAttributePartition) *WorklogAttributePartition {
+	o := &WorklogAttributePartition{}
+	if tbl := fbs.Table(); tbl.Offset(4) != 0 {
+		o.Attributes = []data.AttributePair{}
+		for i := 0; i < fbs.AttributesLength(); i++ {
+			var item generated.AttributePair
+			if fbs.Attributes(&item, i) {
+				o.Attributes = append(o.Attributes, *data.AttributePairFromFbs(&item))
+			}
+		}
+	}
+	return o
+}
+
+// WorklogAttributePartitionFromBytes deserializes a WorklogAttributePartition from size-prefixed FlatBuffer bytes.
+func WorklogAttributePartitionFromBytes(data []byte) (o *WorklogAttributePartition, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			o, err = nil, fmt.Errorf("WorklogAttributePartition: invalid FlatBuffer bytes: %v", r)
+		}
+	}()
+	fbs := generated.GetSizePrefixedRootAsWorklogAttributePartition(data, 0)
+	return WorklogAttributePartitionFromFbs(fbs), nil
+}
+
+// ToBytes serializes the WorklogAttributePartition to size-prefixed FlatBuffer bytes.
+func (o *WorklogAttributePartition) ToBytes() []byte {
+	builder := flatbuffers.NewBuilder(256)
+	offset := o.SerializeTo(builder)
+	builder.FinishSizePrefixed(offset)
+	return builder.FinishedBytes()
+}
+
+// SerializeTo writes the WorklogAttributePartition into a FlatBuffer builder and returns the offset.
+func (o *WorklogAttributePartition) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var attributesVecOffset flatbuffers.UOffsetT
+	attributesOffsets := make([]flatbuffers.UOffsetT, len(o.Attributes))
+	for i := range o.Attributes {
+		attributesOffsets[i] = o.Attributes[i].SerializeTo(builder)
+	}
+	generated.WorklogAttributePartitionStartAttributesVector(builder, len(o.Attributes))
+	for i := len(o.Attributes) - 1; i >= 0; i-- {
+		builder.PrependUOffsetT(attributesOffsets[i])
+	}
+	attributesVecOffset = builder.EndVector(len(o.Attributes))
+	generated.WorklogAttributePartitionStart(builder)
+	generated.WorklogAttributePartitionAddAttributes(builder, attributesVecOffset)
+	return generated.WorklogAttributePartitionEnd(builder)
+}
+
+// TablePartition is a union type. Possible concrete types: MvdbPartition, WorklogPartition, WorklogAttributePartition
 // Assign a pointer to one of these types.
 type TablePartition interface{}
 
@@ -1569,6 +1626,10 @@ func DataCatalogFromFbs(fbs *generated.DataCatalog) *DataCatalog {
 			var u generated.WorklogPartition
 			u.Init(tbl.Bytes, tbl.Pos)
 			o.Partition = WorklogPartitionFromFbs(&u)
+		case generated.TablePartitionWorklogAttributePartition:
+			var u generated.WorklogAttributePartition
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Partition = WorklogAttributePartitionFromFbs(&u)
 		}
 	}
 	if fbsVal := fbs.Revision(nil); fbsVal != nil {
@@ -1610,6 +1671,10 @@ func (o *DataCatalog) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOff
 	case *WorklogPartition:
 		if v != nil {
 			partitionType, partitionOffset = generated.TablePartitionWorklogPartition, v.SerializeTo(builder)
+		}
+	case *WorklogAttributePartition:
+		if v != nil {
+			partitionType, partitionOffset = generated.TablePartitionWorklogAttributePartition, v.SerializeTo(builder)
 		}
 	default:
 		panic(fmt.Sprintf("DataCatalog.Partition: %T is not a pointer to a TablePartition variant", v))
@@ -1916,13 +1981,32 @@ func (o *Vector) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT 
 	return generated.VectorEnd(builder)
 }
 
+// Placeholder -
+//  A source supplied by index in Query.bound_sources or while data is loaded.
 type Placeholder struct {
 	Idx uint32
+	Partition TablePartition
 }
 
 func PlaceholderFromFbs(fbs *generated.Placeholder) *Placeholder {
 	o := &Placeholder{}
 	o.Idx = fbs.Idx()
+	if tbl := new(flatbuffers.Table); fbs.Partition(tbl) {
+		switch fbs.PartitionType() {
+		case generated.TablePartitionMvdbPartition:
+			var u generated.MvdbPartition
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Partition = MvdbPartitionFromFbs(&u)
+		case generated.TablePartitionWorklogPartition:
+			var u generated.WorklogPartition
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Partition = WorklogPartitionFromFbs(&u)
+		case generated.TablePartitionWorklogAttributePartition:
+			var u generated.WorklogAttributePartition
+			u.Init(tbl.Bytes, tbl.Pos)
+			o.Partition = WorklogAttributePartitionFromFbs(&u)
+		}
+	}
 	return o
 }
 
@@ -1947,8 +2031,31 @@ func (o *Placeholder) ToBytes() []byte {
 
 // SerializeTo writes the Placeholder into a FlatBuffer builder and returns the offset.
 func (o *Placeholder) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	var partitionType generated.TablePartition
+	var partitionOffset flatbuffers.UOffsetT
+	switch v := o.Partition.(type) {
+	case nil:
+	case *MvdbPartition:
+		if v != nil {
+			partitionType, partitionOffset = generated.TablePartitionMvdbPartition, v.SerializeTo(builder)
+		}
+	case *WorklogPartition:
+		if v != nil {
+			partitionType, partitionOffset = generated.TablePartitionWorklogPartition, v.SerializeTo(builder)
+		}
+	case *WorklogAttributePartition:
+		if v != nil {
+			partitionType, partitionOffset = generated.TablePartitionWorklogAttributePartition, v.SerializeTo(builder)
+		}
+	default:
+		panic(fmt.Sprintf("Placeholder.Partition: %T is not a pointer to a TablePartition variant", v))
+	}
 	generated.PlaceholderStart(builder)
 	generated.PlaceholderAddIdx(builder, o.Idx)
+	if partitionOffset != 0 {
+		generated.PlaceholderAddPartitionType(builder, partitionType)
+		generated.PlaceholderAddPartition(builder, partitionOffset)
+	}
 	return generated.PlaceholderEnd(builder)
 }
 

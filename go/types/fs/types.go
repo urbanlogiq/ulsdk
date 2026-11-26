@@ -17,6 +17,7 @@ var _ flatbuffers.UOffsetT
 
 type File struct {
 	Account string
+	Appendable bool
 	Blob *id.GenericId
 	Chunks []Chunk
 	Container *string
@@ -30,6 +31,7 @@ type File struct {
 func FileFromFbs(fbs *generated.File) *File {
 	o := &File{}
 	o.Account = string(fbs.Account())
+	o.Appendable = fbs.Appendable()
 	if fbsVal := fbs.Blob(nil); fbsVal != nil {
 		o.Blob = id.GenericIdFromFbs(fbsVal)
 	}
@@ -124,6 +126,7 @@ func (o *File) SerializeTo(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	}
 	generated.FileStart(builder)
 	generated.FileAddAccount(builder, accountOffset)
+	generated.FileAddAppendable(builder, o.Appendable)
 	generated.FileAddBlob(builder, blobOffset)
 	generated.FileAddChunks(builder, chunksVecOffset)
 	generated.FileAddContainer(builder, containerOffset)

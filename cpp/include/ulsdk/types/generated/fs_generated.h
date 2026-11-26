@@ -461,7 +461,8 @@ struct File FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_ACCOUNT = 16,
     VT_CONTAINER = 18,
     VT_CHUNKS = 20,
-    VT_TIER = 22
+    VT_TIER = 22,
+    VT_APPENDABLE = 24
   };
   const ::flatbuffers::String *mime() const {
     return GetPointer<const ::flatbuffers::String *>(VT_MIME);
@@ -497,6 +498,11 @@ struct File FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   StorageTier tier() const {
     return static_cast<StorageTier>(GetField<int8_t>(VT_TIER, 0));
   }
+  /// True if the file accepts appends. Only the server sets this value,
+  /// when it creates the file (docs/architecture/04-fs.md).
+  bool appendable() const {
+    return GetField<uint8_t>(VT_APPENDABLE, 0) != 0;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_MIME) &&
@@ -517,6 +523,7 @@ struct File FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyVector(chunks()) &&
            verifier.VerifyVectorOfTables(chunks()) &&
            VerifyField<int8_t>(verifier, VT_TIER, 1) &&
+           VerifyField<uint8_t>(verifier, VT_APPENDABLE, 1) &&
            verifier.EndTable();
   }
 };
@@ -559,6 +566,9 @@ struct FileBuilder {
   void add_tier(StorageTier tier) {
     fbb_.AddElement<int8_t>(File::VT_TIER, static_cast<int8_t>(tier), 0);
   }
+  void add_appendable(bool appendable) {
+    fbb_.AddElement<uint8_t>(File::VT_APPENDABLE, static_cast<uint8_t>(appendable), 0);
+  }
   explicit FileBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -583,7 +593,8 @@ inline ::flatbuffers::Offset<File> CreateFile(
     ::flatbuffers::Offset<::flatbuffers::String> account = 0,
     ::flatbuffers::Offset<::flatbuffers::String> container = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Chunk>>> chunks = 0,
-    StorageTier tier = StorageTier::Hot) {
+    StorageTier tier = StorageTier::Hot,
+    bool appendable = false) {
   FileBuilder builder_(_fbb);
   builder_.add_size(size);
   builder_.add_chunks(chunks);
@@ -593,6 +604,7 @@ inline ::flatbuffers::Offset<File> CreateFile(
   builder_.add_virus(virus);
   builder_.add_blob(blob);
   builder_.add_mime(mime);
+  builder_.add_appendable(appendable);
   builder_.add_tier(tier);
   builder_.add_digest_type(digest_type);
   return builder_.Finish();
@@ -614,7 +626,8 @@ inline ::flatbuffers::Offset<File> CreateFileDirect(
     const char *account = nullptr,
     const char *container = nullptr,
     const std::vector<::flatbuffers::Offset<Chunk>> *chunks = nullptr,
-    StorageTier tier = StorageTier::Hot) {
+    StorageTier tier = StorageTier::Hot,
+    bool appendable = false) {
   auto mime__ = mime ? _fbb.CreateString(mime) : 0;
   auto virus__ = virus ? _fbb.CreateString(virus) : 0;
   auto account__ = account ? _fbb.CreateString(account) : 0;
@@ -631,7 +644,8 @@ inline ::flatbuffers::Offset<File> CreateFileDirect(
       account__,
       container__,
       chunks__,
-      tier);
+      tier,
+      appendable);
 }
 
 struct Slot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

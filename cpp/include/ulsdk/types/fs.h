@@ -59,6 +59,7 @@ typedef std::variant<
 using ::StorageTier;
 struct File {
     std::string account_;
+    bool appendable_;
     std::optional<GenericId> blob_;
     std::optional<std::vector<Chunk>> chunks_;
     std::optional<std::string> container_;

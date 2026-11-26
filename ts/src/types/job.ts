@@ -1017,7 +1017,7 @@ export class Task {
   private _status!: number;
 
 /**
- *  Task object, either a source or a stream
+ *  Task object: a source, a stream, or a list of views
  */
   private _task!: ObjectId;
 

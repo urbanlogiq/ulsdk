@@ -52,6 +52,11 @@ public final class File extends com.google.flatbuffers.Table {
   public Chunk._Vector chunksVector() { return chunksVector(new Chunk._Vector()); }
   public Chunk._Vector chunksVector(Chunk._Vector obj) { int o = __offset(20); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
   public byte tier() { int o = __offset(22); return o != 0 ? bb.get(o + bb_pos) : 0; }
+  /**
+   * True if the file accepts appends. Only the server sets this value,
+   * when it creates the file (docs/architecture/04-fs.md).
+   */
+  public boolean appendable() { int o = __offset(24); return o != 0 ? 0!=bb.get(o + bb_pos) : false; }
 
   public static int createFile(FlatBufferBuilder builder,
       int mimeOffset,
@@ -63,8 +68,9 @@ public final class File extends com.google.flatbuffers.Table {
       int accountOffset,
       int containerOffset,
       int chunksOffset,
-      byte tier) {
-    builder.startTable(10);
+      byte tier,
+      boolean appendable) {
+    builder.startTable(11);
     File.addSize(builder, size);
     File.addChunks(builder, chunksOffset);
     File.addContainer(builder, containerOffset);
@@ -73,12 +79,13 @@ public final class File extends com.google.flatbuffers.Table {
     File.addVirus(builder, virusOffset);
     File.addBlob(builder, blobOffset);
     File.addMime(builder, mimeOffset);
+    File.addAppendable(builder, appendable);
     File.addTier(builder, tier);
     File.addDigestType(builder, digestType);
     return File.endFile(builder);
   }
 
-  public static void startFile(FlatBufferBuilder builder) { builder.startTable(10); }
+  public static void startFile(FlatBufferBuilder builder) { builder.startTable(11); }
   public static void addMime(FlatBufferBuilder builder, int mimeOffset) { builder.addOffset(0, mimeOffset, 0); }
   public static void addSize(FlatBufferBuilder builder, long size) { builder.addLong(1, size, 0L); }
   public static void addBlob(FlatBufferBuilder builder, int blobOffset) { builder.addOffset(2, blobOffset, 0); }
@@ -91,6 +98,7 @@ public final class File extends com.google.flatbuffers.Table {
   public static int createChunksVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
   public static void startChunksVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
   public static void addTier(FlatBufferBuilder builder, byte tier) { builder.addByte(9, tier, 0); }
+  public static void addAppendable(FlatBufferBuilder builder, boolean appendable) { builder.addBoolean(10, appendable, false); }
   public static int endFile(FlatBufferBuilder builder) {
     int o = builder.endTable();
     builder.required(o, 4);  // mime

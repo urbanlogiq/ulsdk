@@ -49,6 +49,7 @@ const (
 	DataCatalogObjectTyExploration DataCatalogObjectTy = 21
 	DataCatalogObjectTyKpiSpec DataCatalogObjectTy = 22
 	DataCatalogObjectTyGovernedDocument DataCatalogObjectTy = 23
+	DataCatalogObjectTyViewList DataCatalogObjectTy = 24
 )
 
 type DataCatalogObject struct {

@@ -1725,7 +1725,7 @@ impl<'a> Task<'a> {
                 .unwrap()
         }
     }
-    /// Task object, either a source or a stream
+    /// Task object: a source, a stream, or a list of views
     #[inline]
     pub fn task(&self) -> ObjectId<'a> {
         // Safety:

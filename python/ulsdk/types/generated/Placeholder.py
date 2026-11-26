@@ -6,6 +6,7 @@ import flatbuffers
 from flatbuffers.compat import import_numpy
 np = import_numpy()
 
+# A source supplied by index in Query.bound_sources or while data is loaded.
 class Placeholder(object):
     __slots__ = ['_tab']
 
@@ -31,8 +32,28 @@ class Placeholder(object):
             return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
         return 0
 
+    # Placeholder
+    def PartitionType(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Uint8Flags, o + self._tab.Pos)
+        return 0
+
+    # Select part of the supplied source. A worklog defaults to its first output.
+    # Worklog selections also accept a stream or an Arrow table directly.
+    # When set, this field must match any partition on the supplied source.
+    # Placeholder
+    def Partition(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        if o != 0:
+            from flatbuffers.table import Table
+            obj = Table(bytearray(), 0)
+            self._tab.Union(obj, o)
+            return obj
+        return None
+
 def PlaceholderStart(builder):
-    builder.StartObject(1)
+    builder.StartObject(3)
 
 def Start(builder):
     PlaceholderStart(builder)
@@ -42,6 +63,18 @@ def PlaceholderAddIdx(builder, idx):
 
 def AddIdx(builder, idx):
     PlaceholderAddIdx(builder, idx)
+
+def PlaceholderAddPartitionType(builder, partitionType):
+    builder.PrependUint8Slot(1, partitionType, 0)
+
+def AddPartitionType(builder, partitionType):
+    PlaceholderAddPartitionType(builder, partitionType)
+
+def PlaceholderAddPartition(builder, partition):
+    builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(partition), 0)
+
+def AddPartition(builder, partition):
+    PlaceholderAddPartition(builder, partition)
 
 def PlaceholderEnd(builder):
     return builder.EndObject()

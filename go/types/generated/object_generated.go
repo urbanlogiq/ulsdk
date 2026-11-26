@@ -34,6 +34,7 @@ const (
 	DataCatalogObjectTyExploration         DataCatalogObjectTy = 21
 	DataCatalogObjectTyKpiSpec             DataCatalogObjectTy = 22
 	DataCatalogObjectTyGovernedDocument    DataCatalogObjectTy = 23
+	DataCatalogObjectTyViewList            DataCatalogObjectTy = 24
 )
 
 var EnumNamesDataCatalogObjectTy = map[DataCatalogObjectTy]string{
@@ -61,6 +62,7 @@ var EnumNamesDataCatalogObjectTy = map[DataCatalogObjectTy]string{
 	DataCatalogObjectTyExploration:         "Exploration",
 	DataCatalogObjectTyKpiSpec:             "KpiSpec",
 	DataCatalogObjectTyGovernedDocument:    "GovernedDocument",
+	DataCatalogObjectTyViewList:            "ViewList",
 }
 
 var EnumValuesDataCatalogObjectTy = map[string]DataCatalogObjectTy{
@@ -88,6 +90,7 @@ var EnumValuesDataCatalogObjectTy = map[string]DataCatalogObjectTy{
 	"Exploration":         DataCatalogObjectTyExploration,
 	"KpiSpec":             DataCatalogObjectTyKpiSpec,
 	"GovernedDocument":    DataCatalogObjectTyGovernedDocument,
+	"ViewList":            DataCatalogObjectTyViewList,
 }
 
 func (v DataCatalogObjectTy) String() string {

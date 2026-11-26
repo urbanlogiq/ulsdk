@@ -1315,7 +1315,7 @@ class Task:
     # Task status
     status: "Status"
 
-    # Task object, either a source or a stream
+    # Task object: a source, a stream, or a list of views
     task: "ObjectId"
 
     # The upstream nodes that enabled this task

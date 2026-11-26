@@ -173,6 +173,7 @@ pub enum DataCatalogObjectTy {
     Exploration = 21,
     KpiSpec = 22,
     GovernedDocument = 23,
+    ViewList = 24,
 }
 
 impl TryFrom<i16> for DataCatalogObjectTy {
@@ -209,6 +210,7 @@ impl DataCatalogObjectTy {
             Self::Exploration => Some("Exploration"),
             Self::KpiSpec => Some("KpiSpec"),
             Self::GovernedDocument => Some("GovernedDocument"),
+            Self::ViewList => Some("ViewList"),
             _ => None,
         }
     }
@@ -241,6 +243,7 @@ impl From<DataCatalogObjectTy> for FbsDataCatalogObjectTy {
             DataCatalogObjectTy::Exploration => FbsDataCatalogObjectTy::Exploration,
             DataCatalogObjectTy::KpiSpec => FbsDataCatalogObjectTy::KpiSpec,
             DataCatalogObjectTy::GovernedDocument => FbsDataCatalogObjectTy::GovernedDocument,
+            DataCatalogObjectTy::ViewList => FbsDataCatalogObjectTy::ViewList,
         }
     }
 }
@@ -272,6 +275,7 @@ impl From<FbsDataCatalogObjectTy> for DataCatalogObjectTy {
             21 => Self::Exploration,
             22 => Self::KpiSpec,
             23 => Self::GovernedDocument,
+            24 => Self::ViewList,
             _ => panic!(
                 "Invalid value {} when constructing DataCatalogObjectTy",
                 fbs.0

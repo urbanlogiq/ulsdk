@@ -49,7 +49,7 @@ userId(obj?:ObjectId):ObjectId|null {
 }
 
 /**
- * Task object, either a source or a stream
+ * Task object: a source, a stream, or a list of views
  */
 task(obj?:ObjectId):ObjectId|null {
   const offset = this.bb!.__offset(this.bb_pos, 8);

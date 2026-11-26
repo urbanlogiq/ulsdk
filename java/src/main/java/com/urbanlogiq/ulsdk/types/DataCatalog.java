@@ -44,6 +44,10 @@ public final class DataCatalog {
             com.google.flatbuffers.Table partitionFbsTable = o.partition(new com.urbanlogiq.ulsdk.types.generated.WorklogPartition());
             com.urbanlogiq.ulsdk.types.generated.WorklogPartition partitionFbsValue = (com.urbanlogiq.ulsdk.types.generated.WorklogPartition)partitionFbsTable;
             partitionValue = new com.urbanlogiq.ulsdk.types.WorklogPartition(partitionFbsValue);
+        } else if (partitionTy == com.urbanlogiq.ulsdk.types.generated.TablePartition.WorklogAttributePartition) {
+            com.google.flatbuffers.Table partitionFbsTable = o.partition(new com.urbanlogiq.ulsdk.types.generated.WorklogAttributePartition());
+            com.urbanlogiq.ulsdk.types.generated.WorklogAttributePartition partitionFbsValue = (com.urbanlogiq.ulsdk.types.generated.WorklogAttributePartition)partitionFbsTable;
+            partitionValue = new com.urbanlogiq.ulsdk.types.WorklogAttributePartition(partitionFbsValue);
         }
         if (partitionValue != null) {
             this._partition = new com.urbanlogiq.ulsdk.types.TablePartition(partitionValue);

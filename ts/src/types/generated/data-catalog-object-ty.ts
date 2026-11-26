@@ -30,5 +30,6 @@ export enum DataCatalogObjectTy {
   SourceNote = 20,
   Exploration = 21,
   KpiSpec = 22,
-  GovernedDocument = 23
+  GovernedDocument = 23,
+  ViewList = 24
 }

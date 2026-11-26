@@ -1016,6 +1016,7 @@ impl<'a> File<'a> {
     pub const VT_CONTAINER: flatbuffers::VOffsetT = 18;
     pub const VT_CHUNKS: flatbuffers::VOffsetT = 20;
     pub const VT_TIER: flatbuffers::VOffsetT = 22;
+    pub const VT_APPENDABLE: flatbuffers::VOffsetT = 24;
 
     #[inline]
     pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -1049,6 +1050,7 @@ impl<'a> File<'a> {
         if let Some(x) = args.mime {
             builder.add_mime(x);
         }
+        builder.add_appendable(args.appendable);
         builder.add_tier(args.tier);
         builder.add_digest_type(args.digest_type);
         builder.finish()
@@ -1158,6 +1160,19 @@ impl<'a> File<'a> {
                 .unwrap()
         }
     }
+    /// True if the file accepts appends. Only the server sets this value,
+    /// when it creates the file (docs/architecture/04-fs.md).
+    #[inline]
+    pub fn appendable(&self) -> bool {
+        // Safety:
+        // Created from valid Table for this object
+        // which contains a valid value in this slot
+        unsafe {
+            self._tab
+                .get::<bool>(File::VT_APPENDABLE, Some(false))
+                .unwrap()
+        }
+    }
     #[inline]
     #[allow(non_snake_case)]
     pub fn digest_as_sha_256(&self) -> Option<Sha256<'a>> {
@@ -1211,6 +1226,7 @@ impl flatbuffers::Verifiable for File<'_> {
                 flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Chunk>>,
             >>("chunks", Self::VT_CHUNKS, false)?
             .visit_field::<StorageTier>("tier", Self::VT_TIER, false)?
+            .visit_field::<bool>("appendable", Self::VT_APPENDABLE, false)?
             .finish();
         Ok(())
     }
@@ -1228,6 +1244,7 @@ pub struct FileArgs<'a> {
         flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Chunk<'a>>>>,
     >,
     pub tier: StorageTier,
+    pub appendable: bool,
 }
 impl<'a> Default for FileArgs<'a> {
     #[inline]
@@ -1243,6 +1260,7 @@ impl<'a> Default for FileArgs<'a> {
             container: None,
             chunks: None,
             tier: StorageTier::Hot,
+            appendable: false,
         }
     }
 }
@@ -1252,7 +1270,7 @@ impl Serialize for File<'_> {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("File", 10)?;
+        let mut s = serializer.serialize_struct("File", 11)?;
         s.serialize_field("mime", &self.mime())?;
         s.serialize_field("size", &self.size())?;
         if let Some(f) = self.blob() {
@@ -1288,6 +1306,7 @@ impl Serialize for File<'_> {
             s.skip_field("chunks")?;
         }
         s.serialize_field("tier", &self.tier())?;
+        s.serialize_field("appendable", &self.appendable())?;
         s.end()
     }
 }
@@ -1352,6 +1371,11 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> FileBuilder<'a, 'b, A> {
             .push_slot::<StorageTier>(File::VT_TIER, tier, StorageTier::Hot);
     }
     #[inline]
+    pub fn add_appendable(&mut self, appendable: bool) {
+        self.fbb_
+            .push_slot::<bool>(File::VT_APPENDABLE, appendable, false);
+    }
+    #[inline]
     pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> FileBuilder<'a, 'b, A> {
         let start = _fbb.start_table();
         FileBuilder {
@@ -1396,6 +1420,7 @@ impl core::fmt::Debug for File<'_> {
         ds.field("container", &self.container());
         ds.field("chunks", &self.chunks());
         ds.field("tier", &self.tier());
+        ds.field("appendable", &self.appendable());
         ds.finish()
     }
 }
